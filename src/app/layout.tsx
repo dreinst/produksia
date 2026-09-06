@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import AppShell from "@/components/AppShell";
+import KerangkaAplikasi from "@/komponen/KerangkaAplikasi";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${hanken.variable} ${jetbrains.variable} ${materialSymbols.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <AppShell>{children}</AppShell>
+        <KerangkaAplikasi>{children}</KerangkaAplikasi>
       </body>
     </html>
   );

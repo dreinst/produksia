@@ -1,37 +1,39 @@
-// Accurate Copy - schema awal berdasarkan alur Penjualan & Persediaan Accurate 5
+// Accurate Copy — skema data (seluruh penamaan dalam bahasa Indonesia)
 // https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/prisma-klien"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-enum DocStatus {
-  DRAFT
-  CONVERTED
-  PROCESSED
-  PAID
-  PARTIAL
-  CANCELLED
+// ---------- Enum ----------
+
+enum StatusDokumen {
+  DRAF
+  DIKONVERSI
+  DIPROSES
+  LUNAS
+  SEBAGIAN
+  DIBATALKAN
 }
 
-enum ItemType {
+enum JenisBarang {
   BARANG
   JASA
 }
 
-enum UserRole {
-  OWNER
+enum PeranPengguna {
+  PEMILIK
   ADMIN
   KASIR
   GUDANG
 }
 
-enum AccountType {
+enum JenisAkun {
   ASET
   KEWAJIBAN
   MODAL
@@ -39,7 +41,7 @@ enum AccountType {
   BEBAN
 }
 
-enum JournalSource {
+enum SumberJurnal {
   MANUAL
   KAS_MASUK
   KAS_KELUAR
@@ -48,507 +50,506 @@ enum JournalSource {
   PENYUSUTAN
 }
 
-enum AssetStatus {
+enum StatusAset {
   AKTIF
   DIJUAL
   DIHAPUS
 }
 
-// ---------- Auth / User ----------
+// ---------- Pengguna ----------
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  passwordHash String
-  role      UserRole @default(KASIR)
-  employee  Employee?
-  createdAt DateTime @default(now())
+model Pengguna {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  nama         String
+  kataSandiHash String
+  peran        PeranPengguna @default(KASIR)
+  karyawan     Karyawan?
+  dibuatPada   DateTime      @default(now())
 }
 
-// ---------- Master Data ----------
+// ---------- Data induk ----------
 
-model Department {
-  id        String     @id @default(cuid())
-  name      String
-  employees Employee[]
+model Departemen {
+  id       String     @id @default(cuid())
+  nama     String
+  karyawan Karyawan[]
 }
 
-model Employee {
+model Karyawan {
   id           String      @id @default(cuid())
-  code         String      @unique
-  name         String
-  departmentId String?
-  department   Department? @relation(fields: [departmentId], references: [id])
-  userId       String?     @unique
-  user         User?       @relation(fields: [userId], references: [id])
-  customers    Customer[]
-  createdAt    DateTime    @default(now())
+  kode         String      @unique
+  nama         String
+  departemenId String?
+  departemen   Departemen? @relation(fields: [departemenId], references: [id])
+  penggunaId   String?     @unique
+  pengguna     Pengguna?   @relation(fields: [penggunaId], references: [id])
+  pelanggan    Pelanggan[]
+  dibuatPada   DateTime    @default(now())
 }
 
-model Customer {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  name      String
-  address   String?
-  phone     String?
+model Pelanggan {
+  id        String    @id @default(cuid())
+  kode      String    @unique
+  nama      String
+  alamat    String?
+  telepon   String?
   npwp      String?
-  salesId   String?
-  sales     Employee? @relation(fields: [salesId], references: [id])
+  penjualId String?
+  penjual   Karyawan? @relation(fields: [penjualId], references: [id])
 
-  quotations SalesQuotation[]
-  orders     SalesOrder[]
-  invoices   SalesInvoice[]
-  receipts   SalesReceipt[]
-  projects   Project[]
-  createdAt  DateTime @default(now())
+  penawaran  PenawaranPenjualan[]
+  pesanan    PesananPenjualan[]
+  faktur     FakturPenjualan[]
+  penerimaan PenerimaanPenjualan[]
+  proyek     Proyek[]
+  dibuatPada DateTime @default(now())
 }
 
-model Supplier {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  name      String
-  address   String?
-  phone     String?
-  createdAt DateTime @default(now())
-
-  orders   PurchaseOrder[]
-  invoices PurchaseInvoice[]
-  payments PurchasePayment[]
-}
-
-model Project {
+model Pemasok {
   id         String   @id @default(cuid())
-  code       String   @unique
-  name       String
-  customerId String?
-  customer   Customer? @relation(fields: [customerId], references: [id])
-  status     String    @default("OPEN")
+  kode       String   @unique
+  nama       String
+  alamat     String?
+  telepon    String?
+  dibuatPada DateTime @default(now())
+
+  pesanan    PesananPembelian[]
+  faktur     FakturPembelian[]
+  pembayaran PembayaranPembelian[]
 }
 
-model Warehouse {
-  id      String @id @default(cuid())
-  code    String @unique
-  name    String
-  address String?
-
-  stocks           ItemStock[]
-  deliveries       Delivery[]
-  returns          SalesReturn[]
-  goodsReceipts    GoodsReceipt[]
-  purchaseReturns  PurchaseReturn[]
+model Proyek {
+  id          String     @id @default(cuid())
+  kode        String     @unique
+  nama        String
+  pelangganId String?
+  pelanggan   Pelanggan? @relation(fields: [pelangganId], references: [id])
+  status      String     @default("BERJALAN")
 }
 
-model ItemCategory {
-  id       String        @id @default(cuid())
-  name     String
-  parentId String?
-  parent   ItemCategory? @relation("CategoryTree", fields: [parentId], references: [id])
-  children ItemCategory[] @relation("CategoryTree")
-  items    Item[]
+model Gudang {
+  id     String  @id @default(cuid())
+  kode   String  @unique
+  nama   String
+  alamat String?
+
+  stok             StokBarang[]
+  pengiriman       PengirimanPesanan[]
+  returPenjualan   ReturPenjualan[]
+  penerimaanBarang PenerimaanBarang[]
+  returPembelian   ReturPembelian[]
 }
 
-model Item {
-  id         String       @id @default(cuid())
-  code       String       @unique
-  name       String
-  type       ItemType     @default(BARANG)
-  categoryId String?
-  category   ItemCategory? @relation(fields: [categoryId], references: [id])
-  unit       String       @default("pcs")
-  costPrice  Decimal      @default(0) @db.Decimal(18, 2)
-  sellPrice  Decimal      @default(0) @db.Decimal(18, 2)
-  minStock   Decimal      @default(0) @db.Decimal(18, 2)
-
-  stocks             ItemStock[]
-  quotationLines     SalesQuotationLine[]
-  orderLines         SalesOrderLine[]
-  deliveryLines      DeliveryLine[]
-  invoiceLines       SalesInvoiceLine[]
-  returnLines        SalesReturnLine[]
-  purchaseOrderLines    PurchaseOrderLine[]
-  goodsReceiptLines     GoodsReceiptLine[]
-  purchaseInvoiceLines  PurchaseInvoiceLine[]
-  purchaseReturnLines   PurchaseReturnLine[]
-  createdAt          DateTime @default(now())
+model KelompokBarang {
+  id      String           @id @default(cuid())
+  nama    String
+  indukId String?
+  induk   KelompokBarang?  @relation("PohonKelompok", fields: [indukId], references: [id])
+  anak    KelompokBarang[] @relation("PohonKelompok")
+  barang  Barang[]
 }
 
-model ItemStock {
-  itemId      String
-  item        Item      @relation(fields: [itemId], references: [id])
-  warehouseId String
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
-  qty         Decimal   @default(0) @db.Decimal(18, 2)
+model Barang {
+  id          String          @id @default(cuid())
+  kode        String          @unique
+  nama        String
+  jenis       JenisBarang     @default(BARANG)
+  kelompokId  String?
+  kelompok    KelompokBarang? @relation(fields: [kelompokId], references: [id])
+  satuan      String          @default("pcs")
+  hargaBeli   Decimal         @default(0) @db.Decimal(18, 2)
+  hargaJual   Decimal         @default(0) @db.Decimal(18, 2)
+  stokMinimum Decimal         @default(0) @db.Decimal(18, 2)
 
-  @@id([itemId, warehouseId])
+  stok                    StokBarang[]
+  barisPenawaran          BarisPenawaranPenjualan[]
+  barisPesananPenjualan   BarisPesananPenjualan[]
+  barisPengiriman         BarisPengiriman[]
+  barisFakturPenjualan    BarisFakturPenjualan[]
+  barisReturPenjualan     BarisReturPenjualan[]
+  barisPesananPembelian   BarisPesananPembelian[]
+  barisPenerimaanBarang   BarisPenerimaanBarang[]
+  barisFakturPembelian    BarisFakturPembelian[]
+  barisReturPembelian     BarisReturPembelian[]
+  dibuatPada              DateTime @default(now())
+}
+
+model StokBarang {
+  barangId String
+  barang   Barang  @relation(fields: [barangId], references: [id])
+  gudangId String
+  gudang   Gudang  @relation(fields: [gudangId], references: [id])
+  jumlah   Decimal @default(0) @db.Decimal(18, 2)
+
+  @@id([barangId, gudangId])
 }
 
 // ---------- Siklus Penjualan ----------
 
-model SalesQuotation {
-  id         String    @id @default(cuid())
-  no         String    @unique
-  date       DateTime  @default(now())
-  customerId String
-  customer   Customer  @relation(fields: [customerId], references: [id])
-  status     DocStatus @default(DRAFT)
-  total      Decimal   @default(0) @db.Decimal(18, 2)
+model PenawaranPenjualan {
+  id          String        @id @default(cuid())
+  nomor       String        @unique
+  tanggal     DateTime      @default(now())
+  pelangganId String
+  pelanggan   Pelanggan     @relation(fields: [pelangganId], references: [id])
+  status      StatusDokumen @default(DRAF)
+  total       Decimal       @default(0) @db.Decimal(18, 2)
 
-  lines SalesQuotationLine[]
-  order SalesOrder?
+  baris   BarisPenawaranPenjualan[]
+  pesanan PesananPenjualan?
 }
 
-model SalesQuotationLine {
-  id           String         @id @default(cuid())
-  quotationId  String
-  quotation    SalesQuotation @relation(fields: [quotationId], references: [id])
-  itemId       String
-  item         Item           @relation(fields: [itemId], references: [id])
-  qty          Decimal        @db.Decimal(18, 2)
-  price        Decimal        @db.Decimal(18, 2)
-  subtotal     Decimal        @db.Decimal(18, 2)
+model BarisPenawaranPenjualan {
+  id          String             @id @default(cuid())
+  penawaranId String
+  penawaran   PenawaranPenjualan @relation(fields: [penawaranId], references: [id])
+  barangId    String
+  barang      Barang             @relation(fields: [barangId], references: [id])
+  jumlah      Decimal            @db.Decimal(18, 2)
+  harga       Decimal            @db.Decimal(18, 2)
+  subtotal    Decimal            @db.Decimal(18, 2)
 }
 
-model SalesOrder {
-  id           String          @id @default(cuid())
-  no           String          @unique
-  date         DateTime        @default(now())
-  customerId   String
-  customer     Customer        @relation(fields: [customerId], references: [id])
-  quotationId  String?         @unique
-  quotation    SalesQuotation? @relation(fields: [quotationId], references: [id])
-  status       DocStatus       @default(DRAFT)
-  total        Decimal         @default(0) @db.Decimal(18, 2)
+model PesananPenjualan {
+  id          String              @id @default(cuid())
+  nomor       String              @unique
+  tanggal     DateTime            @default(now())
+  pelangganId String
+  pelanggan   Pelanggan           @relation(fields: [pelangganId], references: [id])
+  penawaranId String?             @unique
+  penawaran   PenawaranPenjualan? @relation(fields: [penawaranId], references: [id])
+  status      StatusDokumen       @default(DRAF)
+  total       Decimal             @default(0) @db.Decimal(18, 2)
 
-  lines      SalesOrderLine[]
-  deliveries Delivery[]
-  invoices   SalesInvoice[]
+  baris      BarisPesananPenjualan[]
+  pengiriman PengirimanPesanan[]
+  faktur     FakturPenjualan[]
 }
 
-model SalesOrderLine {
-  id          String     @id @default(cuid())
-  orderId     String
-  order       SalesOrder @relation(fields: [orderId], references: [id])
-  itemId      String
-  item        Item       @relation(fields: [itemId], references: [id])
-  qty         Decimal    @db.Decimal(18, 2)
-  price       Decimal    @db.Decimal(18, 2)
-  qtyShipped  Decimal    @default(0) @db.Decimal(18, 2)
-  qtyInvoiced Decimal    @default(0) @db.Decimal(18, 2)
+model BarisPesananPenjualan {
+  id             String           @id @default(cuid())
+  pesananId      String
+  pesanan        PesananPenjualan @relation(fields: [pesananId], references: [id])
+  barangId       String
+  barang         Barang           @relation(fields: [barangId], references: [id])
+  jumlah         Decimal          @db.Decimal(18, 2)
+  harga          Decimal          @db.Decimal(18, 2)
+  jumlahTerkirim Decimal          @default(0) @db.Decimal(18, 2)
+  jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
-  deliveryLines DeliveryLine[]
+  barisPengiriman BarisPengiriman[]
 }
 
-model Delivery {
-  id          String     @id @default(cuid())
-  no          String     @unique
-  date        DateTime   @default(now())
-  orderId     String
-  order       SalesOrder @relation(fields: [orderId], references: [id])
-  warehouseId String
-  warehouse   Warehouse  @relation(fields: [warehouseId], references: [id])
-  status      DocStatus  @default(DRAFT)
+model PengirimanPesanan {
+  id        String           @id @default(cuid())
+  nomor     String           @unique
+  tanggal   DateTime         @default(now())
+  pesananId String
+  pesanan   PesananPenjualan @relation(fields: [pesananId], references: [id])
+  gudangId  String
+  gudang    Gudang           @relation(fields: [gudangId], references: [id])
+  status    StatusDokumen    @default(DRAF)
 
-  lines    DeliveryLine[]
-  invoices SalesInvoice[]
+  baris  BarisPengiriman[]
+  faktur FakturPenjualan[]
 }
 
-model DeliveryLine {
-  id           String         @id @default(cuid())
-  deliveryId   String
-  delivery     Delivery       @relation(fields: [deliveryId], references: [id])
-  orderLineId  String
-  orderLine    SalesOrderLine @relation(fields: [orderLineId], references: [id])
-  itemId       String
-  item         Item           @relation(fields: [itemId], references: [id])
-  qty          Decimal        @db.Decimal(18, 2)
+model BarisPengiriman {
+  id             String                @id @default(cuid())
+  pengirimanId   String
+  pengiriman     PengirimanPesanan     @relation(fields: [pengirimanId], references: [id])
+  barisPesananId String
+  barisPesanan   BarisPesananPenjualan @relation(fields: [barisPesananId], references: [id])
+  barangId       String
+  barang         Barang                @relation(fields: [barangId], references: [id])
+  jumlah         Decimal               @db.Decimal(18, 2)
 }
 
-model SalesInvoice {
-  id          String    @id @default(cuid())
-  no          String    @unique
-  date        DateTime  @default(now())
-  dueDate     DateTime?
-  customerId  String
-  customer    Customer  @relation(fields: [customerId], references: [id])
-  orderId     String?
-  order       SalesOrder? @relation(fields: [orderId], references: [id])
-  deliveryId  String?
-  delivery    Delivery?   @relation(fields: [deliveryId], references: [id])
-  status      DocStatus @default(DRAFT)
-  total       Decimal   @default(0) @db.Decimal(18, 2)
+model FakturPenjualan {
+  id           String             @id @default(cuid())
+  nomor        String             @unique
+  tanggal      DateTime           @default(now())
+  jatuhTempo   DateTime?
+  pelangganId  String
+  pelanggan    Pelanggan          @relation(fields: [pelangganId], references: [id])
+  pesananId    String?
+  pesanan      PesananPenjualan?  @relation(fields: [pesananId], references: [id])
+  pengirimanId String?
+  pengiriman   PengirimanPesanan? @relation(fields: [pengirimanId], references: [id])
+  status       StatusDokumen      @default(DRAF)
+  total        Decimal            @default(0) @db.Decimal(18, 2)
 
-  lines    SalesInvoiceLine[]
-  receipts SalesReceipt[]
-  returns  SalesReturn[]
+  baris      BarisFakturPenjualan[]
+  penerimaan PenerimaanPenjualan[]
+  retur      ReturPenjualan[]
 }
 
-model SalesInvoiceLine {
-  id        String       @id @default(cuid())
-  invoiceId String
-  invoice   SalesInvoice @relation(fields: [invoiceId], references: [id])
-  itemId    String
-  item      Item         @relation(fields: [itemId], references: [id])
-  qty       Decimal      @db.Decimal(18, 2)
-  price     Decimal      @db.Decimal(18, 2)
-  subtotal  Decimal      @db.Decimal(18, 2)
+model BarisFakturPenjualan {
+  id       String          @id @default(cuid())
+  fakturId String
+  faktur   FakturPenjualan @relation(fields: [fakturId], references: [id])
+  barangId String
+  barang   Barang          @relation(fields: [barangId], references: [id])
+  jumlah   Decimal         @db.Decimal(18, 2)
+  harga    Decimal         @db.Decimal(18, 2)
+  subtotal Decimal         @db.Decimal(18, 2)
 }
 
-model SalesReceipt {
-  id            String       @id @default(cuid())
-  no            String       @unique
-  date          DateTime     @default(now())
-  customerId    String
-  customer      Customer     @relation(fields: [customerId], references: [id])
-  invoiceId     String
-  invoice       SalesInvoice @relation(fields: [invoiceId], references: [id])
-  accountId     String
-  account       Account      @relation("SalesReceiptAccount", fields: [accountId], references: [id])
-  amount        Decimal      @db.Decimal(18, 2)
-  paymentMethod String       @default("CASH")
+model PenerimaanPenjualan {
+  id          String          @id @default(cuid())
+  nomor       String          @unique
+  tanggal     DateTime        @default(now())
+  pelangganId String
+  pelanggan   Pelanggan       @relation(fields: [pelangganId], references: [id])
+  fakturId    String
+  faktur      FakturPenjualan @relation(fields: [fakturId], references: [id])
+  akunId      String
+  akun        Akun            @relation("AkunPenerimaanPenjualan", fields: [akunId], references: [id])
+  jumlah      Decimal         @db.Decimal(18, 2)
+  metodeBayar String          @default("TUNAI")
 }
 
-model SalesReturn {
-  id          String       @id @default(cuid())
-  no          String       @unique
-  date        DateTime     @default(now())
-  invoiceId   String
-  invoice     SalesInvoice @relation(fields: [invoiceId], references: [id])
-  warehouseId String
-  warehouse   Warehouse    @relation(fields: [warehouseId], references: [id])
-  reason      String?
+model ReturPenjualan {
+  id       String          @id @default(cuid())
+  nomor    String          @unique
+  tanggal  DateTime        @default(now())
+  fakturId String
+  faktur   FakturPenjualan @relation(fields: [fakturId], references: [id])
+  gudangId String
+  gudang   Gudang          @relation(fields: [gudangId], references: [id])
+  alasan   String?
 
-  lines SalesReturnLine[]
+  baris BarisReturPenjualan[]
 }
 
-model SalesReturnLine {
-  id       String      @id @default(cuid())
-  returnId String
-  return   SalesReturn @relation(fields: [returnId], references: [id])
-  itemId   String
-  item     Item        @relation(fields: [itemId], references: [id])
-  qty      Decimal     @db.Decimal(18, 2)
+model BarisReturPenjualan {
+  id       String         @id @default(cuid())
+  returId  String
+  retur    ReturPenjualan @relation(fields: [returId], references: [id])
+  barangId String
+  barang   Barang         @relation(fields: [barangId], references: [id])
+  jumlah   Decimal        @db.Decimal(18, 2)
 }
 
 // ---------- Siklus Pembelian ----------
-// Mirror dari siklus Penjualan: Pesanan -> Penerimaan Barang -> Faktur -> Pembayaran -> Retur
 
-model PurchaseOrder {
-  id         String    @id @default(cuid())
-  no         String    @unique
-  date       DateTime  @default(now())
-  supplierId String
-  supplier   Supplier  @relation(fields: [supplierId], references: [id])
-  status     DocStatus @default(DRAFT)
-  total      Decimal   @default(0) @db.Decimal(18, 2)
+model PesananPembelian {
+  id        String        @id @default(cuid())
+  nomor     String        @unique
+  tanggal   DateTime      @default(now())
+  pemasokId String
+  pemasok   Pemasok       @relation(fields: [pemasokId], references: [id])
+  status    StatusDokumen @default(DRAF)
+  total     Decimal       @default(0) @db.Decimal(18, 2)
 
-  lines    PurchaseOrderLine[]
-  receipts GoodsReceipt[]
-  invoices PurchaseInvoice[]
+  baris            BarisPesananPembelian[]
+  penerimaanBarang PenerimaanBarang[]
+  faktur           FakturPembelian[]
 }
 
-model PurchaseOrderLine {
-  id          String        @id @default(cuid())
-  orderId     String
-  order       PurchaseOrder @relation(fields: [orderId], references: [id])
-  itemId      String
-  item        Item          @relation(fields: [itemId], references: [id])
-  qty         Decimal       @db.Decimal(18, 2)
-  price       Decimal       @db.Decimal(18, 2)
-  qtyReceived Decimal       @default(0) @db.Decimal(18, 2)
-  qtyInvoiced Decimal       @default(0) @db.Decimal(18, 2)
+model BarisPesananPembelian {
+  id             String           @id @default(cuid())
+  pesananId      String
+  pesanan        PesananPembelian @relation(fields: [pesananId], references: [id])
+  barangId       String
+  barang         Barang           @relation(fields: [barangId], references: [id])
+  jumlah         Decimal          @db.Decimal(18, 2)
+  harga          Decimal          @db.Decimal(18, 2)
+  jumlahDiterima Decimal          @default(0) @db.Decimal(18, 2)
+  jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
-  receiptLines GoodsReceiptLine[]
+  barisPenerimaan BarisPenerimaanBarang[]
 }
 
-model GoodsReceipt {
-  id          String        @id @default(cuid())
-  no          String        @unique
-  date        DateTime      @default(now())
-  orderId     String
-  order       PurchaseOrder @relation(fields: [orderId], references: [id])
-  warehouseId String
-  warehouse   Warehouse     @relation(fields: [warehouseId], references: [id])
-  status      DocStatus     @default(DRAFT)
+model PenerimaanBarang {
+  id        String           @id @default(cuid())
+  nomor     String           @unique
+  tanggal   DateTime         @default(now())
+  pesananId String
+  pesanan   PesananPembelian @relation(fields: [pesananId], references: [id])
+  gudangId  String
+  gudang    Gudang           @relation(fields: [gudangId], references: [id])
+  status    StatusDokumen    @default(DRAF)
 
-  lines    GoodsReceiptLine[]
-  invoices PurchaseInvoice[]
+  baris  BarisPenerimaanBarang[]
+  faktur FakturPembelian[]
 }
 
-model GoodsReceiptLine {
-  id          String            @id @default(cuid())
-  receiptId   String
-  receipt     GoodsReceipt      @relation(fields: [receiptId], references: [id])
-  orderLineId String
-  orderLine   PurchaseOrderLine @relation(fields: [orderLineId], references: [id])
-  itemId      String
-  item        Item              @relation(fields: [itemId], references: [id])
-  qty         Decimal           @db.Decimal(18, 2)
+model BarisPenerimaanBarang {
+  id             String                @id @default(cuid())
+  penerimaanId   String
+  penerimaan     PenerimaanBarang      @relation(fields: [penerimaanId], references: [id])
+  barisPesananId String
+  barisPesanan   BarisPesananPembelian @relation(fields: [barisPesananId], references: [id])
+  barangId       String
+  barang         Barang                @relation(fields: [barangId], references: [id])
+  jumlah         Decimal               @db.Decimal(18, 2)
 }
 
-model PurchaseInvoice {
-  id         String        @id @default(cuid())
-  no         String        @unique
-  date       DateTime      @default(now())
-  dueDate    DateTime?
-  supplierId String
-  supplier   Supplier      @relation(fields: [supplierId], references: [id])
-  orderId    String?
-  order      PurchaseOrder? @relation(fields: [orderId], references: [id])
-  receiptId  String?
-  receipt    GoodsReceipt?  @relation(fields: [receiptId], references: [id])
-  status     DocStatus     @default(DRAFT)
-  total      Decimal       @default(0) @db.Decimal(18, 2)
+model FakturPembelian {
+  id           String            @id @default(cuid())
+  nomor        String            @unique
+  tanggal      DateTime          @default(now())
+  jatuhTempo   DateTime?
+  pemasokId    String
+  pemasok      Pemasok           @relation(fields: [pemasokId], references: [id])
+  pesananId    String?
+  pesanan      PesananPembelian? @relation(fields: [pesananId], references: [id])
+  penerimaanId String?
+  penerimaan   PenerimaanBarang? @relation(fields: [penerimaanId], references: [id])
+  status       StatusDokumen     @default(DRAF)
+  total        Decimal           @default(0) @db.Decimal(18, 2)
 
-  lines    PurchaseInvoiceLine[]
-  payments PurchasePayment[]
-  returns  PurchaseReturn[]
+  baris      BarisFakturPembelian[]
+  pembayaran PembayaranPembelian[]
+  retur      ReturPembelian[]
 }
 
-model PurchaseInvoiceLine {
-  id        String          @id @default(cuid())
-  invoiceId String
-  invoice   PurchaseInvoice @relation(fields: [invoiceId], references: [id])
-  itemId    String
-  item      Item            @relation(fields: [itemId], references: [id])
-  qty       Decimal         @db.Decimal(18, 2)
-  price     Decimal         @db.Decimal(18, 2)
-  subtotal  Decimal         @db.Decimal(18, 2)
+model BarisFakturPembelian {
+  id       String          @id @default(cuid())
+  fakturId String
+  faktur   FakturPembelian @relation(fields: [fakturId], references: [id])
+  barangId String
+  barang   Barang          @relation(fields: [barangId], references: [id])
+  jumlah   Decimal         @db.Decimal(18, 2)
+  harga    Decimal         @db.Decimal(18, 2)
+  subtotal Decimal         @db.Decimal(18, 2)
 }
 
-model PurchasePayment {
-  id            String          @id @default(cuid())
-  no            String          @unique
-  date          DateTime        @default(now())
-  supplierId    String
-  supplier      Supplier        @relation(fields: [supplierId], references: [id])
-  invoiceId     String
-  invoice       PurchaseInvoice @relation(fields: [invoiceId], references: [id])
-  accountId     String
-  account       Account         @relation("PurchasePaymentAccount", fields: [accountId], references: [id])
-  amount        Decimal         @db.Decimal(18, 2)
-  paymentMethod String          @default("TRANSFER")
-}
-
-model PurchaseReturn {
+model PembayaranPembelian {
   id          String          @id @default(cuid())
-  no          String          @unique
-  date        DateTime        @default(now())
-  invoiceId   String
-  invoice     PurchaseInvoice @relation(fields: [invoiceId], references: [id])
-  warehouseId String
-  warehouse   Warehouse       @relation(fields: [warehouseId], references: [id])
-  reason      String?
-
-  lines PurchaseReturnLine[]
+  nomor       String          @unique
+  tanggal     DateTime        @default(now())
+  pemasokId   String
+  pemasok     Pemasok         @relation(fields: [pemasokId], references: [id])
+  fakturId    String
+  faktur      FakturPembelian @relation(fields: [fakturId], references: [id])
+  akunId      String
+  akun        Akun            @relation("AkunPembayaranPembelian", fields: [akunId], references: [id])
+  jumlah      Decimal         @db.Decimal(18, 2)
+  metodeBayar String          @default("TRANSFER")
 }
 
-model PurchaseReturnLine {
+model ReturPembelian {
+  id       String          @id @default(cuid())
+  nomor    String          @unique
+  tanggal  DateTime        @default(now())
+  fakturId String
+  faktur   FakturPembelian @relation(fields: [fakturId], references: [id])
+  gudangId String
+  gudang   Gudang          @relation(fields: [gudangId], references: [id])
+  alasan   String?
+
+  baris BarisReturPembelian[]
+}
+
+model BarisReturPembelian {
   id       String         @id @default(cuid())
-  returnId String
-  return   PurchaseReturn @relation(fields: [returnId], references: [id])
-  itemId   String
-  item     Item           @relation(fields: [itemId], references: [id])
-  qty      Decimal        @db.Decimal(18, 2)
+  returId  String
+  retur    ReturPembelian @relation(fields: [returId], references: [id])
+  barangId String
+  barang   Barang         @relation(fields: [barangId], references: [id])
+  jumlah   Decimal        @db.Decimal(18, 2)
 }
 
 // ---------- Buku Besar & Kas/Bank ----------
 
-model Account {
-  id       String       @id @default(cuid())
-  code     String       @unique
-  name     String
-  type     AccountType
-  parentId String?
-  parent   Account?     @relation("AccountTree", fields: [parentId], references: [id])
-  children Account[]    @relation("AccountTree")
+model Akun {
+  id      String    @id @default(cuid())
+  kode    String    @unique
+  nama    String
+  jenis   JenisAkun
+  indukId String?
+  induk   Akun?     @relation("PohonAkun", fields: [indukId], references: [id])
+  anak    Akun[]    @relation("PohonAkun")
 
-  journalLines     JournalLine[]
-  salesReceipts    SalesReceipt[]    @relation("SalesReceiptAccount")
-  purchasePayments PurchasePayment[] @relation("PurchasePaymentAccount")
+  barisJurnal         BarisJurnal[]
+  penerimaanPenjualan PenerimaanPenjualan[] @relation("AkunPenerimaanPenjualan")
+  pembayaranPembelian PembayaranPembelian[] @relation("AkunPembayaranPembelian")
 
-  mappingPiutang     AccountMapping? @relation("MapPiutang")
-  mappingPersediaan  AccountMapping? @relation("MapPersediaan")
-  mappingHpp         AccountMapping? @relation("MapHpp")
-  mappingPendapatan  AccountMapping? @relation("MapPendapatan")
-  mappingUtang       AccountMapping? @relation("MapUtang")
+  pemetaanPiutang    PemetaanAkun? @relation("PetaPiutang")
+  pemetaanPersediaan PemetaanAkun? @relation("PetaPersediaan")
+  pemetaanHpp        PemetaanAkun? @relation("PetaHpp")
+  pemetaanPendapatan PemetaanAkun? @relation("PetaPendapatan")
+  pemetaanUtang      PemetaanAkun? @relation("PetaUtang")
 
-  fixedAssetsAsAsset       FixedAsset[] @relation("FixedAssetAssetAccount")
-  fixedAssetsAsExpense     FixedAsset[] @relation("FixedAssetExpenseAccount")
-  fixedAssetsAsAccumulated FixedAsset[] @relation("FixedAssetAccumAccount")
+  asetSebagaiAkunAset       AsetTetap[] @relation("AkunAsetTetap")
+  asetSebagaiAkunBeban      AsetTetap[] @relation("AkunBebanPenyusutan")
+  asetSebagaiAkunAkumulasi  AsetTetap[] @relation("AkunAkumulasiPenyusutan")
 }
 
-model AccountMapping {
+model PemetaanAkun {
   id String @id @default("default")
 
-  piutangUsahaId String  @unique
-  piutangUsaha   Account @relation("MapPiutang", fields: [piutangUsahaId], references: [id])
+  piutangUsahaId String @unique
+  piutangUsaha   Akun   @relation("PetaPiutang", fields: [piutangUsahaId], references: [id])
 
-  persediaanId String  @unique
-  persediaan   Account @relation("MapPersediaan", fields: [persediaanId], references: [id])
+  persediaanId String @unique
+  persediaan   Akun   @relation("PetaPersediaan", fields: [persediaanId], references: [id])
 
-  hppId String  @unique
-  hpp   Account @relation("MapHpp", fields: [hppId], references: [id])
+  hppId String @unique
+  hpp   Akun   @relation("PetaHpp", fields: [hppId], references: [id])
 
-  pendapatanPenjualanId String  @unique
-  pendapatanPenjualan   Account @relation("MapPendapatan", fields: [pendapatanPenjualanId], references: [id])
+  pendapatanPenjualanId String @unique
+  pendapatanPenjualan   Akun   @relation("PetaPendapatan", fields: [pendapatanPenjualanId], references: [id])
 
-  utangUsahaId String  @unique
-  utangUsaha   Account @relation("MapUtang", fields: [utangUsahaId], references: [id])
+  utangUsahaId String @unique
+  utangUsaha   Akun   @relation("PetaUtang", fields: [utangUsahaId], references: [id])
 }
 
-model JournalEntry {
-  id     String        @id @default(cuid())
-  no     String        @unique
-  date   DateTime      @default(now())
-  memo   String?
-  source JournalSource @default(MANUAL)
+model Jurnal {
+  id         String       @id @default(cuid())
+  nomor      String       @unique
+  tanggal    DateTime     @default(now())
+  keterangan String?
+  sumber     SumberJurnal @default(MANUAL)
 
-  lines JournalLine[]
-  fixedAssetDepreciations FixedAssetDepreciation[]
+  baris          BarisJurnal[]
+  penyusutanAset PenyusutanAset[]
 }
 
-model JournalLine {
-  id             String       @id @default(cuid())
-  journalEntryId String
-  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id])
-  accountId      String
-  account        Account      @relation(fields: [accountId], references: [id])
-  debit          Decimal      @default(0) @db.Decimal(18, 2)
-  credit         Decimal      @default(0) @db.Decimal(18, 2)
-  description    String?
+model BarisJurnal {
+  id         String  @id @default(cuid())
+  jurnalId   String
+  jurnal     Jurnal  @relation(fields: [jurnalId], references: [id])
+  akunId     String
+  akun       Akun    @relation(fields: [akunId], references: [id])
+  debit      Decimal @default(0) @db.Decimal(18, 2)
+  kredit     Decimal @default(0) @db.Decimal(18, 2)
+  keterangan String?
 }
 
 // ---------- Aset Tetap ----------
 
-model FixedAsset {
-  id                String      @id @default(cuid())
-  code              String      @unique
-  name              String
-  acquisitionDate   DateTime    @default(now())
-  acquisitionCost   Decimal     @db.Decimal(18, 2)
-  salvageValue      Decimal     @default(0) @db.Decimal(18, 2)
-  usefulLifeMonths  Int
-  status            AssetStatus @default(AKTIF)
+model AsetTetap {
+  id               String     @id @default(cuid())
+  kode             String     @unique
+  nama             String
+  tanggalPerolehan DateTime   @default(now())
+  hargaPerolehan   Decimal    @db.Decimal(18, 2)
+  nilaiSisa        Decimal    @default(0) @db.Decimal(18, 2)
+  umurBulan        Int
+  status           StatusAset @default(AKTIF)
 
-  assetAccountId                String
-  assetAccount                  Account @relation("FixedAssetAssetAccount", fields: [assetAccountId], references: [id])
-  depreciationExpenseAccountId  String
-  depreciationExpenseAccount    Account @relation("FixedAssetExpenseAccount", fields: [depreciationExpenseAccountId], references: [id])
-  accumulatedDepreciationAccountId String
-  accumulatedDepreciationAccount   Account @relation("FixedAssetAccumAccount", fields: [accumulatedDepreciationAccountId], references: [id])
+  akunAsetId                String
+  akunAset                  Akun   @relation("AkunAsetTetap", fields: [akunAsetId], references: [id])
+  akunBebanPenyusutanId     String
+  akunBebanPenyusutan       Akun   @relation("AkunBebanPenyusutan", fields: [akunBebanPenyusutanId], references: [id])
+  akunAkumulasiPenyusutanId String
+  akunAkumulasiPenyusutan   Akun   @relation("AkunAkumulasiPenyusutan", fields: [akunAkumulasiPenyusutanId], references: [id])
 
-  depreciations FixedAssetDepreciation[]
+  penyusutan PenyusutanAset[]
 }
 
-model FixedAssetDepreciation {
-  id             String       @id @default(cuid())
-  assetId        String
-  asset          FixedAsset   @relation(fields: [assetId], references: [id])
-  period         DateTime
-  amount         Decimal      @db.Decimal(18, 2)
-  journalEntryId String?
-  journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
+model PenyusutanAset {
+  id       String    @id @default(cuid())
+  asetId   String
+  aset     AsetTetap @relation(fields: [asetId], references: [id])
+  periode  DateTime
+  jumlah   Decimal   @db.Decimal(18, 2)
+  jurnalId String?
+  jurnal   Jurnal?   @relation(fields: [jurnalId], references: [id])
 
-  @@unique([assetId, period])
+  @@unique([asetId, periode])
 }
