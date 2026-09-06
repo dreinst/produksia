@@ -68,78 +68,78 @@ body {
 
 @layer components {
   /* ---------- Tipografi ---------- */
-  .page-title {
+  .judul-halaman {
     @apply font-heading text-xl sm:text-2xl font-bold tracking-tight text-slate-900;
   }
-  .page-subtitle {
+  .subjudul-halaman {
     @apply text-xs sm:text-sm text-slate-500 mt-0.5;
   }
-  .muted {
+  .redup {
     @apply text-sm text-slate-500;
   }
-  .num {
+  .angka {
     @apply font-mono tabular-nums;
   }
   .mono {
     @apply font-mono text-[12px] tracking-tight;
   }
-  .eyebrow {
+  .teks-label {
     @apply text-[11px] font-semibold uppercase tracking-wider text-slate-400;
   }
 
   /* ---------- Kartu ---------- */
-  .card {
+  .kartu {
     @apply bg-white rounded-2xl border border-slate-200/70 p-5 md:p-6;
     box-shadow: var(--shadow-card);
   }
-  .card-table {
+  .kartu-tabel {
     @apply p-0 overflow-hidden;
   }
-  .card-head {
+  .kepala-kartu {
     @apply flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100;
   }
-  .card-table .card-head {
+  .kartu-tabel .kepala-kartu {
     @apply p-5 md:p-6 pb-4 md:pb-4 mb-0;
   }
-  .card-title {
+  .judul-kartu {
     @apply font-heading text-base font-bold text-slate-900;
   }
-  .card-subtitle {
+  .subjudul-kartu {
     @apply text-xs text-slate-500 mt-0.5;
   }
-  .tile {
+  .ubin {
     @apply p-4 rounded-xl bg-slate-50/70 border border-slate-100;
   }
-  .table-wrap {
+  .bungkus-tabel {
     @apply overflow-x-auto;
   }
 
   /* ---------- Tombol ---------- */
-  .btn {
+  .tombol {
     @apply inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
   }
-  .btn-primary {
+  .tombol-utama {
     @apply bg-slate-900 text-white hover:bg-slate-800;
   }
-  .btn-accent {
+  .tombol-aksen {
     @apply bg-blue-600 text-white hover:bg-blue-700;
   }
-  .btn-outline {
+  .tombol-garis {
     @apply bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300;
   }
-  .btn-soft {
+  .tombol-lembut {
     @apply bg-slate-50 text-slate-700 border border-slate-200/70 hover:bg-slate-100;
   }
-  .btn-danger {
+  .tombol-bahaya {
     @apply bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100;
   }
-  .btn-sm {
+  .tombol-kecil {
     @apply h-8 px-3;
   }
-  .btn-link {
+  .tombol-tautan {
     @apply text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline;
   }
-  .btn-link-danger {
+  .tombol-tautan-bahaya {
     @apply text-xs font-semibold text-rose-600 hover:underline;
   }
 
@@ -147,101 +147,101 @@ body {
   .label {
     @apply text-[13px] font-semibold text-slate-800 flex items-center justify-between gap-2;
   }
-  .hint {
+  .petunjuk {
     @apply font-mono text-[11px] font-medium text-slate-500 tracking-wide;
   }
-  .input {
+  .isian {
     @apply h-9 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors;
   }
-  .input:focus-visible {
+  .isian:focus-visible {
     @apply border-blue-600 outline-none ring-2 ring-blue-500/20;
   }
-  .input:disabled,
-  .input[readonly] {
+  .isian:disabled,
+  .isian[readonly] {
     @apply bg-slate-50 text-slate-600 cursor-not-allowed;
   }
-  .input-sm {
+  .isian-kecil {
     @apply h-8 px-2 text-[13px];
   }
-  select.input {
+  select.isian {
     @apply pr-8 appearance-none bg-no-repeat;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
     background-position: right 0.5rem center;
   }
-  .field {
+  .bidang {
     @apply flex flex-col gap-1;
   }
 
   /* ---------- Tabel ---------- */
-  .tbl {
+  .tabel {
     @apply w-full text-left border-collapse text-[13px] text-slate-700;
   }
-  .tbl thead tr {
+  .tabel thead tr {
     @apply bg-slate-50/70 text-slate-500 border-b border-slate-200;
   }
-  .tbl th {
+  .tabel th {
     @apply py-2.5 px-3 first:pl-5 last:pr-5 text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap;
   }
-  .tbl tbody tr {
+  .tabel tbody tr {
     @apply border-b border-slate-100 transition-colors;
   }
-  .tbl tbody tr:hover {
+  .tabel tbody tr:hover {
     @apply bg-slate-50/60;
   }
-  .tbl td {
+  .tabel td {
     @apply py-2.5 px-3 first:pl-5 last:pr-5 align-middle;
   }
-  .tbl tfoot tr {
+  .tabel tfoot tr {
     @apply bg-slate-50 border-t-2 border-slate-300 font-semibold text-slate-900;
   }
-  .tbl tfoot td {
+  .tabel tfoot td {
     @apply py-2.5 px-3 first:pl-5 last:pr-5;
   }
-  .tbl .empty {
+  .tabel .kosong {
     @apply py-8 text-center text-sm text-slate-400;
   }
-  .tbl-plain {
+  .tabel-polos {
     @apply w-full text-left border-collapse text-[13px] text-slate-700;
   }
-  .tbl-plain thead tr {
+  .tabel-polos thead tr {
     @apply text-slate-500 border-b border-slate-200;
   }
-  .tbl-plain th {
+  .tabel-polos th {
     @apply py-2 px-2 text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap;
   }
-  .tbl-plain td {
+  .tabel-polos td {
     @apply py-2 px-2 align-middle;
   }
-  .tbl-plain tbody tr {
+  .tabel-polos tbody tr {
     @apply border-b border-slate-100;
   }
 
   /* ---------- Badge ---------- */
-  .badge {
+  .lencana {
     @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border whitespace-nowrap;
   }
-  .badge-emerald {
+  .lencana-emerald {
     @apply bg-emerald-50 text-emerald-700 border-emerald-200;
   }
-  .badge-amber {
+  .lencana-amber {
     @apply bg-amber-50 text-amber-700 border-amber-200;
   }
-  .badge-rose {
+  .lencana-rose {
     @apply bg-rose-50 text-rose-700 border-rose-200;
   }
-  .badge-slate {
+  .lencana-slate {
     @apply bg-slate-100 text-slate-600 border-slate-200;
   }
-  .badge-blue {
+  .lencana-blue {
     @apply bg-blue-50 text-blue-700 border-blue-200;
   }
-  .badge-cyan {
+  .lencana-cyan {
     @apply bg-cyan-50 text-cyan-700 border-cyan-200;
   }
-  .badge-indigo {
+  .lencana-indigo {
     @apply bg-indigo-50 text-indigo-700 border-indigo-200;
   }
-  .doc-badge {
+  .lencana-dokumen {
     @apply inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold font-mono leading-4;
   }
 }
