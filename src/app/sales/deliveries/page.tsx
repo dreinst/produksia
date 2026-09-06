@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { DocNo, StatusBadge } from "@/components/ui/Badges";
 
 export default async function DeliveriesPage() {
   const deliveries = await db.delivery.findMany({
@@ -8,44 +9,44 @@ export default async function DeliveriesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Pengiriman Pesanan</h1>
-      <p className="text-sm text-zinc-500">
+      <h1 className="page-title">Pengiriman Pesanan</h1>
+      <p className="muted">
         Pengiriman dibuat dari halaman Pesanan Penjualan (tombol &quot;Kirim&quot;).
       </p>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Pesanan</th>
-            <th className="py-2 pr-4">Pelanggan</th>
-            <th className="py-2 pr-4">Gudang</th>
-            <th className="py-2 pr-4">Status</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Pesanan</th>
+            <th>Pelanggan</th>
+            <th>Gudang</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {deliveries.map((d) => (
-            <tr key={d.id} className="border-b">
-              <td className="py-2 pr-4">{d.no}</td>
-              <td className="py-2 pr-4">{d.date.toLocaleDateString("id-ID")}</td>
-              <td className="py-2 pr-4">{d.order.no}</td>
-              <td className="py-2 pr-4">{d.order.customer.name}</td>
-              <td className="py-2 pr-4">{d.warehouse.name}</td>
-              <td className="py-2 pr-4">{d.status}</td>
+            <tr key={d.id}>
+              <td><DocNo no={d.no} /></td>
+              <td className="text-slate-500 whitespace-nowrap">{d.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+              <td>{d.order.no}</td>
+              <td>{d.order.customer.name}</td>
+              <td>{d.warehouse.name}</td>
+              <td><StatusBadge status={d.status} /></td>
             </tr>
           ))}
           {deliveries.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-zinc-500">
+              <td colSpan={6} className="empty">
                 Belum ada pengiriman.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

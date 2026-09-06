@@ -16,7 +16,7 @@ export default function AccountSelect({
   return (
     <select
       defaultValue={selectedId ?? ""}
-      className="border rounded px-2 py-1 text-sm"
+      className="input input-sm w-auto"
       onChange={(e) => router.push(`/ledger/general-ledger?accountId=${e.target.value}`)}
     >
       {accounts.map((a) => (

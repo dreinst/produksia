@@ -29,7 +29,10 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 16. **[OPEN] `<label>` belum terhubung ke input (`htmlFor`/`id`)** — aksesibilitas & klik-label. Skala: ~60 field. Layak dibuat komponen `Field` sekaligus merapikan duplikasi markup.
 17. **[OPEN] Tabel di mobile masih perlu scroll** (bukan kartu). Untuk tabel transaksi dengan 6–7 kolom ini keputusan yang wajar; kalau mau lebih ramah HP, ubah baris jadi kartu di `< md`.
 18. **[OPEN] Belum ada halaman edit** untuk master data & dokumen; belum ada pencarian/filter/pagination di daftar (masalah begitu data > ratusan baris).
-19. **[OPEN] Tiga komponen picker (`OrderLinesPicker`, `ReceiptLinesPicker`, `InvoiceLinesPicker`) hampir identik** — bisa dijadikan satu komponen dengan prop label. Ditunda: duplikasinya kecil dan jelas.
+19. **[OPEN] Tiga komponen picker (`OrderLinesPicker`, `ReceiptLinesPicker`) hampir identik** — bisa dijadikan satu komponen dengan prop label. `InvoiceLinesPicker` sudah digantikan `InvoiceComposer`. Ditunda: duplikasinya kecil dan jelas.
+19b. **[FIXED] Tampilan tidak mengikuti design system.** Seluruh UI dipindah ke design system "Precision Ledger" (paket Stitch): token & kelas komponen global, sidebar/topbar baru, Dashboard dan form Faktur dibangun ulang mengikuti layar contoh dengan data sungguhan; diverifikasi lewat screenshot headless (desktop 1440px & mobile 390px). Ditambah halaman `/search` agar kotak pencarian di topbar benar-benar berfungsi.
+19c. **[OPEN] File font ikon 3,9 MB** (`src/app/fonts/material-symbols-outlined.woff2`, variable font penuh). Dimuat sekali lalu di-cache browser, tapi bisa di-subset ke ±40 ikon yang dipakai (mis. dengan `pyftsubset`) untuk memangkasnya ke < 50 KB.
+19d. **[OPEN] Kolom "Aksi" di tabel transaksi terbaru & tabel daftar hanya muncul bila ada aksi** — untuk konsistensi visual dengan desain, tombol aksi kontekstual (lihat, cetak) bisa ditambahkan setelah ada halaman detail dokumen.
 
 ## C. Teknis / operasional
 

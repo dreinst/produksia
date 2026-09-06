@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DocNo, StatusBadge } from "@/components/ui/Badges";
 import { db } from "@/lib/db";
 
 export default async function PurchaseOrdersPage() {
@@ -10,21 +11,21 @@ export default async function PurchaseOrdersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Pesanan Pembelian</h1>
-        <Link href="/purchasing/orders/new" className="bg-black text-white px-4 py-2 rounded text-sm">
+        <h1 className="page-title">Pesanan Pembelian</h1>
+        <Link href="/purchasing/orders/new" className="btn btn-primary">
           + Pesanan Baru
         </Link>
       </div>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Pemasok</th>
-            <th className="py-2 pr-4">Total</th>
-            <th className="py-2 pr-4">Status</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Pemasok</th>
+            <th className="text-right">Total</th>
+            <th>Status</th>
             <th />
           </tr>
         </thead>
@@ -33,17 +34,17 @@ export default async function PurchaseOrdersPage() {
             const fullyReceived = o.lines.every((l) => Number(l.qtyReceived) >= Number(l.qty));
             const fullyInvoiced = o.lines.every((l) => Number(l.qtyInvoiced) >= Number(l.qty));
             return (
-              <tr key={o.id} className="border-b">
-                <td className="py-2 pr-4">{o.no}</td>
-                <td className="py-2 pr-4">{o.date.toLocaleDateString("id-ID")}</td>
-                <td className="py-2 pr-4">{o.supplier.name}</td>
-                <td className="py-2 pr-4">{Number(o.total).toLocaleString("id-ID")}</td>
-                <td className="py-2 pr-4">{o.status}</td>
-                <td className="py-2 pr-4 space-x-3">
+              <tr key={o.id}>
+                <td><DocNo no={o.no} /></td>
+                <td className="text-slate-500 whitespace-nowrap">{o.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+                <td>{o.supplier.name}</td>
+                <td className="text-right num">{Number(o.total).toLocaleString("id-ID")}</td>
+                <td><StatusBadge status={o.status} /></td>
+                <td className="space-x-3 whitespace-nowrap">
                   {!fullyReceived && (
                     <Link
                       href={`/purchasing/receipts/new?orderId=${o.id}`}
-                      className="text-blue-600 text-xs hover:underline"
+                      className="btn-link"
                     >
                       Terima Barang
                     </Link>
@@ -51,7 +52,7 @@ export default async function PurchaseOrdersPage() {
                   {!fullyInvoiced && (
                     <Link
                       href={`/purchasing/invoices/new?orderId=${o.id}`}
-                      className="text-blue-600 text-xs hover:underline"
+                      className="btn-link"
                     >
                       Fakturkan
                     </Link>
@@ -62,14 +63,14 @@ export default async function PurchaseOrdersPage() {
           })}
           {orders.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-zinc-500">
+              <td colSpan={6} className="empty">
                 Belum ada pesanan pembelian.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

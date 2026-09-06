@@ -35,7 +35,7 @@ export default function ActionForm({ action, children, className, confirmMessage
       {state.error && (
         <div
           role="alert"
-          className="md:col-span-2 rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700"
+          className="md:col-span-2 rounded border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
         >
           {state.error}
         </div>
@@ -43,7 +43,7 @@ export default function ActionForm({ action, children, className, confirmMessage
       {successMessage && state.ok && !state.error && (
         <div
           role="status"
-          className="md:col-span-2 rounded border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-700"
+          className="md:col-span-2 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
         >
           {successMessage}
         </div>

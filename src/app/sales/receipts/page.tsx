@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { DocNo } from "@/components/ui/Badges";
 
 export default async function ReceiptsPage() {
   const receipts = await db.salesReceipt.findMany({
@@ -8,44 +9,44 @@ export default async function ReceiptsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Penerimaan Penjualan</h1>
-      <p className="text-sm text-zinc-500">
+      <h1 className="page-title">Penerimaan Penjualan</h1>
+      <p className="muted">
         Penerimaan dibuat dari halaman Faktur Penjualan (tombol &quot;Terima Bayar&quot;).
       </p>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Faktur</th>
-            <th className="py-2 pr-4">Pelanggan</th>
-            <th className="py-2 pr-4">Jumlah</th>
-            <th className="py-2 pr-4">Metode</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Faktur</th>
+            <th>Pelanggan</th>
+            <th className="text-right">Jumlah</th>
+            <th>Metode</th>
           </tr>
         </thead>
         <tbody>
           {receipts.map((r) => (
-            <tr key={r.id} className="border-b">
-              <td className="py-2 pr-4">{r.no}</td>
-              <td className="py-2 pr-4">{r.date.toLocaleDateString("id-ID")}</td>
-              <td className="py-2 pr-4">{r.invoice.no}</td>
-              <td className="py-2 pr-4">{r.customer.name}</td>
-              <td className="py-2 pr-4">{Number(r.amount).toLocaleString("id-ID")}</td>
-              <td className="py-2 pr-4">{r.paymentMethod}</td>
+            <tr key={r.id}>
+              <td><DocNo no={r.no} /></td>
+              <td className="text-slate-500 whitespace-nowrap">{r.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+              <td>{r.invoice.no}</td>
+              <td>{r.customer.name}</td>
+              <td className="text-right num">{Number(r.amount).toLocaleString("id-ID")}</td>
+              <td>{r.paymentMethod}</td>
             </tr>
           ))}
           {receipts.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-zinc-500">
+              <td colSpan={6} className="empty">
                 Belum ada penerimaan.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

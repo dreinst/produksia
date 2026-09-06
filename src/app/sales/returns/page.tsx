@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { DocNo } from "@/components/ui/Badges";
 
 export default async function ReturnsPage() {
   const returns = await db.salesReturn.findMany({
@@ -8,44 +9,44 @@ export default async function ReturnsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Retur Penjualan</h1>
-      <p className="text-sm text-zinc-500">
+      <h1 className="page-title">Retur Penjualan</h1>
+      <p className="muted">
         Retur dibuat dari halaman Faktur Penjualan (tombol &quot;Retur&quot;).
       </p>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Faktur</th>
-            <th className="py-2 pr-4">Pelanggan</th>
-            <th className="py-2 pr-4">Gudang</th>
-            <th className="py-2 pr-4">Alasan</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Faktur</th>
+            <th>Pelanggan</th>
+            <th>Gudang</th>
+            <th>Alasan</th>
           </tr>
         </thead>
         <tbody>
           {returns.map((r) => (
-            <tr key={r.id} className="border-b">
-              <td className="py-2 pr-4">{r.no}</td>
-              <td className="py-2 pr-4">{r.date.toLocaleDateString("id-ID")}</td>
-              <td className="py-2 pr-4">{r.invoice.no}</td>
-              <td className="py-2 pr-4">{r.invoice.customer.name}</td>
-              <td className="py-2 pr-4">{r.warehouse.name}</td>
-              <td className="py-2 pr-4">{r.reason ?? "-"}</td>
+            <tr key={r.id}>
+              <td><DocNo no={r.no} /></td>
+              <td className="text-slate-500 whitespace-nowrap">{r.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+              <td>{r.invoice.no}</td>
+              <td>{r.invoice.customer.name}</td>
+              <td>{r.warehouse.name}</td>
+              <td>{r.reason ?? "-"}</td>
             </tr>
           ))}
           {returns.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-zinc-500">
+              <td colSpan={6} className="empty">
                 Belum ada retur.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

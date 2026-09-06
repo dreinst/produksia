@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DocNo, StatusBadge } from "@/components/ui/Badges";
 import { db } from "@/lib/db";
 
 export default async function PurchaseInvoicesPage() {
@@ -9,21 +10,21 @@ export default async function PurchaseInvoicesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Faktur Pembelian</h1>
-      <p className="text-sm text-zinc-500">
+      <h1 className="page-title">Faktur Pembelian</h1>
+      <p className="muted">
         Faktur dibuat dari halaman Pesanan Pembelian (tombol &quot;Fakturkan&quot;).
       </p>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Pemasok</th>
-            <th className="py-2 pr-4">Total</th>
-            <th className="py-2 pr-4">Terbayar</th>
-            <th className="py-2 pr-4">Status</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Pemasok</th>
+            <th className="text-right">Total</th>
+            <th className="text-right">Terbayar</th>
+            <th>Status</th>
             <th />
           </tr>
         </thead>
@@ -31,25 +32,25 @@ export default async function PurchaseInvoicesPage() {
           {invoices.map((inv) => {
             const paid = inv.payments.reduce((s, p) => s + Number(p.amount), 0);
             return (
-              <tr key={inv.id} className="border-b">
-                <td className="py-2 pr-4">{inv.no}</td>
-                <td className="py-2 pr-4">{inv.date.toLocaleDateString("id-ID")}</td>
-                <td className="py-2 pr-4">{inv.supplier.name}</td>
-                <td className="py-2 pr-4">{Number(inv.total).toLocaleString("id-ID")}</td>
-                <td className="py-2 pr-4">{paid.toLocaleString("id-ID")}</td>
-                <td className="py-2 pr-4">{inv.status}</td>
-                <td className="py-2 pr-4 space-x-3">
+              <tr key={inv.id}>
+                <td><DocNo no={inv.no} /></td>
+                <td className="text-slate-500 whitespace-nowrap">{inv.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+                <td>{inv.supplier.name}</td>
+                <td className="text-right num">{Number(inv.total).toLocaleString("id-ID")}</td>
+                <td className="text-right num">{paid.toLocaleString("id-ID")}</td>
+                <td><StatusBadge status={inv.status} /></td>
+                <td className="space-x-3 whitespace-nowrap">
                   {inv.status !== "PAID" && (
                     <Link
                       href={`/purchasing/payments/new?invoiceId=${inv.id}`}
-                      className="text-blue-600 text-xs hover:underline"
+                      className="btn-link"
                     >
                       Bayar
                     </Link>
                   )}
                   <Link
                     href={`/purchasing/returns/new?invoiceId=${inv.id}`}
-                    className="text-blue-600 text-xs hover:underline"
+                    className="btn-link"
                   >
                     Retur
                   </Link>
@@ -59,14 +60,14 @@ export default async function PurchaseInvoicesPage() {
           })}
           {invoices.length === 0 && (
             <tr>
-              <td colSpan={7} className="py-4 text-zinc-500">
+              <td colSpan={7} className="empty">
                 Belum ada faktur pembelian.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

@@ -45,12 +45,12 @@ export default async function MasterEntityPage({
 
   return (
     <div className="space-y-8">
-      <h1 className="text-xl font-semibold">{config.label}</h1>
+      <h1 className="page-title">{config.label}</h1>
 
-      <ActionForm action={boundCreateForm} className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl border rounded-lg p-4">
+      <ActionForm action={boundCreateForm} className="card grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         {config.fields.map((field) => (
-          <div key={field.name} className="flex flex-col gap-1">
-            <label className="text-sm font-medium">
+          <div key={field.name} className="field">
+            <label className="label">
               {field.label}
               {field.required && <span className="text-red-500"> *</span>}
             </label>
@@ -58,7 +58,7 @@ export default async function MasterEntityPage({
               <select
                 name={field.name}
                 defaultValue={field.defaultValue ?? ""}
-                className="border rounded px-2 py-1"
+                className="input"
               >
                 <option value="">-</option>
                 {(field.staticOptions
@@ -77,24 +77,24 @@ export default async function MasterEntityPage({
                 name={field.name}
                 required={field.required}
                 defaultValue={field.defaultValue}
-                className="border rounded px-2 py-1"
+                className="input"
               />
             )}
           </div>
         ))}
         <div className="md:col-span-2">
-          <button type="submit" className="bg-black text-white px-4 py-2 rounded text-sm">
+          <button type="submit" className="btn btn-primary">
             Tambah {config.label}
           </button>
         </div>
       </ActionForm>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
+          <tr>
             {config.columns.map((col) => (
-              <th key={col.key} className="py-2 pr-4 font-medium">
+              <th key={col.key} className={config.fields.find((f) => f.name === col.key)?.type === "number" ? "text-right" : undefined}>
                 {col.label}
               </th>
             ))}
@@ -103,18 +103,22 @@ export default async function MasterEntityPage({
         </thead>
         <tbody>
           {records.map((rec) => (
-            <tr key={String(rec.id)} className="border-b">
-              {config.columns.map((col) => (
-                <td key={col.key} className="py-2 pr-4">
-                  {String(getValue(rec, col.key) ?? "")}
-                </td>
-              ))}
-              <td className="py-2">
+            <tr key={String(rec.id)}>
+              {config.columns.map((col) => {
+                const isNumber = config.fields.find((f) => f.name === col.key)?.type === "number";
+                const raw = getValue(rec, col.key);
+                return (
+                  <td key={col.key} className={isNumber ? "text-right num" : undefined}>
+                    {isNumber ? Number(String(raw ?? 0)).toLocaleString("id-ID") : String(raw ?? "")}
+                  </td>
+                );
+              })}
+              <td>
                 <ActionForm
                   action={deleteMasterRecordForm.bind(null, entity, String(rec.id))}
                   confirmMessage={`Hapus ${config.label} ini? Tindakan tidak bisa dibatalkan.`}
                 >
-                  <button type="submit" className="text-red-600 text-xs hover:underline">
+                  <button type="submit" className="btn-link-danger">
                     Hapus
                   </button>
                 </ActionForm>
@@ -123,14 +127,14 @@ export default async function MasterEntityPage({
           ))}
           {records.length === 0 && (
             <tr>
-              <td colSpan={config.columns.length + 1} className="py-4 text-zinc-500">
+              <td colSpan={config.columns.length + 1} className="empty">
                 Belum ada data.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

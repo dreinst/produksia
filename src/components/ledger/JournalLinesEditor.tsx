@@ -30,23 +30,23 @@ export default function JournalLinesEditor({ accounts }: { accounts: AccountOpti
   return (
     <div className="md:col-span-2 space-y-2">
       <input type="hidden" name="lines" value={JSON.stringify(rows)} />
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl-plain min-w-[36rem]">
         <thead>
-          <tr className="text-left text-zinc-500">
-            <th className="pb-1">Akun</th>
-            <th className="pb-1">Keterangan</th>
-            <th className="pb-1 w-32">Debit</th>
-            <th className="pb-1 w-32">Kredit</th>
+          <tr>
+            <th>Akun</th>
+            <th>Keterangan</th>
+            <th className="w-32">Debit</th>
+            <th className="w-32">Kredit</th>
             <th />
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              <td className="pr-2 py-1">
+              <td>
                 <select
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.accountId}
                   onChange={(e) => updateRow(i, { accountId: e.target.value })}
                 >
@@ -58,39 +58,39 @@ export default function JournalLinesEditor({ accounts }: { accounts: AccountOpti
                   ))}
                 </select>
               </td>
-              <td className="pr-2 py-1">
+              <td>
                 <input
                   type="text"
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.description}
                   onChange={(e) => updateRow(i, { description: e.target.value })}
                 />
               </td>
-              <td className="pr-2 py-1">
+              <td>
                 <input
                   type="number"
                   min={0}
                   step="0.01"
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.debit}
                   onChange={(e) => updateRow(i, { debit: Number(e.target.value), credit: 0 })}
                 />
               </td>
-              <td className="pr-2 py-1">
+              <td>
                 <input
                   type="number"
                   min={0}
                   step="0.01"
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.credit}
                   onChange={(e) => updateRow(i, { credit: Number(e.target.value), debit: 0 })}
                 />
               </td>
-              <td className="py-1">
+              <td>
                 <button
                   type="button"
                   onClick={() => removeRow(i)}
-                  className="text-red-600 text-xs hover:underline"
+                  className="btn-link-danger"
                 >
                   Hapus
                 </button>
@@ -99,8 +99,8 @@ export default function JournalLinesEditor({ accounts }: { accounts: AccountOpti
           ))}
         </tbody>
         </table>
-      </div>
-      <button type="button" onClick={addRow} className="text-sm text-blue-600 hover:underline">
+      </div></div>
+      <button type="button" onClick={addRow} className="btn-link">
         + Tambah baris
       </button>
       <div className={`text-right text-sm font-medium ${balanced ? "text-green-600" : "text-red-600"}`}>

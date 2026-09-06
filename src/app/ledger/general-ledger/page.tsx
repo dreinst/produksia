@@ -32,51 +32,51 @@ export default async function GeneralLedgerPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Buku Besar</h1>
+      <h1 className="page-title">Buku Besar</h1>
 
       <div className="flex items-center gap-2">
-        <label className="text-sm font-medium">Akun:</label>
+        <label className="label">Akun:</label>
         <AccountSelect accounts={accounts} selectedId={account?.id} />
       </div>
 
       {account && (
-        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-          <table className="w-full text-sm border-collapse min-w-[36rem]">
+        <div className="card card-table"><div className="table-wrap">
+          <table className="tbl min-w-[36rem]">
           <thead>
-            <tr className="border-b text-left">
-              <th className="py-2 pr-4">Tanggal</th>
-              <th className="py-2 pr-4">No Jurnal</th>
-              <th className="py-2 pr-4">Keterangan</th>
-              <th className="py-2 pr-4 text-right">Debit</th>
-              <th className="py-2 pr-4 text-right">Kredit</th>
-              <th className="py-2 pr-4 text-right">Saldo</th>
+            <tr>
+              <th>Tanggal</th>
+              <th>No Jurnal</th>
+              <th>Keterangan</th>
+              <th className="text-right num">Debit</th>
+              <th className="text-right num">Kredit</th>
+              <th className="text-right num">Saldo</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((l) => (
-              <tr key={l.id} className="border-b">
-                <td className="py-2 pr-4">{l.journalEntry.date.toLocaleDateString("id-ID")}</td>
-                <td className="py-2 pr-4">{l.journalEntry.no}</td>
-                <td className="py-2 pr-4">{l.description || l.journalEntry.memo || "-"}</td>
-                <td className="py-2 pr-4 text-right">
+              <tr key={l.id}>
+                <td>{l.journalEntry.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+                <td>{l.journalEntry.no}</td>
+                <td>{l.description || l.journalEntry.memo || "-"}</td>
+                <td className="text-right num">
                   {Number(l.debit) > 0 ? Number(l.debit).toLocaleString("id-ID") : ""}
                 </td>
-                <td className="py-2 pr-4 text-right">
+                <td className="text-right num">
                   {Number(l.credit) > 0 ? Number(l.credit).toLocaleString("id-ID") : ""}
                 </td>
-                <td className="py-2 pr-4 text-right font-medium">{l.runningBalance.toLocaleString("id-ID")}</td>
+                <td className="text-right num font-semibold">{l.runningBalance.toLocaleString("id-ID")}</td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="py-4 text-zinc-500">
+                <td colSpan={6} className="empty">
                   Belum ada mutasi untuk akun ini.
                 </td>
               </tr>
             )}
           </tbody>
           </table>
-        </div>
+        </div></div>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DocNo, StatusBadge } from "@/components/ui/Badges";
 import { db } from "@/lib/db";
 import ActionForm from "@/components/ActionForm";
 import { convertQuotationToOrderForm } from "@/lib/actions/sales";
@@ -12,39 +13,39 @@ export default async function QuotationsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Penawaran Penjualan</h1>
-        <Link href="/sales/quotations/new" className="bg-black text-white px-4 py-2 rounded text-sm">
+        <h1 className="page-title">Penawaran Penjualan</h1>
+        <Link href="/sales/quotations/new" className="btn btn-primary">
           + Penawaran Baru
         </Link>
       </div>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Pelanggan</th>
-            <th className="py-2 pr-4">Total</th>
-            <th className="py-2 pr-4">Status</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Pelanggan</th>
+            <th className="text-right">Total</th>
+            <th>Status</th>
             <th />
           </tr>
         </thead>
         <tbody>
           {quotations.map((q) => (
-            <tr key={q.id} className="border-b">
-              <td className="py-2 pr-4">{q.no}</td>
-              <td className="py-2 pr-4">{q.date.toLocaleDateString("id-ID")}</td>
-              <td className="py-2 pr-4">{q.customer.name}</td>
-              <td className="py-2 pr-4">{Number(q.total).toLocaleString("id-ID")}</td>
-              <td className="py-2 pr-4">{q.status}</td>
-              <td className="py-2">
+            <tr key={q.id}>
+              <td><DocNo no={q.no} /></td>
+              <td className="text-slate-500 whitespace-nowrap">{q.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+              <td>{q.customer.name}</td>
+              <td className="text-right num">{Number(q.total).toLocaleString("id-ID")}</td>
+              <td><StatusBadge status={q.status} /></td>
+              <td>
                 {q.status === "DRAFT" && (
                   <ActionForm
                     action={convertQuotationToOrderForm.bind(null, q.id)}
                     confirmMessage={`Konversi penawaran ${q.no} menjadi Pesanan Penjualan?`}
                   >
-                    <button type="submit" className="text-blue-600 text-xs hover:underline">
+                    <button type="submit" className="btn-link">
                       Konversi ke Pesanan
                     </button>
                   </ActionForm>
@@ -54,14 +55,14 @@ export default async function QuotationsPage() {
           ))}
           {quotations.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-zinc-500">
+              <td colSpan={6} className="empty">
                 Belum ada penawaran.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }
