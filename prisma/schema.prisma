@@ -1,0 +1,554 @@
+// Accurate Copy - schema awal berdasarkan alur Penjualan & Persediaan Accurate 5
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DocStatus {
+  DRAFT
+  CONVERTED
+  PROCESSED
+  PAID
+  PARTIAL
+  CANCELLED
+}
+
+enum ItemType {
+  BARANG
+  JASA
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  KASIR
+  GUDANG
+}
+
+enum AccountType {
+  ASET
+  KEWAJIBAN
+  MODAL
+  PENDAPATAN
+  BEBAN
+}
+
+enum JournalSource {
+  MANUAL
+  KAS_MASUK
+  KAS_KELUAR
+  PENJUALAN
+  PEMBELIAN
+  PENYUSUTAN
+}
+
+enum AssetStatus {
+  AKTIF
+  DIJUAL
+  DIHAPUS
+}
+
+// ---------- Auth / User ----------
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  passwordHash String
+  role      UserRole @default(KASIR)
+  employee  Employee?
+  createdAt DateTime @default(now())
+}
+
+// ---------- Master Data ----------
+
+model Department {
+  id        String     @id @default(cuid())
+  name      String
+  employees Employee[]
+}
+
+model Employee {
+  id           String      @id @default(cuid())
+  code         String      @unique
+  name         String
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  userId       String?     @unique
+  user         User?       @relation(fields: [userId], references: [id])
+  customers    Customer[]
+  createdAt    DateTime    @default(now())
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  address   String?
+  phone     String?
+  npwp      String?
+  salesId   String?
+  sales     Employee? @relation(fields: [salesId], references: [id])
+
+  quotations SalesQuotation[]
+  orders     SalesOrder[]
+  invoices   SalesInvoice[]
+  receipts   SalesReceipt[]
+  projects   Project[]
+  createdAt  DateTime @default(now())
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  address   String?
+  phone     String?
+  createdAt DateTime @default(now())
+
+  orders   PurchaseOrder[]
+  invoices PurchaseInvoice[]
+  payments PurchasePayment[]
+}
+
+model Project {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  name       String
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  status     String    @default("OPEN")
+}
+
+model Warehouse {
+  id      String @id @default(cuid())
+  code    String @unique
+  name    String
+  address String?
+
+  stocks           ItemStock[]
+  deliveries       Delivery[]
+  returns          SalesReturn[]
+  goodsReceipts    GoodsReceipt[]
+  purchaseReturns  PurchaseReturn[]
+}
+
+model ItemCategory {
+  id       String        @id @default(cuid())
+  name     String
+  parentId String?
+  parent   ItemCategory? @relation("CategoryTree", fields: [parentId], references: [id])
+  children ItemCategory[] @relation("CategoryTree")
+  items    Item[]
+}
+
+model Item {
+  id         String       @id @default(cuid())
+  code       String       @unique
+  name       String
+  type       ItemType     @default(BARANG)
+  categoryId String?
+  category   ItemCategory? @relation(fields: [categoryId], references: [id])
+  unit       String       @default("pcs")
+  costPrice  Decimal      @default(0) @db.Decimal(18, 2)
+  sellPrice  Decimal      @default(0) @db.Decimal(18, 2)
+  minStock   Decimal      @default(0) @db.Decimal(18, 2)
+
+  stocks             ItemStock[]
+  quotationLines     SalesQuotationLine[]
+  orderLines         SalesOrderLine[]
+  deliveryLines      DeliveryLine[]
+  invoiceLines       SalesInvoiceLine[]
+  returnLines        SalesReturnLine[]
+  purchaseOrderLines    PurchaseOrderLine[]
+  goodsReceiptLines     GoodsReceiptLine[]
+  purchaseInvoiceLines  PurchaseInvoiceLine[]
+  purchaseReturnLines   PurchaseReturnLine[]
+  createdAt          DateTime @default(now())
+}
+
+model ItemStock {
+  itemId      String
+  item        Item      @relation(fields: [itemId], references: [id])
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  qty         Decimal   @default(0) @db.Decimal(18, 2)
+
+  @@id([itemId, warehouseId])
+}
+
+// ---------- Siklus Penjualan ----------
+
+model SalesQuotation {
+  id         String    @id @default(cuid())
+  no         String    @unique
+  date       DateTime  @default(now())
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  status     DocStatus @default(DRAFT)
+  total      Decimal   @default(0) @db.Decimal(18, 2)
+
+  lines SalesQuotationLine[]
+  order SalesOrder?
+}
+
+model SalesQuotationLine {
+  id           String         @id @default(cuid())
+  quotationId  String
+  quotation    SalesQuotation @relation(fields: [quotationId], references: [id])
+  itemId       String
+  item         Item           @relation(fields: [itemId], references: [id])
+  qty          Decimal        @db.Decimal(18, 2)
+  price        Decimal        @db.Decimal(18, 2)
+  subtotal     Decimal        @db.Decimal(18, 2)
+}
+
+model SalesOrder {
+  id           String          @id @default(cuid())
+  no           String          @unique
+  date         DateTime        @default(now())
+  customerId   String
+  customer     Customer        @relation(fields: [customerId], references: [id])
+  quotationId  String?         @unique
+  quotation    SalesQuotation? @relation(fields: [quotationId], references: [id])
+  status       DocStatus       @default(DRAFT)
+  total        Decimal         @default(0) @db.Decimal(18, 2)
+
+  lines      SalesOrderLine[]
+  deliveries Delivery[]
+  invoices   SalesInvoice[]
+}
+
+model SalesOrderLine {
+  id          String     @id @default(cuid())
+  orderId     String
+  order       SalesOrder @relation(fields: [orderId], references: [id])
+  itemId      String
+  item        Item       @relation(fields: [itemId], references: [id])
+  qty         Decimal    @db.Decimal(18, 2)
+  price       Decimal    @db.Decimal(18, 2)
+  qtyShipped  Decimal    @default(0) @db.Decimal(18, 2)
+  qtyInvoiced Decimal    @default(0) @db.Decimal(18, 2)
+
+  deliveryLines DeliveryLine[]
+}
+
+model Delivery {
+  id          String     @id @default(cuid())
+  no          String     @unique
+  date        DateTime   @default(now())
+  orderId     String
+  order       SalesOrder @relation(fields: [orderId], references: [id])
+  warehouseId String
+  warehouse   Warehouse  @relation(fields: [warehouseId], references: [id])
+  status      DocStatus  @default(DRAFT)
+
+  lines    DeliveryLine[]
+  invoices SalesInvoice[]
+}
+
+model DeliveryLine {
+  id           String         @id @default(cuid())
+  deliveryId   String
+  delivery     Delivery       @relation(fields: [deliveryId], references: [id])
+  orderLineId  String
+  orderLine    SalesOrderLine @relation(fields: [orderLineId], references: [id])
+  itemId       String
+  item         Item           @relation(fields: [itemId], references: [id])
+  qty          Decimal        @db.Decimal(18, 2)
+}
+
+model SalesInvoice {
+  id          String    @id @default(cuid())
+  no          String    @unique
+  date        DateTime  @default(now())
+  dueDate     DateTime?
+  customerId  String
+  customer    Customer  @relation(fields: [customerId], references: [id])
+  orderId     String?
+  order       SalesOrder? @relation(fields: [orderId], references: [id])
+  deliveryId  String?
+  delivery    Delivery?   @relation(fields: [deliveryId], references: [id])
+  status      DocStatus @default(DRAFT)
+  total       Decimal   @default(0) @db.Decimal(18, 2)
+
+  lines    SalesInvoiceLine[]
+  receipts SalesReceipt[]
+  returns  SalesReturn[]
+}
+
+model SalesInvoiceLine {
+  id        String       @id @default(cuid())
+  invoiceId String
+  invoice   SalesInvoice @relation(fields: [invoiceId], references: [id])
+  itemId    String
+  item      Item         @relation(fields: [itemId], references: [id])
+  qty       Decimal      @db.Decimal(18, 2)
+  price     Decimal      @db.Decimal(18, 2)
+  subtotal  Decimal      @db.Decimal(18, 2)
+}
+
+model SalesReceipt {
+  id            String       @id @default(cuid())
+  no            String       @unique
+  date          DateTime     @default(now())
+  customerId    String
+  customer      Customer     @relation(fields: [customerId], references: [id])
+  invoiceId     String
+  invoice       SalesInvoice @relation(fields: [invoiceId], references: [id])
+  accountId     String
+  account       Account      @relation("SalesReceiptAccount", fields: [accountId], references: [id])
+  amount        Decimal      @db.Decimal(18, 2)
+  paymentMethod String       @default("CASH")
+}
+
+model SalesReturn {
+  id          String       @id @default(cuid())
+  no          String       @unique
+  date        DateTime     @default(now())
+  invoiceId   String
+  invoice     SalesInvoice @relation(fields: [invoiceId], references: [id])
+  warehouseId String
+  warehouse   Warehouse    @relation(fields: [warehouseId], references: [id])
+  reason      String?
+
+  lines SalesReturnLine[]
+}
+
+model SalesReturnLine {
+  id       String      @id @default(cuid())
+  returnId String
+  return   SalesReturn @relation(fields: [returnId], references: [id])
+  itemId   String
+  item     Item        @relation(fields: [itemId], references: [id])
+  qty      Decimal     @db.Decimal(18, 2)
+}
+
+// ---------- Siklus Pembelian ----------
+// Mirror dari siklus Penjualan: Pesanan -> Penerimaan Barang -> Faktur -> Pembayaran -> Retur
+
+model PurchaseOrder {
+  id         String    @id @default(cuid())
+  no         String    @unique
+  date       DateTime  @default(now())
+  supplierId String
+  supplier   Supplier  @relation(fields: [supplierId], references: [id])
+  status     DocStatus @default(DRAFT)
+  total      Decimal   @default(0) @db.Decimal(18, 2)
+
+  lines    PurchaseOrderLine[]
+  receipts GoodsReceipt[]
+  invoices PurchaseInvoice[]
+}
+
+model PurchaseOrderLine {
+  id          String        @id @default(cuid())
+  orderId     String
+  order       PurchaseOrder @relation(fields: [orderId], references: [id])
+  itemId      String
+  item        Item          @relation(fields: [itemId], references: [id])
+  qty         Decimal       @db.Decimal(18, 2)
+  price       Decimal       @db.Decimal(18, 2)
+  qtyReceived Decimal       @default(0) @db.Decimal(18, 2)
+  qtyInvoiced Decimal       @default(0) @db.Decimal(18, 2)
+
+  receiptLines GoodsReceiptLine[]
+}
+
+model GoodsReceipt {
+  id          String        @id @default(cuid())
+  no          String        @unique
+  date        DateTime      @default(now())
+  orderId     String
+  order       PurchaseOrder @relation(fields: [orderId], references: [id])
+  warehouseId String
+  warehouse   Warehouse     @relation(fields: [warehouseId], references: [id])
+  status      DocStatus     @default(DRAFT)
+
+  lines    GoodsReceiptLine[]
+  invoices PurchaseInvoice[]
+}
+
+model GoodsReceiptLine {
+  id          String            @id @default(cuid())
+  receiptId   String
+  receipt     GoodsReceipt      @relation(fields: [receiptId], references: [id])
+  orderLineId String
+  orderLine   PurchaseOrderLine @relation(fields: [orderLineId], references: [id])
+  itemId      String
+  item        Item              @relation(fields: [itemId], references: [id])
+  qty         Decimal           @db.Decimal(18, 2)
+}
+
+model PurchaseInvoice {
+  id         String        @id @default(cuid())
+  no         String        @unique
+  date       DateTime      @default(now())
+  dueDate    DateTime?
+  supplierId String
+  supplier   Supplier      @relation(fields: [supplierId], references: [id])
+  orderId    String?
+  order      PurchaseOrder? @relation(fields: [orderId], references: [id])
+  receiptId  String?
+  receipt    GoodsReceipt?  @relation(fields: [receiptId], references: [id])
+  status     DocStatus     @default(DRAFT)
+  total      Decimal       @default(0) @db.Decimal(18, 2)
+
+  lines    PurchaseInvoiceLine[]
+  payments PurchasePayment[]
+  returns  PurchaseReturn[]
+}
+
+model PurchaseInvoiceLine {
+  id        String          @id @default(cuid())
+  invoiceId String
+  invoice   PurchaseInvoice @relation(fields: [invoiceId], references: [id])
+  itemId    String
+  item      Item            @relation(fields: [itemId], references: [id])
+  qty       Decimal         @db.Decimal(18, 2)
+  price     Decimal         @db.Decimal(18, 2)
+  subtotal  Decimal         @db.Decimal(18, 2)
+}
+
+model PurchasePayment {
+  id            String          @id @default(cuid())
+  no            String          @unique
+  date          DateTime        @default(now())
+  supplierId    String
+  supplier      Supplier        @relation(fields: [supplierId], references: [id])
+  invoiceId     String
+  invoice       PurchaseInvoice @relation(fields: [invoiceId], references: [id])
+  accountId     String
+  account       Account         @relation("PurchasePaymentAccount", fields: [accountId], references: [id])
+  amount        Decimal         @db.Decimal(18, 2)
+  paymentMethod String          @default("TRANSFER")
+}
+
+model PurchaseReturn {
+  id          String          @id @default(cuid())
+  no          String          @unique
+  date        DateTime        @default(now())
+  invoiceId   String
+  invoice     PurchaseInvoice @relation(fields: [invoiceId], references: [id])
+  warehouseId String
+  warehouse   Warehouse       @relation(fields: [warehouseId], references: [id])
+  reason      String?
+
+  lines PurchaseReturnLine[]
+}
+
+model PurchaseReturnLine {
+  id       String         @id @default(cuid())
+  returnId String
+  return   PurchaseReturn @relation(fields: [returnId], references: [id])
+  itemId   String
+  item     Item           @relation(fields: [itemId], references: [id])
+  qty      Decimal        @db.Decimal(18, 2)
+}
+
+// ---------- Buku Besar & Kas/Bank ----------
+
+model Account {
+  id       String       @id @default(cuid())
+  code     String       @unique
+  name     String
+  type     AccountType
+  parentId String?
+  parent   Account?     @relation("AccountTree", fields: [parentId], references: [id])
+  children Account[]    @relation("AccountTree")
+
+  journalLines     JournalLine[]
+  salesReceipts    SalesReceipt[]    @relation("SalesReceiptAccount")
+  purchasePayments PurchasePayment[] @relation("PurchasePaymentAccount")
+
+  mappingPiutang     AccountMapping? @relation("MapPiutang")
+  mappingPersediaan  AccountMapping? @relation("MapPersediaan")
+  mappingHpp         AccountMapping? @relation("MapHpp")
+  mappingPendapatan  AccountMapping? @relation("MapPendapatan")
+  mappingUtang       AccountMapping? @relation("MapUtang")
+
+  fixedAssetsAsAsset       FixedAsset[] @relation("FixedAssetAssetAccount")
+  fixedAssetsAsExpense     FixedAsset[] @relation("FixedAssetExpenseAccount")
+  fixedAssetsAsAccumulated FixedAsset[] @relation("FixedAssetAccumAccount")
+}
+
+model AccountMapping {
+  id String @id @default("default")
+
+  piutangUsahaId String  @unique
+  piutangUsaha   Account @relation("MapPiutang", fields: [piutangUsahaId], references: [id])
+
+  persediaanId String  @unique
+  persediaan   Account @relation("MapPersediaan", fields: [persediaanId], references: [id])
+
+  hppId String  @unique
+  hpp   Account @relation("MapHpp", fields: [hppId], references: [id])
+
+  pendapatanPenjualanId String  @unique
+  pendapatanPenjualan   Account @relation("MapPendapatan", fields: [pendapatanPenjualanId], references: [id])
+
+  utangUsahaId String  @unique
+  utangUsaha   Account @relation("MapUtang", fields: [utangUsahaId], references: [id])
+}
+
+model JournalEntry {
+  id     String        @id @default(cuid())
+  no     String        @unique
+  date   DateTime      @default(now())
+  memo   String?
+  source JournalSource @default(MANUAL)
+
+  lines JournalLine[]
+  fixedAssetDepreciations FixedAssetDepreciation[]
+}
+
+model JournalLine {
+  id             String       @id @default(cuid())
+  journalEntryId String
+  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id])
+  accountId      String
+  account        Account      @relation(fields: [accountId], references: [id])
+  debit          Decimal      @default(0) @db.Decimal(18, 2)
+  credit         Decimal      @default(0) @db.Decimal(18, 2)
+  description    String?
+}
+
+// ---------- Aset Tetap ----------
+
+model FixedAsset {
+  id                String      @id @default(cuid())
+  code              String      @unique
+  name              String
+  acquisitionDate   DateTime    @default(now())
+  acquisitionCost   Decimal     @db.Decimal(18, 2)
+  salvageValue      Decimal     @default(0) @db.Decimal(18, 2)
+  usefulLifeMonths  Int
+  status            AssetStatus @default(AKTIF)
+
+  assetAccountId                String
+  assetAccount                  Account @relation("FixedAssetAssetAccount", fields: [assetAccountId], references: [id])
+  depreciationExpenseAccountId  String
+  depreciationExpenseAccount    Account @relation("FixedAssetExpenseAccount", fields: [depreciationExpenseAccountId], references: [id])
+  accumulatedDepreciationAccountId String
+  accumulatedDepreciationAccount   Account @relation("FixedAssetAccumAccount", fields: [accumulatedDepreciationAccountId], references: [id])
+
+  depreciations FixedAssetDepreciation[]
+}
+
+model FixedAssetDepreciation {
+  id             String       @id @default(cuid())
+  assetId        String
+  asset          FixedAsset   @relation(fields: [assetId], references: [id])
+  period         DateTime
+  amount         Decimal      @db.Decimal(18, 2)
+  journalEntryId String?
+  journalEntry   JournalEntry? @relation(fields: [journalEntryId], references: [id])
+
+  @@unique([assetId, period])
+}

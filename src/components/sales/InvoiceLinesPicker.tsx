@@ -1,0 +1,69 @@
+"use client";
+
+import { useState } from "react";
+
+type OrderLine = {
+  id: string;
+  itemId: string;
+  itemLabel: string;
+  qty: number;
+  qtyInvoiced: number;
+  price: number;
+};
+
+export default function InvoiceLinesPicker({ lines }: { lines: OrderLine[] }) {
+  const initial = lines.map((l) => ({
+    itemId: l.itemId,
+    qty: Math.max(Number(l.qty) - Number(l.qtyInvoiced), 0),
+    price: Number(l.price),
+  }));
+  const [rows, setRows] = useState(initial);
+
+  const total = rows.reduce((sum, r) => sum + r.qty * r.price, 0);
+
+  function updateQty(index: number, qty: number) {
+    setRows((prev) => prev.map((r, i) => (i === index ? { ...r, qty } : r)));
+  }
+
+  return (
+    <div className="md:col-span-2 space-y-2">
+      <input type="hidden" name="lines" value={JSON.stringify(rows)} />
+      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <table className="w-full text-sm min-w-[36rem]">
+        <thead>
+          <tr className="text-left text-zinc-500">
+            <th className="pb-1">Barang</th>
+            <th className="pb-1 w-24">Sisa Tagih</th>
+            <th className="pb-1 w-28">Qty Faktur</th>
+            <th className="pb-1 w-28">Harga</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lines.map((l, i) => {
+            const remaining = Number(l.qty) - Number(l.qtyInvoiced);
+            return (
+              <tr key={l.id}>
+                <td className="py-1">{l.itemLabel}</td>
+                <td className="py-1">{remaining}</td>
+                <td className="py-1">
+                  <input
+                    type="number"
+                    min={0}
+                    max={remaining}
+                    step="0.01"
+                    className="border rounded px-2 py-1 w-full"
+                    value={rows[i].qty}
+                    onChange={(e) => updateQty(i, Number(e.target.value))}
+                  />
+                </td>
+                <td className="py-1">{Number(l.price).toLocaleString("id-ID")}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+        </table>
+      </div>
+      <div className="text-right font-medium">Total: {total.toLocaleString("id-ID")}</div>
+    </div>
+  );
+}
