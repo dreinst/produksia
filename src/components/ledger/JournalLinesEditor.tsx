@@ -105,7 +105,7 @@ export default function JournalLinesEditor({ accounts }: { accounts: AccountOpti
       </button>
       <div className={`text-right text-sm font-medium ${balanced ? "text-green-600" : "text-red-600"}`}>
         Total Debit: {totalDebit.toLocaleString("id-ID")} &middot; Total Kredit: {totalCredit.toLocaleString("id-ID")}
-        {!balanced && " (belum balance)"}
+        {!balanced && " (belum seimbang)"}
       </div>
     </div>
   );

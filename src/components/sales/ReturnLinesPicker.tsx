@@ -19,8 +19,8 @@ export default function ReturnLinesPicker({ lines }: { lines: InvoiceLine[] }) {
         <thead>
           <tr>
             <th>Barang</th>
-            <th className="w-24">Qty Dibeli</th>
-            <th className="w-28">Qty Retur</th>
+            <th className="w-24">Kuantitas Dibeli</th>
+            <th className="w-28">Kuantitas Retur</th>
           </tr>
         </thead>
         <tbody>

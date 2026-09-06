@@ -1,40 +1,72 @@
+/**
+ * Label tampilan (bahasa Indonesia) untuk nilai internal enum/status.
+ * Nilai di database tetap kode internal (DRAFT, PAID, …); yang tampil ke pengguna selalu Indonesia.
+ */
 const STATUS_STYLE: Record<string, { cls: string; label: string }> = {
-  DRAFT: { cls: "badge-amber", label: "DRAFT" },
-  CONVERTED: { cls: "badge-slate", label: "CONVERTED" },
-  PARTIAL: { cls: "badge-amber", label: "PARTIAL" },
-  PROCESSED: { cls: "badge-blue", label: "PROCESSED" },
-  PAID: { cls: "badge-emerald", label: "PAID" },
-  CANCELLED: { cls: "badge-rose", label: "CANCELLED" },
-  AKTIF: { cls: "badge-emerald", label: "AKTIF" },
-  DIJUAL: { cls: "badge-slate", label: "DIJUAL" },
-  DIHAPUS: { cls: "badge-rose", label: "DIHAPUS" },
-  OPEN: { cls: "badge-blue", label: "OPEN" },
+  DRAFT: { cls: "badge-amber", label: "Draf" },
+  CONVERTED: { cls: "badge-slate", label: "Dikonversi" },
+  PARTIAL: { cls: "badge-amber", label: "Sebagian" },
+  PROCESSED: { cls: "badge-blue", label: "Diproses" },
+  PAID: { cls: "badge-emerald", label: "Lunas" },
+  CANCELLED: { cls: "badge-rose", label: "Dibatalkan" },
+  POSTED: { cls: "badge-emerald", label: "Tercatat" },
+  AKTIF: { cls: "badge-emerald", label: "Aktif" },
+  DIJUAL: { cls: "badge-slate", label: "Dijual" },
+  DIHAPUS: { cls: "badge-rose", label: "Dihapus" },
+  OPEN: { cls: "badge-blue", label: "Berjalan" },
 };
+
+export function statusLabel(status: string) {
+  return STATUS_STYLE[status]?.label ?? status;
+}
 
 export function StatusBadge({ status }: { status: string }) {
   const s = STATUS_STYLE[status] ?? { cls: "badge-slate", label: status };
   return <span className={`badge ${s.cls}`}>{s.label}</span>;
 }
 
+const PAYMENT_LABEL: Record<string, string> = { CASH: "Tunai", TRANSFER: "Transfer", CARD: "Kartu" };
+export function labelPaymentMethod(v: string) {
+  return PAYMENT_LABEL[v] ?? v;
+}
+
+const SOURCE_LABEL: Record<string, string> = {
+  MANUAL: "Jurnal manual",
+  KAS_MASUK: "Kas masuk",
+  KAS_KELUAR: "Kas keluar",
+  PENJUALAN: "Penjualan",
+  PEMBELIAN: "Pembelian",
+  PENYUSUTAN: "Penyusutan",
+};
+export function labelJournalSource(v: string) {
+  return SOURCE_LABEL[v] ?? v;
+}
+
+/**
+ * Kode dokumen (semua singkatan Indonesia):
+ * PNW Penawaran · PSJ Pesanan Penjualan · SJ Surat Jalan · FJ Faktur Penjualan · TRM Penerimaan · RJ Retur Penjualan
+ * PSB Pesanan Pembelian · TB Terima Barang · FB Faktur Pembelian · BYR Pembayaran · RB Retur Pembelian
+ * JU Jurnal Umum · KM Kas Masuk · KK Kas Keluar · AT Aset Tetap
+ */
 const DOC_STYLE: Record<string, string> = {
-  SQ: "bg-slate-100 text-slate-700",
-  SO: "bg-indigo-50 text-indigo-700",
-  DO: "bg-cyan-50 text-cyan-700",
-  INV: "bg-blue-50 text-blue-700",
-  RCP: "bg-emerald-50 text-emerald-700",
-  RET: "bg-rose-50 text-rose-700",
-  PO: "bg-indigo-50 text-indigo-700",
-  GR: "bg-cyan-50 text-cyan-700",
-  PINV: "bg-slate-100 text-slate-700",
-  PP: "bg-emerald-50 text-emerald-700",
-  PRET: "bg-rose-50 text-rose-700",
+  PNW: "bg-slate-100 text-slate-700",
+  PSJ: "bg-indigo-50 text-indigo-700",
+  SJ: "bg-cyan-50 text-cyan-700",
+  FJ: "bg-blue-50 text-blue-700",
+  TRM: "bg-emerald-50 text-emerald-700",
+  RJ: "bg-rose-50 text-rose-700",
+  PSB: "bg-indigo-50 text-indigo-700",
+  TB: "bg-cyan-50 text-cyan-700",
+  FB: "bg-slate-100 text-slate-700",
+  BYR: "bg-emerald-50 text-emerald-700",
+  RB: "bg-rose-50 text-rose-700",
   JU: "bg-slate-100 text-slate-700",
   KM: "bg-emerald-50 text-emerald-700",
   KK: "bg-rose-50 text-rose-700",
   AT: "bg-amber-50 text-amber-700",
 };
 
-/** Nomor dokumen: badge prefix berwarna + nomor monospace, mis. [INV] INV-2026-0001 */
+/** Nomor dokumen: badge prefix berwarna + nomor monospace, mis. [FJ] FJ-2026-0001 */
 export function DocNo({ no }: { no: string }) {
   const m = /^([A-Z]+)(?:-[A-Z]+)*-/.exec(no);
   const prefix = no.startsWith("JU-") ? "JU" : (m?.[1] ?? "");

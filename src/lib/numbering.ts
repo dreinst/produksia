@@ -7,7 +7,7 @@ type NumberedDelegate = {
 };
 
 /**
- * Nomor dokumen berurutan per prefix per tahun, mis. SO-2026-0007.
+ * Nomor dokumen berurutan per prefix per tahun, mis. PSJ-2026-0007.
  * Mengambil nomor terakhir yang ada (bukan count), jadi aman walau ada data yang pernah dihapus.
  * Catatan: masih ada celah race condition kalau dua user submit di milidetik yang sama —
  * unique constraint di kolom `no` akan menolak yang kedua, bukan diam-diam duplikat.

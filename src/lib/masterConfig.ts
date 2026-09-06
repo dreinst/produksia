@@ -134,14 +134,14 @@ export const masterEntities: EntityConfig[] = [
   },
   {
     slug: "categories",
-    label: "Group Barang",
+    label: "Kelompok Barang",
     model: "itemCategory",
     section: "persediaan",
     fields: [
       { name: "name", label: "Nama", type: "text", required: true },
       {
         name: "parentId",
-        label: "Induk Group",
+        label: "Kelompok Induk",
         type: "select",
         options: { model: "itemCategory", valueField: "id", labelField: "name" },
       },
@@ -162,7 +162,7 @@ export const masterEntities: EntityConfig[] = [
       { name: "type", label: "Tipe", type: "select", staticOptions: ["BARANG", "JASA"], defaultValue: "BARANG" },
       {
         name: "categoryId",
-        label: "Group",
+        label: "Kelompok",
         type: "select",
         options: { model: "itemCategory", valueField: "id", labelField: "name" },
       },

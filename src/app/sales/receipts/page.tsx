@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { DocNo } from "@/components/ui/Badges";
+import { DocNo, labelPaymentMethod } from "@/components/ui/Badges";
 
 export default async function ReceiptsPage() {
   const receipts = await db.salesReceipt.findMany({
@@ -34,7 +34,7 @@ export default async function ReceiptsPage() {
               <td>{r.invoice.no}</td>
               <td>{r.customer.name}</td>
               <td className="text-right num">{Number(r.amount).toLocaleString("id-ID")}</td>
-              <td>{r.paymentMethod}</td>
+              <td>{labelPaymentMethod(r.paymentMethod)}</td>
             </tr>
           ))}
           {receipts.length === 0 && (

@@ -13,23 +13,23 @@ const operasional: Group[] = [
     title: "Penjualan",
     icon: "point_of_sale",
     links: [
-      { href: "/sales/quotations", label: "Penawaran", code: "SQ" },
-      { href: "/sales/orders", label: "Pesanan", code: "SO" },
-      { href: "/sales/deliveries", label: "Pengiriman", code: "DO" },
-      { href: "/sales/invoices", label: "Faktur Penjualan", code: "INV" },
-      { href: "/sales/receipts", label: "Penerimaan", code: "RCP" },
-      { href: "/sales/returns", label: "Retur Penjualan", code: "RET" },
+      { href: "/sales/quotations", label: "Penawaran", code: "PNW" },
+      { href: "/sales/orders", label: "Pesanan", code: "PSJ" },
+      { href: "/sales/deliveries", label: "Pengiriman", code: "SJ" },
+      { href: "/sales/invoices", label: "Faktur Penjualan", code: "FJ" },
+      { href: "/sales/receipts", label: "Penerimaan", code: "TRM" },
+      { href: "/sales/returns", label: "Retur Penjualan", code: "RJ" },
     ],
   },
   {
     title: "Pembelian",
     icon: "shopping_bag",
     links: [
-      { href: "/purchasing/orders", label: "Pesanan", code: "PO" },
-      { href: "/purchasing/receipts", label: "Penerimaan Barang", code: "GR" },
-      { href: "/purchasing/invoices", label: "Faktur Pembelian", code: "PINV" },
-      { href: "/purchasing/payments", label: "Pembayaran", code: "PP" },
-      { href: "/purchasing/returns", label: "Retur Pembelian", code: "PRET" },
+      { href: "/purchasing/orders", label: "Pesanan", code: "PSB" },
+      { href: "/purchasing/receipts", label: "Penerimaan Barang", code: "TB" },
+      { href: "/purchasing/invoices", label: "Faktur Pembelian", code: "FB" },
+      { href: "/purchasing/payments", label: "Pembayaran", code: "BYR" },
+      { href: "/purchasing/returns", label: "Retur Pembelian", code: "RB" },
     ],
   },
   {
@@ -60,15 +60,15 @@ const operasional: Group[] = [
 ];
 
 const masterData: Group = {
-  title: "Master Data",
+  title: "Data Induk",
   icon: "dataset",
   links: [
     { href: "/master/customers", label: "Pelanggan" },
     { href: "/master/suppliers", label: "Pemasok" },
     { href: "/master/items", label: "Barang & Jasa" },
-    { href: "/master/categories", label: "Group Barang" },
+    { href: "/master/categories", label: "Kelompok Barang" },
     { href: "/master/warehouses", label: "Gudang" },
-    { href: "/master/accounts", label: "Bagan Akun", code: "COA" },
+    { href: "/master/accounts", label: "Bagan Akun" },
     { href: "/master/departments", label: "Departemen" },
     { href: "/master/employees", label: "Karyawan" },
     { href: "/master/projects", label: "Proyek" },
@@ -161,7 +161,7 @@ function NavAccordion({ pathname, onNavigate }: { pathname: string; onNavigate: 
           }`}
         >
           <Icon name="space_dashboard" className="!text-[20px]" />
-          <span>Dashboard</span>
+          <span>Beranda</span>
         </Link>
       </div>
 
@@ -180,7 +180,7 @@ function NavAccordion({ pathname, onNavigate }: { pathname: string; onNavigate: 
       </div>
 
       <div className="space-y-1">
-        <span className="px-3 eyebrow">Administrasi &amp; Setup</span>
+        <span className="px-3 eyebrow">Administrasi &amp; Pengaturan</span>
         <NavGroup
           group={masterData}
           pathname={pathname}
@@ -219,7 +219,7 @@ function DbStatus() {
     };
   }, []);
   const dot = state === "ok" ? "bg-emerald-500" : state === "error" ? "bg-rose-500" : "bg-slate-300 animate-pulse";
-  const label = state === "ok" ? "OK" : state === "error" ? "GAGAL" : "...";
+  const label = state === "ok" ? "Terhubung" : state === "error" ? "Gagal" : "…";
   return (
     <div className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg text-xs font-medium text-slate-600">
       <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
                 Accurate <span className="text-blue-600">Copy</span>
               </span>
               <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-400 uppercase mt-0.5">
-                Enterprise ERP &amp; Ledger
+                Sistem Akuntansi Terpadu
               </span>
             </span>
           </Link>
@@ -277,7 +277,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
           <div className="bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
             <div className="flex flex-col min-w-0">
               <span className="text-xs font-semibold text-slate-900 truncate">Accurate Copy</span>
-              <span className="text-[11px] text-slate-500 font-medium">FY {year} • IDR Ledger</span>
+              <span className="text-[11px] text-slate-500 font-medium">Tahun Buku {year} • Rupiah</span>
             </div>
             <Icon name="unfold_more" className="!text-[18px] text-slate-400" />
           </div>

@@ -102,7 +102,7 @@ export default async function Home() {
   const labaBerjalan = sumType("PENDAPATAN") - sumType("BEBAN");
   const balanced = Math.abs(totalDebit - totalCredit) < 0.005;
 
-  // ---- Pipeline ----
+  // ---- Alur dokumen ----
   const sqTotal = draftQuotations.reduce((s, q) => s + Number(q.total), 0);
   const soTotal = openOrders.reduce((s, o) => s + Number(o.total), 0);
   const rcpTotal = receiptsMonth.reduce((s, r) => s + Number(r.amount), 0);
@@ -130,7 +130,7 @@ export default async function Home() {
       const fullyShipped = d.lines.every((l) => Number(l.qtyShipped) >= Number(l.qty));
       return {
         no: d.no, date: d.date, who: d.customer.name, amount: Number(d.total), status: d.status,
-        action: !fullyShipped ? { label: "Buat DO", href: `/sales/deliveries/new?orderId=${d.id}`, icon: "local_shipping" } : undefined,
+        action: !fullyShipped ? { label: "Buat SJ", href: `/sales/deliveries/new?orderId=${d.id}`, icon: "local_shipping" } : undefined,
       };
     }),
     ...recentRcp.map((d) => ({ no: d.no, date: d.date, who: d.customer.name, amount: Number(d.amount), status: "POSTED" })),
@@ -145,19 +145,19 @@ export default async function Home() {
     .slice(0, 8);
 
   const quick = [
-    { href: "/sales/orders", label: "+ Faktur (INV)", icon: "receipt_long", color: "text-blue-600" },
-    { href: "/sales/orders", label: "+ Pengiriman (DO)", icon: "local_shipping", color: "text-slate-600" },
-    { href: "/sales/invoices", label: "+ Penerimaan (RCP)", icon: "payments", color: "text-emerald-600" },
+    { href: "/sales/orders", label: "+ Faktur (FJ)", icon: "receipt_long", color: "text-blue-600" },
+    { href: "/sales/orders", label: "+ Pengiriman (SJ)", icon: "local_shipping", color: "text-slate-600" },
+    { href: "/sales/invoices", label: "+ Penerimaan (TRM)", icon: "payments", color: "text-emerald-600" },
     { href: "/cashbank/in", label: "Kas Masuk / Keluar", icon: "swap_horiz", color: "text-indigo-600" },
     { href: "/ledger/journal/new", label: "+ Jurnal Umum (JU)", icon: "edit_note", color: "text-slate-600" },
   ];
 
   const steps = [
-    { code: "SQ", tag: "Tahap 1", title: "Penawaran", value: `${draftQuotations.length} Dokumen`, sub: `Est. ${rp(sqTotal)}`, note: "Belum memengaruhi buku", dot: "bg-slate-300", tone: "" },
-    { code: "SO", tag: "Tahap 2", title: "Pesanan Penjualan", value: `${openOrders.length} Pesanan Aktif`, sub: rp(soTotal), note: "Reservasi stok", dot: "bg-amber-400", tone: "text-amber-600" },
-    { code: "DO", tag: "Fisik Keluar", title: "Surat Jalan (DO)", value: `${deliveriesMonth} Pengiriman`, sub: periodLabel, note: "Kuantitas stok berkurang", dot: "bg-blue-500", tone: "text-blue-700", highlight: true },
-    { code: "INV", tag: "Tahap 4", title: "Faktur Penjualan", value: `${unpaidSales.length} Faktur Aktif`, sub: `${rp(ar)} Piutang`, note: "Jurnal otomatis terbit", dot: "bg-emerald-500", tone: "text-emerald-600" },
-    { code: "RCP", tag: "Lunas", title: "Penerimaan Kas", value: rp(rcpTotal), sub: `${receiptsMonth.length} Transaksi Masuk`, note: "Piutang lunas", dot: "bg-emerald-500", tone: "text-emerald-600" },
+    { code: "PNW", tag: "Tahap 1", title: "Penawaran", value: `${draftQuotations.length} Dokumen`, sub: `Perkiraan ${rp(sqTotal)}`, note: "Belum memengaruhi buku", dot: "bg-slate-300", tone: "" },
+    { code: "PSJ", tag: "Tahap 2", title: "Pesanan Penjualan", value: `${openOrders.length} Pesanan Aktif`, sub: rp(soTotal), note: "Reservasi stok", dot: "bg-amber-400", tone: "text-amber-600" },
+    { code: "SJ", tag: "Fisik Keluar", title: "Surat Jalan (SJ)", value: `${deliveriesMonth} Pengiriman`, sub: periodLabel, note: "Kuantitas stok berkurang", dot: "bg-blue-500", tone: "text-blue-700", highlight: true },
+    { code: "FJ", tag: "Tahap 4", title: "Faktur Penjualan", value: `${unpaidSales.length} Faktur Aktif`, sub: `${rp(ar)} Piutang`, note: "Jurnal otomatis terbit", dot: "bg-emerald-500", tone: "text-emerald-600" },
+    { code: "TRM", tag: "Lunas", title: "Penerimaan Kas", value: rp(rcpTotal), sub: `${receiptsMonth.length} Transaksi Masuk`, note: "Piutang lunas", dot: "bg-emerald-500", tone: "text-emerald-600" },
   ];
 
   return (
@@ -176,7 +176,7 @@ export default async function Home() {
               </span>
               <span className="text-slate-400">•</span>
               <span>
-                Mata Uang: <strong className="text-slate-700 font-medium">IDR (Rp)</strong>
+                Mata Uang: <strong className="text-slate-700 font-medium">Rupiah (Rp)</strong>
               </span>
             </div>
             <h1 className="page-title">Ringkasan Keuangan &amp; Operasional</h1>
@@ -203,10 +203,10 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* KPI */}
+      {/* Ringkasan angka */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <Kpi
-          title="Piutang Usaha (AR)"
+          title="Piutang Usaha"
           badge={{ text: `${unpaidSales.length} Faktur`, cls: unpaidSales.length ? "badge-amber" : "badge-emerald" }}
           value={rp(ar)}
           note="Faktur penjualan belum lunas"
@@ -216,7 +216,7 @@ export default async function Home() {
           ]}
         />
         <Kpi
-          title="Utang Usaha (AP)"
+          title="Utang Usaha"
           badge={{ text: apOverdueCount ? `${apOverdueCount} Faktur Tempo` : `${unpaidPurchase.length} Faktur`, cls: apOverdueCount ? "badge-amber" : "badge-slate" }}
           value={rp(ap)}
           note="Faktur pembelian belum lunas"
@@ -234,25 +234,25 @@ export default async function Home() {
         />
         <Kpi
           title="Nilai Persediaan"
-          badge={{ text: `${itemCount} SKU`, cls: "badge-slate" }}
+          badge={{ text: `${itemCount} Barang`, cls: "badge-slate" }}
           value={rp(inventoryValue)}
           note="Σ qty × harga pokok, semua gudang"
           rows={[
             ...byWarehouse.map((w) => ({ k: w.name, v: rp(w.value) })),
-            ...(belowMin.length ? [{ k: "Di bawah stok minimum", v: `${belowMin.length} SKU`, cls: "text-amber-600" }] : []),
+            ...(belowMin.length ? [{ k: "Di bawah stok minimum", v: `${belowMin.length} Barang`, cls: "text-amber-600" }] : []),
           ].slice(0, 2)}
         />
       </div>
 
-      {/* Pipeline */}
+      {/* Alur dokumen */}
       <div className="card">
         <div className="card-head">
           <div>
             <h2 className="card-title">Alur Transaksi &amp; Dokumen Terintegrasi</h2>
-            <p className="card-subtitle">Siklus penjualan: Pesanan terbit → stok fisik berkurang di DO → pengakuan piutang &amp; jurnal di Faktur/Penerimaan.</p>
+            <p className="card-subtitle">Siklus penjualan: Pesanan terbit → stok fisik berkurang di SJ → pengakuan piutang &amp; jurnal di Faktur/Penerimaan.</p>
           </div>
           <span className="text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1 rounded-lg border border-slate-100 whitespace-nowrap">
-            Stok terpotong di DO • Jurnal di INV &amp; RCP
+            Stok terpotong di SJ • Jurnal di FJ &amp; TRM
           </span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
@@ -336,7 +336,7 @@ export default async function Home() {
               </div>
               <span className={`badge ${balanced ? "badge-emerald" : "badge-rose"}`}>
                 <Icon name={balanced ? "check_circle" : "error"} className="!text-[14px]" />
-                {balanced ? "Balance Verified (Σ Debit = Σ Kredit)" : "Tidak balance — periksa jurnal"}
+                {balanced ? "Seimbang (Σ Debit = Σ Kredit)" : "Tidak seimbang — periksa jurnal"}
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
@@ -421,7 +421,7 @@ export default async function Home() {
               {alerts.length === 0 && <p className="text-sm text-slate-400">Belum ada barang dengan stok minimum.</p>}
             </div>
             <Link href="/purchasing/orders/new" className="btn btn-primary w-full">
-              <Icon name="shopping_cart" className="!text-[18px]" /> + Buat Pesanan Pembelian (PO)
+              <Icon name="shopping_cart" className="!text-[18px]" /> + Buat Pesanan Pembelian (PSB)
             </Link>
           </div>
 
@@ -436,7 +436,7 @@ export default async function Home() {
             <div className="tile space-y-2 text-xs">
               <div className="flex justify-between items-center text-slate-500">
                 <span>Status periode ini</span>
-                <span className={`font-semibold ${depPosted ? "text-emerald-600" : "text-amber-600"}`}>{assets.length === 0 ? "Belum ada aset" : depPosted ? "Sudah diposting" : "Belum diposting"}</span>
+                <span className={`font-semibold ${depPosted ? "text-emerald-600" : "text-amber-600"}`}>{assets.length === 0 ? "Belum ada aset" : depPosted ? "Sudah dicatat" : "Belum dicatat"}</span>
               </div>
               <div className="flex justify-between items-center text-slate-500">
                 <span>Estimasi beban bulan ini</span>
@@ -449,7 +449,7 @@ export default async function Home() {
             </div>
             <Link href="/assets/depreciation" className={`btn w-full ${depPosted ? "btn-outline" : "btn-accent"}`}>
               <Icon name={depPosted ? "check_circle" : "play_arrow"} className="!text-[18px]" />
-              {depPosted ? "Lihat Riwayat Penyusutan" : "Posting Jurnal Penyusutan (JU-PNY)"}
+              {depPosted ? "Lihat Riwayat Penyusutan" : "Catat Jurnal Penyusutan (JU-PNY)"}
             </Link>
           </div>
 
@@ -476,7 +476,7 @@ export default async function Home() {
             </div>
             <div className="pt-3 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-400 font-mono">
               <span>PostgreSQL 18 • Prisma 7</span>
-              <span className={balanced ? "text-emerald-400 font-semibold" : "text-rose-400 font-semibold"}>{balanced ? "Ledger balanced" : "Ledger unbalanced"}</span>
+              <span className={balanced ? "text-emerald-400 font-semibold" : "text-rose-400 font-semibold"}>{balanced ? "Buku besar seimbang" : "Buku besar tidak seimbang"}</span>
             </div>
           </div>
         </div>

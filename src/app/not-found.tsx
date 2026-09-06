@@ -6,7 +6,7 @@ export default function NotFound() {
       <h1 className="page-title">Halaman tidak ditemukan</h1>
       <p className="text-sm text-slate-600">Alamat yang kamu buka tidak ada atau datanya sudah dihapus.</p>
       <Link href="/" className="btn btn-primary">
-        Ke Dashboard
+        Ke Beranda
       </Link>
     </div>
   );

@@ -71,7 +71,7 @@ export default async function TrialBalancePage() {
 
       {grandTotalDebit !== grandTotalCredit && (
         <p className="text-red-600 text-sm">
-          Peringatan: total debit dan kredit tidak sama — ada jurnal yang tidak balance.
+          Peringatan: total debit dan kredit tidak sama — ada jurnal yang tidak seimbang.
         </p>
       )}
     </div>

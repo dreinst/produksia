@@ -62,7 +62,7 @@ export async function createQuotation(formData: FormData) {
   const lines = parseLines(formData);
   const total = lineTotal(lines);
 
-  const no = await nextDocNumber(db.salesQuotation, "SQ");
+  const no = await nextDocNumber(db.salesQuotation, "PNW");
 
   await db.salesQuotation.create({
     data: {
@@ -86,7 +86,7 @@ export async function convertQuotationToOrder(quotationId: string) {
   });
   if (quotation.status === "CONVERTED") throw new Error("Penawaran sudah dikonversi");
 
-  const no = await nextDocNumber(db.salesOrder, "SO");
+  const no = await nextDocNumber(db.salesOrder, "PSJ");
 
   await db.$transaction([
     db.salesOrder.create({
@@ -114,7 +114,7 @@ export async function createOrder(formData: FormData) {
   const lines = parseLines(formData);
   const total = lineTotal(lines);
 
-  const no = await nextDocNumber(db.salesOrder, "SO");
+  const no = await nextDocNumber(db.salesOrder, "PSJ");
 
   await db.salesOrder.create({
     data: {
@@ -150,11 +150,11 @@ export async function createDelivery(formData: FormData) {
     if (!orderLine) throw new Error("Baris pesanan tidak ditemukan");
     const remaining = D(orderLine.qty).minus(orderLine.qtyShipped);
     if (l.qty.gt(remaining)) {
-      throw new Error(`Qty kirim melebihi sisa pesanan (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
+      throw new Error(`Kuantitas kirim melebihi sisa pesanan (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
     }
   }
 
-  const no = await nextDocNumber(db.delivery, "DO");
+  const no = await nextDocNumber(db.delivery, "SJ");
 
   await db.$transaction(async (tx) => {
     const labels = await itemLabels(tx, lines.map((l) => l.itemId));
@@ -201,11 +201,11 @@ export async function createInvoice(formData: FormData) {
     if (orderLines.length === 0) throw new Error("Barang tidak ada di pesanan ini");
     const remaining = sum(orderLines.map((ol) => D(ol.qty).minus(ol.qtyInvoiced)));
     if (l.qty.gt(remaining)) {
-      throw new Error(`Qty faktur melebihi sisa yang belum ditagih (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
+      throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
     }
   }
 
-  const no = await nextDocNumber(db.salesInvoice, "INV");
+  const no = await nextDocNumber(db.salesInvoice, "FJ");
 
   await db.$transaction(async (tx) => {
     const invoice = await tx.salesInvoice.create({
@@ -258,7 +258,7 @@ export async function createReceipt(formData: FormData) {
   }
   const status = alreadyPaid.plus(amount).gte(invoice.total) ? "PAID" : "PARTIAL";
 
-  const no = await nextDocNumber(db.salesReceipt, "RCP");
+  const no = await nextDocNumber(db.salesReceipt, "TRM");
 
   await db.$transaction(async (tx) => {
     const receipt = await tx.salesReceipt.create({
@@ -296,7 +296,7 @@ export async function createReturn(formData: FormData) {
     const returned = sum(invoice.returns.flatMap((r) => r.lines.filter((rl) => rl.itemId === l.itemId).map((rl) => rl.qty)));
     const remaining = invoiced.minus(returned);
     if (l.qty.gt(remaining)) {
-      throw new Error(`Qty retur melebihi yang bisa diretur (maks ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
+      throw new Error(`Kuantitas retur melebihi yang bisa diretur (maks ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
     }
   }
 
@@ -304,7 +304,7 @@ export async function createReturn(formData: FormData) {
   const returnAmount = sum(lines.map((l) => mul(l.qty, invoice.lines.find((il) => il.itemId === l.itemId)?.price ?? 0)));
   const costOfGoods = sum(lines.map((l) => mul(l.qty, items.find((i) => i.id === l.itemId)?.costPrice ?? 0)));
 
-  const no = await nextDocNumber(db.salesReturn, "RET");
+  const no = await nextDocNumber(db.salesReturn, "RJ");
 
   await db.$transaction(async (tx) => {
     await tx.salesReturn.create({

@@ -31,7 +31,7 @@ export default function OrderLinesPicker({ lines }: { lines: OrderLine[] }) {
           <tr>
             <th>Barang</th>
             <th className="w-28">Sisa Pesanan</th>
-            <th className="w-28">Qty Kirim</th>
+            <th className="w-28">Kuantitas Kirim</th>
           </tr>
         </thead>
         <tbody>

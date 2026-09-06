@@ -40,14 +40,14 @@ export async function postSalesInvoiceJournal(tx: Tx, invoice: { total: Dec | nu
       { accountId: m.persediaanId, debit: ZERO, credit: costOfGoods, description: "Pengurangan Persediaan" },
     );
   }
-  await postJournal(tx, "JU-INV", "Faktur Penjualan", "PENJUALAN", lines);
+  await postJournal(tx, "JU-FJ", "Faktur Penjualan", "PENJUALAN", lines);
 }
 
 /** Penerimaan Penjualan: Dr Kas/Bank pilihan / Cr Piutang. */
 export async function postSalesReceiptJournal(tx: Tx, receipt: { accountId: string; amount: Dec | number | string }) {
   const m = await getAccountMapping(tx);
   const amount = D(receipt.amount);
-  await postJournal(tx, "JU-RCP", "Penerimaan Penjualan", "PENJUALAN", [
+  await postJournal(tx, "JU-TRM", "Penerimaan Penjualan", "PENJUALAN", [
     { accountId: receipt.accountId, debit: amount, credit: ZERO, description: "Penerimaan dari pelanggan" },
     { accountId: m.piutangUsahaId, debit: ZERO, credit: amount, description: "Pelunasan piutang" },
   ]);
@@ -66,14 +66,14 @@ export async function postSalesReturnJournal(tx: Tx, returnAmount: Dec, costOfGo
       { accountId: m.hppId, debit: ZERO, credit: costOfGoods, description: "Koreksi HPP" },
     );
   }
-  await postJournal(tx, "JU-RET", "Retur Penjualan", "PENJUALAN", lines);
+  await postJournal(tx, "JU-RJ", "Retur Penjualan", "PENJUALAN", lines);
 }
 
 /** Faktur Pembelian: Dr Persediaan / Cr Utang. */
 export async function postPurchaseInvoiceJournal(tx: Tx, invoice: { total: Dec | number | string }) {
   const m = await getAccountMapping(tx);
   const total = D(invoice.total);
-  await postJournal(tx, "JU-PINV", "Faktur Pembelian", "PEMBELIAN", [
+  await postJournal(tx, "JU-FB", "Faktur Pembelian", "PEMBELIAN", [
     { accountId: m.persediaanId, debit: total, credit: ZERO, description: "Penambahan Persediaan" },
     { accountId: m.utangUsahaId, debit: ZERO, credit: total, description: "Utang Faktur Pembelian" },
   ]);
@@ -83,7 +83,7 @@ export async function postPurchaseInvoiceJournal(tx: Tx, invoice: { total: Dec |
 export async function postPurchasePaymentJournal(tx: Tx, payment: { accountId: string; amount: Dec | number | string }) {
   const m = await getAccountMapping(tx);
   const amount = D(payment.amount);
-  await postJournal(tx, "JU-PP", "Pembayaran Pembelian", "PEMBELIAN", [
+  await postJournal(tx, "JU-BYR", "Pembayaran Pembelian", "PEMBELIAN", [
     { accountId: m.utangUsahaId, debit: amount, credit: ZERO, description: "Pelunasan utang" },
     { accountId: payment.accountId, debit: ZERO, credit: amount, description: "Pembayaran ke pemasok" },
   ]);
@@ -92,7 +92,7 @@ export async function postPurchasePaymentJournal(tx: Tx, payment: { accountId: s
 /** Retur Pembelian: Dr Utang / Cr Persediaan. */
 export async function postPurchaseReturnJournal(tx: Tx, returnAmount: Dec) {
   const m = await getAccountMapping(tx);
-  await postJournal(tx, "JU-PRET", "Retur Pembelian", "PEMBELIAN", [
+  await postJournal(tx, "JU-RB", "Retur Pembelian", "PEMBELIAN", [
     { accountId: m.utangUsahaId, debit: returnAmount, credit: ZERO, description: "Pengurangan Utang" },
     { accountId: m.persediaanId, debit: ZERO, credit: returnAmount, description: "Barang keluar retur ke pemasok" },
   ]);

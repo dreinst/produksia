@@ -35,7 +35,7 @@ export default async function NewInvoicePage({ searchParams }: { searchParams: P
       where: { id: "default" },
       include: { piutangUsaha: true, pendapatanPenjualan: true, hpp: true, persediaan: true },
     }),
-    nextDocNumber(db.salesInvoice, "INV"),
+    nextDocNumber(db.salesInvoice, "FJ"),
   ]);
 
   const today = new Date();
