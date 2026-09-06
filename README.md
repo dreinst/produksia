@@ -33,6 +33,15 @@ Jalankan reset lalu seed kalau mau mulai bersih lagi.
 - **Tabel** dibungkus `<div className="overflow-x-auto ...">`, form pakai `grid-cols-1 md:grid-cols-2`, elemen lebar penuh pakai `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: lihat `AUDIT.md`.
 
+## Desain (Precision Ledger)
+
+UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_portfolio.zip` di folder induk — tidak ikut repo). Aturan praktisnya:
+
+- Pakai **kelas komponen** di `src/app/globals.css`, bukan utility lepas: `card`, `card-table` + `table-wrap`, `btn btn-primary|accent|outline|soft|danger`, `input`/`input-sm`, `label`, `hint`, `field`, `tbl`/`tbl-plain`, `badge badge-emerald|amber|rose|slate|blue`, `num` (angka, rata kanan), `mono`, `eyebrow`.
+- Nomor dokumen → `<DocNo no=…/>`, status → `<StatusBadge status=…/>`, ikon → `<Icon name="…"/>` (nama dari fonts.google.com/icons).
+- Halaman baru: judul dengan `PageHeader` (breadcrumb + badge + aksi), konten dalam `card`, tabel dalam `card card-table`.
+- Font teks dari `next/font/google` (Inter, Hanken Grotesk, JetBrains Mono); ikon Material Symbols self-hosted di `src/app/fonts/`.
+
 ## Struktur
 
 - `prisma/schema.prisma` — seluruh model data (master data + siklus penjualan + siklus pembelian)

@@ -303,10 +303,16 @@ Boundary: `error.tsx` (kegagalan render, tombol coba lagi), `not-found.tsx` (`no
 
 ## 8. Antarmuka
 
-- **Kerangka:** `layout.tsx` = `<Sidebar/>` + `<main class="min-w-0 flex-1 p-4 md:p-8">`. Di `< md` sidebar menjadi *drawer* dengan top-bar ☰; di desktop sticky 256px.
-- **Navigasi:** accordion 7 menu utama (urutan mengikuti alur kerja: transaksi → pembukuan → master). Hanya satu grup terbuka; grup yang memuat halaman aktif terbuka otomatis (state di-reset via `key={pathname}` tanpa `useEffect`).
-- **Responsif:** form `grid-cols-1 md:grid-cols-2`; elemen lebar penuh `md:col-span-2`; setiap tabel dibungkus `overflow-x-auto` dengan `min-w` agar HP scroll di dalam tabel, bukan seluruh halaman.
-- **Tema:** satu tema terang (`color-scheme: light`) — override dark-mode bawaan sengaja dihapus (lihat AUDIT #13).
+Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESIGN.md` + 2 layar contoh: Dashboard dan form Faktur). Implementasinya ada di `src/app/globals.css` (token & kelas komponen) dan `src/components/{AppShell,Sidebar,Topbar,InvoiceComposer,ui/*}`.
+
+- **Token:** kanvas `#f8fafc`; kartu putih `rounded-2xl` border `slate-200/70` + bayangan sangat halus; Inter (teks), Hanken Grotesk (judul), JetBrains Mono (angka & nomor dokumen, `tabular-nums`). Sinyal finansial: emerald = kredit/lunas, rose = debit/jatuh tempo, amber = draft/menunggu, blue = aksi/aktif.
+- **Kelas komponen** (dipakai semua halaman, bukan utility per elemen): `.card`/`.card-table`/`.card-head`/`.tile`, `.btn` + `btn-primary|accent|outline|soft|danger|sm`, `.input`/`.input-sm`/`.label`/`.hint`/`.field`, `.tbl` (header uppercase 11px, baris 40px, hover) / `.tbl-plain`, `.badge-*`, `.doc-badge`, `.num`/`.mono`/`.eyebrow`. Komponen kecil: `DocNo` (badge prefix + nomor mono), `StatusBadge`, `Icon` (Material Symbols).
+- **Kerangka:** `AppShell` (client) = `Sidebar` tetap 16rem di desktop / *drawer* di mobile + `Topbar` lengket (pencarian ⌘K → `/search`, menu "Transaksi Baru", status DB) + `<main max-w-7xl>`.
+- **Navigasi:** Dashboard, lalu grup **Operasional Finansial** (Penjualan, Pembelian, Kas & Bank, Buku Besar, Aset Tetap) dan **Administrasi & Setup** (Master Data, Pemetaan Akun). Accordion satu-terbuka; grup yang memuat halaman aktif terbuka otomatis (state di-reset via `key={pathname}` tanpa `useEffect`); sub-menu menampilkan kode dokumen (SQ, SO, DO, …).
+- **Dashboard & form Faktur** dibangun ulang mengikuti layar Stitch dengan data sungguhan: KPI (piutang, utang, kas & bank, nilai persediaan), pipeline SQ→SO→DO→INV→RCP, transaksi terbaru gabungan, neraca saldo cepat, peringatan stok, status penyusutan; `InvoiceComposer` menampilkan ringkasan finansial, **preview jurnal otomatis** (dari pemetaan akun), dan guardrails secara live saat qty diubah.
+- **Ikon:** Material Symbols Outlined di-self-host (`src/app/fonts/…woff2`, ±3,9 MB, variable font) lewat `next/font/local` — tidak ada request ke Google saat runtime.
+- **Responsif:** form `grid-cols-1 md:grid-cols-2`; elemen lebar penuh `md:col-span-2`; setiap tabel dalam `.card-table > .table-wrap` (scroll horizontal di HP, halaman tidak ikut melebar).
+- **Tema:** satu tema terang (`color-scheme: light`) sesuai DESIGN.md; dark mode sengaja tidak didukung.
 
 ---
 

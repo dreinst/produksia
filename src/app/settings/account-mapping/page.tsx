@@ -19,8 +19,8 @@ export default async function AccountMappingPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-xl font-semibold">Pemetaan Akun</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="page-title">Pemetaan Akun</h1>
+        <p className="text-sm text-slate-500 mt-1">
           Menentukan akun mana yang dipakai saat sistem otomatis membuat jurnal dari transaksi Penjualan &
           Pembelian (Faktur, Penerimaan, Pembayaran, Retur). Wajib diisi sebelum transaksi tersebut bisa dibuat.
         </p>
@@ -29,16 +29,16 @@ export default async function AccountMappingPage() {
       <ActionForm
         action={saveAccountMappingForm}
         successMessage="Pemetaan akun tersimpan."
-        className="flex flex-col gap-4 border rounded-lg p-4"
+        className="card flex flex-col gap-4"
       >
         {FIELDS.map((field) => (
-          <div key={field.name} className="flex flex-col gap-1">
-            <label className="text-sm font-medium">{field.label} *</label>
+          <div key={field.name} className="field">
+            <label className="label">{field.label} *</label>
             <select
               name={field.name}
               required
               defaultValue={(mapping as unknown as Record<string, string>)?.[field.name] ?? ""}
-              className="border rounded px-2 py-1"
+              className="input"
             >
               <option value="">-</option>
               {accounts
@@ -52,7 +52,7 @@ export default async function AccountMappingPage() {
           </div>
         ))}
 
-        <button type="submit" className="bg-black text-white px-4 py-2 rounded text-sm w-fit">
+        <button type="submit" className="btn btn-primary w-fit">
           Simpan Pemetaan
         </button>
       </ActionForm>

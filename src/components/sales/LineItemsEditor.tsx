@@ -25,23 +25,23 @@ export default function LineItemsEditor({ items }: { items: ItemOption[] }) {
   return (
     <div className="md:col-span-2 space-y-2">
       <input type="hidden" name="lines" value={JSON.stringify(rows)} />
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl-plain min-w-[36rem]">
         <thead>
-          <tr className="text-left text-zinc-500">
-            <th className="pb-1">Barang</th>
-            <th className="pb-1 w-24">Qty</th>
-            <th className="pb-1 w-32">Harga</th>
-            <th className="pb-1 w-32">Subtotal</th>
+          <tr>
+            <th>Barang</th>
+            <th className="w-24">Qty</th>
+            <th className="w-32">Harga</th>
+            <th className="w-32">Subtotal</th>
             <th />
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              <td className="pr-2 py-1">
+              <td>
                 <select
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.itemId}
                   onChange={(e) => {
                     const item = items.find((it) => it.id === e.target.value);
@@ -59,32 +59,32 @@ export default function LineItemsEditor({ items }: { items: ItemOption[] }) {
                   ))}
                 </select>
               </td>
-              <td className="pr-2 py-1">
+              <td>
                 <input
                   type="number"
                   min={0}
                   step="0.01"
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.qty}
                   onChange={(e) => updateRow(i, { qty: Number(e.target.value) })}
                 />
               </td>
-              <td className="pr-2 py-1">
+              <td>
                 <input
                   type="number"
                   min={0}
                   step="0.01"
-                  className="border rounded px-2 py-1 w-full"
+                  className="input input-sm"
                   value={row.price}
                   onChange={(e) => updateRow(i, { price: Number(e.target.value) })}
                 />
               </td>
-              <td className="pr-2 py-1">{(row.qty * row.price).toLocaleString("id-ID")}</td>
-              <td className="py-1">
+              <td>{(row.qty * row.price).toLocaleString("id-ID")}</td>
+              <td>
                 <button
                   type="button"
                   onClick={() => removeRow(i)}
-                  className="text-red-600 text-xs hover:underline"
+                  className="btn-link-danger"
                 >
                   Hapus
                 </button>
@@ -93,8 +93,8 @@ export default function LineItemsEditor({ items }: { items: ItemOption[] }) {
           ))}
         </tbody>
         </table>
-      </div>
-      <button type="button" onClick={addRow} className="text-sm text-blue-600 hover:underline">
+      </div></div>
+      <button type="button" onClick={addRow} className="btn-link">
         + Tambah baris
       </button>
       <div className="text-right font-medium">Total: {total.toLocaleString("id-ID")}</div>

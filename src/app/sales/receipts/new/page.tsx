@@ -22,10 +22,10 @@ export default async function NewReceiptPage({
   if (!invoiceId || !invoice) {
     return (
       <div className="max-w-3xl space-y-4">
-        <h1 className="text-xl font-semibold">Penerimaan Penjualan Baru</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="page-title">Penerimaan Penjualan Baru</h1>
+        <p className="muted">
           Pilih faktur dari halaman{" "}
-          <a href="/sales/invoices" className="text-blue-600 hover:underline">
+          <a href="/sales/invoices" className="font-semibold text-blue-600 hover:underline">
             Faktur Penjualan
           </a>{" "}
           lalu klik &quot;Terima Bayar&quot;.
@@ -39,17 +39,17 @@ export default async function NewReceiptPage({
 
   return (
     <div className="space-y-6 max-w-md">
-      <h1 className="text-xl font-semibold">Penerimaan untuk Faktur {invoice.no}</h1>
-      <p className="text-sm text-zinc-500">
+      <h1 className="page-title">Penerimaan untuk Faktur {invoice.no}</h1>
+      <p className="muted">
         Pelanggan: {invoice.customer.name} &middot; Sisa tagihan: {remaining.toLocaleString("id-ID")}
       </p>
 
-      <ActionForm action={createReceiptForm} className="flex flex-col gap-4 border rounded-lg p-4">
+      <ActionForm action={createReceiptForm} className="card flex flex-col gap-4">
         <input type="hidden" name="invoiceId" value={invoice.id} />
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Akun Kas/Bank Penerima *</label>
-          <select name="accountId" required className="border rounded px-2 py-1">
+        <div className="field">
+          <label className="label">Akun Kas/Bank Penerima *</label>
+          <select name="accountId" required className="input">
             <option value="">-</option>
             {accounts.map((a) => (
               <option key={a.id} value={a.id}>
@@ -59,8 +59,8 @@ export default async function NewReceiptPage({
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Jumlah Bayar *</label>
+        <div className="field">
+          <label className="label">Jumlah Bayar *</label>
           <input
             type="number"
             name="amount"
@@ -69,20 +69,20 @@ export default async function NewReceiptPage({
             max={remaining}
             defaultValue={remaining}
             required
-            className="border rounded px-2 py-1"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Metode Pembayaran</label>
-          <select name="paymentMethod" defaultValue="CASH" className="border rounded px-2 py-1">
+        <div className="field">
+          <label className="label">Metode Pembayaran</label>
+          <select name="paymentMethod" defaultValue="CASH" className="input">
             <option value="CASH">Tunai</option>
             <option value="TRANSFER">Transfer</option>
             <option value="CARD">Kartu</option>
           </select>
         </div>
 
-        <button type="submit" className="bg-black text-white px-4 py-2 rounded text-sm">
+        <button type="submit" className="btn btn-primary">
           Catat Penerimaan
         </button>
       </ActionForm>

@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { DocNo } from "@/components/ui/Badges";
 
 export default async function PurchasePaymentsPage() {
   const payments = await db.purchasePayment.findMany({
@@ -8,44 +9,44 @@ export default async function PurchasePaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold">Pembayaran Pembelian</h1>
-      <p className="text-sm text-zinc-500">
+      <h1 className="page-title">Pembayaran Pembelian</h1>
+      <p className="muted">
         Pembayaran dibuat dari halaman Faktur Pembelian (tombol &quot;Bayar&quot;).
       </p>
 
-      <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <table className="w-full text-sm border-collapse min-w-[36rem]">
+      <div className="card card-table"><div className="table-wrap">
+        <table className="tbl min-w-[36rem]">
         <thead>
-          <tr className="border-b text-left">
-            <th className="py-2 pr-4">No</th>
-            <th className="py-2 pr-4">Tanggal</th>
-            <th className="py-2 pr-4">Faktur</th>
-            <th className="py-2 pr-4">Pemasok</th>
-            <th className="py-2 pr-4">Jumlah</th>
-            <th className="py-2 pr-4">Metode</th>
+          <tr>
+            <th>No</th>
+            <th>Tanggal</th>
+            <th>Faktur</th>
+            <th>Pemasok</th>
+            <th className="text-right">Jumlah</th>
+            <th>Metode</th>
           </tr>
         </thead>
         <tbody>
           {payments.map((p) => (
-            <tr key={p.id} className="border-b">
-              <td className="py-2 pr-4">{p.no}</td>
-              <td className="py-2 pr-4">{p.date.toLocaleDateString("id-ID")}</td>
-              <td className="py-2 pr-4">{p.invoice.no}</td>
-              <td className="py-2 pr-4">{p.supplier.name}</td>
-              <td className="py-2 pr-4">{Number(p.amount).toLocaleString("id-ID")}</td>
-              <td className="py-2 pr-4">{p.paymentMethod}</td>
+            <tr key={p.id}>
+              <td><DocNo no={p.no} /></td>
+              <td className="text-slate-500 whitespace-nowrap">{p.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
+              <td>{p.invoice.no}</td>
+              <td>{p.supplier.name}</td>
+              <td className="text-right num">{Number(p.amount).toLocaleString("id-ID")}</td>
+              <td>{p.paymentMethod}</td>
             </tr>
           ))}
           {payments.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-4 text-zinc-500">
+              <td colSpan={6} className="empty">
                 Belum ada pembayaran.
               </td>
             </tr>
           )}
         </tbody>
         </table>
-      </div>
+      </div></div>
     </div>
   );
 }

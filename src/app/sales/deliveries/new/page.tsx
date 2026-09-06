@@ -23,10 +23,10 @@ export default async function NewDeliveryPage({
   if (!orderId || !order) {
     return (
       <div className="max-w-3xl space-y-4">
-        <h1 className="text-xl font-semibold">Pengiriman Pesanan Baru</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="page-title">Pengiriman Pesanan Baru</h1>
+        <p className="muted">
           Pilih pesanan dari halaman{" "}
-          <a href="/sales/orders" className="text-blue-600 hover:underline">
+          <a href="/sales/orders" className="font-semibold text-blue-600 hover:underline">
             Pesanan Penjualan
           </a>{" "}
           lalu klik &quot;Kirim&quot;.
@@ -45,15 +45,15 @@ export default async function NewDeliveryPage({
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <h1 className="text-xl font-semibold">Pengiriman untuk Pesanan {order.no}</h1>
-      <p className="text-sm text-zinc-500">Pelanggan: {order.customer.name}</p>
+      <h1 className="page-title">Pengiriman untuk Pesanan {order.no}</h1>
+      <p className="muted">Pelanggan: {order.customer.name}</p>
 
-      <ActionForm action={createDeliveryForm} className="grid grid-cols-1 md:grid-cols-2 gap-4 border rounded-lg p-4">
+      <ActionForm action={createDeliveryForm} className="card grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="hidden" name="orderId" value={order.id} />
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Gudang *</label>
-          <select name="warehouseId" required className="border rounded px-2 py-1">
+        <div className="field">
+          <label className="label">Gudang *</label>
+          <select name="warehouseId" required className="input">
             <option value="">-</option>
             {warehouses.map((w) => (
               <option key={w.id} value={w.id}>
@@ -68,7 +68,7 @@ export default async function NewDeliveryPage({
         <OrderLinesPicker lines={linesForPicker} />
 
         <div className="md:col-span-2">
-          <button type="submit" className="bg-black text-white px-4 py-2 rounded text-sm">
+          <button type="submit" className="btn btn-primary">
             Proses Pengiriman
           </button>
         </div>
