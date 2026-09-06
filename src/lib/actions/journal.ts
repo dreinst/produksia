@@ -40,7 +40,7 @@ async function createBalancedJournal(memo: string, lines: JournalLineInput[], so
   const totalDebit = sum(lines.map((l) => l.debit));
   const totalCredit = sum(lines.map((l) => l.credit));
   if (!totalDebit.equals(totalCredit)) {
-    throw new Error(`Jurnal tidak balance: total debit ${fmt(totalDebit)} vs kredit ${fmt(totalCredit)}`);
+    throw new Error(`Jurnal tidak seimbang: total debit ${fmt(totalDebit)} vs kredit ${fmt(totalCredit)}`);
   }
   if (totalDebit.isZero()) throw new Error("Jumlah jurnal tidak boleh nol");
 

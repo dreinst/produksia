@@ -56,8 +56,8 @@ export default function InvoiceComposer(p: ComposerProps) {
   const update = (i: number, qty: number) => setRows((prev) => prev.map((r, k) => (k === i ? { ...r, qty } : r)));
 
   const labels = isSales
-    ? { title: "Buat Faktur Penjualan (INV)", module: "Penjualan", list: "Faktur Penjualan", partner: "Pelanggan", counter: "Akun Piutang", prior: "Surat Jalan (DO)", submit: "Terbitkan Faktur & Jurnal", partnerHref: "/master/customers" }
-    : { title: "Buat Faktur Pembelian (PINV)", module: "Pembelian", list: "Faktur Pembelian", partner: "Pemasok", counter: "Akun Utang", prior: "Penerimaan Barang (GR)", submit: "Terbitkan Faktur & Jurnal", partnerHref: "/master/suppliers" };
+    ? { title: "Buat Faktur Penjualan (FJ)", module: "Penjualan", list: "Faktur Penjualan", partner: "Pelanggan", counter: "Akun Piutang", prior: "Surat Jalan (SJ)", submit: "Terbitkan Faktur & Jurnal", partnerHref: "/master/customers" }
+    : { title: "Buat Faktur Pembelian (FB)", module: "Pembelian", list: "Faktur Pembelian", partner: "Pemasok", counter: "Akun Utang", prior: "Penerimaan Barang (TB)", submit: "Terbitkan Faktur & Jurnal", partnerHref: "/master/suppliers" };
 
   const journalRows = isSales
     ? [
@@ -76,7 +76,7 @@ export default function InvoiceComposer(p: ComposerProps) {
   const guards = [
     { ok: calc.qtyOk, text: "Semua qty valid (≤ sisa pesanan, minimal 1 baris > 0)" },
     { ok: !!p.mapping, text: p.mapping ? "Pemetaan akun terpasang (5 peran akun)" : "Pemetaan akun belum diatur — buka Buku Besar › Pemetaan Akun" },
-    { ok: true, text: isSales ? "Stok dipotong saat Pengiriman (DO), bukan saat faktur" : "Stok bertambah saat Penerimaan Barang (GR), bukan saat faktur" },
+    { ok: true, text: isSales ? "Stok dipotong saat Pengiriman (SJ), bukan saat faktur" : "Stok bertambah saat Penerimaan Barang (TB), bukan saat faktur" },
   ];
   const canSubmit = calc.qtyOk && !!p.mapping && !pending;
 
@@ -106,7 +106,7 @@ export default function InvoiceComposer(p: ComposerProps) {
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="page-title">{labels.title}</h1>
             <span className="badge badge-amber">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Draft (belum diposting)
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Draf (belum dicatat)
             </span>
             <span className="badge badge-slate">
               <Icon name="link" className="!text-[14px] text-blue-600" /> Ref Pesanan: <span className="mono">{p.order.no}</span>
@@ -141,11 +141,11 @@ export default function InvoiceComposer(p: ComposerProps) {
                   <Icon name="receipt_long" className="!text-[20px] text-blue-600" />
                   <h2 className="card-title !text-[15px]">Informasi Dokumen &amp; Rekanan</h2>
                 </div>
-                <span className="hint uppercase">Metode: Akrual • IDR</span>
+                <span className="hint uppercase">Metode: Akrual • Rp</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 <div className="field">
-                  <label className="label"><span>No. Faktur</span><span className="hint text-blue-600">Auto</span></label>
+                  <label className="label"><span>No. Faktur</span><span className="hint text-blue-600">Otomatis</span></label>
                   <div className="relative">
                     <input readOnly value={p.nextNo} className="input input-sm mono" />
                     <Icon name="lock" className="absolute right-2 top-1.5 !text-[16px] text-slate-400" />
@@ -156,7 +156,7 @@ export default function InvoiceComposer(p: ComposerProps) {
                   <input readOnly type="date" value={p.date} className="input input-sm" />
                 </div>
                 <div className="field">
-                  <label className="label"><span>Jatuh Tempo</span><span className="hint">Net 14</span></label>
+                  <label className="label"><span>Jatuh Tempo</span><span className="hint">14 hari</span></label>
                   <input readOnly type="date" value={p.dueDate} className="input input-sm" />
                 </div>
                 <div className="field sm:col-span-2">
@@ -167,7 +167,7 @@ export default function InvoiceComposer(p: ComposerProps) {
                   <input readOnly value={`${p.partner.code} • ${p.partner.name}`} className="input input-sm" />
                 </div>
                 <div className="field">
-                  <label className="label"><span>{labels.counter}</span><span className="hint">COA Map</span></label>
+                  <label className="label"><span>{labels.counter}</span><span className="hint">Peta Akun</span></label>
                   <div className="relative">
                     <input readOnly value={p.mapping?.counter ?? "Belum dipetakan"} className={`input input-sm ${p.mapping ? "" : "!text-rose-600"}`} />
                     <Icon name="hub" className="absolute right-2 top-1.5 !text-[16px] text-slate-400" />
@@ -198,7 +198,7 @@ export default function InvoiceComposer(p: ComposerProps) {
                       <th className="w-8 text-center">#</th>
                       <th>Kode &amp; Nama Barang / Jasa</th>
                       <th className="text-right">Sisa / Pesanan</th>
-                      <th className="text-right w-24">Qty Faktur</th>
+                      <th className="text-right w-24">Kuantitas Faktur</th>
                       <th className="text-center w-14">Satuan</th>
                       <th className="text-right w-24">Harga</th>
                       <th className="text-right w-28">Total (Rp)</th>
@@ -251,7 +251,7 @@ export default function InvoiceComposer(p: ComposerProps) {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-[13px] font-semibold text-slate-900 flex items-center gap-2">
                   <Icon name="alt_route" className="!text-[18px] text-blue-600" />
-                  Pipeline Terhubung ({isSales ? "SO → DO → INV" : "PO → GR → PINV"})
+                  Alur Terhubung ({isSales ? "PSJ → SJ → FJ" : "PSB → TB → FB"})
                 </h3>
                 <span className="hint text-emerald-600">Tautan dokumen tervalidasi</span>
               </div>
@@ -300,7 +300,7 @@ export default function InvoiceComposer(p: ComposerProps) {
                 <div className="mt-3 p-3 rounded-lg bg-blue-50/60 border border-blue-100 flex flex-col gap-1">
                   <div className="flex justify-between items-baseline">
                     <span className="eyebrow">Total Nilai Tagihan</span>
-                    <span className="hint font-bold text-blue-600">IDR</span>
+                    <span className="hint font-bold text-blue-600">Rp</span>
                   </div>
                   <div className="font-mono text-xl font-bold tracking-tight text-slate-900">Rp {fmt(calc.subtotal)}</div>
                 </div>
@@ -312,12 +312,12 @@ export default function InvoiceComposer(p: ComposerProps) {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <Icon name="balance" className="!text-[18px] text-blue-600" />
-                    <h3 className="text-[13px] font-semibold text-slate-900">Preview Jurnal Otomatis</h3>
+                    <h3 className="text-[13px] font-semibold text-slate-900">Pratinjau Jurnal Otomatis</h3>
                   </div>
-                  <span className="hint">Diposting bersama faktur dalam 1 transaksi</span>
+                  <span className="hint">Dicatat bersama faktur dalam 1 transaksi</span>
                 </div>
                 <span className={`badge ${jDebit === jCredit ? "badge-emerald" : "badge-rose"}`}>
-                  <Icon name="done_all" className="!text-[14px]" /> {jDebit === jCredit ? "Balanced" : "Tidak balance"}
+                  <Icon name="done_all" className="!text-[14px]" /> {jDebit === jCredit ? "Seimbang" : "Tidak seimbang"}
                 </span>
               </div>
               <div className="rounded border border-slate-200 overflow-hidden">
@@ -354,7 +354,7 @@ export default function InvoiceComposer(p: ComposerProps) {
 
             <section className="card">
               <h3 className="text-[13px] font-semibold text-slate-900 flex items-center gap-1.5 mb-3">
-                <Icon name="shield" className="!text-[18px] text-blue-600" /> Guardrails &amp; Validasi
+                <Icon name="shield" className="!text-[18px] text-blue-600" /> Pengaman &amp; Validasi
               </h3>
               <div className="space-y-2 text-[13px]">
                 {guards.map((g) => (

@@ -166,24 +166,24 @@ Status (`DocStatus`): `DRAFT` → `PARTIAL` → `PROCESSED` untuk pesanan (berda
 
 ```mermaid
 flowchart LR
-    SQ[Penawaran<br/>SQ · DRAFT] -->|Konversi| SO[Pesanan<br/>SO · DRAFT]
-    SO -->|Kirim, bisa cicil| DO[Pengiriman<br/>DO]
-    SO -->|Fakturkan| INV[Faktur<br/>INV · DRAFT]
-    INV -->|Terima bayar, bisa cicil| RCP[Penerimaan<br/>RCP]
-    INV -->|Retur| RET[Retur<br/>RET]
-    DO -.->|stok −| STK[(ItemStock)]
-    RET -.->|stok +| STK
-    INV -.->|Dr Piutang / Cr Pendapatan<br/>Dr HPP / Cr Persediaan| GL[(Jurnal)]
-    RCP -.->|Dr Kas-Bank / Cr Piutang| GL
-    RET -.->|kebalikan faktur| GL
+    PNW[Penawaran<br/>PNW · DRAFT] -->|Konversi| PSJ[Pesanan<br/>PSJ · DRAFT]
+    PSJ -->|Kirim, bisa cicil| SJ[Pengiriman<br/>SJ]
+    PSJ -->|Fakturkan| FJ[Faktur<br/>FJ · DRAFT]
+    FJ -->|Terima bayar, bisa cicil| TRM[Penerimaan<br/>TRM]
+    FJ -->|Retur| RJ[Retur<br/>RJ]
+    SJ -.->|stok −| STK[(ItemStock)]
+    RJ -.->|stok +| STK
+    FJ -.->|Dr Piutang / Cr Pendapatan<br/>Dr HPP / Cr Persediaan| GL[(Jurnal)]
+    TRM -.->|Dr Kas-Bank / Cr Piutang| GL
+    RJ -.->|kebalikan faktur| GL
 ```
 
 | Tahap | Halaman | Action | Validasi utama | Efek |
 |---|---|---|---|---|
 | Penawaran | `/sales/quotations/new` | `createQuotation` | pelanggan, ≥1 baris qty>0 | — |
-| Konversi | tombol di daftar penawaran | `convertQuotationToOrder` | belum `CONVERTED` | buat SO, penawaran → `CONVERTED` |
+| Konversi | tombol di daftar penawaran | `convertQuotationToOrder` | belum `CONVERTED` | buat PSJ, penawaran → `CONVERTED` |
 | Pesanan langsung | `/sales/orders/new` | `createOrder` | idem penawaran | — |
-| Pengiriman | `/sales/deliveries/new?orderId=` | `createDelivery` | qty ≤ sisa pesanan; **stok cukup** | stok −, `qtyShipped` +, status SO |
+| Pengiriman | `/sales/deliveries/new?orderId=` | `createDelivery` | qty ≤ sisa pesanan; **stok cukup** | stok −, `qtyShipped` +, status PSJ |
 | Faktur | `/sales/invoices/new?orderId=` | `createInvoice` | qty ≤ sisa belum ditagih | `qtyInvoiced` +, **jurnal** |
 | Penerimaan | `/sales/receipts/new?invoiceId=` | `createReceipt` | pilih akun kas/bank; ≤ sisa tagihan; belum lunas | status faktur, **jurnal** |
 | Retur | `/sales/returns/new?invoiceId=` | `createReturn` | qty ≤ faktur − retur sebelumnya | stok +, **jurnal** |
@@ -194,15 +194,15 @@ Catatan desain: **stok berkurang saat pengiriman, bukan saat pesanan** (pesanan 
 
 ```mermaid
 flowchart LR
-    PO[Pesanan Pembelian<br/>PO] -->|Terima barang, bisa cicil| GR[Penerimaan Barang<br/>GR]
-    PO -->|Fakturkan| PINV[Faktur Pembelian<br/>PINV]
-    PINV -->|Bayar, bisa cicil| PP[Pembayaran<br/>PP]
-    PINV -->|Retur| PRET[Retur Pembelian<br/>PRET]
-    GR -.->|stok +| STK[(ItemStock)]
-    PRET -.->|stok − (cek cukup)| STK
-    PINV -.->|Dr Persediaan / Cr Utang| GL[(Jurnal)]
-    PP -.->|Dr Utang / Cr Kas-Bank| GL
-    PRET -.->|Dr Utang / Cr Persediaan| GL
+    PSB[Pesanan Pembelian<br/>PSB] -->|Terima barang, bisa cicil| TB[Penerimaan Barang<br/>TB]
+    PSB -->|Fakturkan| FB[Faktur Pembelian<br/>FB]
+    FB -->|Bayar, bisa cicil| BYR[Pembayaran<br/>BYR]
+    FB -->|Retur| RB[Retur Pembelian<br/>RB]
+    TB -.->|stok +| STK[(ItemStock)]
+    RB -.->|stok − (cek cukup)| STK
+    FB -.->|Dr Persediaan / Cr Utang| GL[(Jurnal)]
+    BYR -.->|Dr Utang / Cr Kas-Bank| GL
+    RB -.->|Dr Utang / Cr Persediaan| GL
 ```
 
 Action: `createPurchaseOrder`, `createGoodsReceipt`, `createPurchaseInvoice`, `createPurchasePayment`, `createPurchaseReturn` (`src/lib/actions/purchasing.ts`). Aturan validasi identik dengan penjualan dengan arah stok terbalik. Harga default di editor baris = `costPrice` barang.
@@ -237,8 +237,8 @@ flowchart TB
 
 | Prefix | Dokumen | | Prefix | Dokumen |
 |---|---|---|---|---|
-| SQ / SO / DO / INV / RCP / RET | siklus penjualan | | JU · KM · KK | jurnal manual, kas masuk, kas keluar |
-| PO / GR / PINV / PP / PRET | siklus pembelian | | JU-INV · JU-RCP · JU-RET · JU-PINV · JU-PP · JU-PRET · JU-PNY | jurnal otomatis |
+| PNW / PSJ / SJ / FJ / TRM / RJ | siklus penjualan | | JU · KM · KK | jurnal manual, kas masuk, kas keluar |
+| PSB / TB / FB / BYR / RB | siklus pembelian | | JU-FJ · JU-TRM · JU-RJ · JU-FB · JU-BYR · JU-RB · JU-PNY | jurnal otomatis |
 
 ---
 
@@ -303,13 +303,13 @@ Boundary: `error.tsx` (kegagalan render, tombol coba lagi), `not-found.tsx` (`no
 
 ## 8. Antarmuka
 
-Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESIGN.md` + 2 layar contoh: Dashboard dan form Faktur). Implementasinya ada di `src/app/globals.css` (token & kelas komponen) dan `src/components/{AppShell,Sidebar,Topbar,InvoiceComposer,ui/*}`.
+Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESIGN.md` + 2 layar contoh: Beranda dan form Faktur). Implementasinya ada di `src/app/globals.css` (token & kelas komponen) dan `src/components/{AppShell,Sidebar,Topbar,InvoiceComposer,ui/*}`.
 
 - **Token:** kanvas `#f8fafc`; kartu putih `rounded-2xl` border `slate-200/70` + bayangan sangat halus; Inter (teks), Hanken Grotesk (judul), JetBrains Mono (angka & nomor dokumen, `tabular-nums`). Sinyal finansial: emerald = kredit/lunas, rose = debit/jatuh tempo, amber = draft/menunggu, blue = aksi/aktif.
 - **Kelas komponen** (dipakai semua halaman, bukan utility per elemen): `.card`/`.card-table`/`.card-head`/`.tile`, `.btn` + `btn-primary|accent|outline|soft|danger|sm`, `.input`/`.input-sm`/`.label`/`.hint`/`.field`, `.tbl` (header uppercase 11px, baris 40px, hover) / `.tbl-plain`, `.badge-*`, `.doc-badge`, `.num`/`.mono`/`.eyebrow`. Komponen kecil: `DocNo` (badge prefix + nomor mono), `StatusBadge`, `Icon` (Material Symbols).
 - **Kerangka:** `AppShell` (client) = `Sidebar` tetap 16rem di desktop / *drawer* di mobile + `Topbar` lengket (pencarian ⌘K → `/search`, menu "Transaksi Baru", status DB) + `<main max-w-7xl>`.
-- **Navigasi:** Dashboard, lalu grup **Operasional Finansial** (Penjualan, Pembelian, Kas & Bank, Buku Besar, Aset Tetap) dan **Administrasi & Setup** (Master Data, Pemetaan Akun). Accordion satu-terbuka; grup yang memuat halaman aktif terbuka otomatis (state di-reset via `key={pathname}` tanpa `useEffect`); sub-menu menampilkan kode dokumen (SQ, SO, DO, …).
-- **Dashboard & form Faktur** dibangun ulang mengikuti layar Stitch dengan data sungguhan: KPI (piutang, utang, kas & bank, nilai persediaan), pipeline SQ→SO→DO→INV→RCP, transaksi terbaru gabungan, neraca saldo cepat, peringatan stok, status penyusutan; `InvoiceComposer` menampilkan ringkasan finansial, **preview jurnal otomatis** (dari pemetaan akun), dan guardrails secara live saat qty diubah.
+- **Navigasi:** Beranda, lalu grup **Operasional Finansial** (Penjualan, Pembelian, Kas & Bank, Buku Besar, Aset Tetap) dan **Administrasi & Setup** (Data Induk, Pemetaan Akun). Accordion satu-terbuka; grup yang memuat halaman aktif terbuka otomatis (state di-reset via `key={pathname}` tanpa `useEffect`); sub-menu menampilkan kode dokumen (PNW, PSJ, SJ, …).
+- **Beranda & form Faktur** dibangun ulang mengikuti layar Stitch dengan data sungguhan: KPI (piutang, utang, kas & bank, nilai persediaan), pipeline PNW→PSJ→SJ→FJ→TRM, transaksi terbaru gabungan, neraca saldo cepat, peringatan stok, status penyusutan; `InvoiceComposer` menampilkan ringkasan finansial, **preview jurnal otomatis** (dari pemetaan akun), dan guardrails secara live saat qty diubah.
 - **Ikon:** Material Symbols Outlined di-self-host (`src/app/fonts/…woff2`, ±3,9 MB, variable font) lewat `next/font/local` — tidak ada request ke Google saat runtime.
 - **Responsif:** form `grid-cols-1 md:grid-cols-2`; elemen lebar penuh `md:col-span-2`; setiap tabel dalam `.card-table > .table-wrap` (scroll horizontal di HP, halaman tidak ikut melebar).
 - **Tema:** satu tema terang (`color-scheme: light`) sesuai DESIGN.md; dark mode sengaja tidak didukung.

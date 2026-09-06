@@ -30,7 +30,7 @@ export default function LineItemsEditor({ items }: { items: ItemOption[] }) {
         <thead>
           <tr>
             <th>Barang</th>
-            <th className="w-24">Qty</th>
+            <th className="w-24">Kuantitas</th>
             <th className="w-32">Harga</th>
             <th className="w-32">Subtotal</th>
             <th />

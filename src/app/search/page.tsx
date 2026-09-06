@@ -56,7 +56,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   return (
     <div className="space-y-6">
       <PageHeader
-        crumbs={[{ label: "Dashboard", href: "/" }, { label: "Pencarian" }]}
+        crumbs={[{ label: "Beranda", href: "/" }, { label: "Pencarian" }]}
         title={term ? `Hasil untuk “${term}”` : "Pencarian"}
         subtitle={term ? `${docs.length} dokumen · ${masters.length} master data` : "Ketik nomor dokumen, nama rekanan, barang, atau akun di kotak pencarian."}
       />
@@ -109,7 +109,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
           <div className="lg:col-span-4 card">
             <div className="card-head">
-              <h2 className="card-title">Master Data</h2>
+              <h2 className="card-title">Data Induk</h2>
             </div>
             <ul className="divide-y divide-slate-100">
               {masters.map((m) => (

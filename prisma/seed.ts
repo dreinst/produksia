@@ -86,7 +86,7 @@ async function main() {
   console.log("=== Tahap 1: Penawaran Penjualan (draft, belum dikonversi) ===");
   await db.salesQuotation.create({
     data: {
-      no: "SQ-2026-0001",
+      no: "PNW-2026-0001",
       customerId: customer.id,
       status: "DRAFT",
       total: 5 * 12000 + 5 * 16000,
@@ -98,7 +98,7 @@ async function main() {
       },
     },
   });
-  console.log("  -> SQ-2026-0001 dibuat (cek halaman Penawaran Penjualan)");
+  console.log("  -> PNW-2026-0001 dibuat (cek halaman Penawaran Penjualan)");
 
   console.log("=== Tahap 2: Penawaran kedua, dikonversi jadi Pesanan ===");
   const qtyTepung = 20;
@@ -108,7 +108,7 @@ async function main() {
 
   const q2 = await db.salesQuotation.create({
     data: {
-      no: "SQ-2026-0002",
+      no: "PNW-2026-0002",
       customerId: customer.id,
       status: "CONVERTED",
       total: orderTotal,
@@ -124,7 +124,7 @@ async function main() {
 
   const order = await db.salesOrder.create({
     data: {
-      no: "SO-2026-0001",
+      no: "PSJ-2026-0001",
       customerId: customer.id,
       quotationId: q2.id,
       status: "DRAFT",
@@ -139,7 +139,7 @@ async function main() {
     },
     include: { lines: true },
   });
-  console.log("  -> SQ-2026-0002 dikonversi jadi SO-2026-0001 (cek halaman Pesanan Penjualan)");
+  console.log("  -> PNW-2026-0002 dikonversi jadi PSJ-2026-0001 (cek halaman Pesanan Penjualan)");
 
   const orderLineTepung = order.lines.find((l) => l.itemId === tepung.id)!;
   const orderLineGula = order.lines.find((l) => l.itemId === gula.id)!;
@@ -148,7 +148,7 @@ async function main() {
   console.log("=== Tahap 3: Pengiriman sebagian (parsial) ===");
   await db.delivery.create({
     data: {
-      no: "DO-2026-0001",
+      no: "SJ-2026-0001",
       orderId: order.id,
       warehouseId: warehouse.id,
       status: "PROCESSED",
@@ -171,12 +171,12 @@ async function main() {
     data: { qty: { decrement: 5 } },
   });
   await db.salesOrder.update({ where: { id: order.id }, data: { status: "PARTIAL" } });
-  console.log("  -> DO-2026-0001 (parsial), status Pesanan jadi PARTIAL, stok berkurang (cek halaman Pengiriman & Barang)");
+  console.log("  -> SJ-2026-0001 (parsial), status Pesanan jadi PARTIAL, stok berkurang (cek halaman Pengiriman & Barang)");
 
   console.log("=== Tahap 4: Pengiriman sisa (lengkap) ===");
   await db.delivery.create({
     data: {
-      no: "DO-2026-0002",
+      no: "SJ-2026-0002",
       orderId: order.id,
       warehouseId: warehouse.id,
       status: "PROCESSED",
@@ -205,12 +205,12 @@ async function main() {
     data: { qty: { decrement: qtyTelur } },
   });
   await db.salesOrder.update({ where: { id: order.id }, data: { status: "PROCESSED" } });
-  console.log("  -> DO-2026-0002 (sisa), status Pesanan jadi PROCESSED, stok Tepung/Gula/Telur berkurang penuh");
+  console.log("  -> SJ-2026-0002 (sisa), status Pesanan jadi PROCESSED, stok Tepung/Gula/Telur berkurang penuh");
 
   console.log("=== Tahap 5: Faktur Penjualan (untuk seluruh qty pesanan) ===");
   const invoice = await db.salesInvoice.create({
     data: {
-      no: "INV-2026-0001",
+      no: "FJ-2026-0001",
       customerId: customer.id,
       orderId: order.id,
       status: "DRAFT",
@@ -228,28 +228,28 @@ async function main() {
   await db.salesOrderLine.update({ where: { id: orderLineTepung.id }, data: { qtyInvoiced: qtyTepung } });
   await db.salesOrderLine.update({ where: { id: orderLineGula.id }, data: { qtyInvoiced: qtyGula } });
   await db.salesOrderLine.update({ where: { id: orderLineTelur.id }, data: { qtyInvoiced: qtyTelur } });
-  console.log(`  -> INV-2026-0001 terbit, total ${orderTotal.toLocaleString("id-ID")} (cek halaman Faktur Penjualan)`);
+  console.log(`  -> FJ-2026-0001 terbit, total ${orderTotal.toLocaleString("id-ID")} (cek halaman Faktur Penjualan)`);
 
   console.log("=== Tahap 6: Penerimaan sebagian (cicilan pertama) ===");
   const firstPayment = Math.round(orderTotal / 2);
   await db.salesReceipt.create({
-    data: { no: "RCP-2026-0001", customerId: customer.id, invoiceId: invoice.id, accountId: bank.id, amount: firstPayment, paymentMethod: "TRANSFER" },
+    data: { no: "TRM-2026-0001", customerId: customer.id, invoiceId: invoice.id, accountId: bank.id, amount: firstPayment, paymentMethod: "TRANSFER" },
   });
   await db.salesInvoice.update({ where: { id: invoice.id }, data: { status: "PARTIAL" } });
-  console.log(`  -> RCP-2026-0001 (${firstPayment.toLocaleString("id-ID")}), status Faktur jadi PARTIAL`);
+  console.log(`  -> TRM-2026-0001 (${firstPayment.toLocaleString("id-ID")}), status Faktur jadi PARTIAL`);
 
   console.log("=== Tahap 7: Penerimaan pelunasan ===");
   const secondPayment = orderTotal - firstPayment;
   await db.salesReceipt.create({
-    data: { no: "RCP-2026-0002", customerId: customer.id, invoiceId: invoice.id, accountId: kas.id, amount: secondPayment, paymentMethod: "CASH" },
+    data: { no: "TRM-2026-0002", customerId: customer.id, invoiceId: invoice.id, accountId: kas.id, amount: secondPayment, paymentMethod: "CASH" },
   });
   await db.salesInvoice.update({ where: { id: invoice.id }, data: { status: "PAID" } });
-  console.log(`  -> RCP-2026-0002 (${secondPayment.toLocaleString("id-ID")}), status Faktur jadi PAID (cek halaman Penerimaan Penjualan)`);
+  console.log(`  -> TRM-2026-0002 (${secondPayment.toLocaleString("id-ID")}), status Faktur jadi PAID (cek halaman Penerimaan Penjualan)`);
 
   console.log("=== Tahap 8: Retur sebagian barang ===");
   await db.salesReturn.create({
     data: {
-      no: "RET-2026-0001",
+      no: "RJ-2026-0001",
       invoiceId: invoice.id,
       warehouseId: warehouse.id,
       reason: "Kemasan tepung rusak saat pengiriman",
@@ -260,14 +260,14 @@ async function main() {
     where: { itemId_warehouseId: { itemId: tepung.id, warehouseId: warehouse.id } },
     data: { qty: { increment: 2 } },
   });
-  console.log("  -> RET-2026-0001, stok Tepung bertambah 2 (cek halaman Retur Penjualan & Barang)");
+  console.log("  -> RJ-2026-0001, stok Tepung bertambah 2 (cek halaman Retur Penjualan & Barang)");
 
   console.log("=== Tahap 9: Pesanan Pembelian (restock Tepung ke pemasok) ===");
   const qtyBeli = 50;
   const poTotal = qtyBeli * 9000;
   const po = await db.purchaseOrder.create({
     data: {
-      no: "PO-2026-0001",
+      no: "PSB-2026-0001",
       supplierId: supplier.id,
       status: "DRAFT",
       total: poTotal,
@@ -276,12 +276,12 @@ async function main() {
     include: { lines: true },
   });
   const poLine = po.lines[0];
-  console.log("  -> PO-2026-0001 dibuat (cek halaman Pesanan Pembelian)");
+  console.log("  -> PSB-2026-0001 dibuat (cek halaman Pesanan Pembelian)");
 
   console.log("=== Tahap 10: Penerimaan Barang sebagian ===");
   await db.goodsReceipt.create({
     data: {
-      no: "GR-2026-0001",
+      no: "TB-2026-0001",
       orderId: po.id,
       warehouseId: warehouse.id,
       status: "PROCESSED",
@@ -294,12 +294,12 @@ async function main() {
     data: { qty: { increment: 30 } },
   });
   await db.purchaseOrder.update({ where: { id: po.id }, data: { status: "PARTIAL" } });
-  console.log("  -> GR-2026-0001 (30 dari 50), status Pesanan Pembelian jadi PARTIAL, stok Tepung bertambah (cek halaman Penerimaan Barang)");
+  console.log("  -> TB-2026-0001 (30 dari 50), status Pesanan Pembelian jadi PARTIAL, stok Tepung bertambah (cek halaman Penerimaan Barang)");
 
   console.log("=== Tahap 11: Penerimaan Barang sisa ===");
   await db.goodsReceipt.create({
     data: {
-      no: "GR-2026-0002",
+      no: "TB-2026-0002",
       orderId: po.id,
       warehouseId: warehouse.id,
       status: "PROCESSED",
@@ -312,12 +312,12 @@ async function main() {
     data: { qty: { increment: 20 } },
   });
   await db.purchaseOrder.update({ where: { id: po.id }, data: { status: "PROCESSED" } });
-  console.log("  -> GR-2026-0002 (sisa 20), status Pesanan Pembelian jadi PROCESSED");
+  console.log("  -> TB-2026-0002 (sisa 20), status Pesanan Pembelian jadi PROCESSED");
 
   console.log("=== Tahap 12: Faktur Pembelian ===");
   const purchaseInvoice = await db.purchaseInvoice.create({
     data: {
-      no: "PINV-2026-0001",
+      no: "FB-2026-0001",
       supplierId: supplier.id,
       orderId: po.id,
       status: "DRAFT",
@@ -327,28 +327,28 @@ async function main() {
     },
   });
   await db.purchaseOrderLine.update({ where: { id: poLine.id }, data: { qtyInvoiced: qtyBeli } });
-  console.log(`  -> PINV-2026-0001 terbit, total ${poTotal.toLocaleString("id-ID")} (cek halaman Faktur Pembelian)`);
+  console.log(`  -> FB-2026-0001 terbit, total ${poTotal.toLocaleString("id-ID")} (cek halaman Faktur Pembelian)`);
 
   console.log("=== Tahap 13: Pembayaran sebagian ke pemasok ===");
   const firstPurchasePayment = Math.round(poTotal / 2);
   await db.purchasePayment.create({
-    data: { no: "PP-2026-0001", supplierId: supplier.id, invoiceId: purchaseInvoice.id, accountId: bank.id, amount: firstPurchasePayment, paymentMethod: "TRANSFER" },
+    data: { no: "BYR-2026-0001", supplierId: supplier.id, invoiceId: purchaseInvoice.id, accountId: bank.id, amount: firstPurchasePayment, paymentMethod: "TRANSFER" },
   });
   await db.purchaseInvoice.update({ where: { id: purchaseInvoice.id }, data: { status: "PARTIAL" } });
-  console.log(`  -> PP-2026-0001 (${firstPurchasePayment.toLocaleString("id-ID")}), status Faktur Pembelian jadi PARTIAL (cek halaman Pembayaran Pembelian)`);
+  console.log(`  -> BYR-2026-0001 (${firstPurchasePayment.toLocaleString("id-ID")}), status Faktur Pembelian jadi PARTIAL (cek halaman Pembayaran Pembelian)`);
 
   console.log("=== Tahap 14: Pelunasan ke pemasok ===");
   const secondPurchasePayment = poTotal - firstPurchasePayment;
   await db.purchasePayment.create({
-    data: { no: "PP-2026-0002", supplierId: supplier.id, invoiceId: purchaseInvoice.id, accountId: kas.id, amount: secondPurchasePayment, paymentMethod: "CASH" },
+    data: { no: "BYR-2026-0002", supplierId: supplier.id, invoiceId: purchaseInvoice.id, accountId: kas.id, amount: secondPurchasePayment, paymentMethod: "CASH" },
   });
   await db.purchaseInvoice.update({ where: { id: purchaseInvoice.id }, data: { status: "PAID" } });
-  console.log(`  -> PP-2026-0002 (${secondPurchasePayment.toLocaleString("id-ID")}), status Faktur Pembelian jadi PAID`);
+  console.log(`  -> BYR-2026-0002 (${secondPurchasePayment.toLocaleString("id-ID")}), status Faktur Pembelian jadi PAID`);
 
   console.log("=== Tahap 15: Retur sebagian barang ke pemasok ===");
   await db.purchaseReturn.create({
     data: {
-      no: "PRET-2026-0001",
+      no: "RB-2026-0001",
       invoiceId: purchaseInvoice.id,
       warehouseId: warehouse.id,
       reason: "Tepung apek, dikembalikan ke pemasok",
@@ -359,7 +359,7 @@ async function main() {
     where: { itemId_warehouseId: { itemId: tepung.id, warehouseId: warehouse.id } },
     data: { qty: { decrement: 5 } },
   });
-  console.log("  -> PRET-2026-0001, stok Tepung berkurang 5 (cek halaman Retur Pembelian & Barang)");
+  console.log("  -> RB-2026-0001, stok Tepung berkurang 5 (cek halaman Retur Pembelian & Barang)");
 
   console.log("=== Tahap 16: Jurnal Umum - setoran modal awal ===");
   await db.journalEntry.create({

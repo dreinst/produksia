@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { labelJournalSource } from "@/components/ui/Badges";
 import { db } from "@/lib/db";
 
 export default async function JournalPage() {
@@ -24,7 +25,7 @@ export default async function JournalPage() {
               <div className="flex justify-between text-sm mb-2">
                 <div>
                   <span className="font-medium">{e.no}</span> &middot; {e.date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })} &middot;{" "}
-                  <span className="text-slate-500">{e.source}</span>
+                  <span className="text-slate-500">{labelJournalSource(e.source)}</span>
                 </div>
                 <div className="font-medium">{total.toLocaleString("id-ID")}</div>
               </div>

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { DocNo } from "@/components/ui/Badges";
+import { DocNo, labelPaymentMethod } from "@/components/ui/Badges";
 
 export default async function PurchasePaymentsPage() {
   const payments = await db.purchasePayment.findMany({
@@ -34,7 +34,7 @@ export default async function PurchasePaymentsPage() {
               <td>{p.invoice.no}</td>
               <td>{p.supplier.name}</td>
               <td className="text-right num">{Number(p.amount).toLocaleString("id-ID")}</td>
-              <td>{p.paymentMethod}</td>
+              <td>{labelPaymentMethod(p.paymentMethod)}</td>
             </tr>
           ))}
           {payments.length === 0 && (

@@ -31,7 +31,7 @@ export default function ReceiptLinesPicker({ lines }: { lines: OrderLine[] }) {
           <tr>
             <th>Barang</th>
             <th className="w-28">Sisa Pesanan</th>
-            <th className="w-28">Qty Terima</th>
+            <th className="w-28">Kuantitas Terima</th>
           </tr>
         </thead>
         <tbody>

@@ -32,7 +32,7 @@ export default async function NewPurchaseInvoicePage({ searchParams }: { searchP
 
   const [mapping, nextNo] = await Promise.all([
     db.accountMapping.findUnique({ where: { id: "default" }, include: { utangUsaha: true, persediaan: true } }),
-    nextDocNumber(db.purchaseInvoice, "PINV"),
+    nextDocNumber(db.purchaseInvoice, "FB"),
   ]);
 
   const today = new Date();

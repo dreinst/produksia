@@ -13,7 +13,7 @@ export default function ErrorPage({
     <div className="max-w-lg space-y-4">
       <h1 className="page-title">Terjadi kesalahan</h1>
       <p className="text-sm text-slate-600">
-        Halaman ini gagal dimuat. Coba muat ulang; kalau masih gagal, catat kode berikut untuk pengecekan log
+        Halaman ini gagal dimuat. Coba muat ulang; kalau masih gagal, catat kode berikut untuk pengecekan catatan
         server: <code className="font-mono text-xs">{error.digest ?? "-"}</code>
       </p>
       {process.env.NODE_ENV !== "production" && (
@@ -24,7 +24,7 @@ export default function ErrorPage({
           Coba lagi
         </button>
         <Link href="/" className="btn btn-outline">
-          Ke Dashboard
+          Ke Beranda
         </Link>
       </div>
     </div>

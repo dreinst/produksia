@@ -6,9 +6,9 @@ import { useEffect, useRef } from "react";
 import Icon from "@/components/ui/Icon";
 
 const newTransactionLinks = [
-  { href: "/sales/quotations/new", label: "Penawaran Penjualan", code: "SQ", icon: "request_quote" },
-  { href: "/sales/orders/new", label: "Pesanan Penjualan", code: "SO", icon: "receipt_long" },
-  { href: "/purchasing/orders/new", label: "Pesanan Pembelian", code: "PO", icon: "shopping_bag" },
+  { href: "/sales/quotations/new", label: "Penawaran Penjualan", code: "PNW", icon: "request_quote" },
+  { href: "/sales/orders/new", label: "Pesanan Penjualan", code: "PSJ", icon: "receipt_long" },
+  { href: "/purchasing/orders/new", label: "Pesanan Pembelian", code: "PSB", icon: "shopping_bag" },
   { href: "/cashbank/in", label: "Kas Masuk", code: "KM", icon: "south_west" },
   { href: "/cashbank/out", label: "Kas Keluar", code: "KK", icon: "north_east" },
   { href: "/ledger/journal/new", label: "Jurnal Umum", code: "JU", icon: "edit_note" },
@@ -95,7 +95,7 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
           </span>
           <div className="flex flex-col text-left">
             <span className="text-xs font-semibold text-slate-900 leading-tight">Admin Lokal</span>
-            <span className="text-[11px] text-slate-500 leading-normal">Belum ada login</span>
+            <span className="text-[11px] text-slate-500 leading-normal">Belum masuk</span>
           </div>
         </div>
       </div>

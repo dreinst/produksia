@@ -27,7 +27,7 @@ async function expectThrow(label: string, fn: () => Promise<void>) {
     throw new Error(`${label} should have thrown`);
   } catch (err: unknown) {
     const message = (err as { message?: string })?.message ?? "";
-    if (message.includes("tidak balance") || message.includes("harus lebih dari 0")) {
+    if (message.includes("tidak seimbang") || message.includes("harus lebih dari 0")) {
       console.log(`[ok] ${label} -> rejected as expected: ${message}`);
     } else {
       throw err;
@@ -43,9 +43,9 @@ async function main() {
   const modal = await db.account.create({ data: { code: "3-TEST-MODAL", name: "Modal Test", type: "MODAL" } });
   const beban = await db.account.create({ data: { code: "5-TEST-BEBAN", name: "Beban Test", type: "BEBAN" } });
 
-  console.log("=== 1. Jurnal manual tidak balance harus ditolak ===");
+  console.log("=== 1. Jurnal manual tidak seimbang harus ditolak ===");
   const badFd = new FormData();
-  badFd.set("memo", "test tidak balance");
+  badFd.set("memo", "test tidak seimbang");
   badFd.set("lines", JSON.stringify([
     { accountId: kas.id, debit: 100000, credit: 0 },
     { accountId: modal.id, debit: 0, credit: 50000 },
@@ -97,7 +97,7 @@ async function main() {
   const totalDebit = allLines.reduce((s, l) => s + Number(l.debit), 0);
   const totalCredit = allLines.reduce((s, l) => s + Number(l.credit), 0);
   console.log(`Total debit: ${totalDebit}, total credit: ${totalCredit}`);
-  if (totalDebit !== totalCredit) throw new Error("Neraca saldo tidak balance!");
+  if (totalDebit !== totalCredit) throw new Error("Neraca saldo tidak seimbang!");
 
   console.log("=== Cleanup ===");
   // Hanya hapus jurnal yang dibuat SELAMA test ini (berdasarkan waktu), bukan berdasarkan memo —

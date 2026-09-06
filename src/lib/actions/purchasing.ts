@@ -64,7 +64,7 @@ export async function createPurchaseOrder(formData: FormData) {
   const lines = parseLines(formData);
   const total = lineTotal(lines);
 
-  const no = await nextDocNumber(db.purchaseOrder, "PO");
+  const no = await nextDocNumber(db.purchaseOrder, "PSB");
 
   await db.purchaseOrder.create({
     data: {
@@ -99,11 +99,11 @@ export async function createGoodsReceipt(formData: FormData) {
     if (!orderLine) throw new Error("Baris pesanan tidak ditemukan");
     const remaining = D(orderLine.qty).minus(orderLine.qtyReceived);
     if (l.qty.gt(remaining)) {
-      throw new Error(`Qty terima melebihi sisa pesanan (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
+      throw new Error(`Kuantitas terima melebihi sisa pesanan (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
     }
   }
 
-  const no = await nextDocNumber(db.goodsReceipt, "GR");
+  const no = await nextDocNumber(db.goodsReceipt, "TB");
 
   await db.$transaction(async (tx) => {
     await tx.goodsReceipt.create({
@@ -147,11 +147,11 @@ export async function createPurchaseInvoice(formData: FormData) {
     if (orderLines.length === 0) throw new Error("Barang tidak ada di pesanan ini");
     const remaining = sum(orderLines.map((ol) => D(ol.qty).minus(ol.qtyInvoiced)));
     if (l.qty.gt(remaining)) {
-      throw new Error(`Qty faktur melebihi sisa yang belum ditagih (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
+      throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
     }
   }
 
-  const no = await nextDocNumber(db.purchaseInvoice, "PINV");
+  const no = await nextDocNumber(db.purchaseInvoice, "FB");
 
   await db.$transaction(async (tx) => {
     const invoice = await tx.purchaseInvoice.create({
@@ -202,7 +202,7 @@ export async function createPurchasePayment(formData: FormData) {
   }
   const status = alreadyPaid.plus(amount).gte(invoice.total) ? "PAID" : "PARTIAL";
 
-  const no = await nextDocNumber(db.purchasePayment, "PP");
+  const no = await nextDocNumber(db.purchasePayment, "BYR");
 
   await db.$transaction(async (tx) => {
     const payment = await tx.purchasePayment.create({
@@ -239,13 +239,13 @@ export async function createPurchaseReturn(formData: FormData) {
     const returned = sum(invoice.returns.flatMap((r) => r.lines.filter((rl) => rl.itemId === l.itemId).map((rl) => rl.qty)));
     const remaining = invoiced.minus(returned);
     if (l.qty.gt(remaining)) {
-      throw new Error(`Qty retur melebihi yang bisa diretur (maks ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
+      throw new Error(`Kuantitas retur melebihi yang bisa diretur (maks ${fmt(remaining)}, diminta ${fmt(l.qty)})`);
     }
   }
 
   const returnAmount = sum(lines.map((l) => mul(l.qty, invoice.lines.find((il) => il.itemId === l.itemId)?.price ?? 0)));
 
-  const no = await nextDocNumber(db.purchaseReturn, "PRET");
+  const no = await nextDocNumber(db.purchaseReturn, "RB");
 
   await db.$transaction(async (tx) => {
     const labels = await itemLabels(tx, lines.map((l) => l.itemId));

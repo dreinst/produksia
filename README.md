@@ -42,6 +42,20 @@ UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_port
 - Halaman baru: judul dengan `PageHeader` (breadcrumb + badge + aksi), konten dalam `card`, tabel dalam `card card-table`.
 - Font teks dari `next/font/google` (Inter, Hanken Grotesk, JetBrains Mono); ikon Material Symbols self-hosted di `src/app/fonts/`.
 
+## Kode dokumen (semua singkatan Indonesia)
+
+| Kode | Dokumen | | Kode | Dokumen |
+|---|---|---|---|---|
+| PNW | Penawaran Penjualan | | PSB | Pesanan Pembelian |
+| PSJ | Pesanan Penjualan | | TB | Terima Barang (Penerimaan Barang) |
+| SJ | Surat Jalan (Pengiriman) | | FB | Faktur Pembelian |
+| FJ | Faktur Penjualan | | BYR | Pembayaran Pembelian |
+| TRM | Penerimaan (uang masuk) | | RB | Retur Pembelian |
+| RJ | Retur Penjualan | | JU · KM · KK | Jurnal Umum · Kas Masuk · Kas Keluar |
+| AT | Aset Tetap | | JU-FJ, JU-TRM, JU-RJ, JU-FB, JU-BYR, JU-RB, JU-PNY | Jurnal otomatis dari dokumen terkait |
+
+Label status yang tampil juga Indonesia (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalkan, Tercatat) — nilai internalnya di database tetap kode teknis (`DRAFT`, `PAID`, …), dipetakan di `src/components/ui/Badges.tsx`.
+
 ## Struktur
 
 - `prisma/schema.prisma` — seluruh model data (master data + siklus penjualan + siklus pembelian)
@@ -56,7 +70,7 @@ UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_port
 
 ## Alur kerja
 
-1. Buat **Pelanggan**, **Barang**, **Gudang** di Master Data, lalu isi stok awal lewat Prisma Studio (`npx prisma studio`) — belum ada halaman "Penyesuaian Persediaan" untuk stok awal.
+1. Buat **Pelanggan**, **Barang**, **Gudang** di Data Induk, lalu isi stok awal lewat Prisma Studio (`npx prisma studio`) — belum ada halaman "Penyesuaian Persediaan" untuk stok awal.
 2. Buat **Penawaran Penjualan** (opsional) → konversi jadi **Pesanan Penjualan**, atau langsung buat Pesanan.
 3. Dari daftar Pesanan, klik **Kirim** untuk membuat Pengiriman (stok otomatis berkurang) — bisa dicicil (parsial).
 4. Dari daftar Pesanan, klik **Fakturkan** untuk membuat Faktur.
@@ -73,5 +87,5 @@ Karena diminta lanjut tanpa konfirmasi bertahap, berikut keputusan yang saya amb
 - **Belum ada halaman edit** untuk master data maupun dokumen transaksi — saat ini hanya tambah & hapus. Hapus dokumen transaksi yang sudah diproses juga belum dibatasi (idealnya faktur yang sudah `PAID` tidak boleh dihapus).
 - **Belum ada Penyesuaian Persediaan / Pindah Barang** (ada di diagram Accurate asli) — untuk sekarang stok awal harus diisi manual lewat Prisma Studio.
 - **Perhitungan uang pakai `Number` di sisi aplikasi**, bukan aritmatika desimal presisi tinggi — cukup untuk skala UMKM tapi berisiko untuk angka sangat besar/presisi tinggi. Kolom database tetap `Decimal(18,2)`.
-- **Nomor dokumen** (`SQ-2026-0001` dst.) dihitung dari jumlah baris yang ada — cukup aman untuk pemakaian satu-persatu, tapi berpotensi bentrok kalau dua orang submit persis bersamaan (race condition). Belum kritikal untuk tim kecil, tapi perlu diperbaiki (pakai sequence DB) sebelum dipakai dengan banyak kasir sekaligus.
+- **Nomor dokumen** (`PNW-2026-0001` dst.) dihitung dari jumlah baris yang ada — cukup aman untuk pemakaian satu-persatu, tapi berpotensi bentrok kalau dua orang submit persis bersamaan (race condition). Belum kritikal untuk tim kecil, tapi perlu diperbaiki (pakai sequence DB) sebelum dipakai dengan banyak kasir sekaligus.
 - **Prisma versi 7.10.0** dipakai sengaja (bukan 8.0 beta terbaru yang ternyata CLI platform cloud Prisma, bukan ORM lokal biasa).
