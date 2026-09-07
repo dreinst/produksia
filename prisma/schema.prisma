@@ -59,13 +59,27 @@ enum StatusAset {
 // ---------- Pengguna ----------
 
 model Pengguna {
-  id           String        @id @default(cuid())
-  email        String        @unique
-  nama         String
+  id            String        @id @default(cuid())
+  email         String        @unique
+  nama          String
   kataSandiHash String
-  peran        PeranPengguna @default(KASIR)
-  karyawan     Karyawan?
-  dibuatPada   DateTime      @default(now())
+  peran         PeranPengguna @default(KASIR)
+  aktif         Boolean       @default(true)
+  karyawan      Karyawan?
+  sesi          Sesi[]
+  dibuatPada    DateTime      @default(now())
+}
+
+/// Sesi login berbasis basis data: cookie hanya menyimpan token acak, yang disimpan di sini dalam bentuk hash.
+model Sesi {
+  id          String   @id @default(cuid())
+  tokenHash   String   @unique
+  penggunaId  String
+  pengguna    Pengguna @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
+  kedaluwarsa DateTime
+  dibuatPada  DateTime @default(now())
+
+  @@index([penggunaId])
 }
 
 // ---------- Data induk ----------

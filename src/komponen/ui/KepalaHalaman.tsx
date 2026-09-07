@@ -43,7 +43,7 @@ export default function KepalaHalaman({
           <h1 className="judul-halaman">{judul}</h1>
           {lencana}
         </div>
-        {subjudul && <p className="page-subjudul">{subjudul}</p>}
+        {subjudul && <p className="subjudul-halaman">{subjudul}</p>}
       </div>
       {aksi && <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">{aksi}</div>}
     </div>

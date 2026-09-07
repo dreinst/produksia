@@ -1,4 +1,6 @@
 import "dotenv/config";
+// Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
+process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { buatPesanan, buatPengiriman, buatFaktur, buatPenerimaan, buatRetur } from "../src/lib/aksi/penjualan";
 

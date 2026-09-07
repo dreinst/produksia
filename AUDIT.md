@@ -1,6 +1,6 @@
 # Audit Proyek — Accurate Copy
 
-Tanggal: 6 September 2026. Cakupan: seluruh `src/` (33 halaman, 7 file action, 8 komponen), skema Prisma, skrip seed & regresi.
+Tanggal: 6 September 2026, diperbarui 7 September 2026 (butir 7, 16, 18, 19c, 21, 24). Cakupan awal: seluruh `src/` (33 halaman, 7 file action, 8 komponen), skema Prisma, skrip seed & regresi.
 
 Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** sengaja belum, dengan alasan.
 
@@ -13,7 +13,7 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 4. **[FIXED] Variabel `pesanan` tidak terpakai di `buatPengiriman`** (query penuh dengan `include` hanya untuk cek keberadaan). Disederhanakan.
 5. **[FIXED] Uang dihitung sebagai `Number` (float) di aplikasi.** Semua perhitungan uang/qty di server sekarang memakai `Prisma.Decimal` lewat `src/lib/uang.ts` (`D`, `uang`, `jumlahkan`, `kali`, `bacaUang`) — di penjual, purchasing, jurnal, accounting, fixedAssets. Bukti: pesanan 3 × 0,1 tersimpan persis `0.3`. Tampilan di komponen client tetap `Number` (hanya untuk preview).
 6. **[OPEN] Tidak ada pembatasan hapus/ubah dokumen yang sudah diproses** — belum relevan karena memang belum ada fitur hapus/edit dokumen transaksi. Master data yang masih direferensikan ditolak DB dengan pesan jelas.
-7. **[OPEN] Belum ada login/otorisasi** — `Pengguna`/`PeranPengguna` ada di skema tapi tidak dipakai. Ini fitur (bukan bug) dan wajib sebelum multi-user sungguhan.
+7. **[FIXED] Belum ada login/otorisasi.** Ditambahkan (7 Sep 2026) tanpa pustaka luar: kata sandi scrypt + garam, sesi di tabel `Sesi` (cookie `sesi_ac` hanya token acak; tabel menyimpan SHA-256-nya; 30 hari), `src/proxy.ts` mengalihkan permintaan tanpa cookie ke `/masuk`, `(aplikasi)/layout.tsx` memvalidasi sesi, **setiap halaman** `wajibHak(...)` dan **setiap aksi server** `wajibHakAksi(...)`. Empat peran dengan matriks 16 hak (`src/lib/hakAkses.ts`); sidebar/menu/tombol disaring per peran. Halaman baru: `/masuk` (+ pemasangan awal akun Pemilik pertama bila basis data kosong), `/profil` (ganti kata sandi → sesi lain dicabut), `/pengaturan/pengguna` (+ `[id]`: ubah nama/peran/status, atur ulang kata sandi, hapus; Admin tidak bisa menyentuh Pemilik; minimal satu Pemilik aktif), `/tanpa-akses`. Diverifikasi lewat browser headless: redirect `kembali=`, kata sandi salah, keluar, peran Gudang ditolak di `/kas-bank/masuk`, `/penjualan/faktur/baru`, `/pengaturan/pengguna`, dan hanya-lihat di bagan akun. Sisa: lupa-kata-sandi via email, pembatasan percobaan masuk, 2FA.
 8. **[FIXED] Stok bisa negatif / race condition.** Dua lapis: (a) `src/lib/stok.ts` mengecek ketersediaan di dalam transaksi dan menolak dengan pesan "Stok X tidak cukup (tersedia…, diminta…)"; (b) migrasi `stock_non_negative` menambah `CHECK ("jumlah" >= 0)` di `StokBarang` sebagai pengaman balapan — transaksi kedua yang lolos cek aplikasi ditolak DB dan di-rollback, pesannya diterjemahkan di `statusFormulir.ts`.
 8b. **[FIXED] Validasi kuantitas & pembayaran yang sebelumnya tidak ada:** kirim/terima tidak boleh melebihi sisa pesanan; faktur tidak boleh melebihi sisa yang belum ditagih; retur tidak boleh melebihi qty faktur dikurangi retur sebelumnya; pembayaran tidak boleh melebihi sisa tagihan/utang dan ditolak jika faktur sudah lunas. Semua diuji di `skrip/uji-pengaman.ts`.
 
@@ -26,12 +26,12 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 13. **[FIXED] Dark mode "setengah jadi".** CSS bawaan create-next-app mengganti latar jadi hitam saat OS dark-mode, sementara komponen (hover `bg-zinc-100`, border, tombol) didesain untuk terang → teks tak terbaca. Dipaksa `color-scheme: light` sampai ada desain dark yang utuh.
 14. **[FIXED] Tidak ada `error.tsx` / `not-found.tsx`.** `notFound()` di `/data-induk/[entitas]` jatuh ke halaman default Next; sekarang ada halaman ramah + tombol kembali.
 15. **[FIXED] Nama prop menyesatkan** `hargaJual` di `EditorBarisBarang` (diisi `hargaBeli` untuk PSB) → `hargaBawaan`.
-16. **[OPEN] `<label>` belum terhubung ke isian (`htmlFor`/`id`)** — aksesibilitas & klik-label. Skala: ~60 bidang. Layak dibuat komponen `Field` sekaligus merapikan duplikasi markup.
+16. **[FIXED] `<label>` belum terhubung ke isian (`htmlFor`/`id`).** 34 label di 14 halaman formulir dihubungkan otomatis (id = name), ditambah formulir pemetaan akun, pemilih akun buku besar, form data induk (id berprefix agar form tambah & ubah tidak bentrok), dan semua formulir baru (masuk, profil, pengguna). Yang sengaja dibiarkan: bidang baca-saja di `PenyusunFaktur` (nomor otomatis, tanggal, rekanan) — bukan isian yang bisa difokuskan.
 17. **[OPEN] Tabel di mobile masih perlu scroll** (bukan kartu). Untuk tabel transaksi dengan 6–7 kolom ini keputusan yang wajar; kalau mau lebih ramah HP, ubah baris jadi kartu di `< md`.
-18. **[OPEN] Belum ada halaman edit** untuk master data & dokumen; belum ada pencarian/filter/pagination di daftar (masalah begitu data > ratusan baris).
+18. **[FIXED sebagian] Belum ada halaman edit; belum ada pencarian/paginasi.** (a) **Data induk kini bisa diubah**: `/data-induk/[entitas]/[id]` memakai `FormulirDataInduk` yang sama dengan form tambah; bidang opsional yang dikosongkan menjadi `null`, bidang berdefault kembali ke defaultnya; data tidak bisa menjadi induk dirinya sendiri; tombol Ubah/Hapus hanya untuk peran yang berhak (bagan akun butuh `buku-besar.tulis`). (b) **Pencarian + paginasi 25 baris** di 16 halaman daftar (`src/lib/daftar.ts` + `<KontrolDaftar>`, `?q=&hal=`, tanpa JavaScript klien): data induk (semua kolom teks), penjualan & pembelian (nomor, nomor dokumen induk, nama rekanan), jurnal & kas (nomor, keterangan), aset (kode, nama). Diuji dengan 31 pelanggan: hal 1 = 25 baris, hal 2 = 6, pencarian "paginasi 02" = 10. **Masih terbuka:** ubah/hapus dokumen transaksi (lihat butir 6).
 19. **[OPEN] Tiga komponen picker (`PemilihBarisPesanan`, `PemilihBarisPenerimaan`) hampir identik** — bisa dijadikan satu komponen dengan prop label. `PenyusunFaktur` sudah digantikan `PenyusunFaktur`. Ditunda: duplikasinya kecil dan jelas.
 19b. **[FIXED] Tampilan tidak mengikuti design system.** Seluruh UI dipindah ke design system "Precision Ledger" (paket Stitch): token & kelas komponen global, sidebar/topbar baru, Beranda dan form Faktur dibangun ulang mengikuti layar contoh dengan data sungguhan; diverifikasi lewat screenshot headless (desktop 1440px & mobile 390px). Ditambah halaman `/cari` agar kotak pencarian di topbar benar-benar berfungsi.
-19c. **[OPEN] File font ikon 3,9 MB** (`src/app/fonts/material-symbols-outlined.woff2`, variable font penuh). Dimuat sekali lalu di-cache browser, tapi bisa di-subset ke ±40 ikon yang dipakai (mis. dengan `pyftsubset`) untuk memangkasnya ke < 50 KB.
+19c. **[FIXED] File font ikon 3,9 MB.** Di-subset dengan `skrip/subset-font-ikon.sh` (pyftsubset) ke 47 ikon yang dipakai — < 50 KB. Catatan teknis: font ini memetakan nama → ikon lewat ligatur di fitur `rlig`/`rclt` (bukan `liga`) dalam lookup Extension, jadi subset harus `--layout-features=rlig,rclt --no-layout-closure` (closure lewat huruf a–z akan menarik semua 6.600 ikon kembali). Ikon baru = jalankan ulang skripnya (dicatat di README).
 19d. **[OPEN] Kolom "Aksi" di tabel transaksi terbaru & tabel daftar hanya muncul bila ada aksi** — untuk konsistensi visual dengan desain, tombol aksi kontekstual (lihat, cetak) bisa ditambahkan setelah ada halaman detail dokumen.
 
 19e. **[FIXED] Istilah Inggris di antarmuka.** Semua yang tampil ke pengguna kini Indonesia: kode dokumen (PNW, PSJ, SJ, FJ, TRM, RJ, PSB, TB, FB, BYR, RB), label status (Draf, Lunas, Sebagian, …), metode bayar (Tunai/Transfer/Kartu), sumber jurnal, serta kata seperti Beranda, Data Induk, Kelompok Barang, Kuantitas, Pratinjau, Pengaman, seimbang, dicatat. **Keputusan yang sengaja diambil:** nama pengenal di kode program dan database (`FakturPenjualan`, `pelangganId`, nilai enum `LUNAS`) tetap Inggris — tidak pernah terlihat pengguna, dan mengganti skema database berarti migrasi berisiko tanpa manfaat tampilan. Kalau diperlukan, bisa dilakukan sebagai pekerjaan terpisah.
@@ -41,11 +41,22 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 ## C. Teknis / operasional
 
 20. **[FIXED] Lint bersih.** 2 error React Compiler (setKeadaan dalam effect di BilahSamping; mutasi variabel luar di Buku Besar) diperbaiki; `tsc --noEmit` dan `eslint` lulus tanpa error.
-21. **[OPEN] Belum ada CI/commit.** Repo git ada (init dari create-next-app) tapi semua perubahan belum di-commit. Saran: commit sekarang sebagai baseline, lalu jalankan `tsc`, `eslint`, dan 4 skrip regresi di CI.
+21. **[FIXED] Belum ada CI/commit.** Semua pekerjaan di-commit ke `github.com/dreinst/accuratecopy` (main). `.github/workflows/ci.yml`: PostgreSQL 16 sebagai service → `prisma migrate deploy` + `generate` → `tsc` → `eslint` → seed → 5 suite regresi (`UJI_TANPA_SESI=1`) → `next build`.
+24. **[FIXED] Sisa nama Inggris di kode** setelah butir 19f: fungsi halaman (`InvoicesPage` → `HalamanFakturPenjualan`, `Home` → `Beranda`, dst.), tipe (`OrderLine` → `BarisPesananOpsi`, `ItemOption` → `OpsiBarang`, `InvoiceLine` → `BarisFakturOpsi`, `AccountOption` → `OpsiAkun`), kelas CSS sisa (`page-subjudul` → `subjudul-halaman`), dan dokumentasi yang masih menyebut `pgctl.sh awal`/`skrip/uji-penjualan*.ts` (artefak penggantian otomatis).
 22. **[OPEN] Skrip regresi memakai database yang sama dengan data seed.** Sudah aman (cleanup berbasis waktu), tapi idealnya `DATABASE_URL` terpisah untuk test.
 23. **[OPEN] Turbopack tidak me-reload Prisma Client setelah `prisma generate`** — restart `npm run dev` setiap ganti skema (sudah dicatat di README).
 
 ## Verifikasi yang dilakukan
+
+### 7 September 2026 — login & hak akses, ubah data induk, pencarian & paginasi, subset font, CI
+
+- `npx tsc --noEmit` ✔ · `npx eslint` ✔ (0 galat)
+- 5 suite regresi lulus **dengan pemeriksaan hak aktif** (aksi server memanggil `wajibHakAksi`; skrip memakai `UJI_TANPA_SESI=1`)
+- Browser headless (Playwright, desktop 1440 & HP 390): tanpa sesi → `/masuk?kembali=`; kata sandi salah → pesan di formulir; masuk → kembali ke halaman asal; nama & peran tampil di topbar; keluar → `/masuk`; daftar 4 pengguna seed; ubah telepon pelanggan tersimpan; peran Gudang: sidebar tanpa Kas & Bank/Buku Besar/Pengguna, `/kas-bank/masuk`, `/penjualan/faktur/baru`, `/pengaturan/pengguna` → `/tanpa-akses`, bagan akun hanya-lihat
+- Paginasi & pencarian: 31 pelanggan → hal 1 = 25 baris, hal 2 = 6; cari "paginasi 02" = 10; cari nama pelanggan di faktur; pencarian kosong memberi pesan; cari keterangan jurnal
+- Font ikon subset: 47 ikon, ligatur `rlig/rclt` & sumbu FILL/GRAD/opsz/wght utuh, ikon dicek tampil di screenshot
+
+### 6 September 2026 — audit awal
 
 - `npx tsc --noEmit` ✔ · `npx eslint src` ✔ (0 error)
 - 4 skrip regresi (`uji-*`, `-purchasing`, `-ledger`, `-daftarAset`) lulus setelah refactor penomoran & form

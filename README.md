@@ -1,46 +1,66 @@
 # Accurate Copy
 
-Aplikasi internal penjualan, pembelian & persediaan, dibangun mengikuti alur modul Accurate 5:
+Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, dibangun mengikuti alur modul Accurate 5:
 - **Penjualan**: Penawaran → Pesanan → Pengiriman → Faktur → Penerimaan → Retur
-- **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (mirror dari Penjualan)
+- **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
+- **Pengguna & hak akses**: login email + kata sandi, empat peran (Pemilik, Admin, Kasir, Gudang), kelola pengguna
+
+Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (lihat `ARCHITECTURE.md`).
 
 ## Menjalankan
 
-1. Pastikan PostgreSQL lokal jalan: `~/Cooking/PostgreSQL/pgctl.sh awal`
+1. Pastikan PostgreSQL lokal jalan: `~/Cooking/PostgreSQL/pgctl.sh start`
 2. `npm install`
-3. `npm run dev` lalu buka http://localhost:3000
+3. `npx prisma migrate deploy --config prisma7.config.ts` (sekali, atau setiap ada migrasi baru)
+4. `npm run dev` lalu buka http://localhost:3000
 
-Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`).
+Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak ada kunci rahasia lain yang perlu diatur.
 
-## Data dummy
+### Masuk pertama kali
 
-- `npx tsx prisma/reset.ts` — hapus semua data (transaksi + master data)
-- `npx tsx prisma/seed.ts` — isi 1 alur cerita tunggal yang melewati SEMUA tahap siklus Penjualan DAN Pembelian (15 tahap total: Penawaran draft → dikonversi → Pesanan → 2x Pengiriman parsial → Faktur → 2x Penerimaan cicilan → Retur, lalu restock: Pesanan Pembelian → 2x Penerimaan Barang parsial → Faktur → 2x Pembayaran cicilan → Retur), supaya tiap halaman langsung punya contoh data yang saling terhubung dan bisa ditelusuri dari awal sampai akhir.
+- **Basis data kosong** (belum ada pengguna): halaman `/masuk` otomatis menampilkan formulir **pemasangan awal** untuk membuat akun Pemilik pertama.
+- **Setelah `prisma/seed.ts`**: tersedia 4 akun contoh, semua berkata sandi `rahasia123`:
 
-**Penting:** setiap kali `prisma/schema.prisma` berubah dan kamu migrate, **restart dev server** (`npm run dev`) — Turbopack tidak otomatis reload Prisma Client yang sudah ter-generate ulang, nanti errornya "Cannot read properties of undefined (reading 'findMany')".
+| Email | Peran | Bisa apa |
+|---|---|---|
+| pemilik@contoh.id | Pemilik | Semua, termasuk mengelola akun Pemilik lain |
+| admin@contoh.id | Admin | Semua modul; tidak bisa menyentuh akun Pemilik |
+| kasir@contoh.id | Kasir | Penjualan, pembelian, kas & bank, data induk; buku besar & aset hanya lihat |
+| gudang@contoh.id | Gudang | Surat jalan, terima barang, data induk barang/gudang; tanpa modul keuangan |
 
-Jalankan reset lalu seed kalau mau mulai bersih lagi.
+Matriks lengkapnya ada di `src/lib/hakAkses.ts`. Pengguna baru ditambah lewat **Pengguna** di sidebar (Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**.
+
+## Data contoh
+
+- `npx tsx prisma/reset.ts` — hapus semua data (transaksi, data induk, pengguna & sesi)
+- `npx tsx prisma/seed.ts` — 4 pengguna + satu alur cerita 20 tahap yang melewati SEMUA modul (Penawaran draft → dikonversi → Pesanan → 2× Pengiriman parsial → Faktur → 2× Penerimaan cicilan → Retur; restock: Pesanan Pembelian → 2× Penerimaan Barang → Faktur → 2× Pembayaran → Retur; modal awal, setor bank, bayar sewa; aset + satu penyusutan), supaya tiap halaman langsung punya contoh data yang saling terhubung.
+
+**Penting:** setiap kali `prisma/schema.prisma` berubah dan kamu migrate, **restart dev server** (`npm run dev`) — Turbopack tidak otomatis memuat ulang Prisma Client yang di-generate ulang; gejalanya "Cannot read properties of undefined (reading 'findMany')".
 
 ## Pola yang wajib diikuti saat menambah fitur
 
-- **Form → `<FormulirAksi action={xxxForm}>`**, bukan `<form action={xxx}>`. Setiap server action punya dua versi: `xxx(dataFormulir)` (melempar error, dipakai skrip regresi) dan `xxxForm(sebelumnya, dataFormulir)` (membungkus dengan `jalankanFormulir`, mengembalikan `{ error }`). Alasannya: di production Next.js menyamarkan error yang di-throw dari server action, jadi pesan validasi hanya bisa sampai ke user kalau **dikembalikan** sebagai keadaan. Lihat `src/lib/statusFormulir.ts`, `src/komponen/FormulirAksi.tsx`.
+- **Hak akses di dua tempat.** Halaman memanggil `await wajibHak("modul.lihat")` (mengalihkan ke `/masuk` atau `/tanpa-akses`); aksi server memanggil `await wajibHakAksi("modul.tulis")` sebagai pernyataan pertama (melempar galat yang tampil di formulir). Sidebar/menu hanya *menyembunyikan* tautan lewat `punyaHak` — bukan pengaman. Semua di `src/lib/otentikasi.ts` & `src/lib/hakAkses.ts`.
+- **Form → `<FormulirAksi aksi={xxxFormulir}>`**, bukan `<form action={xxx}>`. Setiap aksi server punya dua versi: `xxx(dataFormulir)` (melempar galat, dipakai skrip regresi) dan `xxxFormulir(sebelumnya, dataFormulir)` (membungkus dengan `jalankanFormulir`, mengembalikan `{ galat }`). Alasannya: di produksi Next.js menyamarkan galat yang di-throw dari aksi server, jadi pesan validasi hanya sampai ke pengguna kalau **dikembalikan** sebagai status. Lihat `src/lib/statusFormulir.ts`, `src/komponen/FormulirAksi.tsx`.
+- **Halaman daftar → `bacaParamDaftar(searchParams)` + `<KontrolDaftar>`** (`src/lib/daftar.ts`, `src/komponen/ui/KontrolDaftar.tsx`): pencarian `?q=` dan paginasi `?hal=` 25 baris, tanpa JavaScript klien. Kueri memakai `count` + `findMany({ where, skip, take })`.
 - **Nomor dokumen → `nomorDokumenBerikutnya(db.model, "PREFIX")`** (`src/lib/penomoran.ts`), jangan `count()+1`.
-- **Uang & qty → `Prisma.Decimal`** lewat helper `src/lib/uang.ts` (`uang()`, `jumlahkan()`, `kali()`, `bacaUang()`), jangan `Number()` untuk nilai yang disimpan/dibandingkan.
-- **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK (qty >= 0)`.
-- Skrip regresi: `skrip/uji-penjualan*.ts` (5 suite) — jalankan semua sebelum commit: `for s in skrip/uji-penjualan*.ts; do npx tsx $s; done`.
-- **Tabel** dibungkus `<div className="overflow-x-auto ...">`, form pakai `grid-cols-1 md:grid-cols-2`, elemen lebar penuh pakai `md:col-span-2`.
-- Hasil audit lengkap & daftar pekerjaan yang masih terbuka: lihat `AUDIT.md`.
+- **Uang & kuantitas → `Prisma.Decimal`** lewat `src/lib/uang.ts` (`uang()`, `jumlahkan()`, `kali()`, `bacaUang()`), jangan `Number()` untuk nilai yang disimpan/dibandingkan.
+- **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`.
+- **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
+- Skrip regresi: 5 suite di `skrip/uji-*.ts` — jalankan semua sebelum commit:
+  `for s in skrip/uji-*.ts; do npx tsx $s; done`
+- **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
+- Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
 
 ## Desain (Precision Ledger)
 
 UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_portfolio.zip` di folder induk — tidak ikut repo). Aturan praktisnya:
 
-- Pakai **kelas komponen** di `src/app/globals.css`, bukan utility lepas: `kartu`, `kartu-tabel` + `bungkus-tabel`, `tombol tombol-utama|accent|outline|soft|danger`, `isian`/`isian-kecil`, `label`, `petunjuk`, `bidang`, `tabel`/`tabel-polos`, `lencana lencana-emerald|amber|rose|slate|blue`, `angka` (angka, rata kanan), `mono`, `teks-label`.
-- Nomor dokumen → `<NomorDokumen no=…/>`, status → `<LencanaStatus status=…/>`, ikon → `<Ikon nama="…"/>` (nama dari fonts.google.com/icons).
-- Halaman baru: judul dengan `KepalaHalaman` (breadcrumb + lencana + aksi), konten dalam `kartu`, tabel dalam `kartu kartu-tabel`.
-- Font teks dari `next/font/google` (Inter, Hanken Grotesk, JetBrains Mono); ikon Material Symbols self-hosted di `src/app/fonts/`.
+- Pakai **kelas komponen** di `src/app/globals.css`, bukan utility lepas: `kartu`, `kartu-tabel` + `bungkus-tabel`, `tombol tombol-utama|aksen|garis|lembut|bahaya|kecil`, `isian`/`isian-kecil`, `label`, `petunjuk`, `bidang`, `tabel`/`tabel-polos`, `lencana lencana-emerald|amber|rose|slate|blue`, `angka` (rata kanan, tabular), `mono`, `teks-label`.
+- Nomor dokumen → `<NomorDokumen nomor=…/>`, status → `<LencanaStatus status=…/>`, ikon → `<Ikon nama="…"/>` (nama dari fonts.google.com/icons).
+- Halaman baru: judul dengan `KepalaHalaman` (jejak + lencana + aksi), konten dalam `kartu`, tabel dalam `kartu kartu-tabel`.
+- Font teks dari `next/font/google` (Inter, Hanken Grotesk, JetBrains Mono). **Ikon** Material Symbols di-self-host di `src/app/fonts/`, sudah di-subset ke ikon yang dipakai saja (< 50 KB). **Setiap menambah ikon baru, jalankan `skrip/subset-font-ikon.sh`** (butuh `pip install fonttools brotli`); tanpa itu ikon baru tampil sebagai teks.
 
 ## Kode dokumen (semua singkatan Indonesia)
 
@@ -54,38 +74,39 @@ UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_port
 | RJ | Retur Penjualan | | JU · KM · KK | Jurnal Umum · Kas Masuk · Kas Keluar |
 | AT | Aset Tetap | | JU-FJ, JU-TRM, JU-RJ, JU-FB, JU-BYR, JU-RB, JU-PNY | Jurnal otomatis dari dokumen terkait |
 
-Label status yang tampil juga Indonesia (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalkan, Tercatat) — nilai internalnya di database tetap kode teknis (`DRAF`, `LUNAS`, …), dipetakan di `src/komponen/ui/Lencana.tsx`.
+Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalkan, Tercatat) dipetakan dari nilai enum di database (`DRAF`, `LUNAS`, …) di `src/komponen/ui/Lencana.tsx`.
 
-## Struktur
+## Struktur singkat
 
-- `prisma/schema.prisma` — seluruh model data (master data + siklus penjualan + siklus pembelian)
-- `src/lib/aksi/dataInduk.ts` — CRUD generik untuk semua entitas master data
-- `src/lib/aksi/penjualan.ts` — logika bisnis siklus penjualan (transaksi, potong/tambah stok, perubahan status dokumen)
-- `src/lib/aksi/pembelian.ts` — logika bisnis siklus pembelian (mirror dari penjual.ts: stok bertambah saat terima, berkurang saat retur)
-- `src/app/data-induk/[entitas]` — satu halaman generik untuk semua master data (dikonfigurasi di `src/lib/konfigurasiDataInduk.ts`)
-- `src/app/penjualan/*` — halaman per tahap siklus penjualan
-- `src/app/pembelian/*` — halaman per tahap siklus pembelian
-- `skrip/uji-penjualan.ts` — regresi siklus Penjualan (penawaran → pesanan → pengiriman parsial & penuh → faktur → penerimaan parsial & penuh → return)
-- `skrip/uji-pembelian.ts` — regresi siklus Pembelian (pesanan → penerimaan parsial & penuh → faktur → pembayaran parsial & penuh → return)
+- `prisma/schema.prisma` — seluruh model data (36 model + `Sesi`, 6 enum)
+- `src/proxy.ts` — pemeriksaan cookie sesi di tepi: tanpa cookie → `/masuk`
+- `src/app/(publik)/masuk` — halaman masuk & pemasangan awal (tanpa kerangka aplikasi)
+- `src/app/(aplikasi)/` — semua halaman aplikasi; `layout.tsx`-nya memasang sidebar/topbar dengan identitas pengguna
+- `src/app/(aplikasi)/data-induk/[entitas]` (+ `[id]` untuk ubah) — satu halaman generik untuk semua data induk (`src/lib/konfigurasiDataInduk.ts`)
+- `src/app/(aplikasi)/pengaturan/pengguna` — kelola akun; `profil` — ganti kata sandi; `tanpa-akses` — halaman 403
+- `src/lib/aksi/*.ts` — logika bisnis per modul (`penjualan`, `pembelian`, `jurnal`, `asetTetap`, `dataInduk`, `pengaturan`, `otentikasi`, `pengguna`)
+- `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
+- `skrip/uji-{penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon
+- `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
+
+Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
 ## Alur kerja
 
-1. Buat **Pelanggan**, **Barang**, **Gudang** di Data Induk, lalu isi stok awal lewat Prisma Studio (`npx prisma studio`) — belum ada halaman "Penyesuaian Persediaan" untuk stok awal.
-2. Buat **Penawaran Penjualan** (opsional) → konversi jadi **Pesanan Penjualan**, atau langsung buat Pesanan.
-3. Dari daftar Pesanan, klik **Kirim** untuk membuat Pengiriman (stok otomatis berkurang) — bisa dicicil (parsial).
-4. Dari daftar Pesanan, klik **Fakturkan** untuk membuat Faktur.
-5. Dari daftar Faktur, klik **Terima Bayar** untuk mencatat pelunasan (bisa dicicil), atau **Retur** untuk mengembalikan barang (stok otomatis bertambah).
+1. Masuk sebagai Pemilik/Admin, isi **Pengaturan > Pemetaan Akun** (wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat).
+2. Buat **Pelanggan**, **Barang**, **Gudang** di Data Induk; stok awal lewat pembelian (Pesanan Pembelian → Terima Barang) atau Prisma Studio (`npx prisma studio`) — belum ada halaman "Penyesuaian Persediaan".
+3. Buat **Penawaran Penjualan** (opsional) → konversi jadi **Pesanan Penjualan**, atau langsung buat Pesanan.
+4. Dari daftar Pesanan, **Kirim** untuk membuat Surat Jalan (stok berkurang; bisa parsial), lalu **Fakturkan**.
+5. Dari daftar Faktur, **Terima Bayar** (bisa dicicil) atau **Retur** (stok bertambah).
+6. Ulangi cermin-nya di Pembelian; Buku Besar & Neraca Saldo terisi otomatis dari jurnal tiap dokumen.
 
 ## Keputusan & batasan yang perlu diketahui
 
-Karena diminta lanjut tanpa konfirmasi bertahap, berikut keputusan yang saya ambil sendiri dan hal yang **belum** dikerjakan:
-
-- **Jurnal Penjualan/Pembelian OTOMATIS** (per permintaan). Faktur Penjualan/Pembelian, Penerimaan, Pembayaran, dan Retur sekarang otomatis membuat jurnal via `src/lib/akuntansi.ts`, menggunakan pemetaan akun yang diatur di **Pengaturan > Pemetaan Akun** (`/pengaturan/pemetaan-akun`). **Wajib diisi dulu** sebelum bisa membuat Faktur/Penerimaan/Pembayaran/Retur — kalau belum, sistem menolak dengan pesan jelas. Aturan yang dipakai: Faktur Penjualan → Dr Piutang/Cr Pendapatan + Dr HPP/Cr Persediaan (kalau ada cost). Penerimaan → Dr Kas-Bank pilihan/Cr Piutang. Retur Penjualan → kebalikannya. Faktur Pembelian → Dr Persediaan/Cr Utang. Pembayaran → Dr Utang/Cr Kas-Bank pilihan. Retur Pembelian → Dr Utang/Cr Persediaan.
-  - Data dummy hasil `prisma/seed.ts` **tidak** melewati jalur ini (dibuat langsung ke database untuk kecepatan), jadi transaksi Penjualan/Pembelian di data dummy tidak otomatis muncul di Buku Besar — hanya 3 jurnal contoh manual (JU/KM/KK) yang sengaja ditambahkan untuk demo Buku Besar.
-- **Aset Tetap: hanya metode garis lurus (straight-baris)**, tidak ada metode saldo menurun (saldo menurun). Pencatatan **perolehan** aset TIDAK otomatis membuat jurnal (Dr Aset/Cr Kas atau Utang) — asumsinya sudah dicatat manual lewat Jurnal Umum atau Kas Keluar saat beli. Belum ada fitur "pelepasan/penjualan aset" (disposal) yang menghitung untung/rugi.
-- **Belum ada login/otorisasi.** Model `Pengguna` & `PeranPengguna` sudah ada di schema tapi belum dipakai — semua halaman bisa diakses siapa saja. Wajib ditambahkan sebelum dipakai multi-user beneran.
-- **Belum ada halaman edit** untuk master data maupun dokumen transaksi — saat ini hanya tambah & hapus. Hapus dokumen transaksi yang sudah diproses juga belum dibatasi (idealnya faktur yang sudah `LUNAS` tidak boleh dihapus).
-- **Belum ada Penyesuaian Persediaan / Pindah Barang** (ada di diagram Accurate asli) — untuk sekarang stok awal harus diisi manual lewat Prisma Studio.
-- **Perhitungan uang pakai `Number` di sisi aplikasi**, bukan aritmatika desimal presisi tinggi — cukup untuk skala UMKM tapi berisiko untuk angka sangat besar/presisi tinggi. Kolom database tetap `Decimal(18,2)`.
-- **Nomor dokumen** (`PNW-2026-0001` dst.) dihitung dari jumlah baris yang ada — cukup aman untuk pemakaian satu-persatu, tapi berpotensi bentrok kalau dua orang submit persis bersamaan (race condition). Belum kritikal untuk tim kecil, tapi perlu diperbaiki (pakai sequence DB) sebelum dipakai dengan banyak kasir sekaligus.
-- **Prisma versi 7.10.0** dipakai sengaja (bukan 8.0 beta terbaru yang ternyata CLI platform cloud Prisma, bukan ORM lokal biasa).
+- **Jurnal otomatis** untuk Faktur/Penerimaan/Pembayaran/Retur via `src/lib/akuntansi.ts` memakai pemetaan akun (Piutang, Persediaan, HPP, Pendapatan, Utang). Aturan: Faktur Penjualan → Dr Piutang/Cr Pendapatan + Dr HPP/Cr Persediaan; Penerimaan → Dr Kas-Bank/Cr Piutang; Retur Penjualan → kebalikannya; Faktur Pembelian → Dr Persediaan/Cr Utang; Pembayaran → Dr Utang/Cr Kas-Bank; Retur Pembelian → Dr Utang/Cr Persediaan.
+- **Aset Tetap: hanya garis lurus.** Perolehan aset tidak otomatis membuat jurnal (catat lewat Jurnal Umum/Kas Keluar); belum ada pelepasan aset.
+- **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Belum ada: lupa-kata-sandi via email (diatur ulang oleh Pemilik/Admin), 2FA, pembatasan percobaan login.
+- **Hak akses per modul**, bukan per dokumen/gudang. Peran Gudang bisa *melihat* semua daftar penjualan/pembelian (perlu untuk membuat SJ/TB).
+- **Dokumen transaksi belum bisa diubah/dihapus** dari UI (data induk sudah bisa: tombol Ubah/Hapus; yang masih dipakai transaksi ditolak DB dengan pesan jelas).
+- **Belum ada Penyesuaian Persediaan / Pindah Barang**, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya).
+- **Skrip regresi** memakai basis data yang sama dengan data contoh (bersih-bersih berbasis waktu mulai uji) dan menyetel `UJI_TANPA_SESI=1` agar aksi server bisa dipanggil tanpa HTTP — pintu ini hanya terbuka di luar `NODE_ENV=production`.
+- **Prisma 7.10.0** dipakai sengaja (bukan 8.0 rc yang merupakan CLI platform Prisma).

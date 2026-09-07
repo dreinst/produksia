@@ -1,4 +1,6 @@
 import "dotenv/config";
+// Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
+process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import {
   buatPesananPembelian,
@@ -83,7 +85,7 @@ async function main() {
   let stok = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barang.id, gudangId: gudang.id } } });
   console.log("Stock after partial penerimaan (expect 58):", stok.jumlah.toString());
 
-  let orderAfterPartial = await db.pesananPembelian.findUniqueOrThrow({ where: { id: pesanan.id } });
+  const orderAfterPartial = await db.pesananPembelian.findUniqueOrThrow({ where: { id: pesanan.id } });
   console.log("Order status after partial penerimaan (expect SEBAGIAN):", orderAfterPartial.status);
 
   console.log("=== 3. Goods Receipt (sisa 12) ===");
@@ -115,7 +117,7 @@ async function main() {
   pay1.set("jumlah", "40000");
   await jalankanAbaikanRedirect("buatPembayaranPembelian (partial)", () => buatPembayaranPembelian(pay1));
 
-  let invoiceAfterPartialPay = await db.fakturPembelian.findUniqueOrThrow({ where: { id: faktur.id } });
+  const invoiceAfterPartialPay = await db.fakturPembelian.findUniqueOrThrow({ where: { id: faktur.id } });
   console.log("Invoice status after partial pay (expect SEBAGIAN):", invoiceAfterPartialPay.status);
 
   console.log("=== 6. Purchase Payment (sisa 60000) ===");

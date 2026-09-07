@@ -1,5 +1,6 @@
 "use server";
 
+import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -59,6 +60,7 @@ function totalBaris(daftarBaris: BarisInput[]): Desimal {
 // ---------- Pesanan Pembelian ----------
 
 export async function buatPesananPembelian(dataFormulir: FormData) {
+  await wajibHakAksi("pembelian.tulis");
   const pemasokId = String(dataFormulir.get("pemasokId") ?? "");
   if (!pemasokId) throw new Error("Pemasok wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
@@ -82,6 +84,7 @@ export async function buatPesananPembelian(dataFormulir: FormData) {
 // ---------- Penerimaan Barang ----------
 
 export async function buatPenerimaanBarang(dataFormulir: FormData) {
+  await wajibHakAksi("pembelian.terima");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -134,6 +137,7 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
 // ---------- Faktur Pembelian ----------
 
 export async function buatFakturPembelian(dataFormulir: FormData) {
+  await wajibHakAksi("pembelian.tulis");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const penerimaanId = String(dataFormulir.get("penerimaanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -185,6 +189,7 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
 // ---------- Pembayaran Pembelian ----------
 
 export async function buatPembayaranPembelian(dataFormulir: FormData) {
+  await wajibHakAksi("pembelian.tulis");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const akunId = String(dataFormulir.get("akunId") ?? "");
   const metodeBayar = String(dataFormulir.get("metodeBayar") ?? "TRANSFER");
@@ -220,6 +225,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
 // ---------- Retur Pembelian ----------
 
 export async function buatReturPembelian(dataFormulir: FormData) {
+  await wajibHakAksi("pembelian.tulis");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   const alasan = String(dataFormulir.get("alasan") ?? "").trim();

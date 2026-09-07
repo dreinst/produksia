@@ -4,20 +4,25 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import Ikon from "@/komponen/ui/Ikon";
+import { keluar } from "@/lib/aksi/otentikasi";
+import { inisialNama, LABEL_PERAN, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
-const tautanTransaksiBaru = [
-  { href: "/penjualan/penawaran/baru", label: "Penawaran Penjualan", kode: "PNW", ikon: "request_quote" },
-  { href: "/penjualan/pesanan/baru", label: "Pesanan Penjualan", kode: "PSJ", ikon: "receipt_long" },
-  { href: "/pembelian/pesanan/baru", label: "Pesanan Pembelian", kode: "PSB", ikon: "shopping_bag" },
-  { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", ikon: "south_west" },
-  { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", ikon: "north_east" },
-  { href: "/buku-besar/jurnal/baru", label: "Jurnal Umum", kode: "JU", ikon: "edit_note" },
-  { href: "/aset-tetap/baru", label: "Aset Tetap", kode: "AT", ikon: "domain" },
+const tautanTransaksiBaru: { href: string; label: string; kode: string; ikon: string; hak: Hak }[] = [
+  { href: "/penjualan/penawaran/baru", label: "Penawaran Penjualan", kode: "PNW", ikon: "request_quote", hak: "penjualan.tulis" },
+  { href: "/penjualan/pesanan/baru", label: "Pesanan Penjualan", kode: "PSJ", ikon: "receipt_long", hak: "penjualan.tulis" },
+  { href: "/penjualan/pengiriman", label: "Surat Jalan", kode: "SJ", ikon: "local_shipping", hak: "penjualan.kirim" },
+  { href: "/pembelian/pesanan/baru", label: "Pesanan Pembelian", kode: "PSB", ikon: "shopping_bag", hak: "pembelian.tulis" },
+  { href: "/pembelian/penerimaan-barang", label: "Terima Barang", kode: "TB", ikon: "inventory", hak: "pembelian.terima" },
+  { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", ikon: "south_west", hak: "kas-bank.tulis" },
+  { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", ikon: "north_east", hak: "kas-bank.tulis" },
+  { href: "/buku-besar/jurnal/baru", label: "Jurnal Umum", kode: "JU", ikon: "edit_note", hak: "buku-besar.tulis" },
+  { href: "/aset-tetap/baru", label: "Aset Tetap", kode: "AT", ikon: "domain", hak: "aset-tetap.tulis" },
 ];
 
-export default function BilahAtas({ saatMenu }: { saatMenu: () => void }) {
+export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSesi; saatMenu: () => void }) {
   const router = useRouter();
   const refCari = useRef<HTMLInputElement>(null);
+  const tautanBoleh = tautanTransaksiBaru.filter((l) => punyaHak(pengguna.peran, l.hak));
 
   // ⌘K / Ctrl+K memfokuskan kotak pencarian
   useEffect(() => {
@@ -67,37 +72,61 @@ export default function BilahAtas({ saatMenu }: { saatMenu: () => void }) {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4 shrink-0">
-        <details className="relative group">
-          <summary className="tombol tombol-utama list-none cursor-pointer select-none [&::-webkit-details-marker]:hidden">
-            <Ikon nama="add" className="!text-[18px]" />
-            <span className="hidden sm:inline">Transaksi Baru</span>
-          </summary>
-          <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-1.5 z-40" style={{ boxShadow: "var(--shadow-pop)" }}>
-            {tautanTransaksiBaru.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-              >
-                <Ikon nama={l.ikon} className="!text-[18px] text-slate-400" />
-                <span className="flex-1">{l.label}</span>
-                <span className="mono text-[10px] text-slate-400">{l.kode}</span>
-              </Link>
-            ))}
-          </div>
-        </details>
+        {tautanBoleh.length > 0 && (
+          <details className="relative group">
+            <summary className="tombol tombol-utama list-none cursor-pointer select-none [&::-webkit-details-marker]:hidden">
+              <Ikon nama="add" className="!text-[18px]" />
+              <span className="hidden sm:inline">Transaksi Baru</span>
+            </summary>
+            <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-1.5 z-40" style={{ boxShadow: "var(--shadow-pop)" }}>
+              {tautanBoleh.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                >
+                  <Ikon nama={l.ikon} className="!text-[18px] text-slate-400" />
+                  <span className="flex-1">{l.label}</span>
+                  <span className="mono text-[10px] text-slate-400">{l.kode}</span>
+                </Link>
+              ))}
+            </div>
+          </details>
+        )}
 
         <div className="hidden md:block h-6 w-px bg-slate-200" />
 
-        <div className="hidden md:flex items-center gap-3">
-          <span className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold ring-2 ring-slate-100">
-            AL
-          </span>
-          <div className="flex flex-col text-left">
-            <span className="text-xs font-semibold text-slate-900 leading-tight">Admin Lokal</span>
-            <span className="text-[11px] text-slate-500 leading-normal">Belum masuk</span>
+        <details className="relative">
+          <summary
+            className="flex items-center gap-3 list-none cursor-pointer select-none rounded-lg px-1 py-0.5 hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
+            aria-label="Menu akun"
+          >
+            <span className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold ring-2 ring-slate-100">
+              {inisialNama(pengguna.nama)}
+            </span>
+            <span className="hidden md:flex flex-col text-left">
+              <span className="text-xs font-semibold text-slate-900 leading-tight max-w-[10rem] truncate">{pengguna.nama}</span>
+              <span className="text-[11px] text-slate-500 leading-normal">{LABEL_PERAN[pengguna.peran]}</span>
+            </span>
+            <Ikon nama="expand_more" className="hidden md:block !text-[18px] text-slate-400" />
+          </summary>
+          <div className="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white p-1.5 z-40" style={{ boxShadow: "var(--shadow-pop)" }}>
+            <div className="px-3 py-2 border-b border-slate-100 mb-1">
+              <div className="text-sm font-semibold text-slate-900 truncate">{pengguna.nama}</div>
+              <div className="text-xs text-slate-500 truncate">{pengguna.email}</div>
+            </div>
+            <Link href="/profil" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900">
+              <Ikon nama="person" className="!text-[18px] text-slate-400" />
+              Profil &amp; kata sandi
+            </Link>
+            <form action={keluar}>
+              <button type="submit" className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-rose-600 hover:bg-rose-50">
+                <Ikon nama="logout" className="!text-[18px]" />
+                Keluar
+              </button>
+            </form>
           </div>
-        </div>
+        </details>
       </div>
     </header>
   );

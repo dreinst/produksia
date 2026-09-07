@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-type ItemOption = { id: string; kode: string; nama: string; hargaBawaan: number };
+type OpsiBarang = { id: string; kode: string; nama: string; hargaBawaan: number };
 type Row = { barangId: string; jumlah: number; harga: number };
 
-export default function EditorBarisBarang({ daftarBarang }: { daftarBarang: ItemOption[] }) {
+export default function EditorBarisBarang({ daftarBarang }: { daftarBarang: OpsiBarang[] }) {
   const [isian, setIsian] = useState<Row[]>([{ barangId: "", jumlah: 1, harga: 0 }]);
 
   function ubahBaris(index: number, patch: Partial<Row>) {

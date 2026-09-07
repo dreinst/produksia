@@ -1,4 +1,6 @@
 import "dotenv/config";
+// Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
+process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import {
   buatPenawaran,
@@ -109,7 +111,7 @@ async function main() {
   });
   console.log("Stock after partial pengiriman (expect 96):", stok.jumlah.toString());
 
-  let orderAfterPartial = await db.pesananPenjualan.findUniqueOrThrow({
+  const orderAfterPartial = await db.pesananPenjualan.findUniqueOrThrow({
     where: { id: pesanan.id },
     include: { baris: true },
   });
@@ -157,7 +159,7 @@ async function main() {
   rFd.set("jumlah", "40000");
   await jalankanAbaikanRedirect("buatPenerimaan (partial)", () => buatPenerimaan(rFd));
 
-  let invoiceAfterPartialPay = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: faktur.id } });
+  const invoiceAfterPartialPay = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: faktur.id } });
   console.log("Invoice status after partial pay (expect SEBAGIAN):", invoiceAfterPartialPay.status);
 
   console.log("=== 7. Create Receipt (sisa 60000) ===");

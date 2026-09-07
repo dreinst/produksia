@@ -2,19 +2,21 @@
 
 import { useRouter } from "next/navigation";
 
-type AccountOption = { id: string; kode: string; nama: string };
+type OpsiAkun = { id: string; kode: string; nama: string };
 
 export default function PilihAkun({
   daftarAkun,
   idTerpilih,
 }: {
-  daftarAkun: AccountOption[];
+  daftarAkun: OpsiAkun[];
   idTerpilih?: string;
 }) {
   const router = useRouter();
 
   return (
     <select
+      id="akunId"
+      name="akunId"
       defaultValue={idTerpilih ?? ""}
       className="isian isian-kecil w-auto"
       onChange={(e) => router.push(`/buku-besar/mutasi?akunId=${e.target.value}`)}

@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type Pengguna = Prisma.PenggunaModel
 /**
+ * Model Sesi
+ * Sesi login berbasis basis data: cookie hanya menyimpan token acak, yang disimpan di sini dalam bentuk hash.
+ */
+export type Sesi = Prisma.SesiModel
+/**
  * Model Departemen
  * 
  */

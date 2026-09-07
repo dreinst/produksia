@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  uji:
+    name: Tipe · lint · regresi · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: accurate
+          POSTGRES_PASSWORD: accurate
+          POSTGRES_DB: accurate_copy
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U accurate"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://accurate:accurate@localhost:5432/accurate_copy
+      # Skrip regresi memanggil aksi server di luar HTTP (lihat penggunaSaatIni di src/lib/otentikasi.ts)
+      UJI_TANPA_SESI: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Pasang dependensi
+        run: npm ci
+
+      - name: Migrasi & generate Prisma
+        run: |
+          npx prisma migrate deploy --config prisma7.config.ts
+          npx prisma generate --config prisma7.config.ts
+
+      - name: Pemeriksaan tipe
+        run: npx tsc --noEmit -p .
+
+      - name: Lint
+        run: npx eslint
+
+      - name: Data contoh
+        run: npx tsx prisma/seed.ts
+
+      - name: Regresi (5 suite)
+        run: |
+          for s in skrip/uji-penjualan.ts skrip/uji-pembelian.ts skrip/uji-buku-besar.ts skrip/uji-aset-tetap.ts skrip/uji-pengaman.ts; do
+            echo "##### $s"
+            npx tsx "$s"
+          done
+
+      - name: Build produksi
+        run: npx next build

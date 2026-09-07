@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-type AccountOption = { id: string; kode: string; nama: string };
+type OpsiAkun = { id: string; kode: string; nama: string };
 type Row = { akunId: string; debit: number; kredit: number; keterangan: string };
 
-export default function EditorBarisJurnal({ daftarAkun }: { daftarAkun: AccountOption[] }) {
+export default function EditorBarisJurnal({ daftarAkun }: { daftarAkun: OpsiAkun[] }) {
   const [isian, setIsian] = useState<Row[]>([
     { akunId: "", debit: 0, kredit: 0, keterangan: "" },
     { akunId: "", debit: 0, kredit: 0, keterangan: "" },

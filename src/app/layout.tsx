@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import KerangkaAplikasi from "@/komponen/KerangkaAplikasi";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
@@ -21,15 +20,14 @@ export const viewport: Viewport = {
   themeColor: "#f8fafc",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+/** Tata letak akar: hanya font & kanvas. Kerangka aplikasi (sidebar/topbar) ada di (aplikasi)/layout.tsx. */
+export default function TataLetakUtama({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="id"
       className={`${inter.variable} ${hanken.variable} ${jetbrains.variable} ${materialSymbols.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        <KerangkaAplikasi>{children}</KerangkaAplikasi>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

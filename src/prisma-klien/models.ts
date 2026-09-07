@@ -9,6 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/Pengguna'
+export type * from './models/Sesi'
 export type * from './models/Departemen'
 export type * from './models/Karyawan'
 export type * from './models/Pelanggan'
