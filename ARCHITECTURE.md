@@ -89,7 +89,7 @@ app/
 │  │  ├─ akuntansi.ts          # aturan posting jurnal otomatis (§6.2)
 │  │  ├─ statusFormulir.ts     # jalankanFormulir: galat → status, terjemahkan galat Prisma
 │  │  └─ aksi/                 # "use server": penjualan, pembelian, jurnal, asetTetap, dataInduk, pengaturan, otentikasi, pengguna
-│  └─ prisma-klien/            # output Prisma Client (di-gitignore, dibuat `prisma generate`)
+│  └─ prisma-klien/            # output `prisma generate` — ikut di-commit agar tipe langsung tersedia; jangan diedit manual
 ├─ AUDIT.md · ARCHITECTURE.md · README.md
 └─ prisma7.config.ts · .env (DATABASE_URL, tidak di-commit)
 ```
