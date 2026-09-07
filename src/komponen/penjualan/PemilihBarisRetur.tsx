@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
-type InvoiceLine = { barangId: string; labelBarang: string; jumlah: number };
+type BarisFakturOpsi = { barangId: string; labelBarang: string; jumlah: number };
 
-export default function PemilihBarisRetur({ daftarBaris }: { daftarBaris: InvoiceLine[] }) {
+export default function PemilihBarisRetur({ daftarBaris }: { daftarBaris: BarisFakturOpsi[] }) {
   const [isian, setIsian] = useState(daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: 0 })));
 
   function ubahJumlah(index: number, jumlah: number) {

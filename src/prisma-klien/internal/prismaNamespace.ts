@@ -398,6 +398,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   Pengguna: 'Pengguna',
+  Sesi: 'Sesi',
   Departemen: 'Departemen',
   Karyawan: 'Karyawan',
   Pelanggan: 'Pelanggan',
@@ -448,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -523,6 +524,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PenggunaCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PenggunaCountAggregateOutputType> | number
+        }
+      }
+    }
+    Sesi: {
+      payload: Prisma.$SesiPayload<ExtArgs>
+      fields: Prisma.SesiFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SesiFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SesiFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>
+        }
+        findFirst: {
+          args: Prisma.SesiFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SesiFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>
+        }
+        findMany: {
+          args: Prisma.SesiFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>[]
+        }
+        create: {
+          args: Prisma.SesiCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>
+        }
+        createMany: {
+          args: Prisma.SesiCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SesiCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>[]
+        }
+        delete: {
+          args: Prisma.SesiDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>
+        }
+        update: {
+          args: Prisma.SesiUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>
+        }
+        deleteMany: {
+          args: Prisma.SesiDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SesiUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SesiUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>[]
+        }
+        upsert: {
+          args: Prisma.SesiUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SesiPayload>
+        }
+        aggregate: {
+          args: Prisma.SesiAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSesi>
+        }
+        groupBy: {
+          args: Prisma.SesiGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SesiGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SesiCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SesiCountAggregateOutputType> | number
         }
       }
     }
@@ -3161,10 +3236,22 @@ export const PenggunaScalarFieldEnum = {
   nama: 'nama',
   kataSandiHash: 'kataSandiHash',
   peran: 'peran',
+  aktif: 'aktif',
   dibuatPada: 'dibuatPada'
 } as const
 
 export type PenggunaScalarFieldEnum = (typeof PenggunaScalarFieldEnum)[keyof typeof PenggunaScalarFieldEnum]
+
+
+export const SesiScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  penggunaId: 'penggunaId',
+  kedaluwarsa: 'kedaluwarsa',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type SesiScalarFieldEnum = (typeof SesiScalarFieldEnum)[keyof typeof SesiScalarFieldEnum]
 
 
 export const DepartemenScalarFieldEnum = {
@@ -3648,6 +3735,13 @@ export type ListEnumPeranPenggunaFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -3924,6 +4018,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   pengguna?: Prisma.PenggunaOmit
+  sesi?: Prisma.SesiOmit
   departemen?: Prisma.DepartemenOmit
   karyawan?: Prisma.KaryawanOmit
   pelanggan?: Prisma.PelangganOmit

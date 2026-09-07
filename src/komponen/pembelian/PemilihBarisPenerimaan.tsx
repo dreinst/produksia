@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type OrderLine = {
+type BarisPesananOpsi = {
   id: string;
   barangId: string;
   labelBarang: string;
@@ -10,7 +10,7 @@ type OrderLine = {
   jumlahDiterima: number;
 };
 
-export default function PemilihBarisPenerimaan({ daftarBaris }: { daftarBaris: OrderLine[] }) {
+export default function PemilihBarisPenerimaan({ daftarBaris }: { daftarBaris: BarisPesananOpsi[] }) {
   const awal = daftarBaris.map((l) => ({
     barisPesananId: l.id,
     barangId: l.barangId,

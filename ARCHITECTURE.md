@@ -41,41 +41,55 @@ flowchart LR
 ```
 app/
 ├─ prisma/
-│  ├─ schema.prisma          # seluruh model data (§3)
-│  ├─ migrations/            # riwayat migrasi, termasuk CHECK constraint stok
-│  ├─ seed.ts                # 1 alur cerita 20 tahap yang melewati semua modul
-│  └─ reset.ts               # kosongkan semua tabel (urutan aman terhadap FK)
+│  ├─ schema.prisma            # seluruh model data (§3) + Pengguna/Sesi (§6.4)
+│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna
+│  ├─ seed.ts                  # 4 pengguna + 1 alur cerita 20 tahap yang melewati semua modul
+│  └─ reset.ts                 # kosongkan semua tabel (urutan aman terhadap FK)
 ├─ skrip/
-│  └─ uji-*.ts           # 5 suite regresi: penjual, purchasing, ledger, daftarAset, pengaman
+│  ├─ uji-*.ts                 # 5 suite regresi: penjualan, pembelian, buku-besar, aset-tetap, pengaman
+│  └─ subset-font-ikon.sh      # pangkas font ikon ke ikon yang dipakai
+├─ .github/workflows/ci.yml    # tsc · eslint · migrasi+seed di PostgreSQL · 5 suite · next build
 ├─ src/
-│  ├─ app/                   # routing (App Router)
-│  │  ├─ layout.tsx          # kerangka: BilahSamping + <main>
-│  │  ├─ page.tsx            # dashboard
-│  │  ├─ error.tsx · not-found.tsx · loading.tsx
-│  │  ├─ master/[entity]/    # SATU halaman generik untuk semua master data
-│  │  ├─ penjual/…             # daftarPenawaran, daftarPesanan, daftarPengiriman, daftarFaktur, daftarPenerimaan, daftarRetur
-│  │  ├─ purchasing/…        # daftarPesanan, daftarPenerimaan, daftarFaktur, daftarPembayaran, daftarRetur
-│  │  ├─ cashbank/…          # in, out
-│  │  ├─ ledger/…            # jurnal, mutasi, neraca-saldo
-│  │  ├─ daftarAset/…            # daftar aset, depreciation
-│  │  ├─ settings/akun-pemetaan/
-│  │  └─ api/health/         # cek koneksi DB
-│  ├─ components/
-│  │  ├─ BilahSamping.tsx         # accordion 7 menu + drawer mobile (client)
-│  │  ├─ FormulirAksi.tsx      # pembungkus form: error keadaan, pending, konfirmasi (client)
-│  │  ├─ penjual/*Picker.tsx, EditorBarisBarang.tsx   # editor baris (client)
-│  │  ├─ purchasing/PemilihBarisPenerimaan.tsx
-│  │  └─ ledger/EditorBarisJurnal.tsx, PilihAkun.tsx
+│  ├─ proxy.ts                 # tepi: tanpa cookie sesi → /masuk (tanpa sentuh DB)
+│  ├─ app/                     # routing (App Router)
+│  │  ├─ layout.tsx            # akar: font & kanvas saja
+│  │  ├─ not-found.tsx         # 404 mandiri (bisa tampil sebelum masuk)
+│  │  ├─ (publik)/masuk/       # halaman masuk / pemasangan awal — tanpa kerangka aplikasi
+│  │  ├─ (aplikasi)/           # semua halaman yang butuh sesi
+│  │  │  ├─ layout.tsx         # penggunaSaatIni() → <KerangkaAplikasi pengguna>; tanpa sesi → /masuk
+│  │  │  ├─ page.tsx           # beranda (KPI, alur dokumen, transaksi terbaru)
+│  │  │  ├─ error.tsx · loading.tsx
+│  │  │  ├─ data-induk/[entitas]/ (+ [id]/)   # SATU halaman generik daftar+tambah, dan ubah
+│  │  │  ├─ penjualan/…        # penawaran, pesanan, pengiriman, faktur, penerimaan, retur (+ /baru)
+│  │  │  ├─ pembelian/…        # pesanan, penerimaan-barang, faktur, pembayaran, retur (+ /baru)
+│  │  │  ├─ kas-bank/…         # masuk, keluar
+│  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo
+│  │  │  ├─ aset-tetap/…       # daftar, baru, penyusutan
+│  │  │  ├─ pengaturan/        # pemetaan-akun, pengguna (+ [id]/)
+│  │  │  ├─ profil/ · tanpa-akses/ · cari/
+│  │  └─ api/status/           # cek koneksi DB (butuh sesi)
+│  ├─ komponen/
+│  │  ├─ KerangkaAplikasi.tsx · BilahSamping.tsx · BilahAtas.tsx   # kerangka; menu disaring per peran (client)
+│  │  ├─ FormulirAksi.tsx      # pembungkus form: galat sebagai status, pending, konfirmasi (client)
+│  │  ├─ PenyusunFaktur.tsx    # form faktur dengan pratinjau jurnal (client)
+│  │  ├─ data-induk/FormulirDataInduk.tsx     # form tambah/ubah dari konfigurasi entitas
+│  │  ├─ penjualan/*, pembelian/*, buku-besar/*   # editor baris & pemilih (client)
+│  │  └─ ui/                   # Ikon, KepalaHalaman, Lencana, KontrolDaftar (cari + paginasi)
 │  ├─ lib/
-│  │  ├─ db.ts               # singleton PrismaClient + adapter pg
-│  │  ├─ konfigurasiDataInduk.ts     # definisi entitas master data (bidang, kolom, section)
-│  │  ├─ uang.ts            # Decimal helpers: D, uang, jumlahkan, kali, bacaUang, format
-│  │  ├─ penomoran.ts        # nomorDokumenBerikutnya(delegasi, prefix)
-│  │  ├─ stok.ts            # kurangiStok (cek ketersediaan), tambahStok
-│  │  ├─ akuntansi.ts       # aturan posting jurnal otomatis (§6)
-│  │  ├─ statusFormulir.ts        # jalankanFormulir: ubah error → keadaan, terjemahkan error Prisma
-│  │  └─ aksi/            # "use server": master, penjual, purchasing, jurnal, fixedAssets, settings
-│  └─ prisma-klien/      # output Prisma Client (di-gitignore, dibuat oleh `prisma generate`)
+│  │  ├─ db.ts                 # singleton PrismaClient + adapter pg
+│  │  ├─ otentikasi.ts         # sesi (cookie ↔ tabel Sesi), penggunaSaatIni, wajibMasuk/wajibHak/wajibHakAksi
+│  │  ├─ hakAkses.ts           # matriks peran → hak (aman untuk komponen client), label peran
+│  │  ├─ kataSandi.ts          # hash/verifikasi scrypt, aturan kekuatan
+│  │  ├─ daftar.ts             # bacaParamDaftar(?q,?hal) untuk halaman daftar
+│  │  ├─ dataInduk.ts          # pembacaan generik data induk (opsi, include, pencarian)
+│  │  ├─ konfigurasiDataInduk.ts   # definisi entitas data induk (bidang, kolom, bagian)
+│  │  ├─ uang.ts               # Decimal: D, uang, jumlahkan, kali, bacaUang, format
+│  │  ├─ penomoran.ts          # nomorDokumenBerikutnya(delegasi, prefix)
+│  │  ├─ stok.ts               # kurangiStok (cek ketersediaan), tambahStok
+│  │  ├─ akuntansi.ts          # aturan posting jurnal otomatis (§6.2)
+│  │  ├─ statusFormulir.ts     # jalankanFormulir: galat → status, terjemahkan galat Prisma
+│  │  └─ aksi/                 # "use server": penjualan, pembelian, jurnal, asetTetap, dataInduk, pengaturan, otentikasi, pengguna
+│  └─ prisma-klien/            # output Prisma Client (di-gitignore, dibuat `prisma generate`)
 ├─ AUDIT.md · ARCHITECTURE.md · README.md
 └─ prisma7.config.ts · .env (DATABASE_URL, tidak di-commit)
 ```
@@ -84,10 +98,11 @@ app/
 
 | Lapisan | Isi | Boleh mengimpor |
 |---|---|---|
-| Halaman (`src/app`) | Server Components: query baca, susun props, render | components, lib/db, lib/aksi |
-| Komponen client (`src/komponen`) | Interaksi: editor baris, form, sidebar | tipe saja; **tidak** boleh `db` |
-| Actions (`src/lib/aksi`) | Validasi input, orkestrasi transaksi, redirect | lib/* |
-| Domain (`src/lib/{uang,stok,accounting,numbering}`) | Aturan bisnis murni yang dipakai lintas modul | lib/db (tipe), Prisma |
+| Tepi (`src/proxy.ts`) | Cek keberadaan cookie sesi, alihkan ke `/masuk` | hakAkses (konstanta) saja |
+| Halaman (`src/app`) | Server Components: `wajibHak`, query baca, susun props, render | komponen, lib/* |
+| Komponen client (`src/komponen`) | Interaksi: editor baris, form, sidebar (disaring `punyaHak`) | tipe & `hakAkses`; **tidak** boleh `db` |
+| Aksi (`src/lib/aksi`) | `wajibHakAksi`, validasi input, orkestrasi transaksi, redirect | lib/* |
+| Domain (`src/lib/{uang,stok,akuntansi,penomoran,otentikasi}`) | Aturan bisnis murni yang dipakai lintas modul | lib/db, Prisma |
 | Data (`src/lib/db.ts`, Prisma) | Akses DB | — |
 
 ---
@@ -264,6 +279,20 @@ Semua posting terjadi **di dalam transaksi yang sama** dengan dokumen sumbernya.
 ### 6.3 Uang & kuantitas (`src/lib/uang.ts`)
 `uang()` membulatkan ke 2 desimal half-up; `bacaUang()` memvalidasi isian form (wajib, angka valid, tidak negatif, default > 0); `jumlahkan`/`kali` mengembalikan Decimal. Perbandingan status (mis. lunas) memakai `.gte()`, bukan `>=` float.
 
+### 6.4 Otentikasi & hak akses (`src/lib/otentikasi.ts`, `src/lib/hakAkses.ts`, `src/proxy.ts`)
+
+Tanpa pustaka luar dan tanpa kunci rahasia di `.env`:
+
+- **Kata sandi**: scrypt (Node `crypto`) dengan garam acak 16 byte per pengguna, disimpan sebagai `scrypt$garam$hash`; aturan minimal 8 karakter berisi huruf & angka.
+- **Sesi berbasis basis data**: saat masuk dibuat token acak 256-bit; cookie `sesi_ac` (httpOnly, SameSite=Lax, 30 hari) menyimpan tokennya, tabel `Sesi` menyimpan SHA-256-nya. Mencabut sesi = menghapus barisnya — dipakai saat keluar, ganti kata sandi (semua perangkat lain keluar), akun dinonaktifkan, atau peran diubah.
+- **Tiga lapis pemeriksaan**:
+  1. `proxy.ts` — hanya melihat *ada/tidaknya* cookie: tanpa cookie → `/masuk?kembali=…` (juga menahan prefetch), `/api/*` → 401. Tidak menyentuh DB.
+  2. `(aplikasi)/layout.tsx` — `penggunaSaatIni()` (di-`cache` per render): token dicocokkan ke tabel, kedaluwarsa & `aktif` dicek → kerangka dipasang dengan identitas pengguna, atau dialihkan ke `/masuk`.
+  3. **Setiap halaman** memanggil `wajibHak("modul.lihat")` dan **setiap aksi server** memanggil `wajibHakAksi("modul.tulis")` sebagai pernyataan pertama. Halaman mengalihkan ke `/tanpa-akses`; aksi melempar galat yang tampil di formulir (isian tidak hilang).
+- **Matriks hak** (`hakAkses.ts`, boleh diimpor komponen client): 16 hak berbentuk `modul.lihat|tulis` (+ `penjualan.kirim`, `pembelian.terima`, `pengaturan.tulis`, `pengguna.kelola`). Pemilik & Admin = semua; Kasir = penjualan/pembelian/kas-bank/data-induk tulis, buku-besar & aset lihat; Gudang = SJ, TB, data induk. Sidebar, menu Transaksi Baru, dan tombol aksi di daftar disaring dengan `punyaHak` — itu kenyamanan, bukan pengaman.
+- **Kelola pengguna** (`/pengaturan/pengguna`): Admin tidak bisa menyentuh akun Pemilik; peran/status akun sendiri tidak bisa diubah; minimal satu Pemilik aktif harus tersisa; hapus akun melepas tautan `Karyawan.penggunaId` (riwayat transaksi tidak terhapus).
+- **Skrip regresi** memanggil aksi server tanpa HTTP; `cookies()` melempar galat di luar permintaan, dan `penggunaSaatIni` mengembalikan pengguna sintetis Pemilik hanya bila `UJI_TANPA_SESI=1` **dan** `NODE_ENV !== "production"`.
+
 ---
 
 ## 7. Siklus hidup satu request (form → DB → layar)
@@ -281,6 +310,7 @@ sequenceDiagram
     AF->>SA: useActionState → (prevState, dataFormulir)
     SA->>RF: jalankanFormulir(() => xxx(dataFormulir))
     RF->>X: jalankan
+    X->>DB: wajibHakAksi: cookie sesi → tabel Sesi → peran berhak?
     X->>X: parse & validasi (bacaUang, bacaBaris, aturan qty)
     X->>DB: nomorDokumenBerikutnya, $transaction { dokumen + stok + jurnal }
     alt sukses
@@ -295,9 +325,9 @@ sequenceDiagram
 
 Mengapa dua versi action (`buatFaktur` dan `buatFakturFormulir`)? Di production Next.js **menyamarkan** pesan error yang dilempar server action (anti-bocor data). Satu-satunya cara pesan validasi sampai ke user adalah **mengembalikannya sebagai keadaan**. Versi tanpa akhiran `Form` tetap dipakai skrip regresi (yang justru ingin exception).
 
-Halaman **daftar** adalah Server Component: query Prisma langsung, tanpa API layer; `revalidatePath` di action membuat daftar segar setelah redirect. Halaman **buat** memuat opsi (pelanggan, barang, gudang) di server dan menyerahkan isian dinamis ke komponen client yang menyimpan baris sebagai JSON di `<input type="hidden" name="baris">`.
+Halaman **daftar** adalah Server Component: `wajibHak` → `bacaParamDaftar(searchParams)` → `count` + `findMany({ where, skip, take })` langsung ke Prisma, tanpa lapisan API; `<KontrolDaftar>` merender kotak cari (`<form method="get">`) dan tautan halaman — semuanya tanpa JavaScript klien. `revalidatePath` di aksi membuat daftar segar setelah redirect. Halaman **buat** memuat opsi (pelanggan, barang, gudang) di server dan menyerahkan isian dinamis ke komponen client yang menyimpan baris sebagai JSON di `<input type="hidden" name="baris">`. Halaman **ubah** data induk (`/data-induk/[entitas]/[id]`) memakai `FormulirDataInduk` yang sama dengan form tambah, diisi nilai awal.
 
-Boundary: `error.tsx` (kegagalan render, tombol coba lagi), `not-found.tsx` (`notFound()` dari master entity yang tidak dikenal), `loading.tsx` (skeleton saat navigasi).
+Boundary: `error.tsx` (kegagalan render, tombol coba lagi), `not-found.tsx` (404 mandiri, juga untuk `notFound()` dari entitas yang tidak dikenal), `loading.tsx` (kerangka saat navigasi), `tanpa-akses` (peran tidak berhak).
 
 ---
 
@@ -306,11 +336,11 @@ Boundary: `error.tsx` (kegagalan render, tombol coba lagi), `not-found.tsx` (`no
 Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESIGN.md` + 2 layar contoh: Beranda dan form Faktur). Implementasinya ada di `src/app/globals.css` (token & kelas komponen) dan `src/komponen/{KerangkaAplikasi,BilahSamping,BilahAtas,PenyusunFaktur,ui/*}`.
 
 - **Token:** kanvas `#f8fafc`; kartu putih `rounded-2xl` border `slate-200/70` + bayangan sangat halus; Inter (teks), Hanken Grotesk (judul), JetBrains Mono (angka & nomor dokumen, `tabular-nums`). Sinyal finansial: emerald = kredit/lunas, rose = debit/jatuh tempo, amber = draft/menunggu, blue = aksi/aktif.
-- **Kelas komponen** (dipakai semua halaman, bukan utility per elemen): `.kartu`/`.kartu-tabel`/`.kepala-kartu`/`.ubin`, `.tombol` + `tombol-utama|accent|outline|soft|danger|sm`, `.input`/`.isian-kecil`/`.label`/`.petunjuk`/`.bidang`, `.tabel` (header uppercase 11px, baris 40px, hover) / `.tabel-polos`, `.lencana-*`, `.lencana-dokumen`, `.angka`/`.mono`/`.teks-label`. Komponen kecil: `NomorDokumen` (lencana prefix + nomor mono), `LencanaStatus`, `Ikon` (Material Symbols).
-- **Kerangka:** `KerangkaAplikasi` (client) = `BilahSamping` tetap 16rem di desktop / *drawer* di mobile + `BilahAtas` lengket (pencarian ⌘K → `/cari`, menu "Transaksi Baru", status DB) + `<main max-w-7xl>`.
-- **Navigasi:** Beranda, lalu grup **Operasional Finansial** (Penjualan, Pembelian, Kas & Bank, Buku Besar, Aset Tetap) dan **Administrasi & Setup** (Data Induk, Pemetaan Akun). Accordion satu-terbuka; grup yang memuat halaman aktif terbuka otomatis (keadaan di-reset via `key={pathname}` tanpa `useEffect`); sub-menu menampilkan kode dokumen (PNW, PSJ, SJ, …).
+- **Kelas komponen** (dipakai semua halaman, bukan utility per elemen): `.kartu`/`.kartu-tabel`/`.kepala-kartu`/`.ubin`, `.tombol` + `tombol-utama|aksen|garis|lembut|bahaya|kecil`, `.isian`/`.isian-kecil`/`.label`/`.petunjuk`/`.bidang`, `.tabel` (header uppercase 11px, baris 40px, hover) / `.tabel-polos`, `.lencana-*`, `.lencana-dokumen`, `.angka`/`.mono`/`.teks-label`. Komponen kecil: `NomorDokumen` (lencana prefix + nomor mono), `LencanaStatus`, `Ikon` (Material Symbols), `KontrolDaftar` (cari + paginasi).
+- **Kerangka:** `KerangkaAplikasi` (client, menerima `pengguna` dari layout) = `BilahSamping` tetap 16rem di desktop / *drawer* di mobile + `BilahAtas` lengket (pencarian ⌘K → `/cari`, menu "Transaksi Baru", menu akun: nama, peran, Profil, Keluar) + `<main max-w-7xl>`. Halaman `/masuk` dirender tanpa kerangka (grup rute `(publik)`).
+- **Navigasi:** Beranda, lalu grup **Operasional** (Penjualan, Pembelian, Kas & Bank, Buku Besar, Aset Tetap) dan **Administrasi & Pengaturan** (Data Induk, Pemetaan Akun, Pengguna). Setiap tautan punya `hak`; grup yang tak punya tautan tersisa untuk peran itu disembunyikan. Accordion satu-terbuka; grup yang memuat halaman aktif terbuka otomatis (keadaan di-reset via `key={pathname}` tanpa `useEffect`); sub-menu menampilkan kode dokumen (PNW, PSJ, SJ, …).
 - **Beranda & form Faktur** dibangun ulang mengikuti layar Stitch dengan data sungguhan: KPI (piutang, utang, kas & bank, nilai persediaan), pipeline PNW→PSJ→SJ→FJ→TRM, transaksi terbaru gabungan, neraca saldo cepat, peringatan stok, status penyusutan; `PenyusunFaktur` menampilkan ringkasan finansial, **preview jurnal otomatis** (dari pemetaan akun), dan guardrails secara live saat qty diubah.
-- **Ikon:** Material Symbols Outlined di-self-host (`src/app/fonts/…woff2`, ±3,9 MB, variable font) lewat `next/font/local` — tidak ada request ke Google saat runtime.
+- **Ikon:** Material Symbols Outlined di-self-host (`src/app/fonts/…woff2`) lewat `next/font/local` — tidak ada request ke Google saat runtime. File-nya sudah di-**subset** ke ±47 ikon yang dipakai (< 50 KB, dari 3,9 MB) dengan `skrip/subset-font-ikon.sh` (pyftsubset; ligatur `rlig/rclt` dipertahankan agar `<span>home</span>` tetap jadi ikon). Menambah ikon baru = jalankan ulang skrip itu.
 - **Responsif:** form `grid-cols-1 md:grid-cols-2`; elemen lebar penuh `md:col-span-2`; setiap tabel dalam `.kartu-tabel > .bungkus-tabel` (scroll horizontal di HP, halaman tidak ikut melebar).
 - **Tema:** satu tema terang (`color-scheme: light`) sesuai DESIGN.md; dark mode sengaja tidak didukung.
 
@@ -326,15 +356,17 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 10. Operasional
 
-- **DB lokal:** `~/Cooking/PostgreSQL/pgctl.sh awal|stop|status`; database `accurate_copy`; koneksi di `.env` (`DATABASE_URL`, tidak di-commit).
-- **Ubah skema:** edit `prisma/schema.prisma` → `npx prisma migrate dev --name …` → **restart `npm run dev`** (Turbopack tidak memuat ulang Prisma Client yang di-generate ulang; gejalanya `Cannot read properties of undefined (reading 'findMany')`). Constraint yang tidak didukung Prisma (mis. `CHECK`) ditulis manual di file migrasi (`--create-only`).
-- **Sebelum commit:** `npx tsc --noEmit && npx eslint src && for s in skrip/uji-penjualan*.ts; do npx tsx $s; done`.
+- **DB lokal:** `~/Cooking/PostgreSQL/pgctl.sh start|stop|status`; database `accurate_copy`; koneksi di `.env` (`DATABASE_URL`, tidak di-commit). Tidak ada rahasia lain.
+- **Pemasangan awal:** basis data tanpa pengguna → `/masuk` menampilkan formulir pembuatan akun Pemilik pertama. Data contoh (`seed.ts`) membuat 4 akun berkata sandi `rahasia123` (lihat README).
+- **Ubah skema:** edit `prisma/schema.prisma` → `npx prisma migrate dev --name … --config prisma7.config.ts` → **restart `npm run dev`** (Turbopack tidak memuat ulang Prisma Client yang di-generate ulang; gejalanya `Cannot read properties of undefined (reading 'findMany')`). Constraint yang tidak didukung Prisma (mis. `CHECK`) ditulis manual di file migrasi (`--create-only`).
+- **Sebelum commit:** `npx tsc --noEmit && npx eslint && for s in skrip/uji-*.ts; do npx tsx $s; done` — hal yang sama dijalankan CI (`.github/workflows/ci.yml`) di PostgreSQL 16 sekali pakai, ditambah `next build`.
+- **Menambah ikon:** `skrip/subset-font-ikon.sh` (butuh `pip install fonttools brotli`).
 - **Repo:** `github.com/dreinst/accuratecopy` (folder `app/` saja).
 
 ---
 
 ## 11. Batas & arah pengembangan
 
-Belum ada: **login/otorisasi** (model `Pengguna`/`PeranPengguna` sudah disiapkan), halaman **edit** dokumen & master, pencarian/filter/pagination, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya), Proyek sebagai dimensi transaksi, RMA, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
+Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya), Penyesuaian Persediaan / Pindah Barang, Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
 
-Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → action (`xxx` + `xxxForm`) dengan validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar + halaman buat dengan `FormulirAksi` → tambahkan ke `sections` di `BilahSamping.tsx` → suite regresi.
+Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → aksi (`xxx` + `xxxFormulir`) yang diawali `wajibHakAksi` lalu validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar (`wajibHak`, `bacaParamDaftar`, `KontrolDaftar`) + halaman buat dengan `FormulirAksi` → tambahkan hak baru di `hakAkses.ts` bila perlu dan tautan (dengan `hak`) di `BilahSamping.tsx` → suite regresi.

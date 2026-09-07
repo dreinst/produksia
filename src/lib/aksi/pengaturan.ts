@@ -1,10 +1,12 @@
 "use server";
 
+import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 
 export async function simpanPemetaanAkun(dataFormulir: FormData) {
+  await wajibHakAksi("pengaturan.tulis");
   const piutangUsahaId = String(dataFormulir.get("piutangUsahaId") ?? "");
   const persediaanId = String(dataFormulir.get("persediaanId") ?? "");
   const hppId = String(dataFormulir.get("hppId") ?? "");

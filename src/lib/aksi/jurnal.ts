@@ -1,5 +1,6 @@
 "use server";
 
+import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -68,6 +69,7 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
 // ---------- Jurnal Umum (manual) ----------
 
 export async function buatJurnalManual(dataFormulir: FormData) {
+  await wajibHakAksi("buku-besar.tulis");
   const keterangan = String(dataFormulir.get("keterangan") ?? "");
   const daftarBaris = bacaBarisJurnal(dataFormulir.get("baris"));
 
@@ -91,6 +93,7 @@ function bacaFormulirKas(dataFormulir: FormData) {
 }
 
 export async function buatKasMasuk(dataFormulir: FormData) {
+  await wajibHakAksi("kas-bank.tulis");
   const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
   const zero = D(0);
 
@@ -109,6 +112,7 @@ export async function buatKasMasuk(dataFormulir: FormData) {
 }
 
 export async function buatKasKeluar(dataFormulir: FormData) {
+  await wajibHakAksi("kas-bank.tulis");
   const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
   const zero = D(0);
 

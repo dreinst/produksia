@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { db } from "../src/lib/db";
+import { hashKataSandi } from "../src/lib/kataSandi";
 
 /**
  * Satu alur cerita tunggal yang melewati SETIAP tahap siklus penjualan,
@@ -7,6 +8,17 @@ import { db } from "../src/lib/db";
  * langsung punya contoh data yang bisa dilihat dan saling terhubung.
  */
 async function main() {
+  console.log("=== Pengguna (kata sandi semua: rahasia123) ===");
+  const kataSandiHash = await hashKataSandi("rahasia123");
+  await db.pengguna.createMany({
+    data: [
+      { email: "pemilik@contoh.id", nama: "Dewi Lestari", peran: "PEMILIK", kataSandiHash },
+      { email: "admin@contoh.id", nama: "Bagus Santoso", peran: "ADMIN", kataSandiHash },
+      { email: "kasir@contoh.id", nama: "Sari Wulandari", peran: "KASIR", kataSandiHash },
+      { email: "gudang@contoh.id", nama: "Joko Prasetyo", peran: "GUDANG", kataSandiHash },
+    ],
+  });
+
   console.log("=== Master data ===");
   const dept = await db.departemen.create({ data: { nama: "Penjualan" } });
   const penjual = await db.karyawan.create({

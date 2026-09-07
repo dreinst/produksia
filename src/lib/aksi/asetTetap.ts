@@ -1,5 +1,6 @@
 "use server";
 
+import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -8,6 +9,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
 
 export async function buatAsetTetap(dataFormulir: FormData) {
+  await wajibHakAksi("aset-tetap.tulis");
   const kode = String(dataFormulir.get("kode") ?? "").trim();
   const nama = String(dataFormulir.get("nama") ?? "").trim();
   const tanggalPerolehan = String(dataFormulir.get("tanggalPerolehan") ?? "");
@@ -49,6 +51,7 @@ export async function buatAsetTetap(dataFormulir: FormData) {
 }
 
 export async function jalankanPenyusutanBulanan(dataFormulir: FormData) {
+  await wajibHakAksi("aset-tetap.tulis");
   const teksPeriode = String(dataFormulir.get("periode") ?? "");
   if (!/^\d{4}-\d{2}$/.test(teksPeriode)) throw new Error("Periode wajib dipilih (format YYYY-MM)");
   const periode = new Date(`${teksPeriode}-01T00:00:00.000Z`);

@@ -30,6 +30,7 @@ export type PenggunaMinAggregateOutputType = {
   nama: string | null
   kataSandiHash: string | null
   peran: $Enums.PeranPengguna | null
+  aktif: boolean | null
   dibuatPada: Date | null
 }
 
@@ -39,6 +40,7 @@ export type PenggunaMaxAggregateOutputType = {
   nama: string | null
   kataSandiHash: string | null
   peran: $Enums.PeranPengguna | null
+  aktif: boolean | null
   dibuatPada: Date | null
 }
 
@@ -48,6 +50,7 @@ export type PenggunaCountAggregateOutputType = {
   nama: number
   kataSandiHash: number
   peran: number
+  aktif: number
   dibuatPada: number
   _all: number
 }
@@ -59,6 +62,7 @@ export type PenggunaMinAggregateInputType = {
   nama?: true
   kataSandiHash?: true
   peran?: true
+  aktif?: true
   dibuatPada?: true
 }
 
@@ -68,6 +72,7 @@ export type PenggunaMaxAggregateInputType = {
   nama?: true
   kataSandiHash?: true
   peran?: true
+  aktif?: true
   dibuatPada?: true
 }
 
@@ -77,6 +82,7 @@ export type PenggunaCountAggregateInputType = {
   nama?: true
   kataSandiHash?: true
   peran?: true
+  aktif?: true
   dibuatPada?: true
   _all?: true
 }
@@ -159,6 +165,7 @@ export type PenggunaGroupByOutputType = {
   nama: string
   kataSandiHash: string
   peran: $Enums.PeranPengguna
+  aktif: boolean
   dibuatPada: Date
   _count: PenggunaCountAggregateOutputType | null
   _min: PenggunaMinAggregateOutputType | null
@@ -189,8 +196,10 @@ export type PenggunaWhereInput = {
   nama?: Prisma.StringFilter<"Pengguna"> | string
   kataSandiHash?: Prisma.StringFilter<"Pengguna"> | string
   peran?: Prisma.EnumPeranPenggunaFilter<"Pengguna"> | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFilter<"Pengguna"> | boolean
   dibuatPada?: Prisma.DateTimeFilter<"Pengguna"> | Date | string
   karyawan?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
+  sesi?: Prisma.SesiListRelationFilter
 }
 
 export type PenggunaOrderByWithRelationInput = {
@@ -199,8 +208,10 @@ export type PenggunaOrderByWithRelationInput = {
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
+  aktif?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   karyawan?: Prisma.KaryawanOrderByWithRelationInput
+  sesi?: Prisma.SesiOrderByRelationAggregateInput
 }
 
 export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
@@ -212,8 +223,10 @@ export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
   nama?: Prisma.StringFilter<"Pengguna"> | string
   kataSandiHash?: Prisma.StringFilter<"Pengguna"> | string
   peran?: Prisma.EnumPeranPenggunaFilter<"Pengguna"> | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFilter<"Pengguna"> | boolean
   dibuatPada?: Prisma.DateTimeFilter<"Pengguna"> | Date | string
   karyawan?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
+  sesi?: Prisma.SesiListRelationFilter
 }, "id" | "email">
 
 export type PenggunaOrderByWithAggregationInput = {
@@ -222,6 +235,7 @@ export type PenggunaOrderByWithAggregationInput = {
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
+  aktif?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   _count?: Prisma.PenggunaCountOrderByAggregateInput
   _max?: Prisma.PenggunaMaxOrderByAggregateInput
@@ -237,6 +251,7 @@ export type PenggunaScalarWhereWithAggregatesInput = {
   nama?: Prisma.StringWithAggregatesFilter<"Pengguna"> | string
   kataSandiHash?: Prisma.StringWithAggregatesFilter<"Pengguna"> | string
   peran?: Prisma.EnumPeranPenggunaWithAggregatesFilter<"Pengguna"> | $Enums.PeranPengguna
+  aktif?: Prisma.BoolWithAggregatesFilter<"Pengguna"> | boolean
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"Pengguna"> | Date | string
 }
 
@@ -246,8 +261,10 @@ export type PenggunaCreateInput = {
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
+  aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUncheckedCreateInput = {
@@ -256,8 +273,10 @@ export type PenggunaUncheckedCreateInput = {
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
+  aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUpdateInput = {
@@ -266,8 +285,10 @@ export type PenggunaUpdateInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaUncheckedUpdateInput = {
@@ -276,8 +297,10 @@ export type PenggunaUncheckedUpdateInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaCreateManyInput = {
@@ -286,6 +309,7 @@ export type PenggunaCreateManyInput = {
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
+  aktif?: boolean
   dibuatPada?: Date | string
 }
 
@@ -295,6 +319,7 @@ export type PenggunaUpdateManyMutationInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -304,6 +329,7 @@ export type PenggunaUncheckedUpdateManyInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -313,6 +339,7 @@ export type PenggunaCountOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
+  aktif?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -322,6 +349,7 @@ export type PenggunaMaxOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
+  aktif?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -331,7 +359,13 @@ export type PenggunaMinOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
+  aktif?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+}
+
+export type PenggunaScalarRelationFilter = {
+  is?: Prisma.PenggunaWhereInput
+  isNot?: Prisma.PenggunaWhereInput
 }
 
 export type PenggunaNullableScalarRelationFilter = {
@@ -347,8 +381,26 @@ export type EnumPeranPenggunaFieldUpdateOperationsInput = {
   set?: $Enums.PeranPengguna
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type PenggunaCreateNestedOneWithoutSesiInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutSesiInput, Prisma.PenggunaUncheckedCreateWithoutSesiInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutSesiInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaUpdateOneRequiredWithoutSesiNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutSesiInput, Prisma.PenggunaUncheckedCreateWithoutSesiInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutSesiInput
+  upsert?: Prisma.PenggunaUpsertWithoutSesiInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutSesiInput, Prisma.PenggunaUpdateWithoutSesiInput>, Prisma.PenggunaUncheckedUpdateWithoutSesiInput>
 }
 
 export type PenggunaCreateNestedOneWithoutKaryawanInput = {
@@ -367,13 +419,75 @@ export type PenggunaUpdateOneWithoutKaryawanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutKaryawanInput, Prisma.PenggunaUpdateWithoutKaryawanInput>, Prisma.PenggunaUncheckedUpdateWithoutKaryawanInput>
 }
 
+export type PenggunaCreateWithoutSesiInput = {
+  id?: string
+  email: string
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+}
+
+export type PenggunaUncheckedCreateWithoutSesiInput = {
+  id?: string
+  email: string
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+}
+
+export type PenggunaCreateOrConnectWithoutSesiInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutSesiInput, Prisma.PenggunaUncheckedCreateWithoutSesiInput>
+}
+
+export type PenggunaUpsertWithoutSesiInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutSesiInput, Prisma.PenggunaUncheckedUpdateWithoutSesiInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutSesiInput, Prisma.PenggunaUncheckedCreateWithoutSesiInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutSesiInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutSesiInput, Prisma.PenggunaUncheckedUpdateWithoutSesiInput>
+}
+
+export type PenggunaUpdateWithoutSesiInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutSesiInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+}
+
 export type PenggunaCreateWithoutKaryawanInput = {
   id?: string
   email: string
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
+  aktif?: boolean
   dibuatPada?: Date | string
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUncheckedCreateWithoutKaryawanInput = {
@@ -382,7 +496,9 @@ export type PenggunaUncheckedCreateWithoutKaryawanInput = {
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
+  aktif?: boolean
   dibuatPada?: Date | string
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaCreateOrConnectWithoutKaryawanInput = {
@@ -407,7 +523,9 @@ export type PenggunaUpdateWithoutKaryawanInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
@@ -416,9 +534,40 @@ export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
 }
 
+
+/**
+ * Count Type PenggunaCountOutputType
+ */
+
+export type PenggunaCountOutputType = {
+  sesi: number
+}
+
+export type PenggunaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  sesi?: boolean | PenggunaCountOutputTypeCountSesiArgs
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PenggunaCountOutputType
+   */
+  select?: Prisma.PenggunaCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountSesiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SesiWhereInput
+}
 
 
 export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -427,8 +576,11 @@ export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
+  aktif?: boolean
   dibuatPada?: boolean
   karyawan?: boolean | Prisma.Pengguna$karyawanArgs<ExtArgs>
+  sesi?: boolean | Prisma.Pengguna$sesiArgs<ExtArgs>
+  _count?: boolean | Prisma.PenggunaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pengguna"]>
 
 export type PenggunaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -437,6 +589,7 @@ export type PenggunaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
+  aktif?: boolean
   dibuatPada?: boolean
 }, ExtArgs["result"]["pengguna"]>
 
@@ -446,6 +599,7 @@ export type PenggunaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
+  aktif?: boolean
   dibuatPada?: boolean
 }, ExtArgs["result"]["pengguna"]>
 
@@ -455,12 +609,15 @@ export type PenggunaSelectScalar = {
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
+  aktif?: boolean
   dibuatPada?: boolean
 }
 
-export type PenggunaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "nama" | "kataSandiHash" | "peran" | "dibuatPada", ExtArgs["result"]["pengguna"]>
+export type PenggunaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "nama" | "kataSandiHash" | "peran" | "aktif" | "dibuatPada", ExtArgs["result"]["pengguna"]>
 export type PenggunaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   karyawan?: boolean | Prisma.Pengguna$karyawanArgs<ExtArgs>
+  sesi?: boolean | Prisma.Pengguna$sesiArgs<ExtArgs>
+  _count?: boolean | Prisma.PenggunaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PenggunaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 export type PenggunaIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -469,6 +626,7 @@ export type $PenggunaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "Pengguna"
   objects: {
     karyawan: Prisma.$KaryawanPayload<ExtArgs> | null
+    sesi: Prisma.$SesiPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -476,6 +634,7 @@ export type $PenggunaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     nama: string
     kataSandiHash: string
     peran: $Enums.PeranPengguna
+    aktif: boolean
     dibuatPada: Date
   }, ExtArgs["result"]["pengguna"]>
   composites: {}
@@ -872,6 +1031,7 @@ readonly fields: PenggunaFieldRefs;
 export interface Prisma__PenggunaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   karyawan<T extends Prisma.Pengguna$karyawanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$karyawanArgs<ExtArgs>>): Prisma.Prisma__KaryawanClient<runtime.Types.Result.GetResult<Prisma.$KaryawanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  sesi<T extends Prisma.Pengguna$sesiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$sesiArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SesiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -906,6 +1066,7 @@ export interface PenggunaFieldRefs {
   readonly nama: Prisma.FieldRef<"Pengguna", 'String'>
   readonly kataSandiHash: Prisma.FieldRef<"Pengguna", 'String'>
   readonly peran: Prisma.FieldRef<"Pengguna", 'PeranPengguna'>
+  readonly aktif: Prisma.FieldRef<"Pengguna", 'Boolean'>
   readonly dibuatPada: Prisma.FieldRef<"Pengguna", 'DateTime'>
 }
     
@@ -1316,6 +1477,30 @@ export type Pengguna$karyawanArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.KaryawanInclude<ExtArgs> | null
   where?: Prisma.KaryawanWhereInput
+}
+
+/**
+ * Pengguna.sesi
+ */
+export type Pengguna$sesiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Sesi
+   */
+  select?: Prisma.SesiSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Sesi
+   */
+  omit?: Prisma.SesiOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SesiInclude<ExtArgs> | null
+  where?: Prisma.SesiWhereInput
+  orderBy?: Prisma.SesiOrderByWithRelationInput | Prisma.SesiOrderByWithRelationInput[]
+  cursor?: Prisma.SesiWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SesiScalarFieldEnum | Prisma.SesiScalarFieldEnum[]
 }
 
 /**

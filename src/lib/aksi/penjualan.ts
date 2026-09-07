@@ -1,5 +1,6 @@
 "use server";
 
+import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -57,6 +58,7 @@ function totalBaris(daftarBaris: BarisInput[]): Desimal {
 // ---------- Penawaran Penjualan ----------
 
 export async function buatPenawaran(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.tulis");
   const pelangganId = String(dataFormulir.get("pelangganId") ?? "");
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
@@ -80,6 +82,7 @@ export async function buatPenawaran(dataFormulir: FormData) {
 }
 
 export async function konversiPenawaranKePesanan(penawaranId: string) {
+  await wajibHakAksi("penjualan.tulis");
   const penawaran = await db.penawaranPenjualan.findUniqueOrThrow({
     where: { id: penawaranId },
     include: { baris: true },
@@ -109,6 +112,7 @@ export async function konversiPenawaranKePesanan(penawaranId: string) {
 // ---------- Pesanan Penjualan ----------
 
 export async function buatPesanan(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.tulis");
   const pelangganId = String(dataFormulir.get("pelangganId") ?? "");
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
@@ -132,6 +136,7 @@ export async function buatPesanan(dataFormulir: FormData) {
 // ---------- Pengiriman Pesanan ----------
 
 export async function buatPengiriman(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.kirim");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -187,6 +192,7 @@ export async function buatPengiriman(dataFormulir: FormData) {
 // ---------- Faktur Penjualan ----------
 
 export async function buatFaktur(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.tulis");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const pengirimanId = String(dataFormulir.get("pengirimanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -241,6 +247,7 @@ export async function buatFaktur(dataFormulir: FormData) {
 // ---------- Penerimaan Penjualan ----------
 
 export async function buatPenerimaan(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.tulis");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const akunId = String(dataFormulir.get("akunId") ?? "");
   const metodeBayar = String(dataFormulir.get("metodeBayar") ?? "TUNAI");
@@ -276,6 +283,7 @@ export async function buatPenerimaan(dataFormulir: FormData) {
 // ---------- Retur Penjualan ----------
 
 export async function buatRetur(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.tulis");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   const alasan = String(dataFormulir.get("alasan") ?? "").trim();
