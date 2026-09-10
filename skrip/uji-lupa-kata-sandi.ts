@@ -5,45 +5,13 @@ import { db } from "../src/lib/db";
 import { verifikasiKataSandi } from "../src/lib/kataSandi";
 import { mintaAturUlang, pakaiTautanAturUlang, periksaTautanAturUlang } from "../src/lib/aksi/otentikasi";
 import { buatTautanAturUlang, tolakPermintaanAturUlang, aturUlangKataSandi } from "../src/lib/aksi/pengguna";
+import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
 /*
  * Lupa kata sandi tanpa email: permintaan dari halaman masuk → Superadmin/Pemilik/Admin membuat tautan
  * sekali pakai (24 jam) → pengguna membuat kata sandi baru → sesi lama dicabut. Nama pengguna yang tidak ada
  * tidak menghasilkan galat (tidak membocorkan keberadaan akun) dan permintaan terbuka tidak digandakan.
  */
-async function jalankan(label: string, fn: () => Promise<void>) {
-  try {
-    await fn();
-  } catch (err) {
-    const digest = (err as { digest?: string })?.digest ?? "";
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing") && !pesan.includes("cookies") && !pesan.includes("outside a request scope")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
-function formulir(isian: Record<string, string>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, v);
-  return fd;
-}
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? String(err);
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label} TIDAK ditolak`);
-  process.exit(1);
-}
 
 async function main() {
   const mulaiUji = new Date();

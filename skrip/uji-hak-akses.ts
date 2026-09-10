@@ -4,35 +4,15 @@ process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { DOKUMEN_HAK, HAK_BAWAAN, SEMUA_HAK, HAK_LAIN, hitungHak, labelHak, modulTerlihat, punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
 import { simpanHakAkses, pulihkanHakBawaan } from "../src/lib/aksi/hakAkses";
+import { jalankan, formulir, pastikan } from "./bantuan";
 
 /** Aksi server diakhiri revalidatePath() yang melempar di luar Next — efek DB-nya sudah tersimpan. */
-async function jalankan(label: string, fn: () => Promise<void>) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!pesan.includes("static generation store missing")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
 
 /*
  * Hak akses per dokumen: bawaan tiap peran masuk akal, penyesuaian dari Pengaturan › Hak Akses
  * menambah/mengurangi hak (kecuali Superadmin/Pemilik dan hak-akses.kelola), tersimpan sebagai selisih
  * terhadap bawaan, dan bisa dipulihkan.
  */
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-function formulir(isian: Record<string, string>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, v);
-  return fd;
-}
 const sesi = (peran: PenggunaSesi["peran"], hak: readonly Hak[]): PenggunaSesi => ({ id: "x", nama: "Uji", namaPengguna: "uji", email: null, peran, hak });
 
 async function main() {

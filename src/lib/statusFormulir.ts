@@ -2,7 +2,6 @@ import { unstable_rethrow } from "next/navigation";
 
 export type StatusFormulir = { galat: string | null; ok?: boolean };
 
-export const statusFormulirAwal: StatusFormulir = { galat: null };
 
 function pesanRamah(galat: unknown): string {
   const e = galat as { code?: string; message?: string; meta?: { target?: string[] } };

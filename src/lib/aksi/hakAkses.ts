@@ -5,7 +5,6 @@ import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { HAK_BAWAAN, LABEL_PERAN, PERAN_DAPAT_DIATUR, SEMUA_HAK, type Hak } from "@/lib/hakAkses";
-import type { PeranPengguna } from "@/prisma-klien/enums";
 
 const HALAMAN = "/pengaturan/hak-akses";
 
@@ -57,11 +56,6 @@ export async function pulihkanHakBawaan() {
   if (count) await catat(pengguna.id, pengguna.nama, `${count} penyesuaian dihapus; semua peran kembali ke bawaan`);
   revalidatePath(HALAMAN);
   revalidatePath("/", "layout");
-}
-
-/** Penyesuaian tersimpan per peran (untuk halaman & skrip uji). */
-export async function bacaPenyesuaianHak(peran: PeranPengguna) {
-  return db.hakAksesPeran.findMany({ where: { peran }, select: { hak: true, boleh: true } });
 }
 
 export async function simpanHakAksesFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {

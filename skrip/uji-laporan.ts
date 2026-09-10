@@ -2,14 +2,8 @@ import "dotenv/config";
 import { db } from "../src/lib/db";
 import { bacaPeriode, hitungLabaRugi, hitungNeraca } from "../src/lib/laporan";
 import { hitungArusKas } from "../src/lib/arusKas";
+import { pastikan } from "./bantuan";
 
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
 const n = (v: { toString(): string }) => Number(v);
 
 async function main() {

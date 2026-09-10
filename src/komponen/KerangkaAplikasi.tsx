@@ -18,7 +18,7 @@ export default function KerangkaAplikasi({ pengguna, namaPerusahaan, tahunBuku, 
       <BilahSamping pengguna={pengguna} namaPerusahaan={namaPerusahaan} tahunBuku={tahunBuku} daftarTahun={daftarTahun} open={lacaTerbuka} saatTutup={() => setLacaTerbuka(false)} />
       <div className="md:pl-64 min-h-screen flex flex-col">
         <BilahAtas pengguna={pengguna} saatMenu={() => setLacaTerbuka(true)} />
-        <main className="w-full max-w-7xl mx-auto flex-1 px-4 md:px-8 py-5 md:py-7 space-y-6 min-w-0">{children}</main>
+        <main className="animasi-masuk w-full max-w-7xl mx-auto flex-1 px-4 md:px-8 py-5 md:py-7 space-y-6 min-w-0">{children}</main>
       </div>
     </div>
   );

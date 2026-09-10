@@ -6,26 +6,7 @@ import { daftarAkunKasBank, terapkanBaganAkunStandar } from "../src/lib/baganAku
 import { BAGAN_AKUN_STANDAR } from "../src/lib/baganAkunStandar";
 import { buatJurnalManual, buatKasMasuk } from "../src/lib/aksi/jurnal";
 import { simpanPemetaanAkun } from "../src/lib/aksi/pengaturan";
-
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? String(err);
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label} TIDAK ditolak`);
-  process.exit(1);
-}
+import { pastikan, harusDitolak } from "./bantuan";
 
 async function main() {
   console.log("=== 1. Terapkan bagan akun standar: idempoten & lengkap ===");

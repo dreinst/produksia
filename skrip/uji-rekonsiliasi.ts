@@ -7,45 +7,13 @@ import { imporMutasi, cocokkanOtomatis, cocokkanManual, lepasCocok, hapusMutasi,
 import { buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { laporanPiutang, laporanHutang } from "../src/lib/laporanRekanan";
+import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
 /*
  * Impor mutasi rekening (CSV format Indonesia, CSV Inggris satu kolom jumlah, HTML tabel) dan rekonsiliasi:
  * dedupe sidik, pencocokan otomatis (nominal+arah, tanggal ±3 hari), manual, lepas, hapus berkas;
  * plus laporan umur piutang/hutang.
  */
-async function jalankan(label: string, fn: () => Promise<unknown>) {
-  try {
-    await fn();
-  } catch (err) {
-    const digest = (err as { digest?: string })?.digest ?? "";
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
-function formulir(isian: Record<string, string | number | object>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
-  return fd;
-}
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? String(err);
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label} TIDAK ditolak`);
-  process.exit(1);
-}
 const n = (v: { toString(): string } | null) => (v === null ? null : Number(v));
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
