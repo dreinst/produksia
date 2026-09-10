@@ -4,6 +4,7 @@ import { db } from "../src/lib/db";
 async function main() {
   console.log("=== Menghapus semua data transaksi & master data ===");
   await db.logAktivitas.deleteMany();
+  await db.hakAksesPeran.deleteMany();
   await db.barisPindahBarang.deleteMany();
   await db.pindahBarang.deleteMany();
   await db.barisPenyesuaianPersediaan.deleteMany();

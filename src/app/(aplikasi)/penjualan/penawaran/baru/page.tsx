@@ -5,7 +5,7 @@ import { buatPenawaranFormulir } from "@/lib/aksi/penjualan";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
 
 export default async function HalamanPenawaranBaru() {
-  await wajibHak("penjualan.tulis");
+  await wajibHak("penawaran.buat");
   const [daftarPelanggan, daftarBarang] = await Promise.all([
     db.pelanggan.findMany({ orderBy: { nama: "asc" } }),
     db.barang.findMany({ orderBy: { nama: "asc" } }),

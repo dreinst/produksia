@@ -5,7 +5,7 @@ import { buatJurnalManualFormulir } from "@/lib/aksi/jurnal";
 import EditorBarisJurnal from "@/komponen/buku-besar/EditorBarisJurnal";
 
 export default async function HalamanJurnalBaru() {
-  await wajibHak("buku-besar.tulis");
+  await wajibHak("jurnal.buat");
   const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
 
   return (

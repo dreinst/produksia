@@ -8,7 +8,7 @@ import PenyusunFaktur from "@/komponen/PenyusunFaktur";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
 export default async function HalamanFakturPenjualanBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string }> }) {
-  await wajibHak("penjualan.tulis");
+  await wajibHak("faktur.buat");
   const { pesananId } = await searchParams;
 
   const pesanan = pesananId

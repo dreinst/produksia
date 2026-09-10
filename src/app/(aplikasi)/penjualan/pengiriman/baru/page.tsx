@@ -9,7 +9,7 @@ export default async function HalamanPengirimanBaru({
 }: {
   searchParams: Promise<{ pesananId?: string }>;
 }) {
-  await wajibHak("penjualan.kirim");
+  await wajibHak("pengiriman.buat");
   const { pesananId } = await searchParams;
 
   const [pesanan, daftarGudang] = await Promise.all([

@@ -5,7 +5,7 @@ import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
 export default async function HalamanLogAktivitas({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await wajibHak("dokumen.hapus");
+  await wajibHak("log-aktivitas.lihat");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { jenis: cocokTeks(param.q) }, { penggunaNama: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
   const [total, daftar] = await Promise.all([

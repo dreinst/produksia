@@ -15,7 +15,7 @@ const HALAMAN = "/buku-besar/pajak";
 
 /** PPh Final UMKM satu bulan: omzet bulan itu × tarif → jurnal JU-PPHF (Dr Beban PPh Final / Cr Hutang PPh Final) bertanggal akhir bulan. */
 export async function catatPphFinal(dataFormulir: FormData) {
-  const pengguna = await wajibHakAksi("buku-besar.tulis");
+  const pengguna = await wajibHakAksi("pph-final.buat");
   const periode = String(dataFormulir.get("periode") ?? "").trim();
   const cocok = /^(\d{4})-(\d{2})$/.exec(periode);
   if (!cocok) throw new Error("Periode harus berformat YYYY-MM");

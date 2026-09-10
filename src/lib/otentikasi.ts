@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash, randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
-import { LABEL_PERAN, NAMA_COOKIE_SESI, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import { LABEL_PERAN, NAMA_COOKIE_SESI, SEMUA_HAK, hitungHak, labelHak, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
 export { hashKataSandi, verifikasiKataSandi, periksaKekuatanKataSandi, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/kataSandi";
 
@@ -67,7 +67,7 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
     // Skrip regresi (skrip/uji-*.ts) memanggil aksi server langsung tanpa HTTP.
     // Pintu ini hanya terbuka di luar produksi DAN bila skrip menyetel UJI_TANPA_SESI=1.
     if (process.env.NODE_ENV !== "production" && process.env.UJI_TANPA_SESI === "1") {
-      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, peran: "PEMILIK" };
+      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, peran: "PEMILIK", hak: SEMUA_HAK };
     }
     return null;
   }
@@ -79,7 +79,9 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
   });
   if (!sesi || sesi.kedaluwarsa < new Date() || !sesi.pengguna.aktif) return null;
   const { id, nama, namaPengguna, email, peran } = sesi.pengguna;
-  return { id, nama, namaPengguna, email, peran };
+  // hak efektif = bawaan peran ± penyesuaian di Pengaturan › Hak Akses (dibaca tiap permintaan, jadi perubahan langsung berlaku)
+  const penyesuaian = await db.hakAksesPeran.findMany({ where: { peran }, select: { hak: true, boleh: true } });
+  return { id, nama, namaPengguna, email, peran, hak: hitungHak(peran, penyesuaian) };
 });
 
 /** Untuk halaman: belum masuk → dialihkan ke /masuk. */
@@ -92,7 +94,7 @@ export async function wajibMasuk(): Promise<PenggunaSesi> {
 /** Untuk halaman: belum masuk → /masuk; masuk tapi tidak berhak → /tanpa-akses. */
 export async function wajibHak(hak: Hak): Promise<PenggunaSesi> {
   const pengguna = await wajibMasuk();
-  if (!punyaHak(pengguna.peran, hak)) redirect(`/tanpa-akses?hak=${encodeURIComponent(hak)}`);
+  if (!punyaHak(pengguna, hak)) redirect(`/tanpa-akses?hak=${encodeURIComponent(hak)}`);
   return pengguna;
 }
 
@@ -100,8 +102,20 @@ export async function wajibHak(hak: Hak): Promise<PenggunaSesi> {
 export async function wajibHakAksi(hak: Hak): Promise<PenggunaSesi> {
   const pengguna = await penggunaSaatIni();
   if (!pengguna) throw new Error("Sesi sudah berakhir. Masuk kembali di tab lain, lalu kirim ulang formulir ini.");
-  if (!punyaHak(pengguna.peran, hak)) {
-    throw new Error(`Peran ${LABEL_PERAN[pengguna.peran]} tidak berwenang melakukan tindakan ini.`);
+  if (!punyaHak(pengguna, hak)) {
+    throw new Error(`Peran ${LABEL_PERAN[pengguna.peran]} tidak punya hak "${labelHak(hak)}" untuk tindakan ini.`);
   }
   return pengguna;
+}
+
+/** Untuk aksi server yang memeriksa haknya sendiri setelah membaca data (mis. hapus jurnal menurut sumbernya). */
+export async function wajibMasukAksi(): Promise<PenggunaSesi> {
+  const pengguna = await penggunaSaatIni();
+  if (!pengguna) throw new Error("Sesi sudah berakhir. Masuk kembali di tab lain, lalu kirim ulang formulir ini.");
+  return pengguna;
+}
+
+/** Melempar galat bila pengguna (sudah masuk) tidak punya hak — dipakai setelah wajibMasukAksi. */
+export function pastikanHak(pengguna: PenggunaSesi, hak: Hak) {
+  if (!punyaHak(pengguna, hak)) throw new Error(`Peran ${LABEL_PERAN[pengguna.peran]} tidak punya hak "${labelHak(hak)}" untuk tindakan ini.`);
 }

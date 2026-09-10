@@ -13,7 +13,7 @@ const tanggal = (d: Date) => d.toLocaleDateString("id-ID", { day: "2-digit", mon
 
 export default async function HalamanTutupBuku({ searchParams }: { searchParams: Promise<{ tahun?: string }> }) {
   const pengguna = await wajibHak("buku-besar.lihat");
-  const bolehTulis = punyaHak(pengguna.peran, "buku-besar.tulis");
+  const bolehTulis = punyaHak(pengguna, "tutup-buku.buat");
   const { tahun: tahunParam } = await searchParams;
   const [pengaturan, pemetaan, daftarTutup, batasJurnal] = await Promise.all([
     ambilPengaturanPerusahaan(db),

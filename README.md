@@ -5,7 +5,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, **Laba Rugi**, **Neraca**, **Arus Kas** (metode langsung), **Tutup Buku tahunan** (jurnal penutup ke Laba Ditahan + kunci tahun), Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
-- **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna
+- **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna, **hak akses per dokumen** (lihat/buat/hapus tiap jenis dokumen per peran, diatur Superadmin/Pemilik di Pengaturan → Hak Akses)
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
 - **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, **PPh Final UMKM** bulanan dari omzet, ringkasan **Pajak & SPT** per masa (omzet, PPN kurang/lebih bayar, PPh 23, PPh Final), termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
@@ -37,7 +37,7 @@ Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak a
 | kasir | kasir123 | Sari Wulandari | Kasir | Penjualan, pembelian, kas & bank, data induk; buku besar & aset hanya lihat |
 | gudang | gudang123 | Joko Prasetyo | Gudang | Surat jalan, terima barang, data induk barang/gudang; tanpa modul keuangan |
 
-Matriks lengkapnya ada di `src/lib/hakAkses.ts`. Pengguna baru ditambah lewat **Pengguna** di sidebar (Superadmin/Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**. Email hanya kontak opsional.
+Bawaan hak tiap peran ada di `src/lib/hakAkses.ts` (`HAK_BAWAAN`); Superadmin/Pemilik bisa mengubah hak Admin/Kasir/Gudang per dokumen (lihat/buat/hapus) di **Pengaturan → Hak Akses** — perubahan langsung berlaku tanpa masuk ulang. Pengguna baru ditambah lewat **Pengguna** di sidebar (Superadmin/Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**. Email hanya kontak opsional.
 
 ## Bagan akun (Event/Wedding Organizer)
 
@@ -87,7 +87,7 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 15 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 16 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -130,7 +130,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
@@ -151,7 +151,7 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 - **Pajak**: PPN, PPh 23, dan PPh Final UMKM dihitung dari dokumen; PPh badan (tarif umum), ambang omzet UMKM, dan e-Faktur/e-Bupot belum dihitung/terhubung otomatis.
 - **Tutup buku** hanya memindahkan laba ke Laba Ditahan; belum ada jurnal penyesuaian akhir tahun otomatis (akrual, prive ke modal).
 - **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Belum ada: lupa-kata-sandi via email (diatur ulang oleh Pemilik/Admin), 2FA, pembatasan percobaan login.
-- **Hak akses per modul**, bukan per dokumen/gudang. Peran Gudang bisa *melihat* semua daftar penjualan/pembelian (perlu untuk membuat SJ/TB).
+- **Hak akses per dokumen & per peran**, belum per gudang/per pelanggan. Bawaan Gudang bisa *melihat* daftar penjualan/pembelian (perlu untuk membuat SJ/TB) — bisa dicabut di Pengaturan → Hak Akses.
 - **Dokumen transaksi dihapus dengan pembalikan penuh; ubah = hapus lalu buat ulang** (data induk bisa diubah langsung; yang masih dipakai transaksi ditolak DB dengan pesan jelas).
 - **Laporan Laba Rugi & Neraca dihitung langsung dari jurnal** (belum ada jurnal penutup tahun: laba tahun-tahun lalu & tahun berjalan tampil sebagai baris hitungan di ekuitas). Belum ada Pindah Barang antar gudang dan arus kas.
 - **Skrip regresi** memakai basis data yang sama dengan data contoh (bersih-bersih berbasis waktu mulai uji) dan menyetel `UJI_TANPA_SESI=1` agar aksi server bisa dipanggil tanpa HTTP — pintu ini hanya terbuka di luar `NODE_ENV=production`.

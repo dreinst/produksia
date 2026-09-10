@@ -67,7 +67,7 @@ function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" 
 // ---------- Penawaran Penjualan ----------
 
 export async function buatPenawaran(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("penawaran.buat");
   const pelangganId = String(dataFormulir.get("pelangganId") ?? "");
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
@@ -91,7 +91,7 @@ export async function buatPenawaran(dataFormulir: FormData) {
 }
 
 export async function konversiPenawaranKePesanan(penawaranId: string) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("pesanan.buat");
   const penawaran = await db.penawaranPenjualan.findUniqueOrThrow({
     where: { id: penawaranId },
     include: { baris: true },
@@ -121,7 +121,7 @@ export async function konversiPenawaranKePesanan(penawaranId: string) {
 // ---------- Pesanan Penjualan ----------
 
 export async function buatPesanan(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("pesanan.buat");
   const pelangganId = String(dataFormulir.get("pelangganId") ?? "");
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
@@ -145,7 +145,7 @@ export async function buatPesanan(dataFormulir: FormData) {
 // ---------- Pengiriman Pesanan ----------
 
 export async function buatPengiriman(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.kirim");
+  await wajibHakAksi("pengiriman.buat");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -229,7 +229,7 @@ export async function buatPengiriman(dataFormulir: FormData) {
 // ---------- Faktur Penjualan ----------
 
 export async function buatFaktur(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("faktur.buat");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const pengirimanId = String(dataFormulir.get("pengirimanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -330,7 +330,7 @@ export async function buatFaktur(dataFormulir: FormData) {
 // ---------- Penerimaan Penjualan ----------
 
 export async function buatPenerimaan(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("penerimaan.buat");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const akunId = String(dataFormulir.get("akunId") ?? "");
   const metodeBayar = String(dataFormulir.get("metodeBayar") ?? "TUNAI");
@@ -373,7 +373,7 @@ export async function buatPenerimaan(dataFormulir: FormData) {
 // ---------- Retur Penjualan ----------
 
 export async function buatRetur(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("retur-penjualan.buat");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   const alasan = String(dataFormulir.get("alasan") ?? "").trim();
@@ -457,7 +457,7 @@ export async function buatRetur(dataFormulir: FormData) {
 
 /** DP diterima di muka atas sebuah pesanan: Dr Kas/Bank / Cr Uang Muka Pelanggan; dipakai mengurangi piutang saat faktur dibuat. */
 export async function buatUangMuka(dataFormulir: FormData) {
-  await wajibHakAksi("penjualan.tulis");
+  await wajibHakAksi("uang-muka.buat");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const akunId = String(dataFormulir.get("akunId") ?? "");
   const metodeBayar = String(dataFormulir.get("metodeBayar") ?? "TRANSFER");

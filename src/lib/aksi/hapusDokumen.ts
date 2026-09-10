@@ -1,12 +1,12 @@
 "use server";
 
-import { wajibHakAksi } from "@/lib/otentikasi";
+import { pastikanHak, wajibHakAksi, wajibMasukAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
 import { kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata } from "@/lib/stok";
-import type { PenggunaSesi } from "@/lib/hakAkses";
+import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma } from "@/prisma-klien/client";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 
@@ -122,10 +122,31 @@ async function segarkanStatusPesananPembelian(tx: Tx, pesananId: string) {
   const ada = baris.some((l) => D(l.jumlahDiterima).gt(0));
   await tx.pesananPembelian.update({ where: { id: pesananId }, data: { status: semua ? "DIPROSES" : ada ? "SEBAGIAN" : "DRAF" } });
 }
+/** Hak yang dibutuhkan untuk menghapus tiap jenis dokumen (jurnal diperiksa menurut sumbernya). */
+const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal">, Hak> = {
+  penawaran: "penawaran.hapus",
+  pesanan: "pesanan.hapus",
+  pengiriman: "pengiriman.hapus",
+  faktur: "faktur.hapus",
+  penerimaan: "penerimaan.hapus",
+  uangMuka: "uang-muka.hapus",
+  returPenjualan: "retur-penjualan.hapus",
+  pesananPembelian: "pesanan-pembelian.hapus",
+  penerimaanBarang: "penerimaan-barang.hapus",
+  fakturPembelian: "faktur-pembelian.hapus",
+  pembayaran: "pembayaran.hapus",
+  returPembelian: "retur-pembelian.hapus",
+  penyesuaian: "penyesuaian.hapus",
+  pindahBarang: "pindah-barang.hapus",
+  pphFinal: "pph-final.hapus",
+  aset: "aset.hapus",
+  penyusutan: "penyusutan.hapus",
+};
+
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
 
 export async function hapusDokumen(jenis: JenisDokumen, id: string) {
-  const pengguna = await wajibHakAksi("dokumen.hapus");
+  const pengguna = jenis === "jurnal" ? await wajibMasukAksi() : await wajibHakAksi(HAK_HAPUS[jenis]);
 
   await db.$transaction(async (tx) => {
     switch (jenis) {
@@ -319,6 +340,7 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       }
       case "jurnal": {
         const d = await tx.jurnal.findUniqueOrThrow({ where: { id } });
+        pastikanHak(pengguna, d.sumber === "KAS_MASUK" ? "kas-masuk.hapus" : d.sumber === "KAS_KELUAR" ? "kas-keluar.hapus" : "jurnal.hapus");
         if (d.sumber === "PENUTUP") throw new Error(`${d.nomor} adalah jurnal penutup tahun; buka kembali tahun bukunya di Buku Besar › Tutup Buku`);
         if (!["MANUAL", "KAS_MASUK", "KAS_KELUAR"].includes(d.sumber)) {
           throw new Error(`${d.nomor} adalah jurnal otomatis; hapus lewat dokumen sumbernya`);

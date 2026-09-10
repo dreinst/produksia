@@ -43,7 +43,7 @@ function bacaBaris(raw: FormDataEntryValue | null): BarisPenyesuaian[] {
  * Persediaan untuk opname). Dengan ini nilai stok dan saldo akun Persediaan tetap sama.
  */
 export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
-  await wajibHakAksi("persediaan.tulis");
+  await wajibHakAksi("penyesuaian.buat");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   const akunLawanId = String(dataFormulir.get("akunLawanId") ?? "");
   const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();
@@ -135,7 +135,7 @@ function bacaBarisPindah(raw: FormDataEntryValue | null): BarisPindah[] {
  * Nilai persediaan tidak berubah (harga pokok rata-rata per barang berlaku di semua gudang), jadi tanpa jurnal.
  */
 export async function buatPindahBarang(dataFormulir: FormData) {
-  await wajibHakAksi("persediaan.tulis");
+  await wajibHakAksi("pindah-barang.buat");
   const gudangAsalId = String(dataFormulir.get("gudangAsalId") ?? "");
   const gudangTujuanId = String(dataFormulir.get("gudangTujuanId") ?? "");
   const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();

@@ -8,9 +8,9 @@ import { LencanaStatus } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
 
 export default async function HalamanAsetTetap({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("aset-tetap.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("aset.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const bolehHapus = boleh("aset.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ kode: cocokTeks(param.q) }, { nama: cocokTeks(param.q) }] } : undefined;
   const [total, daftarAset] = await Promise.all([
@@ -22,14 +22,18 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="judul-halaman">Daftar Aset Tetap</h1>
-        {boleh("aset-tetap.tulis") && (
+        {(boleh("penyusutan.buat") || boleh("aset.buat")) && (
           <div className="space-x-3">
-          <Link href="/aset-tetap/penyusutan" className="tombol-tautan">
-            Jalankan Penyusutan →
-          </Link>
-          <Link href="/aset-tetap/baru" className="tombol tombol-utama">
-            + Aset Baru
-          </Link>
+          {boleh("penyusutan.buat") && (
+            <Link href="/aset-tetap/penyusutan" className="tombol-tautan">
+              Jalankan Penyusutan →
+            </Link>
+          )}
+          {boleh("aset.buat") && (
+            <Link href="/aset-tetap/baru" className="tombol tombol-utama">
+              + Aset Baru
+            </Link>
+          )}
         </div>
         )}
       </div>

@@ -8,9 +8,9 @@ import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
 
 export default async function HalamanPesananPenjualan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("penjualan.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("pesanan.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const bolehHapus = boleh("pesanan.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pelanggan: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarPesanan] = await Promise.all([
@@ -22,7 +22,7 @@ export default async function HalamanPesananPenjualan({ searchParams }: { search
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="judul-halaman">Pesanan Penjualan</h1>
-        {boleh("penjualan.tulis") && (
+        {boleh("pesanan.buat") && (
           <Link href="/penjualan/pesanan/baru" className="tombol tombol-utama">
           + Pesanan Baru
         </Link>
@@ -55,7 +55,7 @@ export default async function HalamanPesananPenjualan({ searchParams }: { search
                 <td className="text-right angka">{Number(o.total).toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={o.status} /></td>
                 <td className="space-x-3 whitespace-nowrap">
-                  {!terkirimSemua && boleh("penjualan.kirim") && (
+                  {!terkirimSemua && boleh("pengiriman.buat") && (
                     <Link
                       href={`/penjualan/pengiriman/baru?pesananId=${o.id}`}
                       className="tombol-tautan"
@@ -63,12 +63,12 @@ export default async function HalamanPesananPenjualan({ searchParams }: { search
                       Kirim
                     </Link>
                   )}
-                  {!difakturSemua && boleh("penjualan.tulis") && (
+                  {!difakturSemua && boleh("uang-muka.buat") && (
                     <Link href={`/penjualan/uang-muka/baru?pesananId=${o.id}`} className="tombol-tautan">
                       Uang Muka
                     </Link>
                   )}
-                  {!difakturSemua && boleh("penjualan.tulis") && (
+                  {!difakturSemua && boleh("faktur.buat") && (
                     <Link
                       href={`/penjualan/faktur/baru?pesananId=${o.id}`}
                       className="tombol-tautan"

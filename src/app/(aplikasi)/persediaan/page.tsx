@@ -29,16 +29,20 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
         judul="Stok per Gudang"
         subjudul="Jumlah fisik dan nilainya (harga pokok rata-rata bergerak). Nilai ini harus sama dengan saldo akun Persediaan di buku besar."
         aksi={
-          punyaHak(pengguna.peran, "persediaan.tulis") ? (
+          punyaHak(pengguna, "pindah-barang.buat") || punyaHak(pengguna, "penyesuaian.buat") ? (
             <span className="flex items-center gap-2">
-              <Link href="/persediaan/pindah/baru" className="tombol tombol-garis">
-                <Ikon nama="swap_horiz" className="!text-[18px]" />
-                Pindah Barang
-              </Link>
-              <Link href="/persediaan/penyesuaian/baru" className="tombol tombol-utama">
-                <Ikon nama="tune" className="!text-[18px]" />
-                Penyesuaian Stok
-              </Link>
+              {punyaHak(pengguna, "pindah-barang.buat") && (
+                <Link href="/persediaan/pindah/baru" className="tombol tombol-garis">
+                  <Ikon nama="swap_horiz" className="!text-[18px]" />
+                  Pindah Barang
+                </Link>
+              )}
+              {punyaHak(pengguna, "penyesuaian.buat") && (
+                <Link href="/persediaan/penyesuaian/baru" className="tombol tombol-utama">
+                  <Ikon nama="tune" className="!text-[18px]" />
+                  Penyesuaian Stok
+                </Link>
+              )}
             </span>
           ) : undefined
         }

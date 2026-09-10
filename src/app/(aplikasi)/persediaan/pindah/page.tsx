@@ -9,8 +9,8 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPindahBarang({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("persediaan.lihat");
-  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
+  const pengguna = await wajibHak("pindah-barang.lihat");
+  const bolehHapus = punyaHak(pengguna, "pindah-barang.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q
     ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }, { gudangAsal: { nama: cocokTeks(param.q) } }, { gudangTujuan: { nama: cocokTeks(param.q) } }] }
@@ -33,7 +33,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
         judul="Pindah Barang"
         subjudul="Perpindahan stok fisik antar gudang. Nilai persediaan tidak berubah, jadi tidak ada jurnal."
         aksi={
-          punyaHak(pengguna.peran, "persediaan.tulis") ? (
+          punyaHak(pengguna, "pindah-barang.buat") ? (
             <Link href="/persediaan/pindah/baru" className="tombol tombol-utama">
               + Pindah Barang Baru
             </Link>

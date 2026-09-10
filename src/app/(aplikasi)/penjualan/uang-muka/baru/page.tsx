@@ -9,7 +9,7 @@ import { buatUangMukaFormulir } from "@/lib/aksi/penjualan";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 
 export default async function HalamanUangMukaBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string }> }) {
-  await wajibHak("penjualan.tulis");
+  await wajibHak("uang-muka.buat");
   const { pesananId } = await searchParams;
   const [pesanan, daftarAkun, pengaturan] = await Promise.all([
     pesananId ? db.pesananPenjualan.findUnique({ where: { id: pesananId }, include: { pelanggan: true, baris: true, uangMuka: { orderBy: { tanggal: "asc" } } } }) : null,

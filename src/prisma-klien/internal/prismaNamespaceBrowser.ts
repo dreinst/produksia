@@ -97,6 +97,7 @@ export const ModelName = {
   PengaturanPerusahaan: 'PengaturanPerusahaan',
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
+  HakAksesPeran: 'HakAksesPeran',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -724,6 +725,15 @@ export const PphFinalBulananScalarFieldEnum = {
 } as const
 
 export type PphFinalBulananScalarFieldEnum = (typeof PphFinalBulananScalarFieldEnum)[keyof typeof PphFinalBulananScalarFieldEnum]
+
+
+export const HakAksesPeranScalarFieldEnum = {
+  peran: 'peran',
+  hak: 'hak',
+  boleh: 'boleh'
+} as const
+
+export type HakAksesPeranScalarFieldEnum = (typeof HakAksesPeranScalarFieldEnum)[keyof typeof HakAksesPeranScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {

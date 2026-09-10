@@ -6,7 +6,7 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import EditorBarisPenyesuaian from "@/komponen/persediaan/EditorBarisPenyesuaian";
 
 export default async function HalamanPenyesuaianBaru({ searchParams }: { searchParams: Promise<{ gudangId?: string }> }) {
-  await wajibHak("persediaan.tulis");
+  await wajibHak("penyesuaian.buat");
   const { gudangId } = await searchParams;
   const [daftarGudang, daftarBarang, daftarStok, daftarAkun, pemetaan] = await Promise.all([
     db.gudang.findMany({ orderBy: { kode: "asc" } }),

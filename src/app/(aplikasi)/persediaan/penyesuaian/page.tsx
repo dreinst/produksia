@@ -9,8 +9,8 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPenyesuaianPersediaan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("persediaan.lihat");
-  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
+  const pengguna = await wajibHak("penyesuaian.lihat");
+  const bolehHapus = punyaHak(pengguna, "penyesuaian.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }, { gudang: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftar] = await Promise.all([
@@ -31,7 +31,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
         judul="Penyesuaian Stok"
         subjudul="Saldo awal, hasil opname, dan koreksi stok. Setiap penyesuaian otomatis membuat jurnal JU-PS."
         aksi={
-          punyaHak(pengguna.peran, "persediaan.tulis") ? (
+          punyaHak(pengguna, "penyesuaian.buat") ? (
             <Link href="/persediaan/penyesuaian/baru" className="tombol tombol-utama">
               + Penyesuaian Baru
             </Link>

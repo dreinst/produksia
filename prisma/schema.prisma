@@ -843,6 +843,15 @@ model PphFinalBulanan {
   dibuatPada  DateTime @default(now())
 }
 
+/// Penyesuaian hak akses per peran (Pengaturan › Hak Akses); bawaan ada di src/lib/hakAkses.ts
+model HakAksesPeran {
+  peran PeranPengguna
+  hak   String
+  boleh Boolean
+
+  @@id([peran, hak])
+}
+
 model LogAktivitas {
   id           String   @id @default(cuid())
   waktu        DateTime @default(now())
