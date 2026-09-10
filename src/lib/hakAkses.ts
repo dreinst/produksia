@@ -51,6 +51,8 @@ export const HAK_LAIN = [
   "pengaturan.tulis", // Perusahaan & pajak, pemetaan akun, bagan akun standar
   "pengguna.kelola",
   "log-aktivitas.lihat",
+  "rekonsiliasi.lihat", // Rekonsiliasi event (LPJ) & kas/bank
+  "rekonsiliasi.tulis", // Impor mutasi rekening & pencocokan
   "hak-akses.kelola", // hanya Superadmin/Pemilik
 ] as const;
 
@@ -63,6 +65,8 @@ export const LABEL_HAK_LAIN: Record<(typeof HAK_LAIN)[number], string> = {
   "pengaturan.tulis": "Pengaturan perusahaan · ubah",
   "pengguna.kelola": "Pengguna · kelola",
   "log-aktivitas.lihat": "Log aktivitas · lihat",
+  "rekonsiliasi.lihat": "Rekonsiliasi (LPJ & kas/bank) · lihat",
+  "rekonsiliasi.tulis": "Rekonsiliasi · impor mutasi & cocokkan",
   "hak-akses.kelola": "Hak akses · kelola",
 };
 
@@ -74,13 +78,17 @@ const hakDok = (kode: KodeDokumen, ...aksi: AksiDokumen[]): Hak[] => aksi.map((a
 const lihatModul = (...modul: ModulDokumen[]): Hak[] =>
   DOKUMEN_HAK.filter((d) => modul.includes(d.modul) && (d.aksi as readonly string[]).includes("lihat")).map((d) => `${d.kode}.lihat` as Hak);
 
-/** Bawaan hak per peran; Superadmin & Pemilik selalu penuh dan tidak bisa dikurangi. */
+/**
+ * Bawaan hak per peran. Superadmin (admin IT) & Pemilik selalu penuh dan tidak bisa dikurangi.
+ * Admin = pengelola dokumen & laporan; batasnya diatur Pemilik di Pengaturan › Hak Akses — tanpa
+ * pengaturan perusahaan, pengguna, dan hak akses. Kasir/Gudang hanya dokumen operasionalnya, tanpa laporan keuangan.
+ */
 export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
   SUPERADMIN: SEMUA_HAK,
   PEMILIK: SEMUA_HAK,
-  ADMIN: SEMUA_HAK.filter((h) => h !== "hak-akses.kelola"),
+  ADMIN: SEMUA_HAK.filter((h) => !["hak-akses.kelola", "pengaturan.tulis", "pengguna.kelola", "buku-besar.tulis"].includes(h)),
   KASIR: [
-    ...lihatModul("penjualan", "pembelian", "kas-bank", "buku-besar", "persediaan", "aset-tetap"),
+    ...lihatModul("penjualan", "pembelian", "kas-bank"),
     ...hakDok("penawaran", "buat"),
     ...hakDok("pesanan", "buat"),
     ...hakDok("uang-muka", "buat"),
@@ -96,7 +104,6 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     "data-induk.lihat",
     "data-induk.tulis",
     "persediaan.lihat",
-    "buku-besar.lihat",
   ],
   GUDANG: [
     ...lihatModul("penjualan", "pembelian", "persediaan"),
@@ -129,10 +136,10 @@ export const LABEL_PERAN: Record<PeranPengguna, string> = {
 };
 
 export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
-  SUPERADMIN: "Akses penuh, setara Pemilik: semua dokumen, laporan, pengaturan, hak akses, dan semua akun termasuk Superadmin/Pemilik lain.",
-  PEMILIK: "Akses penuh, setara Superadmin: semua dokumen, laporan, pengaturan, hak akses, dan semua akun termasuk Superadmin/Pemilik lain.",
-  ADMIN: "Bawaan: semua dokumen (lihat, buat, hapus), laporan, dan pengaturan; tidak bisa menyentuh akun Superadmin/Pemilik atau mengubah hak akses.",
-  KASIR: "Bawaan: membuat dokumen penjualan, pembelian, dan kas; melihat semua dokumen, laporan, stok, dan aset; tidak menghapus.",
+  SUPERADMIN: "Admin IT: akses penuh setara Pemilik — semua dokumen, laporan keuangan, rekonsiliasi, pengaturan, hak akses, dan semua akun termasuk Pemilik.",
+  PEMILIK: "Akses penuh setara Superadmin — semua dokumen, laporan keuangan, rekonsiliasi, pengaturan, hak akses, dan semua akun.",
+  ADMIN: "Pengelola dokumen: semua dokumen (lihat, buat, hapus), laporan keuangan, rekonsiliasi, data induk, log aktivitas; TANPA pengaturan perusahaan, pengguna, bagan akun, dan hak akses. Batasnya diatur Pemilik di Pengaturan › Hak Akses.",
+  KASIR: "Bawaan: membuat & melihat dokumen penjualan, pembelian, dan kas; data induk; melihat stok; tanpa laporan keuangan dan tanpa hapus.",
   GUDANG: "Bawaan: surat jalan, terima barang, penyesuaian & pindah stok, data induk; melihat dokumen penjualan/pembelian; tanpa modul keuangan.",
 };
 

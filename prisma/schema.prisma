@@ -142,6 +142,7 @@ model Pemasok {
   pembayaran PembayaranPembelian[]
 }
 
+/// Proyek = event/pekerjaan: dimensi transaksi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ)
 model Proyek {
   id          String     @id @default(cuid())
   kode        String     @unique
@@ -149,6 +150,17 @@ model Proyek {
   pelangganId String?
   pelanggan   Pelanggan? @relation(fields: [pelangganId], references: [id])
   status      String     @default("BERJALAN")
+  /// Nilai proposal/kontrak yang disetujui klien dan anggaran biaya — pembanding realisasi di LPJ
+  nilaiKontrak  Decimal? @db.Decimal(18, 2)
+  anggaranBiaya Decimal? @db.Decimal(18, 2)
+  tanggalMulai   DateTime?
+  tanggalSelesai DateTime?
+  keterangan     String?
+
+  penawaran        PenawaranPenjualan[]
+  pesanan          PesananPenjualan[]
+  pesananPembelian PesananPembelian[]
+  jurnal           Jurnal[]
 }
 
 model Gudang {
@@ -233,6 +245,8 @@ model PenawaranPenjualan {
   pelangganId String
   pelanggan   Pelanggan     @relation(fields: [pelangganId], references: [id])
   status      StatusDokumen @default(DRAF)
+  proyekId    String?
+  proyek      Proyek?       @relation(fields: [proyekId], references: [id])
   total       Decimal       @default(0) @db.Decimal(18, 2)
 
   baris   BarisPenawaranPenjualan[]
@@ -259,6 +273,8 @@ model PesananPenjualan {
   penawaranId String?             @unique
   penawaran   PenawaranPenjualan? @relation(fields: [penawaranId], references: [id])
   status      StatusDokumen       @default(DRAF)
+  proyekId    String?
+  proyek      Proyek?             @relation(fields: [proyekId], references: [id])
   total       Decimal             @default(0) @db.Decimal(18, 2)
 
   baris      BarisPesananPenjualan[]
@@ -439,6 +455,8 @@ model PesananPembelian {
   pemasokId String
   pemasok   Pemasok       @relation(fields: [pemasokId], references: [id])
   status    StatusDokumen @default(DRAF)
+  proyekId  String?
+  proyek    Proyek?       @relation(fields: [proyekId], references: [id])
   total     Decimal       @default(0) @db.Decimal(18, 2)
 
   baris            BarisPesananPembelian[]
@@ -614,6 +632,7 @@ model Akun {
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
   pelepasanPenerimaan        PelepasanAset[] @relation("AkunPenerimaanPelepasan")
   pelepasanLabaRugi          PelepasanAset[] @relation("AkunLabaRugiPelepasan")
+  mutasiBank                 MutasiBank[]    @relation("AkunMutasiBank")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
   pengaturanPpnMasukan    PengaturanPerusahaan? @relation("PetaPpnMasukan")
@@ -667,6 +686,9 @@ model Jurnal {
   tanggal    DateTime     @default(now())
   keterangan String?
   sumber     SumberJurnal @default(MANUAL)
+  /// Dimensi event/proyek: diwarisi dari pesanan (jurnal otomatis) atau dipilih di jurnal manual/kas
+  proyekId   String?
+  proyek     Proyek?      @relation(fields: [proyekId], references: [id])
 
   baris          BarisJurnal[]
   penyusutanAset PenyusutanAset[]
@@ -695,6 +717,9 @@ model BarisJurnal {
   debit      Decimal @default(0) @db.Decimal(18, 2)
   kredit     Decimal @default(0) @db.Decimal(18, 2)
   keterangan String?
+  /// Rekonsiliasi kas/bank: kapan baris ini dicocokkan dengan mutasi rekening
+  rekonsiliasiPada DateTime?
+  mutasiBank       MutasiBank?
 }
 
 // ---------- Aset Tetap ----------
@@ -895,6 +920,28 @@ model PermintaanAturUlang {
   selesaiPada   DateTime?
 
   @@index([status])
+}
+
+/// Mutasi rekening koran hasil impor (CSV/HTML) per akun kas/bank; dicocokkan ke baris jurnal saat rekonsiliasi
+model MutasiBank {
+  id          String   @id @default(cuid())
+  akunId      String
+  akun        Akun     @relation("AkunMutasiBank", fields: [akunId], references: [id])
+  tanggal     DateTime
+  keterangan  String
+  referensi   String?
+  masuk       Decimal  @default(0) @db.Decimal(18, 2)
+  keluar      Decimal  @default(0) @db.Decimal(18, 2)
+  saldo       Decimal? @db.Decimal(18, 2)
+  /// Sidik jari (akun + tanggal + masuk + keluar + keterangan) untuk menolak baris yang diimpor dua kali
+  sidik       String   @unique
+  berkas      String
+  diimporPada DateTime @default(now())
+  penggunaNama String
+  barisJurnalId String?     @unique
+  barisJurnal   BarisJurnal? @relation(fields: [barisJurnalId], references: [id])
+
+  @@index([akunId, tanggal])
 }
 
 model LogAktivitas {

@@ -85,6 +85,12 @@ export async function catatJurnal(tx: Tx, prefix: string, keterangan: string, su
   return tx.jurnal.create({ data: { nomor, keterangan, sumber, baris: { create: baris } } });
 }
 
+/** Menandai jurnal dengan proyek/event asal dokumennya (dimensi Laba Rugi per event & LPJ). */
+export async function tandaiProyek(tx: Tx, jurnal: { id: string } | null | undefined, proyekId: string | null | undefined) {
+  if (!jurnal || !proyekId) return;
+  await tx.jurnal.update({ where: { id: jurnal.id }, data: { proyekId } });
+}
+
 /** Nilai pokok satu baris: hanya BARANG (jasa tidak punya persediaan). */
 export function hargaPokokBaris(info: InfoBarang, jumlah: Desimal): Desimal {
   return info.jenis === "BARANG" ? kali(jumlah, info.hargaBeli) : NOL;

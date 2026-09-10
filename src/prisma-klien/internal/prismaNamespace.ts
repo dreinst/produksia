@@ -446,6 +446,7 @@ export const ModelName = {
   PphFinalBulanan: 'PphFinalBulanan',
   HakAksesPeran: 'HakAksesPeran',
   PermintaanAturUlang: 'PermintaanAturUlang',
+  MutasiBank: 'MutasiBank',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -462,7 +463,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4092,6 +4093,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MutasiBank: {
+      payload: Prisma.$MutasiBankPayload<ExtArgs>
+      fields: Prisma.MutasiBankFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MutasiBankFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MutasiBankFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>
+        }
+        findFirst: {
+          args: Prisma.MutasiBankFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MutasiBankFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>
+        }
+        findMany: {
+          args: Prisma.MutasiBankFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>[]
+        }
+        create: {
+          args: Prisma.MutasiBankCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>
+        }
+        createMany: {
+          args: Prisma.MutasiBankCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MutasiBankCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>[]
+        }
+        delete: {
+          args: Prisma.MutasiBankDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>
+        }
+        update: {
+          args: Prisma.MutasiBankUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>
+        }
+        deleteMany: {
+          args: Prisma.MutasiBankDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MutasiBankUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MutasiBankUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>[]
+        }
+        upsert: {
+          args: Prisma.MutasiBankUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MutasiBankPayload>
+        }
+        aggregate: {
+          args: Prisma.MutasiBankAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMutasiBank>
+        }
+        groupBy: {
+          args: Prisma.MutasiBankGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MutasiBankGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MutasiBankCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MutasiBankCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAktivitas: {
       payload: Prisma.$LogAktivitasPayload<ExtArgs>
       fields: Prisma.LogAktivitasFieldRefs
@@ -4281,7 +4356,12 @@ export const ProyekScalarFieldEnum = {
   kode: 'kode',
   nama: 'nama',
   pelangganId: 'pelangganId',
-  status: 'status'
+  status: 'status',
+  nilaiKontrak: 'nilaiKontrak',
+  anggaranBiaya: 'anggaranBiaya',
+  tanggalMulai: 'tanggalMulai',
+  tanggalSelesai: 'tanggalSelesai',
+  keterangan: 'keterangan'
 } as const
 
 export type ProyekScalarFieldEnum = (typeof ProyekScalarFieldEnum)[keyof typeof ProyekScalarFieldEnum]
@@ -4341,6 +4421,7 @@ export const PenawaranPenjualanScalarFieldEnum = {
   tanggal: 'tanggal',
   pelangganId: 'pelangganId',
   status: 'status',
+  proyekId: 'proyekId',
   total: 'total'
 } as const
 
@@ -4366,6 +4447,7 @@ export const PesananPenjualanScalarFieldEnum = {
   pelangganId: 'pelangganId',
   penawaranId: 'penawaranId',
   status: 'status',
+  proyekId: 'proyekId',
   total: 'total'
 } as const
 
@@ -4519,6 +4601,7 @@ export const PesananPembelianScalarFieldEnum = {
   tanggal: 'tanggal',
   pemasokId: 'pemasokId',
   status: 'status',
+  proyekId: 'proyekId',
   total: 'total'
 } as const
 
@@ -4674,7 +4757,8 @@ export const JurnalScalarFieldEnum = {
   nomor: 'nomor',
   tanggal: 'tanggal',
   keterangan: 'keterangan',
-  sumber: 'sumber'
+  sumber: 'sumber',
+  proyekId: 'proyekId'
 } as const
 
 export type JurnalScalarFieldEnum = (typeof JurnalScalarFieldEnum)[keyof typeof JurnalScalarFieldEnum]
@@ -4686,7 +4770,8 @@ export const BarisJurnalScalarFieldEnum = {
   akunId: 'akunId',
   debit: 'debit',
   kredit: 'kredit',
-  keterangan: 'keterangan'
+  keterangan: 'keterangan',
+  rekonsiliasiPada: 'rekonsiliasiPada'
 } as const
 
 export type BarisJurnalScalarFieldEnum = (typeof BarisJurnalScalarFieldEnum)[keyof typeof BarisJurnalScalarFieldEnum]
@@ -4858,6 +4943,25 @@ export const PermintaanAturUlangScalarFieldEnum = {
 export type PermintaanAturUlangScalarFieldEnum = (typeof PermintaanAturUlangScalarFieldEnum)[keyof typeof PermintaanAturUlangScalarFieldEnum]
 
 
+export const MutasiBankScalarFieldEnum = {
+  id: 'id',
+  akunId: 'akunId',
+  tanggal: 'tanggal',
+  keterangan: 'keterangan',
+  referensi: 'referensi',
+  masuk: 'masuk',
+  keluar: 'keluar',
+  saldo: 'saldo',
+  sidik: 'sidik',
+  berkas: 'berkas',
+  diimporPada: 'diimporPada',
+  penggunaNama: 'penggunaNama',
+  barisJurnalId: 'barisJurnalId'
+} as const
+
+export type MutasiBankScalarFieldEnum = (typeof MutasiBankScalarFieldEnum)[keyof typeof MutasiBankScalarFieldEnum]
+
+
 export const LogAktivitasScalarFieldEnum = {
   id: 'id',
   waktu: 'waktu',
@@ -4952,20 +5056,6 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'JenisBarang'
- */
-export type EnumJenisBarangFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisBarang'>
-    
-
-
-/**
- * Reference to a field of type 'JenisBarang[]'
- */
-export type ListEnumJenisBarangFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisBarang[]'>
-    
-
-
-/**
  * Reference to a field of type 'Decimal'
  */
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -4976,6 +5066,20 @@ export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
  * Reference to a field of type 'Decimal[]'
  */
 export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+/**
+ * Reference to a field of type 'JenisBarang'
+ */
+export type EnumJenisBarangFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisBarang'>
+    
+
+
+/**
+ * Reference to a field of type 'JenisBarang[]'
+ */
+export type ListEnumJenisBarangFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisBarang[]'>
     
 
 
@@ -5262,6 +5366,7 @@ export type GlobalOmitConfig = {
   pphFinalBulanan?: Prisma.PphFinalBulananOmit
   hakAksesPeran?: Prisma.HakAksesPeranOmit
   permintaanAturUlang?: Prisma.PermintaanAturUlangOmit
+  mutasiBank?: Prisma.MutasiBankOmit
   logAktivitas?: Prisma.LogAktivitasOmit
 }
 

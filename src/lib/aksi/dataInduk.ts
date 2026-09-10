@@ -46,6 +46,12 @@ function bacaData(config: KonfigurasiEntitas, dataFormulir: FormData, untukUbah:
       continue;
     }
     if (bidang.jenis === "number" && Number.isNaN(Number(nilai))) throw new Error(`${bidang.label} harus berupa angka`);
+    if (bidang.jenis === "date") {
+      const tanggal = new Date(`${nilai}T00:00:00`);
+      if (Number.isNaN(tanggal.getTime())) throw new Error(`${bidang.label} harus berupa tanggal`);
+      data[bidang.nama] = tanggal;
+      continue;
+    }
     data[bidang.nama] = nilai;
   }
   return data;

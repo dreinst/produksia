@@ -10,6 +10,7 @@ import { D, format, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import type { SumberJurnal } from "@/prisma-klien/enums";
+import { bacaProyekId } from "@/lib/proyek";
 
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan?: string };
 
@@ -32,7 +33,7 @@ function bacaBarisJurnal(raw: FormDataEntryValue | null): InputBarisJurnal[] {
     .filter((l) => l.debit.gt(0) || l.kredit.gt(0));
 }
 
-async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJurnal[], sumber: SumberJurnal, prefix: string) {
+async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJurnal[], sumber: SumberJurnal, prefix: string, proyekId: string | null = null) {
   if (daftarBaris.length < 2) throw new Error("Jurnal minimal punya 2 baris (debit & kredit) dengan nominal > 0");
   if (daftarBaris.some((l) => !l.akunId)) throw new Error("Setiap baris jurnal harus memilih akun");
   if (daftarBaris.some((l) => l.debit.isNegative() || l.kredit.isNegative())) throw new Error("Nominal tidak boleh negatif");
@@ -56,6 +57,7 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
       nomor,
       keterangan,
       sumber,
+      proyekId,
       baris: {
         create: daftarBaris.map((l) => ({
           akunId: l.akunId,
@@ -77,7 +79,7 @@ export async function buatJurnalManual(dataFormulir: FormData) {
   const keterangan = String(dataFormulir.get("keterangan") ?? "");
   const daftarBaris = bacaBarisJurnal(dataFormulir.get("baris"));
 
-  await buatJurnalSeimbang(keterangan, daftarBaris, "MANUAL", "JU");
+  await buatJurnalSeimbang(keterangan, daftarBaris, "MANUAL", "JU", await bacaProyekId(dataFormulir));
 
   revalidatePath("/buku-besar/jurnal");
   redirect("/buku-besar/jurnal");
@@ -109,6 +111,7 @@ export async function buatKasMasuk(dataFormulir: FormData) {
     ],
     "KAS_MASUK",
     "KM",
+    await bacaProyekId(dataFormulir),
   );
 
   revalidatePath("/kas-bank/masuk");
@@ -128,6 +131,7 @@ export async function buatKasKeluar(dataFormulir: FormData) {
     ],
     "KAS_KELUAR",
     "KK",
+    await bacaProyekId(dataFormulir),
   );
 
   revalidatePath("/kas-bank/keluar");

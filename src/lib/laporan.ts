@@ -48,12 +48,15 @@ export type AkunSaldo = {
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
 
 /** Saldo tiap akun rinci dari jurnal bertanggal dalam [dari, sampai]; `tanpaPenutup` mengabaikan jurnal penutup tahun. */
-export async function saldoAkunPeriode(klien: PrismaClient, dari: Date | null, sampai: Date, tanpaPenutup = false): Promise<AkunSaldo[]> {
+/** Filter tambahan laporan: proyek/event tertentu. */
+export type OpsiLaporan = { proyekId?: string | null };
+
+export async function saldoAkunPeriode(klien: PrismaClient, dari: Date | null, sampai: Date, tanpaPenutup = false, opsi: OpsiLaporan = {}): Promise<AkunSaldo[]> {
   const [daftarAkun, agregat] = await Promise.all([
     klien.akun.findMany({ orderBy: { kode: "asc" } }),
     klien.barisJurnal.groupBy({
       by: ["akunId"],
-      where: { jurnal: { tanggal: { ...(dari ? { gte: dari } : {}), lte: sampai }, ...(tanpaPenutup ? { sumber: { not: "PENUTUP" as const } } : {}) } },
+      where: { jurnal: { tanggal: { ...(dari ? { gte: dari } : {}), lte: sampai }, ...(tanpaPenutup ? { sumber: { not: "PENUTUP" as const } } : {}), ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}) } },
       _sum: { debit: true, kredit: true },
     }),
   ]);
@@ -127,8 +130,8 @@ export type LabaRugi = {
 };
 
 /** Laba Rugi periode: pendapatan − beban pokok (kelompok yang memuat akun HPP) = laba kotor; − beban lain = laba bersih. */
-export async function hitungLabaRugi(klien: PrismaClient = db, periode: Periode): Promise<LabaRugi> {
-  const [daftar, pemetaan] = await Promise.all([saldoAkunPeriode(klien, periode.dari, periode.sampai, true), klien.pemetaanAkun.findUnique({ where: { id: "default" } })]);
+export async function hitungLabaRugi(klien: PrismaClient = db, periode: Periode, opsi: OpsiLaporan = {}): Promise<LabaRugi> {
+  const [daftar, pemetaan] = await Promise.all([saldoAkunPeriode(klien, periode.dari, periode.sampai, true, opsi), klien.pemetaanAkun.findUnique({ where: { id: "default" } })]);
   const akarPokok = akarDari(daftar, pemetaan?.hppId);
   const pokok = keturunanDari(daftar, akarPokok);
   const pendapatan = susunHierarki(daftar, (a) => a.jenis === "PENDAPATAN");
@@ -199,4 +202,38 @@ export async function hitungNeraca(klien: PrismaClient = db, sampai: Date, sampa
     totalPasiva,
     seimbang: aset.total.minus(totalPasiva).abs().lte(D("0.01")),
   };
+}
+
+export type LabaRugiBulan = { bulan: number; pendapatan: Desimal; bebanPokok: Desimal; bebanLain: Desimal; labaBersih: Desimal };
+export type LabaRugiBulanan = { tahun: number; bulan: LabaRugiBulan[]; total: Omit<LabaRugiBulan, "bulan"> };
+
+/** Laba Rugi per bulan dalam satu tahun (untuk tampilan bulanan), tanpa jurnal penutup, opsional per proyek. */
+export async function hitungLabaRugiBulanan(klien: PrismaClient = db, tahun: number, opsi: OpsiLaporan = {}): Promise<LabaRugiBulanan> {
+  const dari = new Date(tahun, 0, 1), sampai = new Date(tahun, 11, 31, 23, 59, 59, 999);
+  const [baris, pemetaan, daftarAkun] = await Promise.all([
+    klien.barisJurnal.findMany({
+      where: { jurnal: { tanggal: { gte: dari, lte: sampai }, sumber: { not: "PENUTUP" }, ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}) }, akun: { jenis: { in: ["PENDAPATAN", "BEBAN"] } } },
+      select: { debit: true, kredit: true, akunId: true, jurnal: { select: { tanggal: true } }, akun: { select: { jenis: true } } },
+    }),
+    klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
+    klien.akun.findMany({ select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } }),
+  ]);
+  const dasar: AkunSaldo[] = daftarAkun.map((a) => ({ ...a, debit: D(0), kredit: D(0), saldo: D(0) }));
+  const pokok = keturunanDari(dasar, akarDari(dasar, pemetaan?.hppId));
+  const nol = D(0);
+  const bulan: LabaRugiBulan[] = Array.from({ length: 12 }, (_, i) => ({ bulan: i + 1, pendapatan: nol, bebanPokok: nol, bebanLain: nol, labaBersih: nol }));
+  for (const b of baris) {
+    const m = bulan[b.jurnal.tanggal.getMonth()];
+    if (b.akun.jenis === "PENDAPATAN") m.pendapatan = m.pendapatan.plus(b.kredit).minus(b.debit);
+    else if (pokok.has(b.akunId)) m.bebanPokok = m.bebanPokok.plus(b.debit).minus(b.kredit);
+    else m.bebanLain = m.bebanLain.plus(b.debit).minus(b.kredit);
+  }
+  for (const m of bulan) m.labaBersih = m.pendapatan.minus(m.bebanPokok).minus(m.bebanLain);
+  const total = {
+    pendapatan: jumlahkan(bulan.map((m) => m.pendapatan)),
+    bebanPokok: jumlahkan(bulan.map((m) => m.bebanPokok)),
+    bebanLain: jumlahkan(bulan.map((m) => m.bebanLain)),
+    labaBersih: jumlahkan(bulan.map((m) => m.labaBersih)),
+  };
+  return { tahun, bulan, total };
 }

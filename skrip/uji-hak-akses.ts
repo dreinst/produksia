@@ -38,11 +38,11 @@ const sesi = (peran: PenggunaSesi["peran"], hak: readonly Hak[]): PenggunaSesi =
 async function main() {
   const mulaiUji = new Date();
   console.log("=== 1. Bawaan peran ===");
-  pastikan(SEMUA_HAK.length === DOKUMEN_HAK.reduce((s, d) => s + d.aksi.length, 0) + 9, `${SEMUA_HAK.length} hak: ${DOKUMEN_HAK.length} dokumen + 9 hak modul`);
+  pastikan(SEMUA_HAK.length === DOKUMEN_HAK.reduce((s, d) => s + d.aksi.length, 0) + 11, `${SEMUA_HAK.length} hak: ${DOKUMEN_HAK.length} dokumen + 11 hak modul`);
   pastikan(new Set(SEMUA_HAK).size === SEMUA_HAK.length, "tidak ada hak ganda");
   pastikan(hitungHak("SUPERADMIN").length === SEMUA_HAK.length && hitungHak("PEMILIK").length === SEMUA_HAK.length, "Superadmin & Pemilik penuh");
-  pastikan(!punyaHak("ADMIN", "hak-akses.kelola") && punyaHak("ADMIN", "faktur.hapus") && punyaHak("ADMIN", "pengguna.kelola"), "Admin: semua kecuali kelola hak akses");
-  pastikan(punyaHak("KASIR", "faktur.buat") && punyaHak("KASIR", "kas-masuk.buat") && !punyaHak("KASIR", "faktur.hapus") && !punyaHak("KASIR", "pengiriman.buat") && punyaHak("KASIR", "pengiriman.lihat"), "Kasir: buat dokumen keuangan, lihat SJ, tanpa hapus");
+  pastikan(!punyaHak("ADMIN", "hak-akses.kelola") && !punyaHak("ADMIN", "pengguna.kelola") && !punyaHak("ADMIN", "pengaturan.tulis") && punyaHak("ADMIN", "faktur.hapus") && punyaHak("ADMIN", "buku-besar.lihat") && punyaHak("ADMIN", "rekonsiliasi.tulis"), "Admin: dokumen, laporan, rekonsiliasi; tanpa pengaturan/pengguna/hak akses");
+  pastikan(punyaHak("KASIR", "faktur.buat") && punyaHak("KASIR", "kas-masuk.buat") && !punyaHak("KASIR", "faktur.hapus") && !punyaHak("KASIR", "pengiriman.buat") && punyaHak("KASIR", "pengiriman.lihat") && !punyaHak("KASIR", "buku-besar.lihat") && !punyaHak("KASIR", "jurnal.lihat"), "Kasir: buat dokumen keuangan, lihat SJ, tanpa hapus, tanpa laporan/jurnal");
   pastikan(punyaHak("GUDANG", "pengiriman.buat") && punyaHak("GUDANG", "pindah-barang.buat") && !punyaHak("GUDANG", "faktur.buat") && !punyaHak("GUDANG", "kas-masuk.lihat") && !punyaHak("GUDANG", "buku-besar.lihat"), "Gudang: SJ/TB/stok, tanpa keuangan");
   pastikan(modulTerlihat(sesi("GUDANG", HAK_BAWAAN.GUDANG), "penjualan") && !modulTerlihat(sesi("GUDANG", HAK_BAWAAN.GUDANG), "kas-bank"), "modul tampil hanya bila ada dokumen yang boleh dilihat");
   pastikan(labelHak("faktur.buat") === "Faktur Penjualan · buat" && labelHak("pengguna.kelola") === "Pengguna · kelola", "label hak terbaca manusia");

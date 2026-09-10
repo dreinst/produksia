@@ -31,7 +31,9 @@ export default function FormulirDataInduk({
   const bacaAwal = (nama: string, bawaan?: string) => {
     if (!nilai) return bawaan ?? "";
     const v = nilai[nama];
-    return v === null || v === undefined ? "" : String(v);
+    if (v === null || v === undefined) return "";
+    if (v instanceof Date) return v.toISOString().slice(0, 10);
+    return String(v);
   };
   const awalanId = nilai ? `ubah-${config.slug}` : `tambah-${config.slug}`;
 
@@ -67,7 +69,7 @@ export default function FormulirDataInduk({
             ) : (
               <input
                 id={id}
-                type={bidang.jenis === "number" ? "number" : "text"}
+                type={bidang.jenis === "number" ? "number" : bidang.jenis === "date" ? "date" : "text"}
                 step={bidang.jenis === "number" ? "0.01" : undefined}
                 name={bidang.nama}
                 required={bidang.wajib}

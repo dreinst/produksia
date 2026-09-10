@@ -753,10 +753,6 @@ export type FakturPenjualanUncheckedUpdateManyWithoutPengirimanNestedInput = {
   deleteMany?: Prisma.FakturPenjualanScalarWhereInput | Prisma.FakturPenjualanScalarWhereInput[]
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type FakturPenjualanCreateNestedOneWithoutBarisInput = {
   create?: Prisma.XOR<Prisma.FakturPenjualanCreateWithoutBarisInput, Prisma.FakturPenjualanUncheckedCreateWithoutBarisInput>
   connectOrCreate?: Prisma.FakturPenjualanCreateOrConnectWithoutBarisInput

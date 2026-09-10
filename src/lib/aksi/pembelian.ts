@@ -14,6 +14,8 @@ import {
   catatJurnalPembayaranPembelian,
   catatJurnalReturPembelian,
 } from "@/lib/akuntansi";
+import { tandaiProyek } from "@/lib/akuntansi";
+import { bacaProyekId } from "@/lib/proyek";
 import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
@@ -73,12 +75,14 @@ export async function buatPesananPembelian(dataFormulir: FormData) {
   const daftarBaris = bacaBaris(dataFormulir);
   const total = totalBaris(daftarBaris);
 
+  const proyekId = await bacaProyekId(dataFormulir);
   const nomor = await nomorDokumenBerikutnya(db.pesananPembelian, "PSB");
 
   await db.pesananPembelian.create({
     data: {
       nomor,
       pemasokId,
+      proyekId,
       total,
       baris: { create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah, harga: l.harga })) },
     },
@@ -153,6 +157,7 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
 
     const jurnal = await catatJurnalPenerimaanBarang(tx, penerimaan, barisNilai);
     if (jurnal) await tx.penerimaanBarang.update({ where: { id: penerimaan.id }, data: { jurnalId: jurnal.id } });
+    await tandaiProyek(tx, jurnal, pesanan.proyekId);
 
     const barisTerbaru = await tx.barisPesananPembelian.findMany({ where: { pesananId } });
     const diterimaSemua = barisTerbaru.every((l) => D(l.jumlahDiterima).gte(l.jumlah));
@@ -225,6 +230,7 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
 
     const jurnal = await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan, pengaturan.akunPpnMasukanId);
     if (jurnal) await tx.fakturPembelian.update({ where: { id: faktur.id }, data: { jurnalId: jurnal.id } });
+    await tandaiProyek(tx, jurnal, pesanan.proyekId);
   });
 
   revalidatePath("/pembelian/faktur");
@@ -246,7 +252,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
   const pengaturan = await ambilPengaturanPerusahaan(db);
   if (potonganPajak.gt(0) && !pengaturan.akunPph23DipotongId) throw new Error("Akun Hutang PPh 23 belum diatur di Pengaturan > Perusahaan & Pajak");
 
-  const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true, retur: true } });
+  const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true, retur: true, pesanan: { select: { proyekId: true } } } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");
 
   const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak)));
@@ -267,6 +273,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
     const jurnal = await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor, pengaturan.akunPph23DipotongId);
     if (jurnal) await tx.pembayaranPembelian.update({ where: { id: pembayaran.id }, data: { jurnalId: jurnal.id } });
+    await tandaiProyek(tx, jurnal, faktur.pesanan?.proyekId);
   });
 
   revalidatePath("/pembelian/pembayaran");
@@ -288,7 +295,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
 
   const faktur = await db.fakturPembelian.findUniqueOrThrow({
     where: { id: fakturId },
-    include: { baris: true, retur: { include: { baris: true } }, pembayaran: true },
+    include: { baris: true, retur: { include: { baris: true } }, pembayaran: true, pesanan: { select: { proyekId: true } } },
   });
 
   for (const l of daftarBaris) {
@@ -353,6 +360,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     // harga pokok rata-rata tidak berubah saat barang keluar, jadi jurnal aman dihitung setelah stok berkurang
     const jurnal = await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnMasukanId);
     if (jurnal) await tx.returPembelian.update({ where: { id: retur.id }, data: { jurnalId: jurnal.id } });
+    await tandaiProyek(tx, jurnal, faktur.pesanan?.proyekId);
   });
 
   revalidatePath("/pembelian/retur");

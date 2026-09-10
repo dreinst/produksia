@@ -69,7 +69,7 @@ export default async function HalamanDataInduk({
                     const mentah = ambilNilai(rekaman, kolom.key);
                     return (
                       <td key={kolom.key} className={angka ? "text-right angka" : undefined}>
-                        {angka ? Number(String(mentah ?? 0)).toLocaleString("id-ID") : typeof mentah === "boolean" ? (mentah ? "Ya" : "–") : String(mentah ?? "")}
+                        {angka ? Number(String(mentah ?? 0)).toLocaleString("id-ID") : typeof mentah === "boolean" ? (mentah ? "Ya" : "–") : mentah instanceof Date ? mentah.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : String(mentah ?? "")}
                       </td>
                     );
                   })}
