@@ -64,7 +64,9 @@ async function main() {
   const gudangVenue = await db.gudang.create({ data: { kode: "WH-02", nama: "Gudang Venue", alamat: "Gedung Serbaguna Cikarang" } });
   const kelompokMerch = await db.kelompokBarang.create({ data: { nama: "Merchandise & Produksi" } });
   const kelompokJasa = await db.kelompokBarang.create({ data: { nama: "Jasa Event" } });
-  await db.proyek.create({ data: { kode: "PRJ-001", nama: "Wedding Andi & Sari", pelangganId: pelanggan.id, status: "BERJALAN" } });
+  const proyek = await db.proyek.create({
+    data: { kode: "PRJ-001", nama: "Wedding Andi & Sari", pelangganId: pelanggan.id, status: "BERJALAN", nilaiKontrak: 3335000, anggaranBiaya: 2000000, tanggalMulai: new Date("2026-09-01T00:00:00"), tanggalSelesai: new Date("2026-09-20T00:00:00"), keterangan: "Resepsi 300 tamu, Gedung Serbaguna Cikarang" },
+  });
 
   console.log(`=== Bagan Akun Standar EO/WO (${BAGAN_AKUN_STANDAR.length} akun) + pemetaan akun ===`);
   await terapkanBaganAkunStandar(db);
@@ -114,7 +116,7 @@ async function main() {
 
   console.log("=== Tahap 2: Penawaran kedua → dikonversi jadi Pesanan Penjualan ===");
   await jalankan("PNW-…-0002: 20 lanyard, 10 stiker, 15 goodie bag, 1 paket dekorasi (jasa)", () =>
-    buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [
+    buatPenawaran(formulir({ pelangganId: pelanggan.id, proyekId: proyek.id, baris: [
       { barangId: lanyard.id, jumlah: 20, harga: 12000 },
       { barangId: stiker.id, jumlah: 10, harga: 16000 },
       { barangId: goodieBag.id, jumlah: 15, harga: 29000 },
@@ -166,7 +168,7 @@ async function main() {
 
   console.log("=== Tahap 9-11: Pesanan Pembelian → Terima Barang 2× (jurnal JU-TB, harga pokok rata-rata) ===");
   await jalankan("PSB-…-0001: 50 lanyard @9.000 + 1 hari jasa sound engineer @750.000", () =>
-    buatPesananPembelian(formulir({ pemasokId: pemasok.id, baris: [
+    buatPesananPembelian(formulir({ pemasokId: pemasok.id, proyekId: proyek.id, baris: [
       { barangId: lanyard.id, jumlah: 50, harga: 9000 },
       { barangId: jasaSound.id, jumlah: 1, harga: 750000 },
     ] })),
@@ -201,6 +203,11 @@ async function main() {
   console.log("=== Tahap 15b: Pindah Barang 20 goodie bag ke Gudang Venue (stok berpindah, tanpa jurnal) ===");
   await jalankan("PB-…-0001: 20 goodie bag WH-01 → WH-02", () =>
     buatPindahBarang(formulir({ gudangAsalId: gudang.id, gudangTujuanId: gudangVenue.id, keterangan: "Perlengkapan untuk event di venue", baris: [{ barangId: goodieBag.id, jumlah: 20 }] })),
+  );
+
+  console.log("=== Tahap 15c: Kas Keluar honor crew event (bertanda proyek → masuk LPJ & Laba Rugi per event) ===");
+  await jalankan("KK: honor crew wedding Rp 750.000 dari Kas (5-1200, proyek PRJ-001)", () =>
+    buatKasKeluar(formulir({ akunKasId: kas.id, akunLawanId: biayaEvent.id, jumlah: 750000, keterangan: "Honor crew & MC wedding Andi & Sari", proyekId: proyek.id })),
   );
 
   console.log("=== Tahap 16: Kas Keluar - bayar sewa kantor ===");

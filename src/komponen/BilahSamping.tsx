@@ -50,12 +50,30 @@ const operasional: Grup[] = [
     tautan: [
       { href: "/buku-besar/jurnal", label: "Jurnal Umum", kode: "JU", hak: "jurnal.lihat" },
       { href: "/buku-besar/mutasi", label: "Buku Besar Mutasi", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/tutup-buku", label: "Tutup Buku", kode: "TUTUP", hak: "buku-besar.lihat" },
+    ],
+  },
+  {
+    judul: "Laporan",
+    ikon: "monitoring",
+    tautan: [
       { href: "/buku-besar/neraca-saldo", label: "Neraca Saldo", hak: "buku-besar.lihat" },
-      { href: "/buku-besar/laba-rugi", label: "Laba Rugi", hak: "buku-besar.lihat" },
+      { href: "/laporan/piutang", label: "Laporan Piutang", hak: "buku-besar.lihat" },
+      { href: "/laporan/hutang", label: "Laporan Hutang", hak: "buku-besar.lihat" },
       { href: "/buku-besar/neraca", label: "Neraca", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/laba-rugi", label: "Laba Rugi (per event / per waktu)", hak: "buku-besar.lihat" },
+      { href: "/laporan/perubahan-modal", label: "Perubahan Modal", hak: "buku-besar.lihat" },
       { href: "/buku-besar/arus-kas", label: "Arus Kas", hak: "buku-besar.lihat" },
       { href: "/buku-besar/pajak", label: "Pajak & SPT", hak: "buku-besar.lihat" },
-      { href: "/buku-besar/tutup-buku", label: "Tutup Buku", kode: "TUTUP", hak: "buku-besar.lihat" },
+    ],
+  },
+  {
+    judul: "Rekonsiliasi",
+    ikon: "fact_check",
+    tautan: [
+      { href: "/rekonsiliasi", label: "Rekonsiliasi Event (LPJ)", kode: "LPJ", hak: "rekonsiliasi.lihat" },
+      { href: "/rekonsiliasi/kas-bank", label: "Rekonsiliasi Kas/Bank", hak: "rekonsiliasi.lihat" },
+      { href: "/rekonsiliasi/mutasi", label: "Impor Mutasi Rekening", hak: "rekonsiliasi.tulis" },
     ],
   },
   {
@@ -111,7 +129,8 @@ function saringGrup(daftar: Grup[], pengguna: PenggunaSesi): Grup[] {
 }
 
 function aktifDi(pathname: string, href: string) {
-  if (href === "/aset-tetap") return pathname === "/aset-tetap" || pathname === "/aset-tetap/baru";
+  if (href === "/aset-tetap") return pathname === "/aset-tetap" || pathname === "/aset-tetap/baru" || /^\/aset-tetap\/[^/]+\/lepas$/.test(pathname);
+  if (href === "/rekonsiliasi") return pathname === "/rekonsiliasi" || pathname.startsWith("/rekonsiliasi/event");
   return pathname === href || pathname.startsWith(href + "/");
 }
 

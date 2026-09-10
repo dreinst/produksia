@@ -49,7 +49,7 @@ export type Pelanggan = Prisma.PelangganModel
 export type Pemasok = Prisma.PemasokModel
 /**
  * Model Proyek
- * 
+ * Proyek = event/pekerjaan: dimensi transaksi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ)
  */
 export type Proyek = Prisma.ProyekModel
 /**
@@ -262,6 +262,11 @@ export type HakAksesPeran = Prisma.HakAksesPeranModel
  * Permintaan "lupa kata sandi" dari halaman masuk; ditangani Superadmin/Pemilik/Admin dengan tautan sekali pakai
  */
 export type PermintaanAturUlang = Prisma.PermintaanAturUlangModel
+/**
+ * Model MutasiBank
+ * Mutasi rekening koran hasil impor (CSV/HTML) per akun kas/bank; dicocokkan ke baris jurnal saat rekonsiliasi
+ */
+export type MutasiBank = Prisma.MutasiBankModel
 /**
  * Model LogAktivitas
  * 

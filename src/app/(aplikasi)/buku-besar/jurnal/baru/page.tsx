@@ -1,12 +1,13 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatJurnalManualFormulir } from "@/lib/aksi/jurnal";
 import EditorBarisJurnal from "@/komponen/buku-besar/EditorBarisJurnal";
 
 export default async function HalamanJurnalBaru() {
   await wajibHak("jurnal.buat");
-  const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
+  const [daftarAkun, daftarProyek] = await Promise.all([db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } }), daftarProyekAktif()]);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -16,6 +17,18 @@ export default async function HalamanJurnalBaru() {
         <div className="bidang md:col-span-2">
           <label className="label" htmlFor="keterangan">Keterangan</label>
           <input id="keterangan" type="text" name="keterangan" className="isian" />
+        </div>
+        <div className="bidang">
+          <label className="label" htmlFor="proyekId">Proyek / Event</label>
+          <select id="proyekId" name="proyekId" className="isian" defaultValue="">
+            <option value="">— tanpa event</option>
+            {daftarProyek.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.kode} - {p.nama}
+              </option>
+            ))}
+          </select>
+          <span className="petunjuk">Dimensi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ); diwariskan ke semua dokumen & jurnal turunannya</span>
         </div>
 
         <EditorBarisJurnal daftarAkun={daftarAkun} />

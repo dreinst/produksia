@@ -4,6 +4,7 @@ import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { daftarProyekAktif } from "@/lib/proyek";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -15,11 +16,12 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
   const bolehBuat = punyaHak(pengguna, "kas-masuk.buat");
   const param = await bacaParamDaftar(searchParams);
   const where = { sumber: "KAS_MASUK" as const, ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}) };
-  const [daftarAkunKas, daftarAkun, total, daftarJurnal] = await Promise.all([
+  const [daftarAkunKas, daftarAkun, total, daftarJurnal, daftarProyek] = await Promise.all([
     daftarAkunKasBank(),
     db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } }),
     db.jurnal.count({ where }),
     db.jurnal.findMany({ where, include: { baris: { include: { akun: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    daftarProyekAktif(),
   ]);
 
   return (
@@ -60,6 +62,18 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
         <div className="bidang">
           <label className="label" htmlFor="keterangan">Keterangan</label>
           <input id="keterangan" type="text" name="keterangan" className="isian" />
+        </div>
+        <div className="bidang">
+          <label className="label" htmlFor="proyekId">Proyek / Event</label>
+          <select id="proyekId" name="proyekId" className="isian" defaultValue="">
+            <option value="">— tanpa event</option>
+            {daftarProyek.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.kode} - {p.nama}
+              </option>
+            ))}
+          </select>
+          <span className="petunjuk">Dimensi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ); diwariskan ke semua dokumen & jurnal turunannya</span>
         </div>
 
         <div className="md:col-span-2">

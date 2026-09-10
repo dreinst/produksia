@@ -100,6 +100,7 @@ export const ModelName = {
   PphFinalBulanan: 'PphFinalBulanan',
   HakAksesPeran: 'HakAksesPeran',
   PermintaanAturUlang: 'PermintaanAturUlang',
+  MutasiBank: 'MutasiBank',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -195,7 +196,12 @@ export const ProyekScalarFieldEnum = {
   kode: 'kode',
   nama: 'nama',
   pelangganId: 'pelangganId',
-  status: 'status'
+  status: 'status',
+  nilaiKontrak: 'nilaiKontrak',
+  anggaranBiaya: 'anggaranBiaya',
+  tanggalMulai: 'tanggalMulai',
+  tanggalSelesai: 'tanggalSelesai',
+  keterangan: 'keterangan'
 } as const
 
 export type ProyekScalarFieldEnum = (typeof ProyekScalarFieldEnum)[keyof typeof ProyekScalarFieldEnum]
@@ -255,6 +261,7 @@ export const PenawaranPenjualanScalarFieldEnum = {
   tanggal: 'tanggal',
   pelangganId: 'pelangganId',
   status: 'status',
+  proyekId: 'proyekId',
   total: 'total'
 } as const
 
@@ -280,6 +287,7 @@ export const PesananPenjualanScalarFieldEnum = {
   pelangganId: 'pelangganId',
   penawaranId: 'penawaranId',
   status: 'status',
+  proyekId: 'proyekId',
   total: 'total'
 } as const
 
@@ -433,6 +441,7 @@ export const PesananPembelianScalarFieldEnum = {
   tanggal: 'tanggal',
   pemasokId: 'pemasokId',
   status: 'status',
+  proyekId: 'proyekId',
   total: 'total'
 } as const
 
@@ -588,7 +597,8 @@ export const JurnalScalarFieldEnum = {
   nomor: 'nomor',
   tanggal: 'tanggal',
   keterangan: 'keterangan',
-  sumber: 'sumber'
+  sumber: 'sumber',
+  proyekId: 'proyekId'
 } as const
 
 export type JurnalScalarFieldEnum = (typeof JurnalScalarFieldEnum)[keyof typeof JurnalScalarFieldEnum]
@@ -600,7 +610,8 @@ export const BarisJurnalScalarFieldEnum = {
   akunId: 'akunId',
   debit: 'debit',
   kredit: 'kredit',
-  keterangan: 'keterangan'
+  keterangan: 'keterangan',
+  rekonsiliasiPada: 'rekonsiliasiPada'
 } as const
 
 export type BarisJurnalScalarFieldEnum = (typeof BarisJurnalScalarFieldEnum)[keyof typeof BarisJurnalScalarFieldEnum]
@@ -770,6 +781,25 @@ export const PermintaanAturUlangScalarFieldEnum = {
 } as const
 
 export type PermintaanAturUlangScalarFieldEnum = (typeof PermintaanAturUlangScalarFieldEnum)[keyof typeof PermintaanAturUlangScalarFieldEnum]
+
+
+export const MutasiBankScalarFieldEnum = {
+  id: 'id',
+  akunId: 'akunId',
+  tanggal: 'tanggal',
+  keterangan: 'keterangan',
+  referensi: 'referensi',
+  masuk: 'masuk',
+  keluar: 'keluar',
+  saldo: 'saldo',
+  sidik: 'sidik',
+  berkas: 'berkas',
+  diimporPada: 'diimporPada',
+  penggunaNama: 'penggunaNama',
+  barisJurnalId: 'barisJurnalId'
+} as const
+
+export type MutasiBankScalarFieldEnum = (typeof MutasiBankScalarFieldEnum)[keyof typeof MutasiBankScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {

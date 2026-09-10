@@ -1,7 +1,7 @@
 export type KonfigurasiBidang = {
   nama: string;
   label: string;
-  jenis: "text" | "number" | "select" | "boolean";
+  jenis: "text" | "number" | "select" | "boolean" | "date";
   wajib?: boolean;
   nilaiBawaan?: string;
   opsi?: { model: string; bidangNilai: string; bidangLabel: string; where?: Record<string, unknown> };
@@ -103,18 +103,20 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
         jenis: "select",
         opsi: { model: "pelanggan", bidangNilai: "id", bidangLabel: "nama" },
       },
-      {
-        nama: "status",
-        label: "Status",
-        jenis: "text",
-        nilaiBawaan: "BERJALAN",
-      },
+      { nama: "status", label: "Status", jenis: "select", opsiStatis: ["BERJALAN", "SELESAI", "BATAL"], nilaiBawaan: "BERJALAN" },
+      { nama: "nilaiKontrak", label: "Nilai kontrak / proposal disetujui", jenis: "number" },
+      { nama: "anggaranBiaya", label: "Anggaran biaya event", jenis: "number" },
+      { nama: "tanggalMulai", label: "Tanggal mulai", jenis: "date" },
+      { nama: "tanggalSelesai", label: "Tanggal selesai", jenis: "date" },
+      { nama: "keterangan", label: "Keterangan", jenis: "text" },
     ],
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
       { key: "pelanggan.nama", label: "Pelanggan" },
       { key: "status", label: "Status" },
+      { key: "nilaiKontrak", label: "Nilai kontrak" },
+      { key: "anggaranBiaya", label: "Anggaran biaya" },
     ],
   },
   {

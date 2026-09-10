@@ -1,14 +1,16 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatPesananFormulir } from "@/lib/aksi/penjualan";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
 
 export default async function HalamanPesananPenjualanBaru() {
   await wajibHak("pesanan.buat");
-  const [daftarPelanggan, daftarBarang] = await Promise.all([
+  const [daftarPelanggan, daftarBarang, daftarProyek] = await Promise.all([
     db.pelanggan.findMany({ orderBy: { nama: "asc" } }),
     db.barang.findMany({ orderBy: { nama: "asc" } }),
+    daftarProyekAktif(),
   ]);
 
   const opsiBarang = daftarBarang.map((i) => ({
@@ -33,6 +35,18 @@ export default async function HalamanPesananPenjualanBaru() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="bidang">
+          <label className="label" htmlFor="proyekId">Proyek / Event</label>
+          <select id="proyekId" name="proyekId" className="isian" defaultValue="">
+            <option value="">— tanpa event</option>
+            {daftarProyek.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.kode} - {p.nama}
+              </option>
+            ))}
+          </select>
+          <span className="petunjuk">Dimensi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ); diwariskan ke semua dokumen & jurnal turunannya</span>
         </div>
 
         <div />
