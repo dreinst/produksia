@@ -98,6 +98,7 @@ export const ModelName = {
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
   HakAksesPeran: 'HakAksesPeran',
+  PermintaanAturUlang: 'PermintaanAturUlang',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -734,6 +735,21 @@ export const HakAksesPeranScalarFieldEnum = {
 } as const
 
 export type HakAksesPeranScalarFieldEnum = (typeof HakAksesPeranScalarFieldEnum)[keyof typeof HakAksesPeranScalarFieldEnum]
+
+
+export const PermintaanAturUlangScalarFieldEnum = {
+  id: 'id',
+  penggunaId: 'penggunaId',
+  dibuatPada: 'dibuatPada',
+  status: 'status',
+  token: 'token',
+  kedaluwarsa: 'kedaluwarsa',
+  ditanganiOleh: 'ditanganiOleh',
+  ditanganiPada: 'ditanganiPada',
+  selesaiPada: 'selesaiPada'
+} as const
+
+export type PermintaanAturUlangScalarFieldEnum = (typeof PermintaanAturUlangScalarFieldEnum)[keyof typeof PermintaanAturUlangScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {

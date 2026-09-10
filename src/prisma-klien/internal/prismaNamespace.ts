@@ -444,6 +444,7 @@ export const ModelName = {
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
   HakAksesPeran: 'HakAksesPeran',
+  PermintaanAturUlang: 'PermintaanAturUlang',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -460,7 +461,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3942,6 +3943,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PermintaanAturUlang: {
+      payload: Prisma.$PermintaanAturUlangPayload<ExtArgs>
+      fields: Prisma.PermintaanAturUlangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PermintaanAturUlangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PermintaanAturUlangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>
+        }
+        findFirst: {
+          args: Prisma.PermintaanAturUlangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PermintaanAturUlangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>
+        }
+        findMany: {
+          args: Prisma.PermintaanAturUlangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>[]
+        }
+        create: {
+          args: Prisma.PermintaanAturUlangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>
+        }
+        createMany: {
+          args: Prisma.PermintaanAturUlangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PermintaanAturUlangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>[]
+        }
+        delete: {
+          args: Prisma.PermintaanAturUlangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>
+        }
+        update: {
+          args: Prisma.PermintaanAturUlangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>
+        }
+        deleteMany: {
+          args: Prisma.PermintaanAturUlangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PermintaanAturUlangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PermintaanAturUlangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>[]
+        }
+        upsert: {
+          args: Prisma.PermintaanAturUlangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermintaanAturUlangPayload>
+        }
+        aggregate: {
+          args: Prisma.PermintaanAturUlangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePermintaanAturUlang>
+        }
+        groupBy: {
+          args: Prisma.PermintaanAturUlangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PermintaanAturUlangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PermintaanAturUlangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PermintaanAturUlangCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAktivitas: {
       payload: Prisma.$LogAktivitasPayload<ExtArgs>
       fields: Prisma.LogAktivitasFieldRefs
@@ -4674,6 +4749,21 @@ export const HakAksesPeranScalarFieldEnum = {
 export type HakAksesPeranScalarFieldEnum = (typeof HakAksesPeranScalarFieldEnum)[keyof typeof HakAksesPeranScalarFieldEnum]
 
 
+export const PermintaanAturUlangScalarFieldEnum = {
+  id: 'id',
+  penggunaId: 'penggunaId',
+  dibuatPada: 'dibuatPada',
+  status: 'status',
+  token: 'token',
+  kedaluwarsa: 'kedaluwarsa',
+  ditanganiOleh: 'ditanganiOleh',
+  ditanganiPada: 'ditanganiPada',
+  selesaiPada: 'selesaiPada'
+} as const
+
+export type PermintaanAturUlangScalarFieldEnum = (typeof PermintaanAturUlangScalarFieldEnum)[keyof typeof PermintaanAturUlangScalarFieldEnum]
+
+
 export const LogAktivitasScalarFieldEnum = {
   id: 'id',
   waktu: 'waktu',
@@ -5076,6 +5166,7 @@ export type GlobalOmitConfig = {
   tutupBuku?: Prisma.TutupBukuOmit
   pphFinalBulanan?: Prisma.PphFinalBulananOmit
   hakAksesPeran?: Prisma.HakAksesPeranOmit
+  permintaanAturUlang?: Prisma.PermintaanAturUlangOmit
   logAktivitas?: Prisma.LogAktivitasOmit
 }
 

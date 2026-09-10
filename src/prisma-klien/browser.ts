@@ -253,6 +253,11 @@ export type PphFinalBulanan = Prisma.PphFinalBulananModel
  */
 export type HakAksesPeran = Prisma.HakAksesPeranModel
 /**
+ * Model PermintaanAturUlang
+ * Permintaan "lupa kata sandi" dari halaman masuk; ditangani Superadmin/Pemilik/Admin dengan tautan sekali pakai
+ */
+export type PermintaanAturUlang = Prisma.PermintaanAturUlangModel
+/**
  * Model LogAktivitas
  * 
  */

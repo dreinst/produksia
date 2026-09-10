@@ -62,7 +62,11 @@ export default async function Beranda() {
     db.pembayaranPembelian.findMany({ include: { pemasok: true }, orderBy: { tanggal: "desc" }, take: 2 }),
   ]);
 
-  const [sinkron, pengaturan] = await Promise.all([periksaSinkron(db), ambilPengaturanPerusahaan(db)]);
+  const [sinkron, pengaturan, permintaanLupa] = await Promise.all([
+    periksaSinkron(db),
+    ambilPengaturanPerusahaan(db),
+    boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
+  ]);
 
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
@@ -172,6 +176,12 @@ export default async function Beranda() {
 
   return (
     <div className="space-y-7">
+      {permintaanLupa > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex flex-wrap items-center justify-between gap-2">
+          <span><strong>{permintaanLupa} permintaan lupa kata sandi</strong> menunggu ditangani.</span>
+          <Link href="/pengaturan/pengguna" className="tombol tombol-kecil tombol-utama">Buka Pengguna</Link>
+        </div>
+      )}
       {/* Hero */}
       <div className="kartu space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

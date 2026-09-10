@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { wajibHak, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
 import { DAFTAR_PERAN, KETERANGAN_PERAN, LABEL_PERAN, peranTertinggi } from "@/lib/hakAkses";
-import { buatPenggunaFormulir } from "@/lib/aksi/pengguna";
+import { buatPenggunaFormulir, buatTautanAturUlangFormulir, tolakPermintaanAturUlangFormulir } from "@/lib/aksi/pengguna";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
@@ -13,6 +14,15 @@ export default async function HalamanPengguna() {
     orderBy: [{ peran: "asc" }, { nama: "asc" }],
   });
   const peranBolehDibuat = DAFTAR_PERAN.filter((p) => !peranTertinggi(p) || peranTertinggi(saya.peran));
+  const permintaan = await db.permintaanAturUlang.findMany({
+    where: { status: { in: ["MENUNGGU", "TAUTAN"] } },
+    include: { pengguna: { select: { nama: true, namaPengguna: true, peran: true } } },
+    orderBy: { dibuatPada: "asc" },
+  });
+  const kepala = await headers();
+  const asal = `${kepala.get("x-forwarded-proto") ?? "http"}://${kepala.get("host") ?? "localhost:3000"}`;
+  const bolehTangani = (peran: (typeof DAFTAR_PERAN)[number]) => !peranTertinggi(peran) || peranTertinggi(saya.peran);
+  const waktu = (d: Date) => d.toLocaleString("id-ID", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
   return (
     <div className="space-y-6">
@@ -20,7 +30,47 @@ export default async function HalamanPengguna() {
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }]}
         judul="Pengguna"
         subjudul="Akun yang bisa masuk ke sistem beserta perannya. Masuk memakai nama pengguna, bukan email."
+        lencana={permintaan.length ? <span className="lencana lencana-amber">{permintaan.length} permintaan lupa kata sandi</span> : undefined}
       />
+
+      {permintaan.length > 0 && (
+        <div className="kartu space-y-3 border-amber-200">
+          <div>
+            <h2 className="judul-kartu">Permintaan atur ulang kata sandi</h2>
+            <p className="subjudul-kartu">Dikirim dari halaman masuk (lupa kata sandi). Buat tautan sekali pakai (berlaku 24 jam) lalu berikan langsung ke orangnya — sistem tidak mengirim email.</p>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {permintaan.map((p) => (
+              <li key={p.id} className="py-3 flex flex-col gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <span className="font-semibold text-slate-900">{p.pengguna.nama}</span> <span className="font-mono text-slate-500"></span> · {LABEL_PERAN[p.pengguna.peran]} · diminta {waktu(p.dibuatPada)}
+                    {p.status === "TAUTAN" && p.kedaluwarsa && <span className="ml-2 lencana lencana-blue">tautan dibuat, berlaku s.d. {waktu(p.kedaluwarsa)}</span>}
+                  </div>
+                  {bolehTangani(p.pengguna.peran) ? (
+                    <div className="flex items-center gap-2">
+                      <FormulirAksi aksi={buatTautanAturUlangFormulir.bind(null, p.id)}>
+                        <button type="submit" className="tombol tombol-utama tombol-kecil">{p.status === "TAUTAN" ? "Buat tautan baru" : "Buat tautan"}</button>
+                      </FormulirAksi>
+                      <FormulirAksi aksi={tolakPermintaanAturUlangFormulir.bind(null, p.id)} pesanKonfirmasi={`Tolak permintaan ${p.pengguna.nama}?`}>
+                        <button type="submit" className="tombol tombol-garis tombol-kecil">Tolak</button>
+                      </FormulirAksi>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-500">Hanya Superadmin/Pemilik yang bisa menangani</span>
+                  )}
+                </div>
+                {p.status === "TAUTAN" && p.token && (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
+                    <span className="text-slate-500 shrink-0">Berikan tautan ini:</span>
+                    <input readOnly value={`${asal}/atur-ulang/${p.token}`} className="isian isian-kecil font-mono flex-1" aria-label={`Tautan atur ulang ${p.pengguna.namaPengguna}`} />
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <FormulirAksi aksi={buatPenggunaFormulir} className="kartu space-y-4 lg:col-span-1 self-start" pesanSukses="Pengguna ditambahkan.">

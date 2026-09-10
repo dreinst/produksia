@@ -7,7 +7,7 @@ import { NAMA_COOKIE_SESI } from "@/lib/hakAkses";
  * masih berlaku dan peran berhak — tetap dilakukan di layout, halaman, dan aksi server
  * (lihat src/lib/otentikasi.ts).
  */
-const JALUR_PUBLIK = ["/masuk"];
+const JALUR_PUBLIK = ["/masuk", "/lupa-kata-sandi", "/atur-ulang"];
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
