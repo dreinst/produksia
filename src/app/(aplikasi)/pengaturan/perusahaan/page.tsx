@@ -12,7 +12,7 @@ function PilihAkunPajak({ nama, label, nilai, daftar, petunjuk }: { nama: string
     <div className="bidang">
       <label className="label" htmlFor={nama}>{label}</label>
       <select id={nama} name={nama} defaultValue={nilai} className="isian">
-        <option value="">— tidak dipakai</option>
+        <option value="">Tidak dipakai</option>
         {daftar.map((a) => (
           <option key={a.id} value={a.id}>
             {a.kode} - {a.nama}

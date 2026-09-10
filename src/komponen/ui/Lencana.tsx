@@ -41,6 +41,7 @@ const LABEL_SUMBER: Record<string, string> = {
   ASET_TETAP: "Aset tetap",
   PENUTUP: "Penutup tahun",
   PAJAK: "Pajak",
+  PRIVE: "Prive",
 };
 export function labelSumberJurnal(v: string) {
   return LABEL_SUMBER[v] ?? v;
@@ -70,6 +71,7 @@ const GAYA_DOKUMEN: Record<string, string> = {
   AT: "bg-amber-50 text-amber-700",
   UM: "bg-emerald-50 text-emerald-700",
   PB: "bg-blue-50 text-blue-700",
+  PRV: "bg-amber-50 text-amber-700",
 };
 
 /** Nomor dokumen: lencana prefix berwarna + nomor monospace, mis. [FJ] FJ-2026-0001 */

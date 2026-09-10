@@ -63,7 +63,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
                   <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                   <td>{p.gudangAsal.nama}</td>
                   <td>{p.gudangTujuan.nama}</td>
-                  <td className="text-slate-600">{p.keterangan ?? "—"}</td>
+                  <td className="text-slate-600">{p.keterangan ?? "-"}</td>
                   <td className="text-slate-600 text-xs">
                     {p.baris.map((b) => (
                       <span key={b.id} className="inline-block mr-2 whitespace-nowrap">

@@ -38,7 +38,7 @@ export type RingkasanPenutupan = {
   jumlahJurnal: number;
 };
 
-/** Saldo pendapatan & beban rinci tahun `tahun` (tanpa jurnal penutup) — bahan jurnal penutup dan pratinjaunya. */
+/** Saldo pendapatan & beban rinci tahun `tahun` (tanpa jurnal penutup), bahan jurnal penutup dan pratinjaunya. */
 export async function ringkasanPenutupan(klien: Klien, tahun: number): Promise<RingkasanPenutupan> {
   const [daftar, jumlahJurnal] = await Promise.all([
     saldoAkunPeriode(klien as PrismaClient, awalTahun(tahun), akhirTahun(tahun), true),

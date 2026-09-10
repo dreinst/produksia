@@ -1,4 +1,4 @@
-// Accurate Copy — skema data (seluruh penamaan dalam bahasa Indonesia)
+// Produksia: skema data (seluruh penamaan dalam bahasa Indonesia)
 // https://pris.ly/d/prisma-schema
 
 generator client {
@@ -46,6 +46,7 @@ enum SumberJurnal {
   MANUAL
   PENUTUP
   PAJAK
+  PRIVE
   KAS_MASUK
   KAS_KELUAR
   PENJUALAN
@@ -198,6 +199,8 @@ model Barang {
   satuan      String          @default("pcs")
   hargaBeli   Decimal         @default(0) @db.Decimal(18, 2)
   hargaJual   Decimal         @default(0) @db.Decimal(18, 2)
+  /// Batas bawah harga saat nego dengan klien (0 = tanpa batas)
+  hargaMinimum Decimal        @default(0) @db.Decimal(18, 2)
   stokMinimum Decimal         @default(0) @db.Decimal(18, 2)
 
   stok                    StokBarang[]
@@ -633,6 +636,9 @@ model Akun {
   pelepasanPenerimaan        PelepasanAset[] @relation("AkunPenerimaanPelepasan")
   pelepasanLabaRugi          PelepasanAset[] @relation("AkunLabaRugiPelepasan")
   mutasiBank                 MutasiBank[]    @relation("AkunMutasiBank")
+  priveKas                   Prive[]         @relation("AkunKasPrive")
+  priveModal                 Prive[]         @relation("AkunPrive")
+  pemetaanTambahan           PemetaanAkunTambahan[] @relation("AkunPemetaanTambahan")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
   pengaturanPpnMasukan    PengaturanPerusahaan? @relation("PetaPpnMasukan")
@@ -702,6 +708,7 @@ model Jurnal {
   tutupBuku             TutupBuku?             @relation("JurnalTutupBuku")
   pphFinal              PphFinalBulanan?       @relation("JurnalPphFinal")
   pelepasanAset         PelepasanAset?         @relation("JurnalPelepasanAset")
+  prive                 Prive?                 @relation("JurnalPrive")
   returPenjualan        ReturPenjualan?        @relation("JurnalReturPenjualan")
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
@@ -842,7 +849,7 @@ model BarisPenyesuaianPersediaan {
 
 model PengaturanPerusahaan {
   id             String  @id @default("default")
-  nama           String  @default("Accurate Copy")
+  nama           String  @default("Produksia")
   /// Pengusaha Kena Pajak: faktur memungut PPN
   pkp            Boolean @default(false)
   tarifPpnPersen Decimal @default(11) @db.Decimal(5, 2)
@@ -940,8 +947,41 @@ model MutasiBank {
   penggunaNama String
   barisJurnalId String?     @unique
   barisJurnal   BarisJurnal? @relation(fields: [barisJurnalId], references: [id])
+  /// Cocok otomatis tapi tanggal buku ≠ tanggal rekening: perlu dicek orang; dikonfirmasiPada diisi setelah dicek
+  perluPerhatian   Boolean   @default(false)
+  dikonfirmasiPada DateTime?
 
   @@index([akunId, tanggal])
+}
+
+/// Prive: pengambilan uang pribadi pemilik dari kas/bank (Dr Prive 3-4000 / Cr Kas)
+model Prive {
+  id          String   @id @default(cuid())
+  nomor       String   @unique
+  tanggal     DateTime @default(now())
+  pemilikNama String
+  akunKasId   String
+  akunKas     Akun     @relation("AkunKasPrive", fields: [akunKasId], references: [id])
+  akunPriveId String
+  akunPrive   Akun     @relation("AkunPrive", fields: [akunPriveId], references: [id])
+  jumlah      Decimal  @db.Decimal(18, 2)
+  keterangan  String?
+  jurnalId    String?  @unique
+  jurnal      Jurnal?  @relation("JurnalPrive", fields: [jurnalId], references: [id])
+  penggunaNama String
+  dibuatPada   DateTime @default(now())
+}
+
+/// Pemetaan akun tambahan buatan pengguna (mis. "prive" → 3-4000) untuk peran yang belum ada di PemetaanAkun
+model PemetaanAkunTambahan {
+  id         String   @id @default(cuid())
+  kunci      String   @unique
+  label      String
+  akunId     String
+  akun       Akun     @relation("AkunPemetaanTambahan", fields: [akunId], references: [id])
+  keterangan String?
+  dibuatOleh String
+  dibuatPada DateTime @default(now())
 }
 
 model LogAktivitas {

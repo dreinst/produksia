@@ -14,7 +14,7 @@ export default async function HalamanLupaKataSandi() {
         <FormulirAksi
           aksi={mintaAturUlangFormulir}
           className="kartu space-y-4"
-          pesanSukses="Permintaan dikirim. Superadmin/Pemilik/Admin akan melihatnya di menu Pengguna dan memberimu tautan untuk membuat kata sandi baru — hubungi mereka langsung (WhatsApp/telepon) agar cepat ditangani."
+          pesanSukses="Permintaan terkirim. Hubungi Superadmin, Pemilik, atau Admin untuk mendapat tautan kata sandi baru."
         >
           <div>
             <h1 className="judul-kartu">Lupa kata sandi</h1>

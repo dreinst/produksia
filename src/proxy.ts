@@ -3,8 +3,8 @@ import { NAMA_COOKIE_SESI } from "@/lib/hakAkses";
 
 /*
  * Pemeriksaan optimistis di tepi: permintaan tanpa cookie sesi langsung dialihkan ke /masuk
- * (termasuk prefetch), tanpa menyentuh basis data. Pemeriksaan sesungguhnya — apakah token
- * masih berlaku dan peran berhak — tetap dilakukan di layout, halaman, dan aksi server
+ * (termasuk prefetch), tanpa menyentuh basis data. Pemeriksaan sesungguhnya, apakah token
+ * masih berlaku dan peran berhak, tetap dilakukan di layout, halaman, dan aksi server
  * (lihat src/lib/otentikasi.ts).
  */
 const JALUR_PUBLIK = ["/masuk", "/lupa-kata-sandi", "/atur-ulang"];

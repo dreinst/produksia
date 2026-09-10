@@ -34,7 +34,7 @@ export default async function HalamanBaganAkunStandar() {
       <KepalaHalaman
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }]}
         judul="Bagan Akun Standar EO/WO"
-        subjudul="Hasil kurasi catatan bagan akun usaha Event/Wedding Organizer. Terapkan untuk membuat akun yang belum ada — akun yang sudah ada tidak diubah."
+        subjudul="Akun standar usaha event organizer. Terapkan untuk membuat akun yang belum ada."
         aksi={
           <Link href="/data-induk/akun" className="tombol tombol-garis">
             <Ikon nama="format_list_bulleted" className="!text-[18px]" />
@@ -51,8 +51,8 @@ export default async function HalamanBaganAkunStandar() {
           </div>
           <div className="ubin space-y-1.5 text-sm">
             <div className="flex justify-between"><span className="text-slate-500">Akun dalam standar</span><span className="angka font-semibold">{BAGAN_AKUN_STANDAR.length}</span></div>
-            <div className="flex justify-between"><span className="text-slate-500">— akun kelompok (induk)</span><span className="angka">{jumlahKelompok}</span></div>
-            <div className="flex justify-between"><span className="text-slate-500">— akun rinci (bisa dijurnal)</span><span className="angka">{BAGAN_AKUN_STANDAR.length - jumlahKelompok}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500">Akun kelompok (induk)</span><span className="angka">{jumlahKelompok}</span></div>
+            <div className="flex justify-between"><span className="text-slate-500">Akun rinci (bisa dijurnal)</span><span className="angka">{BAGAN_AKUN_STANDAR.length - jumlahKelompok}</span></div>
             <div className="flex justify-between border-t border-slate-200 pt-1.5"><span className="text-slate-500">Sudah ada di sistem</span><span className="angka">{BAGAN_AKUN_STANDAR.length - belumAda.length}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">Akan dibuat</span><span className={`angka font-semibold ${belumAda.length ? "text-blue-700" : "text-emerald-700"}`}>{belumAda.length}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">Pemetaan akun</span><span className={pemetaan ? "text-emerald-700" : "text-amber-700"}>{pemetaan ? "sudah diatur" : `akan diisi (${Object.values(PEMETAAN_STANDAR).join(", ")})`}</span></div>
@@ -86,7 +86,7 @@ export default async function HalamanBaganAkunStandar() {
         <div className="kepala-kartu">
           <div>
             <h2 className="judul-kartu">Struktur bagan akun</h2>
-            <p className="subjudul-kartu">Penomoran X-YZWW ala Accurate: digit pertama jenis, ratusan kelompok, puluhan akun rinci.</p>
+            <p className="subjudul-kartu">Penomoran X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {ringkasanAsal.map((r) => (

@@ -64,11 +64,11 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                     <td><NomorDokumen nomor={p.nomor} /></td>
                     <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                     <td>{p.gudang.nama}</td>
-                    <td className="text-slate-600">{p.keterangan ?? "—"}</td>
+                    <td className="text-slate-600">{p.keterangan ?? "-"}</td>
                     <td className="text-slate-500">{p.akunLawan.kode} - {p.akunLawan.nama}</td>
                     <td className="text-right angka">{p.baris.length}</td>
                     <td className={`text-right angka font-semibold ${nilai < 0 ? "text-rose-700" : "text-emerald-700"}`}>{nilai.toLocaleString("id-ID")}</td>
-                    <td className="mono text-slate-500">{p.jurnal?.nomor ?? "—"}</td>
+                    <td className="mono text-slate-500">{p.jurnal?.nomor ?? "-"}</td>
                     <td className="text-right"><TombolHapusDokumen jenis="penyesuaian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                   </tr>
                 );

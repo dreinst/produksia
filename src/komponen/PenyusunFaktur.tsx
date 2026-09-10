@@ -93,11 +93,11 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
 
   const pengaman = [
     { ok: hitung.jumlahValid, teks: "Semua kuantitas valid (≤ sisa pesanan, minimal 1 baris > 0)" },
-    { ok: !!p.pemetaan, teks: p.pemetaan ? "Pemetaan akun terpasang (5 peran akun)" : "Pemetaan akun belum diatur — buka Buku Besar › Pemetaan Akun" },
+    { ok: !!p.pemetaan, teks: p.pemetaan ? "Pemetaan akun terpasang (5 peran akun)" : "Pemetaan akun belum diatur. Buka Pengaturan, Pemetaan Akun" },
     { ok: true, teks: teks.catatanStok },
-    { ok: true, teks: p.pajak.pkp ? `Perusahaan PKP — PPN ${ppnPersen}% dipungut pada faktur ini` : "Perusahaan non-PKP — faktur tanpa PPN" },
+    { ok: true, teks: p.pajak.pkp ? `PKP: PPN ${ppnPersen}% dipungut` : "Non-PKP: tanpa PPN" },
     ...(adalahPenjualan
-      ? [{ ok: true, teks: uangMukaTersedia > 0 ? `Uang muka pesanan tersedia Rp ${format(uangMukaTersedia)} — dipakai Rp ${format(hitung.uangMuka)}, sisa piutang Rp ${format(hitung.piutang)}` : "Tidak ada uang muka pada pesanan ini" }]
+      ? [{ ok: true, teks: uangMukaTersedia > 0 ? `Uang muka Rp ${format(uangMukaTersedia)}, dipakai Rp ${format(hitung.uangMuka)}, sisa piutang Rp ${format(hitung.piutang)}` : "Tidak ada uang muka" }]
       : []),
   ];
   const bisaKirim = hitung.jumlahValid && !!p.pemetaan && !sedangProses;
@@ -294,7 +294,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                       </span>
                     ))
                   ) : (
-                    <span className="text-[12px] text-amber-600 font-medium">Belum ada — faktur boleh mendahului</span>
+                    <span className="text-[12px] text-amber-600 font-medium">Belum ada. Faktur boleh mendahului</span>
                   )}
                 </div>
                 <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-200 flex flex-col gap-1">
@@ -318,7 +318,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
               </div>
               <div className="flex flex-col gap-2 text-[13px]">
                 <div className="flex justify-between text-slate-500"><span>Subtotal ({hitung.banyakBaris} baris)</span><span className="angka text-slate-900">Rp {format(hitung.subtotal)}</span></div>
-                <div className="flex justify-between text-slate-500"><span>Diskon</span><span className="angka text-slate-400">—</span></div>
+                <div className="flex justify-between text-slate-500"><span>Diskon</span><span className="angka text-slate-400">-</span></div>
                 <div className="flex justify-between text-slate-500 pt-1 border-t border-dashed border-slate-200"><span className="font-semibold text-slate-900">Dasar Pengenaan Pajak</span><span className="angka font-semibold text-slate-900">Rp {format(hitung.subtotal)}</span></div>
                 <div className="flex justify-between items-center text-slate-500">
                   <span>PPN</span>

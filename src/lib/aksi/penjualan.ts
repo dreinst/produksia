@@ -1,6 +1,7 @@
 "use server";
 
 import { wajibHakAksi } from "@/lib/otentikasi";
+import { punyaHak, PERAN_TERTINGGI, type PenggunaSesi } from "@/lib/hakAkses";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -15,6 +16,33 @@ const NOL = D(0);
 import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
+
+/**
+ * Aturan harga jual di penawaran/pesanan:
+ * - di bawah harga jual barang → hanya pemegang hak "harga.nego" (nego dengan klien)
+ * - di bawah harga minimum barang (bila diisi) → hanya Pemilik/Superadmin
+ */
+async function periksaHargaNego(pengguna: PenggunaSesi, daftarBaris: BarisInput[]) {
+  const daftarBarang = await db.barang.findMany({
+    where: { id: { in: daftarBaris.map((l) => l.barangId) } },
+    select: { id: true, nama: true, hargaJual: true, hargaMinimum: true },
+  });
+  const peta = new Map(daftarBarang.map((b) => [b.id, b]));
+  const bolehNego = punyaHak(pengguna, "harga.nego");
+  const bolehBawahMinimum = PERAN_TERTINGGI.includes(pengguna.peran);
+  for (const l of daftarBaris) {
+    const b = peta.get(l.barangId);
+    if (!b) continue;
+    const hargaJual = D(b.hargaJual);
+    const minimum = D(b.hargaMinimum);
+    if (l.harga.lt(hargaJual) && !bolehNego) {
+      throw new Error(`Harga ${b.nama} di bawah harga jual (${format(hargaJual)}). Nego harga perlu hak "Harga jual · boleh nego".`);
+    }
+    if (minimum.gt(0) && l.harga.lt(minimum) && !bolehBawahMinimum) {
+      throw new Error(`Harga ${b.nama} di bawah harga minimum (${format(minimum)}). Hanya Pemilik atau Superadmin yang boleh.`);
+    }
+  }
+}
 
 function bacaJson(raw: FormDataEntryValue | null, pesanKosong: string): unknown[] {
   if (typeof raw !== "string" || !raw) throw new Error(pesanKosong);
@@ -68,10 +96,11 @@ function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" 
 // ---------- Penawaran Penjualan ----------
 
 export async function buatPenawaran(dataFormulir: FormData) {
-  await wajibHakAksi("penawaran.buat");
+  const pengguna = await wajibHakAksi("penawaran.buat");
   const pelangganId = String(dataFormulir.get("pelangganId") ?? "");
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
+  await periksaHargaNego(pengguna, daftarBaris);
   const total = totalBaris(daftarBaris);
 
   const proyekId = await bacaProyekId(dataFormulir);
@@ -125,10 +154,11 @@ export async function konversiPenawaranKePesanan(penawaranId: string) {
 // ---------- Pesanan Penjualan ----------
 
 export async function buatPesanan(dataFormulir: FormData) {
-  await wajibHakAksi("pesanan.buat");
+  const pengguna = await wajibHakAksi("pesanan.buat");
   const pelangganId = String(dataFormulir.get("pelangganId") ?? "");
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
+  await periksaHargaNego(pengguna, daftarBaris);
   const total = totalBaris(daftarBaris);
 
   const proyekId = await bacaProyekId(dataFormulir);

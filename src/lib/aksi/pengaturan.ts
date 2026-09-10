@@ -8,7 +8,7 @@ import { bacaUang } from "@/lib/uang";
 import { pastikanAkunRinci, terapkanBaganAkunStandar } from "@/lib/baganAkun";
 
 export async function simpanPemetaanAkun(dataFormulir: FormData) {
-  await wajibHakAksi("pengaturan.tulis");
+  await wajibHakAksi("pemetaan.tulis");
   const piutangUsahaId = String(dataFormulir.get("piutangUsahaId") ?? "");
   const persediaanId = String(dataFormulir.get("persediaanId") ?? "");
   const hppId = String(dataFormulir.get("hppId") ?? "");
@@ -119,4 +119,56 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
 
 export async function simpanPengaturanPerusahaanFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => simpanPengaturanPerusahaan(dataFormulir));
+}
+
+// ---------- Pemetaan akun tambahan (peran buatan pengguna, mis. Prive) ----------
+
+function bacaKunci(label: string): string {
+  return label
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+
+export async function tambahPemetaanTambahan(dataFormulir: FormData) {
+  const pengguna = await wajibHakAksi("pemetaan.tulis");
+  const label = String(dataFormulir.get("label") ?? "").trim();
+  const akunId = String(dataFormulir.get("akunId") ?? "");
+  const keterangan = String(dataFormulir.get("keterangan") ?? "").trim() || null;
+  if (!label) throw new Error("Nama peran wajib diisi");
+  if (!akunId) throw new Error("Akun wajib dipilih");
+  const kunci = bacaKunci(label);
+  if (!kunci) throw new Error("Nama peran harus memuat huruf atau angka");
+  await pastikanAkunRinci(db, [akunId]);
+  if (await db.pemetaanAkunTambahan.findUnique({ where: { kunci } })) throw new Error(`Peran "${label}" sudah ada`);
+  await db.pemetaanAkunTambahan.create({ data: { kunci, label, akunId, keterangan, dibuatOleh: pengguna.nama } });
+  revalidatePath("/pengaturan/pemetaan-akun");
+}
+
+export async function ubahPemetaanTambahan(id: string, dataFormulir: FormData) {
+  await wajibHakAksi("pemetaan.tulis");
+  const akunId = String(dataFormulir.get("akunId") ?? "");
+  if (!akunId) throw new Error("Akun wajib dipilih");
+  await pastikanAkunRinci(db, [akunId]);
+  await db.pemetaanAkunTambahan.update({ where: { id }, data: { akunId } });
+  revalidatePath("/pengaturan/pemetaan-akun");
+}
+
+export async function hapusPemetaanTambahan(id: string) {
+  await wajibHakAksi("pemetaan.tulis");
+  await db.pemetaanAkunTambahan.delete({ where: { id } });
+  revalidatePath("/pengaturan/pemetaan-akun");
+}
+
+export async function tambahPemetaanTambahanFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => tambahPemetaanTambahan(dataFormulir));
+}
+export async function ubahPemetaanTambahanFormulir(id: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => ubahPemetaanTambahan(id, dataFormulir));
+}
+export async function hapusPemetaanTambahanFormulir(id: string) {
+  return jalankanFormulir(() => hapusPemetaanTambahan(id));
 }

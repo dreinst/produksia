@@ -35,7 +35,7 @@ export default async function HalamanPerubahanModal({ searchParams }: { searchPa
       <KepalaHalaman
         jejak={[{ label: "Laporan" }]}
         judul="Laporan Perubahan Modal"
-        subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)} — Harta = Utang + Modal; modal berubah karena setoran, laba/rugi, dan prive.`}
+        subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
         lencana={<span className={`lencana ${pm.cocok ? "lencana-emerald" : "lencana-rose"}`}>{pm.cocok ? "Cocok dengan ekuitas neraca" : "TIDAK COCOK dengan neraca"}</span>}
       />
       <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
@@ -81,7 +81,7 @@ export default async function HalamanPerubahanModal({ searchParams }: { searchPa
               <div className="ubin"><div className="teks-label">Utang</div><div className="font-heading font-bold angka">{rp(neracaAkhir.totalKewajiban)}</div></div>
               <div className="ubin"><div className="teks-label">Modal</div><div className="font-heading font-bold angka">{rp(neracaAkhir.totalEkuitas)}</div></div>
             </div>
-            <p className="text-xs text-slate-500">Prive dikenali dari akun modal bernama “Prive” (3-4000). Setoran modal = mutasi akun modal lain (bukan Laba Ditahan). Jurnal penutup tahun tidak dihitung sebagai setoran.</p>
+            <p className="text-xs text-slate-500">Prive diambil dari akun modal bernama Prive. Setoran modal dari akun modal lainnya.</p>
           </div>
         </div>
       </div>

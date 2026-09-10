@@ -29,7 +29,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
       <KepalaHalaman
         jejak={[{ label: "Buku Besar" }]}
         judul="Ringkasan Pajak & SPT"
-        subjudul={`Tahun ${tahun} — omzet, PPN, PPh 23, dan PPh Final UMKM ${angka(pengaturan.pphFinalPersen)}% per masa pajak, dihitung langsung dari dokumen.`}
+        subjudul={`Tahun ${tahun}. Omzet, PPN, PPh 23, dan PPh Final ${angka(pengaturan.pphFinalPersen)}% per bulan.`}
         lencana={<span className={`lencana ${pengaturan.pkp ? "lencana-blue" : "lencana-slate"}`}>{pengaturan.pkp ? `PKP · PPN ${angka(pengaturan.tarifPpnPersen)}%` : "Non-PKP"}</span>}
         aksi={
           <span className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
 
       {!akunSiap && (
         <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Akun Beban PPh Final / Hutang PPh Final belum diatur — buka <Link href="/pengaturan/perusahaan" className="font-semibold underline">Perusahaan &amp; Pajak</Link> sebelum mencatat PPh Final.
+          Akun PPh Final belum diatur. Buka <Link href="/pengaturan/perusahaan" className="font-semibold underline">Perusahaan &amp; Pajak</Link>.
         </div>
       )}
 
@@ -84,7 +84,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
                     {b.tercatat ? (
                       <span className="inline-flex items-center gap-2">
                         <span className="lencana lencana-emerald">Tercatat {angka(b.tercatat.jumlah)}</span>
-                        <span className="mono text-xs text-slate-500">{b.tercatat.nomorJurnal ?? "—"}</span>
+                        <span className="mono text-xs text-slate-500">{b.tercatat.nomorJurnal ?? "-"}</span>
                         <TombolHapusDokumen jenis="pphFinal" id={b.tercatat.id} nomor={b.tercatat.nomorJurnal ?? b.periode} boleh={bolehHapus} />
                       </span>
                     ) : b.omzet.gt(0) && bulanBerjalan(b.bulan) && bolehTulis ? (
@@ -93,7 +93,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
                         <button type="submit" className="tombol tombol-garis tombol-kecil" disabled={!akunSiap}>Catat</button>
                       </FormulirAksi>
                     ) : (
-                      <span className="text-xs text-slate-400">{b.omzet.gt(0) ? "—" : "tanpa omzet"}</span>
+                      <span className="text-xs text-slate-400">{b.omzet.gt(0) ? "-" : "tanpa omzet"}</span>
                     )}
                   </td>
                 </tr>
@@ -120,18 +120,18 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
         <div className="kartu space-y-2">
           <h2 className="judul-kartu">Cara pakai untuk SPT</h2>
           <ul className="list-disc pl-5 space-y-1 text-slate-600">
-            <li><strong>PPh Final UMKM</strong> (PP 55/2022, {angka(pengaturan.pphFinalPersen)}% dari peredaran bruto): klik <em>Catat</em> tiap akhir bulan → jurnal Dr Beban PPh Final / Cr Hutang PPh Final. Setor ke DJP (kode akun pajak 411128-420) lewat <Link href="/kas-bank/keluar/baru" className="text-blue-600 hover:underline">Kas Keluar</Link> dengan akun lawan Hutang PPh Final, paling lambat tanggal 15 bulan berikutnya.</li>
-            <li><strong>PPN</strong> (hanya PKP): kolom kurang/(lebih) bayar = PPN keluaran faktur penjualan − PPN masukan faktur pembelian, sudah dikurangi retur; laporkan di SPT Masa PPN dan setor lewat Kas Keluar (akun lawan Hutang PPN Keluaran / PPN Masukan).</li>
-            <li><strong>PPh 23</strong>: yang dipotong klien menjadi kredit pajak (akun Pajak Dibayar Dimuka, minta bukti potongnya); yang kita potong dari vendor wajib disetor & dilaporkan (SPT Masa PPh Unifikasi).</li>
+            <li><strong>PPh Final UMKM</strong> ({angka(pengaturan.pphFinalPersen)}% dari omzet): klik <em>Catat</em> tiap akhir bulan. Setor lewat <Link href="/kas-bank/keluar/baru" className="text-blue-600 hover:underline">Kas Keluar</Link> ke akun Hutang PPh Final paling lambat tanggal 15 bulan berikutnya.</li>
+            <li><strong>PPN</strong> (hanya PKP): kurang/(lebih) bayar = PPN penjualan dikurangi PPN pembelian. Lapor di SPT Masa PPN, setor lewat Kas Keluar.</li>
+            <li><strong>PPh 23</strong>: potongan dari klien jadi kredit pajak (minta bukti potong). Potongan ke vendor wajib disetor dan dilaporkan.</li>
           </ul>
         </div>
         <div className="kartu space-y-2">
           <h2 className="judul-kartu">Catatan</h2>
           <ul className="list-disc pl-5 space-y-1 text-slate-600">
-            <li>Omzet = DPP faktur penjualan bulan itu dikurangi DPP retur penjualan (bukan kas diterima).</li>
-            <li>PPh Final yang sudah dicatat menyimpan omzet & tarif saat itu; bila dokumen bulan itu berubah, hapus catatannya lalu catat ulang.</li>
-            <li>Bulan pada tahun yang sudah ditutup bukunya tidak bisa dicatat/dihapus sampai tahun dibuka kembali.</li>
-            <li>Ambang omzet Rp 4,8 miliar/tahun (batas skema UMKM) dan pengecualian omzet Rp 500 juta pertama untuk WP orang pribadi tidak dihitung otomatis.</li>
+            <li>Omzet = faktur penjualan bulan itu dikurangi retur, bukan kas yang diterima.</li>
+            <li>Bila dokumen bulan itu berubah setelah dicatat, hapus catatan PPh Final lalu catat ulang.</li>
+            <li>Tahun yang sudah ditutup bukunya tidak bisa dicatat atau dihapus.</li>
+            <li>Batas omzet UMKM Rp 4,8 miliar/tahun tidak dihitung otomatis.</li>
           </ul>
         </div>
       </div>

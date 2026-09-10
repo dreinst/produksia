@@ -70,7 +70,7 @@ async function main() {
   await db.pengaturanPerusahaan.upsert({ where: { id: "default" }, create: { id: "default", nama: "Uji Pajak", pkp: false }, update: { pkp: false } });
   await jalankan("PSJ 2 jasa @100.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100000 }] })));
   const pesanan = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id } });
-  await harusDitolak("faktur PPN 11% saat non-PKP", () => buatFaktur(formulir({ pesananId: pesanan.id, ppnPersen: 11, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100000 }] })), "belum berstatus PKP");
+  await harusDitolak("faktur PPN 11% saat non-PKP", () => buatFaktur(formulir({ pesananId: pesanan.id, ppnPersen: 11, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100000 }] })), "belum PKP");
 
   console.log("=== 2. PKP: Faktur Penjualan memungut PPN 11% ===");
   await db.pengaturanPerusahaan.update({

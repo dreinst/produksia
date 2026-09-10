@@ -22,7 +22,7 @@ export type PengaturanPajak = {
 };
 
 export const PENGATURAN_BAWAAN: PengaturanPajak = {
-  nama: "Accurate Copy",
+  nama: "Produksia",
   pkp: false,
   tarifPpnPersen: D(11),
   terminHari: 14,
@@ -61,7 +61,7 @@ export function bacaTarifPpn(nilai: FormDataEntryValue | null, pengaturan: Penga
   const teks = typeof nilai === "string" ? nilai.trim() : "";
   const tarif = teks === "" ? (pengaturan.pkp ? pengaturan.tarifPpnPersen : D(0)) : uang(teks);
   if (tarif.isNegative() || tarif.gt(100)) throw new Error("Tarif PPN harus antara 0 dan 100 persen");
-  if (tarif.gt(0) && !pengaturan.pkp) throw new Error("Perusahaan belum berstatus PKP — aktifkan di Pengaturan > Perusahaan & Pajak sebelum memungut PPN");
+  if (tarif.gt(0) && !pengaturan.pkp) throw new Error("Perusahaan belum PKP. Aktifkan di Pengaturan, Perusahaan & Pajak");
   return tarif;
 }
 

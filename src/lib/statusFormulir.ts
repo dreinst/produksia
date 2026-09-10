@@ -19,7 +19,7 @@ function pesanRamah(galat: unknown): string {
     return "Data tidak ditemukan (mungkin sudah dihapus).";
   }
   if (e?.message?.includes("StokBarang_jumlah_tidak_negatif")) {
-    return "Stok tidak cukup — baru saja berkurang oleh transaksi lain. Muat ulang halaman lalu coba lagi.";
+    return "Stok tidak cukup. Muat ulang halaman lalu coba lagi.";
   }
   return e?.message || "Terjadi kesalahan. Coba lagi.";
 }

@@ -3,7 +3,7 @@ import "dotenv/config";
 process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { bacaMutasi, bacaAngka, bacaTanggal, sidikMutasi, CONTOH_CSV } from "../src/lib/mutasiBank";
-import { imporMutasi, cocokkanOtomatis, cocokkanManual, lepasCocok, hapusMutasi } from "../src/lib/aksi/rekonsiliasi";
+import { imporMutasi, cocokkanOtomatis, cocokkanManual, lepasCocok, hapusMutasi, konfirmasiPerhatian } from "../src/lib/aksi/rekonsiliasi";
 import { buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { laporanPiutang, laporanHutang } from "../src/lib/laporanRekanan";
@@ -107,8 +107,20 @@ async function main() {
   const cocok0 = await db.mutasiBank.count({ where: { akunId: bank.id, barisJurnalId: { not: null } } });
   pastikan(hariSelisih < 1 ? cocok0 >= 1 : cocok0 === 0, `toleransi 0 hari: ${cocok0} cocok (selisih tanggal ${Math.round(hariSelisih)} hari)`);
   await jalankan("cocokkan otomatis toleransi 31 hari", () => cocokkanOtomatis(formulir({ akunId: bank.id, toleransiHari: 31 })));
-  const tercocok = await db.mutasiBank.findMany({ where: { akunId: bank.id, barisJurnalId: { not: null } }, include: { barisJurnal: true } });
+  const tercocok = await db.mutasiBank.findMany({ where: { akunId: bank.id, barisJurnalId: { not: null } }, include: { barisJurnal: { include: { jurnal: { select: { tanggal: true } } } } } });
   pastikan(tercocok.length === 2 && tercocok.every((m) => m.barisJurnal?.rekonsiliasiPada), "2 mutasi (DP 1.000.000 & admin 6.500) cocok dengan baris buku dan baris ditandai");
+  const bedaTanggal = tercocok.filter((m) => m.tanggal.toDateString() !== m.barisJurnal!.jurnal.tanggal.toDateString());
+  pastikan(bedaTanggal.every((m) => m.perluPerhatian && !m.dikonfirmasiPada) && tercocok.filter((m) => !bedaTanggal.includes(m)).every((m) => !m.perluPerhatian), `${bedaTanggal.length} mutasi beda tanggal ditandai perlu perhatian, sisanya cocok penuh`);
+  if (bedaTanggal.length > 0) {
+    const fdCek = formulir({ akunId: bank.id });
+    fdCek.set(`cek_${bedaTanggal[0].id}`, "on");
+    await jalankan("tandai 1 mutasi beda tanggal sudah dicek", () => konfirmasiPerhatian(fdCek));
+    const dicek = await db.mutasiBank.findUniqueOrThrow({ where: { id: bedaTanggal[0].id } });
+    pastikan(dicek.perluPerhatian && dicek.dikonfirmasiPada !== null, "mutasi yang dicentang tersimpan sudah dicek");
+    if (bedaTanggal.length > 1) pastikan((await db.mutasiBank.findUniqueOrThrow({ where: { id: bedaTanggal[1].id } })).dikonfirmasiPada === null, "yang tidak dicentang tetap belum dicek");
+    await jalankan("hapus centang", () => konfirmasiPerhatian(formulir({ akunId: bank.id })));
+    pastikan((await db.mutasiBank.findUniqueOrThrow({ where: { id: bedaTanggal[0].id } })).dikonfirmasiPada === null, "centang dilepas → belum dicek lagi");
+  }
   const belum = await db.mutasiBank.findFirstOrThrow({ where: { akunId: bank.id, barisJurnalId: null } });
   pastikan(n(belum.keluar) === 600000, "mutasi 600.000 (pembayaran vendor) belum cocok karena belum dicatat di buku");
   await harusDitolak("cocok manual nominal beda", () => cocokkanManual(formulir({ mutasiId: belum.id, barisId: tercocok[0].barisJurnalId! })), "sudah dicocokkan");
@@ -116,8 +128,11 @@ async function main() {
   const barisVendor = await db.barisJurnal.findFirstOrThrow({ where: { akunId: bank.id, kredit: 600000 } });
   await jalankan("cocok manual 600.000", () => cocokkanManual(formulir({ mutasiId: belum.id, barisId: barisVendor.id })));
   pastikan((await db.mutasiBank.count({ where: { akunId: bank.id, barisJurnalId: null } })) === 0, "semua mutasi cocok");
+  const manual = await db.mutasiBank.findUniqueOrThrow({ where: { id: belum.id } });
+  pastikan(!manual.perluPerhatian && manual.dikonfirmasiPada !== null, "cocok manual = sudah dicek orang, tanpa tanda perlu perhatian");
   await jalankan("lepas cocok 600.000", () => lepasCocok(formulir({ mutasiId: belum.id })));
-  pastikan((await db.barisJurnal.findUniqueOrThrow({ where: { id: barisVendor.id } })).rekonsiliasiPada === null && (await db.mutasiBank.findUniqueOrThrow({ where: { id: belum.id } })).barisJurnalId === null, "lepas cocok memulihkan keduanya");
+  const dilepas = await db.mutasiBank.findUniqueOrThrow({ where: { id: belum.id } });
+  pastikan((await db.barisJurnal.findUniqueOrThrow({ where: { id: barisVendor.id } })).rekonsiliasiPada === null && dilepas.barisJurnalId === null && !dilepas.perluPerhatian && dilepas.dikonfirmasiPada === null, "lepas cocok memulihkan keduanya dan menghapus tanda");
   const jurnalBuku = await db.jurnal.findFirst({ where: { keterangan: "uji rekonsiliasi dp" }, include: { baris: true } });
   await harusDitolak("hapus jurnal yang sudah direkonsiliasi tetap boleh? (tidak dibatasi) — cek tidak ada galat lain", async () => { throw new Error("dilewati"); }, "dilewati");
   void jurnalBuku;

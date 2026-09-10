@@ -268,6 +268,16 @@ export type PermintaanAturUlang = Prisma.PermintaanAturUlangModel
  */
 export type MutasiBank = Prisma.MutasiBankModel
 /**
+ * Model Prive
+ * Prive: pengambilan uang pribadi pemilik dari kas/bank (Dr Prive 3-4000 / Cr Kas)
+ */
+export type Prive = Prisma.PriveModel
+/**
+ * Model PemetaanAkunTambahan
+ * Pemetaan akun tambahan buatan pengguna (mis. "prive" → 3-4000) untuk peran yang belum ada di PemetaanAkun
+ */
+export type PemetaanAkunTambahan = Prisma.PemetaanAkunTambahanModel
+/**
  * Model LogAktivitas
  * 
  */

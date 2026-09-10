@@ -3,7 +3,7 @@ import { KERANJANG_UMUR } from "@/lib/laporanRekanan";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
-const tgl = (d: Date | null) => (d ? d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "—");
+const tgl = (d: Date | null) => (d ? d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-");
 
 /** Tabel umur piutang/hutang: subtotal per rekanan + rincian faktur. */
 export default function TabelUmur({ laporan, labelRekanan, tautanFaktur }: { laporan: LaporanUmur; labelRekanan: string; tautanFaktur: string }) {

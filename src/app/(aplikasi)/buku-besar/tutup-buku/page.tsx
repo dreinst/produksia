@@ -37,13 +37,13 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
       <KepalaHalaman
         jejak={[{ label: "Buku Besar" }]}
         judul="Tutup Buku Tahunan"
-        subjudul="Menutup tahun memindahkan seluruh pendapatan & beban tahun itu ke Laba Ditahan lewat jurnal penutup (JU-TUTUP, 31 Desember) dan mengunci tahun tersebut dari transaksi baru."
+        subjudul="Menutup tahun memindahkan laba/rugi ke Laba Ditahan dan mengunci tahun itu."
         lencana={<span className="lencana lencana-slate">Tahun buku aktif {pengaturan.tahunBuku}</span>}
       />
 
       {!pemetaan?.labaDitahanId && (
         <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Pemetaan akun <strong>Laba Ditahan</strong> belum diatur — buka Pengaturan › Pemetaan Akun (atau terapkan Bagan Akun Standar) sebelum menutup buku.
+          Akun <strong>Laba Ditahan</strong> belum diatur. Buka Pengaturan, Pemetaan Akun.
         </div>
       )}
 
@@ -60,7 +60,7 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
                     <tr key={t} className={t === tahunDipilih ? "bg-blue-50/60" : undefined}>
                       <td><a href={`/buku-besar/tutup-buku?tahun=${t}`} className="font-semibold text-blue-600 hover:underline">{t}</a></td>
                       <td>{tutup ? <span className="lencana lencana-slate">Ditutup</span> : <span className="lencana lencana-emerald">Terbuka</span>}</td>
-                      <td className="text-right angka">{tutup ? rp(tutup.labaBersih) : "—"}</td>
+                      <td className="text-right angka">{tutup ? rp(tutup.labaBersih) : "-"}</td>
                     </tr>
                   );
                 })}
@@ -115,7 +115,7 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
                     <tr key={b.akunId}><td className="mono">{b.kode}</td><td>{b.nama}</td><td className="text-right angka">{b.saldo.lt(0) ? rp(b.saldo.neg()) : "-"}</td><td className="text-right angka">{b.saldo.gt(0) ? rp(b.saldo) : "-"}</td></tr>
                   ))}
                   {!ringkasan.labaBersih.isZero() && (
-                    <tr className="bg-slate-50/70 font-semibold"><td className="mono">{pemetaan?.labaDitahan?.kode ?? "—"}</td><td>{pemetaan?.labaDitahan?.nama ?? "Laba Ditahan"}</td><td className="text-right angka">{ringkasan.labaBersih.lt(0) ? rp(ringkasan.labaBersih.neg()) : "-"}</td><td className="text-right angka">{ringkasan.labaBersih.gt(0) ? rp(ringkasan.labaBersih) : "-"}</td></tr>
+                    <tr className="bg-slate-50/70 font-semibold"><td className="mono">{pemetaan?.labaDitahan?.kode ?? "-"}</td><td>{pemetaan?.labaDitahan?.nama ?? "Laba Ditahan"}</td><td className="text-right angka">{ringkasan.labaBersih.lt(0) ? rp(ringkasan.labaBersih.neg()) : "-"}</td><td className="text-right angka">{ringkasan.labaBersih.gt(0) ? rp(ringkasan.labaBersih) : "-"}</td></tr>
                   )}
                   {ringkasan.pendapatan.length + ringkasan.beban.length === 0 && (
                     <tr><td colSpan={4} className="kosong">Tidak ada pendapatan/beban pada tahun ini.</td></tr>
@@ -125,7 +125,7 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
             </div>
           </div>
           <p className="text-xs text-slate-500">
-            Setelah ditutup: Laba Rugi tahun itu tetap terbaca (jurnal penutup diabaikan), Neraca memuat labanya di akun Laba Ditahan, Neraca Saldo menampilkan saldo sebelum penutupan. Transaksi bertanggal tahun yang ditutup ditolak sampai tahun dibuka kembali.
+            Setelah ditutup, transaksi bertanggal tahun itu ditolak sampai tahun dibuka kembali.
           </p>
         </div>
       </div>

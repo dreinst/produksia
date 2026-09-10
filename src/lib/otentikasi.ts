@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createHash, randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { LABEL_PERAN, NAMA_COOKIE_SESI, SEMUA_HAK, hitungHak, labelHak, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import type { PeranPengguna } from "@/prisma-klien/client";
 
 export { hashKataSandi, verifikasiKataSandi, periksaKekuatanKataSandi, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/kataSandi";
 
@@ -67,7 +68,10 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
     // Skrip regresi (skrip/uji-*.ts) memanggil aksi server langsung tanpa HTTP.
     // Pintu ini hanya terbuka di luar produksi DAN bila skrip menyetel UJI_TANPA_SESI=1.
     if (process.env.NODE_ENV !== "production" && process.env.UJI_TANPA_SESI === "1") {
-      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, peran: "PEMILIK", hak: SEMUA_HAK };
+      // UJI_PERAN=KASIR dsb. meniru peran lain (hak bawaan ± penyesuaian di tabel HakAksesPeran)
+      const peran = (process.env.UJI_PERAN as PeranPengguna | undefined) ?? "PEMILIK";
+      const penyesuaian = peran === "PEMILIK" ? [] : await db.hakAksesPeran.findMany({ where: { peran }, select: { hak: true, boleh: true } });
+      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, peran, hak: peran === "PEMILIK" ? SEMUA_HAK : hitungHak(peran, penyesuaian) };
     }
     return null;
   }
@@ -115,7 +119,7 @@ export async function wajibMasukAksi(): Promise<PenggunaSesi> {
   return pengguna;
 }
 
-/** Melempar galat bila pengguna (sudah masuk) tidak punya hak — dipakai setelah wajibMasukAksi. */
+/** Melempar galat bila pengguna (sudah masuk) tidak punya hak, dipakai setelah wajibMasukAksi. */
 export function pastikanHak(pengguna: PenggunaSesi, hak: Hak) {
   if (!punyaHak(pengguna, hak)) throw new Error(`Peran ${LABEL_PERAN[pengguna.peran]} tidak punya hak "${labelHak(hak)}" untuk tindakan ini.`);
 }

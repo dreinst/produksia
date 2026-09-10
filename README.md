@@ -1,10 +1,12 @@
-# Accurate Copy
+# Produksia
 
-Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, dibangun mengikuti alur modul Accurate 5:
+Sistem informasi akuntansi untuk usaha event/wedding organizer: penjualan, pembelian, persediaan, kas/bank, buku besar, laporan, dan rekonsiliasi. Alur modulnya mengikuti kebiasaan software akuntansi pada umumnya:
 - **Penjualan**: Penawaran → Pesanan (+ **Uang Muka**/DP) → Pengiriman → Faktur → Penerimaan → Retur
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), **Tutup Buku tahunan** (jurnal penutup ke Laba Ditahan + kunci tahun), Kas Masuk/Keluar
-- **Laporan** (Admin/Pemilik/Superadmin): Neraca Saldo, **Laporan Piutang & Hutang** (umur per pelanggan/pemasok), Neraca, **Laba Rugi per event / per waktu** (mingguan, bulanan, tahunan; tabel 12 bulan), **Perubahan Modal** (Harta = Utang + Modal; setoran, laba, prive), Arus Kas (metode langsung), Pajak & SPT
+- **Laporan** (Admin/Pemilik/Superadmin): Neraca Saldo, **Laporan Piutang & Hutang** (umur per pelanggan/pemasok), Neraca, **Laba Rugi per event / per waktu** (mingguan, bulanan, tahunan; tabel 12 bulan), **Perubahan Modal** (Harta = Utang + Modal; setoran, laba, prive), **Laporan Prive** (per pemilik), Arus Kas (metode langsung), Pajak & SPT
+- **Prive** (Kas & Bank → Prive): pengambilan pribadi pemilik, jurnal PRV (Dr Prive / Cr Kas), akun prive bawaan dari **pemetaan akun tambahan** (`prive`)
+- **Harga jual, margin, dan nego**: Stok per Gudang menampilkan harga pokok, harga jual, dan margin (Rp dan %) per barang; di Penawaran/Pesanan harga di bawah harga jual hanya bisa diisi pemegang hak `harga.nego` (bawaan Kasir/Admin/Pemilik), dan di bawah **harga minimum** barang hanya Pemilik/Superadmin
 - **Rekonsiliasi**: **Rekonsiliasi Event (LPJ)** per proyek — pemasukan (proposal ter-acc/pesanan → LPJ faktur & TOP → kas masuk → laba/rugi) dan pengeluaran (pengadaan/pembelian/beban → nota → cash flow → neraca & L/R); **Rekonsiliasi Kas/Bank** dengan **impor mutasi rekening** (CSV/HTML), pencocokan otomatis & manual
 - **Proyek/Event sebagai dimensi transaksi**: penawaran, pesanan penjualan/pembelian, kas, dan jurnal manual bisa diberi event; semua jurnal turunannya bertanda event
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal, **Pelepasan aset** (dijual/dihapusbukukan dengan laba-rugi vs nilai buku)
@@ -77,7 +79,7 @@ Setiap **Proyek/Event** (Data Induk → Proyek: nilai kontrak, anggaran biaya, t
 - **Laba Rugi per event / per waktu** (Laporan → Laba Rugi): pilih event dan periode (pintasan minggu ini, bulan ini, bulan lalu, tahun buku) atau tampilan **per bulan** (12 kolom).
 - **Rekonsiliasi Event (LPJ)** (menu Rekonsiliasi): satu halaman per event mengikuti skema catatan pemilik — *Pemasukan:* proposal ter-acc/pesanan → LPJ (faktur, DP, termin/TOP, sisa piutang) → kas/bank masuk → laba/rugi; *Pengeluaran:* pengadaan (PSB) / pembelian (FB) / beban-biaya (KK, JU) → nota → cash flow tunai/transfer → sisa hutang (neraca) & beban (L/R); ditutup rekonsiliasi laba ↔ kas event dan anggaran vs realisasi.
 - **Impor Mutasi Rekening** (Rekonsiliasi → Impor Mutasi): unggah CSV/TSV/HTML mutasi rekening koran yang sudah rapi (tajuk Tanggal, Keterangan, Referensi, Debit/Kredit atau Jumlah bertanda, Saldo; pembatas, format angka, dan tanggal dideteksi otomatis; pemetaan kolom manual bila perlu), pratinjau, lalu simpan — baris yang sama tidak diimpor dua kali (sidik jari). **Debit/Kredit dibalik otomatis ke sudut buku**: di rekening koran uang masuk ada di kolom Kredit (sudut bank), sedangkan di buku uang masuk = Debit akun kas/bank; sistem menebak sudut pandang berkas dari pergerakan kolom Saldo (bisa dipaksa "rekening koran" atau "sudut buku") dan pratinjau menampilkan Dr/Cr akun kas/bank yang akan dicocokkan.
-- **Rekonsiliasi Kas/Bank**: per akun kas/bank & periode, mutasi rekening dicocokkan dengan baris jurnal (otomatis: nominal & arah sama, tanggal ±n hari; manual: pilih pasangan; lepas), baris buku tanpa mutasi bisa ditandai cocok; ringkasan saldo buku, "di buku belum di rekening", "di rekening belum di buku", saldo rekening seharusnya vs saldo rekening koran (selisih 0 = tuntas). Mutasi yang belum ada di buku punya tautan cepat ke Kas Masuk/Keluar.
+- **Rekonsiliasi Kas/Bank**: per akun kas/bank & periode, mutasi rekening dicocokkan dengan baris jurnal (otomatis: nominal & arah sama, tanggal ±n hari; manual: pilih pasangan; lepas). Mutasi yang nominal dan tanggalnya sama berstatus **Cocok** tanpa perlu apa-apa lagi; bila tanggalnya beda, statusnya **Perlu perhatian** dengan kotak centang untuk menandai sudah dicek orang. Ringkasan: saldo buku, "belum di rekening", "belum di buku", saldo rekening seharusnya vs saldo rekening koran (selisih 0 = tuntas). Mutasi yang belum ada di buku punya tautan cepat ke Kas Masuk/Keluar.
 
 ## Tutup buku & arus kas
 
@@ -151,11 +153,12 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
 - `src/lib/baganAkunStandar.ts` (data 111 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
 - `src/lib/akuntansi.ts` (semua aturan posting), `src/lib/sinkron.ts` (pencocokan buku besar ↔ dokumen/stok), `src/lib/aksi/persediaan.ts` + `persediaan/` (stok per gudang, penyesuaian)
-- `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
+- `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`; `src/lib/laporanPrive.ts` + `src/lib/aksi/prive.ts` (prive & laporannya)
+- `src/lib/aksi/pengaturan.ts` — pemetaan akun standar (`PemetaanAkun`) dan **pemetaan akun tambahan** (`PemetaanAkunTambahan`: nama peran bebas → akun, dibaca modul lewat `akunPemetaanTambahan(db, kunci)`); halaman `pengaturan/pemetaan-akun` (hak `pemetaan.tulis`, termasuk Admin)
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,lupa-kata-sandi,pelepasan-aset,proyek,rekonsiliasi,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
-- `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
+- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,lupa-kata-sandi,pelepasan-aset,proyek,rekonsiliasi,prive,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi (`npm run uji`; `UJI_PERAN=KASIR` dsb. meniru peran lain); `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 21 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 

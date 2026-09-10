@@ -67,7 +67,7 @@ export default function EditorBarisPenyesuaian({ daftarBarang, petaStok, gudangI
                       </select>
                     </td>
                     <td className="text-right angka text-slate-500">
-                      {r.barangId ? `${sebelum.toLocaleString("id-ID")} ${barang?.satuan ?? ""}` : "—"}
+                      {r.barangId ? `${sebelum.toLocaleString("id-ID")} ${barang?.satuan ?? ""}` : "-"}
                     </td>
                     <td>
                       <input type="number" min={0} step="0.01" className="isian isian-kecil" value={r.jumlahSesudah} onChange={(e) => ubah(i, { jumlahSesudah: Number(e.target.value) })} />

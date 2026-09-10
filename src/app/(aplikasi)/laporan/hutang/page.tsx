@@ -22,7 +22,7 @@ export default async function HalamanPemasokUmur({ searchParams }: { searchParam
       <KepalaHalaman
         jejak={[{ label: "Laporan" }]}
         judul="Laporan Hutang Usaha"
-        subjudul={`Per ${tanggal(periode.sampaiTeks)} — Sisa kewajiban ke pemasok per tanggal, dikelompokkan menurut umur terhadap jatuh tempo. Faktur pembelian dikurangi pembayaran dan retur s.d. tanggal laporan.`}
+        subjudul={`Per ${tanggal(periode.sampaiTeks)}. Sisa kewajiban ke tiap pemasok menurut umur jatuh tempo.`}
         lencana={<span className={`lencana ${lewatTempo > 0 ? "lencana-rose" : "lencana-emerald"}`}>{lewatTempo > 0 ? `Lewat tempo Rp ${lewatTempo.toLocaleString("id-ID")}` : "Tidak ada yang lewat tempo"}</span>}
       />
       <FilterPeriode sampai={periode.sampaiTeks} hanyaSampai tahunBuku={pengaturan.tahunBuku} />

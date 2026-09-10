@@ -16,11 +16,11 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
       <div className="w-full max-w-md space-y-6">
         <div className="flex items-center justify-center gap-3">
           <span className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-lg">
-            A
+            P
           </span>
           <span className="flex flex-col leading-none">
             <span className="font-heading font-bold text-xl text-slate-900 tracking-tight">
-              Accurate <span className="text-blue-600">Copy</span>
+              Produk<span className="text-blue-600">sia</span>
             </span>
             <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-400 uppercase mt-1">Sistem Akuntansi Terpadu</span>
           </span>

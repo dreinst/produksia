@@ -204,7 +204,7 @@ export default async function Beranda() {
               </span>
             </div>
             <h1 className="judul-halaman">Ringkasan Keuangan &amp; Operasional</h1>
-            <p className="subjudul-halaman">Accurate Copy — dokumen, mutasi stok, dan jurnal tercatat dalam satu transaksi.</p>
+            <p className="subjudul-halaman">Ringkasan keuangan dan operasional hari ini.</p>
           </div>
           {boleh("buku-besar.lihat") && (
             <Link href="/buku-besar/neraca-saldo" className="tombol tombol-lembut self-start md:self-center">
@@ -275,7 +275,7 @@ export default async function Beranda() {
         <div className="kepala-kartu">
           <div>
             <h2 className="judul-kartu">Alur Transaksi &amp; Dokumen Terintegrasi</h2>
-            <p className="kartu-subjudul">Siklus penjualan: Pesanan terbit → stok fisik berkurang di SJ → pengakuan piutang &amp; jurnal di Faktur/Penerimaan.</p>
+            <p className="kartu-subjudul">Alur penjualan: pesanan, surat jalan, faktur, penerimaan.</p>
           </div>
           <span className="text-xs text-slate-500 font-medium bg-slate-50 px-3 py-1 rounded-lg border border-slate-100 whitespace-nowrap">
             Stok terpotong di SJ • Jurnal di FJ &amp; TRM
@@ -330,7 +330,7 @@ export default async function Beranda() {
                       <td><NomorDokumen nomor={r.nomor} /></td>
                       <td className="text-slate-500 whitespace-nowrap">{r.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                       <td className="font-medium text-slate-900">{r.siapa}</td>
-                      <td className="text-right angka font-semibold text-slate-900">{r.jumlah === null ? "—" : r.jumlah.toLocaleString("id-ID")}</td>
+                      <td className="text-right angka font-semibold text-slate-900">{r.jumlah === null ? "-" : r.jumlah.toLocaleString("id-ID")}</td>
                       <td className="text-center"><LencanaStatus status={r.status} /></td>
                       <td className="text-center">
                         {r.aksi ? (
@@ -339,7 +339,7 @@ export default async function Beranda() {
                             <span className="text-[11px] font-semibold">{r.aksi.label}</span>
                           </Link>
                         ) : (
-                          <span className="text-slate-300">—</span>
+                          <span className="text-slate-300">-</span>
                         )}
                       </td>
                     </tr>
@@ -358,11 +358,11 @@ export default async function Beranda() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="judul-kartu">Buku Besar &amp; Neraca Saldo Cepat</h2>
-                <p className="kartu-subjudul">Verifikasi integritas debit–kredit dari seluruh ayat jurnal</p>
+                <p className="kartu-subjudul">Total debit dan kredit seluruh jurnal</p>
               </div>
               <span className={`lencana ${seimbang ? "lencana-emerald" : "lencana-rose"}`}>
                 <Ikon nama={seimbang ? "check_circle" : "error"} className="!text-[14px]" />
-                {seimbang ? "Seimbang (Σ Debit = Σ Kredit)" : "Tidak seimbang — periksa jurnal"}
+                {seimbang ? "Seimbang (Σ Debit = Σ Kredit)" : "Tidak seimbang. Periksa jurnal"}
               </span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
@@ -550,7 +550,7 @@ function Ringkasan({
             <span className={`font-medium angka whitespace-nowrap ${r.cls ?? "text-slate-800"}`}>{r.v}</span>
           </div>
         ))}
-        {isian.length === 0 && <div className="text-[11px] text-slate-400">—</div>}
+        {isian.length === 0 && <div className="text-[11px] text-slate-400">-</div>}
       </div>
     </div>
   );

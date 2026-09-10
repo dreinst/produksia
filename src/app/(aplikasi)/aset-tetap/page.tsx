@@ -78,7 +78,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
                       {a.pelepasan.jurnal && <span className="mono text-slate-400"> {a.pelepasan.jurnal.nomor}</span>}
                     </span>
                   ) : (
-                    "—"
+                    "-"
                   )}
                 </td>
                 <td className="text-right space-x-3 whitespace-nowrap">

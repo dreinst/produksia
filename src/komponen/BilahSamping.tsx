@@ -42,6 +42,7 @@ const operasional: Grup[] = [
     tautan: [
       { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", hak: "kas-masuk.lihat" },
       { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", hak: "kas-keluar.lihat" },
+      { href: "/kas-bank/prive", label: "Prive", kode: "PRV", hak: "prive.lihat" },
     ],
   },
   {
@@ -63,6 +64,7 @@ const operasional: Grup[] = [
       { href: "/buku-besar/neraca", label: "Neraca", hak: "buku-besar.lihat" },
       { href: "/buku-besar/laba-rugi", label: "Laba Rugi (per event / per waktu)", hak: "buku-besar.lihat" },
       { href: "/laporan/perubahan-modal", label: "Perubahan Modal", hak: "buku-besar.lihat" },
+      { href: "/laporan/prive", label: "Laporan Prive", hak: "buku-besar.lihat" },
       { href: "/buku-besar/arus-kas", label: "Arus Kas", hak: "buku-besar.lihat" },
       { href: "/buku-besar/pajak", label: "Pajak & SPT", hak: "buku-besar.lihat" },
     ],
@@ -73,7 +75,7 @@ const operasional: Grup[] = [
     tautan: [
       { href: "/rekonsiliasi", label: "Rekonsiliasi Event (LPJ)", kode: "LPJ", hak: "rekonsiliasi.lihat" },
       { href: "/rekonsiliasi/kas-bank", label: "Rekonsiliasi Kas/Bank", hak: "rekonsiliasi.lihat" },
-      { href: "/rekonsiliasi/mutasi", label: "Impor Mutasi Rekening", hak: "rekonsiliasi.tulis" },
+      { href: "/rekonsiliasi/mutasi", label: "Impor Mutasi Rekening", kode: "CSV", hak: "rekonsiliasi.tulis" },
     ],
   },
   {
@@ -114,7 +116,7 @@ const dataInduk: Grup = {
 
 const tautanPengaturan: (TautanNavigasi & { ikon: string })[] = [
   { href: "/pengaturan/perusahaan", label: "Perusahaan & Pajak", ikon: "domain", hak: "pengaturan.tulis" },
-  { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pengaturan.tulis" },
+  { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pemetaan.tulis" },
   { href: "/pengaturan/bagan-akun", label: "Bagan Akun Standar", ikon: "account_tree", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
   { href: "/pengaturan/hak-akses", label: "Hak Akses", ikon: "shield", hak: "hak-akses.kelola" },
@@ -311,11 +313,11 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
         <div className="h-16 px-5 flex items-center justify-between border-b border-slate-100/80 shrink-0">
           <Link href="/" onClick={saatTutup} className="flex items-center gap-2.5 min-w-0">
             <span className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-sm shrink-0">
-              A
+              P
             </span>
             <span className="flex flex-col leading-none min-w-0">
               <span className="font-heading font-bold text-[15px] text-slate-900 tracking-tight">
-                Accurate <span className="text-blue-600">Copy</span>
+                Produk<span className="text-blue-600">sia</span>
               </span>
               <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-400 uppercase mt-0.5">
                 Sistem Akuntansi Terpadu

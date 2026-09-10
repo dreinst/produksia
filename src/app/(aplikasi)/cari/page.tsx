@@ -94,7 +94,7 @@ export default async function HalamanCari({ searchParams }: { searchParams: Prom
                       <td>{d.jenis}</td>
                       <td className="text-slate-500">{d.tanggal?.toLocaleDateString("id-ID")}</td>
                       <td className="font-medium text-slate-900">{d.siapa}</td>
-                      <td>{d.status ? <LencanaStatus status={d.status} /> : "—"}</td>
+                      <td>{d.status ? <LencanaStatus status={d.status} /> : "-"}</td>
                     </tr>
                   ))}
                   {docs.length === 0 && (
