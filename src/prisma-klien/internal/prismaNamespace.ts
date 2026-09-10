@@ -441,6 +441,7 @@ export const ModelName = {
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
+  TutupBuku: 'TutupBuku',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -457,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3717,6 +3718,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TutupBuku: {
+      payload: Prisma.$TutupBukuPayload<ExtArgs>
+      fields: Prisma.TutupBukuFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TutupBukuFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TutupBukuFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>
+        }
+        findFirst: {
+          args: Prisma.TutupBukuFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TutupBukuFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>
+        }
+        findMany: {
+          args: Prisma.TutupBukuFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>[]
+        }
+        create: {
+          args: Prisma.TutupBukuCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>
+        }
+        createMany: {
+          args: Prisma.TutupBukuCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TutupBukuCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>[]
+        }
+        delete: {
+          args: Prisma.TutupBukuDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>
+        }
+        update: {
+          args: Prisma.TutupBukuUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>
+        }
+        deleteMany: {
+          args: Prisma.TutupBukuDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TutupBukuUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TutupBukuUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>[]
+        }
+        upsert: {
+          args: Prisma.TutupBukuUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TutupBukuPayload>
+        }
+        aggregate: {
+          args: Prisma.TutupBukuAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTutupBuku>
+        }
+        groupBy: {
+          args: Prisma.TutupBukuGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutupBukuGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TutupBukuCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TutupBukuCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAktivitas: {
       payload: Prisma.$LogAktivitasPayload<ExtArgs>
       fields: Prisma.LogAktivitasFieldRefs
@@ -4287,7 +4362,8 @@ export const PemetaanAkunScalarFieldEnum = {
   barangBelumDitagihId: 'barangBelumDitagihId',
   selisihPersediaanId: 'selisihPersediaanId',
   barangTerkirimId: 'barangTerkirimId',
-  uangMukaPelangganId: 'uangMukaPelangganId'
+  uangMukaPelangganId: 'uangMukaPelangganId',
+  labaDitahanId: 'labaDitahanId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]
@@ -4409,6 +4485,18 @@ export const PengaturanPerusahaanScalarFieldEnum = {
 } as const
 
 export type PengaturanPerusahaanScalarFieldEnum = (typeof PengaturanPerusahaanScalarFieldEnum)[keyof typeof PengaturanPerusahaanScalarFieldEnum]
+
+
+export const TutupBukuScalarFieldEnum = {
+  id: 'id',
+  tahun: 'tahun',
+  tanggal: 'tanggal',
+  labaBersih: 'labaBersih',
+  penggunaNama: 'penggunaNama',
+  jurnalId: 'jurnalId'
+} as const
+
+export type TutupBukuScalarFieldEnum = (typeof TutupBukuScalarFieldEnum)[keyof typeof TutupBukuScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {
@@ -4810,6 +4898,7 @@ export type GlobalOmitConfig = {
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanOmit
   barisPenyesuaianPersediaan?: Prisma.BarisPenyesuaianPersediaanOmit
   pengaturanPerusahaan?: Prisma.PengaturanPerusahaanOmit
+  tutupBuku?: Prisma.TutupBukuOmit
   logAktivitas?: Prisma.LogAktivitasOmit
 }
 

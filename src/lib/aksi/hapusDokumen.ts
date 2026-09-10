@@ -8,6 +8,7 @@ import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
 import { kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata } from "@/lib/stok";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma } from "@/prisma-klien/client";
+import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 
 /*
  * Menghapus dokumen transaksi = MEMBALIK seluruh efeknya dalam satu transaksi: stok fisik & harga pokok,
@@ -84,6 +85,8 @@ function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" 
 
 async function hapusJurnal(tx: Tx, jurnalId: string | null | undefined) {
   if (!jurnalId) return;
+  const jurnal = await tx.jurnal.findUnique({ where: { id: jurnalId }, select: { tanggal: true } });
+  if (jurnal) await pastikanTahunTerbuka(tx, jurnal.tanggal);
   await tx.barisJurnal.deleteMany({ where: { jurnalId } });
   await tx.jurnal.delete({ where: { id: jurnalId } });
 }
@@ -313,6 +316,7 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       }
       case "jurnal": {
         const d = await tx.jurnal.findUniqueOrThrow({ where: { id } });
+        if (d.sumber === "PENUTUP") throw new Error(`${d.nomor} adalah jurnal penutup tahun; buka kembali tahun bukunya di Buku Besar › Tutup Buku`);
         if (!["MANUAL", "KAS_MASUK", "KAS_KELUAR"].includes(d.sumber)) {
           throw new Error(`${d.nomor} adalah jurnal otomatis; hapus lewat dokumen sumbernya`);
         }

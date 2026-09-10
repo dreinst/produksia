@@ -14,6 +14,7 @@ const FIELDS = [
   { nama: "selisihPersediaanId", label: "Selisih Persediaan (akun Beban)", filterType: "BEBAN", wajib: false, petunjuk: "Beda harga retur pembelian vs harga pokok, opname stok" },
   { nama: "barangTerkirimId", label: "Barang Terkirim Belum Ditagih (akun Aset)", filterType: "ASET", wajib: false, petunjuk: "Didebit saat Surat Jalan, dikredit saat Faktur Penjualan mengakui HPP — wajib bila memakai alur SJ → FJ" },
   { nama: "uangMukaPelangganId", label: "Uang Muka Pelanggan (akun Kewajiban)", filterType: "KEWAJIBAN", wajib: false, petunjuk: "Dikredit saat DP pesanan diterima, didebit saat dipakai mengurangi Faktur Penjualan" },
+  { nama: "labaDitahanId", label: "Laba Ditahan (akun Modal)", filterType: "MODAL", wajib: false, petunjuk: "Tujuan jurnal penutup tahun: laba/rugi bersih tahun yang ditutup dipindahkan ke sini" },
 ] as const;
 
 export default async function HalamanPemetaanAkun() {

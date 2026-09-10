@@ -53,6 +53,8 @@ const operasional: Grup[] = [
       { href: "/buku-besar/neraca-saldo", label: "Neraca Saldo", hak: "buku-besar.lihat" },
       { href: "/buku-besar/laba-rugi", label: "Laba Rugi", hak: "buku-besar.lihat" },
       { href: "/buku-besar/neraca", label: "Neraca", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/arus-kas", label: "Arus Kas", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/tutup-buku", label: "Tutup Buku", kode: "TUTUP", hak: "buku-besar.lihat" },
     ],
   },
   {
@@ -350,6 +352,14 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
               <Link href={`/buku-besar/neraca?sampai=${akhirTahunBuku}`} onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
                 <Ikon nama="balance" className="!text-[16px] text-slate-400" /> Neraca per {akhirTahunBuku}
               </Link>
+              <Link href={`/buku-besar/arus-kas?dari=${tahunBuku}-01-01&sampai=${akhirTahunBuku}`} onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
+                <Ikon nama="payments" className="!text-[16px] text-slate-400" /> Arus Kas {tahunBuku}
+              </Link>
+              {bolehGantiTahun && (
+                <Link href={`/buku-besar/tutup-buku?tahun=${tahunBuku}`} onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
+                  <Ikon nama="lock" className="!text-[16px] text-slate-400" /> Tutup Buku {tahunBuku}
+                </Link>
+              )}
               {bolehGantiTahun && (
                 <Link href="/pengaturan/perusahaan" onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
                   <Ikon nama="settings" className="!text-[16px] text-slate-400" /> Perusahaan &amp; Pajak

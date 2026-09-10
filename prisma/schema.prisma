@@ -44,6 +44,7 @@ enum JenisAkun {
 
 enum SumberJurnal {
   MANUAL
+  PENUTUP
   KAS_MASUK
   KAS_KELUAR
   PENJUALAN
@@ -607,6 +608,7 @@ model Akun {
   pemetaanSelisihPersediaan  PemetaanAkun? @relation("PetaSelisihPersediaan")
   pemetaanBarangTerkirim     PemetaanAkun? @relation("PetaBarangTerkirim")
   pemetaanUangMuka           PemetaanAkun? @relation("PetaUangMuka")
+  pemetaanLabaDitahan        PemetaanAkun? @relation("PetaLabaDitahan")
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
@@ -648,6 +650,9 @@ model PemetaanAkun {
   /// Kewajiban: uang muka/DP pelanggan yang belum dipakai faktur
   uangMukaPelangganId String? @unique
   uangMukaPelanggan   Akun?   @relation("PetaUangMuka", fields: [uangMukaPelangganId], references: [id])
+  /// Ekuitas: tujuan jurnal penutup tahun (laba/rugi bersih dipindahkan ke sini)
+  labaDitahanId String? @unique
+  labaDitahan   Akun?   @relation("PetaLabaDitahan", fields: [labaDitahanId], references: [id])
 }
 
 model Jurnal {
@@ -666,6 +671,7 @@ model Jurnal {
   fakturPenjualan       FakturPenjualan?       @relation("JurnalFakturPenjualan")
   penerimaanPenjualan   PenerimaanPenjualan?   @relation("JurnalPenerimaanPenjualan")
   uangMukaPelanggan     UangMukaPelanggan?     @relation("JurnalUangMuka")
+  tutupBuku             TutupBuku?             @relation("JurnalTutupBuku")
   returPenjualan        ReturPenjualan?        @relation("JurnalReturPenjualan")
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
@@ -802,6 +808,17 @@ model PengaturanPerusahaan {
 }
 
 // ---------- Jejak audit ----------
+
+/// Penutupan tahun buku: pendapatan & beban tahun itu dipindahkan ke Laba Ditahan lewat jurnal JU-TUTUP
+model TutupBuku {
+  id           String   @id @default(cuid())
+  tahun        Int      @unique
+  tanggal      DateTime @default(now())
+  labaBersih   Decimal  @default(0) @db.Decimal(18, 2)
+  penggunaNama String
+  jurnalId     String?  @unique
+  jurnal       Jurnal?  @relation("JurnalTutupBuku", fields: [jurnalId], references: [id])
+}
 
 model LogAktivitas {
   id           String   @id @default(cuid())

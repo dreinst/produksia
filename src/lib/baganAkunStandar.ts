@@ -184,6 +184,7 @@ export const PEMETAAN_STANDAR = {
   selisihPersediaan: "5-1400",
   barangTerkirim: "1-1650",
   uangMukaPelanggan: "2-1200",
+  labaDitahan: "3-2000",
 } as const;
 
 /** Butir yang semula "pending" di catatan, beserta keputusan kurasinya (ditampilkan di halaman Bagan Akun). */

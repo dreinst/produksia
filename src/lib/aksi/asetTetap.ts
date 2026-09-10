@@ -9,6 +9,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
 import { catatJurnalPerolehanAset } from "@/lib/akuntansi";
+import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 
 export async function buatAsetTetap(dataFormulir: FormData) {
   await wajibHakAksi("aset-tetap.tulis");
@@ -108,6 +109,7 @@ export async function jalankanPenyusutanBulanan(dataFormulir: FormData) {
   await db.$transaction(async (tx) => {
     const nomor = await nomorDokumenBerikutnya(tx.jurnal, "JU-PNY");
     await pastikanAkunRinci(tx, daftarBaris.map((b) => b.akunId));
+    await pastikanTahunTerbuka(tx, new Date());
     const jurnal = await tx.jurnal.create({
       data: { nomor, keterangan: `Penyusutan aset periode ${teksPeriode}`, sumber: "PENYUSUTAN", baris: { create: daftarBaris } },
     });

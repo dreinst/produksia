@@ -28,6 +28,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Barang Diterima Belum Ditagih (dikredit saat Terima Barang, didebit saat Faktur Pembelian) | `2-1600` |
 | Barang Terkirim Belum Ditagih (didebit saat Surat Jalan, dikredit saat Faktur Penjualan mengakui HPP) | `1-1650` |
 | Uang Muka Pelanggan (dikredit saat DP pesanan diterima, didebit saat dipakai mengurangi Faktur Penjualan) | `2-1200` |
+| Laba Ditahan (tujuan jurnal penutup tahun: laba/rugi bersih tahun yang ditutup) | `3-2000` |
 | Beban pembelian jasa (baris JASA di Faktur Pembelian) | `5-1200` Biaya Langsung Event (bawaan; bisa per barang) |
 | Selisih persediaan (beda harga retur pembelian vs harga pokok, opname) | `5-1400` |
 | Akun Kas/Bank (Penerimaan, Pembayaran, Kas Masuk/Keluar, perolehan aset) | `1-1100` Kas, `1-1210` Bank (dan rekening lain yang ditandai kas/bank) |
