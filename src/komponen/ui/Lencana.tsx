@@ -40,6 +40,7 @@ const LABEL_SUMBER: Record<string, string> = {
   PERSEDIAAN: "Persediaan",
   ASET_TETAP: "Aset tetap",
   PENUTUP: "Penutup tahun",
+  PAJAK: "Pajak",
 };
 export function labelSumberJurnal(v: string) {
   return LABEL_SUMBER[v] ?? v;

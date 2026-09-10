@@ -93,11 +93,15 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
   const terminHari = Number(teks("terminHari") || "14");
   if (!Number.isInteger(terminHari) || terminHari < 0 || terminHari > 365) throw new Error("Termin jatuh tempo harus 0–365 hari");
   const tahunBuku = bacaTahunBuku(teks("tahunBuku"));
+  const pphFinalPersen = bacaUang(dataFormulir.get("pphFinalPersen") ?? "0.5", "Tarif PPh Final", { allowZero: true });
+  if (pphFinalPersen.gt(100)) throw new Error("Tarif PPh Final maksimal 100%");
   const akun = {
     akunPpnKeluaranId: teks("akunPpnKeluaranId") || null,
     akunPpnMasukanId: teks("akunPpnMasukanId") || null,
     akunPph23DimukaId: teks("akunPph23DimukaId") || null,
     akunPph23DipotongId: teks("akunPph23DipotongId") || null,
+    akunBebanPphFinalId: teks("akunBebanPphFinalId") || null,
+    akunHutangPphFinalId: teks("akunHutangPphFinalId") || null,
   };
   if (pkp && (!akun.akunPpnKeluaranId || !akun.akunPpnMasukanId)) {
     throw new Error("Status PKP membutuhkan akun PPN Keluaran dan PPN Masukan");
@@ -106,8 +110,8 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
 
   await db.pengaturanPerusahaan.upsert({
     where: { id: "default" },
-    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, tahunBuku, ...akun },
-    update: { nama, pkp, tarifPpnPersen, terminHari, tahunBuku, ...akun },
+    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, ...akun },
+    update: { nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, ...akun },
   });
   revalidatePath("/pengaturan/perusahaan");
   revalidatePath("/", "layout");

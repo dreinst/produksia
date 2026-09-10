@@ -8,7 +8,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
-- **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
+- **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, **PPh Final UMKM** bulanan dari omzet, ringkasan **Pajak & SPT** per masa (omzet, PPN kurang/lebih bayar, PPh 23, PPh Final), termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
 - **Tahun buku**: kartu perusahaan di sidebar membuka tahun buku (Superadmin/Pemilik/Admin) dan pintasan Laba Rugi/Neraca tahun itu; laporan & pintasan periode mengikutinya; mata uang tunggal Rupiah
 - **Hapus dokumen dengan pembalikan penuh** (Pemilik/Admin): stok, harga pokok, jurnal, dan progres/status dokumen induk dibalik dalam satu transaksi; turunannya harus dihapus dulu; semuanya tercatat di Log Aktivitas
 
@@ -51,6 +51,10 @@ Semua dokumen yang memengaruhi uang atau stok menjurnal otomatis lewat `src/lib/
 
 Dari daftar Pesanan Penjualan → **Uang Muka**: DP diterima ke kas/bank dan dicatat sebagai kewajiban *Uang Muka Pelanggan* (2-1200, jurnal JU-UM). Saat Faktur dibuat dari pesanan itu, komposer faktur mengisi otomatis DP yang dipakai (bisa dikurangi): piutang = total − DP, akun Uang Muka Pelanggan didebit, status faktur langsung Lunas bila DP menutup seluruhnya. DP dipakai urut tanggal (FIFO) lintas beberapa DP; sisa DP tetap kewajiban sampai dipakai faktur berikutnya. Menghapus faktur mengembalikan DP; DP yang sudah dipakai tidak bisa dihapus sebelum fakturnya. `periksaSinkron` menjaga saldo akun Uang Muka Pelanggan = Σ DP belum dipakai.
 
+## Pajak & SPT
+
+**Buku Besar → Pajak & SPT**: tabel per masa pajak (bulan) untuk tahun yang dipilih — omzet (DPP faktur penjualan − retur), PPN keluaran/masukan dan kurang/(lebih) bayar (PKP), PPh 23 yang dipotong klien dan yang kita potong, serta **PPh Final UMKM** = omzet × tarif (bawaan 0,5%, PP 55/2022). Tombol *Catat* per bulan membuat jurnal `JU-PPHF` (sumber `PAJAK`, hanya bisa dihapus dari halaman ini) Dr Beban PPh Final (5-9100) / Cr Hutang PPh Final (2-1320) bertanggal akhir bulan; catatan `PphFinalBulanan` menyimpan omzet & tarif saat itu dan bisa dihapus (pembalikan jurnal). Penyetoran ke DJP dicatat lewat Kas Keluar dengan akun lawan Hutang PPh Final.
+
 ## Tutup buku & arus kas
 
 **Buku Besar → Tutup Buku**: menutup tahun membuat jurnal JU-TUTUP bertanggal 31 Desember yang menolkan semua akun pendapatan & beban tahun itu ke *Laba Ditahan* (peran pemetaan `labaDitahan`, standar 3-2000), memajukan tahun buku aktif, dan mengunci tahun itu: jurnal baru (dokumen, kas, penyusutan) maupun penghapusan dokumen bertanggal tahun yang ditutup ditolak sampai tahun dibuka kembali (jurnal penutupnya dihapus). Laba Rugi mengabaikan jurnal penutup, Neraca memuat labanya di akun Laba Ditahan, Neraca Saldo menampilkan saldo sebelum penutupan.
@@ -83,7 +87,7 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 14 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 15 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -126,7 +130,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
@@ -144,7 +148,7 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
 - **Jurnal otomatis** untuk Faktur/Penerimaan/Pembayaran/Retur via `src/lib/akuntansi.ts` memakai pemetaan akun (Piutang, Persediaan, HPP, Pendapatan, Utang). Aturan: Faktur Penjualan → Dr Piutang/Cr Pendapatan + Dr HPP/Cr Persediaan; Penerimaan → Dr Kas-Bank/Cr Piutang; Retur Penjualan → kebalikannya; Faktur Pembelian → Dr Persediaan/Cr Utang; Pembayaran → Dr Utang/Cr Kas-Bank; Retur Pembelian → Dr Utang/Cr Persediaan.
 - **Aset Tetap: hanya garis lurus.** Perolehan aset dijurnal (Dr Aset / Cr Kas-Bank atau Hutang) bila akun pembayaran dipilih; belum ada pelepasan aset.
-- **Pajak**: PPN & PPh 23 dihitung dari dokumen (lihat bagian Pajak); PPh Final UMKM/badan dicatat manual.
+- **Pajak**: PPN, PPh 23, dan PPh Final UMKM dihitung dari dokumen; PPh badan (tarif umum), ambang omzet UMKM, dan e-Faktur/e-Bupot belum dihitung/terhubung otomatis.
 - **Tutup buku** hanya memindahkan laba ke Laba Ditahan; belum ada jurnal penyesuaian akhir tahun otomatis (akrual, prive ke modal).
 - **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Belum ada: lupa-kata-sandi via email (diatur ulang oleh Pemilik/Admin), 2FA, pembatasan percobaan login.
 - **Hak akses per modul**, bukan per dokumen/gudang. Peran Gudang bisa *melihat* semua daftar penjualan/pembelian (perlu untuk membuat SJ/TB).

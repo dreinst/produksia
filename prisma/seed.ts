@@ -12,6 +12,7 @@ import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatPe
 import { buatJurnalManual, buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { buatAsetTetap, jalankanPenyusutanBulanan } from "../src/lib/aksi/asetTetap";
 import { buatPenyesuaianPersediaan, buatPindahBarang } from "../src/lib/aksi/persediaan";
+import { catatPphFinal } from "../src/lib/aksi/pajak";
 
 /** Aksi server diakhiri redirect()/revalidatePath() yang melempar di luar Next — efek DB-nya sudah tersimpan. */
 async function jalankan(label: string, fn: () => Promise<void>) {
@@ -69,9 +70,9 @@ async function main() {
   await terapkanBaganAkunStandar(db);
   const akun = (kode: string) => db.akun.findUniqueOrThrow({ where: { kode } });
   // Identitas & pajak: usaha kecil non-PKP (faktur tanpa PPN), akun PPh 23 disiapkan agar potongan pajak klien/vendor bisa dicatat
-  const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang] = await Promise.all(["2-1330", "1-1800", "1-1900", "2-1320"].map(akun));
+  const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang, bebanPphFinal] = await Promise.all(["2-1330", "1-1800", "1-1900", "2-1320", "5-9100"].map(akun));
   await db.pengaturanPerusahaan.create({
-    data: { id: "default", nama: "D'Production Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id },
+    data: { id: "default", nama: "D'Production Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, pphFinalPersen: 0.5, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id, akunBebanPphFinalId: bebanPphFinal.id, akunHutangPphFinalId: pph23Hutang.id },
   });
   const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan, biayaEvent, pendapatanEvent, pendapatanProduksi] = await Promise.all(
     ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540", "5-1200", "4-1100", "4-2100"].map(akun),
@@ -215,6 +216,10 @@ async function main() {
     })),
   );
   await jalankan("JU-PNY periode 2026-08: Rp 150.000", () => jalankanPenyusutanBulanan(formulir({ periode: "2026-08" })));
+
+  console.log("=== Tahap 19: PPh Final UMKM 0,5% bulan berjalan dari omzet (jurnal JU-PPHF: Dr Beban PPh Final / Cr Hutang PPh Final) ===");
+  const periodeIni = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
+  await jalankan(`JU-PPHF periode ${periodeIni}: 0,5% × omzet Rp 3.311.000 = Rp 16.555`, () => catatPphFinal(formulir({ periode: periodeIni })));
 
   console.log("=== Selesai. Ringkasan & pemeriksaan sinkronisasi ===");
   const daftarStok = await db.stokBarang.findMany({ include: { barang: true } });
