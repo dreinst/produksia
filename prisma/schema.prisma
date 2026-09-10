@@ -27,6 +27,7 @@ enum JenisBarang {
 }
 
 enum PeranPengguna {
+  SUPERADMIN
   PEMILIK
   ADMIN
   KASIR
@@ -62,7 +63,9 @@ enum StatusAset {
 
 model Pengguna {
   id            String        @id @default(cuid())
-  email         String        @unique
+  /// Identitas masuk (huruf kecil, unik); email hanya kontak opsional
+  namaPengguna  String        @unique
+  email         String?       @unique
   nama          String
   kataSandiHash String
   peran         PeranPengguna @default(KASIR)

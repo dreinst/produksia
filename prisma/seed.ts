@@ -33,17 +33,22 @@ function formulir(isian: Record<string, string | number | object>): FormData {
 
 const rp = (n: number | string | { toString(): string }) => Number(n).toLocaleString("id-ID");
 
+/** Akun contoh: Superadmin dan dua Pemilik setara (tingkat tertinggi); peran lain sesuai dummy. Kata sandi = nama peran + 123. */
+export const AKUN_CONTOH = [
+  { namaPengguna: "superadmin", kataSandi: "superadmin123", nama: "Andrew Steine", peran: "SUPERADMIN" },
+  { namaPengguna: "owner", kataSandi: "owner123", nama: "Donny Donatus", peran: "PEMILIK" },
+  { namaPengguna: "owner2", kataSandi: "owner123", nama: "Nadia Yuliana", peran: "PEMILIK" },
+  { namaPengguna: "admin", kataSandi: "admin123", nama: "Bagus Santoso", peran: "ADMIN" },
+  { namaPengguna: "kasir", kataSandi: "kasir123", nama: "Sari Wulandari", peran: "KASIR" },
+  { namaPengguna: "gudang", kataSandi: "gudang123", nama: "Joko Prasetyo", peran: "GUDANG" },
+] as const;
+
 async function main() {
-  console.log("=== Pengguna (kata sandi semua: rahasia123) ===");
-  const kataSandiHash = await hashKataSandi("rahasia123");
-  await db.pengguna.createMany({
-    data: [
-      { email: "pemilik@contoh.id", nama: "Dewi Lestari", peran: "PEMILIK", kataSandiHash },
-      { email: "admin@contoh.id", nama: "Bagus Santoso", peran: "ADMIN", kataSandiHash },
-      { email: "kasir@contoh.id", nama: "Sari Wulandari", peran: "KASIR", kataSandiHash },
-      { email: "gudang@contoh.id", nama: "Joko Prasetyo", peran: "GUDANG", kataSandiHash },
-    ],
-  });
+  console.log("=== Pengguna (masuk dengan nama pengguna; kata sandi = nama peran + 123) ===");
+  for (const a of AKUN_CONTOH) {
+    await db.pengguna.create({ data: { namaPengguna: a.namaPengguna, nama: a.nama, peran: a.peran, kataSandiHash: await hashKataSandi(a.kataSandi) } });
+    console.log(`  -> ${a.namaPengguna.padEnd(10)} / ${a.kataSandi.padEnd(14)} ${a.nama} (${a.peran})`);
+  }
 
   console.log("=== Data induk (usaha Event/Wedding Organizer) ===");
   const dept = await db.departemen.create({ data: { nama: "Marketing & Event" } });
@@ -65,7 +70,7 @@ async function main() {
   // Identitas & pajak: usaha kecil non-PKP (faktur tanpa PPN), akun PPh 23 disiapkan agar potongan pajak klien/vendor bisa dicatat
   const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang] = await Promise.all(["2-1330", "1-1800", "1-1900", "2-1320"].map(akun));
   await db.pengaturanPerusahaan.create({
-    data: { id: "default", nama: "Cahaya Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id },
+    data: { id: "default", nama: "D'Production Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id },
   });
   const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan, biayaEvent, pendapatanEvent, pendapatanProduksi] = await Promise.all(
     ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540", "5-1200", "4-1100", "4-2100"].map(akun),

@@ -52,6 +52,7 @@ export const SEMUA_HAK: readonly Hak[] = [
 ];
 
 export const HAK_PERAN: Record<PeranPengguna, readonly Hak[]> = {
+  SUPERADMIN: SEMUA_HAK,
   PEMILIK: SEMUA_HAK,
   ADMIN: SEMUA_HAK,
   KASIR: [
@@ -70,9 +71,16 @@ export const HAK_PERAN: Record<PeranPengguna, readonly Hak[]> = {
   GUDANG: ["penjualan.lihat", "penjualan.kirim", "pembelian.lihat", "pembelian.terima", "data-induk.lihat", "data-induk.tulis", "persediaan.lihat", "persediaan.tulis"],
 };
 
-export const DAFTAR_PERAN: readonly PeranPengguna[] = ["PEMILIK", "ADMIN", "KASIR", "GUDANG"];
+export const DAFTAR_PERAN: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "GUDANG"];
+
+/** Tingkat tertinggi: Superadmin dan Pemilik setara — hanya mereka yang boleh menyentuh akun setingkat ini. */
+export const PERAN_TERTINGGI: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK"];
+export function peranTertinggi(peran: PeranPengguna): boolean {
+  return PERAN_TERTINGGI.includes(peran);
+}
 
 export const LABEL_PERAN: Record<PeranPengguna, string> = {
+  SUPERADMIN: "Superadmin",
   PEMILIK: "Pemilik",
   ADMIN: "Admin",
   KASIR: "Kasir",
@@ -80,8 +88,9 @@ export const LABEL_PERAN: Record<PeranPengguna, string> = {
 };
 
 export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
-  PEMILIK: "Akses penuh, termasuk menghapus dokumen dan mengelola akun pemilik lain.",
-  ADMIN: "Akses penuh ke semua modul termasuk menghapus dokumen; tidak bisa mengubah akun berperan Pemilik.",
+  SUPERADMIN: "Akses penuh, setara Pemilik: semua modul, hapus dokumen, dan kelola semua akun termasuk Superadmin/Pemilik lain.",
+  PEMILIK: "Akses penuh, setara Superadmin: semua modul, hapus dokumen, dan kelola semua akun termasuk Superadmin/Pemilik lain.",
+  ADMIN: "Akses penuh ke semua modul termasuk menghapus dokumen; tidak bisa menyentuh akun Superadmin/Pemilik.",
   KASIR: "Penjualan, pembelian, kas & bank, data induk; buku besar & aset hanya lihat.",
   GUDANG: "Surat jalan, terima barang, dan data induk barang/gudang; tanpa modul keuangan.",
 };
@@ -94,7 +103,8 @@ export function punyaHak(peran: PeranPengguna, hak: Hak): boolean {
 export type PenggunaSesi = {
   id: string;
   nama: string;
-  email: string;
+  namaPengguna: string;
+  email: string | null;
   peran: PeranPengguna;
 };
 

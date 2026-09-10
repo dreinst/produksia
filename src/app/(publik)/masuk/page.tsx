@@ -30,7 +30,7 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
             <div>
               <h1 className="judul-kartu">Pemasangan awal</h1>
               <p className="subjudul-kartu">
-                Basis data belum punya pengguna. Buat akun <strong>Pemilik</strong> pertama; akun lain bisa ditambah dari menu Pengguna.
+                Basis data belum punya pengguna. Buat akun <strong>Pemilik</strong> pertama; akun lain (termasuk Superadmin) bisa ditambah dari menu Pengguna.
               </p>
             </div>
             <div className="bidang">
@@ -38,8 +38,13 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
               <input id="nama" name="nama" required autoComplete="name" className="isian" />
             </div>
             <div className="bidang">
-              <label className="label" htmlFor="email">Email</label>
-              <input id="email" name="email" type="email" required autoComplete="username" className="isian" />
+              <label className="label" htmlFor="namaPengguna">Nama pengguna</label>
+              <input id="namaPengguna" name="namaPengguna" required autoComplete="username" autoCapitalize="none" spellCheck={false} className="isian" />
+              <span className="petunjuk">Dipakai untuk masuk; huruf kecil/angka/titik/strip, mis. <code>owner</code></span>
+            </div>
+            <div className="bidang">
+              <label className="label" htmlFor="email">Email (opsional)</label>
+              <input id="email" name="email" type="email" autoComplete="email" className="isian" />
             </div>
             <div className="bidang">
               <label className="label" htmlFor="kataSandi">Kata sandi</label>
@@ -59,12 +64,12 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
           <FormulirAksi aksi={masukFormulir} className="kartu space-y-4">
             <div>
               <h1 className="judul-kartu">Masuk</h1>
-              <p className="subjudul-kartu">Gunakan email dan kata sandi yang diberikan pemilik atau admin.</p>
+              <p className="subjudul-kartu">Gunakan nama pengguna dan kata sandi yang diberikan Superadmin, Pemilik, atau Admin.</p>
             </div>
             <input type="hidden" name="kembali" value={kembali ?? "/"} />
             <div className="bidang">
-              <label className="label" htmlFor="email">Email</label>
-              <input id="email" name="email" type="email" required autoComplete="username" autoFocus className="isian" />
+              <label className="label" htmlFor="namaPengguna">Nama pengguna</label>
+              <input id="namaPengguna" name="namaPengguna" required autoComplete="username" autoCapitalize="none" spellCheck={false} autoFocus className="isian" />
             </div>
             <div className="bidang">
               <label className="label" htmlFor="kataSandi">Kata sandi</label>
@@ -77,7 +82,7 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
           </FormulirAksi>
         )}
 
-        <p className="text-center text-xs text-slate-400">Lupa kata sandi? Minta Pemilik/Admin mengatur ulang lewat menu Pengguna.</p>
+        <p className="text-center text-xs text-slate-400">Lupa kata sandi? Minta Superadmin/Pemilik/Admin mengatur ulang lewat menu Pengguna.</p>
       </div>
     </div>
   );

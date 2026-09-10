@@ -67,7 +67,7 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
     // Skrip regresi (skrip/uji-*.ts) memanggil aksi server langsung tanpa HTTP.
     // Pintu ini hanya terbuka di luar produksi DAN bila skrip menyetel UJI_TANPA_SESI=1.
     if (process.env.NODE_ENV !== "production" && process.env.UJI_TANPA_SESI === "1") {
-      return { id: "skrip-uji", nama: "Skrip Uji", email: "uji@lokal", peran: "PEMILIK" };
+      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, peran: "PEMILIK" };
     }
     return null;
   }
@@ -75,11 +75,11 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
 
   const sesi = await db.sesi.findUnique({
     where: { tokenHash: hashToken(token) },
-    include: { pengguna: { select: { id: true, nama: true, email: true, peran: true, aktif: true } } },
+    include: { pengguna: { select: { id: true, nama: true, namaPengguna: true, email: true, peran: true, aktif: true } } },
   });
   if (!sesi || sesi.kedaluwarsa < new Date() || !sesi.pengguna.aktif) return null;
-  const { id, nama, email, peran } = sesi.pengguna;
-  return { id, nama, email, peran };
+  const { id, nama, namaPengguna, email, peran } = sesi.pengguna;
+  return { id, nama, namaPengguna, email, peran };
 });
 
 /** Untuk halaman: belum masuk → dialihkan ke /masuk. */

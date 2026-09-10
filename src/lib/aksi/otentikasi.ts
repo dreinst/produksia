@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
+import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
 import {
   buatSesi,
   hapusSemuaSesiPengguna,
@@ -24,16 +25,16 @@ function tujuanAman(nilai: string): string {
 }
 
 export async function masuk(dataFormulir: FormData) {
-  const email = bacaTeks(dataFormulir, "email").toLowerCase();
+  const namaPengguna = bacaTeks(dataFormulir, "namaPengguna").toLowerCase();
   const kataSandi = bacaTeks(dataFormulir, "kataSandi");
-  if (!email || !kataSandi) throw new Error("Email dan kata sandi wajib diisi");
+  if (!namaPengguna || !kataSandi) throw new Error("Nama pengguna dan kata sandi wajib diisi");
 
-  const pengguna = await db.pengguna.findUnique({ where: { email } });
-  // Tetap hitung hash walau email tidak ada, supaya lama respons tidak membocorkan keberadaan akun
+  const pengguna = await db.pengguna.findUnique({ where: { namaPengguna } });
+  // Tetap hitung hash walau akun tidak ada, supaya lama respons tidak membocorkan keberadaan akun
   const cocok = pengguna
     ? await verifikasiKataSandi(kataSandi, pengguna.kataSandiHash)
     : (await hashKataSandi(kataSandi), false);
-  if (!pengguna || !cocok) throw new Error("Email atau kata sandi salah");
+  if (!pengguna || !cocok) throw new Error("Nama pengguna atau kata sandi salah");
   if (!pengguna.aktif) throw new Error("Akun ini dinonaktifkan. Hubungi pemilik atau admin.");
 
   await buatSesi(pengguna.id);
@@ -54,17 +55,17 @@ export async function buatPemilikPertama(dataFormulir: FormData) {
   if ((await db.pengguna.count()) > 0) throw new Error("Akun pemilik sudah ada. Silakan masuk.");
 
   const nama = bacaTeks(dataFormulir, "nama");
-  const email = bacaTeks(dataFormulir, "email").toLowerCase();
+  const namaPengguna = bacaNamaPengguna(bacaTeks(dataFormulir, "namaPengguna"));
+  const email = bacaEmailOpsional(bacaTeks(dataFormulir, "email"));
   const kataSandi = bacaTeks(dataFormulir, "kataSandi");
   const ulangi = bacaTeks(dataFormulir, "ulangiKataSandi");
-  if (!nama || !email) throw new Error("Nama dan email wajib diisi");
-  if (!email.includes("@")) throw new Error("Format email tidak valid");
+  if (!nama) throw new Error("Nama wajib diisi");
   const galatKekuatan = periksaKekuatanKataSandi(kataSandi);
   if (galatKekuatan) throw new Error(galatKekuatan);
   if (kataSandi !== ulangi) throw new Error("Ulangi kata sandi tidak sama");
 
   const pengguna = await db.pengguna.create({
-    data: { nama, email, kataSandiHash: await hashKataSandi(kataSandi), peran: "PEMILIK" },
+    data: { nama, namaPengguna, email, kataSandiHash: await hashKataSandi(kataSandi), peran: "PEMILIK" },
   });
   await buatSesi(pengguna.id);
   redirect("/");

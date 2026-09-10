@@ -30,6 +30,7 @@ export type JenisBarang = (typeof JenisBarang)[keyof typeof JenisBarang]
 
 
 export const PeranPengguna = {
+  SUPERADMIN: 'SUPERADMIN',
   PEMILIK: 'PEMILIK',
   ADMIN: 'ADMIN',
   KASIR: 'KASIR',
