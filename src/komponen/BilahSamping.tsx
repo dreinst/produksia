@@ -48,6 +48,8 @@ const operasional: Grup[] = [
       { href: "/buku-besar/jurnal", label: "Jurnal Umum", kode: "JU", hak: "buku-besar.lihat" },
       { href: "/buku-besar/mutasi", label: "Buku Besar Mutasi", hak: "buku-besar.lihat" },
       { href: "/buku-besar/neraca-saldo", label: "Neraca Saldo", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/laba-rugi", label: "Laba Rugi", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/neraca", label: "Neraca", hak: "buku-besar.lihat" },
     ],
   },
   {
