@@ -25,7 +25,7 @@ function Langkah({ nomor, judul, keterangan, children }: { nomor: string; judul:
     <section className="kartu kartu-tabel">
       <div className="kepala-kartu">
         <div className="flex items-center gap-2">
-          <span className="w-7 h-7 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center shrink-0">{nomor}</span>
+          <span className="w-7 h-7 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center shrink-0">{nomor}</span>
           <div>
             <h2 className="judul-kartu">{judul}</h2>
             <p className="subjudul-kartu">{keterangan}</p>

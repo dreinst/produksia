@@ -14,7 +14,7 @@ export default async function HalamanProfil() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="kartu space-y-4">
           <div className="flex items-center gap-4">
-            <span className="w-14 h-14 rounded-full bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-lg">
+            <span className="w-14 h-14 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-lg">
               {inisialNama(pengguna.nama)}
             </span>
             <div className="min-w-0">

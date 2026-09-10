@@ -11,13 +11,14 @@ const materialSymbols = localFont({ src: "./fonts/material-symbols-outlined.woff
 
 export const metadata: Metadata = {
   title: "Produksia",
-  description: "Sistem penjualan, pembelian, persediaan & akuntansi internal",
+  applicationName: "Produksia",
+  description: "Sistem informasi akuntansi untuk event & wedding organizer",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f8fafc",
+  themeColor: "#0b2141",
 };
 
 /** Tata letak akar: hanya font & kanvas. Kerangka aplikasi (sidebar/topbar) ada di (aplikasi)/layout.tsx. */

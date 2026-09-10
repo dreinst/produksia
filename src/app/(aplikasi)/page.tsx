@@ -483,7 +483,7 @@ export default async function Beranda() {
             )}
           </div>
 
-          <div className="rounded-2xl bg-slate-900 text-slate-300 p-6 space-y-4">
+          <div className="rounded-2xl bg-navy-lembut text-slate-300 p-6 space-y-4">
             <div className="flex items-center gap-2.5 text-white">
               <Ikon nama="verified_user" className="!text-[22px] text-blue-400" />
               <h3 className="text-sm font-bold">Integritas &amp; Sinkronisasi</h3>

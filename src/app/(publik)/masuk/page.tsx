@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { penggunaSaatIni, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
 import { buatPemilikPertamaFormulir, masukFormulir } from "@/lib/aksi/otentikasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import Logo from "@/komponen/ui/Logo";
 import Ikon from "@/komponen/ui/Ikon";
 
 export default async function HalamanMasuk({ searchParams }: { searchParams: Promise<{ kembali?: string }> }) {
@@ -14,16 +15,9 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="animasi-masuk w-full max-w-md space-y-6">
-        <div className="flex items-center justify-center gap-3">
-          <span className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-lg">
-            P
-          </span>
-          <span className="flex flex-col leading-none">
-            <span className="font-heading font-bold text-xl text-slate-900 tracking-tight">
-              Produk<span className="text-blue-600">sia</span>
-            </span>
-            <span className="text-[10px] font-semibold tracking-[0.12em] text-slate-400 uppercase mt-1">Sistem Akuntansi Terpadu</span>
-          </span>
+        <div className="flex flex-col items-center gap-2">
+          <Logo tinggi={44} />
+          <span className="text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">Sistem Akuntansi Terpadu</span>
         </div>
 
         {pemasanganAwal ? (

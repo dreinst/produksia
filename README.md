@@ -120,6 +120,8 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 
 ## Desain (Precision Ledger)
 
+**Identitas merek Produksia**: navy `#0B2141` (utama; tombol utama, item menu aktif, fokus isian), navy terang `#17417A`, oranye `#F86E18` (aksen tindakan, `.tombol-aksen`). Token ada di `src/app/globals.css` (`--color-navy`, `--color-oranye`, dst., dipakai sebagai kelas Tailwind `bg-navy`, `text-oranye`). Logo: lettermark "P" dengan aksen diagonal oranye + wordmark Poppins Bold (OFL) yang sudah dijadikan path. Berkas di `public/logo/` (`produksia-logo.svg`, `-gelap`, `-putih`, `-mono`, `-lettermark`, `-lettermark-putih`, `-ikon-aplikasi`, PNG 192/512), favicon `src/app/icon.svg` (navy di tab terang, putih di tab gelap) + `favicon.ico`, `apple-icon.png`, manifest `src/app/manifest.ts`. Di aplikasi dipakai lewat komponen `src/komponen/ui/Logo.tsx` (`<Logo tinggi={..} varian="terang|gelap" />`, `<Lettermark />`).
+
 Gerak halus (`src/app/globals.css`, bagian *Gerak*): halaman dan kartu muncul dengan fade-up bertahap (`.animasi-masuk`), tombol/kartu/isian punya transisi hover & tekan, kerangka pemuatan berkilau (`.kerlip`, `src/app/(aplikasi)/loading.tsx`). Semua dimatikan otomatis bila sistem pengguna menyetel *kurangi gerakan* (`prefers-reduced-motion`).
 
 UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_portfolio.zip` di folder induk — tidak ikut repo). Aturan praktisnya:
