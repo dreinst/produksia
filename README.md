@@ -7,7 +7,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
 - **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
-- **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
+- **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
 - **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
 - **Tahun buku**: kartu perusahaan di sidebar membuka tahun buku (Superadmin/Pemilik/Admin) dan pintasan Laba Rugi/Neraca tahun itu; laporan & pintasan periode mengikutinya; mata uang tunggal Rupiah
 - **Hapus dokumen dengan pembalikan penuh** (Pemilik/Admin): stok, harga pokok, jurnal, dan progres/status dokumen induk dibalik dalam satu transaksi; turunannya harus dihapus dulu; semuanya tercatat di Log Aktivitas
@@ -77,7 +77,7 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 12 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 13 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -120,7 +120,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,uang-muka,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `skrip/uji-{sinkron,uang-muka,pindah-barang,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.

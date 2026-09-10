@@ -8,7 +8,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { D, uang, type Desimal } from "@/lib/uang";
-import { perbaruiHargaRata } from "@/lib/stok";
+import { kurangiStok, perbaruiHargaRata, tambahStok } from "@/lib/stok";
 import { catatJurnalPenyesuaianPersediaan } from "@/lib/akuntansi";
 
 type BarisPenyesuaian = { barangId: string; jumlahSesudah: Desimal; hargaSatuan: Desimal | null };
@@ -104,4 +104,70 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
 
 export async function buatPenyesuaianPersediaanFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => buatPenyesuaianPersediaan(dataFormulir));
+}
+
+// ---------- Pindah Barang antar gudang ----------
+
+type BarisPindah = { barangId: string; jumlah: Desimal };
+
+function bacaBarisPindah(raw: FormDataEntryValue | null): BarisPindah[] {
+  if (typeof raw !== "string" || !raw) throw new Error("Minimal 1 baris barang wajib diisi");
+  let hasil: unknown;
+  try {
+    hasil = JSON.parse(raw);
+  } catch {
+    throw new Error("Format baris tidak valid");
+  }
+  if (!Array.isArray(hasil)) throw new Error("Minimal 1 baris barang wajib diisi");
+  const daftar = (hasil as { barangId?: string; jumlah?: string | number }[])
+    .filter((b) => b.barangId)
+    .map((b) => ({ barangId: String(b.barangId), jumlah: uang(b.jumlah) }))
+    .filter((b) => !b.jumlah.isZero());
+  if (daftar.length === 0) throw new Error("Minimal 1 baris barang dengan jumlah > 0 wajib diisi");
+  if (daftar.some((b) => b.jumlah.isNegative())) throw new Error("Jumlah pindah tidak boleh negatif");
+  const ganda = daftar.map((b) => b.barangId).filter((id, i, arr) => arr.indexOf(id) !== i);
+  if (ganda.length) throw new Error("Satu barang hanya boleh muncul sekali per pindah barang");
+  return daftar;
+}
+
+/**
+ * Pindah barang antar gudang: stok fisik berkurang di gudang asal dan bertambah di gudang tujuan.
+ * Nilai persediaan tidak berubah (harga pokok rata-rata per barang berlaku di semua gudang), jadi tanpa jurnal.
+ */
+export async function buatPindahBarang(dataFormulir: FormData) {
+  await wajibHakAksi("persediaan.tulis");
+  const gudangAsalId = String(dataFormulir.get("gudangAsalId") ?? "");
+  const gudangTujuanId = String(dataFormulir.get("gudangTujuanId") ?? "");
+  const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();
+  if (!gudangAsalId) throw new Error("Gudang asal wajib dipilih");
+  if (!gudangTujuanId) throw new Error("Gudang tujuan wajib dipilih");
+  if (gudangAsalId === gudangTujuanId) throw new Error("Gudang asal dan tujuan harus berbeda");
+  const daftarBaris = bacaBarisPindah(dataFormulir.get("baris"));
+  const jumlahGudang = await db.gudang.count({ where: { id: { in: [gudangAsalId, gudangTujuanId] } } });
+  if (jumlahGudang !== 2) throw new Error("Gudang tidak ditemukan");
+
+  const nomor = await nomorDokumenBerikutnya(db.pindahBarang, "PB");
+
+  await db.$transaction(async (tx) => {
+    const daftarBarang = await tx.barang.findMany({ where: { id: { in: daftarBaris.map((b) => b.barangId) } }, select: { id: true, kode: true, nama: true, jenis: true } });
+    const petaBarang = new Map(daftarBarang.map((b) => [b.id, b]));
+    for (const b of daftarBaris) {
+      const barang = petaBarang.get(b.barangId);
+      if (!barang) throw new Error("Barang tidak ditemukan");
+      if (barang.jenis !== "BARANG") throw new Error(`${barang.kode} - ${barang.nama} adalah JASA, tidak punya stok`);
+      await kurangiStok(tx, b.barangId, gudangAsalId, b.jumlah, `${barang.kode} - ${barang.nama}`);
+      await tambahStok(tx, b.barangId, gudangTujuanId, b.jumlah);
+    }
+    await tx.pindahBarang.create({
+      data: { nomor, gudangAsalId, gudangTujuanId, keterangan: keterangan || null, baris: { create: daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.jumlah })) } },
+    });
+  });
+
+  revalidatePath("/persediaan");
+  revalidatePath("/persediaan/pindah");
+  redirect("/persediaan/pindah");
+}
+
+export async function buatPindahBarangFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => buatPindahBarang(dataFormulir));
 }

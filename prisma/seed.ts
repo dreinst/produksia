@@ -11,7 +11,7 @@ import { buatPenawaran, konversiPenawaranKePesanan, buatPengiriman, buatFaktur, 
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatPembayaranPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
 import { buatJurnalManual, buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { buatAsetTetap, jalankanPenyusutanBulanan } from "../src/lib/aksi/asetTetap";
-import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
+import { buatPenyesuaianPersediaan, buatPindahBarang } from "../src/lib/aksi/persediaan";
 
 /** Aksi server diakhiri redirect()/revalidatePath() yang melempar di luar Next — efek DB-nya sudah tersimpan. */
 async function jalankan(label: string, fn: () => Promise<void>) {
@@ -60,6 +60,7 @@ async function main() {
     data: { kode: "SUP-001", nama: "CV Sinar Dekorasi", alamat: "Jl. Pahlawan No. 5, Bekasi", telepon: "021-4449876" },
   });
   const gudang = await db.gudang.create({ data: { kode: "WH-01", nama: "Gudang Peralatan", alamat: "Jl. Raya Bekasi KM 20" } });
+  const gudangVenue = await db.gudang.create({ data: { kode: "WH-02", nama: "Gudang Venue", alamat: "Gedung Serbaguna Cikarang" } });
   const kelompokMerch = await db.kelompokBarang.create({ data: { nama: "Merchandise & Produksi" } });
   const kelompokJasa = await db.kelompokBarang.create({ data: { nama: "Jasa Event" } });
   await db.proyek.create({ data: { kode: "PRJ-001", nama: "Wedding Andi & Sari", pelangganId: pelanggan.id, status: "BERJALAN" } });
@@ -194,6 +195,11 @@ async function main() {
   );
   await jalankan("BYR-…-0002: pelunasan Rp 555.000 tunai → LUNAS", () =>
     buatPembayaranPembelian(formulir({ fakturId: fakturBeli.id, akunId: kas.id, jumlah: 555000, metodeBayar: "TUNAI" })),
+  );
+
+  console.log("=== Tahap 15b: Pindah Barang 20 goodie bag ke Gudang Venue (stok berpindah, tanpa jurnal) ===");
+  await jalankan("PB-…-0001: 20 goodie bag WH-01 → WH-02", () =>
+    buatPindahBarang(formulir({ gudangAsalId: gudang.id, gudangTujuanId: gudangVenue.id, keterangan: "Perlengkapan untuk event di venue", baris: [{ barangId: goodieBag.id, jumlah: 20 }] })),
   );
 
   console.log("=== Tahap 16: Kas Keluar - bayar sewa kantor ===");

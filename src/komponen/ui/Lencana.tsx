@@ -65,6 +65,7 @@ const GAYA_DOKUMEN: Record<string, string> = {
   KK: "bg-rose-50 text-rose-700",
   AT: "bg-amber-50 text-amber-700",
   UM: "bg-emerald-50 text-emerald-700",
+  PB: "bg-blue-50 text-blue-700",
 };
 
 /** Nomor dokumen: lencana prefix berwarna + nomor monospace, mis. [FJ] FJ-2026-0001 */

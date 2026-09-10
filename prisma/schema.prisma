@@ -160,6 +160,8 @@ model Gudang {
   penerimaanBarang PenerimaanBarang[]
   returPembelian   ReturPembelian[]
   penyesuaian      PenyesuaianPersediaan[]
+  pindahAsal       PindahBarang[]          @relation("GudangAsalPindah")
+  pindahTujuan     PindahBarang[]          @relation("GudangTujuanPindah")
 }
 
 model KelompokBarang {
@@ -206,6 +208,7 @@ model Barang {
   akunBebanId      String?
   akunBeban        Akun? @relation("AkunBebanBarang", fields: [akunBebanId], references: [id])
   barisPenyesuaian BarisPenyesuaianPersediaan[]
+  barisPindah      BarisPindahBarang[]
 }
 
 model StokBarang {
@@ -722,6 +725,28 @@ model PenyusutanAset {
 
 // ---------- Persediaan: penyesuaian stok (saldo awal, opname, koreksi) ----------
 
+/// Pindah barang antar gudang: stok fisik berpindah, nilai persediaan tetap (tanpa jurnal)
+model PindahBarang {
+  id             String   @id @default(cuid())
+  nomor          String   @unique
+  tanggal        DateTime @default(now())
+  gudangAsalId   String
+  gudangAsal     Gudang   @relation("GudangAsalPindah", fields: [gudangAsalId], references: [id])
+  gudangTujuanId String
+  gudangTujuan   Gudang   @relation("GudangTujuanPindah", fields: [gudangTujuanId], references: [id])
+  keterangan     String?
+  dibuatPada     DateTime @default(now())
+
+  baris BarisPindahBarang[]
+}
+model BarisPindahBarang {
+  id       String       @id @default(cuid())
+  pindahId String
+  pindah   PindahBarang @relation(fields: [pindahId], references: [id])
+  barangId String
+  barang   Barang       @relation(fields: [barangId], references: [id])
+  jumlah   Decimal      @db.Decimal(18, 2)
+}
 model PenyesuaianPersediaan {
   id          String   @id @default(cuid())
   nomor       String   @unique
