@@ -248,6 +248,11 @@ export type TutupBuku = Prisma.TutupBukuModel
  */
 export type PphFinalBulanan = Prisma.PphFinalBulananModel
 /**
+ * Model HakAksesPeran
+ * Penyesuaian hak akses per peran (Pengaturan › Hak Akses); bawaan ada di src/lib/hakAkses.ts
+ */
+export type HakAksesPeran = Prisma.HakAksesPeranModel
+/**
  * Model LogAktivitas
  * 
  */

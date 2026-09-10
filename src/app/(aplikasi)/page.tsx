@@ -21,7 +21,7 @@ type Terbaru = {
 
 export default async function Beranda() {
   const pengguna = await wajibMasuk();
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const now = new Date();
   const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);
   const labelPeriode = now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
@@ -134,20 +134,20 @@ export default async function Beranda() {
   const terbaru: Terbaru[] = [
     ...fakturTerbaru.map((d) => ({
       nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.total), status: d.status,
-      aksi: d.status !== "LUNAS" && boleh("penjualan.tulis") ? { label: "Terima bayar", href: `/penjualan/penerimaan/baru?fakturId=${d.id}`, ikon: "payments" } : undefined,
+      aksi: d.status !== "LUNAS" && boleh("penerimaan.buat") ? { label: "Terima bayar", href: `/penjualan/penerimaan/baru?fakturId=${d.id}`, ikon: "payments" } : undefined,
     })),
     ...pesananTerbaru.map((d) => {
       const terkirimSemua = d.baris.every((l) => Number(l.jumlahTerkirim) >= Number(l.jumlah));
       return {
         nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.total), status: d.status,
-        aksi: !terkirimSemua && boleh("penjualan.kirim") ? { label: "Buat SJ", href: `/penjualan/pengiriman/baru?pesananId=${d.id}`, ikon: "local_shipping" } : undefined,
+        aksi: !terkirimSemua && boleh("pengiriman.buat") ? { label: "Buat SJ", href: `/penjualan/pengiriman/baru?pesananId=${d.id}`, ikon: "local_shipping" } : undefined,
       };
     }),
     ...penerimaanTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.jumlah), status: "TERCATAT" })),
     ...pengirimanTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pesanan.pelanggan.nama, jumlah: null, status: d.status })),
     ...fakturBeliTerbaru.map((d) => ({
       nomor: d.nomor, tanggal: d.tanggal, siapa: d.pemasok.nama, jumlah: Number(d.total), status: d.status,
-      aksi: d.status !== "LUNAS" && boleh("pembelian.tulis") ? { label: "Bayar", href: `/pembelian/pembayaran/baru?fakturId=${d.id}`, ikon: "payments" } : undefined,
+      aksi: d.status !== "LUNAS" && boleh("pembayaran.buat") ? { label: "Bayar", href: `/pembelian/pembayaran/baru?fakturId=${d.id}`, ikon: "payments" } : undefined,
     })),
     ...pembayaranTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pemasok.nama, jumlah: Number(d.jumlah), status: "TERCATAT" })),
   ]
@@ -155,11 +155,11 @@ export default async function Beranda() {
     .slice(0, 8);
 
   const aksiCepat = [
-    { href: "/penjualan/pesanan", label: "+ Faktur (FJ)", ikon: "receipt_long", warna: "text-blue-600", hak: "penjualan.tulis" as Hak },
-    { href: "/penjualan/pesanan", label: "+ Pengiriman (SJ)", ikon: "local_shipping", warna: "text-slate-600", hak: "penjualan.kirim" as Hak },
-    { href: "/penjualan/faktur", label: "+ Penerimaan (TRM)", ikon: "payments", warna: "text-emerald-600", hak: "penjualan.tulis" as Hak },
-    { href: "/kas-bank/masuk", label: "Kas Masuk / Keluar", ikon: "swap_horiz", warna: "text-indigo-600", hak: "kas-bank.tulis" as Hak },
-    { href: "/buku-besar/jurnal/baru", label: "+ Jurnal Umum (JU)", ikon: "edit_note", warna: "text-slate-600", hak: "buku-besar.tulis" as Hak },
+    { href: "/penjualan/pesanan", label: "+ Faktur (FJ)", ikon: "receipt_long", warna: "text-blue-600", hak: "faktur.buat" as Hak },
+    { href: "/penjualan/pesanan", label: "+ Pengiriman (SJ)", ikon: "local_shipping", warna: "text-slate-600", hak: "pengiriman.buat" as Hak },
+    { href: "/penjualan/faktur", label: "+ Penerimaan (TRM)", ikon: "payments", warna: "text-emerald-600", hak: "penerimaan.buat" as Hak },
+    { href: "/kas-bank/masuk", label: "Kas Masuk / Keluar", ikon: "swap_horiz", warna: "text-indigo-600", hak: "kas-masuk.buat" as Hak },
+    { href: "/buku-besar/jurnal/baru", label: "+ Jurnal Umum (JU)", ikon: "edit_note", warna: "text-slate-600", hak: "jurnal.buat" as Hak },
   ].filter((q) => boleh(q.hak));
 
   const tahapan = [
@@ -436,7 +436,7 @@ export default async function Beranda() {
               })}
               {peringatan.length === 0 && <p className="text-sm text-slate-400">Belum ada barang dengan stok minimum.</p>}
             </div>
-            {boleh("pembelian.tulis") && (
+            {boleh("pesanan-pembelian.buat") && (
               <Link href="/pembelian/pesanan/baru" className="tombol tombol-utama w-full">
                 <Ikon nama="shopping_cart" className="!text-[18px]" /> + Buat Pesanan Pembelian (PSB)
               </Link>
@@ -465,10 +465,10 @@ export default async function Beranda() {
                 <span className="font-medium text-slate-800">{daftarAset.length} Unit</span>
               </div>
             </div>
-            {boleh("aset-tetap.lihat") && (
+            {boleh("aset.lihat") && (
               <Link href="/aset-tetap/penyusutan" className={`tombol w-full ${penyusutanTercatat ? "tombol-garis" : "tombol-aksen"}`}>
                 <Ikon nama={penyusutanTercatat ? "check_circle" : "play_arrow"} className="!text-[18px]" />
-                {penyusutanTercatat || !boleh("aset-tetap.tulis") ? "Lihat Riwayat Penyusutan" : "Catat Jurnal Penyusutan (JU-PNY)"}
+                {penyusutanTercatat || !boleh("penyusutan.buat") ? "Lihat Riwayat Penyusutan" : "Catat Jurnal Penyusutan (JU-PNY)"}
               </Link>
             )}
           </div>

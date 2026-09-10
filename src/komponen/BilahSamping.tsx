@@ -16,39 +16,39 @@ const operasional: Grup[] = [
     judul: "Penjualan",
     ikon: "point_of_sale",
     tautan: [
-      { href: "/penjualan/penawaran", label: "Penawaran", kode: "PNW", hak: "penjualan.lihat" },
-      { href: "/penjualan/pesanan", label: "Pesanan", kode: "PSJ", hak: "penjualan.lihat" },
-      { href: "/penjualan/uang-muka", label: "Uang Muka", kode: "UM", hak: "penjualan.lihat" },
-      { href: "/penjualan/pengiriman", label: "Pengiriman", kode: "SJ", hak: "penjualan.lihat" },
-      { href: "/penjualan/faktur", label: "Faktur Penjualan", kode: "FJ", hak: "penjualan.lihat" },
-      { href: "/penjualan/penerimaan", label: "Penerimaan", kode: "TRM", hak: "penjualan.lihat" },
-      { href: "/penjualan/retur", label: "Retur Penjualan", kode: "RJ", hak: "penjualan.lihat" },
+      { href: "/penjualan/penawaran", label: "Penawaran", kode: "PNW", hak: "penawaran.lihat" },
+      { href: "/penjualan/pesanan", label: "Pesanan", kode: "PSJ", hak: "pesanan.lihat" },
+      { href: "/penjualan/uang-muka", label: "Uang Muka", kode: "UM", hak: "uang-muka.lihat" },
+      { href: "/penjualan/pengiriman", label: "Pengiriman", kode: "SJ", hak: "pengiriman.lihat" },
+      { href: "/penjualan/faktur", label: "Faktur Penjualan", kode: "FJ", hak: "faktur.lihat" },
+      { href: "/penjualan/penerimaan", label: "Penerimaan", kode: "TRM", hak: "penerimaan.lihat" },
+      { href: "/penjualan/retur", label: "Retur Penjualan", kode: "RJ", hak: "retur-penjualan.lihat" },
     ],
   },
   {
     judul: "Pembelian",
     ikon: "shopping_bag",
     tautan: [
-      { href: "/pembelian/pesanan", label: "Pesanan", kode: "PSB", hak: "pembelian.lihat" },
-      { href: "/pembelian/penerimaan-barang", label: "Penerimaan Barang", kode: "TB", hak: "pembelian.lihat" },
-      { href: "/pembelian/faktur", label: "Faktur Pembelian", kode: "FB", hak: "pembelian.lihat" },
-      { href: "/pembelian/pembayaran", label: "Pembayaran", kode: "BYR", hak: "pembelian.lihat" },
-      { href: "/pembelian/retur", label: "Retur Pembelian", kode: "RB", hak: "pembelian.lihat" },
+      { href: "/pembelian/pesanan", label: "Pesanan", kode: "PSB", hak: "pesanan-pembelian.lihat" },
+      { href: "/pembelian/penerimaan-barang", label: "Penerimaan Barang", kode: "TB", hak: "penerimaan-barang.lihat" },
+      { href: "/pembelian/faktur", label: "Faktur Pembelian", kode: "FB", hak: "faktur-pembelian.lihat" },
+      { href: "/pembelian/pembayaran", label: "Pembayaran", kode: "BYR", hak: "pembayaran.lihat" },
+      { href: "/pembelian/retur", label: "Retur Pembelian", kode: "RB", hak: "retur-pembelian.lihat" },
     ],
   },
   {
     judul: "Kas & Bank",
     ikon: "account_balance",
     tautan: [
-      { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", hak: "kas-bank.lihat" },
-      { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", hak: "kas-bank.lihat" },
+      { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", hak: "kas-masuk.lihat" },
+      { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", hak: "kas-keluar.lihat" },
     ],
   },
   {
     judul: "Buku Besar",
     ikon: "menu_book",
     tautan: [
-      { href: "/buku-besar/jurnal", label: "Jurnal Umum", kode: "JU", hak: "buku-besar.lihat" },
+      { href: "/buku-besar/jurnal", label: "Jurnal Umum", kode: "JU", hak: "jurnal.lihat" },
       { href: "/buku-besar/mutasi", label: "Buku Besar Mutasi", hak: "buku-besar.lihat" },
       { href: "/buku-besar/neraca-saldo", label: "Neraca Saldo", hak: "buku-besar.lihat" },
       { href: "/buku-besar/laba-rugi", label: "Laba Rugi", hak: "buku-besar.lihat" },
@@ -62,8 +62,8 @@ const operasional: Grup[] = [
     judul: "Aset Tetap",
     ikon: "domain",
     tautan: [
-      { href: "/aset-tetap", label: "Daftar Aset", hak: "aset-tetap.lihat" },
-      { href: "/aset-tetap/penyusutan", label: "Hitung Penyusutan", kode: "PNY", hak: "aset-tetap.lihat" },
+      { href: "/aset-tetap", label: "Daftar Aset", hak: "aset.lihat" },
+      { href: "/aset-tetap/penyusutan", label: "Hitung Penyusutan", kode: "PNY", hak: "penyusutan.lihat" },
     ],
   },
 ];
@@ -73,8 +73,8 @@ const persediaan: Grup = {
   ikon: "inventory_2",
   tautan: [
     { href: "/persediaan", label: "Stok per Gudang", hak: "persediaan.lihat" },
-    { href: "/persediaan/penyesuaian", label: "Penyesuaian Stok", kode: "PS", hak: "persediaan.lihat" },
-    { href: "/persediaan/pindah", label: "Pindah Barang", kode: "PB", hak: "persediaan.lihat" },
+    { href: "/persediaan/penyesuaian", label: "Penyesuaian Stok", kode: "PS", hak: "penyesuaian.lihat" },
+    { href: "/persediaan/pindah", label: "Pindah Barang", kode: "PB", hak: "pindah-barang.lihat" },
   ],
 };
 
@@ -99,13 +99,14 @@ const tautanPengaturan: (TautanNavigasi & { ikon: string })[] = [
   { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pengaturan.tulis" },
   { href: "/pengaturan/bagan-akun", label: "Bagan Akun Standar", ikon: "account_tree", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
-  { href: "/pengaturan/log-aktivitas", label: "Log Aktivitas", ikon: "history", hak: "dokumen.hapus" },
+  { href: "/pengaturan/hak-akses", label: "Hak Akses", ikon: "shield", hak: "hak-akses.kelola" },
+  { href: "/pengaturan/log-aktivitas", label: "Log Aktivitas", ikon: "history", hak: "log-aktivitas.lihat" },
 ];
 
 /** Menyaring grup & tautan sesuai hak peran; grup tanpa tautan tersisa disembunyikan. */
 function saringGrup(daftar: Grup[], pengguna: PenggunaSesi): Grup[] {
   return daftar
-    .map((g) => ({ ...g, tautan: g.tautan.filter((l) => punyaHak(pengguna.peran, l.hak)) }))
+    .map((g) => ({ ...g, tautan: g.tautan.filter((l) => punyaHak(pengguna, l.hak)) }))
     .filter((g) => g.tautan.length > 0);
 }
 
@@ -195,7 +196,7 @@ function TautanTunggal({ href, label, ikon, pathname, saatNavigasi }: { href: st
 function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: PenggunaSesi; pathname: string; saatNavigasi: () => void }) {
   const grupOperasional = saringGrup(operasional, pengguna);
   const grupDataInduk = saringGrup([persediaan, dataInduk], pengguna);
-  const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna.peran, l.hak));
+  const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna, l.hak));
   const semuaGrup = [...grupOperasional, ...grupDataInduk];
 
   const judulAktif = semuaGrup.find((g) => g.tautan.some((l) => aktifDi(pathname, l.href)))?.judul ?? null;
@@ -276,7 +277,7 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
   const hariIni = new Date();
   const tahunBerjalan = tahunBuku === hariIni.getFullYear();
   const akhirTahunBuku = tahunBerjalan ? `${tahunBuku}-${String(hariIni.getMonth() + 1).padStart(2, "0")}-${String(hariIni.getDate()).padStart(2, "0")}` : `${tahunBuku}-12-31`;
-  const bolehGantiTahun = punyaHak(pengguna.peran, "pengaturan.tulis");
+  const bolehGantiTahun = punyaHak(pengguna, "pengaturan.tulis");
 
   return (
     <>

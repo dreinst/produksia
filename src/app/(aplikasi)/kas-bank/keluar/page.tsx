@@ -10,8 +10,9 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatKasKeluarFormulir } from "@/lib/aksi/jurnal";
 
 export default async function HalamanKasKeluar({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("kas-bank.lihat");
-  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
+  const pengguna = await wajibHak("kas-keluar.lihat");
+  const bolehHapus = punyaHak(pengguna, "kas-keluar.hapus");
+  const bolehBuat = punyaHak(pengguna, "kas-keluar.buat");
   const param = await bacaParamDaftar(searchParams);
   const where = { sumber: "KAS_KELUAR" as const, ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}) };
   const [daftarAkunKas, daftarAkun, total, daftarJurnal] = await Promise.all([
@@ -25,6 +26,7 @@ export default async function HalamanKasKeluar({ searchParams }: { searchParams:
     <div className="space-y-8">
       <h1 className="judul-halaman">Kas Keluar</h1>
 
+      {bolehBuat && (
       <FormulirAksi aksi={buatKasKeluarFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div className="bidang">
           <label className="label" htmlFor="akunKasId">Akun Kas/Bank Sumber *</label>
@@ -66,6 +68,7 @@ export default async function HalamanKasKeluar({ searchParams }: { searchParams:
           </button>
         </div>
       </FormulirAksi>
+      )}
 
       <div className="kartu kartu-tabel">
         <KontrolDaftar param={param} total={total} placeholder="Cari nomor KK / keterangan…" />

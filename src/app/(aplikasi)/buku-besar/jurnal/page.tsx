@@ -8,9 +8,8 @@ import { labelSumberJurnal } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
 
 export default async function HalamanJurnal({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("buku-besar.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("jurnal.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
   const [total, daftarJurnal] = await Promise.all([
@@ -22,7 +21,7 @@ export default async function HalamanJurnal({ searchParams }: { searchParams: Pr
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="judul-halaman">Jurnal Umum</h1>
-        {boleh("buku-besar.tulis") && (
+        {boleh("jurnal.buat") && (
           <Link href="/buku-besar/jurnal/baru" className="tombol tombol-utama">
           + Jurnal Baru
         </Link>
@@ -45,7 +44,7 @@ export default async function HalamanJurnal({ searchParams }: { searchParams: Pr
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="font-medium">{total.toLocaleString("id-ID")}</div>
-                  {["MANUAL", "KAS_MASUK", "KAS_KELUAR"].includes(e.sumber) && <TombolHapusDokumen jenis="jurnal" id={e.id} nomor={e.nomor} boleh={bolehHapus} />}
+                  {["MANUAL", "KAS_MASUK", "KAS_KELUAR"].includes(e.sumber) && <TombolHapusDokumen jenis="jurnal" id={e.id} nomor={e.nomor} boleh={boleh(e.sumber === "KAS_MASUK" ? "kas-masuk.hapus" : e.sumber === "KAS_KELUAR" ? "kas-keluar.hapus" : "jurnal.hapus")} />}
                 </div>
               </div>
               {e.keterangan && <div className="text-sm text-slate-500 mb-2">{e.keterangan}</div>}

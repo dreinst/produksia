@@ -22,7 +22,7 @@ export default async function HalamanDataInduk({
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
   // Bagan akun ikut aturan buku besar; entitas lain cukup hak data induk
-  const bolehTulis = punyaHak(pengguna.peran, entitas === "akun" ? "buku-besar.tulis" : "data-induk.tulis");
+  const bolehTulis = punyaHak(pengguna, entitas === "akun" ? "buku-besar.tulis" : "data-induk.tulis");
 
   const param = await bacaParamDaftar(searchParams);
   const where = wherePencarian(config, param.q);

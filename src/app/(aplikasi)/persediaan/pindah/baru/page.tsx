@@ -6,7 +6,7 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import EditorBarisPindah from "@/komponen/persediaan/EditorBarisPindah";
 
 export default async function HalamanPindahBarangBaru() {
-  await wajibHak("persediaan.tulis");
+  await wajibHak("pindah-barang.buat");
   const [daftarGudang, daftarBarang, daftarStok] = await Promise.all([
     db.gudang.findMany({ orderBy: { kode: "asc" } }),
     db.barang.findMany({ where: { jenis: "BARANG" }, orderBy: { kode: "asc" } }),

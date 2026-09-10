@@ -4,7 +4,7 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatAsetTetapFormulir } from "@/lib/aksi/asetTetap";
 
 export default async function HalamanAsetTetapBaru() {
-  await wajibHak("aset-tetap.tulis");
+  await wajibHak("aset.buat");
   const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
   const hariIni = new Date().toISOString().slice(0, 10);
 

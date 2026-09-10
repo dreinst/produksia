@@ -14,8 +14,8 @@ const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Jul
 
 export default async function HalamanPajak({ searchParams }: { searchParams: Promise<{ tahun?: string }> }) {
   const pengguna = await wajibHak("buku-besar.lihat");
-  const bolehTulis = punyaHak(pengguna.peran, "buku-besar.tulis");
-  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
+  const bolehTulis = punyaHak(pengguna, "pph-final.buat");
+  const bolehHapus = punyaHak(pengguna, "pph-final.hapus");
   const { tahun: tahunParam } = await searchParams;
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const tahun = Number(tahunParam) >= 2000 && Number(tahunParam) <= 2100 ? Number(tahunParam) : pengaturan.tahunBuku;

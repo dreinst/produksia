@@ -8,22 +8,22 @@ import { keluar } from "@/lib/aksi/otentikasi";
 import { inisialNama, LABEL_PERAN, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
 const tautanTransaksiBaru: { href: string; label: string; kode: string; ikon: string; hak: Hak }[] = [
-  { href: "/penjualan/penawaran/baru", label: "Penawaran Penjualan", kode: "PNW", ikon: "request_quote", hak: "penjualan.tulis" },
-  { href: "/penjualan/pesanan/baru", label: "Pesanan Penjualan", kode: "PSJ", ikon: "receipt_long", hak: "penjualan.tulis" },
-  { href: "/penjualan/pengiriman", label: "Surat Jalan", kode: "SJ", ikon: "local_shipping", hak: "penjualan.kirim" },
-  { href: "/pembelian/pesanan/baru", label: "Pesanan Pembelian", kode: "PSB", ikon: "shopping_bag", hak: "pembelian.tulis" },
-  { href: "/pembelian/penerimaan-barang", label: "Terima Barang", kode: "TB", ikon: "inventory", hak: "pembelian.terima" },
-  { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", ikon: "south_west", hak: "kas-bank.tulis" },
-  { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", ikon: "north_east", hak: "kas-bank.tulis" },
-  { href: "/buku-besar/jurnal/baru", label: "Jurnal Umum", kode: "JU", ikon: "edit_note", hak: "buku-besar.tulis" },
-  { href: "/aset-tetap/baru", label: "Aset Tetap", kode: "AT", ikon: "domain", hak: "aset-tetap.tulis" },
-  { href: "/persediaan/penyesuaian/baru", label: "Penyesuaian Stok", kode: "PS", ikon: "inventory_2", hak: "persediaan.tulis" },
+  { href: "/penjualan/penawaran/baru", label: "Penawaran Penjualan", kode: "PNW", ikon: "request_quote", hak: "penawaran.buat" },
+  { href: "/penjualan/pesanan/baru", label: "Pesanan Penjualan", kode: "PSJ", ikon: "receipt_long", hak: "pesanan.buat" },
+  { href: "/penjualan/pengiriman", label: "Surat Jalan", kode: "SJ", ikon: "local_shipping", hak: "pengiriman.buat" },
+  { href: "/pembelian/pesanan/baru", label: "Pesanan Pembelian", kode: "PSB", ikon: "shopping_bag", hak: "pesanan-pembelian.buat" },
+  { href: "/pembelian/penerimaan-barang", label: "Terima Barang", kode: "TB", ikon: "inventory", hak: "penerimaan-barang.buat" },
+  { href: "/kas-bank/masuk", label: "Kas Masuk", kode: "KM", ikon: "south_west", hak: "kas-masuk.buat" },
+  { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", ikon: "north_east", hak: "kas-keluar.buat" },
+  { href: "/buku-besar/jurnal/baru", label: "Jurnal Umum", kode: "JU", ikon: "edit_note", hak: "jurnal.buat" },
+  { href: "/aset-tetap/baru", label: "Aset Tetap", kode: "AT", ikon: "domain", hak: "aset.buat" },
+  { href: "/persediaan/penyesuaian/baru", label: "Penyesuaian Stok", kode: "PS", ikon: "inventory_2", hak: "penyesuaian.buat" },
 ];
 
 export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSesi; saatMenu: () => void }) {
   const router = useRouter();
   const refCari = useRef<HTMLInputElement>(null);
-  const tautanBoleh = tautanTransaksiBaru.filter((l) => punyaHak(pengguna.peran, l.hak));
+  const tautanBoleh = tautanTransaksiBaru.filter((l) => punyaHak(pengguna, l.hak));
 
   // ⌘K / Ctrl+K memfokuskan kotak pencarian
   useEffect(() => {

@@ -8,9 +8,9 @@ import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
 
 export default async function HalamanPesananPembelian({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("pembelian.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("pesanan-pembelian.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const bolehHapus = boleh("pesanan-pembelian.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarPesanan] = await Promise.all([
@@ -22,7 +22,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="judul-halaman">Pesanan Pembelian</h1>
-        {boleh("pembelian.tulis") && (
+        {boleh("pesanan-pembelian.buat") && (
           <Link href="/pembelian/pesanan/baru" className="tombol tombol-utama">
           + Pesanan Baru
         </Link>
@@ -55,7 +55,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
                 <td className="text-right angka">{Number(o.total).toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={o.status} /></td>
                 <td className="space-x-3 whitespace-nowrap">
-                  {!diterimaSemua && boleh("pembelian.terima") && (
+                  {!diterimaSemua && boleh("penerimaan-barang.buat") && (
                     <Link
                       href={`/pembelian/penerimaan-barang/baru?pesananId=${o.id}`}
                       className="tombol-tautan"
@@ -63,7 +63,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
                       Terima Barang
                     </Link>
                   )}
-                  {!difakturSemua && boleh("pembelian.tulis") && (
+                  {!difakturSemua && boleh("faktur-pembelian.buat") && (
                     <Link
                       href={`/pembelian/faktur/baru?pesananId=${o.id}`}
                       className="tombol-tautan"

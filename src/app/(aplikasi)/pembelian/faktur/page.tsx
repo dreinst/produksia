@@ -8,9 +8,9 @@ import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
 
 export default async function HalamanFakturPembelian({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("pembelian.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("faktur-pembelian.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const bolehHapus = boleh("faktur-pembelian.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarFaktur] = await Promise.all([
@@ -52,7 +52,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
                 <td className="text-right angka">{paid.toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={inv.status} /></td>
                 <td className="space-x-3 whitespace-nowrap">
-                  {inv.status !== "LUNAS" && boleh("pembelian.tulis") && (
+                  {inv.status !== "LUNAS" && boleh("pembayaran.buat") && (
                     <Link
                       href={`/pembelian/pembayaran/baru?fakturId=${inv.id}`}
                       className="tombol-tautan"
@@ -60,7 +60,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
                       Bayar
                     </Link>
                   )}
-                  {boleh("pembelian.tulis") && (
+                  {boleh("retur-pembelian.buat") && (
                     <Link
                     href={`/pembelian/retur/baru?fakturId=${inv.id}`}
                     className="tombol-tautan"

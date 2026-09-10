@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { wajibMasuk } from "@/lib/otentikasi";
-import { KETERANGAN_PERAN, LABEL_PERAN } from "@/lib/hakAkses";
+import { KETERANGAN_PERAN, LABEL_PERAN, labelHak } from "@/lib/hakAkses";
 import Ikon from "@/komponen/ui/Ikon";
 
 export default async function HalamanTanpaAkses({ searchParams }: { searchParams: Promise<{ hak?: string }> }) {
@@ -25,11 +25,11 @@ export default async function HalamanTanpaAkses({ searchParams }: { searchParams
         <div className="text-slate-500">{KETERANGAN_PERAN[pengguna.peran]}</div>
         {hak && (
           <div className="text-slate-500">
-            Hak yang dibutuhkan: <code className="mono">{hak}</code>
+            Hak yang dibutuhkan: <strong>{labelHak(hak)}</strong> <code className="mono text-xs text-slate-400">{hak}</code>
           </div>
         )}
       </div>
-      <p className="text-sm text-slate-600">Kalau kamu memang perlu mengakses bagian ini, minta Pemilik atau Admin mengubah peran akunmu.</p>
+      <p className="text-sm text-slate-600">Kalau kamu memang perlu mengakses bagian ini, minta Superadmin/Pemilik mengubah peran akunmu atau membuka haknya di Pengaturan › Hak Akses.</p>
       <Link href="/" className="tombol tombol-utama">
         Ke Beranda
       </Link>

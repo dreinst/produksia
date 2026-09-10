@@ -443,6 +443,7 @@ export const ModelName = {
   PengaturanPerusahaan: 'PengaturanPerusahaan',
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
+  HakAksesPeran: 'HakAksesPeran',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -459,7 +460,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3867,6 +3868,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    HakAksesPeran: {
+      payload: Prisma.$HakAksesPeranPayload<ExtArgs>
+      fields: Prisma.HakAksesPeranFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HakAksesPeranFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HakAksesPeranFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>
+        }
+        findFirst: {
+          args: Prisma.HakAksesPeranFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HakAksesPeranFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>
+        }
+        findMany: {
+          args: Prisma.HakAksesPeranFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>[]
+        }
+        create: {
+          args: Prisma.HakAksesPeranCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>
+        }
+        createMany: {
+          args: Prisma.HakAksesPeranCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HakAksesPeranCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>[]
+        }
+        delete: {
+          args: Prisma.HakAksesPeranDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>
+        }
+        update: {
+          args: Prisma.HakAksesPeranUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>
+        }
+        deleteMany: {
+          args: Prisma.HakAksesPeranDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HakAksesPeranUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HakAksesPeranUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>[]
+        }
+        upsert: {
+          args: Prisma.HakAksesPeranUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HakAksesPeranPayload>
+        }
+        aggregate: {
+          args: Prisma.HakAksesPeranAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHakAksesPeran>
+        }
+        groupBy: {
+          args: Prisma.HakAksesPeranGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HakAksesPeranGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HakAksesPeranCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HakAksesPeranCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAktivitas: {
       payload: Prisma.$LogAktivitasPayload<ExtArgs>
       fields: Prisma.LogAktivitasFieldRefs
@@ -4590,6 +4665,15 @@ export const PphFinalBulananScalarFieldEnum = {
 export type PphFinalBulananScalarFieldEnum = (typeof PphFinalBulananScalarFieldEnum)[keyof typeof PphFinalBulananScalarFieldEnum]
 
 
+export const HakAksesPeranScalarFieldEnum = {
+  peran: 'peran',
+  hak: 'hak',
+  boleh: 'boleh'
+} as const
+
+export type HakAksesPeranScalarFieldEnum = (typeof HakAksesPeranScalarFieldEnum)[keyof typeof HakAksesPeranScalarFieldEnum]
+
+
 export const LogAktivitasScalarFieldEnum = {
   id: 'id',
   waktu: 'waktu',
@@ -4991,6 +5075,7 @@ export type GlobalOmitConfig = {
   pengaturanPerusahaan?: Prisma.PengaturanPerusahaanOmit
   tutupBuku?: Prisma.TutupBukuOmit
   pphFinalBulanan?: Prisma.PphFinalBulananOmit
+  hakAksesPeran?: Prisma.HakAksesPeranOmit
   logAktivitas?: Prisma.LogAktivitasOmit
 }
 

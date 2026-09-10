@@ -6,9 +6,9 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import { jalankanPenyusutanBulananFormulir } from "@/lib/aksi/asetTetap";
 
 export default async function HalamanPenyusutan() {
-  const pengguna = await wajibHak("aset-tetap.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("penyusutan.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const bolehHapus = boleh("penyusutan.hapus");
   const daftarPenyusutan = await db.penyusutanAset.findMany({
     include: { aset: true },
     orderBy: { periode: "desc" },
@@ -20,7 +20,7 @@ export default async function HalamanPenyusutan() {
     <div className="space-y-8">
       <h1 className="judul-halaman">Penyusutan Aset Tetap</h1>
 
-      {boleh("aset-tetap.tulis") && (
+      {boleh("penyusutan.buat") && (
         <>
       <FormulirAksi aksi={jalankanPenyusutanBulananFormulir} className="kartu flex items-end gap-3 max-w-md">
         <div className="bidang flex-1">

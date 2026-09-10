@@ -7,8 +7,8 @@ import { db } from "@/lib/db";
 import { NomorDokumen, labelMetodeBayar } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPenerimaanPenjualan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("penjualan.lihat");
-  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
+  const pengguna = await wajibHak("penerimaan.lihat");
+  const bolehHapus = punyaHak(pengguna, "penerimaan.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { faktur: { nomor: cocokTeks(param.q) } }, { pelanggan: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarPenerimaan] = await Promise.all([

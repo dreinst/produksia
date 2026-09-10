@@ -10,7 +10,7 @@ export default async function HalamanPenerimaanPenjualanBaru({
 }: {
   searchParams: Promise<{ fakturId?: string }>;
 }) {
-  await wajibHak("penjualan.tulis");
+  await wajibHak("penerimaan.buat");
   const { fakturId } = await searchParams;
 
   const [faktur, daftarAkun, pengaturan] = await Promise.all([

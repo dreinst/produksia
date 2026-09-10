@@ -10,9 +10,9 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import { konversiPenawaranKePesananFormulir } from "@/lib/aksi/penjualan";
 
 export default async function HalamanPenawaran({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const pengguna = await wajibHak("penjualan.lihat");
-  const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
-  const bolehHapus = boleh("dokumen.hapus");
+  const pengguna = await wajibHak("penawaran.lihat");
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const bolehHapus = boleh("penawaran.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pelanggan: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarPenawaran] = await Promise.all([
@@ -24,7 +24,7 @@ export default async function HalamanPenawaran({ searchParams }: { searchParams:
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="judul-halaman">Penawaran Penjualan</h1>
-        {boleh("penjualan.tulis") && (
+        {boleh("penawaran.buat") && (
           <Link href="/penjualan/penawaran/baru" className="tombol tombol-utama">
           + Penawaran Baru
         </Link>
@@ -54,7 +54,7 @@ export default async function HalamanPenawaran({ searchParams }: { searchParams:
               <td className="text-right angka">{Number(q.total).toLocaleString("id-ID")}</td>
               <td><LencanaStatus status={q.status} /></td>
               <td className="space-x-3 whitespace-nowrap">
-                {q.status === "DRAF" && boleh("penjualan.tulis") && (
+                {q.status === "DRAF" && boleh("pesanan.buat") && (
                   <FormulirAksi
                     aksi={konversiPenawaranKePesananFormulir.bind(null, q.id)}
                     pesanKonfirmasi={`Konversi penawaran ${q.nomor} menjadi Pesanan Penjualan?`}

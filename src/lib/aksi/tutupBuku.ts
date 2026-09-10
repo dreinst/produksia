@@ -31,7 +31,7 @@ async function segarkan() {
  * bertanggal 31 Desember tahun itu. Bila tahun yang ditutup adalah tahun buku aktif, tahun buku maju satu tahun.
  */
 export async function tutupTahun(dataFormulir: FormData) {
-  const pengguna = await wajibHakAksi("buku-besar.tulis");
+  const pengguna = await wajibHakAksi("tutup-buku.buat");
   const tahun = bacaTahun(dataFormulir);
   if (tahun > new Date().getFullYear()) throw new Error(`Tahun ${tahun} belum berjalan; tutup buku hanya untuk tahun yang sudah/sedang berjalan`);
   if (await db.tutupBuku.findUnique({ where: { tahun } })) throw new Error(`Tahun buku ${tahun} sudah ditutup`);
@@ -77,7 +77,7 @@ export async function tutupTahun(dataFormulir: FormData) {
 
 /** Membuka kembali tahun yang sudah ditutup: jurnal penutupnya dihapus, transaksi tahun itu bisa dicatat lagi. */
 export async function bukaKembaliTahun(dataFormulir: FormData) {
-  const pengguna = await wajibHakAksi("buku-besar.tulis");
+  const pengguna = await wajibHakAksi("tutup-buku.buat");
   const tahun = bacaTahun(dataFormulir);
   const tutup = await db.tutupBuku.findUnique({ where: { tahun } });
   if (!tutup) throw new Error(`Tahun buku ${tahun} tidak dalam keadaan ditutup`);

@@ -73,7 +73,7 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
 // ---------- Jurnal Umum (manual) ----------
 
 export async function buatJurnalManual(dataFormulir: FormData) {
-  await wajibHakAksi("buku-besar.tulis");
+  await wajibHakAksi("jurnal.buat");
   const keterangan = String(dataFormulir.get("keterangan") ?? "");
   const daftarBaris = bacaBarisJurnal(dataFormulir.get("baris"));
 
@@ -97,7 +97,7 @@ function bacaFormulirKas(dataFormulir: FormData) {
 }
 
 export async function buatKasMasuk(dataFormulir: FormData) {
-  await wajibHakAksi("kas-bank.tulis");
+  await wajibHakAksi("kas-masuk.buat");
   const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
   const zero = D(0);
 
@@ -116,7 +116,7 @@ export async function buatKasMasuk(dataFormulir: FormData) {
 }
 
 export async function buatKasKeluar(dataFormulir: FormData) {
-  await wajibHakAksi("kas-bank.tulis");
+  await wajibHakAksi("kas-keluar.buat");
   const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
   const zero = D(0);
 
