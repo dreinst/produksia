@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
+import Logo from "@/komponen/ui/Logo";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { gantiTahunBukuFormulir } from "@/lib/aksi/pengaturan";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
@@ -182,7 +183,7 @@ function GrupNavigasi({
                 onClick={saatNavigasi}
                 aria-current={aktif ? "page" : undefined}
                 className={`flex items-center justify-between gap-2 py-1.5 px-2 rounded-md transition-all duration-150 ${
-                  aktif ? "bg-slate-100 text-slate-900 font-semibold" : "text-slate-500 hover:text-blue-600 hover:bg-slate-50 hover:translate-x-0.5"
+                  aktif ? "bg-slate-100 text-navy font-semibold" : "text-slate-500 hover:text-navy hover:bg-slate-50 hover:translate-x-0.5"
                 }`}
               >
                 <span className="truncate">{l.label}</span>
@@ -204,7 +205,7 @@ function TautanTunggal({ href, label, ikon, pathname, saatNavigasi }: { href: st
       onClick={saatNavigasi}
       aria-current={aktif ? "page" : undefined}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-        aktif ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-0.5"
+        aktif ? "bg-navy text-white shadow-sm" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-0.5"
       }`}
     >
       <Ikon nama={ikon} className={`!text-[20px] ${aktif ? "" : "text-slate-400"}`} />
@@ -311,17 +312,10 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
       >
         {/* Merek */}
         <div className="h-16 px-5 flex items-center justify-between border-b border-slate-100/80 shrink-0">
-          <Link href="/" onClick={saatTutup} className="flex items-center gap-2.5 min-w-0">
-            <span className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-sm shrink-0">
-              P
-            </span>
-            <span className="flex flex-col leading-none min-w-0">
-              <span className="font-heading font-bold text-[15px] text-slate-900 tracking-tight">
-                Produk<span className="text-blue-600">sia</span>
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-400 uppercase mt-0.5">
-                Sistem Akuntansi Terpadu
-              </span>
+          <Link href="/" onClick={saatTutup} className="flex flex-col gap-1 min-w-0" aria-label="Produksia, ke beranda">
+            <Logo tinggi={26} />
+            <span className="text-[9px] font-semibold tracking-[0.12em] text-slate-400 uppercase pl-0.5">
+              Sistem Akuntansi Terpadu
             </span>
           </Link>
           <div className="flex items-center gap-1">

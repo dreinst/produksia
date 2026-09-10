@@ -102,7 +102,7 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
             className="flex items-center gap-3 list-none cursor-pointer select-none rounded-lg px-1 py-0.5 hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
             aria-label="Menu akun"
           >
-            <span className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold ring-2 ring-slate-100">
+            <span className="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center text-xs font-bold ring-2 ring-slate-100">
               {inisialNama(pengguna.nama)}
             </span>
             <span className="hidden md:flex flex-col text-left">

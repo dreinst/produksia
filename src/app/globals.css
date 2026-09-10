@@ -11,6 +11,12 @@
   --font-heading: var(--font-hanken), var(--font-inter), ui-sans-serif, sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-canvas: #f8fafc;
+  /* Identitas merek Produksia: navy sebagai warna utama, oranye sebagai aksen tindakan */
+  --color-navy: #0b2141;
+  --color-navy-terang: #17417a;
+  --color-navy-lembut: #0e2342;
+  --color-oranye: #f86e18;
+  --color-oranye-gelap: #d95a0c;
   --shadow-card: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
   --shadow-pop: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
 }
@@ -119,10 +125,10 @@ body {
     @apply inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
   }
   .tombol-utama {
-    @apply bg-slate-900 text-white hover:bg-slate-800;
+    @apply bg-navy text-white hover:bg-navy-terang;
   }
   .tombol-aksen {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
+    @apply bg-oranye text-white hover:bg-oranye-gelap;
   }
   .tombol-garis {
     @apply bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300;
@@ -154,7 +160,7 @@ body {
     @apply h-9 w-full rounded border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors;
   }
   .isian:focus-visible {
-    @apply border-blue-600 outline-none ring-2 ring-blue-500/20;
+    @apply border-navy-terang outline-none ring-2 ring-navy-terang/20;
   }
   .isian:disabled,
   .isian[readonly] {
@@ -312,11 +318,14 @@ body {
   }
   .tombol-utama,
   .tombol-aksen {
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 1px 2px rgba(11, 33, 65, 0.16);
   }
-  .tombol-utama:hover:not(:disabled),
+  .tombol-utama:hover:not(:disabled) {
+    box-shadow: 0 4px 10px -2px rgba(11, 33, 65, 0.32);
+    transform: translateY(-1px);
+  }
   .tombol-aksen:hover:not(:disabled) {
-    box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.28);
+    box-shadow: 0 4px 10px -2px rgba(248, 110, 24, 0.4);
     transform: translateY(-1px);
   }
   .isian {
