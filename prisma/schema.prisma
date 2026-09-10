@@ -122,6 +122,7 @@ model Pelanggan {
   faktur     FakturPenjualan[]
   penerimaan PenerimaanPenjualan[]
   proyek     Proyek[]
+  uangMuka   UangMukaPelanggan[]
   dibuatPada DateTime @default(now())
 }
 
@@ -257,6 +258,7 @@ model PesananPenjualan {
   baris      BarisPesananPenjualan[]
   pengiriman PengirimanPesanan[]
   faktur     FakturPenjualan[]
+  uangMuka   UangMukaPelanggan[]
 }
 
 model BarisPesananPenjualan {
@@ -321,8 +323,11 @@ model FakturPenjualan {
   dpp        Decimal @default(0) @db.Decimal(18, 2)
   ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
   ppn        Decimal @default(0) @db.Decimal(18, 2)
+  /// Uang muka pelanggan (DP pesanan) yang dipakai mengurangi piutang faktur ini
+  uangMuka   Decimal @default(0) @db.Decimal(18, 2)
   jurnalId   String? @unique
   jurnal     Jurnal? @relation("JurnalFakturPenjualan", fields: [jurnalId], references: [id])
+  pemakaianUangMuka PemakaianUangMuka[]
 
   baris      BarisFakturPenjualan[]
   penerimaan PenerimaanPenjualan[]
@@ -338,6 +343,39 @@ model BarisFakturPenjualan {
   jumlah   Decimal         @db.Decimal(18, 2)
   harga    Decimal         @db.Decimal(18, 2)
   subtotal Decimal         @db.Decimal(18, 2)
+}
+
+model UangMukaPelanggan {
+  id          String           @id @default(cuid())
+  nomor       String           @unique
+  tanggal     DateTime         @default(now())
+  pelangganId String
+  pelanggan   Pelanggan        @relation(fields: [pelangganId], references: [id])
+  pesananId   String
+  pesanan     PesananPenjualan @relation(fields: [pesananId], references: [id])
+  akunId      String
+  akun        Akun             @relation("AkunUangMuka", fields: [akunId], references: [id])
+  /// DP yang diterima; jumlahDipakai = bagian yang sudah mengurangi faktur
+  jumlah        Decimal @db.Decimal(18, 2)
+  jumlahDipakai Decimal @default(0) @db.Decimal(18, 2)
+  metodeBayar   String  @default("TRANSFER")
+  keterangan    String?
+  jurnalId      String? @unique
+  jurnal        Jurnal? @relation("JurnalUangMuka", fields: [jurnalId], references: [id])
+
+  pemakaian PemakaianUangMuka[]
+}
+
+/// Jejak DP mana yang dipakai faktur mana (dibalik saat faktur dihapus)
+model PemakaianUangMuka {
+  id         String            @id @default(cuid())
+  uangMukaId String
+  uangMuka   UangMukaPelanggan @relation(fields: [uangMukaId], references: [id])
+  fakturId   String
+  faktur     FakturPenjualan   @relation(fields: [fakturId], references: [id])
+  jumlah     Decimal           @db.Decimal(18, 2)
+
+  @@index([fakturId])
 }
 
 model PenerimaanPenjualan {
@@ -544,6 +582,7 @@ model Akun {
 
   barisJurnal         BarisJurnal[]
   penerimaanPenjualan PenerimaanPenjualan[] @relation("AkunPenerimaanPenjualan")
+  uangMukaPelanggan   UangMukaPelanggan[]   @relation("AkunUangMuka")
   pembayaranPembelian PembayaranPembelian[] @relation("AkunPembayaranPembelian")
 
   pemetaanPiutang    PemetaanAkun? @relation("PetaPiutang")
@@ -564,6 +603,7 @@ model Akun {
   pemetaanBarangBelumDitagih PemetaanAkun? @relation("PetaBarangBelumDitagih")
   pemetaanSelisihPersediaan  PemetaanAkun? @relation("PetaSelisihPersediaan")
   pemetaanBarangTerkirim     PemetaanAkun? @relation("PetaBarangTerkirim")
+  pemetaanUangMuka           PemetaanAkun? @relation("PetaUangMuka")
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
@@ -602,6 +642,9 @@ model PemetaanAkun {
   /// Aset sementara: barang sudah dikirim (SJ) tapi belum difaktur (FJ)
   barangTerkirimId String? @unique
   barangTerkirim   Akun?   @relation("PetaBarangTerkirim", fields: [barangTerkirimId], references: [id])
+  /// Kewajiban: uang muka/DP pelanggan yang belum dipakai faktur
+  uangMukaPelangganId String? @unique
+  uangMukaPelanggan   Akun?   @relation("PetaUangMuka", fields: [uangMukaPelangganId], references: [id])
 }
 
 model Jurnal {
@@ -619,6 +662,7 @@ model Jurnal {
   pengiriman            PengirimanPesanan?     @relation("JurnalPengiriman")
   fakturPenjualan       FakturPenjualan?       @relation("JurnalFakturPenjualan")
   penerimaanPenjualan   PenerimaanPenjualan?   @relation("JurnalPenerimaanPenjualan")
+  uangMukaPelanggan     UangMukaPelanggan?     @relation("JurnalUangMuka")
   returPenjualan        ReturPenjualan?        @relation("JurnalReturPenjualan")
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")

@@ -1,7 +1,7 @@
 # Accurate Copy
 
 Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, dibangun mengikuti alur modul Accurate 5:
-- **Penjualan**: Penawaran → Pesanan → Pengiriman → Faktur → Penerimaan → Retur
+- **Penjualan**: Penawaran → Pesanan (+ **Uang Muka**/DP) → Pengiriman → Faktur → Penerimaan → Retur
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, **Laba Rugi**, **Neraca**, Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
@@ -47,6 +47,10 @@ Bagan akun standar 111 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputu
 
 Semua dokumen yang memengaruhi uang atau stok menjurnal otomatis lewat `src/lib/akuntansi.ts` di dalam transaksi yang sama: **Surat Jalan** (persediaan ↔ Barang Terkirim Belum Ditagih, dinilai harga pokok saat kirim), Faktur Penjualan (piutang, pendapatan per akun barang, HPP dari barang yang sudah dikirim), Penerimaan, Retur Penjualan, **Terima Barang** (persediaan ↔ Barang Diterima Belum Ditagih), Faktur Pembelian (menutup akun belum ditagih, selisih harga ke persediaan, jasa ke beban), Pembayaran, Retur Pembelian (selisih harga ke Selisih Persediaan), **Penyesuaian Stok**, **perolehan aset tetap**, dan penyusutan. Harga pokok barang memakai rata-rata bergerak, sehingga Σ stok × harga pokok selalu sama dengan saldo akun Persediaan. Kartu *Integritas & Sinkronisasi* di beranda dan `npx tsx skrip/uji-sinkron.ts` mencocokkan buku besar dengan dokumen & stok; selisih ≠ 0 diperlakukan sebagai bug.
 
+## Uang muka pelanggan (DP)
+
+Dari daftar Pesanan Penjualan → **Uang Muka**: DP diterima ke kas/bank dan dicatat sebagai kewajiban *Uang Muka Pelanggan* (2-1200, jurnal JU-UM). Saat Faktur dibuat dari pesanan itu, komposer faktur mengisi otomatis DP yang dipakai (bisa dikurangi): piutang = total − DP, akun Uang Muka Pelanggan didebit, status faktur langsung Lunas bila DP menutup seluruhnya. DP dipakai urut tanggal (FIFO) lintas beberapa DP; sisa DP tetap kewajiban sampai dipakai faktur berikutnya. Menghapus faktur mengembalikan DP; DP yang sudah dipakai tidak bisa dihapus sebelum fakturnya. `periksaSinkron` menjaga saldo akun Uang Muka Pelanggan = Σ DP belum dipakai.
+
 ## Hapus / ubah dokumen
 
 Setiap daftar transaksi punya tombol **Hapus** (hak `dokumen.hapus`, hanya Pemilik & Admin). Menghapus = **membalik seluruh efek** dalam satu transaksi (`src/lib/aksi/hapusDokumen.ts`): stok fisik & harga pokok rata-rata, jurnal otomatis (dihapus lewat tautan `jurnalId`), progres pesanan (terkirim/difaktur/diterima), dan status faktur/pesanan. Dokumen yang sudah punya turunan ditolak dengan pesan apa yang harus dihapus dulu (mis. faktur yang sudah diterima bayarannya, surat jalan yang fakturnya dibuat setelahnya, aset yang sudah disusutkan). Setiap penghapusan tercatat di **Pengaturan → Log Aktivitas**. Mengubah dokumen = hapus lalu buat ulang, supaya jejak stok/jurnal selalu konsisten. Data induk tetap bisa diubah langsung.
@@ -73,7 +77,7 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 11 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 12 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -116,7 +120,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `skrip/uji-{sinkron,uang-muka,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.

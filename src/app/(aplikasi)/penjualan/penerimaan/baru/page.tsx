@@ -41,7 +41,8 @@ export default async function HalamanPenerimaanPenjualanBaru({
 
   const paid = faktur.penerimaan.reduce((s, r) => s + Number(r.jumlah) + Number(r.potonganPajak), 0);
   const diretur = faktur.retur.reduce((s, r) => s + Number(r.total), 0);
-  const sisa = Number(faktur.total) - paid - diretur;
+  const uangMuka = Number(faktur.uangMuka);
+  const sisa = Number(faktur.total) - uangMuka - paid - diretur;
 
   return (
     <div className="space-y-6 max-w-md">
@@ -49,6 +50,7 @@ export default async function HalamanPenerimaanPenjualanBaru({
       <p className="redup">
         Pelanggan: {faktur.pelanggan.nama} &middot; Total {Number(faktur.total).toLocaleString("id-ID")}
         {Number(faktur.ppn) > 0 && <> (termasuk PPN {Number(faktur.ppn).toLocaleString("id-ID")})</>}
+        {uangMuka > 0 && <> &middot; uang muka {uangMuka.toLocaleString("id-ID")}</>}
         {diretur > 0 && <> &middot; retur {diretur.toLocaleString("id-ID")}</>} &middot; Sisa tagihan: <strong>{sisa.toLocaleString("id-ID")}</strong>
       </p>
 

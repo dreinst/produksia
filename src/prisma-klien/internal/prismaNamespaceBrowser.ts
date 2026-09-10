@@ -70,6 +70,8 @@ export const ModelName = {
   BarisPengiriman: 'BarisPengiriman',
   FakturPenjualan: 'FakturPenjualan',
   BarisFakturPenjualan: 'BarisFakturPenjualan',
+  UangMukaPelanggan: 'UangMukaPelanggan',
+  PemakaianUangMuka: 'PemakaianUangMuka',
   PenerimaanPenjualan: 'PenerimaanPenjualan',
   ReturPenjualan: 'ReturPenjualan',
   BarisReturPenjualan: 'BarisReturPenjualan',
@@ -329,6 +331,7 @@ export const FakturPenjualanScalarFieldEnum = {
   dpp: 'dpp',
   ppnPersen: 'ppnPersen',
   ppn: 'ppn',
+  uangMuka: 'uangMuka',
   jurnalId: 'jurnalId'
 } as const
 
@@ -345,6 +348,33 @@ export const BarisFakturPenjualanScalarFieldEnum = {
 } as const
 
 export type BarisFakturPenjualanScalarFieldEnum = (typeof BarisFakturPenjualanScalarFieldEnum)[keyof typeof BarisFakturPenjualanScalarFieldEnum]
+
+
+export const UangMukaPelangganScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  tanggal: 'tanggal',
+  pelangganId: 'pelangganId',
+  pesananId: 'pesananId',
+  akunId: 'akunId',
+  jumlah: 'jumlah',
+  jumlahDipakai: 'jumlahDipakai',
+  metodeBayar: 'metodeBayar',
+  keterangan: 'keterangan',
+  jurnalId: 'jurnalId'
+} as const
+
+export type UangMukaPelangganScalarFieldEnum = (typeof UangMukaPelangganScalarFieldEnum)[keyof typeof UangMukaPelangganScalarFieldEnum]
+
+
+export const PemakaianUangMukaScalarFieldEnum = {
+  id: 'id',
+  uangMukaId: 'uangMukaId',
+  fakturId: 'fakturId',
+  jumlah: 'jumlah'
+} as const
+
+export type PemakaianUangMukaScalarFieldEnum = (typeof PemakaianUangMukaScalarFieldEnum)[keyof typeof PemakaianUangMukaScalarFieldEnum]
 
 
 export const PenerimaanPenjualanScalarFieldEnum = {
@@ -538,7 +568,8 @@ export const PemetaanAkunScalarFieldEnum = {
   bebanJasaId: 'bebanJasaId',
   barangBelumDitagihId: 'barangBelumDitagihId',
   selisihPersediaanId: 'selisihPersediaanId',
-  barangTerkirimId: 'barangTerkirimId'
+  barangTerkirimId: 'barangTerkirimId',
+  uangMukaPelangganId: 'uangMukaPelangganId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]

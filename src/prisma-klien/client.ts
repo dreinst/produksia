@@ -137,6 +137,16 @@ export type FakturPenjualan = Prisma.FakturPenjualanModel
  */
 export type BarisFakturPenjualan = Prisma.BarisFakturPenjualanModel
 /**
+ * Model UangMukaPelanggan
+ * 
+ */
+export type UangMukaPelanggan = Prisma.UangMukaPelangganModel
+/**
+ * Model PemakaianUangMuka
+ * Jejak DP mana yang dipakai faktur mana (dibalik saat faktur dihapus)
+ */
+export type PemakaianUangMuka = Prisma.PemakaianUangMukaModel
+/**
  * Model PenerimaanPenjualan
  * 
  */

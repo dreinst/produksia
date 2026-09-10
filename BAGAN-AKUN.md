@@ -27,6 +27,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Hutang usaha (Faktur Pembelian, Pembayaran, Retur Pembelian) | `2-1100` |
 | Barang Diterima Belum Ditagih (dikredit saat Terima Barang, didebit saat Faktur Pembelian) | `2-1600` |
 | Barang Terkirim Belum Ditagih (didebit saat Surat Jalan, dikredit saat Faktur Penjualan mengakui HPP) | `1-1650` |
+| Uang Muka Pelanggan (dikredit saat DP pesanan diterima, didebit saat dipakai mengurangi Faktur Penjualan) | `2-1200` |
 | Beban pembelian jasa (baris JASA di Faktur Pembelian) | `5-1200` Biaya Langsung Event (bawaan; bisa per barang) |
 | Selisih persediaan (beda harga retur pembelian vs harga pokok, opname) | `5-1400` |
 | Akun Kas/Bank (Penerimaan, Pembayaran, Kas Masuk/Keluar, perolehan aset) | `1-1100` Kas, `1-1210` Bank (dan rekening lain yang ditandai kas/bank) |
@@ -100,7 +101,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `1-3200` | &nbsp;&nbsp;&nbsp;Investasi Lainnya | Aset |  | asli | Saham, reksa dana, deposito > 1 tahun |
 | `2-1000` | **Kewajiban Lancar** | Kewajiban | kelompok | asli |  |
 | `2-1100` | &nbsp;&nbsp;&nbsp;Hutang Usaha | Kewajiban | pemetaan | asli | Tagihan vendor yang belum dibayar (dipakai otomatis oleh Faktur Pembelian) |
-| `2-1200` | &nbsp;&nbsp;&nbsp;Uang Muka Pelanggan / DP Klien | Kewajiban |  | **usul** | DP yang diterima sebelum event; dicatat lewat Kas Masuk |
+| `2-1200` | &nbsp;&nbsp;&nbsp;Uang Muka Pelanggan / DP Klien | Kewajiban | pemetaan | **usul** | DP yang diterima sebelum event lewat menu Uang Muka (Penjualan); dipakai mengurangi piutang saat Faktur Penjualan |
 | `2-1300` | &nbsp;&nbsp;&nbsp;**Hutang Pajak** | Kewajiban | kelompok | **usul** |  |
 | `2-1310` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPh 21 | Kewajiban |  | **usul** | Potongan pajak gaji/honor yang belum disetor |
 | `2-1320` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPh 23 / Final | Kewajiban |  | **usul** | PPh 23 yang kita potong dari vendor; dipakai otomatis oleh Pembayaran Pembelian |

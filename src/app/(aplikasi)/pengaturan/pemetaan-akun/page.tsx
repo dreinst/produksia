@@ -12,6 +12,8 @@ const FIELDS = [
   { nama: "barangBelumDitagihId", label: "Barang Diterima Belum Ditagih (akun Kewajiban)", filterType: "KEWAJIBAN", wajib: false, petunjuk: "Dikredit saat Terima Barang, didebit saat Faktur Pembelian — wajib bila memakai alur TB → FB" },
   { nama: "bebanJasaId", label: "Beban pembelian jasa (akun Beban)", filterType: "BEBAN", wajib: false, petunjuk: "Didebit saat Faktur Pembelian baris JASA; kosong = akun HPP" },
   { nama: "selisihPersediaanId", label: "Selisih Persediaan (akun Beban)", filterType: "BEBAN", wajib: false, petunjuk: "Beda harga retur pembelian vs harga pokok, opname stok" },
+  { nama: "barangTerkirimId", label: "Barang Terkirim Belum Ditagih (akun Aset)", filterType: "ASET", wajib: false, petunjuk: "Didebit saat Surat Jalan, dikredit saat Faktur Penjualan mengakui HPP — wajib bila memakai alur SJ → FJ" },
+  { nama: "uangMukaPelangganId", label: "Uang Muka Pelanggan (akun Kewajiban)", filterType: "KEWAJIBAN", wajib: false, petunjuk: "Dikredit saat DP pesanan diterima, didebit saat dipakai mengurangi Faktur Penjualan" },
 ] as const;
 
 export default async function HalamanPemetaanAkun() {

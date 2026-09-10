@@ -17,11 +17,13 @@ export async function simpanPemetaanAkun(dataFormulir: FormData) {
   const bebanJasaId = String(dataFormulir.get("bebanJasaId") ?? "") || null;
   const barangBelumDitagihId = String(dataFormulir.get("barangBelumDitagihId") ?? "") || null;
   const selisihPersediaanId = String(dataFormulir.get("selisihPersediaanId") ?? "") || null;
+  const barangTerkirimId = String(dataFormulir.get("barangTerkirimId") ?? "") || null;
+  const uangMukaPelangganId = String(dataFormulir.get("uangMukaPelangganId") ?? "") || null;
 
   if (!piutangUsahaId || !persediaanId || !hppId || !pendapatanPenjualanId || !utangUsahaId) {
     throw new Error("Semua pemetaan akun wajib diisi");
   }
-  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId };
+  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId, barangTerkirimId, uangMukaPelangganId };
   await pastikanAkunRinci(db, [piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...Object.values(opsional).filter((v): v is string => Boolean(v))]);
 
   await db.pemetaanAkun.upsert({

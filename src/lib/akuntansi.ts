@@ -131,7 +131,7 @@ export async function catatJurnalPengiriman(tx: Tx, pengiriman: { nomor: string 
  */
 export async function catatJurnalFakturPenjualan(
   tx: Tx,
-  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string },
+  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string; uangMuka?: Desimal | number | string },
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
   konsumsiTransit: { barangId: string; jumlah: Desimal; hargaPokok: Desimal }[] = [],
@@ -139,6 +139,9 @@ export async function catatJurnalFakturPenjualan(
   const m = await ambilPemetaanAkun(tx);
   const ppn = D(faktur.ppn ?? 0);
   if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
+  // Uang muka pesanan yang dipakai: mengurangi piutang, membalik kewajiban Uang Muka Pelanggan
+  const uangMuka = D(faktur.uangMuka ?? 0);
+  if (uangMuka.gt(0) && !m.uangMukaPelangganId) throw new Error("Pemetaan akun 'Uang Muka Pelanggan' belum diatur (Pengaturan > Pemetaan Akun)");
   const peta = await infoBarang(tx, [...daftarBaris.map((b) => b.barangId), ...konsumsiTransit.map((k) => k.barangId)]);
   const pendapatan = pengumpul(), hpp = pengumpul();
   for (const b of daftarBaris) {
@@ -156,7 +159,8 @@ export async function catatJurnalFakturPenjualan(
     throw new Error("Pemetaan akun 'Barang Terkirim Belum Ditagih' belum diatur (Pengaturan > Pemetaan Akun)");
   }
   const baris: InputBarisJurnal[] = [
-    { akunId: m.piutangUsahaId, debit: D(faktur.total), kredit: NOL, keterangan: `Piutang ${faktur.nomor}` },
+    { akunId: m.piutangUsahaId, debit: D(faktur.total).minus(uangMuka), kredit: NOL, keterangan: `Piutang ${faktur.nomor}` },
+    ...(uangMuka.gt(0) && m.uangMukaPelangganId ? [{ akunId: m.uangMukaPelangganId, debit: uangMuka, kredit: NOL, keterangan: `Uang muka dipakai ${faktur.nomor}` }] : []),
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Pendapatan ${faktur.nomor}` })),
     ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: NOL, kredit: ppn, keterangan: `PPN keluaran ${faktur.nomor}` }] : []),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
@@ -180,6 +184,17 @@ export async function catatJurnalPenerimaanPenjualan(
     { akunId: penerimaan.akunId, debit: jumlah, kredit: NOL, keterangan: `Terima ${penerimaan.nomor}` },
     ...(potongan.gt(0) && akunPph23DimukaId ? [{ akunId: akunPph23DimukaId, debit: potongan, kredit: NOL, keterangan: `PPh 23 dipotong pelanggan ${penerimaan.nomor}` }] : []),
     { akunId: m.piutangUsahaId, debit: NOL, kredit: jumlah.plus(potongan), keterangan: `Pelunasan piutang ${nomorFaktur ?? penerimaan.nomor}` },
+  ]);
+}
+
+/** Uang Muka Pelanggan (JU-UM): Dr Kas/Bank / Cr Uang Muka Pelanggan — kewajiban sampai dipakai faktur. */
+export async function catatJurnalUangMuka(tx: Tx, uangMuka: { nomor: string; akunId: string; jumlah: Desimal | number | string }, nomorPesanan?: string) {
+  const m = await ambilPemetaanAkun(tx);
+  if (!m.uangMukaPelangganId) throw new Error("Pemetaan akun 'Uang Muka Pelanggan' belum diatur (Pengaturan > Pemetaan Akun)");
+  const jumlah = D(uangMuka.jumlah);
+  return catatJurnal(tx, "JU-UM", `Uang Muka ${uangMuka.nomor}${nomorPesanan ? ` untuk ${nomorPesanan}` : ""}`, "PENJUALAN", [
+    { akunId: uangMuka.akunId, debit: jumlah, kredit: NOL, keterangan: `Terima DP ${uangMuka.nomor}` },
+    { akunId: m.uangMukaPelangganId, debit: NOL, kredit: jumlah, keterangan: `Uang muka pelanggan ${uangMuka.nomor}` },
   ]);
 }
 

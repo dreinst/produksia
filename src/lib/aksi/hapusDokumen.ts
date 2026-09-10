@@ -24,6 +24,7 @@ export type JenisDokumen =
   | "pengiriman"
   | "faktur"
   | "penerimaan"
+  | "uangMuka"
   | "returPenjualan"
   | "pesananPembelian"
   | "penerimaanBarang"
@@ -41,6 +42,7 @@ const LABEL: Record<JenisDokumen, string> = {
   pengiriman: "Surat Jalan",
   faktur: "Faktur Penjualan",
   penerimaan: "Penerimaan Penjualan",
+  uangMuka: "Uang Muka Pelanggan",
   returPenjualan: "Retur Penjualan",
   pesananPembelian: "Pesanan Pembelian",
   penerimaanBarang: "Terima Barang",
@@ -59,6 +61,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   pengiriman: ["/penjualan/pengiriman", "/penjualan/pesanan", "/persediaan"],
   faktur: ["/penjualan/faktur", "/penjualan/pesanan"],
   penerimaan: ["/penjualan/penerimaan", "/penjualan/faktur"],
+  uangMuka: ["/penjualan/uang-muka", "/penjualan/pesanan"],
   returPenjualan: ["/penjualan/retur", "/penjualan/faktur", "/persediaan"],
   pesananPembelian: ["/pembelian/pesanan"],
   penerimaanBarang: ["/pembelian/penerimaan-barang", "/pembelian/pesanan", "/persediaan"],
@@ -90,7 +93,7 @@ async function catatLog(tx: Tx, pengguna: PenggunaSesi, jenis: JenisDokumen, nom
 
 async function segarkanStatusFakturPenjualan(tx: Tx, fakturId: string) {
   const f = await tx.fakturPenjualan.findUniqueOrThrow({ where: { id: fakturId }, include: { penerimaan: true, retur: true } });
-  const status = statusFaktur(D(f.total), jumlahkan(f.penerimaan.map((p) => D(p.jumlah).plus(p.potonganPajak))), jumlahkan(f.retur.map((r) => r.total)));
+  const status = statusFaktur(D(f.total), D(f.uangMuka).plus(jumlahkan(f.penerimaan.map((p) => D(p.jumlah).plus(p.potonganPajak)))), jumlahkan(f.retur.map((r) => r.total)));
   await tx.fakturPenjualan.update({ where: { id: fakturId }, data: { status } });
 }
 async function segarkanStatusFakturPembelian(tx: Tx, fakturId: string) {
@@ -126,9 +129,10 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         return;
       }
       case "pesanan": {
-        const d = await tx.pesananPenjualan.findUniqueOrThrow({ where: { id }, include: { pengiriman: true, faktur: true } });
+        const d = await tx.pesananPenjualan.findUniqueOrThrow({ where: { id }, include: { pengiriman: true, faktur: true, uangMuka: true } });
         if (d.pengiriman.length) throw new Error(`${d.nomor} sudah punya surat jalan ${daftarNomor(d.pengiriman)}; hapus itu dulu`);
         if (d.faktur.length) throw new Error(`${d.nomor} sudah punya faktur ${daftarNomor(d.faktur)}; hapus itu dulu`);
+        if (d.uangMuka.length) throw new Error(`${d.nomor} sudah punya uang muka ${daftarNomor(d.uangMuka)}; hapus itu dulu`);
         await tx.barisPesananPenjualan.deleteMany({ where: { pesananId: id } });
         await tx.pesananPenjualan.delete({ where: { id } });
         if (d.penawaranId) await tx.penawaranPenjualan.update({ where: { id: d.penawaranId }, data: { status: "DRAF" } });
@@ -188,10 +192,16 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
             }
           }
         }
+        // kembalikan uang muka yang dipakai faktur ini ke DP asalnya
+        const pemakaian = await tx.pemakaianUangMuka.findMany({ where: { fakturId: id } });
+        for (const p of pemakaian) {
+          await tx.uangMukaPelanggan.update({ where: { id: p.uangMukaId }, data: { jumlahDipakai: { decrement: p.jumlah } } });
+        }
+        await tx.pemakaianUangMuka.deleteMany({ where: { fakturId: id } });
         await tx.barisFakturPenjualan.deleteMany({ where: { fakturId: id } });
         await tx.fakturPenjualan.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalId);
-        await catatLog(tx, pengguna, jenis, d.nomor, "Piutang, pendapatan, PPN, dan HPP dibalik; progres faktur pesanan dikurangi");
+        await catatLog(tx, pengguna, jenis, d.nomor, pemakaian.length ? "Piutang, uang muka dipakai, pendapatan, PPN, dan HPP dibalik; progres faktur pesanan dikurangi" : "Piutang, pendapatan, PPN, dan HPP dibalik; progres faktur pesanan dikurangi");
         return;
       }
       case "penerimaan": {
@@ -200,6 +210,14 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await hapusJurnal(tx, d.jurnalId);
         await segarkanStatusFakturPenjualan(tx, d.fakturId);
         await catatLog(tx, pengguna, jenis, d.nomor, "Kas/bank dan piutang dibalik; status faktur dihitung ulang");
+        return;
+      }
+      case "uangMuka": {
+        const d = await tx.uangMukaPelanggan.findUniqueOrThrow({ where: { id }, include: { pemakaian: { include: { faktur: { select: { nomor: true } } } } } });
+        if (D(d.jumlahDipakai).gt(0)) throw new Error(`${d.nomor} sudah dipakai faktur ${daftarNomor(d.pemakaian.map((p) => p.faktur))}; hapus faktur itu dulu`);
+        await tx.uangMukaPelanggan.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        await catatLog(tx, pengguna, jenis, d.nomor, "Kas/bank dan uang muka pelanggan dibalik");
         return;
       }
       case "returPenjualan": {

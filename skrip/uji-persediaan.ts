@@ -47,7 +47,7 @@ async function saldo(akunId: string) {
 }
 async function pastikanSinkron(label: string) {
   const s = await periksaSinkron(db);
-  const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron && s.barangTerkirim.sinkron;
+  const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron && s.barangTerkirim.sinkron && s.uangMuka.sinkron;
   pastikan(ok, `sinkron setelah ${label} (persediaan BB ${Number(s.persediaan.bukuBesar)} vs stok ${Number(s.persediaan.dokumen)}; BBD ${Number(s.barangBelumDitagih.bukuBesar)} vs ${Number(s.barangBelumDitagih.dokumen)}; terkirim ${Number(s.barangTerkirim.bukuBesar)} vs ${Number(s.barangTerkirim.dokumen)})`);
 }
 

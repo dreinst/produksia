@@ -45,7 +45,7 @@ async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan:
 }
 async function pastikanSinkron(label: string) {
   const s = await periksaSinkron(db);
-  const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron && s.barangTerkirim.sinkron;
+  const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron && s.barangTerkirim.sinkron && s.uangMuka.sinkron;
   pastikan(ok, `sinkron setelah ${label} (persediaan ${Number(s.persediaan.bukuBesar)}/${Number(s.persediaan.dokumen)}; piutang ${Number(s.piutang.bukuBesar)}/${Number(s.piutang.dokumen)}; hutang ${Number(s.hutang.bukuBesar)}/${Number(s.hutang.dokumen)}; BBD ${Number(s.barangBelumDitagih.bukuBesar)}/${Number(s.barangBelumDitagih.dokumen)}; terkirim ${Number(s.barangTerkirim.bukuBesar)}/${Number(s.barangTerkirim.dokumen)})`);
 }
 const stok = async (barangId: string, gudangId: string) => Number((await db.stokBarang.findUnique({ where: { barangId_gudangId: { barangId, gudangId } } }))?.jumlah ?? 0);

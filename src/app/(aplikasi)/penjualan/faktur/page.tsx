@@ -35,14 +35,14 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
             <th>Tanggal</th>
             <th>Pelanggan</th>
             <th className="text-right">Total</th>
-            <th className="text-right">Terbayar</th>
+            <th className="text-right">Terbayar (termasuk DP)</th>
             <th>Status</th>
             <th />
           </tr>
         </thead>
         <tbody>
           {daftarFaktur.map((inv) => {
-            const paid = inv.penerimaan.reduce((s, r) => s + Number(r.jumlah), 0);
+            const paid = inv.penerimaan.reduce((s, r) => s + Number(r.jumlah) + Number(r.potonganPajak), 0) + Number(inv.uangMuka);
             return (
               <tr key={inv.id}>
                 <td><NomorDokumen nomor={inv.nomor} /></td>

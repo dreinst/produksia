@@ -237,6 +237,7 @@ export type PesananPenjualanWhereInput = {
   baris?: Prisma.BarisPesananPenjualanListRelationFilter
   pengiriman?: Prisma.PengirimanPesananListRelationFilter
   faktur?: Prisma.FakturPenjualanListRelationFilter
+  uangMuka?: Prisma.UangMukaPelangganListRelationFilter
 }
 
 export type PesananPenjualanOrderByWithRelationInput = {
@@ -252,6 +253,7 @@ export type PesananPenjualanOrderByWithRelationInput = {
   baris?: Prisma.BarisPesananPenjualanOrderByRelationAggregateInput
   pengiriman?: Prisma.PengirimanPesananOrderByRelationAggregateInput
   faktur?: Prisma.FakturPenjualanOrderByRelationAggregateInput
+  uangMuka?: Prisma.UangMukaPelangganOrderByRelationAggregateInput
 }
 
 export type PesananPenjualanWhereUniqueInput = Prisma.AtLeast<{
@@ -270,6 +272,7 @@ export type PesananPenjualanWhereUniqueInput = Prisma.AtLeast<{
   baris?: Prisma.BarisPesananPenjualanListRelationFilter
   pengiriman?: Prisma.PengirimanPesananListRelationFilter
   faktur?: Prisma.FakturPenjualanListRelationFilter
+  uangMuka?: Prisma.UangMukaPelangganListRelationFilter
 }, "id" | "nomor" | "penawaranId">
 
 export type PesananPenjualanOrderByWithAggregationInput = {
@@ -311,6 +314,7 @@ export type PesananPenjualanCreateInput = {
   baris?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUncheckedCreateInput = {
@@ -324,6 +328,7 @@ export type PesananPenjualanUncheckedCreateInput = {
   baris?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUpdateInput = {
@@ -337,6 +342,7 @@ export type PesananPenjualanUpdateInput = {
   baris?: Prisma.BarisPesananPenjualanUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateInput = {
@@ -350,6 +356,7 @@ export type PesananPenjualanUncheckedUpdateInput = {
   baris?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanCreateManyInput = {
@@ -556,6 +563,20 @@ export type PesananPenjualanUpdateOneWithoutFakturNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PesananPenjualanUpdateToOneWithWhereWithoutFakturInput, Prisma.PesananPenjualanUpdateWithoutFakturInput>, Prisma.PesananPenjualanUncheckedUpdateWithoutFakturInput>
 }
 
+export type PesananPenjualanCreateNestedOneWithoutUangMukaInput = {
+  create?: Prisma.XOR<Prisma.PesananPenjualanCreateWithoutUangMukaInput, Prisma.PesananPenjualanUncheckedCreateWithoutUangMukaInput>
+  connectOrCreate?: Prisma.PesananPenjualanCreateOrConnectWithoutUangMukaInput
+  connect?: Prisma.PesananPenjualanWhereUniqueInput
+}
+
+export type PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput = {
+  create?: Prisma.XOR<Prisma.PesananPenjualanCreateWithoutUangMukaInput, Prisma.PesananPenjualanUncheckedCreateWithoutUangMukaInput>
+  connectOrCreate?: Prisma.PesananPenjualanCreateOrConnectWithoutUangMukaInput
+  upsert?: Prisma.PesananPenjualanUpsertWithoutUangMukaInput
+  connect?: Prisma.PesananPenjualanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PesananPenjualanUpdateToOneWithWhereWithoutUangMukaInput, Prisma.PesananPenjualanUpdateWithoutUangMukaInput>, Prisma.PesananPenjualanUncheckedUpdateWithoutUangMukaInput>
+}
+
 export type PesananPenjualanCreateWithoutPelangganInput = {
   id?: string
   nomor: string
@@ -566,6 +587,7 @@ export type PesananPenjualanCreateWithoutPelangganInput = {
   baris?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUncheckedCreateWithoutPelangganInput = {
@@ -578,6 +600,7 @@ export type PesananPenjualanUncheckedCreateWithoutPelangganInput = {
   baris?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanCreateOrConnectWithoutPelangganInput = {
@@ -629,6 +652,7 @@ export type PesananPenjualanCreateWithoutPenawaranInput = {
   baris?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUncheckedCreateWithoutPenawaranInput = {
@@ -641,6 +665,7 @@ export type PesananPenjualanUncheckedCreateWithoutPenawaranInput = {
   baris?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanCreateOrConnectWithoutPenawaranInput = {
@@ -669,6 +694,7 @@ export type PesananPenjualanUpdateWithoutPenawaranInput = {
   baris?: Prisma.BarisPesananPenjualanUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateWithoutPenawaranInput = {
@@ -681,6 +707,7 @@ export type PesananPenjualanUncheckedUpdateWithoutPenawaranInput = {
   baris?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanCreateWithoutBarisInput = {
@@ -693,6 +720,7 @@ export type PesananPenjualanCreateWithoutBarisInput = {
   penawaran?: Prisma.PenawaranPenjualanCreateNestedOneWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUncheckedCreateWithoutBarisInput = {
@@ -705,6 +733,7 @@ export type PesananPenjualanUncheckedCreateWithoutBarisInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanCreateOrConnectWithoutBarisInput = {
@@ -733,6 +762,7 @@ export type PesananPenjualanUpdateWithoutBarisInput = {
   penawaran?: Prisma.PenawaranPenjualanUpdateOneWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateWithoutBarisInput = {
@@ -745,6 +775,7 @@ export type PesananPenjualanUncheckedUpdateWithoutBarisInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanCreateWithoutPengirimanInput = {
@@ -757,6 +788,7 @@ export type PesananPenjualanCreateWithoutPengirimanInput = {
   penawaran?: Prisma.PenawaranPenjualanCreateNestedOneWithoutPesananInput
   baris?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUncheckedCreateWithoutPengirimanInput = {
@@ -769,6 +801,7 @@ export type PesananPenjualanUncheckedCreateWithoutPengirimanInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   baris?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutPesananInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanCreateOrConnectWithoutPengirimanInput = {
@@ -797,6 +830,7 @@ export type PesananPenjualanUpdateWithoutPengirimanInput = {
   penawaran?: Prisma.PenawaranPenjualanUpdateOneWithoutPesananNestedInput
   baris?: Prisma.BarisPesananPenjualanUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateWithoutPengirimanInput = {
@@ -809,6 +843,7 @@ export type PesananPenjualanUncheckedUpdateWithoutPengirimanInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   baris?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanCreateWithoutFakturInput = {
@@ -821,6 +856,7 @@ export type PesananPenjualanCreateWithoutFakturInput = {
   penawaran?: Prisma.PenawaranPenjualanCreateNestedOneWithoutPesananInput
   baris?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanUncheckedCreateWithoutFakturInput = {
@@ -833,6 +869,7 @@ export type PesananPenjualanUncheckedCreateWithoutFakturInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   baris?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutPesananInput
   pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutPesananInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPesananInput
 }
 
 export type PesananPenjualanCreateOrConnectWithoutFakturInput = {
@@ -861,6 +898,7 @@ export type PesananPenjualanUpdateWithoutFakturInput = {
   penawaran?: Prisma.PenawaranPenjualanUpdateOneWithoutPesananNestedInput
   baris?: Prisma.BarisPesananPenjualanUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateWithoutFakturInput = {
@@ -873,6 +911,75 @@ export type PesananPenjualanUncheckedUpdateWithoutFakturInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   baris?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPesananNestedInput
+}
+
+export type PesananPenjualanCreateWithoutUangMukaInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  status?: $Enums.StatusDokumen
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  pelanggan: Prisma.PelangganCreateNestedOneWithoutPesananInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedOneWithoutPesananInput
+  baris?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutPesananInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutPesananInput
+  faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPesananInput
+}
+
+export type PesananPenjualanUncheckedCreateWithoutUangMukaInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  penawaranId?: string | null
+  status?: $Enums.StatusDokumen
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  baris?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutPesananInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutPesananInput
+  faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPesananInput
+}
+
+export type PesananPenjualanCreateOrConnectWithoutUangMukaInput = {
+  where: Prisma.PesananPenjualanWhereUniqueInput
+  create: Prisma.XOR<Prisma.PesananPenjualanCreateWithoutUangMukaInput, Prisma.PesananPenjualanUncheckedCreateWithoutUangMukaInput>
+}
+
+export type PesananPenjualanUpsertWithoutUangMukaInput = {
+  update: Prisma.XOR<Prisma.PesananPenjualanUpdateWithoutUangMukaInput, Prisma.PesananPenjualanUncheckedUpdateWithoutUangMukaInput>
+  create: Prisma.XOR<Prisma.PesananPenjualanCreateWithoutUangMukaInput, Prisma.PesananPenjualanUncheckedCreateWithoutUangMukaInput>
+  where?: Prisma.PesananPenjualanWhereInput
+}
+
+export type PesananPenjualanUpdateToOneWithWhereWithoutUangMukaInput = {
+  where?: Prisma.PesananPenjualanWhereInput
+  data: Prisma.XOR<Prisma.PesananPenjualanUpdateWithoutUangMukaInput, Prisma.PesananPenjualanUncheckedUpdateWithoutUangMukaInput>
+}
+
+export type PesananPenjualanUpdateWithoutUangMukaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutPesananNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateOneWithoutPesananNestedInput
+  baris?: Prisma.BarisPesananPenjualanUpdateManyWithoutPesananNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutPesananNestedInput
+  faktur?: Prisma.FakturPenjualanUpdateManyWithoutPesananNestedInput
+}
+
+export type PesananPenjualanUncheckedUpdateWithoutUangMukaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  baris?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutPesananNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutPesananNestedInput
+  faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanCreateManyPelangganInput = {
@@ -894,6 +1001,7 @@ export type PesananPenjualanUpdateWithoutPelangganInput = {
   baris?: Prisma.BarisPesananPenjualanUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateWithoutPelangganInput = {
@@ -906,6 +1014,7 @@ export type PesananPenjualanUncheckedUpdateWithoutPelangganInput = {
   baris?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutPesananNestedInput
   pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutPesananNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPesananNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPesananNestedInput
 }
 
 export type PesananPenjualanUncheckedUpdateManyWithoutPelangganInput = {
@@ -926,12 +1035,14 @@ export type PesananPenjualanCountOutputType = {
   baris: number
   pengiriman: number
   faktur: number
+  uangMuka: number
 }
 
 export type PesananPenjualanCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   baris?: boolean | PesananPenjualanCountOutputTypeCountBarisArgs
   pengiriman?: boolean | PesananPenjualanCountOutputTypeCountPengirimanArgs
   faktur?: boolean | PesananPenjualanCountOutputTypeCountFakturArgs
+  uangMuka?: boolean | PesananPenjualanCountOutputTypeCountUangMukaArgs
 }
 
 /**
@@ -965,6 +1076,13 @@ export type PesananPenjualanCountOutputTypeCountFakturArgs<ExtArgs extends runti
   where?: Prisma.FakturPenjualanWhereInput
 }
 
+/**
+ * PesananPenjualanCountOutputType without action
+ */
+export type PesananPenjualanCountOutputTypeCountUangMukaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UangMukaPelangganWhereInput
+}
+
 
 export type PesananPenjualanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -979,6 +1097,7 @@ export type PesananPenjualanSelect<ExtArgs extends runtime.Types.Extensions.Inte
   baris?: boolean | Prisma.PesananPenjualan$barisArgs<ExtArgs>
   pengiriman?: boolean | Prisma.PesananPenjualan$pengirimanArgs<ExtArgs>
   faktur?: boolean | Prisma.PesananPenjualan$fakturArgs<ExtArgs>
+  uangMuka?: boolean | Prisma.PesananPenjualan$uangMukaArgs<ExtArgs>
   _count?: boolean | Prisma.PesananPenjualanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pesananPenjualan"]>
 
@@ -1023,6 +1142,7 @@ export type PesananPenjualanInclude<ExtArgs extends runtime.Types.Extensions.Int
   baris?: boolean | Prisma.PesananPenjualan$barisArgs<ExtArgs>
   pengiriman?: boolean | Prisma.PesananPenjualan$pengirimanArgs<ExtArgs>
   faktur?: boolean | Prisma.PesananPenjualan$fakturArgs<ExtArgs>
+  uangMuka?: boolean | Prisma.PesananPenjualan$uangMukaArgs<ExtArgs>
   _count?: boolean | Prisma.PesananPenjualanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PesananPenjualanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1042,6 +1162,7 @@ export type $PesananPenjualanPayload<ExtArgs extends runtime.Types.Extensions.In
     baris: Prisma.$BarisPesananPenjualanPayload<ExtArgs>[]
     pengiriman: Prisma.$PengirimanPesananPayload<ExtArgs>[]
     faktur: Prisma.$FakturPenjualanPayload<ExtArgs>[]
+    uangMuka: Prisma.$UangMukaPelangganPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1450,6 +1571,7 @@ export interface Prisma__PesananPenjualanClient<T, Null = never, ExtArgs extends
   baris<T extends Prisma.PesananPenjualan$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PesananPenjualan$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPesananPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pengiriman<T extends Prisma.PesananPenjualan$pengirimanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PesananPenjualan$pengirimanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PengirimanPesananPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faktur<T extends Prisma.PesananPenjualan$fakturArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PesananPenjualan$fakturArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FakturPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uangMuka<T extends Prisma.PesananPenjualan$uangMukaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PesananPenjualan$uangMukaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UangMukaPelangganPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1975,6 +2097,30 @@ export type PesananPenjualan$fakturArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.FakturPenjualanScalarFieldEnum | Prisma.FakturPenjualanScalarFieldEnum[]
+}
+
+/**
+ * PesananPenjualan.uangMuka
+ */
+export type PesananPenjualan$uangMukaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UangMukaPelanggan
+   */
+  select?: Prisma.UangMukaPelangganSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UangMukaPelanggan
+   */
+  omit?: Prisma.UangMukaPelangganOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UangMukaPelangganInclude<ExtArgs> | null
+  where?: Prisma.UangMukaPelangganWhereInput
+  orderBy?: Prisma.UangMukaPelangganOrderByWithRelationInput | Prisma.UangMukaPelangganOrderByWithRelationInput[]
+  cursor?: Prisma.UangMukaPelangganWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UangMukaPelangganScalarFieldEnum | Prisma.UangMukaPelangganScalarFieldEnum[]
 }
 
 /**
