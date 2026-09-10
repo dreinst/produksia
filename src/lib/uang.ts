@@ -2,7 +2,7 @@ import { Prisma } from "@/prisma-klien/client";
 
 /**
  * Semua perhitungan uang & kuantitas di server memakai Prisma.Decimal (decimal.js),
- * bukan float JS — 0.1 + 0.2 harus persis 0.3, dan total faktur harus sama persis
+ * bukan float JS, 0.1 + 0.2 harus persis 0.3, dan total faktur harus sama persis
  * dengan jumlah barisnya. Kolom DB sudah Decimal(18,2); helper ini menjaga sisi aplikasinya.
  */
 export type Desimal = Prisma.Decimal;
@@ -19,7 +19,7 @@ export function D(v: NilaiDesimal): Desimal {
   }
 }
 
-/** Bulatkan ke 2 desimal (half-up) — dipakai untuk semua nilai uang & jumlah yang disimpan. */
+/** Bulatkan ke 2 desimal (half-up), dipakai untuk semua nilai uang & jumlah yang disimpan. */
 export function uang(v: NilaiDesimal): Desimal {
   return D(v).toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
 }

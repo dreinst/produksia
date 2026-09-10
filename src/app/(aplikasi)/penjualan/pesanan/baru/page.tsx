@@ -1,4 +1,5 @@
 import { wajibHak } from "@/lib/otentikasi";
+import { punyaHak, PERAN_TERTINGGI } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
 import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -6,7 +7,7 @@ import { buatPesananFormulir } from "@/lib/aksi/penjualan";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
 
 export default async function HalamanPesananPenjualanBaru() {
-  await wajibHak("pesanan.buat");
+  const pengguna = await wajibHak("pesanan.buat");
   const [daftarPelanggan, daftarBarang, daftarProyek] = await Promise.all([
     db.pelanggan.findMany({ orderBy: { nama: "asc" } }),
     db.barang.findMany({ orderBy: { nama: "asc" } }),
@@ -18,6 +19,7 @@ export default async function HalamanPesananPenjualanBaru() {
     kode: i.kode,
     nama: i.nama,
     hargaBawaan: Number(i.hargaJual),
+    hargaMinimum: Number(i.hargaMinimum),
   }));
 
   return (
@@ -39,19 +41,19 @@ export default async function HalamanPesananPenjualanBaru() {
         <div className="bidang">
           <label className="label" htmlFor="proyekId">Proyek / Event</label>
           <select id="proyekId" name="proyekId" className="isian" defaultValue="">
-            <option value="">— tanpa event</option>
+            <option value="">Tanpa event</option>
             {daftarProyek.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.kode} - {p.nama}
               </option>
             ))}
           </select>
-          <span className="petunjuk">Dimensi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ); diwariskan ke semua dokumen & jurnal turunannya</span>
+          <span className="petunjuk">Dipakai untuk Laba Rugi per event dan LPJ. Ikut ke semua dokumen turunannya.</span>
         </div>
 
         <div />
 
-        <EditorBarisBarang daftarBarang={opsiBarang} />
+        <EditorBarisBarang daftarBarang={opsiBarang} bolehNego={punyaHak(pengguna, "harga.nego")} bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)} />
 
         <div className="md:col-span-2">
           <button type="submit" className="tombol tombol-utama">

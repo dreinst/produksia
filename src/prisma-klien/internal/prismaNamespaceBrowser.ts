@@ -101,6 +101,8 @@ export const ModelName = {
   HakAksesPeran: 'HakAksesPeran',
   PermintaanAturUlang: 'PermintaanAturUlang',
   MutasiBank: 'MutasiBank',
+  Prive: 'Prive',
+  PemetaanAkunTambahan: 'PemetaanAkunTambahan',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -235,6 +237,7 @@ export const BarangScalarFieldEnum = {
   satuan: 'satuan',
   hargaBeli: 'hargaBeli',
   hargaJual: 'hargaJual',
+  hargaMinimum: 'hargaMinimum',
   stokMinimum: 'stokMinimum',
   dibuatPada: 'dibuatPada',
   akunPendapatanId: 'akunPendapatanId',
@@ -796,10 +799,42 @@ export const MutasiBankScalarFieldEnum = {
   berkas: 'berkas',
   diimporPada: 'diimporPada',
   penggunaNama: 'penggunaNama',
-  barisJurnalId: 'barisJurnalId'
+  barisJurnalId: 'barisJurnalId',
+  perluPerhatian: 'perluPerhatian',
+  dikonfirmasiPada: 'dikonfirmasiPada'
 } as const
 
 export type MutasiBankScalarFieldEnum = (typeof MutasiBankScalarFieldEnum)[keyof typeof MutasiBankScalarFieldEnum]
+
+
+export const PriveScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  tanggal: 'tanggal',
+  pemilikNama: 'pemilikNama',
+  akunKasId: 'akunKasId',
+  akunPriveId: 'akunPriveId',
+  jumlah: 'jumlah',
+  keterangan: 'keterangan',
+  jurnalId: 'jurnalId',
+  penggunaNama: 'penggunaNama',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PriveScalarFieldEnum = (typeof PriveScalarFieldEnum)[keyof typeof PriveScalarFieldEnum]
+
+
+export const PemetaanAkunTambahanScalarFieldEnum = {
+  id: 'id',
+  kunci: 'kunci',
+  label: 'label',
+  akunId: 'akunId',
+  keterangan: 'keterangan',
+  dibuatOleh: 'dibuatOleh',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PemetaanAkunTambahanScalarFieldEnum = (typeof PemetaanAkunTambahanScalarFieldEnum)[keyof typeof PemetaanAkunTambahanScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {

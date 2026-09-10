@@ -1,4 +1,4 @@
-# Audit Proyek — Accurate Copy
+# Audit Proyek Produksia
 
 Tanggal: 6 September 2026, diperbarui 7 September 2026 (butir 7, 16, 18, 19c, 21, 24). Cakupan awal: seluruh `src/` (33 halaman, 7 file action, 8 komponen), skema Prisma, skrip seed & regresi.
 
@@ -41,7 +41,7 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 ## C. Teknis / operasional
 
 20. **[FIXED] Lint bersih.** 2 error React Compiler (setKeadaan dalam effect di BilahSamping; mutasi variabel luar di Buku Besar) diperbaiki; `tsc --noEmit` dan `eslint` lulus tanpa error.
-21. **[FIXED] Belum ada CI/commit.** Semua pekerjaan di-commit ke `github.com/dreinst/accuratecopy` (main). `.github/workflows/ci.yml`: PostgreSQL 16 sebagai service → `prisma migrate deploy` + `generate` → `tsc` → `eslint` → seed → 11 suite regresi + `uji-sinkron` (`UJI_TANPA_SESI=1`) → `next build`.
+21. **[FIXED] Belum ada CI/commit.** Semua pekerjaan di-commit ke `github.com/dreinst/produksia` (main; sebelumnya `accuratecopy`). `.github/workflows/ci.yml`: PostgreSQL 16 sebagai service → `prisma migrate deploy` + `generate` → `tsc` → `eslint` → seed → 11 suite regresi + `uji-sinkron` (`UJI_TANPA_SESI=1`) → `next build`.
 24. **[FIXED] Sisa nama Inggris di kode** setelah butir 19f: fungsi halaman (`InvoicesPage` → `HalamanFakturPenjualan`, `Home` → `Beranda`, dst.), tipe (`OrderLine` → `BarisPesananOpsi`, `ItemOption` → `OpsiBarang`, `InvoiceLine` → `BarisFakturOpsi`, `AccountOption` → `OpsiAkun`), kelas CSS sisa (`page-subjudul` → `subjudul-halaman`), dan dokumentasi yang masih menyebut `pgctl.sh awal`/`skrip/uji-penjualan*.ts` (artefak penggantian otomatis).
 
 25. **[FIXED] Bagan akun standar EO/WO** (10 Sep 2026, dari `coa-draft-eo-wo.md`). Kurasi 108 akun bernomor ala Accurate (41 asli, 52 usulan standar, 15 keputusan atas butir pending — semua dicatat di `BAGAN-AKUN.md` dan tampil di `/pengaturan/bagan-akun`). Skema `Akun` mendapat `kelompok`, `kasBank`, `keterangan` (migrasi `bagan_akun`). Penerapan idempoten (`terapkanBaganAkunStandar`), pemetaan akun otomatis terisi. **Pengaman baru:** akun kelompok ditolak di jurnal umum, kas masuk/keluar, jurnal otomatis penjualan/pembelian, penyusutan, dan pemetaan (`pastikanAkunRinci`); pilihan akun di semua formulir hanya akun rinci; pilihan kas/bank hanya akun bertanda. Neraca Saldo kini berjenjang dengan subtotal per kelompok. Seed & data induk akun (bidang boolean) disesuaikan. Suite regresi baru `skrip/uji-bagan-akun.ts`. Sisa: satu akun pendapatan untuk semua faktur (belum per barang/jasa), pajak belum dihitung otomatis.
@@ -77,6 +77,16 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 23. **[OPEN] Turbopack tidak me-reload Prisma Client setelah `prisma generate`** — restart `npm run dev` setiap ganti skema (sudah dicatat di README).
 
 ## Verifikasi yang dilakukan
+
+### 11 September 2026 (lanjutan 4): audit salinan UI, prive, nego harga, pemetaan akun tambahan, rekonsiliasi perlu perhatian, ganti nama Produksia
+
+- Seluruh teks UI disederhanakan untuk karyawan baru: subjudul satu-dua kalimat, tanpa tanda pisah panjang, catatan panjang di Pajak & SPT, Pemetaan Akun, Hak Akses, Pengguna, dan laporan dipangkas; placeholder pilihan konsisten ("Tanpa event", "-").
+- Rekonsiliasi Kas/Bank: mutasi cocok penuh tanpa kotak centang; hanya mutasi beda tanggal berstatus "Perlu perhatian" dengan centang "sudah dicek" (`perluPerhatian`, `dikonfirmasiPada`); tombol **Impor mutasi rekening** dengan ikon di kepala halaman; alur impor dua langkah dengan tombol "Baca berkas" dan "Simpan N mutasi".
+- Prive: modul Kas & Bank → Prive (jurnal PRV, hapus dengan pembalikan) dan Laporan → Laporan Prive; seed menambah prive Rp 500.000.
+- Harga: kolom Harga jual dan Margin di Stok per Gudang; `Barang.hargaMinimum`; validasi nego harga di penawaran/pesanan menurut hak `harga.nego` dan peran tertinggi; editor baris mengunci harga tanpa hak.
+- Pemetaan Akun: tabel pemetaan tambahan (tambah nama peran, ganti akun, hapus) untuk Admin ke atas (`pemetaan.tulis`), dipakai Prive sebagai akun bawaan.
+- Skrip uji: `uji-prive.ts` baru (prive, laporan, pemetaan tambahan, nego per peran lewat `UJI_PERAN`), `uji-rekonsiliasi.ts` memeriksa tanda perlu perhatian & konfirmasi, `uji-hak-akses.ts` menghitung `HAK_LAIN` dari sumbernya; 21 suite lulus, `tsc`, `eslint`, `next build` bersih.
+- Nama sistem diganti menjadi **Produksia** (UI, metadata, dokumen, `package.json`, bawaan nama perusahaan); repo dipindah ke `github.com/dreinst/produksia`.
 
 ### 10–11 September 2026 (lanjutan 3) — uang muka, pindah barang, tutup buku, arus kas, pajak & SPT, hak akses per dokumen, lupa kata sandi, pelepasan aset, proyek/LPJ, rekonsiliasi kas/bank, laporan tambahan, tahun buku, nama pengguna
 

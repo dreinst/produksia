@@ -52,7 +52,7 @@ export default async function HalamanArusKas({ searchParams }: { searchParams: P
       <KepalaHalaman
         jejak={[{ label: "Buku Besar" }]}
         judul="Laporan Arus Kas"
-        subjudul={`Metode langsung, periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)} — dari ${a.jumlahJurnal} jurnal yang menyentuh akun kas/bank.`}
+        subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
         lencana={<span className={`lencana ${a.cocok ? "lencana-emerald" : "lencana-rose"}`}>{a.cocok ? "Kas akhir = buku besar" : "TIDAK COCOK dengan buku besar"}</span>}
       />
       <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />

@@ -5,7 +5,7 @@ type Tx = Prisma.TransactionClient;
 
 /**
  * Kurangi stok dengan pengecekan ketersediaan. Dipanggil di dalam transaksi.
- * Pengaman terakhir untuk kondisi balapan ada di DB: CHECK ("jumlah" >= 0) pada StokBarang —
+ * Pengaman terakhir untuk kondisi balapan ada di DB: CHECK ("jumlah" >= 0) pada StokBarang -
  * kalau dua transaksi bersamaan sama-sama lolos cek ini, yang kedua ditolak DB dan
  * seluruh transaksinya dibatalkan (bukan stok jadi minus).
  */

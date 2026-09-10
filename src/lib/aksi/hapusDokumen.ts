@@ -36,6 +36,7 @@ export type JenisDokumen =
   | "penyesuaian"
   | "pindahBarang"
   | "pphFinal"
+  | "prive"
   | "aset"
   | "penyusutan"
   | "pelepasanAset";
@@ -57,6 +58,7 @@ const LABEL: Record<JenisDokumen, string> = {
   penyesuaian: "Penyesuaian Stok",
   pindahBarang: "Pindah Barang",
   pphFinal: "PPh Final Bulanan",
+  prive: "Prive",
   aset: "Aset Tetap",
   penyusutan: "Penyusutan",
   pelepasanAset: "Pelepasan Aset",
@@ -79,6 +81,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   penyesuaian: ["/persediaan/penyesuaian", "/persediaan"],
   pindahBarang: ["/persediaan/pindah", "/persediaan"],
   pphFinal: ["/buku-besar/pajak", "/buku-besar/jurnal"],
+  prive: ["/kas-bank/prive", "/laporan/prive", "/buku-besar/jurnal"],
   aset: ["/aset-tetap"],
   penyusutan: ["/aset-tetap/penyusutan", "/aset-tetap"],
   pelepasanAset: ["/aset-tetap", "/buku-besar/jurnal"],
@@ -142,6 +145,7 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal">, Hak> = {
   penyesuaian: "penyesuaian.hapus",
   pindahBarang: "pindah-barang.hapus",
   pphFinal: "pph-final.hapus",
+  prive: "prive.hapus",
   aset: "aset.hapus",
   penyusutan: "penyusutan.hapus",
   pelepasanAset: "pelepasan-aset.hapus",
@@ -386,6 +390,13 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await tx.pphFinalBulanan.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalId);
         await catatLog(tx, pengguna, jenis, d.jurnal?.nomor ?? d.periode, `PPh Final periode ${d.periode} dibatalkan; beban & hutang PPh Final dibalik`);
+        return;
+      }
+      case "prive": {
+        const d = await tx.prive.findUniqueOrThrow({ where: { id } });
+        await tx.prive.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        await catatLog(tx, pengguna, jenis, d.nomor, `Prive ${d.pemilikNama} ${d.jumlah} dibatalkan; kas dan akun prive dibalik`);
         return;
       }
       case "aset": {

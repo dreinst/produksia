@@ -40,7 +40,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 
 ## Alur rekonsiliasi (bagian 6 catatan) → modul
 
-| Catatan | Modul di Accurate Copy |
+| Catatan | Modul di Produksia |
 |---|---|
 | Proposal ter-ACC / Pesanan | Penawaran (PNW) → Konversi ke Pesanan Penjualan (PSJ) |
 | LPJ (laporan pertanggungjawaban event) | Faktur Penjualan (FJ) setelah event selesai; Surat Jalan (SJ) bila ada barang fisik / jasa diserahkan |

@@ -76,7 +76,7 @@ export default async function HalamanAsetTetapBaru() {
         <div className="bidang">
           <label className="label" htmlFor="akunPembayaranId">Dibayar dari (Kas/Bank atau Hutang)</label>
           <select id="akunPembayaranId" name="akunPembayaranId" className="isian" defaultValue="">
-            <option value="">— tidak dijurnal (aset sudah tercatat)</option>
+            <option value="">Tidak dijurnal (aset sudah tercatat)</option>
             {daftarAkun.filter((a) => a.kasBank || a.jenis === "KEWAJIBAN").map((a) => (
               <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
             ))}

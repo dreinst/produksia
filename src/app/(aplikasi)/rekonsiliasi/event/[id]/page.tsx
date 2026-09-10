@@ -6,8 +6,8 @@ import { ringkasanProyek } from "@/lib/proyek";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { LencanaStatus, NomorDokumen } from "@/komponen/ui/Lencana";
 
-const angka = (v: { toString(): string } | null | undefined) => (v === null || v === undefined ? "—" : Number(v).toLocaleString("id-ID"));
-const tgl = (d: Date | null) => (d ? d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "—");
+const angka = (v: { toString(): string } | null | undefined) => (v === null || v === undefined ? "-" : Number(v).toLocaleString("id-ID"));
+const tgl = (d: Date | null) => (d ? d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-");
 const hariIniIso = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 
 function Kartu({ judul, nilai, sub, warna }: { judul: string; nilai: string; sub?: string; warna?: string }) {
@@ -74,8 +74,8 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* ===== PEMASUKAN ===== */}
         <div className="space-y-4">
-          <h2 className="font-heading font-bold text-slate-900">Pemasukan — Proposal ter-acc / Pesanan → LPJ → Kas/Bank masuk → TOP → Laba/Rugi</h2>
-          <Langkah nomor="1" judul="Proposal disetujui & Pesanan" keterangan="Penawaran yang disetujui klien dan pesanan penjualan event ini">
+          <h2 className="font-heading font-bold text-slate-900">Pemasukan: proposal, pesanan, LPJ, kas masuk</h2>
+          <Langkah nomor="1" judul="Proposal disetujui & Pesanan" keterangan="Penawaran dan pesanan event ini">
             <table className="tabel">
               <thead><tr><th>Dokumen</th><th>Tanggal</th><th>Status</th><th className="text-right">Nilai</th></tr></thead>
               <tbody>
@@ -90,7 +90,7 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
               <tfoot><tr className="font-semibold"><td colSpan={3}>Total pesanan</td><td className="text-right angka">{angka(m.totalPesanan)}</td></tr></tfoot>
             </table>
           </Langkah>
-          <Langkah nomor="2" judul="LPJ: Faktur & termin pembayaran (TOP)" keterangan="Tagihan yang diterbitkan, uang muka yang dipakai, sisa per jatuh tempo">
+          <Langkah nomor="2" judul="LPJ: Faktur & termin pembayaran (TOP)" keterangan="Faktur, uang muka, dan sisa tagihan">
             <table className="tabel">
               <thead><tr><th>Faktur</th><th>Jatuh tempo</th><th className="text-right">Total</th><th className="text-right">DP</th><th className="text-right">Diterima</th><th className="text-right">Sisa</th><th>Status</th></tr></thead>
               <tbody>
@@ -110,7 +110,7 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
               <tfoot><tr className="font-semibold"><td colSpan={2}>Total</td><td className="text-right angka">{angka(m.totalFaktur)}</td><td className="text-right angka">{angka(m.totalUangMuka)}</td><td className="text-right angka">{angka(m.totalDiterima)}</td><td className="text-right angka">{angka(m.sisaPiutang)}</td><td /></tr></tfoot>
             </table>
           </Langkah>
-          <Langkah nomor="3" judul="Kas/Bank masuk & Laba/Rugi" keterangan="Uang yang benar-benar masuk (DP + penerimaan) dan pendapatan yang diakui">
+          <Langkah nomor="3" judul="Kas/Bank masuk & Laba/Rugi" keterangan="Uang yang sudah masuk dan pendapatan yang diakui">
             <table className="tabel">
               <tbody>
                 <tr><td>Kas/bank masuk dari event (jurnal bertanda event)</td><td className="text-right angka font-semibold text-emerald-700">{angka(kas.masuk)}</td></tr>
@@ -125,8 +125,8 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
 
         {/* ===== PENGELUARAN ===== */}
         <div className="space-y-4">
-          <h2 className="font-heading font-bold text-slate-900">Pengeluaran — Pengadaan / Pembelian / Beban-biaya → Nota → Cash flow → Neraca & L/R</h2>
-          <Langkah nomor="1" judul="Pengadaan & pembelian" keterangan="Pesanan pembelian event ini, fakturnya, dan pembayarannya (tunai/transfer)">
+          <h2 className="font-heading font-bold text-slate-900">Pengeluaran: pengadaan, pembelian, beban, kas keluar</h2>
+          <Langkah nomor="1" judul="Pengadaan & pembelian" keterangan="Pesanan pembelian, faktur, dan pembayarannya">
             <table className="tabel">
               <thead><tr><th>PSB</th><th>Pemasok</th><th className="text-right">Pesanan</th><th className="text-right">Faktur (nota)</th><th className="text-right">Dibayar</th><th className="text-right">Sisa hutang</th></tr></thead>
               <tbody>
@@ -138,19 +138,19 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
               <tfoot><tr className="font-semibold"><td colSpan={2}>Total</td><td className="text-right angka text-blue-700">{angka(k.totalPesananPembelian)}</td><td className="text-right angka text-blue-700">{angka(k.totalFakturPembelian)}</td><td className="text-right angka text-blue-700">{angka(k.totalDibayar)}</td><td className="text-right angka">{angka(k.sisaHutang)}</td></tr></tfoot>
             </table>
           </Langkah>
-          <Langkah nomor="2" judul="Beban-biaya langsung (nota kas keluar / jurnal)" keterangan="Kas keluar dan jurnal manual yang diberi tanda event ini">
+          <Langkah nomor="2" judul="Beban-biaya langsung (nota kas keluar / jurnal)" keterangan="Kas keluar dan jurnal yang diberi tanda event ini">
             <table className="tabel">
               <thead><tr><th>Nota</th><th>Tanggal</th><th>Keterangan</th><th className="text-right">Jumlah</th></tr></thead>
               <tbody>
                 {k.bebanLain.map((b) => (
-                  <tr key={b.id}><td><NomorDokumen nomor={b.nomor} /></td><td className="text-slate-500">{tgl(b.tanggal)}</td><td className="text-slate-600">{b.keterangan ?? "—"}</td><td className="text-right angka text-blue-700">{angka(b.jumlah)}</td></tr>
+                  <tr key={b.id}><td><NomorDokumen nomor={b.nomor} /></td><td className="text-slate-500">{tgl(b.tanggal)}</td><td className="text-slate-600">{b.keterangan ?? "-"}</td><td className="text-right angka text-blue-700">{angka(b.jumlah)}</td></tr>
                 ))}
                 {k.bebanLain.length === 0 && <tr><td colSpan={4} className="kosong">Belum ada kas keluar/jurnal beban bertanda event ini.</td></tr>}
               </tbody>
               <tfoot><tr className="font-semibold"><td colSpan={3}>Total beban langsung lewat kas/jurnal</td><td className="text-right angka text-blue-700">{angka(k.totalBebanLain)}</td></tr></tfoot>
             </table>
           </Langkah>
-          <Langkah nomor="3" judul="Cash flow keluar & beban diakui" keterangan="Uang yang benar-benar keluar vs biaya yang diakui di L/R (termasuk HPP barang yang dipakai)">
+          <Langkah nomor="3" judul="Cash flow keluar & beban diakui" keterangan="Uang yang sudah keluar dan biaya yang diakui">
             <table className="tabel">
               <tbody>
                 <tr><td>Kas/bank keluar untuk event (jurnal bertanda event)</td><td className="text-right angka font-semibold text-blue-700">{angka(kas.keluar)}</td></tr>
@@ -178,19 +178,19 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
             <tbody>
               <tr><td>Pendapatan diakui</td><td className="text-right angka">{angka(lr.totalPendapatan)}</td></tr>
               <tr><td>− Biaya dikeluarkan (beban diakui)</td><td className="text-right angka text-blue-700">{angka(lr.totalBeban)}</td></tr>
-              <tr className="font-semibold border-t border-slate-200"><td>Laba/Rugi event — masuk ke Laporan Laba Rugi</td><td className={`text-right angka ${lr.laba.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(lr.laba)}</td></tr>
+              <tr className="font-semibold border-t border-slate-200"><td>Laba/Rugi event</td><td className={`text-right angka ${lr.laba.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(lr.laba)}</td></tr>
             </tbody>
           </table>
           <table className="tabel">
             <tbody>
               <tr><td>Kas/bank masuk</td><td className="text-right angka">{angka(kas.masuk)}</td></tr>
               <tr><td>− Kas/bank keluar</td><td className="text-right angka text-blue-700">{angka(kas.keluar)}</td></tr>
-              <tr className="font-semibold border-t border-slate-200"><td>Kas bersih event — masuk ke Neraca (kas/bank)</td><td className={`text-right angka ${kas.bersih.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(kas.bersih)}</td></tr>
+              <tr className="font-semibold border-t border-slate-200"><td>Kas bersih event</td><td className={`text-right angka ${kas.bersih.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(kas.bersih)}</td></tr>
               <tr className="text-xs text-slate-500"><td>Selisih Laba/Rugi vs kas</td><td className="text-right angka">{angka(lr.laba.minus(kas.bersih))}</td></tr>
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-slate-500">Selisih laba vs kas dijelaskan oleh piutang belum tertagih (Rp {angka(m.sisaPiutang)}), hutang belum dibayar (Rp {angka(k.sisaHutang)}), persediaan yang dipakai (HPP) atau dibeli tapi belum terpakai, serta pajak/potongan. {kas.jumlahJurnal} jurnal bertanda event ini.</p>
+        <p className="text-xs text-slate-500">Selisih laba dan kas berasal dari piutang belum tertagih (Rp {angka(m.sisaPiutang)}), hutang belum dibayar (Rp {angka(k.sisaHutang)}), dan persediaan.</p>
       </div>
     </div>
   );

@@ -21,14 +21,14 @@ export default async function HalamanJurnalBaru() {
         <div className="bidang">
           <label className="label" htmlFor="proyekId">Proyek / Event</label>
           <select id="proyekId" name="proyekId" className="isian" defaultValue="">
-            <option value="">— tanpa event</option>
+            <option value="">Tanpa event</option>
             {daftarProyek.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.kode} - {p.nama}
               </option>
             ))}
           </select>
-          <span className="petunjuk">Dimensi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ); diwariskan ke semua dokumen & jurnal turunannya</span>
+          <span className="petunjuk">Dipakai untuk Laba Rugi per event dan LPJ. Ikut ke semua dokumen turunannya.</span>
         </div>
 
         <EditorBarisJurnal daftarAkun={daftarAkun} />

@@ -35,7 +35,7 @@ export default async function HalamanHakAkses() {
       <KepalaHalaman
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }]}
         judul="Hak Akses per Dokumen"
-        subjudul={`Tentukan per peran dokumen mana yang boleh dilihat, dibuat, dan dihapus. ${PERAN_TERTINGGI.map((p) => LABEL_PERAN[p]).join(" & ")} selalu penuh. Perubahan langsung berlaku pada permintaan berikutnya, tanpa perlu masuk ulang.`}
+        subjudul={`Atur per peran: dokumen mana yang boleh dilihat, dibuat, dan dihapus. ${PERAN_TERTINGGI.map((p) => LABEL_PERAN[p]).join(" dan ")} selalu penuh.`}
         lencana={<span className={`lencana ${penyesuaian.length ? "lencana-amber" : "lencana-emerald"}`}>{penyesuaian.length ? `${penyesuaian.length} penyesuaian dari bawaan` : "Semua bawaan"}</span>}
       />
 
@@ -67,7 +67,7 @@ export default async function HalamanHakAkses() {
                         <td>{d.label} <span className="mono text-xs text-slate-400">{d.kode}</span></td>
                         {PERAN_DAPAT_DIATUR.map((p) => AKSI.map((a) => (
                           <td key={`${p}-${a}`} className={`text-center ${a === "lihat" ? "border-l border-slate-200" : ""}`}>
-                            {(d.aksi as readonly string[]).includes(a) ? <Kotak peran={p} hak={`${d.kode}.${a}` as Hak} /> : <span className="text-slate-300">—</span>}
+                            {(d.aksi as readonly string[]).includes(a) ? <Kotak peran={p} hak={`${d.kode}.${a}` as Hak} /> : <span className="text-slate-300">-</span>}
                           </td>
                         )))}
                       </tr>
@@ -91,7 +91,7 @@ export default async function HalamanHakAkses() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button type="submit" className="tombol tombol-utama">Simpan hak akses</button>
-          <span className="text-xs text-slate-500">Kotak berbingkai kuning = berbeda dari bawaan. Hak menghapus dokumen membalik stok & jurnal, berikan hanya ke peran yang paham.</span>
+          <span className="text-xs text-slate-500">Kotak berbingkai kuning berbeda dari bawaan.</span>
         </div>
       </FormulirAksi>
 

@@ -84,7 +84,7 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
       if (selisih.gt(0)) await perbaruiHargaRata(tx, b.barangId, selisih, hargaSatuan, true);
       barisTersimpan.push({ barangId: b.barangId, jumlahSebelum, jumlahSesudah: b.jumlahSesudah, hargaSatuan });
     }
-    if (barisTersimpan.length === 0) throw new Error("Tidak ada perubahan jumlah — semua baris sama dengan stok saat ini");
+    if (barisTersimpan.length === 0) throw new Error("Tidak ada perubahan jumlah. Semua baris sama dengan stok saat ini");
 
     const penyesuaian = await tx.penyesuaianPersediaan.create({
       data: { nomor, gudangId, akunLawanId, keterangan: keterangan || null, baris: { create: barisTersimpan } },

@@ -27,7 +27,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
       <KepalaHalaman
         jejak={[{ label: "Persediaan" }]}
         judul="Stok per Gudang"
-        subjudul="Jumlah fisik dan nilainya (harga pokok rata-rata bergerak). Nilai ini harus sama dengan saldo akun Persediaan di buku besar."
+        subjudul="Jumlah fisik, harga pokok, harga jual, dan margin per barang. Nilai stok harus sama dengan saldo akun Persediaan."
         aksi={
           punyaHak(pengguna, "pindah-barang.buat") || punyaHak(pengguna, "penyesuaian.buat") ? (
             <span className="flex items-center gap-2">
@@ -77,6 +77,8 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
                 <th className="text-right">Jumlah</th>
                 <th>Satuan</th>
                 <th className="text-right">Harga pokok</th>
+                <th className="text-right">Harga jual</th>
+                <th className="text-right">Margin</th>
                 <th className="text-right">Nilai</th>
                 <th>Status</th>
               </tr>
@@ -86,6 +88,11 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
                 const jumlah = Number(s.jumlah);
                 const minimum = Number(s.barang.stokMinimum);
                 const nilai = jumlah * Number(s.barang.hargaBeli);
+                const hargaPokok = Number(s.barang.hargaBeli);
+                const hargaJual = Number(s.barang.hargaJual);
+                const hargaMinimum = Number(s.barang.hargaMinimum);
+                const margin = hargaJual - hargaPokok;
+                const marginPersen = hargaPokok > 0 ? (margin / hargaPokok) * 100 : null;
                 return (
                   <tr key={`${s.barangId}-${s.gudangId}`}>
                     <td className="mono">{s.barang.kode}</td>
@@ -93,7 +100,15 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
                     <td className="text-slate-500">{s.gudang.nama}</td>
                     <td className="text-right angka font-semibold">{jumlah.toLocaleString("id-ID")}</td>
                     <td className="text-slate-500">{s.barang.satuan}</td>
-                    <td className="text-right angka">{Number(s.barang.hargaBeli).toLocaleString("id-ID")}</td>
+                    <td className="text-right angka">{hargaPokok.toLocaleString("id-ID")}</td>
+                    <td className="text-right angka">
+                      {hargaJual.toLocaleString("id-ID")}
+                      {hargaMinimum > 0 && <div className="text-xs text-slate-400">min. {hargaMinimum.toLocaleString("id-ID")}</div>}
+                    </td>
+                    <td className={`text-right angka ${margin < 0 ? "text-rose-700" : margin > 0 ? "text-emerald-700" : ""}`}>
+                      {margin.toLocaleString("id-ID")}
+                      {marginPersen !== null && <div className="text-xs text-slate-400">{marginPersen.toLocaleString("id-ID", { maximumFractionDigits: 1 })}%</div>}
+                    </td>
                     <td className="text-right angka">{nilai.toLocaleString("id-ID")}</td>
                     <td>
                       {minimum > 0 && jumlah < minimum ? (
@@ -109,7 +124,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
               })}
               {daftarStok.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="kosong">
+                  <td colSpan={10} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada stok. Isi saldo awal lewat Penyesuaian Stok."}
                   </td>
                 </tr>

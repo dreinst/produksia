@@ -171,6 +171,7 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
       { nama: "satuan", label: "Satuan", jenis: "text", nilaiBawaan: "pcs" },
       { nama: "hargaBeli", label: "Harga Beli", jenis: "number", nilaiBawaan: "0" },
       { nama: "hargaJual", label: "Harga Jual", jenis: "number", nilaiBawaan: "0" },
+      { nama: "hargaMinimum", label: "Harga Minimum (batas nego, 0 = tanpa batas)", jenis: "number", nilaiBawaan: "0" },
       { nama: "stokMinimum", label: "Stok Minimum", jenis: "number", nilaiBawaan: "0" },
       {
         nama: "akunPendapatanId",

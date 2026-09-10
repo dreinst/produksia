@@ -2,7 +2,7 @@ import type { JenisAkun } from "@/prisma-klien/enums";
 
 /*
  * Bagan Akun Standar untuk usaha Event Organizer / Wedding Organizer (EO/WO).
- * Hasil kurasi dari catatan tangan pemilik (10 September 2026) — lihat BAGAN-AKUN.md untuk
+ * Hasil kurasi dari catatan tangan pemilik (10 September 2026), lihat BAGAN-AKUN.md untuk
  * keputusan tiap butir yang semula "pending".
  *
  * Penomoran ala Accurate: X-YZWW
@@ -60,7 +60,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "1-2940", nama: "Akumulasi Penyusutan Peralatan Event", jenis: A, induk: "1-2900", asal: "USUL" },
   { kode: "1-2950", nama: "Akumulasi Penyusutan Inventaris Kantor", jenis: A, induk: "1-2900", asal: "USUL" },
 
-  { kode: "1-3000", nama: "Investasi Jangka Panjang", jenis: A, kelompok: true, asal: "USUL", keterangan: "Obligasi & investasi dipindah dari Aset Tetap — bukan aset operasional" },
+  { kode: "1-3000", nama: "Investasi Jangka Panjang", jenis: A, kelompok: true, asal: "USUL", keterangan: "Obligasi & investasi dipindah dari Aset Tetap, bukan aset operasional" },
   { kode: "1-3100", nama: "Obligasi", jenis: A, induk: "1-3000", asal: "ASLI" },
   { kode: "1-3200", nama: "Investasi Lainnya", jenis: A, induk: "1-3000", asal: "ASLI", keterangan: "Saham, reksa dana, deposito > 1 tahun" },
 
@@ -97,7 +97,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "4-3000", nama: "Pendapatan Sewa", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Sewa peralatan event & venue" },
   { kode: "4-3100", nama: "Pendapatan Sewa Reguler", jenis: P, induk: "4-3000", asal: "KEPUTUSAN" },
   { kode: "4-3200", nama: "Pendapatan Sewa Flagship", jenis: P, induk: "4-3000", asal: "KEPUTUSAN" },
-  { kode: "4-8000", nama: "Potongan Penjualan", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Kontra-pendapatan (saldo normal debit) — sesuai standar, diskon mengurangi pendapatan, bukan beban pemasaran" },
+  { kode: "4-8000", nama: "Potongan Penjualan", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Kontra-pendapatan (saldo normal debit), sesuai standar, diskon mengurangi pendapatan, bukan beban pemasaran" },
   { kode: "4-8100", nama: "Diskon Penjualan", jenis: P, induk: "4-8000", asal: "KEPUTUSAN", keterangan: "Dipindah dari Beban Pemasaran (catatan asli)" },
   { kode: "4-9000", nama: "Pendapatan Lain-lain", jenis: P, kelompok: true, asal: "USUL" },
   { kode: "4-9100", nama: "Pendapatan Bunga Bank", jenis: P, induk: "4-9000", asal: "USUL" },
@@ -151,12 +151,12 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "5-7200", nama: "Cashback Pelanggan", jenis: B, induk: "5-7000", asal: "ASLI" },
   { kode: "5-7400", nama: "Iklan & Promosi", jenis: B, induk: "5-7000", asal: "USUL", keterangan: "Iklan media sosial, cetak brosur, endorsement" },
 
-  { kode: "5-8000", nama: "Beban Sosial & Sponsorship", jenis: B, kelompok: true, asal: "KEPUTUSAN", keterangan: "'Beban Lain-lain (1)' — tetap dipisah dari (2), diberi nama sesuai isinya" },
+  { kode: "5-8000", nama: "Beban Sosial & Sponsorship", jenis: B, kelompok: true, asal: "KEPUTUSAN", keterangan: "'Beban Lain-lain (1)', tetap dipisah dari (2), diberi nama sesuai isinya" },
   { kode: "5-8100", nama: "Sumbangan", jenis: B, induk: "5-8000", asal: "ASLI" },
   { kode: "5-8200", nama: "Keperluan Rumah Tangga Kantor", jenis: B, induk: "5-8000", asal: "ASLI" },
   { kode: "5-8300", nama: "Sponsorship (Diberikan)", jenis: B, induk: "5-8000", asal: "ASLI" },
 
-  { kode: "5-8500", nama: "Beban Administrasi Bank", jenis: B, kelompok: true, asal: "KEPUTUSAN", keterangan: "'Beban Lain-lain (2)' — dipisah karena sifatnya biaya keuangan, bukan sosial" },
+  { kode: "5-8500", nama: "Beban Administrasi Bank", jenis: B, kelompok: true, asal: "KEPUTUSAN", keterangan: "'Beban Lain-lain (2)', dipisah karena sifatnya biaya keuangan, bukan sosial" },
   { kode: "5-8510", nama: "Administrasi Bank – Rekening Operasional", jenis: B, induk: "5-8500", asal: "ASLI", keterangan: "Satu akun per rekening, sejajar dengan 1-12x0" },
   { kode: "5-8520", nama: "Pajak Bunga Bank", jenis: B, induk: "5-8500", asal: "ASLI" },
 
@@ -191,7 +191,7 @@ export const PEMETAAN_STANDAR = {
 export const KEPUTUSAN_KURASI: readonly { butir: string; keputusan: string }[] = [
   { butir: "Struktur Pendapatan (Reguler/Flagship × Event/Produksi/Sewa)", keputusan: "Dibaca sebagai matriks: tiga kelompok layanan (Event 4-1000, Produksi 4-2000, Sewa 4-3000), masing-masing punya anak Reguler dan Flagship. Reguler = pesanan klien; Flagship = program unggulan milik sendiri. Faktur Penjualan memakai 4-1100 sebagai bawaan." },
   { butir: "Arti \"Adm. Permit Udf.\"", keputusan: "Administrasi Perizinan (5-3600): biaya pengurusan izin keramaian, izin venue, kepolisian, dan surat-surat event." },
-  { butir: "Arti \"TOP\"", keputusan: "Term of Payment — di sistem ini terwujud sebagai tanggal jatuh tempo Faktur Penjualan (bawaan 14 hari) dan status Sebagian/Lunas dari Penerimaan." },
+  { butir: "Arti \"TOP\"", keputusan: "Term of Payment, di sistem ini terwujud sebagai tanggal jatuh tempo Faktur Penjualan (bawaan 14 hari) dan status Sebagian/Lunas dari Penerimaan." },
   { butir: "Coretan di bawah \"Kas\"", keputusan: "Dibaca 'Bank' (1-1200), dibuat sebagai kelompok dengan satu rekening contoh (1-1210) supaya tiap rekening bank bisa punya akun sendiri." },
   { butir: "Redaksi \"Claim/Gagal Produksi\"", keputusan: "Klaim & Gagal Produksi (5-7100): ganti rugi atau pengerjaan ulang akibat komplain klien / produksi gagal. Tetap di Beban Pemasaran sesuai catatan." },
   { butir: "Diskon & Cashback", keputusan: "Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi." },

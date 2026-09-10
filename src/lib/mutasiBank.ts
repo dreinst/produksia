@@ -116,7 +116,7 @@ export function bacaTanggal(teks: string): Date | null {
 /** "1.234.567,89" → 1234567.89; "1,234,567.89" → 1234567.89; "(500)" atau "-500" → -500; "500 DB" → -500; "500 CR" → 500. */
 export function bacaAngka(teks: string): Desimal | null {
   let t = teks.trim();
-  if (!t || t === "-" || t === "—") return null;
+  if (!t || t === "-" || t === "-") return null;
   let negatif = false;
   if (/\bDB\b|\bDR\b/i.test(t)) negatif = true;
   t = t.replace(/\b(DB|DR|CR|IDR|Rp)\b/gi, "").replace(/\s/g, "");
@@ -196,10 +196,10 @@ export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Reco
   const pakaiKolomTerpisah = mentah.some((b) => !b.dariJumlah);
   let sudut: "bank" | "buku" = sudutPandang === "buku" ? "buku" : "bank";
   let keteranganSudut = sudutPandang === "buku"
-    ? "Dipaksa sudut buku: kolom Debit = uang masuk (Dr kas/bank), Kredit = uang keluar."
+    ? "Dibaca sebagai buku kas: Debit = uang masuk, Kredit = uang keluar."
     : sudutPandang === "bank"
-      ? "Dipaksa sudut rekening koran: kolom Kredit bank = uang masuk (Dr kas/bank di buku), Debit bank = uang keluar."
-      : "Tanpa kolom Saldo yang bisa dipakai — dianggap rekening koran: Kredit bank = uang masuk (Dr kas/bank), Debit bank = uang keluar.";
+      ? "Dibaca sebagai rekening koran: Kredit = uang masuk, Debit = uang keluar."
+      : "Tidak ada kolom Saldo. Dibaca sebagai rekening koran: Kredit = uang masuk, Debit = uang keluar.";
   if (sudutPandang === "otomatis" && pakaiKolomTerpisah) {
     // Bandingkan pergerakan saldo antar baris berurutan dengan (masuk − keluar) versi bank vs versi buku
     let cocokBank = 0, cocokBuku = 0;
@@ -214,11 +214,11 @@ export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Reco
     if (cocokBank + cocokBuku > 0) {
       sudut = cocokBuku > cocokBank ? "buku" : "bank";
       keteranganSudut = sudut === "buku"
-        ? `Terdeteksi dari kolom Saldo (${cocokBuku} dari ${cocokBank + cocokBuku} pergerakan cocok): berkas memakai sudut buku — Debit = uang masuk (Dr kas/bank), Kredit = uang keluar.`
-        : `Terdeteksi dari kolom Saldo (${cocokBank} dari ${cocokBank + cocokBuku} pergerakan cocok): rekening koran — Kredit bank = uang masuk (Dr kas/bank di buku), Debit bank = uang keluar.`;
+        ? "Terdeteksi dari kolom Saldo: berkas memakai sudut buku kas. Debit = uang masuk, Kredit = uang keluar."
+        : "Terdeteksi dari kolom Saldo: rekening koran. Kredit = uang masuk, Debit = uang keluar.";
     }
   }
-  if (!pakaiKolomTerpisah) keteranganSudut = "Kolom Jumlah bertanda: positif = uang masuk (Dr kas/bank), negatif/DB = uang keluar (Cr kas/bank).";
+  if (!pakaiKolomTerpisah) keteranganSudut = "Kolom Jumlah: positif = uang masuk, negatif = uang keluar.";
   const baris: BarisMutasi[] = mentah.map(({ dariJumlah, ...b }) => (sudut === "buku" && !dariJumlah ? { ...b, masuk: b.keluar, keluar: b.masuk } : b));
   return { tajuk, peta, baris, diabaikan, format: html ? "html" : "csv", sudutPandang: sudut, keteranganSudut };
 }

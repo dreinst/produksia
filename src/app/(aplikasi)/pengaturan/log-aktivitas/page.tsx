@@ -42,7 +42,7 @@ export default async function HalamanLogAktivitas({ searchParams }: { searchPara
                   <td>
                     <span className="text-slate-500">{l.jenis}</span> <span className="mono font-semibold">{l.nomor}</span>
                   </td>
-                  <td className="text-slate-600">{l.keterangan ?? "—"}</td>
+                  <td className="text-slate-600">{l.keterangan ?? "-"}</td>
                 </tr>
               ))}
               {daftar.length === 0 && (

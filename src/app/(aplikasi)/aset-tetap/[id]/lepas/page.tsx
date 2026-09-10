@@ -67,7 +67,7 @@ export default async function HalamanLepasAset({ params }: { params: Promise<{ i
           <div className="bidang">
             <label className="label" htmlFor="akunPenerimaanId">Akun Kas/Bank penerima</label>
             <select id="akunPenerimaanId" name="akunPenerimaanId" defaultValue={akunKas[0]?.id ?? ""} className="isian">
-              <option value="">— tidak ada hasil</option>
+              <option value="">Tidak ada hasil</option>
               {akunKas.map((a) => (
                 <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
               ))}

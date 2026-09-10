@@ -44,3 +44,8 @@ next-env.d.ts
 
 # hasil tangkapan layar uji browser
 out*/
+
+# berkas alat bantu pengembangan lokal (tidak ikut repo)
+/.claude/
+/.agents/
+/CLAUDE.md

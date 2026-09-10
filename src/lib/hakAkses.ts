@@ -1,13 +1,13 @@
 import type { PeranPengguna } from "@/prisma-klien/enums";
 
 /**
- * Hak akses per dokumen & per peran — file ini aman diimpor dari komponen klien (tidak menyentuh basis data).
+ * Hak akses per dokumen & per peran, file ini aman diimpor dari komponen klien (tidak menyentuh basis data).
  * Setiap jenis dokumen punya hak `lihat` / `buat` / `hapus`; hak lain (data induk, laporan, pengaturan) per modul.
  * Bawaan per peran ada di HAK_BAWAAN; Superadmin/Pemilik selalu penuh, peran lain bisa diubah di
- * Pengaturan › Hak Akses (tabel HakAksesPeran) — hasil akhirnya dihitung `hitungHak` saat sesi dibaca.
+ * Pengaturan › Hak Akses (tabel HakAksesPeran), hasil akhirnya dihitung `hitungHak` saat sesi dibaca.
  * Pemeriksaan sesungguhnya dilakukan di server: `wajibHak` (halaman) dan `wajibHakAksi` (aksi server).
  */
-/** Nama cookie sesi — didefinisikan di sini agar proxy.ts bisa memakainya tanpa menyeret modul basis data. */
+/** Nama cookie sesi, didefinisikan di sini agar proxy.ts bisa memakainya tanpa menyeret modul basis data. */
 export const NAMA_COOKIE_SESI = "sesi_ac";
 
 export type ModulDokumen = "penjualan" | "pembelian" | "kas-bank" | "buku-besar" | "persediaan" | "aset-tetap";
@@ -28,6 +28,7 @@ export const DOKUMEN_HAK = [
   { kode: "retur-pembelian", label: "Retur Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "hapus"] },
   { kode: "kas-masuk", label: "Kas Masuk", modul: "kas-bank", aksi: ["lihat", "buat", "hapus"] },
   { kode: "kas-keluar", label: "Kas Keluar", modul: "kas-bank", aksi: ["lihat", "buat", "hapus"] },
+  { kode: "prive", label: "Prive (pengambilan pemilik)", modul: "kas-bank", aksi: ["lihat", "buat", "hapus"] },
   { kode: "jurnal", label: "Jurnal Umum (manual)", modul: "buku-besar", aksi: ["lihat", "buat", "hapus"] },
   { kode: "tutup-buku", label: "Tutup Buku Tahunan", modul: "buku-besar", aksi: ["buat"] },
   { kode: "pph-final", label: "PPh Final Bulanan", modul: "buku-besar", aksi: ["buat", "hapus"] },
@@ -53,6 +54,8 @@ export const HAK_LAIN = [
   "log-aktivitas.lihat",
   "rekonsiliasi.lihat", // Rekonsiliasi event (LPJ) & kas/bank
   "rekonsiliasi.tulis", // Impor mutasi rekening & pencocokan
+  "harga.nego", // Mengubah harga jual di penawaran/pesanan (nego dengan klien)
+  "pemetaan.tulis", // Pemetaan akun (standar & tambahan)
   "hak-akses.kelola", // hanya Superadmin/Pemilik
 ] as const;
 
@@ -67,6 +70,8 @@ export const LABEL_HAK_LAIN: Record<(typeof HAK_LAIN)[number], string> = {
   "log-aktivitas.lihat": "Log aktivitas · lihat",
   "rekonsiliasi.lihat": "Rekonsiliasi (LPJ & kas/bank) · lihat",
   "rekonsiliasi.tulis": "Rekonsiliasi · impor mutasi & cocokkan",
+  "harga.nego": "Harga jual · boleh nego (ubah harga di penawaran/pesanan)",
+  "pemetaan.tulis": "Pemetaan akun · ubah",
   "hak-akses.kelola": "Hak akses · kelola",
 };
 
@@ -80,7 +85,7 @@ const lihatModul = (...modul: ModulDokumen[]): Hak[] =>
 
 /**
  * Bawaan hak per peran. Superadmin (admin IT) & Pemilik selalu penuh dan tidak bisa dikurangi.
- * Admin = pengelola dokumen & laporan; batasnya diatur Pemilik di Pengaturan › Hak Akses — tanpa
+ * Admin = pengelola dokumen & laporan; batasnya diatur Pemilik di Pengaturan › Hak Akses, tanpa
  * pengaturan perusahaan, pengguna, dan hak akses. Kasir/Gudang hanya dokumen operasionalnya, tanpa laporan keuangan.
  */
 export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
@@ -104,6 +109,7 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     "data-induk.lihat",
     "data-induk.tulis",
     "persediaan.lihat",
+    "harga.nego",
   ],
   GUDANG: [
     ...lihatModul("penjualan", "pembelian", "persediaan"),
@@ -119,7 +125,7 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
 
 export const DAFTAR_PERAN: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "GUDANG"];
 
-/** Tingkat tertinggi: Superadmin dan Pemilik setara — hanya mereka yang boleh menyentuh akun setingkat ini & hak akses. */
+/** Tingkat tertinggi: Superadmin dan Pemilik setara, hanya mereka yang boleh menyentuh akun setingkat ini & hak akses. */
 export const PERAN_TERTINGGI: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK"];
 export function peranTertinggi(peran: PeranPengguna): boolean {
   return PERAN_TERTINGGI.includes(peran);
@@ -136,11 +142,11 @@ export const LABEL_PERAN: Record<PeranPengguna, string> = {
 };
 
 export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
-  SUPERADMIN: "Admin IT: akses penuh setara Pemilik — semua dokumen, laporan keuangan, rekonsiliasi, pengaturan, hak akses, dan semua akun termasuk Pemilik.",
-  PEMILIK: "Akses penuh setara Superadmin — semua dokumen, laporan keuangan, rekonsiliasi, pengaturan, hak akses, dan semua akun.",
-  ADMIN: "Pengelola dokumen: semua dokumen (lihat, buat, hapus), laporan keuangan, rekonsiliasi, data induk, log aktivitas; TANPA pengaturan perusahaan, pengguna, bagan akun, dan hak akses. Batasnya diatur Pemilik di Pengaturan › Hak Akses.",
-  KASIR: "Bawaan: membuat & melihat dokumen penjualan, pembelian, dan kas; data induk; melihat stok; tanpa laporan keuangan dan tanpa hapus.",
-  GUDANG: "Bawaan: surat jalan, terima barang, penyesuaian & pindah stok, data induk; melihat dokumen penjualan/pembelian; tanpa modul keuangan.",
+  SUPERADMIN: "Admin IT. Akses penuh, sama dengan Pemilik.",
+  PEMILIK: "Akses penuh.",
+  ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
+  KASIR: "Dokumen penjualan, pembelian, kas, dan data induk. Tanpa laporan dan tanpa hapus.",
+  GUDANG: "Surat jalan, terima barang, stok, dan data induk.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };

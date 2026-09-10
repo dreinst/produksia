@@ -10,6 +10,7 @@ import { periksaSinkron } from "../src/lib/sinkron";
 import { buatPenawaran, konversiPenawaranKePesanan, buatPengiriman, buatFaktur, buatPenerimaan, buatRetur, buatUangMuka } from "../src/lib/aksi/penjualan";
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatPembayaranPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
 import { buatJurnalManual, buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
+import { buatPrive } from "../src/lib/aksi/prive";
 import { buatAsetTetap, jalankanPenyusutanBulanan } from "../src/lib/aksi/asetTetap";
 import { buatPenyesuaianPersediaan, buatPindahBarang } from "../src/lib/aksi/persediaan";
 import { catatPphFinal } from "../src/lib/aksi/pajak";
@@ -82,11 +83,11 @@ async function main() {
 
   // Barang produksi/merchandise (persediaan) + jasa (tanpa stok, akun pendapatan/beban sendiri)
   const buatBarang = (data: Parameters<typeof db.barang.create>[0]["data"]) => db.barang.create({ data });
-  const lanyard = await buatBarang({ kode: "BRG-001", nama: "Lanyard & ID Card", satuan: "pcs", hargaBeli: 9000, hargaJual: 12000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
-  const stiker = await buatBarang({ kode: "BRG-002", nama: "Stiker & Kupon Event", satuan: "pack", hargaBeli: 13000, hargaJual: 16000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
-  const goodieBag = await buatBarang({ kode: "BRG-003", nama: "Goodie Bag Peserta", satuan: "pcs", hargaBeli: 24000, hargaJual: 29000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
-  const jasaDekor = await buatBarang({ kode: "JSA-001", nama: "Jasa Dekorasi Panggung", jenis: "JASA", satuan: "paket", hargaBeli: 0, hargaJual: 2500000, kelompokId: kelompokJasa.id, akunPendapatanId: pendapatanEvent.id });
-  const jasaSound = await buatBarang({ kode: "JSA-002", nama: "Jasa Sound Engineer (vendor)", jenis: "JASA", satuan: "hari", hargaBeli: 750000, hargaJual: 1000000, kelompokId: kelompokJasa.id, akunPendapatanId: pendapatanEvent.id, akunBebanId: biayaEvent.id });
+  const lanyard = await buatBarang({ kode: "BRG-001", nama: "Lanyard & ID Card", satuan: "pcs", hargaBeli: 9000, hargaJual: 12000, hargaMinimum: 10500, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
+  const stiker = await buatBarang({ kode: "BRG-002", nama: "Stiker & Kupon Event", satuan: "pack", hargaBeli: 13000, hargaJual: 16000, hargaMinimum: 14500, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
+  const goodieBag = await buatBarang({ kode: "BRG-003", nama: "Goodie Bag Peserta", satuan: "pcs", hargaBeli: 24000, hargaJual: 29000, hargaMinimum: 26000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
+  const jasaDekor = await buatBarang({ kode: "JSA-001", nama: "Jasa Dekorasi Panggung", jenis: "JASA", satuan: "paket", hargaBeli: 0, hargaJual: 2500000, hargaMinimum: 2000000, kelompokId: kelompokJasa.id, akunPendapatanId: pendapatanEvent.id });
+  const jasaSound = await buatBarang({ kode: "JSA-002", nama: "Jasa Sound Engineer (vendor)", jenis: "JASA", satuan: "hari", hargaBeli: 750000, hargaJual: 1000000, hargaMinimum: 850000, kelompokId: kelompokJasa.id, akunPendapatanId: pendapatanEvent.id, akunBebanId: biayaEvent.id });
 
   console.log("=== Tahap 0: Modal awal, setor ke bank, saldo awal persediaan ===");
   await jalankan("JU: setoran modal awal Rp 25.000.000 ke Kas", () =>
@@ -208,6 +209,12 @@ async function main() {
   console.log("=== Tahap 15c: Kas Keluar honor crew event (bertanda proyek → masuk LPJ & Laba Rugi per event) ===");
   await jalankan("KK: honor crew wedding Rp 750.000 dari Kas (5-1200, proyek PRJ-001)", () =>
     buatKasKeluar(formulir({ akunKasId: kas.id, akunLawanId: biayaEvent.id, jumlah: 750000, keterangan: "Honor crew & MC wedding Andi & Sari", proyekId: proyek.id })),
+  );
+
+  console.log("=== Tahap 15d: Prive Rp 500.000 (Dr Prive 3-4000 / Cr Kas) ===");
+  const akunPrive = await akun("3-4000");
+  await jalankan("PRV: Donny Donatus mengambil Rp 500.000 dari Kas", () =>
+    buatPrive(formulir({ pemilikNama: "Donny Donatus", akunKasId: kas.id, akunPriveId: akunPrive.id, jumlah: 500000, keterangan: "Keperluan pribadi" })),
   );
 
   console.log("=== Tahap 16: Kas Keluar - bayar sewa kantor ===");

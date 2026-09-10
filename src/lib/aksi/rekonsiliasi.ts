@@ -82,7 +82,7 @@ export async function cocokkanOtomatis(dataFormulir: FormData) {
     db.barisJurnal.findMany({ where: { akunId, mutasiBank: null }, include: { jurnal: { select: { tanggal: true, nomor: true } } }, orderBy: { jurnal: { tanggal: "asc" } } }),
   ]);
   const terpakai = new Set<string>();
-  let cocok = 0;
+  let cocok = 0, perhatian = 0;
   const hari = 24 * 60 * 60 * 1000;
   for (const m of mutasi) {
     const masuk = D(m.masuk), keluar = D(m.keluar);
@@ -94,15 +94,35 @@ export async function cocokkanOtomatis(dataFormulir: FormData) {
     const pilih = kandidat[0];
     if (!pilih) continue;
     terpakai.add(pilih.id);
+    // tanggal buku ≠ tanggal rekening → cocok tapi perlu dicek orang (checkbox "Perlu perhatian")
+    const bedaTanggal = pilih.jurnal.tanggal.toDateString() !== m.tanggal.toDateString();
     await db.$transaction([
-      db.mutasiBank.update({ where: { id: m.id }, data: { barisJurnalId: pilih.id } }),
+      db.mutasiBank.update({ where: { id: m.id }, data: { barisJurnalId: pilih.id, perluPerhatian: bedaTanggal, dikonfirmasiPada: null } }),
       db.barisJurnal.update({ where: { id: pilih.id }, data: { rekonsiliasiPada: new Date() } }),
     ]);
     cocok++;
+    if (bedaTanggal) perhatian++;
   }
-  await catat(pengguna, "COCOK", akunId, `${cocok} mutasi dicocokkan otomatis (toleransi ${toleransi} hari)`);
+  await catat(pengguna, "COCOK", akunId, `${cocok} mutasi dicocokkan otomatis (${perhatian} perlu perhatian karena beda tanggal; toleransi ${toleransi} hari)`);
   revalidatePath(HALAMAN);
-  return { cocok, sisa: mutasi.length - cocok };
+  return { cocok, perhatian, sisa: mutasi.length - cocok };
+}
+
+/** Menyimpan centang "sudah dicek" untuk mutasi yang perlu perhatian (cocok otomatis tapi beda tanggal). */
+export async function konfirmasiPerhatian(dataFormulir: FormData) {
+  const pengguna = await wajibHakAksi("rekonsiliasi.tulis");
+  const akunId = String(dataFormulir.get("akunId") ?? "");
+  const tercentang = new Set<string>();
+  for (const [k, v] of dataFormulir.entries()) if (k.startsWith("cek_") && v === "on") tercentang.add(k.slice(4));
+  const daftar = await db.mutasiBank.findMany({ where: { akunId, perluPerhatian: true }, select: { id: true, dikonfirmasiPada: true } });
+  let berubah = 0;
+  for (const m of daftar) {
+    const harus = tercentang.has(m.id);
+    if (harus && !m.dikonfirmasiPada) { await db.mutasiBank.update({ where: { id: m.id }, data: { dikonfirmasiPada: new Date() } }); berubah++; }
+    if (!harus && m.dikonfirmasiPada) { await db.mutasiBank.update({ where: { id: m.id }, data: { dikonfirmasiPada: null } }); berubah++; }
+  }
+  if (berubah) await catat(pengguna, "CEK", akunId, `${berubah} mutasi beda tanggal ditandai sudah/belum dicek`);
+  revalidatePath(HALAMAN);
 }
 
 /** Pencocokan manual satu mutasi ↔ satu baris jurnal (nominal & arah harus sama). */
@@ -120,7 +140,7 @@ export async function cocokkanManual(dataFormulir: FormData) {
   const sama = masuk.gt(0) ? D(b.debit).equals(masuk) : D(b.kredit).equals(keluar);
   if (!sama) throw new Error(`Nominal tidak sama: mutasi ${masuk.gt(0) ? `masuk ${masuk}` : `keluar ${keluar}`} vs jurnal debit ${b.debit} / kredit ${b.kredit}`);
   await db.$transaction([
-    db.mutasiBank.update({ where: { id: m.id }, data: { barisJurnalId: b.id } }),
+    db.mutasiBank.update({ where: { id: m.id }, data: { barisJurnalId: b.id, perluPerhatian: false, dikonfirmasiPada: new Date() } }),
     db.barisJurnal.update({ where: { id: b.id }, data: { rekonsiliasiPada: new Date() } }),
   ]);
   await catat(pengguna, "COCOK", b.jurnal.nomor, `Mutasi ${m.keterangan} dicocokkan manual`);
@@ -135,7 +155,7 @@ export async function lepasCocok(dataFormulir: FormData) {
   if (!m) throw new Error("Mutasi tidak ditemukan");
   await db.$transaction([
     ...(m.barisJurnalId ? [db.barisJurnal.update({ where: { id: m.barisJurnalId }, data: { rekonsiliasiPada: null } })] : []),
-    db.mutasiBank.update({ where: { id: mutasiId }, data: { barisJurnalId: null } }),
+    db.mutasiBank.update({ where: { id: mutasiId }, data: { barisJurnalId: null, perluPerhatian: false, dikonfirmasiPada: null } }),
   ]);
   await catat(pengguna, "LEPAS", m.keterangan.slice(0, 40), "Pencocokan dilepas");
   revalidatePath(HALAMAN);
@@ -157,21 +177,6 @@ export async function hapusMutasi(dataFormulir: FormData) {
   revalidatePath("/rekonsiliasi/mutasi");
 }
 
-/** Menandai/melepas baris jurnal kas sebagai sudah cocok tanpa mutasi impor (rekonsiliasi manual dengan buku bank). */
-export async function tandaiBarisCocok(dataFormulir: FormData) {
-  await wajibHakAksi("rekonsiliasi.tulis");
-  const akunId = String(dataFormulir.get("akunId") ?? "");
-  const sampai = String(dataFormulir.get("sampai") ?? "");
-  const tercentang = new Set<string>();
-  for (const [k, v] of dataFormulir.entries()) if (k.startsWith("cocok_") && v === "on") tercentang.add(k.slice(6));
-  const daftar = await db.barisJurnal.findMany({ where: { akunId, mutasiBank: null, ...(sampai ? { jurnal: { tanggal: { lte: new Date(`${sampai}T23:59:59.999`) } } } : {}) }, select: { id: true, rekonsiliasiPada: true } });
-  for (const b of daftar) {
-    const harus = tercentang.has(b.id);
-    if (harus && !b.rekonsiliasiPada) await db.barisJurnal.update({ where: { id: b.id }, data: { rekonsiliasiPada: new Date() } });
-    if (!harus && b.rekonsiliasiPada) await db.barisJurnal.update({ where: { id: b.id }, data: { rekonsiliasiPada: null } });
-  }
-  revalidatePath(HALAMAN);
-}
 
 export async function imporMutasiFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(async () => { await imporMutasi(dataFormulir); });
@@ -188,8 +193,8 @@ export async function lepasCocokFormulir(_sebelumnya: StatusFormulir, dataFormul
 export async function hapusMutasiFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => hapusMutasi(dataFormulir));
 }
-export async function tandaiBarisCocokFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
-  return jalankanFormulir(() => tandaiBarisCocok(dataFormulir));
+export async function konfirmasiPerhatianFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => konfirmasiPerhatian(dataFormulir));
 }
 
 /** Hasil pratinjau yang aman dikirim ke komponen klien (tanpa Decimal). */

@@ -13,7 +13,7 @@ export type Periode = { dari: Date; sampai: Date; dariTeks: string; sampaiTeks: 
 
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-/** ?dari=YYYY-MM-DD&sampai=YYYY-MM-DD — bawaan: awal tahun berjalan s.d. hari ini (waktu lokal server). */
+/** ?dari=YYYY-MM-DD&sampai=YYYY-MM-DD, bawaan: awal tahun berjalan s.d. hari ini (waktu lokal server). */
 /** Periode laporan dari query string; bawaan = tahun buku (sampai hari ini bila tahun berjalan, selain itu sampai 31 Des). */
 export function bacaPeriode(p: Record<string, string | string[] | undefined>, tahunBuku?: number): Periode {
   const ambil = (k: string) => {

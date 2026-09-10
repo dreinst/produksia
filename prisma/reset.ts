@@ -6,6 +6,8 @@ async function main() {
   await db.logAktivitas.deleteMany();
   await db.hakAksesPeran.deleteMany();
   await db.mutasiBank.deleteMany();
+  await db.prive.deleteMany();
+  await db.pemetaanAkunTambahan.deleteMany();
   await db.barisPindahBarang.deleteMany();
   await db.pindahBarang.deleteMany();
   await db.barisPenyesuaianPersediaan.deleteMany();

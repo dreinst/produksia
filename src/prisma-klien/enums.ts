@@ -55,6 +55,7 @@ export const SumberJurnal = {
   MANUAL: 'MANUAL',
   PENUTUP: 'PENUTUP',
   PAJAK: 'PAJAK',
+  PRIVE: 'PRIVE',
   KAS_MASUK: 'KAS_MASUK',
   KAS_KELUAR: 'KAS_KELUAR',
   PENJUALAN: 'PENJUALAN',

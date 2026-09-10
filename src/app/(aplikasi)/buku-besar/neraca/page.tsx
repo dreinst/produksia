@@ -20,7 +20,7 @@ export default async function HalamanNeraca({ searchParams }: { searchParams: Pr
       <KepalaHalaman
         jejak={[{ label: "Buku Besar" }]}
         judul="Neraca (Posisi Keuangan)"
-        subjudul={`Per ${tanggal(periode.sampaiTeks)} — tahun yang sudah ditutup ada di akun Laba Ditahan; laba tahun-tahun lalu yang belum ditutup dan tahun berjalan dihitung dari jurnal.`}
+        subjudul={`Per ${tanggal(periode.sampaiTeks)}.`}
         lencana={<span className={`lencana ${n.seimbang ? "lencana-emerald" : "lencana-rose"}`}>{n.seimbang ? "Aset = Kewajiban + Ekuitas" : "TIDAK SEIMBANG"}</span>}
       />
       <FilterPeriode sampai={periode.sampaiTeks} hanyaSampai tahunBuku={pengaturan.tahunBuku} />
@@ -49,12 +49,12 @@ export default async function HalamanNeraca({ searchParams }: { searchParams: Pr
                     </tr>
                   ))}
                   <tr>
-                    <td className="mono text-slate-400">—</td>
+                    <td className="mono text-slate-400">-</td>
                     <td>Laba (rugi) tahun-tahun sebelumnya yang belum ditutup <span className="text-xs text-slate-400">(dihitung)</span></td>
                     <td className="text-right angka">{Number(n.labaDitahan).toLocaleString("id-ID")}</td>
                   </tr>
                   <tr>
-                    <td className="mono text-slate-400">—</td>
+                    <td className="mono text-slate-400">-</td>
                     <td>Laba (rugi) tahun berjalan <span className="text-xs text-slate-400">(dihitung)</span></td>
                     <td className="text-right angka">{Number(n.labaBerjalan).toLocaleString("id-ID")}</td>
                   </tr>

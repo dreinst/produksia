@@ -4,7 +4,7 @@ import { daftarRingkasanProyek } from "@/lib/proyek";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
 
-const angka = (v: { toString(): string } | null) => (v === null ? "—" : Number(v).toLocaleString("id-ID"));
+const angka = (v: { toString(): string } | null) => (v === null ? "-" : Number(v).toLocaleString("id-ID"));
 
 export default async function HalamanRekonsiliasi() {
   await wajibHak("rekonsiliasi.lihat");
@@ -16,7 +16,7 @@ export default async function HalamanRekonsiliasi() {
       <KepalaHalaman
         jejak={[{ label: "Rekonsiliasi" }]}
         judul="Rekonsiliasi Event (LPJ)"
-        subjudul="Per event: proposal disetujui / pesanan → LPJ (faktur & termin) → kas masuk; pengadaan / pembelian / beban → nota → kas keluar → laba/rugi & posisi neraca event."
+        subjudul="Pemasukan, pengeluaran, dan laba/rugi tiap event."
         lencana={<span className={`lencana ${totalLaba >= 0 ? "lencana-emerald" : "lencana-rose"}`}>Laba/Rugi semua event Rp {totalLaba.toLocaleString("id-ID")}</span>}
         aksi={<Link href="/data-induk/proyek" className="tombol tombol-garis">Kelola daftar event</Link>}
       />
@@ -60,7 +60,7 @@ export default async function HalamanRekonsiliasi() {
               {daftar.map((p) => (
                 <tr key={p.id}>
                   <td><span className="mono font-semibold text-slate-900">{p.kode}</span> <span className="text-slate-700">{p.nama}</span></td>
-                  <td className="text-slate-600">{p.pelanggan ?? "—"}</td>
+                  <td className="text-slate-600">{p.pelanggan ?? "-"}</td>
                   <td><LencanaStatus status={p.status} /></td>
                   <td className="text-right angka">{angka(p.nilaiKontrak)}</td>
                   <td className="text-right angka">{angka(p.totalPesanan)}</td>

@@ -447,6 +447,8 @@ export const ModelName = {
   HakAksesPeran: 'HakAksesPeran',
   PermintaanAturUlang: 'PermintaanAturUlang',
   MutasiBank: 'MutasiBank',
+  Prive: 'Prive',
+  PemetaanAkunTambahan: 'PemetaanAkunTambahan',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -463,7 +465,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "pemetaanAkunTambahan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4167,6 +4169,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Prive: {
+      payload: Prisma.$PrivePayload<ExtArgs>
+      fields: Prisma.PriveFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PriveFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PriveFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>
+        }
+        findFirst: {
+          args: Prisma.PriveFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PriveFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>
+        }
+        findMany: {
+          args: Prisma.PriveFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>[]
+        }
+        create: {
+          args: Prisma.PriveCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>
+        }
+        createMany: {
+          args: Prisma.PriveCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PriveCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>[]
+        }
+        delete: {
+          args: Prisma.PriveDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>
+        }
+        update: {
+          args: Prisma.PriveUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>
+        }
+        deleteMany: {
+          args: Prisma.PriveDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PriveUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PriveUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>[]
+        }
+        upsert: {
+          args: Prisma.PriveUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PrivePayload>
+        }
+        aggregate: {
+          args: Prisma.PriveAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePrive>
+        }
+        groupBy: {
+          args: Prisma.PriveGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PriveGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PriveCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PriveCountAggregateOutputType> | number
+        }
+      }
+    }
+    PemetaanAkunTambahan: {
+      payload: Prisma.$PemetaanAkunTambahanPayload<ExtArgs>
+      fields: Prisma.PemetaanAkunTambahanFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PemetaanAkunTambahanFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PemetaanAkunTambahanFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>
+        }
+        findFirst: {
+          args: Prisma.PemetaanAkunTambahanFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PemetaanAkunTambahanFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>
+        }
+        findMany: {
+          args: Prisma.PemetaanAkunTambahanFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>[]
+        }
+        create: {
+          args: Prisma.PemetaanAkunTambahanCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>
+        }
+        createMany: {
+          args: Prisma.PemetaanAkunTambahanCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PemetaanAkunTambahanCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>[]
+        }
+        delete: {
+          args: Prisma.PemetaanAkunTambahanDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>
+        }
+        update: {
+          args: Prisma.PemetaanAkunTambahanUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>
+        }
+        deleteMany: {
+          args: Prisma.PemetaanAkunTambahanDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PemetaanAkunTambahanUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PemetaanAkunTambahanUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>[]
+        }
+        upsert: {
+          args: Prisma.PemetaanAkunTambahanUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PemetaanAkunTambahanPayload>
+        }
+        aggregate: {
+          args: Prisma.PemetaanAkunTambahanAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePemetaanAkunTambahan>
+        }
+        groupBy: {
+          args: Prisma.PemetaanAkunTambahanGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PemetaanAkunTambahanGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PemetaanAkunTambahanCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PemetaanAkunTambahanCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAktivitas: {
       payload: Prisma.$LogAktivitasPayload<ExtArgs>
       fields: Prisma.LogAktivitasFieldRefs
@@ -4395,6 +4545,7 @@ export const BarangScalarFieldEnum = {
   satuan: 'satuan',
   hargaBeli: 'hargaBeli',
   hargaJual: 'hargaJual',
+  hargaMinimum: 'hargaMinimum',
   stokMinimum: 'stokMinimum',
   dibuatPada: 'dibuatPada',
   akunPendapatanId: 'akunPendapatanId',
@@ -4956,10 +5107,42 @@ export const MutasiBankScalarFieldEnum = {
   berkas: 'berkas',
   diimporPada: 'diimporPada',
   penggunaNama: 'penggunaNama',
-  barisJurnalId: 'barisJurnalId'
+  barisJurnalId: 'barisJurnalId',
+  perluPerhatian: 'perluPerhatian',
+  dikonfirmasiPada: 'dikonfirmasiPada'
 } as const
 
 export type MutasiBankScalarFieldEnum = (typeof MutasiBankScalarFieldEnum)[keyof typeof MutasiBankScalarFieldEnum]
+
+
+export const PriveScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  tanggal: 'tanggal',
+  pemilikNama: 'pemilikNama',
+  akunKasId: 'akunKasId',
+  akunPriveId: 'akunPriveId',
+  jumlah: 'jumlah',
+  keterangan: 'keterangan',
+  jurnalId: 'jurnalId',
+  penggunaNama: 'penggunaNama',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PriveScalarFieldEnum = (typeof PriveScalarFieldEnum)[keyof typeof PriveScalarFieldEnum]
+
+
+export const PemetaanAkunTambahanScalarFieldEnum = {
+  id: 'id',
+  kunci: 'kunci',
+  label: 'label',
+  akunId: 'akunId',
+  keterangan: 'keterangan',
+  dibuatOleh: 'dibuatOleh',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PemetaanAkunTambahanScalarFieldEnum = (typeof PemetaanAkunTambahanScalarFieldEnum)[keyof typeof PemetaanAkunTambahanScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {
@@ -5367,6 +5550,8 @@ export type GlobalOmitConfig = {
   hakAksesPeran?: Prisma.HakAksesPeranOmit
   permintaanAturUlang?: Prisma.PermintaanAturUlangOmit
   mutasiBank?: Prisma.MutasiBankOmit
+  prive?: Prisma.PriveOmit
+  pemetaanAkunTambahan?: Prisma.PemetaanAkunTambahanOmit
   logAktivitas?: Prisma.LogAktivitasOmit
 }
 

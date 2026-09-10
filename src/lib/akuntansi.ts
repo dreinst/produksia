@@ -77,7 +77,7 @@ export async function catatJurnal(tx: Tx, prefix: string, keterangan: string, su
   const totalDebit = jumlahkan(baris.map((b) => b.debit));
   const totalKredit = jumlahkan(baris.map((b) => b.kredit));
   if (!totalDebit.equals(totalKredit)) {
-    throw new Error(`Jurnal otomatis ${prefix} tidak seimbang (debit ${totalDebit.toFixed(2)} vs kredit ${totalKredit.toFixed(2)}) — laporkan ke pengembang`);
+    throw new Error(`Jurnal otomatis ${prefix} tidak seimbang (debit ${totalDebit.toFixed(2)} vs kredit ${totalKredit.toFixed(2)}). Laporkan ke pengembang`);
   }
   await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
   await pastikanTahunTerbuka(tx, new Date());
@@ -102,7 +102,7 @@ export function hargaPokokBaris(info: InfoBarang, jumlah: Desimal): Desimal {
 export type BarisKirim = { barangId: string; jumlah: Desimal; hargaPokok: Desimal; sudahDifaktur: Desimal };
 
 /**
- * Surat Jalan: Cr Persediaan (qty × harga pokok saat kirim) — nilai stok turun bersamaan dengan fisiknya.
+ * Surat Jalan: Cr Persediaan (qty × harga pokok saat kirim), nilai stok turun bersamaan dengan fisiknya.
  * Debitnya: HPP untuk porsi yang sudah difaktur lebih dulu, Barang Terkirim Belum Ditagih untuk sisanya
  * (diakui sebagai HPP nanti saat Faktur Penjualan mengonsumsinya).
  */
@@ -195,7 +195,7 @@ export async function catatJurnalPenerimaanPenjualan(
   ]);
 }
 
-/** Uang Muka Pelanggan (JU-UM): Dr Kas/Bank / Cr Uang Muka Pelanggan — kewajiban sampai dipakai faktur. */
+/** Uang Muka Pelanggan (JU-UM): Dr Kas/Bank / Cr Uang Muka Pelanggan, kewajiban sampai dipakai faktur. */
 export async function catatJurnalUangMuka(tx: Tx, uangMuka: { nomor: string; akunId: string; jumlah: Desimal | number | string }, nomorPesanan?: string) {
   const m = await ambilPemetaanAkun(tx);
   if (!m.uangMukaPelangganId) throw new Error("Pemetaan akun 'Uang Muka Pelanggan' belum diatur (Pengaturan > Pemetaan Akun)");
@@ -206,7 +206,7 @@ export async function catatJurnalUangMuka(tx: Tx, uangMuka: { nomor: string; aku
   ]);
 }
 
-/** Retur Penjualan: kebalikan faktur — Dr Pendapatan per akun / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini). */
+/** Retur Penjualan: kebalikan faktur, Dr Pendapatan per akun / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini). */
 export async function catatJurnalReturPenjualan(
   tx: Tx,
   retur: { nomor: string; total: Desimal; ppn?: Desimal },
@@ -396,7 +396,7 @@ export async function catatJurnalPenyesuaianPersediaan(
     })),
     { akunId: penyesuaian.akunLawanId, debit: total.lt(0) ? total.neg() : NOL, kredit: total.gt(0) ? total : NOL, keterangan: `Lawan penyesuaian ${penyesuaian.nomor}` },
   ];
-  return catatJurnal(tx, "JU-PS", `Penyesuaian Persediaan ${penyesuaian.nomor}${penyesuaian.keterangan ? ` — ${penyesuaian.keterangan}` : ""}`, "PERSEDIAAN", baris);
+  return catatJurnal(tx, "JU-PS", `Penyesuaian Persediaan ${penyesuaian.nomor}${penyesuaian.keterangan ? `: ${penyesuaian.keterangan}` : ""}`, "PERSEDIAAN", baris);
 }
 
 /** Perolehan aset tetap: Dr Akun Aset / Cr Kas-Bank atau Hutang. */

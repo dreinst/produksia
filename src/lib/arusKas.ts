@@ -6,7 +6,7 @@ import type { Periode } from "@/lib/laporan";
 /*
  * Laporan arus kas metode langsung, langsung dari jurnal: setiap jurnal yang menyentuh akun kas/bank
  * dipecah menurut akun lawannya (kredit − debit lawan = kas masuk). Karena tiap jurnal seimbang,
- * Σ arus = perubahan saldo kas/bank — dicek ulang ke buku besar (harus persis sama).
+ * Σ arus = perubahan saldo kas/bank, dicek ulang ke buku besar (harus persis sama).
  * Klasifikasi akun lawan: Modal & kewajiban jangka panjang (2-2xxx) → pendanaan;
  * aset tetap & investasi (1-2xxx, 1-3xxx) → investasi; selebihnya → operasi.
  */

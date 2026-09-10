@@ -6,11 +6,11 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const hanken = Hanken_Grotesk({ variable: "--font-hanken", subsets: ["latin"], weight: ["600", "700"], display: "swap" });
 const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"], weight: ["500", "600"], display: "swap" });
-// Ikon Material Symbols (variable font) di-self-host dari src/app/fonts — tanpa request ke Google saat runtime
+// Ikon Material Symbols (variable font) di-self-host dari src/app/fonts, tanpa request ke Google saat runtime
 const materialSymbols = localFont({ src: "./fonts/material-symbols-outlined.woff2", variable: "--font-material", display: "block", weight: "100 700" });
 
 export const metadata: Metadata = {
-  title: "Accurate Copy",
+  title: "Produksia",
   description: "Sistem penjualan, pembelian, persediaan & akuntansi internal",
 };
 

@@ -20,7 +20,7 @@ export async function buatAsetTetap(dataFormulir: FormData) {
   const akunAsetId = String(dataFormulir.get("akunAsetId") ?? "");
   const akunBebanPenyusutanId = String(dataFormulir.get("akunBebanPenyusutanId") ?? "");
   const akunAkumulasiPenyusutanId = String(dataFormulir.get("akunAkumulasiPenyusutanId") ?? "");
-  // opsional: Kas/Bank atau Hutang yang dikredit — kosong berarti aset sudah tercatat, tidak dijurnal lagi
+  // opsional: Kas/Bank atau Hutang yang dikredit, kosong berarti aset sudah tercatat, tidak dijurnal lagi
   const akunPembayaranId = String(dataFormulir.get("akunPembayaranId") ?? "") || null;
 
   if (!kode || !nama) throw new Error("Kode dan nama aset wajib diisi");
@@ -157,7 +157,9 @@ export async function lepasAset(dataFormulir: FormData) {
   if (jenis === "DIJUAL" && hargaJual.gt(0) && !akunPenerimaanId) throw new Error("Akun Kas/Bank penerima hasil penjualan wajib dipilih");
   const tanggal = tanggalTeks ? new Date(`${tanggalTeks}T12:00:00`) : new Date();
   if (Number.isNaN(tanggal.getTime())) throw new Error("Tanggal pelepasan tidak valid");
-  if (tanggal > new Date()) throw new Error("Tanggal pelepasan tidak boleh di masa depan");
+  const akhirHariIni = new Date();
+  akhirHariIni.setHours(23, 59, 59, 999);
+  if (tanggal > akhirHariIni) throw new Error("Tanggal pelepasan tidak boleh di masa depan");
   await pastikanAkunRinci(db, [akunLabaRugiId, ...(akunPenerimaanId ? [akunPenerimaanId] : [])]);
 
   await db.$transaction(async (tx) => {

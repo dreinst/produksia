@@ -29,7 +29,7 @@ export default async function HalamanPengguna() {
       <KepalaHalaman
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }]}
         judul="Pengguna"
-        subjudul="Akun yang bisa masuk ke sistem beserta perannya. Masuk memakai nama pengguna, bukan email."
+        subjudul="Akun yang bisa masuk ke sistem."
         lencana={permintaan.length ? <span className="lencana lencana-amber">{permintaan.length} permintaan lupa kata sandi</span> : undefined}
       />
 
@@ -37,7 +37,7 @@ export default async function HalamanPengguna() {
         <div className="kartu space-y-3 border-amber-200">
           <div>
             <h2 className="judul-kartu">Permintaan atur ulang kata sandi</h2>
-            <p className="subjudul-kartu">Dikirim dari halaman masuk (lupa kata sandi). Buat tautan sekali pakai (berlaku 24 jam) lalu berikan langsung ke orangnya — sistem tidak mengirim email.</p>
+            <p className="subjudul-kartu">Buat tautan sekali pakai (berlaku 24 jam), lalu berikan langsung ke orangnya.</p>
           </div>
           <ul className="divide-y divide-slate-100">
             {permintaan.map((p) => (
@@ -76,7 +76,7 @@ export default async function HalamanPengguna() {
         <FormulirAksi aksi={buatPenggunaFormulir} className="kartu space-y-4 lg:col-span-1 self-start" pesanSukses="Pengguna ditambahkan.">
           <div>
             <h2 className="judul-kartu">Tambah pengguna</h2>
-            <p className="subjudul-kartu">Beritahukan nama pengguna dan kata sandi awal secara langsung; pengguna bisa mengganti kata sandinya di Profil.</p>
+            <p className="subjudul-kartu">Beritahukan nama pengguna dan kata sandi awal. Kata sandi bisa diganti di Profil.</p>
           </div>
           <div className="bidang">
             <label className="label" htmlFor="nama">Nama lengkap</label>
@@ -134,7 +134,7 @@ export default async function HalamanPengguna() {
                         {p.id === saya.id && <span className="ml-2 lencana lencana-blue">Anda</span>}
                       </td>
                       <td className="font-mono text-slate-700">{p.namaPengguna}</td>
-                      <td className="text-slate-500">{p.email ?? "—"}</td>
+                      <td className="text-slate-500">{p.email ?? "-"}</td>
                       <td>{LABEL_PERAN[p.peran]}</td>
                       <td>
                         <span className={`lencana ${p.aktif ? "lencana-emerald" : "lencana-slate"}`}>{p.aktif ? "Aktif" : "Nonaktif"}</span>
@@ -154,7 +154,7 @@ export default async function HalamanPengguna() {
 
           <div className="kartu space-y-3">
             <h2 className="judul-kartu">Arti tiap peran</h2>
-            <p className="subjudul-kartu">Superadmin dan Pemilik setara (tingkat tertinggi); Admin tidak bisa menyentuh akun keduanya.</p>
+            <p className="subjudul-kartu">Superadmin dan Pemilik setara. Admin tidak bisa mengubah akun keduanya.</p>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               {DAFTAR_PERAN.map((p) => (
                 <div key={p} className="ubin">

@@ -1,4 +1,4 @@
-/** Aturan nama pengguna (identitas masuk) dan email kontak — dipakai aksi otentikasi & kelola pengguna. */
+/** Aturan nama pengguna (identitas masuk) dan email kontak, dipakai aksi otentikasi & kelola pengguna. */
 export const POLA_NAMA_PENGGUNA = /^[a-z0-9][a-z0-9._-]{2,31}$/;
 
 export function bacaNamaPengguna(nilai: string): string {

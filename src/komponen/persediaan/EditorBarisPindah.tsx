@@ -73,7 +73,7 @@ export default function EditorBarisPindah({ daftarGudang, daftarBarang, petaStok
                           ))}
                         </select>
                       </td>
-                      <td className="text-right angka text-slate-500">{r.barangId ? `${diAsal.toLocaleString("id-ID")} ${barang?.satuan ?? ""}` : "—"}</td>
+                      <td className="text-right angka text-slate-500">{r.barangId ? `${diAsal.toLocaleString("id-ID")} ${barang?.satuan ?? ""}` : "-"}</td>
                       <td>
                         <input type="number" min={0} max={diAsal} step="0.01" className={`isian isian-kecil ${lebih ? "border-rose-400" : ""}`} value={r.jumlah} onChange={(e) => ubah(i, { jumlah: Number(e.target.value) })} aria-label={`Jumlah pindah baris ${i + 1}`} />
                         {lebih && <span className="petunjuk text-rose-600">Melebihi stok gudang asal</span>}
@@ -83,7 +83,7 @@ export default function EditorBarisPindah({ daftarGudang, daftarBarang, petaStok
                           <>
                             {diTujuan.toLocaleString("id-ID")} <span className="text-emerald-700">→ {(diTujuan + r.jumlah).toLocaleString("id-ID")}</span>
                           </>
-                        ) : "—"}
+                        ) : "-"}
                       </td>
                       <td>
                         <button type="button" onClick={() => setIsian((s) => s.filter((_, idx) => idx !== i))} className="tombol-tautan-bahaya">Hapus</button>

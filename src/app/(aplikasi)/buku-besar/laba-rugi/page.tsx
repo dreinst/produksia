@@ -33,7 +33,7 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
       <KepalaHalaman
         jejak={[{ label: "Laporan" }]}
         judul={proyek ? `Laporan Laba Rugi · Event ${proyek.kode}` : "Laporan Laba Rugi"}
-        subjudul={`${proyek ? `${proyek.nama} — ` : ""}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)} — dihitung langsung dari jurnal${proyek ? " yang bertanda event ini" : ""}.`}
+        subjudul={`${proyek ? `${proyek.nama}. ` : ""}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
         lencana={
           <span className="flex items-center gap-1">
             <a href={tautan("periode")} className={`tombol tombol-kecil ${tampilan === "periode" ? "tombol-utama" : "tombol-garis"}`}>Per periode</a>
@@ -121,7 +121,7 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
             <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold"><span>Laba kotor</span><span className="angka">{rp(lr.labaKotor)}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">− Beban operasional & lainnya</span><span className="angka">{rp(lr.totalBebanLain)}</span></div>
             <div className={`flex justify-between border-t-2 border-slate-300 pt-2 font-bold ${untung ? "text-emerald-700" : "text-rose-700"}`}><span>{untung ? "Laba bersih" : "Rugi bersih"}</span><span className="angka">{rp(lr.labaBersih)}</span></div>
-            <p className="text-xs text-slate-500 pt-2">Akun kontra (mis. Potongan Penjualan) tampil negatif pada kelompoknya. Jurnal penutup tahun (JU-TUTUP) tidak disertakan. Per event: hanya jurnal yang bertanda proyek itu (pesanan penjualan/pembelian, kas, jurnal manual yang diberi event); biaya kantor umum tidak dialokasikan otomatis.</p>
+            <p className="text-xs text-slate-500 pt-2">Jurnal penutup tahun tidak dihitung. Laporan per event hanya memuat transaksi yang diberi tanda event itu.</p>
           </div>
         </div>
       </div>

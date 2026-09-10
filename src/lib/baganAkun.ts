@@ -9,7 +9,7 @@ export type HasilTerapkanBagan = { dibuat: number; sudahAda: number; pemetaanDib
 /**
  * Menerapkan Bagan Akun Standar: akun yang kodenya belum ada dibuat (lengkap dengan induk & tanda),
  * yang sudah ada dibiarkan (nama/tanda buatan pengguna tidak ditimpa; hanya induk yang kosong dilengkapi).
- * Idempoten — aman dijalankan berkali-kali. Pemetaan akun dibuat bila belum ada.
+ * Idempoten, aman dijalankan berkali-kali. Pemetaan akun dibuat bila belum ada.
  */
 export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<HasilTerapkanBagan> {
   const hasil: HasilTerapkanBagan = { dibuat: 0, sudahAda: 0, pemetaanDibuat: false };
@@ -108,4 +108,10 @@ export async function daftarAkunKasBank(klien: Klien = db) {
   const ditandai = await klien.akun.findMany({ where: { kasBank: true, kelompok: false }, orderBy: { kode: "asc" } });
   if (ditandai.length > 0) return ditandai;
   return klien.akun.findMany({ where: { jenis: "ASET", kelompok: false }, orderBy: { kode: "asc" } });
+}
+
+/** Akun dari pemetaan tambahan (Pengaturan, Pemetaan Akun) menurut kuncinya, mis. "prive". */
+export async function akunPemetaanTambahan(klien: Klien, kunci: string) {
+  const p = await klien.pemetaanAkunTambahan.findUnique({ where: { kunci }, include: { akun: true } });
+  return p?.akun ?? null;
 }

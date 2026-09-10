@@ -5,7 +5,7 @@ import { D, kali, jumlahkan, type Desimal } from "@/lib/uang";
 /*
  * Pemeriksaan sinkronisasi buku besar ↔ dokumen/stok. Dipakai kartu Integritas di beranda
  * dan skrip regresi `skrip/uji-sinkron.ts`. Setiap selisih ≠ 0 berarti ada jalur yang tidak
- * menjurnal (atau menjurnal dua kali) — harus diperlakukan sebagai bug.
+ * menjurnal (atau menjurnal dua kali), harus diperlakukan sebagai bug.
  */
 export type Perbandingan = { bukuBesar: Desimal; dokumen: Desimal; selisih: Desimal; sinkron: boolean };
 export type HasilSinkron = {

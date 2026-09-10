@@ -81,7 +81,7 @@ export default async function HalamanUangMukaBaru({ searchParams }: { searchPara
           <div className="bidang">
             <label className="label" htmlFor="jumlah">Jumlah Uang Muka *</label>
             <input id="jumlah" type="number" name="jumlah" step="0.01" min={0} max={maks} defaultValue={maks} required className="isian" />
-            <span className="petunjuk">Maksimal {rp(maks)} (nilai pesanan dikurangi DP yang sudah ada). Dicatat Dr Kas/Bank / Cr Uang Muka Pelanggan; saat faktur dibuat, DP dipakai mengurangi piutang.</span>
+            <span className="petunjuk">Maksimal {rp(maks)}.</span>
           </div>
           <div className="bidang">
             <label className="label" htmlFor="metodeBayar">Metode Pembayaran</label>

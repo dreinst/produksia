@@ -119,7 +119,7 @@ export default async function HalamanNeracaSaldo({ searchParams }: { searchParam
 
       {grandTotalDebit !== grandTotalKredit && (
         <p className="text-red-600 text-sm">
-          Peringatan: total debit dan kredit tidak sama — ada jurnal yang tidak seimbang.
+          Total debit dan kredit tidak sama. Ada jurnal yang tidak seimbang.
         </p>
       )}
     </div>

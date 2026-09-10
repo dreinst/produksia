@@ -2,7 +2,7 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
-import { DOKUMEN_HAK, HAK_BAWAAN, SEMUA_HAK, hitungHak, labelHak, modulTerlihat, punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
+import { DOKUMEN_HAK, HAK_BAWAAN, SEMUA_HAK, HAK_LAIN, hitungHak, labelHak, modulTerlihat, punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
 import { simpanHakAkses, pulihkanHakBawaan } from "../src/lib/aksi/hakAkses";
 
 /** Aksi server diakhiri revalidatePath() yang melempar di luar Next — efek DB-nya sudah tersimpan. */
@@ -38,7 +38,7 @@ const sesi = (peran: PenggunaSesi["peran"], hak: readonly Hak[]): PenggunaSesi =
 async function main() {
   const mulaiUji = new Date();
   console.log("=== 1. Bawaan peran ===");
-  pastikan(SEMUA_HAK.length === DOKUMEN_HAK.reduce((s, d) => s + d.aksi.length, 0) + 11, `${SEMUA_HAK.length} hak: ${DOKUMEN_HAK.length} dokumen + 11 hak modul`);
+  pastikan(SEMUA_HAK.length === DOKUMEN_HAK.reduce((s, d) => s + d.aksi.length, 0) + HAK_LAIN.length, `${SEMUA_HAK.length} hak: ${DOKUMEN_HAK.length} dokumen + ${HAK_LAIN.length} hak modul`);
   pastikan(new Set(SEMUA_HAK).size === SEMUA_HAK.length, "tidak ada hak ganda");
   pastikan(hitungHak("SUPERADMIN").length === SEMUA_HAK.length && hitungHak("PEMILIK").length === SEMUA_HAK.length, "Superadmin & Pemilik penuh");
   pastikan(!punyaHak("ADMIN", "hak-akses.kelola") && !punyaHak("ADMIN", "pengguna.kelola") && !punyaHak("ADMIN", "pengaturan.tulis") && punyaHak("ADMIN", "faktur.hapus") && punyaHak("ADMIN", "buku-besar.lihat") && punyaHak("ADMIN", "rekonsiliasi.tulis"), "Admin: dokumen, laporan, rekonsiliasi; tanpa pengaturan/pengguna/hak akses");

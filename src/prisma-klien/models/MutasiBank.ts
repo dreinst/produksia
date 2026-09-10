@@ -52,6 +52,8 @@ export type MutasiBankMinAggregateOutputType = {
   diimporPada: Date | null
   penggunaNama: string | null
   barisJurnalId: string | null
+  perluPerhatian: boolean | null
+  dikonfirmasiPada: Date | null
 }
 
 export type MutasiBankMaxAggregateOutputType = {
@@ -68,6 +70,8 @@ export type MutasiBankMaxAggregateOutputType = {
   diimporPada: Date | null
   penggunaNama: string | null
   barisJurnalId: string | null
+  perluPerhatian: boolean | null
+  dikonfirmasiPada: Date | null
 }
 
 export type MutasiBankCountAggregateOutputType = {
@@ -84,6 +88,8 @@ export type MutasiBankCountAggregateOutputType = {
   diimporPada: number
   penggunaNama: number
   barisJurnalId: number
+  perluPerhatian: number
+  dikonfirmasiPada: number
   _all: number
 }
 
@@ -114,6 +120,8 @@ export type MutasiBankMinAggregateInputType = {
   diimporPada?: true
   penggunaNama?: true
   barisJurnalId?: true
+  perluPerhatian?: true
+  dikonfirmasiPada?: true
 }
 
 export type MutasiBankMaxAggregateInputType = {
@@ -130,6 +138,8 @@ export type MutasiBankMaxAggregateInputType = {
   diimporPada?: true
   penggunaNama?: true
   barisJurnalId?: true
+  perluPerhatian?: true
+  dikonfirmasiPada?: true
 }
 
 export type MutasiBankCountAggregateInputType = {
@@ -146,6 +156,8 @@ export type MutasiBankCountAggregateInputType = {
   diimporPada?: true
   penggunaNama?: true
   barisJurnalId?: true
+  perluPerhatian?: true
+  dikonfirmasiPada?: true
   _all?: true
 }
 
@@ -249,6 +261,8 @@ export type MutasiBankGroupByOutputType = {
   diimporPada: Date
   penggunaNama: string
   barisJurnalId: string | null
+  perluPerhatian: boolean
+  dikonfirmasiPada: Date | null
   _count: MutasiBankCountAggregateOutputType | null
   _avg: MutasiBankAvgAggregateOutputType | null
   _sum: MutasiBankSumAggregateOutputType | null
@@ -288,6 +302,8 @@ export type MutasiBankWhereInput = {
   diimporPada?: Prisma.DateTimeFilter<"MutasiBank"> | Date | string
   penggunaNama?: Prisma.StringFilter<"MutasiBank"> | string
   barisJurnalId?: Prisma.StringNullableFilter<"MutasiBank"> | string | null
+  perluPerhatian?: Prisma.BoolFilter<"MutasiBank"> | boolean
+  dikonfirmasiPada?: Prisma.DateTimeNullableFilter<"MutasiBank"> | Date | string | null
   akun?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   barisJurnal?: Prisma.XOR<Prisma.BarisJurnalNullableScalarRelationFilter, Prisma.BarisJurnalWhereInput> | null
 }
@@ -306,6 +322,8 @@ export type MutasiBankOrderByWithRelationInput = {
   diimporPada?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   barisJurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perluPerhatian?: Prisma.SortOrder
+  dikonfirmasiPada?: Prisma.SortOrderInput | Prisma.SortOrder
   akun?: Prisma.AkunOrderByWithRelationInput
   barisJurnal?: Prisma.BarisJurnalOrderByWithRelationInput
 }
@@ -327,6 +345,8 @@ export type MutasiBankWhereUniqueInput = Prisma.AtLeast<{
   berkas?: Prisma.StringFilter<"MutasiBank"> | string
   diimporPada?: Prisma.DateTimeFilter<"MutasiBank"> | Date | string
   penggunaNama?: Prisma.StringFilter<"MutasiBank"> | string
+  perluPerhatian?: Prisma.BoolFilter<"MutasiBank"> | boolean
+  dikonfirmasiPada?: Prisma.DateTimeNullableFilter<"MutasiBank"> | Date | string | null
   akun?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   barisJurnal?: Prisma.XOR<Prisma.BarisJurnalNullableScalarRelationFilter, Prisma.BarisJurnalWhereInput> | null
 }, "id" | "sidik" | "barisJurnalId">
@@ -345,6 +365,8 @@ export type MutasiBankOrderByWithAggregationInput = {
   diimporPada?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   barisJurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perluPerhatian?: Prisma.SortOrder
+  dikonfirmasiPada?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MutasiBankCountOrderByAggregateInput
   _avg?: Prisma.MutasiBankAvgOrderByAggregateInput
   _max?: Prisma.MutasiBankMaxOrderByAggregateInput
@@ -369,6 +391,8 @@ export type MutasiBankScalarWhereWithAggregatesInput = {
   diimporPada?: Prisma.DateTimeWithAggregatesFilter<"MutasiBank"> | Date | string
   penggunaNama?: Prisma.StringWithAggregatesFilter<"MutasiBank"> | string
   barisJurnalId?: Prisma.StringNullableWithAggregatesFilter<"MutasiBank"> | string | null
+  perluPerhatian?: Prisma.BoolWithAggregatesFilter<"MutasiBank"> | boolean
+  dikonfirmasiPada?: Prisma.DateTimeNullableWithAggregatesFilter<"MutasiBank"> | Date | string | null
 }
 
 export type MutasiBankCreateInput = {
@@ -383,6 +407,8 @@ export type MutasiBankCreateInput = {
   berkas: string
   diimporPada?: Date | string
   penggunaNama: string
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
   akun: Prisma.AkunCreateNestedOneWithoutMutasiBankInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedOneWithoutMutasiBankInput
 }
@@ -401,6 +427,8 @@ export type MutasiBankUncheckedCreateInput = {
   diimporPada?: Date | string
   penggunaNama: string
   barisJurnalId?: string | null
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
 }
 
 export type MutasiBankUpdateInput = {
@@ -415,6 +443,8 @@ export type MutasiBankUpdateInput = {
   berkas?: Prisma.StringFieldUpdateOperationsInput | string
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   akun?: Prisma.AkunUpdateOneRequiredWithoutMutasiBankNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateOneWithoutMutasiBankNestedInput
 }
@@ -433,6 +463,8 @@ export type MutasiBankUncheckedUpdateInput = {
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
   barisJurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type MutasiBankCreateManyInput = {
@@ -449,6 +481,8 @@ export type MutasiBankCreateManyInput = {
   diimporPada?: Date | string
   penggunaNama: string
   barisJurnalId?: string | null
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
 }
 
 export type MutasiBankUpdateManyMutationInput = {
@@ -463,6 +497,8 @@ export type MutasiBankUpdateManyMutationInput = {
   berkas?: Prisma.StringFieldUpdateOperationsInput | string
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type MutasiBankUncheckedUpdateManyInput = {
@@ -479,6 +515,8 @@ export type MutasiBankUncheckedUpdateManyInput = {
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
   barisJurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type MutasiBankListRelationFilter = {
@@ -510,6 +548,8 @@ export type MutasiBankCountOrderByAggregateInput = {
   diimporPada?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   barisJurnalId?: Prisma.SortOrder
+  perluPerhatian?: Prisma.SortOrder
+  dikonfirmasiPada?: Prisma.SortOrder
 }
 
 export type MutasiBankAvgOrderByAggregateInput = {
@@ -532,6 +572,8 @@ export type MutasiBankMaxOrderByAggregateInput = {
   diimporPada?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   barisJurnalId?: Prisma.SortOrder
+  perluPerhatian?: Prisma.SortOrder
+  dikonfirmasiPada?: Prisma.SortOrder
 }
 
 export type MutasiBankMinOrderByAggregateInput = {
@@ -548,6 +590,8 @@ export type MutasiBankMinOrderByAggregateInput = {
   diimporPada?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   barisJurnalId?: Prisma.SortOrder
+  perluPerhatian?: Prisma.SortOrder
+  dikonfirmasiPada?: Prisma.SortOrder
 }
 
 export type MutasiBankSumOrderByAggregateInput = {
@@ -642,6 +686,8 @@ export type MutasiBankCreateWithoutAkunInput = {
   berkas: string
   diimporPada?: Date | string
   penggunaNama: string
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
   barisJurnal?: Prisma.BarisJurnalCreateNestedOneWithoutMutasiBankInput
 }
 
@@ -658,6 +704,8 @@ export type MutasiBankUncheckedCreateWithoutAkunInput = {
   diimporPada?: Date | string
   penggunaNama: string
   barisJurnalId?: string | null
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
 }
 
 export type MutasiBankCreateOrConnectWithoutAkunInput = {
@@ -703,6 +751,8 @@ export type MutasiBankScalarWhereInput = {
   diimporPada?: Prisma.DateTimeFilter<"MutasiBank"> | Date | string
   penggunaNama?: Prisma.StringFilter<"MutasiBank"> | string
   barisJurnalId?: Prisma.StringNullableFilter<"MutasiBank"> | string | null
+  perluPerhatian?: Prisma.BoolFilter<"MutasiBank"> | boolean
+  dikonfirmasiPada?: Prisma.DateTimeNullableFilter<"MutasiBank"> | Date | string | null
 }
 
 export type MutasiBankCreateWithoutBarisJurnalInput = {
@@ -717,6 +767,8 @@ export type MutasiBankCreateWithoutBarisJurnalInput = {
   berkas: string
   diimporPada?: Date | string
   penggunaNama: string
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
   akun: Prisma.AkunCreateNestedOneWithoutMutasiBankInput
 }
 
@@ -733,6 +785,8 @@ export type MutasiBankUncheckedCreateWithoutBarisJurnalInput = {
   berkas: string
   diimporPada?: Date | string
   penggunaNama: string
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
 }
 
 export type MutasiBankCreateOrConnectWithoutBarisJurnalInput = {
@@ -763,6 +817,8 @@ export type MutasiBankUpdateWithoutBarisJurnalInput = {
   berkas?: Prisma.StringFieldUpdateOperationsInput | string
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   akun?: Prisma.AkunUpdateOneRequiredWithoutMutasiBankNestedInput
 }
 
@@ -779,6 +835,8 @@ export type MutasiBankUncheckedUpdateWithoutBarisJurnalInput = {
   berkas?: Prisma.StringFieldUpdateOperationsInput | string
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type MutasiBankCreateManyAkunInput = {
@@ -794,6 +852,8 @@ export type MutasiBankCreateManyAkunInput = {
   diimporPada?: Date | string
   penggunaNama: string
   barisJurnalId?: string | null
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: Date | string | null
 }
 
 export type MutasiBankUpdateWithoutAkunInput = {
@@ -808,6 +868,8 @@ export type MutasiBankUpdateWithoutAkunInput = {
   berkas?: Prisma.StringFieldUpdateOperationsInput | string
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   barisJurnal?: Prisma.BarisJurnalUpdateOneWithoutMutasiBankNestedInput
 }
 
@@ -824,6 +886,8 @@ export type MutasiBankUncheckedUpdateWithoutAkunInput = {
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
   barisJurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type MutasiBankUncheckedUpdateManyWithoutAkunInput = {
@@ -839,6 +903,8 @@ export type MutasiBankUncheckedUpdateManyWithoutAkunInput = {
   diimporPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
   barisJurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perluPerhatian?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dikonfirmasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -857,6 +923,8 @@ export type MutasiBankSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   diimporPada?: boolean
   penggunaNama?: boolean
   barisJurnalId?: boolean
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: boolean
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   barisJurnal?: boolean | Prisma.MutasiBank$barisJurnalArgs<ExtArgs>
 }, ExtArgs["result"]["mutasiBank"]>
@@ -875,6 +943,8 @@ export type MutasiBankSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   diimporPada?: boolean
   penggunaNama?: boolean
   barisJurnalId?: boolean
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: boolean
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   barisJurnal?: boolean | Prisma.MutasiBank$barisJurnalArgs<ExtArgs>
 }, ExtArgs["result"]["mutasiBank"]>
@@ -893,6 +963,8 @@ export type MutasiBankSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   diimporPada?: boolean
   penggunaNama?: boolean
   barisJurnalId?: boolean
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: boolean
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   barisJurnal?: boolean | Prisma.MutasiBank$barisJurnalArgs<ExtArgs>
 }, ExtArgs["result"]["mutasiBank"]>
@@ -911,9 +983,11 @@ export type MutasiBankSelectScalar = {
   diimporPada?: boolean
   penggunaNama?: boolean
   barisJurnalId?: boolean
+  perluPerhatian?: boolean
+  dikonfirmasiPada?: boolean
 }
 
-export type MutasiBankOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "akunId" | "tanggal" | "keterangan" | "referensi" | "masuk" | "keluar" | "saldo" | "sidik" | "berkas" | "diimporPada" | "penggunaNama" | "barisJurnalId", ExtArgs["result"]["mutasiBank"]>
+export type MutasiBankOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "akunId" | "tanggal" | "keterangan" | "referensi" | "masuk" | "keluar" | "saldo" | "sidik" | "berkas" | "diimporPada" | "penggunaNama" | "barisJurnalId" | "perluPerhatian" | "dikonfirmasiPada", ExtArgs["result"]["mutasiBank"]>
 export type MutasiBankInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   barisJurnal?: boolean | Prisma.MutasiBank$barisJurnalArgs<ExtArgs>
@@ -950,6 +1024,11 @@ export type $MutasiBankPayload<ExtArgs extends runtime.Types.Extensions.Internal
     diimporPada: Date
     penggunaNama: string
     barisJurnalId: string | null
+    /**
+     * Cocok otomatis tapi tanggal buku ≠ tanggal rekening: perlu dicek orang; dikonfirmasiPada diisi setelah dicek
+     */
+    perluPerhatian: boolean
+    dikonfirmasiPada: Date | null
   }, ExtArgs["result"]["mutasiBank"]>
   composites: {}
 }
@@ -1388,6 +1467,8 @@ export interface MutasiBankFieldRefs {
   readonly diimporPada: Prisma.FieldRef<"MutasiBank", 'DateTime'>
   readonly penggunaNama: Prisma.FieldRef<"MutasiBank", 'String'>
   readonly barisJurnalId: Prisma.FieldRef<"MutasiBank", 'String'>
+  readonly perluPerhatian: Prisma.FieldRef<"MutasiBank", 'Boolean'>
+  readonly dikonfirmasiPada: Prisma.FieldRef<"MutasiBank", 'DateTime'>
 }
     
 
