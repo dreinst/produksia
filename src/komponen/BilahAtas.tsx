@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import { keluar } from "@/lib/aksi/otentikasi";
 import { inisialNama, LABEL_PERAN, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
@@ -23,6 +23,7 @@ const tautanTransaksiBaru: { href: string; label: string; kode: string; ikon: st
 export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSesi; saatMenu: () => void }) {
   const router = useRouter();
   const refCari = useRef<HTMLInputElement>(null);
+  const [menuTransaksi, setMenuTransaksi] = useState(false);
   const tautanBoleh = tautanTransaksiBaru.filter((l) => punyaHak(pengguna, l.hak));
 
   // ⌘K / Ctrl+K memfokuskan kotak pencarian
@@ -74,25 +75,51 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
 
       <div className="flex items-center gap-2 md:gap-4 shrink-0">
         {tautanBoleh.length > 0 && (
-          <details className="relative group">
-            <summary className="tombol tombol-utama list-none cursor-pointer select-none [&::-webkit-details-marker]:hidden">
+          <div
+            className="relative group"
+            onMouseLeave={() => setMenuTransaksi(false)}
+            onBlur={(e) => {
+              // fokus keluar dari tombol dan menu (tab/klik di tempat lain) → tutup
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setMenuTransaksi(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setMenuTransaksi(false);
+            }}
+          >
+            <button
+              type="button"
+              className="tombol tombol-utama"
+              aria-haspopup="menu"
+              aria-expanded={menuTransaksi}
+              onClick={() => setMenuTransaksi((v) => !v)}
+            >
               <Ikon nama="add" className="!text-[18px]" />
               <span className="hidden sm:inline">Transaksi Baru</span>
-            </summary>
-            <div className="absolute right-0 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-1.5 z-40" style={{ boxShadow: "var(--shadow-pop)" }}>
-              {tautanBoleh.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                >
-                  <Ikon nama={l.ikon} className="!text-[18px] text-slate-400" />
-                  <span className="flex-1">{l.label}</span>
-                  <span className="mono text-[10px] text-slate-400">{l.kode}</span>
-                </Link>
-              ))}
+            </button>
+            {/* pt-2 menjembatani celah antara tombol dan menu supaya hover tidak terputus */}
+            <div
+              role="menu"
+              className={`absolute right-0 top-full pt-2 w-64 z-40 transition-all duration-150 ${
+                menuTransaksi ? "visible opacity-100 translate-y-0" : "invisible opacity-0 -translate-y-1"
+              } group-hover:visible group-hover:opacity-100 group-hover:translate-y-0`}
+            >
+              <div className="rounded-xl border border-slate-200 bg-white p-1.5" style={{ boxShadow: "var(--shadow-pop)" }}>
+                {tautanBoleh.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    role="menuitem"
+                    onClick={() => setMenuTransaksi(false)}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                  >
+                    <Ikon nama={l.ikon} className="!text-[18px] text-slate-400" />
+                    <span className="flex-1">{l.label}</span>
+                    <span className="mono text-[10px] text-slate-400">{l.kode}</span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </details>
+          </div>
         )}
 
         <div className="hidden md:block h-6 w-px bg-slate-200" />

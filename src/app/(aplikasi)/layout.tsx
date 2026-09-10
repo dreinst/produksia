@@ -13,12 +13,16 @@ import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 export default async function TataLetakAplikasi({ children }: { children: ReactNode }) {
   const pengguna = await penggunaSaatIni();
   if (!pengguna) redirect("/masuk");
-  const [perusahaan, tahunJurnal] = await Promise.all([
+  const [perusahaan, rentang] = await Promise.all([
     ambilPengaturanPerusahaan(),
-    db.$queryRaw<{ tahun: number }[]>`SELECT DISTINCT EXTRACT(YEAR FROM "tanggal")::int AS tahun FROM "Jurnal" ORDER BY 1`,
+    // MIN/MAX memakai indeks Jurnal(tanggal): konstan, tidak memindai seluruh jurnal tiap permintaan
+    db.jurnal.aggregate({ _min: { tanggal: true }, _max: { tanggal: true } }),
   ]);
   const tahunIni = new Date().getFullYear();
-  const daftarTahun = [...new Set([...tahunJurnal.map((t) => t.tahun), perusahaan.tahunBuku, tahunIni - 1, tahunIni, tahunIni + 1])].sort((a, b) => b - a);
+  const tahunAwal = rentang._min.tanggal?.getFullYear() ?? tahunIni;
+  const tahunAkhir = rentang._max.tanggal?.getFullYear() ?? tahunIni;
+  const tahunJurnal = Array.from({ length: Math.max(0, tahunAkhir - tahunAwal + 1) }, (_, i) => tahunAwal + i);
+  const daftarTahun = [...new Set([...tahunJurnal, perusahaan.tahunBuku, tahunIni - 1, tahunIni, tahunIni + 1])].sort((a, b) => b - a);
   return (
     <KerangkaAplikasi pengguna={pengguna} namaPerusahaan={perusahaan.nama} tahunBuku={perusahaan.tahunBuku} daftarTahun={daftarTahun}>
       {children}

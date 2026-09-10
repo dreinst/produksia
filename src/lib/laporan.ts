@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@/prisma-klien/client";
+import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { D, jumlahkan, type Desimal } from "@/lib/uang";
 
@@ -8,6 +8,9 @@ import { D, jumlahkan, type Desimal } from "@/lib/uang";
  * Neraca menyertakannya: tahun yang ditutup sudah pindah ke akun Laba Ditahan, sedangkan laba tahun-tahun
  * yang belum ditutup dan laba tahun berjalan dihitung langsung dari jurnal supaya neraca selalu seimbang.
  */
+
+/** Zona waktu usaha untuk pengelompokan per bulan di SQL (tanggal tersimpan UTC). */
+const ZONA_WAKTU = process.env.ZONA_WAKTU ?? "Asia/Jakarta";
 
 export type Periode = { dari: Date; sampai: Date; dariTeks: string; sampaiTeks: string };
 
@@ -210,11 +213,20 @@ export type LabaRugiBulanan = { tahun: number; bulan: LabaRugiBulan[]; total: Om
 /** Laba Rugi per bulan dalam satu tahun (untuk tampilan bulanan), tanpa jurnal penutup, opsional per proyek. */
 export async function hitungLabaRugiBulanan(klien: PrismaClient = db, tahun: number, opsi: OpsiLaporan = {}): Promise<LabaRugiBulanan> {
   const dari = new Date(tahun, 0, 1), sampai = new Date(tahun, 11, 31, 23, 59, 59, 999);
-  const [baris, pemetaan, daftarAkun] = await Promise.all([
-    klien.barisJurnal.findMany({
-      where: { jurnal: { tanggal: { gte: dari, lte: sampai }, sumber: { not: "PENUTUP" }, ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}) }, akun: { jenis: { in: ["PENDAPATAN", "BEBAN"] } } },
-      select: { debit: true, kredit: true, akunId: true, jurnal: { select: { tanggal: true } }, akun: { select: { jenis: true } } },
-    }),
+  // Dijumlahkan di PostgreSQL per akun per bulan; tidak ada baris jurnal yang dimuat ke memori.
+  // Tanggal disimpan UTC, bulan dihitung menurut zona waktu usaha (sama dengan getMonth() di server Indonesia).
+  const [agregat, pemetaan, daftarAkun] = await Promise.all([
+    klien.$queryRaw<{ akunId: string; jenis: string; bulan: number; debit: Desimal; kredit: Desimal }[]>`
+      SELECT bj."akunId", a."jenis"::text AS jenis,
+             EXTRACT(MONTH FROM ((j."tanggal" AT TIME ZONE 'UTC') AT TIME ZONE ${ZONA_WAKTU}))::int AS bulan,
+             SUM(bj."debit") AS debit, SUM(bj."kredit") AS kredit
+      FROM "BarisJurnal" bj
+      JOIN "Jurnal" j ON j."id" = bj."jurnalId"
+      JOIN "Akun" a ON a."id" = bj."akunId"
+      WHERE j."tanggal" >= ${dari} AND j."tanggal" <= ${sampai} AND j."sumber" <> 'PENUTUP'
+        AND a."jenis" IN ('PENDAPATAN', 'BEBAN')
+        ${opsi.proyekId ? Prisma.sql`AND j."proyekId" = ${opsi.proyekId}` : Prisma.empty}
+      GROUP BY 1, 2, 3`,
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     klien.akun.findMany({ select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } }),
   ]);
@@ -222,9 +234,10 @@ export async function hitungLabaRugiBulanan(klien: PrismaClient = db, tahun: num
   const pokok = keturunanDari(dasar, akarDari(dasar, pemetaan?.hppId));
   const nol = D(0);
   const bulan: LabaRugiBulan[] = Array.from({ length: 12 }, (_, i) => ({ bulan: i + 1, pendapatan: nol, bebanPokok: nol, bebanLain: nol, labaBersih: nol }));
-  for (const b of baris) {
-    const m = bulan[b.jurnal.tanggal.getMonth()];
-    if (b.akun.jenis === "PENDAPATAN") m.pendapatan = m.pendapatan.plus(b.kredit).minus(b.debit);
+  for (const b of agregat) {
+    const m = bulan[b.bulan - 1];
+    if (!m) continue;
+    if (b.jenis === "PENDAPATAN") m.pendapatan = m.pendapatan.plus(b.kredit).minus(b.debit);
     else if (pokok.has(b.akunId)) m.bebanPokok = m.bebanPokok.plus(b.debit).minus(b.kredit);
     else m.bebanLain = m.bebanLain.plus(b.debit).minus(b.kredit);
   }

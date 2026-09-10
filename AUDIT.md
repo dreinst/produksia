@@ -78,6 +78,42 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 
 ## Verifikasi yang dilakukan
 
+### 11 September 2026 (lanjutan 6): kesiapan deploy & kinerja saat banyak pengguna serentak
+
+Temuan dan perbaikan:
+
+1. **[FIXED] 84 kolom relasi (FK) tanpa indeks.** PostgreSQL tidak mengindeks FK otomatis; setiap `include`/`where` relasi memindai tabel. Ditambah `@@index` untuk semua FK plus `tanggal`/`status`/`kedaluwarsa` yang sering difilter (migrasi `indeks_kinerja`, 102 indeks baru).
+2. **[FIXED] Beranda memuat seluruh baris jurnal** (`akun.findMany({ include: { barisJurnal } })`) dan `periksaSinkron` memuat semua faktur, penerimaan barang, baris pengiriman, dan stok ke memori pada setiap kunjungan. Sekarang semuanya `groupBy`/`aggregate`/`SUM` di PostgreSQL; biaya tetap kecil berapa pun jumlah dokumen.
+3. **[FIXED] `hitungLabaRugiBulanan` memuat tiap baris pendapatan/beban setahun.** Diganti `GROUP BY akun, bulan` di SQL (zona waktu `ZONA_WAKTU`).
+4. **[FIXED] Layout menjalankan `SELECT DISTINCT EXTRACT(YEAR)` atas seluruh jurnal di setiap permintaan.** Diganti `MIN/MAX(tanggal)` berindeks.
+5. **[FIXED] Kartu tren beranda memblokir render.** Dipindah ke komponen server async di dalam `<Suspense>` (kerangka tampil dulu, kartu menyusul).
+6. **[FIXED] Pengaturan perusahaan dikueri dua kali per permintaan** (layout + halaman). Dibungkus React `cache()`.
+7. **[FIXED] Tabel `Sesi` tumbuh tanpa batas.** Sesi kedaluwarsa dihapus saat ada yang masuk (indeks `kedaluwarsa`).
+8. **[FIXED] Efek aurora memakai `filter: blur(70px)` pada dua elemen fixed** (mahal di GPU perangkat lemah). Diganti gradasi radial murni tanpa filter; animasinya hanya `transform` di kompositor dan mati pada `prefers-reduced-motion`.
+9. **[FIXED] Pool koneksi tidak bisa diatur & header `X-Powered-By` bocor.** `DB_POOL_MAX`, `poweredByHeader: false`, `output: "standalone"`, `reactStrictMode`.
+10. **[FIXED] Jarak antar isian hilang di formulir `space-y-*`** (fieldset `display: contents` membuat margin `space-y` milik form tidak sampai ke isian; terlihat di halaman masuk: tombol menempel ke kata sandi). `FormulirAksi` menerjemahkan `space-y-N` menjadi `flex flex-col gap-N`; berlaku ke 20 formulir sekaligus.
+11. **[FIXED] Menu Transaksi Baru tetap terbuka setelah diklik.** Kini muncul saat kursor di atasnya dan hilang saat kursor pergi; klik/Enter tetap membuka (layar sentuh), Escape dan pindah fokus menutup.
+12. **[FIXED] Halaman masuk terlalu ramai.** Kembali satu kolom di tengah, latar ringan, hanya nama pengguna, kata sandi, tombol, dan tautan lupa kata sandi.
+
+Batas yang disadari (belum perlu untuk skala usaha ini): pencarian `contains` tanpa indeks trigram; tanpa cache antar permintaan (data selalu segar); satu proses Node per instance (skalakan horizontal di belakang reverse proxy).
+
+Uji beban lokal (`skrip/beban.ts`, build produksi `next start`, PostgreSQL 18 di mesin yang sama, data seed, 30 permintaan serentak per halaman; sukses = 200 dan benar-benar halaman aplikasi, bukan pengalihan):
+
+| Halaman | Serentak | Sukses | p50 ms | p95 ms | Maks ms | Total ms |
+|---|---|---|---|---|---|---|
+| / | 30 | 30/30 | 231 | 232 | 232 | 233 |
+| /buku-besar/neraca | 30 | 30/30 | 78 | 79 | 79 | 79 |
+| /buku-besar/laba-rugi | 30 | 30/30 | 71 | 71 | 71 | 72 |
+| /penjualan/faktur | 30 | 30/30 | 74 | 74 | 74 | 75 |
+| /rekonsiliasi/kas-bank | 30 | 30/30 | 81 | 82 | 82 | 82 |
+| /persediaan | 30 | 30/30 | 75 | 76 | 76 | 76 |
+| /buku-besar/jurnal | 30 | 30/30 | 105 | 106 | 106 | 106 |
+| /laporan/piutang | 30 | 30/30 | 54 | 54 | 54 | 55 |
+
+Campuran 60 permintaan serentak ke 8 halaman: 60/60 sukses dalam 218 ms.
+
+Seluruh permintaan sukses; p95 nyaris sama dengan p50, artinya tidak ada antrean di pool koneksi maupun di server pada beban ini. Angka absolut akan berbeda di server produksi (latensi jaringan, ukuran data), tetapi semua kueri berat sudah berbentuk agregasi berindeks sehingga skalanya mengikuti jumlah akun/periode, bukan jumlah dokumen.
+
 ### 11 September 2026 (lanjutan 5): audit menyeluruh + desain berdimensi & animasi
 
 Acuan: pola dari 21st.dev (aurora/mesh gradient di kompositor, lapisan kaca tipis, border & kartu bercahaya, tombol berkilau, angka berjalan) dan Dribbble (kartu statistik bergradasi, grafik area bergradasi, panel gelap bercahaya). Diterapkan tanpa pustaka tambahan.
