@@ -17,11 +17,16 @@ export default async function HalamanRekonsiliasi() {
         jejak={[{ label: "Rekonsiliasi" }]}
         judul="Rekonsiliasi Event (LPJ)"
         subjudul="Per event: proposal disetujui / pesanan → LPJ (faktur & termin) → kas masuk; pengadaan / pembelian / beban → nota → kas keluar → laba/rugi & posisi neraca event."
-        lencana={<span className={`lencana ${totalLaba >= 0 ? "lencana-emerald" : "lencana-rose"}`}>Laba semua event Rp {totalLaba.toLocaleString("id-ID")}</span>}
+        lencana={<span className={`lencana ${totalLaba >= 0 ? "lencana-emerald" : "lencana-rose"}`}>Laba/Rugi semua event Rp {totalLaba.toLocaleString("id-ID")}</span>}
         aksi={<Link href="/data-induk/proyek" className="tombol tombol-garis">Kelola daftar event</Link>}
       />
 
       <div className="kartu text-sm space-y-2">
+        <div className="flex flex-wrap gap-4 text-xs text-slate-500">
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-blue-600 align-middle mr-1" />Biaya yang dikeluarkan</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-emerald-600 align-middle mr-1" />Laba</span>
+          <span><span className="inline-block w-3 h-3 rounded-sm bg-rose-600 align-middle mr-1" />Rugi</span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="ubin">
             <div className="font-semibold text-slate-900 mb-1">Skema pemasukan</div>
@@ -46,8 +51,8 @@ export default async function HalamanRekonsiliasi() {
                 <th className="text-right">Pesanan (PSJ)</th>
                 <th className="text-right">Pendapatan</th>
                 <th className="text-right">Anggaran biaya</th>
-                <th className="text-right">Realisasi biaya</th>
-                <th className="text-right">Laba (rugi)</th>
+                <th className="text-right">Biaya dikeluarkan</th>
+                <th className="text-right">Laba/Rugi</th>
                 <th />
               </tr>
             </thead>
@@ -61,7 +66,7 @@ export default async function HalamanRekonsiliasi() {
                   <td className="text-right angka">{angka(p.totalPesanan)}</td>
                   <td className="text-right angka">{angka(p.pendapatan)}</td>
                   <td className="text-right angka">{angka(p.anggaranBiaya)}</td>
-                  <td className={`text-right angka ${p.anggaranBiaya && Number(p.beban) > Number(p.anggaranBiaya) ? "text-rose-700" : ""}`}>{angka(p.beban)}</td>
+                  <td className="text-right angka text-blue-700" title={p.anggaranBiaya && Number(p.beban) > Number(p.anggaranBiaya) ? "Melebihi anggaran biaya" : undefined}>{angka(p.beban)}{p.anggaranBiaya && Number(p.beban) > Number(p.anggaranBiaya) ? " ▲" : ""}</td>
                   <td className={`text-right angka font-semibold ${Number(p.laba) < 0 ? "text-rose-700" : "text-emerald-700"}`}>{angka(p.laba)}</td>
                   <td className="text-right"><Link href={`/rekonsiliasi/event/${p.id}`} className="tombol-tautan">Buka LPJ</Link></td>
                 </tr>
