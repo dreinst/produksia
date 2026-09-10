@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
-import { DAFTAR_PERAN, LABEL_PERAN } from "@/lib/hakAkses";
+import { DAFTAR_PERAN, LABEL_PERAN, peranTertinggi } from "@/lib/hakAkses";
 import { aturUlangKataSandiFormulir, hapusPenggunaFormulir, ubahPenggunaFormulir } from "@/lib/aksi/pengguna";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -12,20 +12,20 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
   const { id } = await params;
   const pengguna = await db.pengguna.findUnique({
     where: { id },
-    select: { id: true, nama: true, email: true, peran: true, aktif: true, dibuatPada: true, karyawan: { select: { kode: true, nama: true } } },
+    select: { id: true, nama: true, namaPengguna: true, email: true, peran: true, aktif: true, dibuatPada: true, karyawan: { select: { kode: true, nama: true } } },
   });
   if (!pengguna) notFound();
 
   const diriSendiri = pengguna.id === saya.id;
-  const bolehSentuh = pengguna.peran !== "PEMILIK" || saya.peran === "PEMILIK";
-  const peranTersedia = DAFTAR_PERAN.filter((p) => p !== "PEMILIK" || saya.peran === "PEMILIK" || pengguna.peran === "PEMILIK");
+  const bolehSentuh = !peranTertinggi(pengguna.peran) || peranTertinggi(saya.peran);
+  const peranTersedia = DAFTAR_PERAN.filter((p) => !peranTertinggi(p) || peranTertinggi(saya.peran) || p === pengguna.peran);
 
   return (
     <div className="space-y-6">
       <KepalaHalaman
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }, { label: "Pengguna", href: "/pengaturan/pengguna" }]}
         judul={pengguna.nama}
-        subjudul={`${pengguna.email} · dibuat ${pengguna.dibuatPada.toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}`}
+        subjudul={`@${pengguna.namaPengguna}${pengguna.email ? ` · ${pengguna.email}` : ""} · dibuat ${pengguna.dibuatPada.toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}`}
         aksi={
           <Link href="/pengaturan/pengguna" className="tombol tombol-garis">
             Kembali ke daftar
@@ -35,7 +35,7 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
 
       {!bolehSentuh && (
         <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Akun berperan Pemilik hanya bisa diubah oleh Pemilik lain.
+          Akun berperan Superadmin/Pemilik hanya bisa diubah oleh Superadmin atau Pemilik lain.
         </div>
       )}
 
@@ -47,9 +47,13 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
             <input id="nama" name="nama" defaultValue={pengguna.nama} required disabled={!bolehSentuh} className="isian" />
           </div>
           <div className="bidang">
-            <label className="label" htmlFor="email">Email</label>
-            <input id="email" value={pengguna.email} readOnly className="isian" />
-            <span className="petunjuk">Email adalah identitas masuk dan tidak diubah dari sini</span>
+            <label className="label" htmlFor="namaPengguna">Nama pengguna</label>
+            <input id="namaPengguna" name="namaPengguna" defaultValue={pengguna.namaPengguna} required autoCapitalize="none" spellCheck={false} disabled={!bolehSentuh} className="isian" />
+            <span className="petunjuk">Identitas masuk; mengubahnya berarti pengguna masuk dengan nama baru</span>
+          </div>
+          <div className="bidang">
+            <label className="label" htmlFor="email">Email (opsional)</label>
+            <input id="email" name="email" type="email" defaultValue={pengguna.email ?? ""} disabled={!bolehSentuh} className="isian" />
           </div>
           <div className="bidang">
             <label className="label" htmlFor="peran">Peran</label>

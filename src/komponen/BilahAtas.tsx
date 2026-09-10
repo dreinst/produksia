@@ -114,7 +114,7 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
           <div className="absolute right-0 mt-2 w-60 rounded-xl border border-slate-200 bg-white p-1.5 z-40" style={{ boxShadow: "var(--shadow-pop)" }}>
             <div className="px-3 py-2 border-b border-slate-100 mb-1">
               <div className="text-sm font-semibold text-slate-900 truncate">{pengguna.nama}</div>
-              <div className="text-xs text-slate-500 truncate">{pengguna.email}</div>
+              <div className="text-xs text-slate-500 truncate font-mono">@{pengguna.namaPengguna}</div>
             </div>
             <Link href="/profil" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900">
               <Ikon nama="person" className="!text-[18px] text-slate-400" />

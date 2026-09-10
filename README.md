@@ -5,7 +5,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, **Laba Rugi**, **Neraca**, Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
-- **Pengguna & hak akses**: login email + kata sandi, empat peran (Pemilik, Admin, Kasir, Gudang), kelola pengguna
+- **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
 - **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
@@ -25,16 +25,18 @@ Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak a
 ### Masuk pertama kali
 
 - **Basis data kosong** (belum ada pengguna): halaman `/masuk` otomatis menampilkan formulir **pemasangan awal** untuk membuat akun Pemilik pertama.
-- **Setelah `prisma/seed.ts`**: tersedia 4 akun contoh, semua berkata sandi `rahasia123`:
+- **Setelah `prisma/seed.ts`** (perusahaan contoh *D'Production Event Organizer*): tersedia 6 akun contoh; masuk dengan **nama pengguna** (bukan email), kata sandi = nama peran + `123`:
 
-| Email | Peran | Bisa apa |
-|---|---|---|
-| pemilik@contoh.id | Pemilik | Semua, termasuk mengelola akun Pemilik lain |
-| admin@contoh.id | Admin | Semua modul; tidak bisa menyentuh akun Pemilik |
-| kasir@contoh.id | Kasir | Penjualan, pembelian, kas & bank, data induk; buku besar & aset hanya lihat |
-| gudang@contoh.id | Gudang | Surat jalan, terima barang, data induk barang/gudang; tanpa modul keuangan |
+| Nama pengguna | Kata sandi | Nama | Peran | Bisa apa |
+|---|---|---|---|---|
+| superadmin | superadmin123 | Andrew Steine | Superadmin | Semua; setara Pemilik, termasuk mengelola akun Superadmin/Pemilik lain |
+| owner | owner123 | Donny Donatus | Pemilik A | Semua; setara Superadmin |
+| owner2 | owner123 | Nadia Yuliana | Pemilik B | Semua; setara Superadmin |
+| admin | admin123 | Bagus Santoso | Admin | Semua modul; tidak bisa menyentuh akun Superadmin/Pemilik |
+| kasir | kasir123 | Sari Wulandari | Kasir | Penjualan, pembelian, kas & bank, data induk; buku besar & aset hanya lihat |
+| gudang | gudang123 | Joko Prasetyo | Gudang | Surat jalan, terima barang, data induk barang/gudang; tanpa modul keuangan |
 
-Matriks lengkapnya ada di `src/lib/hakAkses.ts`. Pengguna baru ditambah lewat **Pengguna** di sidebar (Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**.
+Matriks lengkapnya ada di `src/lib/hakAkses.ts`. Pengguna baru ditambah lewat **Pengguna** di sidebar (Superadmin/Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**. Email hanya kontak opsional.
 
 ## Bagan akun (Event/Wedding Organizer)
 

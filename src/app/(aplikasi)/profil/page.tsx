@@ -19,7 +19,7 @@ export default async function HalamanProfil() {
             </span>
             <div className="min-w-0">
               <div className="font-heading font-bold text-slate-900 truncate">{pengguna.nama}</div>
-              <div className="text-sm text-slate-500 truncate">{pengguna.email}</div>
+              <div className="text-sm text-slate-500 truncate"><span className="font-mono">@{pengguna.namaPengguna}</span>{pengguna.email ? ` · ` : ""}</div>
             </div>
           </div>
           <div className="ubin space-y-1">
@@ -27,7 +27,7 @@ export default async function HalamanProfil() {
             <div className="text-sm font-semibold text-slate-900">{LABEL_PERAN[pengguna.peran]}</div>
             <div className="text-xs text-slate-500">{KETERANGAN_PERAN[pengguna.peran]}</div>
           </div>
-          <p className="text-xs text-slate-500">Nama dan peran hanya bisa diubah oleh Pemilik/Admin lewat menu Pengguna.</p>
+          <p className="text-xs text-slate-500">Nama, nama pengguna, dan peran hanya bisa diubah oleh Superadmin/Pemilik/Admin lewat menu Pengguna.</p>
         </div>
 
         <FormulirAksi aksi={gantiKataSandiFormulir} className="kartu space-y-4" pesanSukses="Kata sandi diganti. Perangkat lain otomatis keluar.">

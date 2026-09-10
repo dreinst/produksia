@@ -427,10 +427,6 @@ export type KaryawanUncheckedUpdateManyWithoutDepartemenNestedInput = {
   deleteMany?: Prisma.KaryawanScalarWhereInput | Prisma.KaryawanScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type KaryawanCreateNestedOneWithoutPelangganInput = {
   create?: Prisma.XOR<Prisma.KaryawanCreateWithoutPelangganInput, Prisma.KaryawanUncheckedCreateWithoutPelangganInput>
   connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutPelangganInput

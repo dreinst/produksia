@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { DAFTAR_PERAN, type PenggunaSesi } from "@/lib/hakAkses";
+import { DAFTAR_PERAN, PERAN_TERTINGGI, peranTertinggi, type PenggunaSesi } from "@/lib/hakAkses";
+import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
 import { hapusSemuaSesiPengguna, hashKataSandi, periksaKekuatanKataSandi, wajibHakAksi } from "@/lib/otentikasi";
 import type { PeranPengguna } from "@/prisma-klien/enums";
 
@@ -20,35 +21,41 @@ function bacaPeran(dataFormulir: FormData): PeranPengguna {
   return nilai;
 }
 
-/** Aturan siapa boleh menyentuh akun siapa. */
+/** Aturan siapa boleh menyentuh akun siapa: akun Superadmin/Pemilik hanya oleh Superadmin/Pemilik. */
 async function ambilSasaran(pelaku: PenggunaSesi, id: string) {
   const sasaran = await db.pengguna.findUnique({ where: { id } });
   if (!sasaran) throw new Error("Pengguna tidak ditemukan");
-  if (sasaran.peran === "PEMILIK" && pelaku.peran !== "PEMILIK") {
-    throw new Error("Hanya Pemilik yang bisa mengubah akun berperan Pemilik");
+  if (peranTertinggi(sasaran.peran) && !peranTertinggi(pelaku.peran)) {
+    throw new Error("Hanya Superadmin atau Pemilik yang bisa mengubah akun berperan Superadmin/Pemilik");
   }
   return sasaran;
 }
 
 async function pastikanMasihAdaPemilikAktif(kecualiId: string) {
-  const sisa = await db.pengguna.count({ where: { peran: "PEMILIK", aktif: true, id: { not: kecualiId } } });
-  if (sisa === 0) throw new Error("Harus tersisa minimal satu akun Pemilik yang aktif");
+  const sisa = await db.pengguna.count({ where: { peran: { in: [...PERAN_TERTINGGI] }, aktif: true, id: { not: kecualiId } } });
+  if (sisa === 0) throw new Error("Harus tersisa minimal satu akun Superadmin/Pemilik yang aktif");
+}
+
+async function pastikanNamaPenggunaBebas(namaPengguna: string, kecualiId?: string) {
+  const ada = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true } });
+  if (ada && ada.id !== kecualiId) throw new Error(`Nama pengguna "${namaPengguna}" sudah dipakai`);
 }
 
 export async function buatPengguna(dataFormulir: FormData) {
   const pelaku = await wajibHakAksi("pengguna.kelola");
   const nama = bacaTeks(dataFormulir, "nama");
-  const email = bacaTeks(dataFormulir, "email").toLowerCase();
+  const namaPengguna = bacaNamaPengguna(bacaTeks(dataFormulir, "namaPengguna"));
+  const email = bacaEmailOpsional(bacaTeks(dataFormulir, "email"));
   const kataSandi = bacaTeks(dataFormulir, "kataSandi");
   const peran = bacaPeran(dataFormulir);
 
-  if (!nama || !email) throw new Error("Nama dan email wajib diisi");
-  if (!email.includes("@")) throw new Error("Format email tidak valid");
+  if (!nama) throw new Error("Nama wajib diisi");
   const galatKekuatan = periksaKekuatanKataSandi(kataSandi);
   if (galatKekuatan) throw new Error(galatKekuatan);
-  if (peran === "PEMILIK" && pelaku.peran !== "PEMILIK") throw new Error("Hanya Pemilik yang bisa membuat akun Pemilik");
+  if (peranTertinggi(peran) && !peranTertinggi(pelaku.peran)) throw new Error("Hanya Superadmin atau Pemilik yang bisa membuat akun Superadmin/Pemilik");
+  await pastikanNamaPenggunaBebas(namaPengguna);
 
-  await db.pengguna.create({ data: { nama, email, kataSandiHash: await hashKataSandi(kataSandi), peran } });
+  await db.pengguna.create({ data: { nama, namaPengguna, email, kataSandiHash: await hashKataSandi(kataSandi), peran } });
   revalidatePath(HALAMAN);
 }
 
@@ -56,19 +63,23 @@ export async function ubahPengguna(id: string, dataFormulir: FormData) {
   const pelaku = await wajibHakAksi("pengguna.kelola");
   const sasaran = await ambilSasaran(pelaku, id);
   const nama = bacaTeks(dataFormulir, "nama");
+  const namaPengguna = bacaNamaPengguna(bacaTeks(dataFormulir, "namaPengguna"));
+  const email = bacaEmailOpsional(bacaTeks(dataFormulir, "email"));
   const peran = bacaPeran(dataFormulir);
   const aktif = dataFormulir.get("aktif") === "on";
   if (!nama) throw new Error("Nama wajib diisi");
+  await pastikanNamaPenggunaBebas(namaPengguna, id);
 
   if (sasaran.id === pelaku.id && (peran !== sasaran.peran || !aktif)) {
-    throw new Error("Peran atau status akun sendiri tidak bisa diubah; minta Pemilik lain melakukannya");
+    throw new Error("Peran atau status akun sendiri tidak bisa diubah; minta Superadmin/Pemilik lain melakukannya");
   }
-  if (peran === "PEMILIK" && pelaku.peran !== "PEMILIK") throw new Error("Hanya Pemilik yang bisa memberi peran Pemilik");
-  if (sasaran.peran === "PEMILIK" && (peran !== "PEMILIK" || !aktif)) await pastikanMasihAdaPemilikAktif(sasaran.id);
+  if (peranTertinggi(peran) && !peranTertinggi(pelaku.peran)) throw new Error("Hanya Superadmin atau Pemilik yang bisa memberi peran Superadmin/Pemilik");
+  if (peranTertinggi(sasaran.peran) && (!peranTertinggi(peran) || !aktif)) await pastikanMasihAdaPemilikAktif(sasaran.id);
 
-  await db.pengguna.update({ where: { id }, data: { nama, peran, aktif } });
+  await db.pengguna.update({ where: { id }, data: { nama, namaPengguna, email, peran, aktif } });
   if (!aktif || peran !== sasaran.peran) await hapusSemuaSesiPengguna(id); // paksa masuk ulang dengan hak baru
   revalidatePath(HALAMAN);
+  revalidatePath(`${HALAMAN}/${id}`);
 }
 
 export async function aturUlangKataSandi(id: string, dataFormulir: FormData) {
@@ -87,7 +98,7 @@ export async function hapusPengguna(id: string) {
   const pelaku = await wajibHakAksi("pengguna.kelola");
   const sasaran = await ambilSasaran(pelaku, id);
   if (sasaran.id === pelaku.id) throw new Error("Akun sendiri tidak bisa dihapus");
-  if (sasaran.peran === "PEMILIK") await pastikanMasihAdaPemilikAktif(sasaran.id);
+  if (peranTertinggi(sasaran.peran)) await pastikanMasihAdaPemilikAktif(sasaran.id);
 
   await db.$transaction([
     db.karyawan.updateMany({ where: { penggunaId: id }, data: { penggunaId: null } }),
