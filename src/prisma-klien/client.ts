@@ -267,6 +267,11 @@ export type PengaturanPerusahaan = Prisma.PengaturanPerusahaanModel
  */
 export type TutupBuku = Prisma.TutupBukuModel
 /**
+ * Model PphFinalBulanan
+ * PPh Final UMKM per bulan: omzet (DPP faktur − retur) × tarif, dijurnal Dr Beban PPh Final / Cr Hutang PPh Final
+ */
+export type PphFinalBulanan = Prisma.PphFinalBulananModel
+/**
  * Model LogAktivitas
  * 
  */

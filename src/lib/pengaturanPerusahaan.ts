@@ -15,6 +15,10 @@ export type PengaturanPajak = {
   akunPpnMasukanId: string | null;
   akunPph23DimukaId: string | null;
   akunPph23DipotongId: string | null;
+  /** PPh Final UMKM: tarif % dari omzet bulanan + akun beban & hutangnya */
+  pphFinalPersen: Desimal;
+  akunBebanPphFinalId: string | null;
+  akunHutangPphFinalId: string | null;
 };
 
 export const PENGATURAN_BAWAAN: PengaturanPajak = {
@@ -27,6 +31,9 @@ export const PENGATURAN_BAWAAN: PengaturanPajak = {
   akunPpnMasukanId: null,
   akunPph23DimukaId: null,
   akunPph23DipotongId: null,
+  pphFinalPersen: D("0.5"),
+  akunBebanPphFinalId: null,
+  akunHutangPphFinalId: null,
 };
 
 /** Pengaturan perusahaan (singleton); bila belum pernah disimpan, kembalikan bawaan (non-PKP). */
@@ -43,6 +50,9 @@ export async function ambilPengaturanPerusahaan(klien: Klien = db): Promise<Peng
     akunPpnMasukanId: p.akunPpnMasukanId,
     akunPph23DimukaId: p.akunPph23DimukaId,
     akunPph23DipotongId: p.akunPph23DipotongId,
+    pphFinalPersen: D(p.pphFinalPersen),
+    akunBebanPphFinalId: p.akunBebanPphFinalId,
+    akunHutangPphFinalId: p.akunHutangPphFinalId,
   };
 }
 

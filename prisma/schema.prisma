@@ -45,6 +45,7 @@ enum JenisAkun {
 enum SumberJurnal {
   MANUAL
   PENUTUP
+  PAJAK
   KAS_MASUK
   KAS_KELUAR
   PENJUALAN
@@ -615,6 +616,8 @@ model Akun {
   pengaturanPpnMasukan    PengaturanPerusahaan? @relation("PetaPpnMasukan")
   pengaturanPph23Dimuka   PengaturanPerusahaan? @relation("PetaPph23Dimuka")
   pengaturanPph23Dipotong PengaturanPerusahaan? @relation("PetaPph23Dipotong")
+  pengaturanBebanPphFinal  PengaturanPerusahaan? @relation("PetaBebanPphFinal")
+  pengaturanHutangPphFinal PengaturanPerusahaan? @relation("PetaHutangPphFinal")
 }
 
 model PemetaanAkun {
@@ -672,6 +675,7 @@ model Jurnal {
   penerimaanPenjualan   PenerimaanPenjualan?   @relation("JurnalPenerimaanPenjualan")
   uangMukaPelanggan     UangMukaPelanggan?     @relation("JurnalUangMuka")
   tutupBuku             TutupBuku?             @relation("JurnalTutupBuku")
+  pphFinal              PphFinalBulanan?       @relation("JurnalPphFinal")
   returPenjualan        ReturPenjualan?        @relation("JurnalReturPenjualan")
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
@@ -805,6 +809,12 @@ model PengaturanPerusahaan {
   /// PPh 23 yang kita potong dari vendor (kewajiban: hutang PPh 23)
   akunPph23DipotongId String? @unique
   akunPph23Dipotong   Akun?   @relation("PetaPph23Dipotong", fields: [akunPph23DipotongId], references: [id])
+  /// PPh Final UMKM (PP 55/2022): tarif % dari omzet bulanan; beban & hutangnya dijurnal dari Ringkasan Pajak
+  pphFinalPersen       Decimal @default(0.5) @db.Decimal(5, 2)
+  akunBebanPphFinalId  String? @unique
+  akunBebanPphFinal    Akun?   @relation("PetaBebanPphFinal", fields: [akunBebanPphFinalId], references: [id])
+  akunHutangPphFinalId String? @unique
+  akunHutangPphFinal   Akun?   @relation("PetaHutangPphFinal", fields: [akunHutangPphFinalId], references: [id])
 }
 
 // ---------- Jejak audit ----------
@@ -818,6 +828,19 @@ model TutupBuku {
   penggunaNama String
   jurnalId     String?  @unique
   jurnal       Jurnal?  @relation("JurnalTutupBuku", fields: [jurnalId], references: [id])
+}
+
+/// PPh Final UMKM per bulan: omzet (DPP faktur − retur) × tarif, dijurnal Dr Beban PPh Final / Cr Hutang PPh Final
+model PphFinalBulanan {
+  id          String   @id @default(cuid())
+  /// "YYYY-MM"
+  periode     String   @unique
+  omzet       Decimal  @db.Decimal(18, 2)
+  tarifPersen Decimal  @db.Decimal(5, 2)
+  jumlah      Decimal  @db.Decimal(18, 2)
+  jurnalId    String?  @unique
+  jurnal      Jurnal?  @relation("JurnalPphFinal", fields: [jurnalId], references: [id])
+  dibuatPada  DateTime @default(now())
 }
 
 model LogAktivitas {

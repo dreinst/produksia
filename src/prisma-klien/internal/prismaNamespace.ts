@@ -442,6 +442,7 @@ export const ModelName = {
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
   TutupBuku: 'TutupBuku',
+  PphFinalBulanan: 'PphFinalBulanan',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -458,7 +459,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3792,6 +3793,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PphFinalBulanan: {
+      payload: Prisma.$PphFinalBulananPayload<ExtArgs>
+      fields: Prisma.PphFinalBulananFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PphFinalBulananFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PphFinalBulananFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>
+        }
+        findFirst: {
+          args: Prisma.PphFinalBulananFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PphFinalBulananFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>
+        }
+        findMany: {
+          args: Prisma.PphFinalBulananFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>[]
+        }
+        create: {
+          args: Prisma.PphFinalBulananCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>
+        }
+        createMany: {
+          args: Prisma.PphFinalBulananCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PphFinalBulananCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>[]
+        }
+        delete: {
+          args: Prisma.PphFinalBulananDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>
+        }
+        update: {
+          args: Prisma.PphFinalBulananUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>
+        }
+        deleteMany: {
+          args: Prisma.PphFinalBulananDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PphFinalBulananUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PphFinalBulananUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>[]
+        }
+        upsert: {
+          args: Prisma.PphFinalBulananUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PphFinalBulananPayload>
+        }
+        aggregate: {
+          args: Prisma.PphFinalBulananAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePphFinalBulanan>
+        }
+        groupBy: {
+          args: Prisma.PphFinalBulananGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PphFinalBulananGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PphFinalBulananCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PphFinalBulananCountAggregateOutputType> | number
+        }
+      }
+    }
     LogAktivitas: {
       payload: Prisma.$LogAktivitasPayload<ExtArgs>
       fields: Prisma.LogAktivitasFieldRefs
@@ -4481,7 +4556,10 @@ export const PengaturanPerusahaanScalarFieldEnum = {
   akunPpnKeluaranId: 'akunPpnKeluaranId',
   akunPpnMasukanId: 'akunPpnMasukanId',
   akunPph23DimukaId: 'akunPph23DimukaId',
-  akunPph23DipotongId: 'akunPph23DipotongId'
+  akunPph23DipotongId: 'akunPph23DipotongId',
+  pphFinalPersen: 'pphFinalPersen',
+  akunBebanPphFinalId: 'akunBebanPphFinalId',
+  akunHutangPphFinalId: 'akunHutangPphFinalId'
 } as const
 
 export type PengaturanPerusahaanScalarFieldEnum = (typeof PengaturanPerusahaanScalarFieldEnum)[keyof typeof PengaturanPerusahaanScalarFieldEnum]
@@ -4497,6 +4575,19 @@ export const TutupBukuScalarFieldEnum = {
 } as const
 
 export type TutupBukuScalarFieldEnum = (typeof TutupBukuScalarFieldEnum)[keyof typeof TutupBukuScalarFieldEnum]
+
+
+export const PphFinalBulananScalarFieldEnum = {
+  id: 'id',
+  periode: 'periode',
+  omzet: 'omzet',
+  tarifPersen: 'tarifPersen',
+  jumlah: 'jumlah',
+  jurnalId: 'jurnalId',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PphFinalBulananScalarFieldEnum = (typeof PphFinalBulananScalarFieldEnum)[keyof typeof PphFinalBulananScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {
@@ -4899,6 +4990,7 @@ export type GlobalOmitConfig = {
   barisPenyesuaianPersediaan?: Prisma.BarisPenyesuaianPersediaanOmit
   pengaturanPerusahaan?: Prisma.PengaturanPerusahaanOmit
   tutupBuku?: Prisma.TutupBukuOmit
+  pphFinalBulanan?: Prisma.PphFinalBulananOmit
   logAktivitas?: Prisma.LogAktivitasOmit
 }
 

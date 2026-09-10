@@ -28,7 +28,7 @@ export default async function HalamanPengaturanPerusahaan() {
   await wajibHak("pengaturan.tulis");
   const [pengaturan, daftarAkun, tersimpan] = await Promise.all([
     ambilPengaturanPerusahaan(db),
-    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["ASET", "KEWAJIBAN"] } }, orderBy: { kode: "asc" } }),
+    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["ASET", "KEWAJIBAN", "BEBAN"] } }, orderBy: { kode: "asc" } }),
     db.pengaturanPerusahaan.findUnique({ where: { id: "default" } }),
   ]);
   const byKode = (kode: string) => daftarAkun.find((a) => a.kode === kode)?.id ?? "";
@@ -38,9 +38,12 @@ export default async function HalamanPengaturanPerusahaan() {
     akunPpnMasukanId: pengaturan.akunPpnMasukanId ?? byKode("1-1800"),
     akunPph23DimukaId: pengaturan.akunPph23DimukaId ?? byKode("1-1900"),
     akunPph23DipotongId: pengaturan.akunPph23DipotongId ?? byKode("2-1320"),
+    akunBebanPphFinalId: pengaturan.akunBebanPphFinalId ?? byKode("5-9100"),
+    akunHutangPphFinalId: pengaturan.akunHutangPphFinalId ?? byKode("2-1320"),
   };
   const aset = daftarAkun.filter((a) => a.jenis === "ASET");
   const kewajiban = daftarAkun.filter((a) => a.jenis === "KEWAJIBAN");
+  const beban = daftarAkun.filter((a) => a.jenis === "BEBAN");
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -94,6 +97,15 @@ export default async function HalamanPengaturanPerusahaan() {
         <PilihAkunPajak nama="akunPpnMasukanId" label="Akun PPN Masukan (aset)" nilai={nilai.akunPpnMasukanId} daftar={aset} petunjuk="Didebit saat Faktur Pembelian, dikredit saat Retur Pembelian" />
         <PilihAkunPajak nama="akunPph23DimukaId" label="Akun PPh 23 dibayar dimuka (aset)" nilai={nilai.akunPph23DimukaId} daftar={aset} petunjuk="PPh 23 yang dipotong klien saat membayar kita (isian di Penerimaan)" />
         <PilihAkunPajak nama="akunPph23DipotongId" label="Akun Hutang PPh 23 (kewajiban)" nilai={nilai.akunPph23DipotongId} daftar={kewajiban} petunjuk="PPh 23 yang kita potong saat membayar vendor (isian di Pembayaran)" />
+
+        <div className="bidang">
+          <label className="label" htmlFor="pphFinalPersen">Tarif PPh Final UMKM (% dari omzet)</label>
+          <input id="pphFinalPersen" name="pphFinalPersen" type="number" min={0} max={100} step="0.01" defaultValue={Number(pengaturan.pphFinalPersen)} className="isian" />
+          <span className="petunjuk">PP 55/2022: 0,5% dari peredaran bruto bulanan; dihitung & dijurnal dari Buku Besar › Pajak & SPT</span>
+        </div>
+        <div className="bidang md:col-span-1" />
+        <PilihAkunPajak nama="akunBebanPphFinalId" label="Akun Beban PPh Final (beban)" nilai={nilai.akunBebanPphFinalId} daftar={beban} petunjuk="Didebit saat PPh Final bulanan dicatat" />
+        <PilihAkunPajak nama="akunHutangPphFinalId" label="Akun Hutang PPh Final (kewajiban)" nilai={nilai.akunHutangPphFinalId} daftar={kewajiban} petunjuk="Dikredit saat PPh Final dicatat; dilunasi lewat Kas Keluar saat setor ke DJP" />
 
         <div className="md:col-span-2">
           <button type="submit" className="tombol tombol-utama">

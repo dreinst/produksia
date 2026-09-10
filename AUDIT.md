@@ -63,12 +63,14 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 33. **[FIXED] Belum ada jurnal penutup tahun** (10 Sep 2026). Halaman Buku Besar → Tutup Buku: status per tahun, pratinjau jurnal penutup (pendapatan/beban rinci → Laba Ditahan, pemetaan baru `labaDitahan` = 3-2000), tombol tutup/buka kembali. Jurnal `JU-TUTUP` (sumber `PENUTUP`, 31 Des) + catatan `TutupBuku`; tahun buku aktif maju otomatis. **Kunci tahun:** `pastikanTahunTerbuka` di `catatJurnal`, jurnal manual/kas, penyusutan, dan `hapusJurnal` menolak jurnal baru/penghapusan bertanggal tahun yang ditutup. Laba Rugi & Neraca Saldo mengabaikan jurnal penutup, Neraca menyertakannya. Migrasi `tutup_buku`; suite `uji-tutup-buku`.
 
 34. **[FIXED] Belum ada laporan arus kas** (10 Sep 2026). `src/lib/arusKas.ts` metode langsung dari jurnal (klasifikasi operasi/investasi/pendanaan per akun lawan), halaman `/buku-besar/arus-kas` dengan filter periode, rekonsiliasi kas awal + arus = saldo kas/bank buku besar (lencana cocok/tidak), rincian per akun kas. Suite `uji-laporan` memeriksa kecocokan, identitas kas, dan klasifikasi setoran modal/perolehan aset.
+
+35. **[FIXED] PPh Final UMKM & ringkasan SPT masih manual** (10 Sep 2026). `PengaturanPerusahaan` mendapat `pphFinalPersen` (0,5%), `akunBebanPphFinalId` (5-9100), `akunHutangPphFinalId` (2-1320). Halaman Buku Besar → Pajak & SPT: per masa pajak omzet (DPP FJ − RJ), PPN keluaran/masukan & kurang/(lebih) bayar, PPh 23 dipotong klien / kita potong, PPh Final; tombol *Catat* → jurnal `JU-PPHF` (sumber `PAJAK`) akhir bulan + `PphFinalBulanan` (periode unik, omzet & tarif tersimpan), Hapus membalik. Ditolak: periode belum berjalan, ganda, tanpa omzet, akun belum diatur, tahun ditutup. Seed mencatat PPh Final bulan berjalan; migrasi `pph_final`; suite `uji-pph-final`.
 22. **[OPEN] Skrip regresi memakai database yang sama dengan data seed.** Sudah aman (cleanup berbasis waktu), tapi idealnya `DATABASE_URL` terpisah untuk test.
 23. **[OPEN] Turbopack tidak me-reload Prisma Client setelah `prisma generate`** — restart `npm run dev` setiap ganti skema (sudah dicatat di README).
 
 ## Verifikasi yang dilakukan
 
-### 10 September 2026 (lanjutan 3) — uang muka, pindah barang, tutup buku, arus kas, tahun buku, nama pengguna
+### 10 September 2026 (lanjutan 3) — uang muka, pindah barang, tutup buku, arus kas, pajak & SPT, tahun buku, nama pengguna
 
 - `uji-uang-muka`: DP ditolak tanpa pesanan/akun/nol/melebihi nilai pesanan; UM-1 50.000 → JU-UM Dr Kas / Cr Uang Muka; UM-2 30.000; faktur menolak DP > tersedia / > total; FJ-1 80.000 pakai DP 30.000 → Dr Piutang 50.000 + Dr Uang Muka 30.000, SEBAGIAN, UM-1 terpakai 30.000 (FIFO); bayar > sisa ditolak; TRM 50.000 → LUNAS; FJ-2 120.000 pakai sisa DP 50.000 lintas dua DP; DP setelah pesanan difaktur penuh ditolak; hapus FJ-2/UM-2/TRM/FJ-1/UM-1/PSJ/PS urut mundur mengembalikan DP dan saldo akun; sinkron di tiap langkah
 - Browser: tombol Uang Muka di daftar pesanan → form (maks 60.000) → daftar UM; komposer faktur mengisi DP 20.000 otomatis, sisa piutang 40.000, pratinjau jurnal memuat Uang Muka Pelanggan; faktur tampil Sebagian dengan terbayar 20.000; penerimaan sisa 40.000; beranda kartu integritas memuat pemeriksaan uang muka; hapus faktur → DP kembali utuh
@@ -76,7 +78,8 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 - Browser: peran Gudang membuat PB 3 lanyard ke Gudang Venue lewat formulir (stok kedua gudang tampil), Stok per Gudang menampilkan dua gudang & tetap Sinkron; Pemilik menghapusnya
 - `uji-tutup-buku`: pendapatan 1.000 & beban 400 di tahun lalu → ringkasan laba 600; tutup tahun depan/tahun tak valid ditolak; JU-TUTUP 31 Des: Dr Pendapatan 1.000 / Cr Beban 400 / Cr Laba Ditahan 600; tutup dua kali ditolak; Laba Rugi tahun lalu tetap 600, Neraca per 31 Des seimbang dengan laba di akun Laba Ditahan; tutup tahun ini → tahun buku maju, kas masuk & hapus jurnal ditolak "sudah ditutup", jurnal penutup tak bisa dihapus lewat menu jurnal; buka kembali → boleh lagi; buka tahun yang tidak ditutup ditolak; saldo Laba Ditahan kembali
 - `uji-laporan` + arus kas: kas akhir = buku besar, identitas kas, setoran modal → pendanaan, perolehan aset → investasi, operasi punya masuk & keluar, periode kosong nol & cocok
-- Semua 14 suite + `uji-sinkron` lulus di seed segar (seed kini memakai DP Rp 1.000.000 dan Pindah Barang ke gudang kedua); `tsc` ✔ · `eslint` ✔ · `next build` ✔
+- `uji-pph-final`: ringkasan bulan berjalan = Σ DPP faktur − retur dari DB, PPh Final 0,5%; seed sudah mencatatnya (jurnal Dr 5-9100 / Cr 2-1320); catat ganda, periode depan, periode tak valid, bulan tanpa omzet ditolak; hapus → jurnal hilang; catat ulang → jumlah sama; PPN/PPh 23 nol pada non-PKP
+- Semua 15 suite + `uji-sinkron` lulus di seed segar (seed kini memakai DP Rp 1.000.000 dan Pindah Barang ke gudang kedua); `tsc` ✔ · `eslint` ✔ · `next build` ✔
 
 ### 10 September 2026 (lanjutan 2) — hapus dokumen & JU-SJ
 

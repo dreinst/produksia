@@ -41,6 +41,7 @@ async function main() {
   await db.karyawan.deleteMany();
   await db.departemen.deleteMany();
   await db.gudang.deleteMany();
+  await db.pphFinalBulanan.deleteMany();
   await db.tutupBuku.deleteMany();
   await db.barisJurnal.deleteMany();
   await db.jurnal.deleteMany();

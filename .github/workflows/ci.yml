@@ -55,9 +55,9 @@ jobs:
       - name: Data contoh
         run: npx tsx prisma/seed.ts
 
-      - name: Regresi (14 suite + pemeriksaan sinkron)
+      - name: Regresi (15 suite + pemeriksaan sinkron)
         run: |
-          for s in skrip/uji-sinkron.ts skrip/uji-laporan.ts skrip/uji-pajak.ts skrip/uji-hapus.ts skrip/uji-uang-muka.ts skrip/uji-pindah-barang.ts skrip/uji-tutup-buku.ts skrip/uji-bagan-akun.ts skrip/uji-persediaan.ts skrip/uji-penjualan.ts skrip/uji-pembelian.ts skrip/uji-buku-besar.ts skrip/uji-aset-tetap.ts skrip/uji-pengaman.ts skrip/uji-sinkron.ts; do
+          for s in skrip/uji-sinkron.ts skrip/uji-laporan.ts skrip/uji-pajak.ts skrip/uji-hapus.ts skrip/uji-uang-muka.ts skrip/uji-pindah-barang.ts skrip/uji-tutup-buku.ts skrip/uji-pph-final.ts skrip/uji-bagan-akun.ts skrip/uji-persediaan.ts skrip/uji-penjualan.ts skrip/uji-pembelian.ts skrip/uji-buku-besar.ts skrip/uji-aset-tetap.ts skrip/uji-pengaman.ts skrip/uji-sinkron.ts; do
             echo "##### $s"
             npx tsx "$s"
           done
