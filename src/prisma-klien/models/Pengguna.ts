@@ -208,6 +208,7 @@ export type PenggunaWhereInput = {
   dibuatPada?: Prisma.DateTimeFilter<"Pengguna"> | Date | string
   karyawan?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
   sesi?: Prisma.SesiListRelationFilter
+  permintaanAturUlang?: Prisma.PermintaanAturUlangListRelationFilter
 }
 
 export type PenggunaOrderByWithRelationInput = {
@@ -221,6 +222,7 @@ export type PenggunaOrderByWithRelationInput = {
   dibuatPada?: Prisma.SortOrder
   karyawan?: Prisma.KaryawanOrderByWithRelationInput
   sesi?: Prisma.SesiOrderByRelationAggregateInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangOrderByRelationAggregateInput
 }
 
 export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
@@ -237,6 +239,7 @@ export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
   dibuatPada?: Prisma.DateTimeFilter<"Pengguna"> | Date | string
   karyawan?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
   sesi?: Prisma.SesiListRelationFilter
+  permintaanAturUlang?: Prisma.PermintaanAturUlangListRelationFilter
 }, "id" | "namaPengguna" | "email">
 
 export type PenggunaOrderByWithAggregationInput = {
@@ -278,6 +281,7 @@ export type PenggunaCreateInput = {
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUncheckedCreateInput = {
@@ -291,6 +295,7 @@ export type PenggunaUncheckedCreateInput = {
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUpdateInput = {
@@ -304,6 +309,7 @@ export type PenggunaUpdateInput = {
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaUncheckedUpdateInput = {
@@ -317,6 +323,7 @@ export type PenggunaUncheckedUpdateInput = {
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaCreateManyInput = {
@@ -445,6 +452,20 @@ export type PenggunaUpdateOneWithoutKaryawanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutKaryawanInput, Prisma.PenggunaUpdateWithoutKaryawanInput>, Prisma.PenggunaUncheckedUpdateWithoutKaryawanInput>
 }
 
+export type PenggunaCreateNestedOneWithoutPermintaanAturUlangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutPermintaanAturUlangInput, Prisma.PenggunaUncheckedCreateWithoutPermintaanAturUlangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutPermintaanAturUlangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaUpdateOneRequiredWithoutPermintaanAturUlangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutPermintaanAturUlangInput, Prisma.PenggunaUncheckedCreateWithoutPermintaanAturUlangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutPermintaanAturUlangInput
+  upsert?: Prisma.PenggunaUpsertWithoutPermintaanAturUlangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutPermintaanAturUlangInput, Prisma.PenggunaUpdateWithoutPermintaanAturUlangInput>, Prisma.PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput>
+}
+
 export type PenggunaCreateWithoutSesiInput = {
   id?: string
   namaPengguna: string
@@ -455,6 +476,7 @@ export type PenggunaCreateWithoutSesiInput = {
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUncheckedCreateWithoutSesiInput = {
@@ -467,6 +489,7 @@ export type PenggunaUncheckedCreateWithoutSesiInput = {
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaCreateOrConnectWithoutSesiInput = {
@@ -495,6 +518,7 @@ export type PenggunaUpdateWithoutSesiInput = {
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSesiInput = {
@@ -507,6 +531,7 @@ export type PenggunaUncheckedUpdateWithoutSesiInput = {
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaCreateWithoutKaryawanInput = {
@@ -519,6 +544,7 @@ export type PenggunaCreateWithoutKaryawanInput = {
   aktif?: boolean
   dibuatPada?: Date | string
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaUncheckedCreateWithoutKaryawanInput = {
@@ -531,6 +557,7 @@ export type PenggunaUncheckedCreateWithoutKaryawanInput = {
   aktif?: boolean
   dibuatPada?: Date | string
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
 }
 
 export type PenggunaCreateOrConnectWithoutKaryawanInput = {
@@ -559,6 +586,7 @@ export type PenggunaUpdateWithoutKaryawanInput = {
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
@@ -571,6 +599,75 @@ export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+}
+
+export type PenggunaCreateWithoutPermintaanAturUlangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+}
+
+export type PenggunaUncheckedCreateWithoutPermintaanAturUlangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+}
+
+export type PenggunaCreateOrConnectWithoutPermintaanAturUlangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutPermintaanAturUlangInput, Prisma.PenggunaUncheckedCreateWithoutPermintaanAturUlangInput>
+}
+
+export type PenggunaUpsertWithoutPermintaanAturUlangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutPermintaanAturUlangInput, Prisma.PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutPermintaanAturUlangInput, Prisma.PenggunaUncheckedCreateWithoutPermintaanAturUlangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutPermintaanAturUlangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutPermintaanAturUlangInput, Prisma.PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput>
+}
+
+export type PenggunaUpdateWithoutPermintaanAturUlangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
 }
 
 
@@ -580,10 +677,12 @@ export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
 
 export type PenggunaCountOutputType = {
   sesi: number
+  permintaanAturUlang: number
 }
 
 export type PenggunaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sesi?: boolean | PenggunaCountOutputTypeCountSesiArgs
+  permintaanAturUlang?: boolean | PenggunaCountOutputTypeCountPermintaanAturUlangArgs
 }
 
 /**
@@ -603,6 +702,13 @@ export type PenggunaCountOutputTypeCountSesiArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.SesiWhereInput
 }
 
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountPermintaanAturUlangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PermintaanAturUlangWhereInput
+}
+
 
 export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -615,6 +721,7 @@ export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   dibuatPada?: boolean
   karyawan?: boolean | Prisma.Pengguna$karyawanArgs<ExtArgs>
   sesi?: boolean | Prisma.Pengguna$sesiArgs<ExtArgs>
+  permintaanAturUlang?: boolean | Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs>
   _count?: boolean | Prisma.PenggunaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pengguna"]>
 
@@ -655,6 +762,7 @@ export type PenggunaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type PenggunaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   karyawan?: boolean | Prisma.Pengguna$karyawanArgs<ExtArgs>
   sesi?: boolean | Prisma.Pengguna$sesiArgs<ExtArgs>
+  permintaanAturUlang?: boolean | Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs>
   _count?: boolean | Prisma.PenggunaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PenggunaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -665,6 +773,7 @@ export type $PenggunaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     karyawan: Prisma.$KaryawanPayload<ExtArgs> | null
     sesi: Prisma.$SesiPayload<ExtArgs>[]
+    permintaanAturUlang: Prisma.$PermintaanAturUlangPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1074,6 +1183,7 @@ export interface Prisma__PenggunaClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   karyawan<T extends Prisma.Pengguna$karyawanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$karyawanArgs<ExtArgs>>): Prisma.Prisma__KaryawanClient<runtime.Types.Result.GetResult<Prisma.$KaryawanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sesi<T extends Prisma.Pengguna$sesiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$sesiArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SesiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  permintaanAturUlang<T extends Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermintaanAturUlangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1544,6 +1654,30 @@ export type Pengguna$sesiArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.SesiScalarFieldEnum | Prisma.SesiScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.permintaanAturUlang
+ */
+export type Pengguna$permintaanAturUlangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PermintaanAturUlang
+   */
+  select?: Prisma.PermintaanAturUlangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PermintaanAturUlang
+   */
+  omit?: Prisma.PermintaanAturUlangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PermintaanAturUlangInclude<ExtArgs> | null
+  where?: Prisma.PermintaanAturUlangWhereInput
+  orderBy?: Prisma.PermintaanAturUlangOrderByWithRelationInput | Prisma.PermintaanAturUlangOrderByWithRelationInput[]
+  cursor?: Prisma.PermintaanAturUlangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PermintaanAturUlangScalarFieldEnum | Prisma.PermintaanAturUlangScalarFieldEnum[]
 }
 
 /**

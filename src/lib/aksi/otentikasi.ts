@@ -99,3 +99,56 @@ export async function gantiKataSandi(dataFormulir: FormData) {
 export async function gantiKataSandiFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => gantiKataSandi(dataFormulir));
 }
+
+// ---------- Lupa kata sandi (tanpa email: ditangani Superadmin/Pemilik/Admin lewat tautan sekali pakai) ----------
+
+/**
+ * Pengguna yang lupa kata sandi mengirim permintaan dari halaman masuk. Pesan yang tampil selalu sama
+ * (tidak membocorkan apakah nama pengguna ada). Permintaan yang masih terbuka tidak digandakan.
+ */
+export async function mintaAturUlang(dataFormulir: FormData) {
+  const namaPengguna = bacaTeks(dataFormulir, "namaPengguna").toLowerCase();
+  if (!namaPengguna) throw new Error("Nama pengguna wajib diisi");
+  const pengguna = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true, aktif: true } });
+  if (!pengguna || !pengguna.aktif) return;
+  const terbuka = await db.permintaanAturUlang.findFirst({ where: { penggunaId: pengguna.id, status: { in: ["MENUNGGU", "TAUTAN"] } } });
+  if (terbuka) return;
+  await db.permintaanAturUlang.create({ data: { penggunaId: pengguna.id } });
+}
+
+export async function mintaAturUlangFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => mintaAturUlang(dataFormulir));
+}
+
+/** Membaca tautan: sah bila status TAUTAN dan belum kedaluwarsa. */
+export async function periksaTautanAturUlang(token: string) {
+  if (!token) return null;
+  const p = await db.permintaanAturUlang.findUnique({ where: { token }, include: { pengguna: { select: { id: true, nama: true, namaPengguna: true, aktif: true } } } });
+  if (!p || p.status !== "TAUTAN" || !p.kedaluwarsa || p.kedaluwarsa < new Date() || !p.pengguna.aktif) return null;
+  return p;
+}
+
+/** Pengguna memakai tautan: kata sandi baru disimpan, semua sesi lama dicabut, langsung masuk. */
+export async function pakaiTautanAturUlang(token: string, dataFormulir: FormData) {
+  const p = await periksaTautanAturUlang(token);
+  if (!p) throw new Error("Tautan atur ulang tidak berlaku, sudah dipakai, atau kedaluwarsa. Minta tautan baru ke Superadmin/Pemilik.");
+  const baru = bacaTeks(dataFormulir, "kataSandiBaru");
+  const ulangi = bacaTeks(dataFormulir, "ulangiKataSandi");
+  const galatKekuatan = periksaKekuatanKataSandi(baru);
+  if (galatKekuatan) throw new Error(galatKekuatan);
+  if (baru !== ulangi) throw new Error("Ulangi kata sandi tidak sama");
+
+  await db.$transaction([
+    db.pengguna.update({ where: { id: p.penggunaId }, data: { kataSandiHash: await hashKataSandi(baru) } }),
+    db.permintaanAturUlang.update({ where: { id: p.id }, data: { status: "SELESAI", selesaiPada: new Date(), token: null } }),
+    db.sesi.deleteMany({ where: { penggunaId: p.penggunaId } }),
+    db.logAktivitas.create({ data: { penggunaId: p.penggunaId, penggunaNama: p.pengguna.nama, aksi: "ATUR ULANG", jenis: "Kata Sandi", nomor: p.pengguna.namaPengguna, keterangan: "Kata sandi diganti lewat tautan atur ulang; semua sesi lama dicabut" } }),
+  ]);
+  await buatSesi(p.penggunaId);
+  redirect("/");
+}
+
+export async function pakaiTautanAturUlangFormulir(token: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => pakaiTautanAturUlang(token, dataFormulir));
+}
+

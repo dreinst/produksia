@@ -74,6 +74,7 @@ model Pengguna {
   aktif         Boolean       @default(true)
   karyawan      Karyawan?
   sesi          Sesi[]
+  permintaanAturUlang PermintaanAturUlang[]
   dibuatPada    DateTime      @default(now())
 }
 
@@ -850,6 +851,24 @@ model HakAksesPeran {
   boleh Boolean
 
   @@id([peran, hak])
+}
+
+/// Permintaan "lupa kata sandi" dari halaman masuk; ditangani Superadmin/Pemilik/Admin dengan tautan sekali pakai
+model PermintaanAturUlang {
+  id          String   @id @default(cuid())
+  penggunaId  String
+  pengguna    Pengguna @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
+  dibuatPada  DateTime @default(now())
+  /// MENUNGGU → TAUTAN (tautan dibuat) → SELESAI (kata sandi diganti) | DITOLAK
+  status      String   @default("MENUNGGU")
+  /// Token tautan sekali pakai (/atur-ulang/<token>), berlaku sampai `kedaluwarsa`
+  token       String?  @unique
+  kedaluwarsa DateTime?
+  ditanganiOleh String?
+  ditanganiPada DateTime?
+  selesaiPada   DateTime?
+
+  @@index([status])
 }
 
 model LogAktivitas {

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { DAFTAR_PERAN, PERAN_TERTINGGI, peranTertinggi, type PenggunaSesi } from "@/lib/hakAkses";
@@ -90,6 +91,8 @@ export async function aturUlangKataSandi(id: string, dataFormulir: FormData) {
   if (galatKekuatan) throw new Error(galatKekuatan);
 
   await db.pengguna.update({ where: { id }, data: { kataSandiHash: await hashKataSandi(kataSandi) } });
+  // permintaan "lupa kata sandi" yang masih terbuka otomatis selesai
+  await db.permintaanAturUlang.updateMany({ where: { penggunaId: id, status: { in: ["MENUNGGU", "TAUTAN"] } }, data: { status: "SELESAI", token: null, selesaiPada: new Date(), ditanganiOleh: pelaku.nama, ditanganiPada: new Date() } });
   if (id !== pelaku.id) await hapusSemuaSesiPengguna(id);
   revalidatePath(HALAMAN);
 }
@@ -121,4 +124,52 @@ export async function aturUlangKataSandiFormulir(id: string, _sebelumnya: Status
 // Dipakai lewat .bind(null, id); argumen (prevState, dataFormulir) dari useActionState sengaja diabaikan
 export async function hapusPenggunaFormulir(id: string) {
   return jalankanFormulir(() => hapusPengguna(id));
+}
+
+// ---------- Permintaan atur ulang kata sandi (lupa kata sandi) ----------
+
+const UMUR_TAUTAN_MS = 24 * 60 * 60 * 1000;
+
+async function ambilPermintaan(pelaku: PenggunaSesi, id: string) {
+  const p = await db.permintaanAturUlang.findUnique({ where: { id }, include: { pengguna: true } });
+  if (!p) throw new Error("Permintaan tidak ditemukan");
+  if (peranTertinggi(p.pengguna.peran) && !peranTertinggi(pelaku.peran)) {
+    throw new Error("Hanya Superadmin atau Pemilik yang bisa menangani permintaan akun Superadmin/Pemilik");
+  }
+  return p;
+}
+
+/** Membuat tautan sekali pakai (berlaku 24 jam) untuk diberikan langsung ke pengguna (WhatsApp/telepon/lisan). */
+export async function buatTautanAturUlang(id: string) {
+  const pelaku = await wajibHakAksi("pengguna.kelola");
+  const p = await ambilPermintaan(pelaku, id);
+  if (!["MENUNGGU", "TAUTAN"].includes(p.status)) throw new Error("Permintaan ini sudah selesai atau ditolak");
+  const token = randomBytes(24).toString("base64url");
+  await db.permintaanAturUlang.update({
+    where: { id },
+    data: { status: "TAUTAN", token, kedaluwarsa: new Date(Date.now() + UMUR_TAUTAN_MS), ditanganiOleh: pelaku.nama, ditanganiPada: new Date() },
+  });
+  await db.logAktivitas.create({
+    data: { penggunaId: pelaku.id === "skrip-uji" ? null : pelaku.id, penggunaNama: pelaku.nama, aksi: "TAUTAN", jenis: "Kata Sandi", nomor: p.pengguna.namaPengguna, keterangan: "Tautan atur ulang kata sandi dibuat (berlaku 24 jam)" },
+  });
+  revalidatePath(HALAMAN);
+}
+
+/** Menolak/menutup permintaan tanpa mengubah kata sandi. */
+export async function tolakPermintaanAturUlang(id: string) {
+  const pelaku = await wajibHakAksi("pengguna.kelola");
+  const p = await ambilPermintaan(pelaku, id);
+  if (!["MENUNGGU", "TAUTAN"].includes(p.status)) throw new Error("Permintaan ini sudah selesai atau ditolak");
+  await db.permintaanAturUlang.update({ where: { id }, data: { status: "DITOLAK", token: null, ditanganiOleh: pelaku.nama, ditanganiPada: new Date() } });
+  await db.logAktivitas.create({
+    data: { penggunaId: pelaku.id === "skrip-uji" ? null : pelaku.id, penggunaNama: pelaku.nama, aksi: "TOLAK", jenis: "Kata Sandi", nomor: p.pengguna.namaPengguna, keterangan: "Permintaan atur ulang kata sandi ditolak" },
+  });
+  revalidatePath(HALAMAN);
+}
+
+export async function buatTautanAturUlangFormulir(id: string) {
+  return jalankanFormulir(() => buatTautanAturUlang(id));
+}
+export async function tolakPermintaanAturUlangFormulir(id: string) {
+  return jalankanFormulir(() => tolakPermintaanAturUlang(id));
 }

@@ -50,6 +50,7 @@ async function main() {
   await db.pengaturanPerusahaan.deleteMany();
   await db.akun.deleteMany();
   await db.sesi.deleteMany();
+  await db.permintaanAturUlang.deleteMany();
   await db.pengguna.deleteMany();
   console.log("=== Selesai, database bersih ===");
 }

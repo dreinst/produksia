@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { penggunaSaatIni, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
@@ -82,7 +83,9 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
           </FormulirAksi>
         )}
 
-        <p className="text-center text-xs text-slate-400">Lupa kata sandi? Minta Superadmin/Pemilik/Admin mengatur ulang lewat menu Pengguna.</p>
+        <p className="text-center text-xs text-slate-400">
+          <Link href="/lupa-kata-sandi" className="text-blue-600 hover:underline">Lupa kata sandi?</Link> Superadmin/Pemilik/Admin akan memberimu tautan atur ulang.
+        </p>
       </div>
     </div>
   );
