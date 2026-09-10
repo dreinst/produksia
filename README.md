@@ -6,7 +6,8 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
 - **Pengguna & hak akses**: login email + kata sandi, empat peran (Pemilik, Admin, Kasir, Gudang), kelola pengguna
-- **Bagan akun standar EO/WO**: 108 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
+- **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
+- **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
 
 Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (lihat `ARCHITECTURE.md`).
 
@@ -35,12 +36,16 @@ Matriks lengkapnya ada di `src/lib/hakAkses.ts`. Pengguna baru ditambah lewat **
 
 ## Bagan akun (Event/Wedding Organizer)
 
-Bagan akun standar 108 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
+Bagan akun standar 111 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
+
+## Sinkronisasi buku besar
+
+Semua dokumen yang memengaruhi uang atau stok menjurnal otomatis lewat `src/lib/akuntansi.ts` di dalam transaksi yang sama: Faktur Penjualan (piutang, pendapatan per akun barang, HPP), Penerimaan, Retur Penjualan, **Terima Barang** (persediaan ↔ Barang Diterima Belum Ditagih), Faktur Pembelian (menutup akun belum ditagih, selisih harga ke persediaan, jasa ke beban), Pembayaran, Retur Pembelian (selisih harga ke Selisih Persediaan), **Penyesuaian Stok**, **perolehan aset tetap**, dan penyusutan. Harga pokok barang memakai rata-rata bergerak, sehingga Σ stok × harga pokok selalu sama dengan saldo akun Persediaan. Kartu *Integritas & Sinkronisasi* di beranda dan `npx tsx skrip/uji-sinkron.ts` mencocokkan buku besar dengan dokumen & stok; selisih ≠ 0 diperlakukan sebagai bug.
 
 ## Data contoh
 
 - `npx tsx prisma/reset.ts` — hapus semua data (transaksi, data induk, pengguna & sesi)
-- `npx tsx prisma/seed.ts` — 4 pengguna + bagan akun standar EO/WO + satu alur cerita 20 tahap berlatar usaha event (klien PT Cahaya Nusantara, vendor CV Sinar Dekorasi, merchandise lanyard/stiker/goodie bag, aset sound system) yang melewati SEMUA modul (Penawaran draft → dikonversi → Pesanan → 2× Pengiriman parsial → Faktur → 2× Penerimaan cicilan → Retur; restock: Pesanan Pembelian → 2× Penerimaan Barang → Faktur → 2× Pembayaran → Retur; modal awal, setor bank, bayar sewa; aset + satu penyusutan), supaya tiap halaman langsung punya contoh data yang saling terhubung.
+- `npx tsx prisma/seed.ts` — 4 pengguna + bagan akun standar EO/WO + satu alur cerita berlatar usaha event (klien PT Cahaya Nusantara, vendor CV Sinar Dekorasi, merchandise lanyard/stiker/goodie bag, jasa dekorasi & sound engineer, aset sound system) yang **memanggil aksi server sungguhan** — modal awal, saldo awal stok, Penawaran → Pesanan → 2× Surat Jalan → Faktur → cicilan → retur → pelunasan; Pesanan Pembelian → 2× Terima Barang → Faktur → bayar → retur → lunas; sewa kantor; aset dibeli dari bank → penyusutan — lalu memverifikasi buku besar sinkron (gagal = seed berhenti).
 
 **Penting:** setiap kali `prisma/schema.prisma` berubah dan kamu migrate, **restart dev server** (`npm run dev`) — Turbopack tidak otomatis memuat ulang Prisma Client yang di-generate ulang; gejalanya "Cannot read properties of undefined (reading 'findMany')".
 
@@ -52,9 +57,10 @@ Bagan akun standar 108 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputu
 - **Halaman daftar → `bacaParamDaftar(searchParams)` + `<KontrolDaftar>`** (`src/lib/daftar.ts`, `src/komponen/ui/KontrolDaftar.tsx`): pencarian `?q=` dan paginasi `?hal=` 25 baris, tanpa JavaScript klien. Kueri memakai `count` + `findMany({ where, skip, take })`.
 - **Nomor dokumen → `nomorDokumenBerikutnya(db.model, "PREFIX")`** (`src/lib/penomoran.ts`), jangan `count()+1`.
 - **Uang & kuantitas → `Prisma.Decimal`** lewat `src/lib/uang.ts` (`uang()`, `jumlahkan()`, `kali()`, `bacaUang()`), jangan `Number()` untuk nilai yang disimpan/dibandingkan.
-- **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`.
+- **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
+- **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 6 suite di `skrip/uji-*.ts` — jalankan semua sebelum commit:
+- Skrip regresi: 8 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -92,8 +98,9 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/app/(aplikasi)/pengaturan/pengguna` — kelola akun; `profil` — ganti kata sandi; `tanpa-akses` — halaman 403
 - `src/lib/aksi/*.ts` — logika bisnis per modul (`penjualan`, `pembelian`, `jurnal`, `asetTetap`, `dataInduk`, `pengaturan`, `otentikasi`, `pengguna`)
 - `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
-- `src/lib/baganAkunStandar.ts` (data 108 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
-- `skrip/uji-{bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `src/lib/baganAkunStandar.ts` (data 111 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
+- `src/lib/akuntansi.ts` (semua aturan posting), `src/lib/sinkron.ts` (pencocokan buku besar ↔ dokumen/stok), `src/lib/aksi/persediaan.ts` + `persediaan/` (stok per gudang, penyesuaian)
+- `skrip/uji-{sinkron,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
@@ -101,7 +108,7 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 ## Alur kerja
 
 1. Masuk sebagai Pemilik/Admin, terapkan **Pengaturan → Bagan Akun Standar** (sekaligus mengisi Pemetaan Akun; keduanya wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat). Ganti nama rekening bank 1-1210 sesuai kenyataan.
-2. Buat **Pelanggan**, **Barang**, **Gudang** di Data Induk; stok awal lewat pembelian (Pesanan Pembelian → Terima Barang) atau Prisma Studio (`npx prisma studio`) — belum ada halaman "Penyesuaian Persediaan".
+2. Buat **Pelanggan**, **Barang & Jasa**, **Gudang** di Data Induk; stok awal lewat **Persediaan → Penyesuaian Stok** (akun lawan Modal) atau lewat pembelian (Pesanan Pembelian → Terima Barang).
 3. Buat **Penawaran Penjualan** (opsional) → konversi jadi **Pesanan Penjualan**, atau langsung buat Pesanan.
 4. Dari daftar Pesanan, **Kirim** untuk membuat Surat Jalan (stok berkurang; bisa parsial), lalu **Fakturkan**.
 5. Dari daftar Faktur, **Terima Bayar** (bisa dicicil) atau **Retur** (stok bertambah).
@@ -110,10 +117,10 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 ## Keputusan & batasan yang perlu diketahui
 
 - **Jurnal otomatis** untuk Faktur/Penerimaan/Pembayaran/Retur via `src/lib/akuntansi.ts` memakai pemetaan akun (Piutang, Persediaan, HPP, Pendapatan, Utang). Aturan: Faktur Penjualan → Dr Piutang/Cr Pendapatan + Dr HPP/Cr Persediaan; Penerimaan → Dr Kas-Bank/Cr Piutang; Retur Penjualan → kebalikannya; Faktur Pembelian → Dr Persediaan/Cr Utang; Pembayaran → Dr Utang/Cr Kas-Bank; Retur Pembelian → Dr Utang/Cr Persediaan.
-- **Aset Tetap: hanya garis lurus.** Perolehan aset tidak otomatis membuat jurnal (catat lewat Jurnal Umum/Kas Keluar); belum ada pelepasan aset.
+- **Aset Tetap: hanya garis lurus.** Perolehan aset dijurnal (Dr Aset / Cr Kas-Bank atau Hutang) bila akun pembayaran dipilih; belum ada pelepasan aset.
 - **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Belum ada: lupa-kata-sandi via email (diatur ulang oleh Pemilik/Admin), 2FA, pembatasan percobaan login.
 - **Hak akses per modul**, bukan per dokumen/gudang. Peran Gudang bisa *melihat* semua daftar penjualan/pembelian (perlu untuk membuat SJ/TB).
 - **Dokumen transaksi belum bisa diubah/dihapus** dari UI (data induk sudah bisa: tombol Ubah/Hapus; yang masih dipakai transaksi ditolak DB dengan pesan jelas).
-- **Belum ada Penyesuaian Persediaan / Pindah Barang**, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya).
+- **Belum ada Pindah Barang antar gudang**, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya).
 - **Skrip regresi** memakai basis data yang sama dengan data contoh (bersih-bersih berbasis waktu mulai uji) dan menyetel `UJI_TANPA_SESI=1` agar aksi server bisa dipanggil tanpa HTTP — pintu ini hanya terbuka di luar `NODE_ENV=production`.
 - **Prisma 7.10.0** dipakai sengaja (bukan 8.0 rc yang merupakan CLI platform Prisma).

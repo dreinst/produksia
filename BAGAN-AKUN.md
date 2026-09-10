@@ -2,14 +2,15 @@
 
 Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber datanya ada di `src/lib/baganAkunStandar.ts`; tabel di bawah dihasilkan oleh `npx tsx skrip/cetak-bagan-akun.ts` — ubah data di kode, lalu cetak ulang, jangan edit tabel ini secara manual.
 
-**Ringkasan:** 108 akun — 23 akun kelompok (induk) dan 85 akun rinci; 41 persis dari catatan asli, 52 usulan sesuai standar akuntansi (SAK EMKM), 15 keputusan atas butir yang semula pending.
+**Ringkasan:** 111 akun — 24 akun kelompok (induk) dan 87 akun rinci; 40 persis dari catatan asli, 54 usulan sesuai standar akuntansi (SAK EMKM), 17 keputusan atas butir yang semula pending.
 
 ## Cara pakai di sistem
 
-1. Masuk sebagai Pemilik/Admin → **Pengaturan → Bagan Akun Standar** → tombol **Buat … akun**. Idempoten: akun yang sudah ada tidak diubah, hanya yang belum ada dibuat (lengkap dengan induk, tanda *kelompok*, tanda *kas/bank*). Pemetaan akun otomatis diisi bila belum ada.
+1. Masuk sebagai Pemilik/Admin → **Pengaturan → Bagan Akun Standar** → tombol **Buat … akun**. Idempoten: akun yang sudah ada tidak diubah, hanya yang belum ada dibuat (lengkap dengan induk, tanda *kelompok*, tanda *kas/bank*). Pemetaan akun otomatis diisi bila belum ada; peran opsional yang masih kosong pada pemetaan lama ikut dilengkapi.
 2. Ganti nama `1-1210 Bank – Rekening Operasional` sesuai bank & nomor rekening; tambah rekening lain sebagai anak `1-1200` (dan akun biaya adminnya sebagai anak `5-8500`) lewat **Data Induk → Bagan Akun**.
-3. **Akun kelompok tidak bisa dijurnal** — jurnal umum, kas masuk/keluar, jurnal otomatis penjualan/pembelian, penyusutan, dan pemetaan akun menolaknya dengan pesan jelas. Pilihan akun di formulir hanya menampilkan akun rinci; pilihan Kas/Bank hanya akun bertanda kas/bank.
+3. **Akun kelompok tidak bisa dijurnal** — jurnal umum, kas masuk/keluar, jurnal otomatis penjualan/pembelian/persediaan/aset, penyusutan, dan pemetaan akun menolaknya dengan pesan jelas. Pilihan akun di formulir hanya menampilkan akun rinci; pilihan Kas/Bank hanya akun bertanda kas/bank.
 4. **Neraca Saldo** menampilkan subtotal per kelompok (baris tebal); total bawah hanya menjumlahkan akun rinci.
+5. Akun per barang/jasa (Data Induk → Barang & Jasa): pendapatan, persediaan, HPP, dan beban (untuk jasa yang dibeli) bisa diarahkan ke akun tertentu; kosong = memakai pemetaan.
 
 ## Penomoran
 
@@ -20,12 +21,16 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Kebutuhan sistem | Akun standar |
 |---|---|
 | Piutang usaha (Faktur Penjualan, Penerimaan, Retur Penjualan) | `1-1300` |
-| Persediaan (stok barang produksi/merchandise) | `1-1600` |
-| Harga pokok penjualan | `5-1100` |
-| Pendapatan bawaan Faktur Penjualan | `4-1100` Pendapatan Event Reguler — ganti di Pemetaan Akun bila mayoritas faktur adalah produksi/sewa |
+| Persediaan (stok barang produksi/merchandise; naik saat Terima Barang & penyesuaian, turun saat Faktur Penjualan & retur pembelian) | `1-1600` |
+| Harga pokok penjualan (Σ jumlah × harga pokok rata-rata bergerak) | `5-1100` |
+| Pendapatan bawaan Faktur Penjualan | `4-1100` Pendapatan Event Reguler — data contoh mengarahkan merchandise ke `4-2100` lewat akun per barang |
 | Hutang usaha (Faktur Pembelian, Pembayaran, Retur Pembelian) | `2-1100` |
-| Akun Kas/Bank (Penerimaan, Pembayaran, Kas Masuk/Keluar) | `1-1100` Kas, `1-1210` Bank (dan rekening lain yang ditandai kas/bank) |
-| Aset tetap → beban & akumulasi penyusutan | `1-2200…1-2500` ↔ `5-9520…5-9550` ↔ `1-2920…1-2950` |
+| Barang Diterima Belum Ditagih (dikredit saat Terima Barang, didebit saat Faktur Pembelian) | `2-1600` |
+| Beban pembelian jasa (baris JASA di Faktur Pembelian) | `5-1200` Biaya Langsung Event (bawaan; bisa per barang) |
+| Selisih persediaan (beda harga retur pembelian vs harga pokok, opname) | `5-1400` |
+| Akun Kas/Bank (Penerimaan, Pembayaran, Kas Masuk/Keluar, perolehan aset) | `1-1100` Kas, `1-1210` Bank (dan rekening lain yang ditandai kas/bank) |
+| Aset tetap → beban & akumulasi penyusutan; perolehan dikredit ke kas/bank atau hutang | `1-2200…1-2500` ↔ `5-9520…5-9550` ↔ `1-2920…1-2950` |
+| Saldo awal persediaan (Penyesuaian Stok) | Dr `1-1600` / Cr `3-1000` Modal |
 | Uang muka pelanggan (DP) | `2-1200` — dicatat lewat Kas Masuk (Kas/Bank ↔ 2-1200); belum ada fitur DP pada pesanan |
 
 ## Alur rekonsiliasi (bagian 6 catatan) → modul
@@ -33,20 +38,19 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Catatan | Modul di Accurate Copy |
 |---|---|
 | Proposal ter-ACC / Pesanan | Penawaran (PNW) → Konversi ke Pesanan Penjualan (PSJ) |
-| LPJ (laporan pertanggungjawaban event) | Faktur Penjualan (FJ) setelah event selesai; Surat Jalan (SJ) bila ada barang fisik |
+| LPJ (laporan pertanggungjawaban event) | Faktur Penjualan (FJ) setelah event selesai; Surat Jalan (SJ) bila ada barang fisik / jasa diserahkan |
 | Keluar/Masuk Kas/Bank | Penerimaan (TRM) untuk pelunasan klien; Kas Masuk/Keluar (KM/KK) untuk non-piutang |
 | TOP (Term of Payment) | Tanggal jatuh tempo faktur (bawaan 14 hari) & status Sebagian/Lunas |
 | Laba/Rugi | Neraca Saldo (laporan laba-rugi resmi masih terbuka di AUDIT.md) |
-| Pengadaan / Pembelian / Beban | Pesanan Pembelian (PSB) → Terima Barang (TB); beban langsung lewat Kas Keluar ke akun 5-xxxx |
+| Pengadaan / Pembelian / Beban | Pesanan Pembelian (PSB) → Terima Barang (TB, menjurnal persediaan) → Faktur Pembelian (FB); beban langsung lewat Kas Keluar ke akun 5-xxxx |
 | Nota | Faktur Pembelian (FB) |
 | Cash flow tunai / TF | Pembayaran (BYR) dengan akun Kas atau Bank |
 | Neraca & Laba/Rugi | Buku Besar Mutasi & Neraca Saldo |
 
 ## Batasan yang sengaja dibiarkan
 
-- Satu akun pendapatan untuk seluruh Faktur Penjualan (per barang/jasa belum bisa dipetakan ke akun berbeda) — kandidat pengembangan berikutnya.
-- `5-7300 Diskon Penjualan` mengikuti catatan (di Beban Pemasaran); standar akuntansi memperlakukannya sebagai kontra-pendapatan. Kalau ingin standar, pindahkan ke kelompok `4-xxxx` dengan jenis Pendapatan.
 - Akun pajak (`2-13xx`, `5-9xxx`) disediakan tapi sistem belum menghitung pajak otomatis (belum ada PPN/PPh di dokumen).
+- Satu akun piutang/hutang untuk semua rekanan (belum per pelanggan/pemasok); rincian per rekanan diambil dari dokumen.
 ## Keputusan atas butir pending
 
 | Butir | Keputusan |
@@ -56,6 +60,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Arti "TOP" | Term of Payment — di sistem ini terwujud sebagai tanggal jatuh tempo Faktur Penjualan (bawaan 14 hari) dan status Sebagian/Lunas dari Penerimaan. |
 | Coretan di bawah "Kas" | Dibaca 'Bank' (1-1200), dibuat sebagai kelompok dengan satu rekening contoh (1-1210) supaya tiap rekening bank bisa punya akun sendiri. |
 | Redaksi "Claim/Gagal Produksi" | Klaim & Gagal Produksi (5-7100): ganti rugi atau pengerjaan ulang akibat komplain klien / produksi gagal. Tetap di Beban Pemasaran sesuai catatan. |
+| Diskon & Cashback | Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi. |
 | Beban Lain-lain (1) & (2) | Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500). |
 | Penomoran kode akun | Format Accurate X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan. |
 | Obligasi & Investasi | Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft. |
@@ -96,6 +101,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `2-1330` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPN | Kewajiban |  | **usul** | Hanya bila sudah PKP |
 | `2-1400` | &nbsp;&nbsp;&nbsp;Beban yang Masih Harus Dibayar | Kewajiban |  | **usul** | Gaji/listrik/vendor yang sudah jadi beban tapi belum ditagih |
 | `2-1500` | &nbsp;&nbsp;&nbsp;Hutang Lain-lain | Kewajiban |  | **usul** |  |
+| `2-1600` | &nbsp;&nbsp;&nbsp;Barang Diterima Belum Ditagih | Kewajiban | pemetaan | **usul** | Kewajiban sementara antara Terima Barang (TB) dan Faktur Pembelian (FB); dipakai otomatis oleh sistem |
 | `2-2000` | **Kewajiban Jangka Panjang** | Kewajiban | kelompok | **usul** |  |
 | `2-2100` | &nbsp;&nbsp;&nbsp;Hutang Bank | Kewajiban |  | **usul** |  |
 | `2-2200` | &nbsp;&nbsp;&nbsp;Hutang Pihak Berelasi | Kewajiban |  | **usul** | Pinjaman dari pemilik/keluarga/afiliasi |
@@ -113,13 +119,16 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `4-3000` | **Pendapatan Sewa** | Pendapatan | kelompok | **keputusan** | Sewa peralatan event & venue |
 | `4-3100` | &nbsp;&nbsp;&nbsp;Pendapatan Sewa Reguler | Pendapatan |  | **keputusan** |  |
 | `4-3200` | &nbsp;&nbsp;&nbsp;Pendapatan Sewa Flagship | Pendapatan |  | **keputusan** |  |
+| `4-8000` | **Potongan Penjualan** | Pendapatan | kelompok | **keputusan** | Kontra-pendapatan (saldo normal debit) — sesuai standar, diskon mengurangi pendapatan, bukan beban pemasaran |
+| `4-8100` | &nbsp;&nbsp;&nbsp;Diskon Penjualan | Pendapatan |  | **keputusan** | Dipindah dari Beban Pemasaran (catatan asli) |
 | `4-9000` | **Pendapatan Lain-lain** | Pendapatan | kelompok | **usul** |  |
 | `4-9100` | &nbsp;&nbsp;&nbsp;Pendapatan Bunga Bank | Pendapatan |  | **usul** |  |
 | `4-9200` | &nbsp;&nbsp;&nbsp;Pendapatan Lainnya | Pendapatan |  | **usul** | Selisih kurs, penjualan aset, dll. |
 | `5-1000` | **Beban Pokok Pendapatan** | Beban | kelompok | **usul** | Biaya yang melekat langsung pada pendapatan; menghasilkan laba kotor |
 | `5-1100` | &nbsp;&nbsp;&nbsp;Harga Pokok Penjualan | Beban | pemetaan | **usul** | Nilai persediaan barang yang terjual (dipakai otomatis oleh modul stok) |
-| `5-1200` | &nbsp;&nbsp;&nbsp;Biaya Langsung Event | Beban |  | **usul** | Vendor, crew lepas, sewa venue per event |
+| `5-1200` | &nbsp;&nbsp;&nbsp;Biaya Langsung Event | Beban | pemetaan | **usul** | Vendor, crew lepas, sewa venue per event |
 | `5-1300` | &nbsp;&nbsp;&nbsp;Biaya Langsung Produksi | Beban |  | **usul** | Bahan dekor, cetak, jasa dokumentasi per pesanan |
+| `5-1400` | &nbsp;&nbsp;&nbsp;Selisih Persediaan | Beban | pemetaan | **usul** | Selisih opname/koreksi stok dan beda harga retur pembelian; dipakai otomatis oleh sistem |
 | `5-2000` | **Beban Gaji & Honor** | Beban | kelompok | asli |  |
 | `5-2100` | &nbsp;&nbsp;&nbsp;Gaji Pokok | Beban |  | asli |  |
 | `5-2200` | &nbsp;&nbsp;&nbsp;Upah Harian | Beban |  | asli |  |
@@ -154,7 +163,6 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `5-7000` | **Beban Pemasaran** | Beban | kelompok | asli |  |
 | `5-7100` | &nbsp;&nbsp;&nbsp;Klaim & Gagal Produksi | Beban |  | **keputusan** | Ganti rugi/pengerjaan ulang karena komplain klien atau produksi gagal |
 | `5-7200` | &nbsp;&nbsp;&nbsp;Cashback Pelanggan | Beban |  | asli |  |
-| `5-7300` | &nbsp;&nbsp;&nbsp;Diskon Penjualan | Beban |  | asli | Mengikuti catatan asli (di pemasaran); alternatif standar: kontra-pendapatan |
 | `5-7400` | &nbsp;&nbsp;&nbsp;Iklan & Promosi | Beban |  | **usul** | Iklan media sosial, cetak brosur, endorsement |
 | `5-8000` | **Beban Sosial & Sponsorship** | Beban | kelompok | **keputusan** | 'Beban Lain-lain (1)' — tetap dipisah dari (2), diberi nama sesuai isinya |
 | `5-8100` | &nbsp;&nbsp;&nbsp;Sumbangan | Beban |  | asli |  |

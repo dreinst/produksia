@@ -63,7 +63,7 @@ export default async function HalamanAsetTetapBaru() {
           </select>
         </div>
 
-        <div className="bidang md:col-span-2">
+        <div className="bidang">
           <label className="label" htmlFor="akunAkumulasiPenyusutanId">Akun Akumulasi Penyusutan (kontra-aset) *</label>
           <select id="akunAkumulasiPenyusutanId" name="akunAkumulasiPenyusutanId" required className="isian">
             <option value="">-</option>
@@ -71,6 +71,17 @@ export default async function HalamanAsetTetapBaru() {
               <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
             ))}
           </select>
+        </div>
+
+        <div className="bidang">
+          <label className="label" htmlFor="akunPembayaranId">Dibayar dari (Kas/Bank atau Hutang)</label>
+          <select id="akunPembayaranId" name="akunPembayaranId" className="isian" defaultValue="">
+            <option value="">— tidak dijurnal (aset sudah tercatat)</option>
+            {daftarAkun.filter((a) => a.kasBank || a.jenis === "KEWAJIBAN").map((a) => (
+              <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+            ))}
+          </select>
+          <span className="petunjuk">Bila dipilih, sistem menjurnal Dr Akun Aset / Cr akun ini sebesar harga perolehan</span>
         </div>
 
         <div className="md:col-span-2">

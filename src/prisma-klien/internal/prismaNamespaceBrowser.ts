@@ -87,7 +87,9 @@ export const ModelName = {
   Jurnal: 'Jurnal',
   BarisJurnal: 'BarisJurnal',
   AsetTetap: 'AsetTetap',
-  PenyusutanAset: 'PenyusutanAset'
+  PenyusutanAset: 'PenyusutanAset',
+  PenyesuaianPersediaan: 'PenyesuaianPersediaan',
+  BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -216,7 +218,11 @@ export const BarangScalarFieldEnum = {
   hargaBeli: 'hargaBeli',
   hargaJual: 'hargaJual',
   stokMinimum: 'stokMinimum',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  akunPendapatanId: 'akunPendapatanId',
+  akunHppId: 'akunHppId',
+  akunPersediaanId: 'akunPersediaanId',
+  akunBebanId: 'akunBebanId'
 } as const
 
 export type BarangScalarFieldEnum = (typeof BarangScalarFieldEnum)[keyof typeof BarangScalarFieldEnum]
@@ -351,7 +357,8 @@ export const ReturPenjualanScalarFieldEnum = {
   tanggal: 'tanggal',
   fakturId: 'fakturId',
   gudangId: 'gudangId',
-  alasan: 'alasan'
+  alasan: 'alasan',
+  total: 'total'
 } as const
 
 export type ReturPenjualanScalarFieldEnum = (typeof ReturPenjualanScalarFieldEnum)[keyof typeof ReturPenjualanScalarFieldEnum]
@@ -398,7 +405,8 @@ export const PenerimaanBarangScalarFieldEnum = {
   tanggal: 'tanggal',
   pesananId: 'pesananId',
   gudangId: 'gudangId',
-  status: 'status'
+  status: 'status',
+  jurnalId: 'jurnalId'
 } as const
 
 export type PenerimaanBarangScalarFieldEnum = (typeof PenerimaanBarangScalarFieldEnum)[keyof typeof PenerimaanBarangScalarFieldEnum]
@@ -462,7 +470,8 @@ export const ReturPembelianScalarFieldEnum = {
   tanggal: 'tanggal',
   fakturId: 'fakturId',
   gudangId: 'gudangId',
-  alasan: 'alasan'
+  alasan: 'alasan',
+  total: 'total'
 } as const
 
 export type ReturPembelianScalarFieldEnum = (typeof ReturPembelianScalarFieldEnum)[keyof typeof ReturPembelianScalarFieldEnum]
@@ -498,7 +507,10 @@ export const PemetaanAkunScalarFieldEnum = {
   persediaanId: 'persediaanId',
   hppId: 'hppId',
   pendapatanPenjualanId: 'pendapatanPenjualanId',
-  utangUsahaId: 'utangUsahaId'
+  utangUsahaId: 'utangUsahaId',
+  bebanJasaId: 'bebanJasaId',
+  barangBelumDitagihId: 'barangBelumDitagihId',
+  selisihPersediaanId: 'selisihPersediaanId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]
@@ -538,7 +550,9 @@ export const AsetTetapScalarFieldEnum = {
   status: 'status',
   akunAsetId: 'akunAsetId',
   akunBebanPenyusutanId: 'akunBebanPenyusutanId',
-  akunAkumulasiPenyusutanId: 'akunAkumulasiPenyusutanId'
+  akunAkumulasiPenyusutanId: 'akunAkumulasiPenyusutanId',
+  akunPembayaranId: 'akunPembayaranId',
+  jurnalPerolehanId: 'jurnalPerolehanId'
 } as const
 
 export type AsetTetapScalarFieldEnum = (typeof AsetTetapScalarFieldEnum)[keyof typeof AsetTetapScalarFieldEnum]
@@ -553,6 +567,32 @@ export const PenyusutanAsetScalarFieldEnum = {
 } as const
 
 export type PenyusutanAsetScalarFieldEnum = (typeof PenyusutanAsetScalarFieldEnum)[keyof typeof PenyusutanAsetScalarFieldEnum]
+
+
+export const PenyesuaianPersediaanScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  tanggal: 'tanggal',
+  gudangId: 'gudangId',
+  keterangan: 'keterangan',
+  akunLawanId: 'akunLawanId',
+  jurnalId: 'jurnalId',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PenyesuaianPersediaanScalarFieldEnum = (typeof PenyesuaianPersediaanScalarFieldEnum)[keyof typeof PenyesuaianPersediaanScalarFieldEnum]
+
+
+export const BarisPenyesuaianPersediaanScalarFieldEnum = {
+  id: 'id',
+  penyesuaianId: 'penyesuaianId',
+  barangId: 'barangId',
+  jumlahSebelum: 'jumlahSebelum',
+  jumlahSesudah: 'jumlahSesudah',
+  hargaSatuan: 'hargaSatuan'
+} as const
+
+export type BarisPenyesuaianPersediaanScalarFieldEnum = (typeof BarisPenyesuaianPersediaanScalarFieldEnum)[keyof typeof BarisPenyesuaianPersediaanScalarFieldEnum]
 
 
 export const SortOrder = {

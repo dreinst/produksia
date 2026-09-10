@@ -17,6 +17,7 @@ const tautanTransaksiBaru: { href: string; label: string; kode: string; ikon: st
   { href: "/kas-bank/keluar", label: "Kas Keluar", kode: "KK", ikon: "north_east", hak: "kas-bank.tulis" },
   { href: "/buku-besar/jurnal/baru", label: "Jurnal Umum", kode: "JU", ikon: "edit_note", hak: "buku-besar.tulis" },
   { href: "/aset-tetap/baru", label: "Aset Tetap", kode: "AT", ikon: "domain", hak: "aset-tetap.tulis" },
+  { href: "/persediaan/penyesuaian/baru", label: "Penyesuaian Stok", kode: "PS", ikon: "inventory_2", hak: "persediaan.tulis" },
 ];
 
 export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSesi; saatMenu: () => void }) {

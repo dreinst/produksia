@@ -71,6 +71,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "2-1330", nama: "Hutang PPN", jenis: K, induk: "2-1300", asal: "USUL", keterangan: "Hanya bila sudah PKP" },
   { kode: "2-1400", nama: "Beban yang Masih Harus Dibayar", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "Gaji/listrik/vendor yang sudah jadi beban tapi belum ditagih" },
   { kode: "2-1500", nama: "Hutang Lain-lain", jenis: K, induk: "2-1000", asal: "USUL" },
+  { kode: "2-1600", nama: "Barang Diterima Belum Ditagih", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "Kewajiban sementara antara Terima Barang (TB) dan Faktur Pembelian (FB); dipakai otomatis oleh sistem" },
 
   { kode: "2-2000", nama: "Kewajiban Jangka Panjang", jenis: K, kelompok: true, asal: "USUL" },
   { kode: "2-2100", nama: "Hutang Bank", jenis: K, induk: "2-2000", asal: "USUL" },
@@ -93,6 +94,8 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "4-3000", nama: "Pendapatan Sewa", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Sewa peralatan event & venue" },
   { kode: "4-3100", nama: "Pendapatan Sewa Reguler", jenis: P, induk: "4-3000", asal: "KEPUTUSAN" },
   { kode: "4-3200", nama: "Pendapatan Sewa Flagship", jenis: P, induk: "4-3000", asal: "KEPUTUSAN" },
+  { kode: "4-8000", nama: "Potongan Penjualan", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Kontra-pendapatan (saldo normal debit) — sesuai standar, diskon mengurangi pendapatan, bukan beban pemasaran" },
+  { kode: "4-8100", nama: "Diskon Penjualan", jenis: P, induk: "4-8000", asal: "KEPUTUSAN", keterangan: "Dipindah dari Beban Pemasaran (catatan asli)" },
   { kode: "4-9000", nama: "Pendapatan Lain-lain", jenis: P, kelompok: true, asal: "USUL" },
   { kode: "4-9100", nama: "Pendapatan Bunga Bank", jenis: P, induk: "4-9000", asal: "USUL" },
   { kode: "4-9200", nama: "Pendapatan Lainnya", jenis: P, induk: "4-9000", asal: "USUL", keterangan: "Selisih kurs, penjualan aset, dll." },
@@ -102,6 +105,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "5-1100", nama: "Harga Pokok Penjualan", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Nilai persediaan barang yang terjual (dipakai otomatis oleh modul stok)" },
   { kode: "5-1200", nama: "Biaya Langsung Event", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Vendor, crew lepas, sewa venue per event" },
   { kode: "5-1300", nama: "Biaya Langsung Produksi", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Bahan dekor, cetak, jasa dokumentasi per pesanan" },
+  { kode: "5-1400", nama: "Selisih Persediaan", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Selisih opname/koreksi stok dan beda harga retur pembelian; dipakai otomatis oleh sistem" },
 
   { kode: "5-2000", nama: "Beban Gaji & Honor", jenis: B, kelompok: true, asal: "ASLI" },
   { kode: "5-2100", nama: "Gaji Pokok", jenis: B, induk: "5-2000", asal: "ASLI" },
@@ -142,7 +146,6 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "5-7000", nama: "Beban Pemasaran", jenis: B, kelompok: true, asal: "ASLI" },
   { kode: "5-7100", nama: "Klaim & Gagal Produksi", jenis: B, induk: "5-7000", asal: "KEPUTUSAN", keterangan: "Ganti rugi/pengerjaan ulang karena komplain klien atau produksi gagal" },
   { kode: "5-7200", nama: "Cashback Pelanggan", jenis: B, induk: "5-7000", asal: "ASLI" },
-  { kode: "5-7300", nama: "Diskon Penjualan", jenis: B, induk: "5-7000", asal: "ASLI", keterangan: "Mengikuti catatan asli (di pemasaran); alternatif standar: kontra-pendapatan" },
   { kode: "5-7400", nama: "Iklan & Promosi", jenis: B, induk: "5-7000", asal: "USUL", keterangan: "Iklan media sosial, cetak brosur, endorsement" },
 
   { kode: "5-8000", nama: "Beban Sosial & Sponsorship", jenis: B, kelompok: true, asal: "KEPUTUSAN", keterangan: "'Beban Lain-lain (1)' — tetap dipisah dari (2), diberi nama sesuai isinya" },
@@ -173,6 +176,9 @@ export const PEMETAAN_STANDAR = {
   hpp: "5-1100",
   pendapatanPenjualan: "4-1100",
   utangUsaha: "2-1100",
+  bebanJasa: "5-1200",
+  barangBelumDitagih: "2-1600",
+  selisihPersediaan: "5-1400",
 } as const;
 
 /** Butir yang semula "pending" di catatan, beserta keputusan kurasinya (ditampilkan di halaman Bagan Akun). */
@@ -182,6 +188,7 @@ export const KEPUTUSAN_KURASI: readonly { butir: string; keputusan: string }[] =
   { butir: "Arti \"TOP\"", keputusan: "Term of Payment — di sistem ini terwujud sebagai tanggal jatuh tempo Faktur Penjualan (bawaan 14 hari) dan status Sebagian/Lunas dari Penerimaan." },
   { butir: "Coretan di bawah \"Kas\"", keputusan: "Dibaca 'Bank' (1-1200), dibuat sebagai kelompok dengan satu rekening contoh (1-1210) supaya tiap rekening bank bisa punya akun sendiri." },
   { butir: "Redaksi \"Claim/Gagal Produksi\"", keputusan: "Klaim & Gagal Produksi (5-7100): ganti rugi atau pengerjaan ulang akibat komplain klien / produksi gagal. Tetap di Beban Pemasaran sesuai catatan." },
+  { butir: "Diskon & Cashback", keputusan: "Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi." },
   { butir: "Beban Lain-lain (1) & (2)", keputusan: "Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500)." },
   { butir: "Penomoran kode akun", keputusan: "Format Accurate X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan." },
   { butir: "Obligasi & Investasi", keputusan: "Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft." },

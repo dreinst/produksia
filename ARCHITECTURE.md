@@ -42,8 +42,8 @@ flowchart LR
 app/
 ├─ prisma/
 │  ├─ schema.prisma            # seluruh model data (§3) + Pengguna/Sesi (§6.4)
-│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna, bagan_akun
-│  ├─ seed.ts                  # 4 pengguna + 1 alur cerita 20 tahap yang melewati semua modul
+│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna, bagan_akun, sinkron_akuntansi
+│  ├─ seed.ts                  # 4 pengguna + bagan akun + alur cerita lewat AKSI SERVER sungguhan, diakhiri periksaSinkron
 │  └─ reset.ts                 # kosongkan semua tabel (urutan aman terhadap FK)
 ├─ skrip/
 │  ├─ uji-*.ts                 #  6 suite regresi: bagan-akun, penjualan, pembelian, buku-besar, aset-tetap, pengaman
@@ -65,6 +65,7 @@ app/
 │  │  │  ├─ kas-bank/…         # masuk, keluar
 │  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo
 │  │  │  ├─ aset-tetap/…       # daftar, baru, penyusutan
+│  │  │  ├─ persediaan/…       # stok per gudang, penyesuaian (+ /baru)
 │  │  │  ├─ pengaturan/        # pemetaan-akun, bagan-akun (terapkan standar), pengguna (+ [id]/)
 │  │  │  ├─ profil/ · tanpa-akses/ · cari/
 │  │  └─ api/status/           # cek koneksi DB (butuh sesi)
@@ -82,13 +83,14 @@ app/
 │  │  ├─ kataSandi.ts          # hash/verifikasi scrypt, aturan kekuatan
 │  │  ├─ baganAkunStandar.ts   # data 108 akun EO/WO + keputusan kurasi (BAGAN-AKUN.md)
 │  │  ├─ baganAkun.ts          # terapkanBaganAkunStandar (idempoten), pastikanAkunRinci, daftarAkunKasBank
+│  │  ├─ sinkron.ts            # periksaSinkron: buku besar ↔ stok/piutang/hutang/barang belum ditagih
 │  │  ├─ daftar.ts             # bacaParamDaftar(?q,?hal) untuk halaman daftar
 │  │  ├─ dataInduk.ts          # pembacaan generik data induk (opsi, include, pencarian)
 │  │  ├─ konfigurasiDataInduk.ts   # definisi entitas data induk (bidang, kolom, bagian)
 │  │  ├─ uang.ts               # Decimal: D, uang, jumlahkan, kali, bacaUang, format
 │  │  ├─ penomoran.ts          # nomorDokumenBerikutnya(delegasi, prefix)
-│  │  ├─ stok.ts               # kurangiStok (cek ketersediaan), tambahStok
-│  │  ├─ akuntansi.ts          # aturan posting jurnal otomatis (§6.2)
+│  │  ├─ stok.ts               # kurangiStok, tambahStok, perbaruiHargaRata (rata-rata bergerak), jenisBarang
+│  │  ├─ akuntansi.ts          # SEMUA aturan posting jurnal otomatis per dokumen (§6.2)
 │  │  ├─ statusFormulir.ts     # jalankanFormulir: galat → status, terjemahkan galat Prisma
 │  │  └─ aksi/                 # "use server": penjualan, pembelian, jurnal, asetTetap, dataInduk, pengaturan, otentikasi, pengguna
 │  └─ prisma-klien/            # output `prisma generate` — ikut di-commit agar tipe langsung tersedia; jangan diedit manual
@@ -162,7 +164,7 @@ Semua dikelola oleh **satu halaman generik** `/data-induk/[entitas]` yang membac
 Menambah entitas master baru = menambah satu objek konfigurasi; tidak ada halaman baru.
 
 ### 3.2 Stok
-`StokBarang` berkunci komposit `(barangId, gudangId)` — stok selalu **per gudang**. Constraint DB `CHECK (qty >= 0)`.
+`StokBarang` berkunci komposit `(barangId, gudangId)` — stok selalu **per gudang**. Constraint DB `CHECK ("jumlah" >= 0)`. Hanya `Barang.jenis = BARANG` yang punya stok; JASA tidak pernah menyentuh stok maupun HPP. `Barang.hargaBeli` adalah **harga pokok rata-rata bergerak** yang diperbarui setiap barang masuk (Terima Barang, penyesuaian, selisih harga faktur). `PenyesuaianPersediaan` (+ baris `jumlahSebelum/jumlahSesudah/hargaSatuan`) mencatat saldo awal/opname dan berjurnal JU-PS. Barang juga bisa punya akun pendapatan/HPP/persediaan/beban sendiri (`akun*Id`, kosong = pemetaan).
 
 ### 3.3 Dokumen transaksi
 Pola seragam **header + baris**: header punya `no`, `date`, `status`, `total`, relasi pihak (pelanggan/pemasok) dan relasi ke dokumen asal; baris punya `barangId`, `qty`, `price`. Baris pesanan juga menyimpan **progres**: `jumlahTerkirim`/`jumlahDiterima` dan `jumlahDifaktur` — inilah yang membuat pengiriman & penagihan bisa dicicil dan divalidasi.
@@ -215,14 +217,15 @@ flowchart LR
     PSB -->|Fakturkan| FB[Faktur Pembelian<br/>FB]
     FB -->|Bayar, bisa cicil| BYR[Pembayaran<br/>BYR]
     FB -->|Retur| RB[Retur Pembelian<br/>RB]
-    TB -.->|stok +| STK[(StokBarang)]
+    TB -.->|stok + · harga rata-rata| STK[(StokBarang)]
     RB -.->|stok − (cek cukup)| STK
-    FB -.->|Dr Persediaan / Cr Utang| GL[(Jurnal)]
-    BYR -.->|Dr Utang / Cr Kas-Bank| GL
-    RB -.->|Dr Utang / Cr Persediaan| GL
+    TB -.->|Dr Persediaan / Cr Barang Belum Ditagih| GL[(Jurnal)]
+    FB -.->|Dr Belum Ditagih ± selisih harga · Dr Beban (jasa) / Cr Hutang| GL
+    BYR -.->|Dr Hutang / Cr Kas-Bank| GL
+    RB -.->|Dr Hutang / Cr Persediaan (harga pokok) ± Selisih| GL
 ```
 
-Action: `buatPesananPembelian`, `buatPenerimaanBarang`, `buatFakturPembelian`, `buatPembayaranPembelian`, `buatReturPembelian` (`src/lib/aksi/pembelian.ts`). Aturan validasi identik dengan penjualan dengan arah stok terbalik. Harga default di editor baris = `hargaBeli` barang.
+Action: `buatPesananPembelian`, `buatPenerimaanBarang`, `buatFakturPembelian`, `buatPembayaranPembelian`, `buatReturPembelian` (`src/lib/aksi/pembelian.ts`). Aturan validasi identik dengan penjualan dengan arah stok terbalik. Harga default di editor baris = `hargaBeli` barang. **Terima Barang sudah menjurnal** nilai persediaan (harga pesanan) ke akun *Barang Diterima Belum Ditagih* (2-1600) agar saldo Persediaan naik bersamaan dengan stok fisik; Faktur Pembelian menutup akun itu dan memindahkan selisih harga (faktur vs pesanan) ke Persediaan sekaligus harga rata-rata. Faktur & retur juga mengubah status/sisa hutang (retur mengurangi sisa).
 
 ### 4.3 Kas & Bank dan Buku Besar
 
@@ -262,7 +265,7 @@ flowchart TB
 ## 6. Mekanisme lintas modul
 
 ### 6.1 Stok (`src/lib/stok.ts`)
-`kurangiStok(tx, barangId, gudangId, qty, label)` membaca stok di dalam transaksi, menolak bila kurang ("Stok X tidak cukup (tersedia…, diminta…)"), lalu `decrement`. Pengaman balapan: `CHECK (qty >= 0)` di DB — bila dua transaksi lolos cek aplikasi bersamaan, yang kedua gagal dan seluruh transaksinya di-rollback; pesannya diterjemahkan oleh `statusFormulir.ts`. `tambahStok` memakai `upsert` (baris stok dibuat saat pertama kali ada barang masuk ke gudang itu).
+`kurangiStok(tx, barangId, gudangId, qty, label)` membaca stok di dalam transaksi, menolak bila kurang ("Stok X tidak cukup (tersedia…, diminta…)"), lalu `decrement`. Pengaman balapan: `CHECK (qty >= 0)` di DB — bila dua transaksi lolos cek aplikasi bersamaan, yang kedua gagal dan seluruh transaksinya di-rollback; pesannya diterjemahkan oleh `statusFormulir.ts`. `tambahStok` memakai `upsert` (baris stok dibuat saat pertama kali ada barang masuk ke gudang itu). `jenisBarang` dipakai semua dokumen untuk melewati baris JASA. `perbaruiHargaRata(tx, barangId, qtyMasuk, hargaMasuk, stokSudahTermasuk)` menghitung rata-rata bergerak dari seluruh stok barang (lintas gudang); `sesuaikanHargaRata` menyebar selisih nilai (mis. harga faktur ≠ pesanan) ke harga pokok. Karena setiap barang keluar dinilai dengan harga rata-rata yang sama, **Σ stok × hargaBeli = saldo akun Persediaan** (toleransi pembulatan 2 desimal).
 
 ### 6.2 Posting jurnal otomatis (`src/lib/akuntansi.ts`)
 
@@ -270,15 +273,21 @@ Sebelum baris jurnal ditulis, `pastikanAkunRinci` (`src/lib/baganAkun.ts`) menol
 
 | Peristiwa | Debit | Kredit |
 |---|---|---|
-| Faktur Penjualan | Piutang Usaha (total) · HPP (Σ qty×hargaBeli) | Pendapatan Penjualan (total) · Persediaan (HPP) |
-| Penerimaan Penjualan | Akun kas/bank yang dipilih | Piutang Usaha |
-| Retur Penjualan | Pendapatan (nilai retur di harga faktur) · Persediaan (cost) | Piutang Usaha · HPP |
-| Faktur Pembelian | Persediaan (total) | Utang Usaha (total) |
-| Pembayaran Pembelian | Utang Usaha | Akun kas/bank yang dipilih |
-| Retur Pembelian | Utang Usaha (nilai retur di harga faktur) | Persediaan |
-| Penyusutan | Beban Penyusutan (per aset) | Akumulasi Penyusutan (per aset) |
+| Faktur Penjualan (JU-FJ) | Piutang Usaha (total) · HPP per akun (Σ qty × harga pokok, BARANG saja) | Pendapatan per akun barang/pemetaan · Persediaan per akun (HPP) |
+| Penerimaan Penjualan (JU-TRM) | Akun kas/bank yang dipilih | Piutang Usaha |
+| Retur Penjualan (JU-RJ) | Pendapatan per akun (harga faktur) · Persediaan (harga pokok) | Piutang Usaha (total retur) · HPP |
+| Terima Barang (JU-TB) | Persediaan per akun (qty × harga pesanan, BARANG) | Barang Diterima Belum Ditagih |
+| Faktur Pembelian (JU-FB) | Barang Diterima Belum Ditagih (harga pesanan) · Persediaan (selisih harga, bisa kredit) · Beban jasa per akun (JASA) | Hutang Usaha (total) |
+| Pembayaran Pembelian (JU-BYR) | Hutang Usaha | Akun kas/bank yang dipilih |
+| Retur Pembelian (JU-RB) | Hutang Usaha (harga faktur) · Selisih Persediaan (bila rugi) | Persediaan (harga pokok) · Beban jasa (JASA) · Selisih Persediaan (bila untung) |
+| Penyesuaian Stok (JU-PS) | Persediaan (selisih × harga satuan; kredit bila turun) | Akun lawan: Modal (saldo awal) / Selisih Persediaan (opname) |
+| Perolehan Aset (JU-AT) | Akun aset tetap | Kas/Bank atau Hutang yang dipilih (opsional) |
+| Penyusutan (JU-PNY) | Beban Penyusutan (per aset) | Akumulasi Penyusutan (per aset) |
 
-Semua posting terjadi **di dalam transaksi yang sama** dengan dokumen sumbernya. Data seed dibuat langsung ke DB (tanpa melewati action) sehingga transaksi seed tidak punya jurnal otomatis — hanya jurnal contoh yang sengaja ditambahkan.
+Semua posting terjadi **di dalam transaksi yang sama** dengan dokumen sumbernya, keterangan jurnal memuat nomor dokumen, dan `catatJurnal` menolak jurnal tidak seimbang atau ke akun kelompok. Data seed memanggil aksi server yang sama sehingga jurnal contoh identik dengan yang dibuat pengguna.
+
+### 6.2b Sinkronisasi buku besar (`src/lib/sinkron.ts`)
+`periksaSinkron` mencocokkan saldo buku besar dengan sumber lain: Persediaan ↔ Σ stok × harga pokok; Piutang ↔ Σ (total faktur − penerimaan − retur); Hutang ↔ Σ (total faktur pembelian − pembayaran − retur); Barang Diterima Belum Ditagih ↔ Σ (diterima − difaktur) × harga pesanan; plus Σ debit = Σ kredit. Dipakai kartu *Integritas & Sinkronisasi* di beranda, halaman Stok per Gudang, akhir seed (gagal = seed berhenti), dan `skrip/uji-sinkron.ts` (dijalankan terakhir di CI). Selisih ≠ 0 = ada jalur yang tidak menjurnal atau menjurnal ganda — diperlakukan sebagai bug, bukan dibiarkan.
 
 ### 6.3 Uang & kuantitas (`src/lib/uang.ts`)
 `uang()` membulatkan ke 2 desimal half-up; `bacaUang()` memvalidasi isian form (wajib, angka valid, tidak negatif, default > 0); `jumlahkan`/`kali` mengembalikan Decimal. Perbandingan status (mis. lunas) memakai `.gte()`, bukan `>=` float.
@@ -371,6 +380,6 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 11. Batas & arah pengembangan
 
-Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya), Penyesuaian Persediaan / Pindah Barang, Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
+Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya), Pindah Barang antar gudang, PPN/PPh di dokumen, Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
 
 Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → aksi (`xxx` + `xxxFormulir`) yang diawali `wajibHakAksi` lalu validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar (`wajibHak`, `bacaParamDaftar`, `KontrolDaftar`) + halaman buat dengan `FormulirAksi` → tambahkan hak baru di `hakAkses.ts` bila perlu dan tautan (dengan `hak`) di `BilahSamping.tsx` → suite regresi.

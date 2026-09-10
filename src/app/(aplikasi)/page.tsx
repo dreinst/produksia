@@ -1,5 +1,6 @@
 import { wajibMasuk } from "@/lib/otentikasi";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
+import { periksaSinkron } from "@/lib/sinkron";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import Ikon from "@/komponen/ui/Ikon";
@@ -42,8 +43,8 @@ export default async function Beranda() {
     fakturBeliTerbaru,
     pembayaranTerbaru,
   ] = await Promise.all([
-    db.fakturPenjualan.findMany({ where: { status: { not: "LUNAS" } }, include: { penerimaan: true } }),
-    db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" } }, include: { pembayaran: true } }),
+    db.fakturPenjualan.findMany({ where: { status: { not: "LUNAS" } }, include: { penerimaan: true, retur: { select: { total: true } } } }),
+    db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" } }, include: { pembayaran: true, retur: { select: { total: true } } } }),
     db.akun.findMany({ include: { barisJurnal: true }, orderBy: { kode: "asc" } }),
     db.stokBarang.findMany({ include: { barang: true, gudang: true } }),
     db.barang.count(),
@@ -60,9 +61,11 @@ export default async function Beranda() {
     db.pembayaranPembelian.findMany({ include: { pemasok: true }, orderBy: { tanggal: "desc" }, take: 2 }),
   ]);
 
+  const sinkron = await periksaSinkron(db);
+
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
-    sisa: Number(i.total) - i.penerimaan.reduce((s, r) => s + Number(r.jumlah), 0),
+    sisa: Number(i.total) - i.penerimaan.reduce((s, r) => s + Number(r.jumlah), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
     overdue: !!i.jatuhTempo && i.jatuhTempo < now,
   }));
   const ar = barisPiutang.reduce((s, r) => s + r.sisa, 0);
@@ -70,7 +73,7 @@ export default async function Beranda() {
 
   // ---- KPI 2: Utang ----
   const barisUtang = fakturBeliBelumLunas.map((i) => ({
-    sisa: Number(i.total) - i.pembayaran.reduce((s, p) => s + Number(p.jumlah), 0),
+    sisa: Number(i.total) - i.pembayaran.reduce((s, p) => s + Number(p.jumlah), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
     overdue: !!i.jatuhTempo && i.jatuhTempo < now,
   }));
   const ap = barisUtang.reduce((s, r) => s + r.sisa, 0);
@@ -82,7 +85,9 @@ export default async function Beranda() {
     const kredit = a.barisJurnal.reduce((s, l) => s + Number(l.kredit), 0);
     return { ...a, debit, kredit, balance: NORMAL_DEBIT.has(a.jenis) ? debit - kredit : kredit - debit };
   });
-  const akunKas = saldoAkun.filter((a) => a.jenis === "ASET" && /\b(kas|bank)\b/i.test(a.nama));
+  // akun bertanda kas/bank; kalau belum ada yang ditandai, tebak dari nama
+  const bertanda = saldoAkun.filter((a) => a.kasBank && !a.kelompok);
+  const akunKas = bertanda.length > 0 ? bertanda : saldoAkun.filter((a) => a.jenis === "ASET" && !a.kelompok && /\b(kas|bank)\b/i.test(a.nama));
   const kas = akunKas.reduce((s, a) => s + a.balance, 0);
 
   // ---- KPI 4: Persediaan ----
@@ -466,19 +471,22 @@ export default async function Beranda() {
           <div className="rounded-2xl bg-slate-900 text-slate-300 p-6 space-y-4">
             <div className="flex items-center gap-2.5 text-white">
               <Ikon nama="verified_user" className="!text-[22px] text-blue-400" />
-              <h3 className="text-sm font-bold">Integritas Basis Data</h3>
+              <h3 className="text-sm font-bold">Integritas &amp; Sinkronisasi</h3>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">Pengaman yang berlaku di setiap transaksi Accurate Copy:</p>
+            <p className="text-xs text-slate-400 leading-relaxed">Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:</p>
             <div className="space-y-3 text-xs">
               {[
-                ["Transaksi atomik dokumen–stok–jurnal", "Faktur, pengiriman, pembayaran, retur, dan penyusutan disimpan bersama efeknya dalam satu transaksi database."],
-                ["DB constraint CHECK (jumlah ≥ 0)", "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan."],
-                ["Jurnal wajib balance", "Σ debit harus sama persis dengan Σ kredit; nominal dihitung dengan Decimal, bukan float."],
-              ].map(([t, d]) => (
-                <div key={t} className="flex daftarBarang-awal gap-2.5">
-                  <Ikon nama="check_circle" className="!text-[18px] text-emerald-400 mt-0.5" />
+                { t: "Jurnal seimbang", ok: sinkron.seimbang, d: `Σ debit ${rp(Number(sinkron.totalDebit))} · Σ kredit ${rp(Number(sinkron.totalKredit))}` },
+                { t: "Persediaan = stok fisik × harga pokok", ok: sinkron.persediaan.sinkron, d: `Buku besar ${rp(Number(sinkron.persediaan.bukuBesar))} · stok ${rp(Number(sinkron.persediaan.dokumen))}` },
+                { t: "Piutang = sisa faktur penjualan", ok: sinkron.piutang.sinkron, d: `Buku besar ${rp(Number(sinkron.piutang.bukuBesar))} · dokumen ${rp(Number(sinkron.piutang.dokumen))}` },
+                { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
+                { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
+                { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
+              ].map(({ t, ok, d }) => (
+                <div key={t} className="flex items-start gap-2.5">
+                  <Ikon nama={ok ? "check_circle" : "error"} className={`!text-[18px] mt-0.5 ${ok ? "text-emerald-400" : "text-rose-400"}`} />
                   <div>
-                    <span className="font-semibold text-white">{t}</span>
+                    <span className={`font-semibold ${ok ? "text-white" : "text-rose-300"}`}>{t}</span>
                     <p className="text-slate-400 text-[11px] mt-0.5">{d}</p>
                   </div>
                 </div>

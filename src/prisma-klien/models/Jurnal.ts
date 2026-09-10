@@ -184,6 +184,9 @@ export type JurnalWhereInput = {
   sumber?: Prisma.EnumSumberJurnalFilter<"Jurnal"> | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalListRelationFilter
   penyusutanAset?: Prisma.PenyusutanAsetListRelationFilter
+  perolehanAset?: Prisma.XOR<Prisma.AsetTetapNullableScalarRelationFilter, Prisma.AsetTetapWhereInput> | null
+  penyesuaianPersediaan?: Prisma.XOR<Prisma.PenyesuaianPersediaanNullableScalarRelationFilter, Prisma.PenyesuaianPersediaanWhereInput> | null
+  penerimaanBarang?: Prisma.XOR<Prisma.PenerimaanBarangNullableScalarRelationFilter, Prisma.PenerimaanBarangWhereInput> | null
 }
 
 export type JurnalOrderByWithRelationInput = {
@@ -194,6 +197,9 @@ export type JurnalOrderByWithRelationInput = {
   sumber?: Prisma.SortOrder
   baris?: Prisma.BarisJurnalOrderByRelationAggregateInput
   penyusutanAset?: Prisma.PenyusutanAsetOrderByRelationAggregateInput
+  perolehanAset?: Prisma.AsetTetapOrderByWithRelationInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanOrderByWithRelationInput
+  penerimaanBarang?: Prisma.PenerimaanBarangOrderByWithRelationInput
 }
 
 export type JurnalWhereUniqueInput = Prisma.AtLeast<{
@@ -207,6 +213,9 @@ export type JurnalWhereUniqueInput = Prisma.AtLeast<{
   sumber?: Prisma.EnumSumberJurnalFilter<"Jurnal"> | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalListRelationFilter
   penyusutanAset?: Prisma.PenyusutanAsetListRelationFilter
+  perolehanAset?: Prisma.XOR<Prisma.AsetTetapNullableScalarRelationFilter, Prisma.AsetTetapWhereInput> | null
+  penyesuaianPersediaan?: Prisma.XOR<Prisma.PenyesuaianPersediaanNullableScalarRelationFilter, Prisma.PenyesuaianPersediaanWhereInput> | null
+  penerimaanBarang?: Prisma.XOR<Prisma.PenerimaanBarangNullableScalarRelationFilter, Prisma.PenerimaanBarangWhereInput> | null
 }, "id" | "nomor">
 
 export type JurnalOrderByWithAggregationInput = {
@@ -239,6 +248,9 @@ export type JurnalCreateInput = {
   sumber?: $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateInput = {
@@ -249,6 +261,9 @@ export type JurnalUncheckedCreateInput = {
   sumber?: $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUpdateInput = {
@@ -259,6 +274,9 @@ export type JurnalUpdateInput = {
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateInput = {
@@ -269,6 +287,9 @@ export type JurnalUncheckedUpdateInput = {
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateManyInput = {
@@ -293,6 +314,11 @@ export type JurnalUncheckedUpdateManyInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+}
+
+export type JurnalNullableScalarRelationFilter = {
+  is?: Prisma.JurnalWhereInput | null
+  isNot?: Prisma.JurnalWhereInput | null
 }
 
 export type JurnalCountOrderByAggregateInput = {
@@ -324,9 +350,20 @@ export type JurnalScalarRelationFilter = {
   isNot?: Prisma.JurnalWhereInput
 }
 
-export type JurnalNullableScalarRelationFilter = {
-  is?: Prisma.JurnalWhereInput | null
-  isNot?: Prisma.JurnalWhereInput | null
+export type JurnalCreateNestedOneWithoutPenerimaanBarangInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPenerimaanBarangInput, Prisma.JurnalUncheckedCreateWithoutPenerimaanBarangInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPenerimaanBarangInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutPenerimaanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPenerimaanBarangInput, Prisma.JurnalUncheckedCreateWithoutPenerimaanBarangInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPenerimaanBarangInput
+  upsert?: Prisma.JurnalUpsertWithoutPenerimaanBarangInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPenerimaanBarangInput, Prisma.JurnalUpdateWithoutPenerimaanBarangInput>, Prisma.JurnalUncheckedUpdateWithoutPenerimaanBarangInput>
 }
 
 export type EnumSumberJurnalFieldUpdateOperationsInput = {
@@ -347,6 +384,22 @@ export type JurnalUpdateOneRequiredWithoutBarisNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutBarisInput, Prisma.JurnalUpdateWithoutBarisInput>, Prisma.JurnalUncheckedUpdateWithoutBarisInput>
 }
 
+export type JurnalCreateNestedOneWithoutPerolehanAsetInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPerolehanAsetInput, Prisma.JurnalUncheckedCreateWithoutPerolehanAsetInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPerolehanAsetInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutPerolehanAsetNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPerolehanAsetInput, Prisma.JurnalUncheckedCreateWithoutPerolehanAsetInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPerolehanAsetInput
+  upsert?: Prisma.JurnalUpsertWithoutPerolehanAsetInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPerolehanAsetInput, Prisma.JurnalUpdateWithoutPerolehanAsetInput>, Prisma.JurnalUncheckedUpdateWithoutPerolehanAsetInput>
+}
+
 export type JurnalCreateNestedOneWithoutPenyusutanAsetInput = {
   create?: Prisma.XOR<Prisma.JurnalCreateWithoutPenyusutanAsetInput, Prisma.JurnalUncheckedCreateWithoutPenyusutanAsetInput>
   connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPenyusutanAsetInput
@@ -363,6 +416,86 @@ export type JurnalUpdateOneWithoutPenyusutanAsetNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPenyusutanAsetInput, Prisma.JurnalUpdateWithoutPenyusutanAsetInput>, Prisma.JurnalUncheckedUpdateWithoutPenyusutanAsetInput>
 }
 
+export type JurnalCreateNestedOneWithoutPenyesuaianPersediaanInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPenyesuaianPersediaanInput, Prisma.JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPenyesuaianPersediaanInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutPenyesuaianPersediaanNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPenyesuaianPersediaanInput, Prisma.JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPenyesuaianPersediaanInput
+  upsert?: Prisma.JurnalUpsertWithoutPenyesuaianPersediaanInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPenyesuaianPersediaanInput, Prisma.JurnalUpdateWithoutPenyesuaianPersediaanInput>, Prisma.JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput>
+}
+
+export type JurnalCreateWithoutPenerimaanBarangInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutPenerimaanBarangInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutPenerimaanBarangInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPenerimaanBarangInput, Prisma.JurnalUncheckedCreateWithoutPenerimaanBarangInput>
+}
+
+export type JurnalUpsertWithoutPenerimaanBarangInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutPenerimaanBarangInput, Prisma.JurnalUncheckedUpdateWithoutPenerimaanBarangInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPenerimaanBarangInput, Prisma.JurnalUncheckedCreateWithoutPenerimaanBarangInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutPenerimaanBarangInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutPenerimaanBarangInput, Prisma.JurnalUncheckedUpdateWithoutPenerimaanBarangInput>
+}
+
+export type JurnalUpdateWithoutPenerimaanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutPenerimaanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
 export type JurnalCreateWithoutBarisInput = {
   id?: string
   nomor: string
@@ -370,6 +503,9 @@ export type JurnalCreateWithoutBarisInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutBarisInput = {
@@ -379,6 +515,9 @@ export type JurnalUncheckedCreateWithoutBarisInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutBarisInput = {
@@ -404,6 +543,9 @@ export type JurnalUpdateWithoutBarisInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutBarisInput = {
@@ -413,6 +555,73 @@ export type JurnalUncheckedUpdateWithoutBarisInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutPerolehanAsetInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutPerolehanAsetInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutPerolehanAsetInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPerolehanAsetInput, Prisma.JurnalUncheckedCreateWithoutPerolehanAsetInput>
+}
+
+export type JurnalUpsertWithoutPerolehanAsetInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutPerolehanAsetInput, Prisma.JurnalUncheckedUpdateWithoutPerolehanAsetInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPerolehanAsetInput, Prisma.JurnalUncheckedCreateWithoutPerolehanAsetInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutPerolehanAsetInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutPerolehanAsetInput, Prisma.JurnalUncheckedUpdateWithoutPerolehanAsetInput>
+}
+
+export type JurnalUpdateWithoutPerolehanAsetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutPerolehanAsetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPenyusutanAsetInput = {
@@ -422,6 +631,9 @@ export type JurnalCreateWithoutPenyusutanAsetInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPenyusutanAsetInput = {
@@ -431,6 +643,9 @@ export type JurnalUncheckedCreateWithoutPenyusutanAsetInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPenyusutanAsetInput = {
@@ -456,6 +671,9 @@ export type JurnalUpdateWithoutPenyusutanAsetInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPenyusutanAsetInput = {
@@ -465,6 +683,73 @@ export type JurnalUncheckedUpdateWithoutPenyusutanAsetInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutPenyesuaianPersediaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutPenyesuaianPersediaanInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPenyesuaianPersediaanInput, Prisma.JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput>
+}
+
+export type JurnalUpsertWithoutPenyesuaianPersediaanInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutPenyesuaianPersediaanInput, Prisma.JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPenyesuaianPersediaanInput, Prisma.JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutPenyesuaianPersediaanInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutPenyesuaianPersediaanInput, Prisma.JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput>
+}
+
+export type JurnalUpdateWithoutPenyesuaianPersediaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 
@@ -515,6 +800,9 @@ export type JurnalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   sumber?: boolean
   baris?: boolean | Prisma.Jurnal$barisArgs<ExtArgs>
   penyusutanAset?: boolean | Prisma.Jurnal$penyusutanAsetArgs<ExtArgs>
+  perolehanAset?: boolean | Prisma.Jurnal$perolehanAsetArgs<ExtArgs>
+  penyesuaianPersediaan?: boolean | Prisma.Jurnal$penyesuaianPersediaanArgs<ExtArgs>
+  penerimaanBarang?: boolean | Prisma.Jurnal$penerimaanBarangArgs<ExtArgs>
   _count?: boolean | Prisma.JurnalCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jurnal"]>
 
@@ -546,6 +834,9 @@ export type JurnalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type JurnalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   baris?: boolean | Prisma.Jurnal$barisArgs<ExtArgs>
   penyusutanAset?: boolean | Prisma.Jurnal$penyusutanAsetArgs<ExtArgs>
+  perolehanAset?: boolean | Prisma.Jurnal$perolehanAsetArgs<ExtArgs>
+  penyesuaianPersediaan?: boolean | Prisma.Jurnal$penyesuaianPersediaanArgs<ExtArgs>
+  penerimaanBarang?: boolean | Prisma.Jurnal$penerimaanBarangArgs<ExtArgs>
   _count?: boolean | Prisma.JurnalCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JurnalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -556,6 +847,9 @@ export type $JurnalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     baris: Prisma.$BarisJurnalPayload<ExtArgs>[]
     penyusutanAset: Prisma.$PenyusutanAsetPayload<ExtArgs>[]
+    perolehanAset: Prisma.$AsetTetapPayload<ExtArgs> | null
+    penyesuaianPersediaan: Prisma.$PenyesuaianPersediaanPayload<ExtArgs> | null
+    penerimaanBarang: Prisma.$PenerimaanBarangPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -959,6 +1253,9 @@ export interface Prisma__JurnalClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   baris<T extends Prisma.Jurnal$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisJurnalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   penyusutanAset<T extends Prisma.Jurnal$penyusutanAsetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$penyusutanAsetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenyusutanAsetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  perolehanAset<T extends Prisma.Jurnal$perolehanAsetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$perolehanAsetArgs<ExtArgs>>): Prisma.Prisma__AsetTetapClient<runtime.Types.Result.GetResult<Prisma.$AsetTetapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  penyesuaianPersediaan<T extends Prisma.Jurnal$penyesuaianPersediaanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$penyesuaianPersediaanArgs<ExtArgs>>): Prisma.Prisma__PenyesuaianPersediaanClient<runtime.Types.Result.GetResult<Prisma.$PenyesuaianPersediaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  penerimaanBarang<T extends Prisma.Jurnal$penerimaanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$penerimaanBarangArgs<ExtArgs>>): Prisma.Prisma__PenerimaanBarangClient<runtime.Types.Result.GetResult<Prisma.$PenerimaanBarangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1431,6 +1728,63 @@ export type Jurnal$penyusutanAsetArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PenyusutanAsetScalarFieldEnum | Prisma.PenyusutanAsetScalarFieldEnum[]
+}
+
+/**
+ * Jurnal.perolehanAset
+ */
+export type Jurnal$perolehanAsetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AsetTetap
+   */
+  select?: Prisma.AsetTetapSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AsetTetap
+   */
+  omit?: Prisma.AsetTetapOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AsetTetapInclude<ExtArgs> | null
+  where?: Prisma.AsetTetapWhereInput
+}
+
+/**
+ * Jurnal.penyesuaianPersediaan
+ */
+export type Jurnal$penyesuaianPersediaanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PenyesuaianPersediaan
+   */
+  select?: Prisma.PenyesuaianPersediaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PenyesuaianPersediaan
+   */
+  omit?: Prisma.PenyesuaianPersediaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenyesuaianPersediaanInclude<ExtArgs> | null
+  where?: Prisma.PenyesuaianPersediaanWhereInput
+}
+
+/**
+ * Jurnal.penerimaanBarang
+ */
+export type Jurnal$penerimaanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PenerimaanBarang
+   */
+  select?: Prisma.PenerimaanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PenerimaanBarang
+   */
+  omit?: Prisma.PenerimaanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenerimaanBarangInclude<ExtArgs> | null
+  where?: Prisma.PenerimaanBarangWhereInput
 }
 
 /**

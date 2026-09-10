@@ -23,6 +23,8 @@ export type Hak =
   | "aset-tetap.tulis"
   | "data-induk.lihat"
   | "data-induk.tulis"
+  | "persediaan.lihat" // Stok per gudang
+  | "persediaan.tulis" // Penyesuaian stok (saldo awal, opname)
   | "pengaturan.tulis" // Pemetaan akun
   | "pengguna.kelola"; // Kelola akun pengguna
 
@@ -41,6 +43,8 @@ export const SEMUA_HAK: readonly Hak[] = [
   "aset-tetap.tulis",
   "data-induk.lihat",
   "data-induk.tulis",
+  "persediaan.lihat",
+  "persediaan.tulis",
   "pengaturan.tulis",
   "pengguna.kelola",
 ];
@@ -59,8 +63,9 @@ export const HAK_PERAN: Record<PeranPengguna, readonly Hak[]> = {
     "aset-tetap.lihat",
     "data-induk.lihat",
     "data-induk.tulis",
+    "persediaan.lihat",
   ],
-  GUDANG: ["penjualan.lihat", "penjualan.kirim", "pembelian.lihat", "pembelian.terima", "data-induk.lihat", "data-induk.tulis"],
+  GUDANG: ["penjualan.lihat", "penjualan.kirim", "pembelian.lihat", "pembelian.terima", "data-induk.lihat", "data-induk.tulis", "persediaan.lihat", "persediaan.tulis"],
 };
 
 export const DAFTAR_PERAN: readonly PeranPengguna[] = ["PEMILIK", "ADMIN", "KASIR", "GUDANG"];
