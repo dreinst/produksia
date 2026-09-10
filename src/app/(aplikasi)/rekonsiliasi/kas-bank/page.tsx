@@ -147,12 +147,15 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
           <input type="hidden" name="akunId" value={akunId} />
           <input type="hidden" name="sampai" value={periode.sampaiTeks} />
           <div className="kepala-kartu">
-            <h2 className="judul-kartu">Buku kas/bank ({baris.length} baris)</h2>
+            <div>
+              <h2 className="judul-kartu">Buku kas/bank ({baris.length} baris)</h2>
+              <p className="subjudul-kartu">Baris yang berpasangan dengan mutasi impor otomatis bertanda hijau. Baris tanpa pasangan boleh dicentang <em>sudah dicek</em> bila Anda mencocokkannya sendiri dengan rekening koran (mis. saat mutasi tidak diimpor), lalu tekan Simpan.</p>
+            </div>
             {bolehTulis && <button type="submit" className="tombol tombol-garis tombol-kecil">Simpan tanda cocok</button>}
           </div>
           <div className="bungkus-tabel">
             <table className="tabel text-xs">
-              <thead><tr><th>Tanggal</th><th>Jurnal</th><th>Keterangan</th><th className="text-right">Debit</th><th className="text-right">Kredit</th><th>Cocok</th></tr></thead>
+              <thead><tr><th>Tanggal</th><th>Jurnal</th><th>Keterangan</th><th className="text-right">Debit</th><th className="text-right">Kredit</th><th>Cocok dengan rekening?</th></tr></thead>
               <tbody>
                 {baris.map((b) => (
                   <tr key={b.id} className={!b.mutasiBank && !b.rekonsiliasiPada ? "bg-amber-50/40" : undefined}>
@@ -163,9 +166,9 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
                     <td className="text-right angka text-rose-700">{Number(b.kredit) ? angka(b.kredit) : ""}</td>
                     <td>
                       {b.mutasiBank ? (
-                        <span className="lencana lencana-emerald" title={b.mutasiBank.keterangan}>mutasi {tgl(b.mutasiBank.tanggal)}</span>
+                        <span className="lencana lencana-emerald" title={b.mutasiBank.keterangan}>Ya · mutasi {tgl(b.mutasiBank.tanggal)}</span>
                       ) : (
-                        <label className="inline-flex items-center gap-1"><input type="checkbox" name={`cocok_${b.id}`} defaultChecked={!!b.rekonsiliasiPada} disabled={!bolehTulis} className="h-4 w-4 rounded border-slate-300" /> <span className="text-slate-500">manual</span></label>
+                        <label className="inline-flex items-center gap-1" title="Centang bila baris ini sudah Anda cocokkan sendiri dengan rekening koran (tanpa mutasi impor)"><input type="checkbox" name={`cocok_${b.id}`} defaultChecked={!!b.rekonsiliasiPada} disabled={!bolehTulis} className="h-4 w-4 rounded border-slate-300" /> <span className={b.rekonsiliasiPada ? "text-emerald-700" : "text-slate-500"}>{b.rekonsiliasiPada ? "sudah dicek sendiri" : "belum · centang bila sudah dicek"}</span></label>
                       )}
                     </td>
                   </tr>
@@ -174,7 +177,7 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
               </tbody>
             </table>
           </div>
-          {barisCocokTanpaMutasi.length > 0 && <p className="text-xs text-slate-500 p-3">{barisCocokTanpaMutasi.length} baris ditandai cocok secara manual (tanpa mutasi impor).</p>}
+          {barisCocokTanpaMutasi.length > 0 && <p className="text-xs text-slate-500 p-3">{barisCocokTanpaMutasi.length} baris ditandai sudah dicek sendiri (tanpa mutasi impor).</p>}
         </FormulirAksi>
       </div>
     </div>
