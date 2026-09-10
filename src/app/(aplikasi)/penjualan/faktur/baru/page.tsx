@@ -2,6 +2,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
+import { ambilPengaturanPerusahaan, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 import { buatFakturFormulir } from "@/lib/aksi/penjualan";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -40,8 +41,10 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
     nomorDokumenBerikutnya(db.fakturPenjualan, "FJ"),
   ]);
 
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const akunPpn = pengaturan.akunPpnKeluaranId ? await db.akun.findUnique({ where: { id: pengaturan.akunPpnKeluaranId } }) : null;
   const hariIni = new Date();
-  const tempo = new Date(hariIni.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const tempo = tanggalJatuhTempo(pengaturan.terminHari, hariIni);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const label = (a: { kode: string; nama: string }) => `${a.kode} • ${a.nama}`;
 
@@ -75,9 +78,12 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
               pendapatanAtauPersediaan: label(pemetaan.pendapatanPenjualan),
               hpp: label(pemetaan.hpp),
               persediaan: label(pemetaan.persediaan),
+              ppn: akunPpn ? label(akunPpn) : undefined,
             }
           : null
       }
+      pajak={{ pkp: pengaturan.pkp, tarif: Number(pengaturan.tarifPpnPersen) }}
+      terminHari={pengaturan.terminHari}
     />
   );
 }

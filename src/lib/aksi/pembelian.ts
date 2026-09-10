@@ -14,6 +14,7 @@ import {
   catatJurnalPembayaranPembelian,
   catatJurnalReturPembelian,
 } from "@/lib/akuntansi";
+import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
 
@@ -164,7 +165,11 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
   const penerimaanId = String(dataFormulir.get("penerimaanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
-  const total = totalBaris(daftarBaris);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const ppnPersen = bacaTarifPpn(dataFormulir.get("ppnPersen"), pengaturan);
+  const dpp = totalBaris(daftarBaris);
+  const ppn = hitungPpn(dpp, ppnPersen);
+  const total = dpp.plus(ppn);
 
   const pesanan = await db.pesananPembelian.findUniqueOrThrow({ where: { id: pesananId }, include: { baris: true } });
 
@@ -189,7 +194,10 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
         pesananId,
         penerimaanId,
         total,
-        jatuhTempo: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        dpp,
+        ppnPersen,
+        ppn,
+        jatuhTempo: tanggalJatuhTempo(pengaturan.terminHari),
         baris: {
           create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah, harga: l.harga, subtotal: kali(l.jumlah, l.harga) })),
         },
@@ -208,7 +216,7 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       }
     }
 
-    await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan);
+    await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan, pengaturan.akunPpnMasukanId);
   });
 
   revalidatePath("/pembelian/faktur");
@@ -225,26 +233,31 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
   if (!fakturId) throw new Error("Faktur wajib dipilih");
   if (!akunId) throw new Error("Akun Kas/Bank sumber wajib dipilih");
   const jumlah = bacaUang(dataFormulir.get("jumlah"), "Jumlah bayar");
+  const potonganMentah = dataFormulir.get("potonganPajak");
+  const potonganPajak = typeof potonganMentah === "string" && potonganMentah.trim() !== "" ? bacaUang(potonganMentah, "Potongan PPh 23", { allowZero: true }) : D(0);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  if (potonganPajak.gt(0) && !pengaturan.akunPph23DipotongId) throw new Error("Akun Hutang PPh 23 belum diatur di Pengaturan > Perusahaan & Pajak");
 
   const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true, retur: true } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");
 
-  const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => p.jumlah));
+  const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
   const sisa = D(faktur.total).minus(sudahDibayar).minus(sudahDiretur);
-  if (jumlah.gt(sisa)) {
-    throw new Error(`Jumlah bayar melebihi sisa utang (sisa ${format(sisa)})`);
+  const bayarBruto = jumlah.plus(potonganPajak);
+  if (bayarBruto.gt(sisa)) {
+    throw new Error(`Jumlah bayar + potongan pajak melebihi sisa utang (sisa ${format(sisa)})`);
   }
-  const status = statusFaktur(D(faktur.total), sudahDibayar.plus(jumlah), sudahDiretur);
+  const status = statusFaktur(D(faktur.total), sudahDibayar.plus(bayarBruto), sudahDiretur);
 
   const nomor = await nomorDokumenBerikutnya(db.pembayaranPembelian, "BYR");
 
   await db.$transaction(async (tx) => {
     const pembayaran = await tx.pembayaranPembelian.create({
-      data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, metodeBayar },
+      data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, potonganPajak, metodeBayar },
     });
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
-    await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor);
+    await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor, pengaturan.akunPph23DipotongId);
   });
 
   revalidatePath("/pembelian/pembayaran");
@@ -284,8 +297,11 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     jumlah: l.jumlah,
     harga: D(faktur.baris.find((il) => il.barangId === l.barangId)?.harga ?? 0),
   }));
-  const total = totalBaris(barisRetur);
-  const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => p.jumlah));
+  const dpp = totalBaris(barisRetur);
+  const ppn = hitungPpn(dpp, D(faktur.ppnPersen));
+  const total = dpp.plus(ppn);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
   const status = statusFaktur(D(faktur.total), sudahDibayar, sudahDiretur.plus(total));
 
@@ -304,6 +320,8 @@ export async function buatReturPembelian(dataFormulir: FormData) {
         gudangId,
         alasan: alasan || null,
         total,
+        dpp,
+        ppn,
         baris: { create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah })) },
       },
     });
@@ -316,7 +334,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
 
     // jurnal dihitung dengan harga pokok rata-rata SEBELUM stok berkurang? Tidak perlu: harga rata-rata tidak berubah saat barang keluar.
-    await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total }, barisRetur);
+    await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnMasukanId);
   });
 
   revalidatePath("/pembelian/retur");

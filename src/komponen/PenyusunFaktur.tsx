@@ -32,11 +32,15 @@ export type PropsPenyusun = {
   /** dokumen tahap sebelumnya: SJ (penjualan) atau TB (pembelian) */
   dokumenSebelumnya: { nomor: string; tanggal: string }[];
   pemetaan: null | {
-    akunLawan: string; // Piutang (penjualan) / Utang (pembelian)
-    pendapatanAtauPersediaan: string; // Pendapatan (penjualan) / Persediaan (pembelian)
+    akunLawan: string; // Piutang (penjualan) / Hutang (pembelian)
+    pendapatanAtauPersediaan: string; // Pendapatan (penjualan) / Barang belum ditagih (pembelian)
     hpp?: string;
     persediaan?: string;
+    ppn?: string; // PPN Keluaran (penjualan) / PPN Masukan (pembelian)
   };
+  /** status PKP perusahaan & tarif bawaan; non-PKP selalu 0% */
+  pajak: { pkp: boolean; tarif: number };
+  terminHari: number;
 };
 
 const format = (n: number) => n.toLocaleString("id-ID");
@@ -46,13 +50,15 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
   const adalahPenjualan = p.mode === "penjualan";
   const [status, aksiFormulir, sedangProses] = useActionState(p.aksi, { galat: null });
   const [isian, setIsian] = useState(p.daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.sisa, harga: b.harga })));
+  const [ppnPersen, setPpnPersen] = useState(p.pajak.pkp ? p.pajak.tarif : 0);
 
   const hitung = useMemo(() => {
     const subtotal = isian.reduce((s, r) => s + r.jumlah * r.harga, 0);
     const hargaPokok = isian.reduce((s, r, i) => s + r.jumlah * p.daftarBaris[i].hargaBeli, 0);
     const jumlahValid = isian.every((r, i) => r.jumlah >= 0 && r.jumlah <= p.daftarBaris[i].sisa) && isian.some((r) => r.jumlah > 0);
-    return { subtotal, hargaPokok, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
-  }, [isian, p.daftarBaris]);
+    const ppn = Math.round(subtotal * ppnPersen) / 100;
+    return { subtotal, hargaPokok, ppn, total: subtotal + ppn, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
+  }, [isian, ppnPersen, p.daftarBaris]);
 
   const ubahJumlah = (i: number, jumlah: number) => setIsian((sebelumnya) => sebelumnya.map((r, k) => (k === i ? { ...r, jumlah } : r)));
 
@@ -62,15 +68,17 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
 
   const barisJurnalPratinjau = adalahPenjualan
     ? [
-        { akun: p.pemetaan?.akunLawan ?? "Piutang Usaha", catatan: "Tagihan bruto pelanggan", debit: hitung.subtotal, kredit: 0 },
-        { akun: p.pemetaan?.hpp ?? "HPP", catatan: "Harga pokok terjual (Σ jumlah × harga beli)", debit: hitung.hargaPokok, kredit: 0 },
-        { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Pendapatan Penjualan", catatan: "Pendapatan diakui", debit: 0, kredit: hitung.subtotal },
+        { akun: p.pemetaan?.akunLawan ?? "Piutang Usaha", catatan: "Tagihan bruto pelanggan (DPP + PPN)", debit: hitung.total, kredit: 0 },
+        { akun: p.pemetaan?.hpp ?? "HPP", catatan: "Harga pokok terjual (Σ jumlah × harga pokok, barang saja)", debit: hitung.hargaPokok, kredit: 0 },
+        { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Pendapatan Penjualan", catatan: "Pendapatan diakui (akun per barang bila diatur)", debit: 0, kredit: hitung.subtotal },
+        { akun: p.pemetaan?.ppn ?? "PPN Keluaran", catatan: `PPN dipungut ${ppnPersen}%`, debit: 0, kredit: hitung.ppn },
         { akun: p.pemetaan?.persediaan ?? "Persediaan", catatan: "Pengurangan nilai persediaan", debit: 0, kredit: hitung.hargaPokok },
       ].filter((r) => r.debit > 0 || r.kredit > 0 || hitung.subtotal === 0)
     : [
-        { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Persediaan", catatan: "Penambahan nilai persediaan", debit: hitung.subtotal, kredit: 0 },
-        { akun: p.pemetaan?.akunLawan ?? "Utang Usaha", catatan: "Kewajiban ke pemasok", debit: 0, kredit: hitung.subtotal },
-      ];
+        { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Barang Diterima Belum Ditagih", catatan: "Menutup nilai Terima Barang (baris jasa → beban)", debit: hitung.subtotal, kredit: 0 },
+        { akun: p.pemetaan?.ppn ?? "PPN Masukan", catatan: `PPN masukan ${ppnPersen}%`, debit: hitung.ppn, kredit: 0 },
+        { akun: p.pemetaan?.akunLawan ?? "Hutang Usaha", catatan: "Kewajiban ke pemasok (DPP + PPN)", debit: 0, kredit: hitung.total },
+      ].filter((r) => r.debit > 0 || r.kredit > 0 || hitung.subtotal === 0);
   const totalDebit = barisJurnalPratinjau.reduce((s, r) => s + r.debit, 0);
   const totalKredit = barisJurnalPratinjau.reduce((s, r) => s + r.kredit, 0);
 
@@ -78,6 +86,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     { ok: hitung.jumlahValid, teks: "Semua kuantitas valid (≤ sisa pesanan, minimal 1 baris > 0)" },
     { ok: !!p.pemetaan, teks: p.pemetaan ? "Pemetaan akun terpasang (5 peran akun)" : "Pemetaan akun belum diatur — buka Buku Besar › Pemetaan Akun" },
     { ok: true, teks: teks.catatanStok },
+    { ok: true, teks: p.pajak.pkp ? `Perusahaan PKP — PPN ${ppnPersen}% dipungut pada faktur ini` : "Perusahaan non-PKP — faktur tanpa PPN" },
   ];
   const bisaKirim = hitung.jumlahValid && !!p.pemetaan && !sedangProses;
 
@@ -93,6 +102,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     >
       <input type="hidden" name="pesananId" value={p.pesanan.id} />
       <input type="hidden" name="baris" value={JSON.stringify(isian)} />
+      <input type="hidden" name="ppnPersen" value={ppnPersen} />
 
       {/* Kepala halaman */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -157,7 +167,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                   <input readOnly type="date" value={p.tanggal} className="isian isian-kecil" />
                 </div>
                 <div className="bidang">
-                  <label className="label"><span>Jatuh Tempo</span><span className="petunjuk">14 hari</span></label>
+                  <label className="label"><span>Jatuh Tempo</span><span className="petunjuk">{p.terminHari} hari</span></label>
                   <input readOnly type="date" value={p.jatuhTempo} className="isian isian-kecil" />
                 </div>
                 <div className="bidang sm:col-span-2">
@@ -291,19 +301,32 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                   <Ikon nama="calculate" className="!text-[20px] text-blue-600" />
                   <h2 className="judul-kartu !text-[15px]">Ringkasan Finansial</h2>
                 </div>
-                <span className="lencana lencana-slate">Tanpa PPN</span>
+                <span className={`lencana ${hitung.ppn > 0 ? "lencana-blue" : "lencana-slate"}`}>{hitung.ppn > 0 ? `PPN ${ppnPersen}%` : "Tanpa PPN"}</span>
               </div>
               <div className="flex flex-col gap-2 text-[13px]">
                 <div className="flex justify-between text-slate-500"><span>Subtotal ({hitung.banyakBaris} baris)</span><span className="angka text-slate-900">Rp {format(hitung.subtotal)}</span></div>
                 <div className="flex justify-between text-slate-500"><span>Diskon</span><span className="angka text-slate-400">—</span></div>
                 <div className="flex justify-between text-slate-500 pt-1 border-t border-dashed border-slate-200"><span className="font-semibold text-slate-900">Dasar Pengenaan Pajak</span><span className="angka font-semibold text-slate-900">Rp {format(hitung.subtotal)}</span></div>
-                <div className="flex justify-between text-slate-500"><span>PPN</span><span className="angka text-slate-400">tidak diterapkan</span></div>
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>PPN</span>
+                  {p.pajak.pkp ? (
+                    <span className="flex items-center gap-2">
+                      <select value={ppnPersen} onChange={(e) => setPpnPersen(Number(e.target.value))} className="isian isian-kecil w-auto" aria-label="Tarif PPN">
+                        <option value={0}>0%</option>
+                        <option value={p.pajak.tarif}>{p.pajak.tarif}%</option>
+                      </select>
+                      <span className="angka text-slate-900">Rp {format(hitung.ppn)}</span>
+                    </span>
+                  ) : (
+                    <span className="angka text-slate-400">non-PKP</span>
+                  )}
+                </div>
                 <div className="mt-3 p-3 rounded-lg bg-blue-50/60 border border-blue-100 flex flex-col gap-1">
                   <div className="flex justify-between items-baseline">
                     <span className="teks-label">Total Nilai Tagihan</span>
                     <span className="petunjuk font-bold text-blue-600">Rp</span>
                   </div>
-                  <div className="font-mono text-xl font-bold tracking-tight text-slate-900">Rp {format(hitung.subtotal)}</div>
+                  <div className="font-mono text-xl font-bold tracking-tight text-slate-900">Rp {format(hitung.total)}</div>
                 </div>
               </div>
             </section>

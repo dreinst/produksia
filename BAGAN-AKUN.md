@@ -2,7 +2,7 @@
 
 Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber datanya ada di `src/lib/baganAkunStandar.ts`; tabel di bawah dihasilkan oleh `npx tsx skrip/cetak-bagan-akun.ts` — ubah data di kode, lalu cetak ulang, jangan edit tabel ini secara manual.
 
-**Ringkasan:** 111 akun — 24 akun kelompok (induk) dan 87 akun rinci; 40 persis dari catatan asli, 54 usulan sesuai standar akuntansi (SAK EMKM), 17 keputusan atas butir yang semula pending.
+**Ringkasan:** 113 akun — 24 akun kelompok (induk) dan 89 akun rinci; 40 persis dari catatan asli, 56 usulan sesuai standar akuntansi (SAK EMKM), 17 keputusan atas butir yang semula pending.
 
 ## Cara pakai di sistem
 
@@ -32,6 +32,8 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Aset tetap → beban & akumulasi penyusutan; perolehan dikredit ke kas/bank atau hutang | `1-2200…1-2500` ↔ `5-9520…5-9550` ↔ `1-2920…1-2950` |
 | Saldo awal persediaan (Penyesuaian Stok) | Dr `1-1600` / Cr `3-1000` Modal |
 | Uang muka pelanggan (DP) | `2-1200` — dicatat lewat Kas Masuk (Kas/Bank ↔ 2-1200); belum ada fitur DP pada pesanan |
+| PPN Keluaran (Faktur Penjualan bila PKP) / PPN Masukan (Faktur Pembelian) | `2-1330` / `1-1800` — diatur di Pengaturan → Perusahaan & Pajak |
+| PPh 23 dipotong klien (Penerimaan) / PPh 23 kita potong dari vendor (Pembayaran) | `1-1900` / `2-1320` |
 
 ## Alur rekonsiliasi (bagian 6 catatan) → modul
 
@@ -49,7 +51,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 
 ## Batasan yang sengaja dibiarkan
 
-- Akun pajak (`2-13xx`, `5-9xxx`) disediakan tapi sistem belum menghitung pajak otomatis (belum ada PPN/PPh di dokumen).
+- PPN (bila PKP) dan potongan PPh 23 sudah dihitung & dijurnal otomatis dari dokumen; PPh Final UMKM / PPh badan (`5-9100`) masih dicatat manual lewat Jurnal Umum / Kas Keluar.
 - Satu akun piutang/hutang untuk semua rekanan (belum per pelanggan/pemasok); rincian per rekanan diambil dari dokumen.
 ## Keputusan atas butir pending
 
@@ -78,6 +80,8 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `1-1500` | &nbsp;&nbsp;&nbsp;Biaya Dibayar Dimuka | Aset |  | **usul** | Sewa/asuransi yang dibayar di depan, dibebankan bertahap |
 | `1-1600` | &nbsp;&nbsp;&nbsp;Persediaan | Aset | pemetaan | **usul** | Barang produksi & merchandise yang dijual (dipakai otomatis oleh modul stok) |
 | `1-1700` | &nbsp;&nbsp;&nbsp;Piutang Lain-lain | Aset |  | **usul** | Kasbon karyawan/crew, piutang non-usaha |
+| `1-1800` | &nbsp;&nbsp;&nbsp;PPN Masukan | Aset |  | **usul** | PPN yang dibayar ke vendor (hanya bila PKP); dipakai otomatis oleh Faktur Pembelian |
+| `1-1900` | &nbsp;&nbsp;&nbsp;Pajak Dibayar Dimuka (PPh 23) | Aset |  | **usul** | PPh 23 yang dipotong klien dari pembayaran; dipakai otomatis oleh Penerimaan |
 | `1-2000` | **Aset Tetap** | Aset | kelompok | asli |  |
 | `1-2100` | &nbsp;&nbsp;&nbsp;Tanah | Aset |  | asli |  |
 | `1-2200` | &nbsp;&nbsp;&nbsp;Bangunan | Aset |  | asli |  |
@@ -97,8 +101,8 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `2-1200` | &nbsp;&nbsp;&nbsp;Uang Muka Pelanggan / DP Klien | Kewajiban |  | **usul** | DP yang diterima sebelum event; dicatat lewat Kas Masuk |
 | `2-1300` | &nbsp;&nbsp;&nbsp;**Hutang Pajak** | Kewajiban | kelompok | **usul** |  |
 | `2-1310` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPh 21 | Kewajiban |  | **usul** | Potongan pajak gaji/honor yang belum disetor |
-| `2-1320` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPh 23 / Final | Kewajiban |  | **usul** |  |
-| `2-1330` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPN | Kewajiban |  | **usul** | Hanya bila sudah PKP |
+| `2-1320` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPh 23 / Final | Kewajiban |  | **usul** | PPh 23 yang kita potong dari vendor; dipakai otomatis oleh Pembayaran Pembelian |
+| `2-1330` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPN (Keluaran) | Kewajiban |  | **usul** | PPN yang dipungut dari klien (hanya bila PKP); dipakai otomatis oleh Faktur Penjualan |
 | `2-1400` | &nbsp;&nbsp;&nbsp;Beban yang Masih Harus Dibayar | Kewajiban |  | **usul** | Gaji/listrik/vendor yang sudah jadi beban tapi belum ditagih |
 | `2-1500` | &nbsp;&nbsp;&nbsp;Hutang Lain-lain | Kewajiban |  | **usul** |  |
 | `2-1600` | &nbsp;&nbsp;&nbsp;Barang Diterima Belum Ditagih | Kewajiban | pemetaan | **usul** | Kewajiban sementara antara Terima Barang (TB) dan Faktur Pembelian (FB); dipakai otomatis oleh sistem |

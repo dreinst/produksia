@@ -212,3 +212,8 @@ export type PenyesuaianPersediaan = Prisma.PenyesuaianPersediaanModel
  * 
  */
 export type BarisPenyesuaianPersediaan = Prisma.BarisPenyesuaianPersediaanModel
+/**
+ * Model PengaturanPerusahaan
+ * 
+ */
+export type PengaturanPerusahaan = Prisma.PengaturanPerusahaanModel

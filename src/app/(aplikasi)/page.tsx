@@ -65,7 +65,7 @@ export default async function Beranda() {
 
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
-    sisa: Number(i.total) - i.penerimaan.reduce((s, r) => s + Number(r.jumlah), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
+    sisa: Number(i.total) - i.penerimaan.reduce((s, r) => s + Number(r.jumlah) + Number(r.potonganPajak), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
     overdue: !!i.jatuhTempo && i.jatuhTempo < now,
   }));
   const ar = barisPiutang.reduce((s, r) => s + r.sisa, 0);
@@ -73,7 +73,7 @@ export default async function Beranda() {
 
   // ---- KPI 2: Utang ----
   const barisUtang = fakturBeliBelumLunas.map((i) => ({
-    sisa: Number(i.total) - i.pembayaran.reduce((s, p) => s + Number(p.jumlah), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
+    sisa: Number(i.total) - i.pembayaran.reduce((s, p) => s + Number(p.jumlah) + Number(p.potonganPajak), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
     overdue: !!i.jatuhTempo && i.jatuhTempo < now,
   }));
   const ap = barisUtang.reduce((s, r) => s + r.sisa, 0);

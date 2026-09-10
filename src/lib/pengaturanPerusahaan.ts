@@ -1,0 +1,60 @@
+import type { Prisma, PrismaClient } from "@/prisma-klien/client";
+import { db } from "@/lib/db";
+import { D, uang, type Desimal } from "@/lib/uang";
+
+type Klien = PrismaClient | Prisma.TransactionClient;
+
+export type PengaturanPajak = {
+  nama: string;
+  pkp: boolean;
+  tarifPpnPersen: Desimal;
+  terminHari: number;
+  akunPpnKeluaranId: string | null;
+  akunPpnMasukanId: string | null;
+  akunPph23DimukaId: string | null;
+  akunPph23DipotongId: string | null;
+};
+
+export const PENGATURAN_BAWAAN: PengaturanPajak = {
+  nama: "Accurate Copy",
+  pkp: false,
+  tarifPpnPersen: D(11),
+  terminHari: 14,
+  akunPpnKeluaranId: null,
+  akunPpnMasukanId: null,
+  akunPph23DimukaId: null,
+  akunPph23DipotongId: null,
+};
+
+/** Pengaturan perusahaan (singleton); bila belum pernah disimpan, kembalikan bawaan (non-PKP). */
+export async function ambilPengaturanPerusahaan(klien: Klien = db): Promise<PengaturanPajak> {
+  const p = await klien.pengaturanPerusahaan.findUnique({ where: { id: "default" } });
+  if (!p) return PENGATURAN_BAWAAN;
+  return {
+    nama: p.nama,
+    pkp: p.pkp,
+    tarifPpnPersen: D(p.tarifPpnPersen),
+    terminHari: p.terminHari,
+    akunPpnKeluaranId: p.akunPpnKeluaranId,
+    akunPpnMasukanId: p.akunPpnMasukanId,
+    akunPph23DimukaId: p.akunPph23DimukaId,
+    akunPph23DipotongId: p.akunPph23DipotongId,
+  };
+}
+
+/** Membaca tarif PPN yang diminta formulir dan memastikannya sah untuk status PKP perusahaan. */
+export function bacaTarifPpn(nilai: FormDataEntryValue | null, pengaturan: PengaturanPajak): Desimal {
+  const teks = typeof nilai === "string" ? nilai.trim() : "";
+  const tarif = teks === "" ? (pengaturan.pkp ? pengaturan.tarifPpnPersen : D(0)) : uang(teks);
+  if (tarif.isNegative() || tarif.gt(100)) throw new Error("Tarif PPN harus antara 0 dan 100 persen");
+  if (tarif.gt(0) && !pengaturan.pkp) throw new Error("Perusahaan belum berstatus PKP — aktifkan di Pengaturan > Perusahaan & Pajak sebelum memungut PPN");
+  return tarif;
+}
+
+export function hitungPpn(dpp: Desimal, tarifPersen: Desimal): Desimal {
+  return uang(dpp.mul(tarifPersen).div(100));
+}
+
+export function tanggalJatuhTempo(terminHari: number, dari: Date = new Date()): Date {
+  return new Date(dari.getTime() + terminHari * 24 * 60 * 60 * 1000);
+}

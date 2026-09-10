@@ -89,7 +89,8 @@ export const ModelName = {
   AsetTetap: 'AsetTetap',
   PenyusutanAset: 'PenyusutanAset',
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
-  BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan'
+  BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
+  PengaturanPerusahaan: 'PengaturanPerusahaan'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -319,7 +320,10 @@ export const FakturPenjualanScalarFieldEnum = {
   pesananId: 'pesananId',
   pengirimanId: 'pengirimanId',
   status: 'status',
-  total: 'total'
+  total: 'total',
+  dpp: 'dpp',
+  ppnPersen: 'ppnPersen',
+  ppn: 'ppn'
 } as const
 
 export type FakturPenjualanScalarFieldEnum = (typeof FakturPenjualanScalarFieldEnum)[keyof typeof FakturPenjualanScalarFieldEnum]
@@ -345,6 +349,7 @@ export const PenerimaanPenjualanScalarFieldEnum = {
   fakturId: 'fakturId',
   akunId: 'akunId',
   jumlah: 'jumlah',
+  potonganPajak: 'potonganPajak',
   metodeBayar: 'metodeBayar'
 } as const
 
@@ -358,7 +363,9 @@ export const ReturPenjualanScalarFieldEnum = {
   fakturId: 'fakturId',
   gudangId: 'gudangId',
   alasan: 'alasan',
-  total: 'total'
+  total: 'total',
+  dpp: 'dpp',
+  ppn: 'ppn'
 } as const
 
 export type ReturPenjualanScalarFieldEnum = (typeof ReturPenjualanScalarFieldEnum)[keyof typeof ReturPenjualanScalarFieldEnum]
@@ -432,7 +439,10 @@ export const FakturPembelianScalarFieldEnum = {
   pesananId: 'pesananId',
   penerimaanId: 'penerimaanId',
   status: 'status',
-  total: 'total'
+  total: 'total',
+  dpp: 'dpp',
+  ppnPersen: 'ppnPersen',
+  ppn: 'ppn'
 } as const
 
 export type FakturPembelianScalarFieldEnum = (typeof FakturPembelianScalarFieldEnum)[keyof typeof FakturPembelianScalarFieldEnum]
@@ -458,6 +468,7 @@ export const PembayaranPembelianScalarFieldEnum = {
   fakturId: 'fakturId',
   akunId: 'akunId',
   jumlah: 'jumlah',
+  potonganPajak: 'potonganPajak',
   metodeBayar: 'metodeBayar'
 } as const
 
@@ -471,7 +482,9 @@ export const ReturPembelianScalarFieldEnum = {
   fakturId: 'fakturId',
   gudangId: 'gudangId',
   alasan: 'alasan',
-  total: 'total'
+  total: 'total',
+  dpp: 'dpp',
+  ppn: 'ppn'
 } as const
 
 export type ReturPembelianScalarFieldEnum = (typeof ReturPembelianScalarFieldEnum)[keyof typeof ReturPembelianScalarFieldEnum]
@@ -593,6 +606,21 @@ export const BarisPenyesuaianPersediaanScalarFieldEnum = {
 } as const
 
 export type BarisPenyesuaianPersediaanScalarFieldEnum = (typeof BarisPenyesuaianPersediaanScalarFieldEnum)[keyof typeof BarisPenyesuaianPersediaanScalarFieldEnum]
+
+
+export const PengaturanPerusahaanScalarFieldEnum = {
+  id: 'id',
+  nama: 'nama',
+  pkp: 'pkp',
+  tarifPpnPersen: 'tarifPpnPersen',
+  terminHari: 'terminHari',
+  akunPpnKeluaranId: 'akunPpnKeluaranId',
+  akunPpnMasukanId: 'akunPpnMasukanId',
+  akunPph23DimukaId: 'akunPph23DimukaId',
+  akunPph23DipotongId: 'akunPph23DipotongId'
+} as const
+
+export type PengaturanPerusahaanScalarFieldEnum = (typeof PengaturanPerusahaanScalarFieldEnum)[keyof typeof PengaturanPerusahaanScalarFieldEnum]
 
 
 export const SortOrder = {
