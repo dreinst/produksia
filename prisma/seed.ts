@@ -1,14 +1,38 @@
 import "dotenv/config";
+// Seed memanggil aksi server yang sama dengan UI (di luar siklus HTTP), supaya dokumen, stok,
+// harga pokok rata-rata, dan jurnal dijamin sinkron — bukan menulis tabel satu per satu.
+process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { hashKataSandi } from "../src/lib/kataSandi";
 import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
 import { BAGAN_AKUN_STANDAR } from "../src/lib/baganAkunStandar";
+import { periksaSinkron } from "../src/lib/sinkron";
+import { buatPenawaran, konversiPenawaranKePesanan, buatPengiriman, buatFaktur, buatPenerimaan, buatRetur } from "../src/lib/aksi/penjualan";
+import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatPembayaranPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
+import { buatJurnalManual, buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
+import { buatAsetTetap, jalankanPenyusutanBulanan } from "../src/lib/aksi/asetTetap";
+import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 
-/**
- * Satu alur cerita tunggal yang melewati SETIAP tahap siklus penjualan,
- * supaya tiap halaman (Penawaran, Pesanan, Pengiriman, Faktur, Penerimaan, Retur)
- * langsung punya contoh data yang bisa dilihat dan saling terhubung.
- */
+/** Aksi server diakhiri redirect()/revalidatePath() yang melempar di luar Next — efek DB-nya sudah tersimpan. */
+async function jalankan(label: string, fn: () => Promise<void>) {
+  try {
+    await fn();
+  } catch (err) {
+    const digest = (err as { digest?: string })?.digest ?? "";
+    const pesan = (err as { message?: string })?.message ?? "";
+    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing")) throw err;
+  }
+  console.log(`  -> ${label}`);
+}
+
+function formulir(isian: Record<string, string | number | object>): FormData {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(isian)) fd.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
+  return fd;
+}
+
+const rp = (n: number | string | { toString(): string }) => Number(n).toLocaleString("id-ID");
+
 async function main() {
   console.log("=== Pengguna (kata sandi semua: rahasia123) ===");
   const kataSandiHash = await hashKataSandi("rahasia123");
@@ -21,429 +45,180 @@ async function main() {
     ],
   });
 
-  console.log("=== Master data ===");
+  console.log("=== Data induk (usaha Event/Wedding Organizer) ===");
   const dept = await db.departemen.create({ data: { nama: "Marketing & Event" } });
-  const penjual = await db.karyawan.create({
-    data: { kode: "SLS-01", nama: "Rudi Hartono", departemenId: dept.id },
-  });
+  const penjual = await db.karyawan.create({ data: { kode: "SLS-01", nama: "Rudi Hartono", departemenId: dept.id } });
   const pelanggan = await db.pelanggan.create({
-    data: {
-      kode: "CUST-001",
-      nama: "PT Cahaya Nusantara",
-      alamat: "Jl. Sudirman Kav. 12, Jakarta",
-      telepon: "021-5551234",
-      penjualId: penjual.id,
-    },
+    data: { kode: "CUST-001", nama: "PT Cahaya Nusantara", alamat: "Jl. Sudirman Kav. 12, Jakarta", telepon: "021-5551234", penjualId: penjual.id },
   });
   const pemasok = await db.pemasok.create({
     data: { kode: "SUP-001", nama: "CV Sinar Dekorasi", alamat: "Jl. Pahlawan No. 5, Bekasi", telepon: "021-4449876" },
   });
-  const gudang = await db.gudang.create({
-    data: { kode: "WH-01", nama: "Gudang Peralatan", alamat: "Jl. Raya Bekasi KM 20" },
-  });
-  const kelompok = await db.kelompokBarang.create({ data: { nama: "Merchandise & Produksi" } });
-  await db.proyek.create({
-    data: { kode: "PRJ-001", nama: "Wedding Andi & Sari", pelangganId: pelanggan.id, status: "BERJALAN" },
-  });
+  const gudang = await db.gudang.create({ data: { kode: "WH-01", nama: "Gudang Peralatan", alamat: "Jl. Raya Bekasi KM 20" } });
+  const kelompokMerch = await db.kelompokBarang.create({ data: { nama: "Merchandise & Produksi" } });
+  const kelompokJasa = await db.kelompokBarang.create({ data: { nama: "Jasa Event" } });
+  await db.proyek.create({ data: { kode: "PRJ-001", nama: "Wedding Andi & Sari", pelangganId: pelanggan.id, status: "BERJALAN" } });
 
   console.log(`=== Bagan Akun Standar EO/WO (${BAGAN_AKUN_STANDAR.length} akun) + pemetaan akun ===`);
   await terapkanBaganAkunStandar(db);
   const akun = (kode: string) => db.akun.findUniqueOrThrow({ where: { kode } });
-  const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan] = await Promise.all(
-    ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540"].map(akun),
+  const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan, biayaEvent, pendapatanEvent, pendapatanProduksi] = await Promise.all(
+    ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540", "5-1200", "4-1100", "4-2100"].map(akun),
   );
 
-  const itemDefs = [
-    { kode: "BRG-001", nama: "Lanyard & ID Card", satuan: "pcs", hargaBeli: 9000, hargaJual: 12000 },
-    { kode: "BRG-002", nama: "Stiker & Kupon Event", satuan: "pack", hargaBeli: 13000, hargaJual: 16000 },
-    { kode: "BRG-003", nama: "Goodie Bag Peserta", satuan: "pcs", hargaBeli: 24000, hargaJual: 29000 },
-  ];
-  const daftarBarang: Record<string, Awaited<ReturnType<typeof db.barang.create>>> = {};
-  for (const def of itemDefs) {
-    const barang = await db.barang.create({
-      data: { ...def, kelompokId: kelompok.id, stokMinimum: 10 },
-    });
-    daftarBarang[def.kode] = barang;
-    await db.stokBarang.create({ data: { barangId: barang.id, gudangId: gudang.id, jumlah: 100 } });
-  }
-  const lanyard = daftarBarang["BRG-001"];
-  const stiker = daftarBarang["BRG-002"];
-  const goodieBag = daftarBarang["BRG-003"];
+  // Barang produksi/merchandise (persediaan) + jasa (tanpa stok, akun pendapatan/beban sendiri)
+  const buatBarang = (data: Parameters<typeof db.barang.create>[0]["data"]) => db.barang.create({ data });
+  const lanyard = await buatBarang({ kode: "BRG-001", nama: "Lanyard & ID Card", satuan: "pcs", hargaBeli: 9000, hargaJual: 12000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
+  const stiker = await buatBarang({ kode: "BRG-002", nama: "Stiker & Kupon Event", satuan: "pack", hargaBeli: 13000, hargaJual: 16000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
+  const goodieBag = await buatBarang({ kode: "BRG-003", nama: "Goodie Bag Peserta", satuan: "pcs", hargaBeli: 24000, hargaJual: 29000, kelompokId: kelompokMerch.id, stokMinimum: 10, akunPendapatanId: pendapatanProduksi.id });
+  const jasaDekor = await buatBarang({ kode: "JSA-001", nama: "Jasa Dekorasi Panggung", jenis: "JASA", satuan: "paket", hargaBeli: 0, hargaJual: 2500000, kelompokId: kelompokJasa.id, akunPendapatanId: pendapatanEvent.id });
+  const jasaSound = await buatBarang({ kode: "JSA-002", nama: "Jasa Sound Engineer (vendor)", jenis: "JASA", satuan: "hari", hargaBeli: 750000, hargaJual: 1000000, kelompokId: kelompokJasa.id, akunPendapatanId: pendapatanEvent.id, akunBebanId: biayaEvent.id });
+
+  console.log("=== Tahap 0: Modal awal, setor ke bank, saldo awal persediaan ===");
+  await jalankan("JU: setoran modal awal Rp 25.000.000 ke Kas", () =>
+    buatJurnalManual(formulir({ keterangan: "Setoran modal awal pemilik", baris: [
+      { akunId: kas.id, debit: 25000000, kredit: 0, keterangan: "Setoran modal" },
+      { akunId: modal.id, debit: 0, kredit: 25000000, keterangan: "Setoran modal" },
+    ] })),
+  );
+  await jalankan("KM: setor tunai Rp 10.000.000 ke Bank", () =>
+    buatKasMasuk(formulir({ akunKasId: bank.id, akunLawanId: kas.id, jumlah: 10000000, keterangan: "Setor tunai ke bank" })),
+  );
+  await jalankan("PS: saldo awal persediaan 100 pcs tiap barang (Dr Persediaan / Cr Modal)", () =>
+    buatPenyesuaianPersediaan(formulir({ gudangId: gudang.id, akunLawanId: modal.id, keterangan: "Saldo awal persediaan", baris: [
+      { barangId: lanyard.id, jumlahSesudah: 100, hargaSatuan: 9000 },
+      { barangId: stiker.id, jumlahSesudah: 100, hargaSatuan: 13000 },
+      { barangId: goodieBag.id, jumlahSesudah: 100, hargaSatuan: 24000 },
+    ] })),
+  );
 
   console.log("=== Tahap 1: Penawaran Penjualan (draft, belum dikonversi) ===");
-  await db.penawaranPenjualan.create({
-    data: {
-      nomor: "PNW-2026-0001",
-      pelangganId: pelanggan.id,
-      status: "DRAF",
-      total: 5 * 12000 + 5 * 16000,
-      baris: {
-        create: [
-          { barangId: lanyard.id, jumlah: 5, harga: 12000, subtotal: 60000 },
-          { barangId: stiker.id, jumlah: 5, harga: 16000, subtotal: 80000 },
-        ],
-      },
-    },
-  });
-  console.log("  -> PNW-2026-0001 dibuat (cek halaman Penawaran Penjualan)");
+  await jalankan("PNW-…-0001 draft: 5 lanyard + 5 stiker", () =>
+    buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [
+      { barangId: lanyard.id, jumlah: 5, harga: 12000 },
+      { barangId: stiker.id, jumlah: 5, harga: 16000 },
+    ] })),
+  );
 
-  console.log("=== Tahap 2: Penawaran kedua, dikonversi jadi Pesanan ===");
-  const qtyLanyard = 20;
-  const qtyStiker = 10;
-  const qtyGoodieBag = 15;
-  const orderTotal = qtyLanyard * 12000 + qtyStiker * 16000 + qtyGoodieBag * 29000;
+  console.log("=== Tahap 2: Penawaran kedua → dikonversi jadi Pesanan Penjualan ===");
+  await jalankan("PNW-…-0002: 20 lanyard, 10 stiker, 15 goodie bag, 1 paket dekorasi (jasa)", () =>
+    buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [
+      { barangId: lanyard.id, jumlah: 20, harga: 12000 },
+      { barangId: stiker.id, jumlah: 10, harga: 16000 },
+      { barangId: goodieBag.id, jumlah: 15, harga: 29000 },
+      { barangId: jasaDekor.id, jumlah: 1, harga: 2500000 },
+    ] })),
+  );
+  const pnw2 = await db.penawaranPenjualan.findFirstOrThrow({ where: { status: "DRAF", total: { gt: 1000000 } }, orderBy: { nomor: "desc" } });
+  await jalankan("PSJ-…-0001 dari konversi PNW-…-0002", () => konversiPenawaranKePesanan(pnw2.id));
+  const pesanan = await db.pesananPenjualan.findFirstOrThrow({ where: { penawaranId: pnw2.id }, include: { baris: true } });
+  const barisPesanan = (barangId: string) => pesanan.baris.find((b) => b.barangId === barangId)!;
 
-  const q2 = await db.penawaranPenjualan.create({
-    data: {
-      nomor: "PNW-2026-0002",
-      pelangganId: pelanggan.id,
-      status: "DIKONVERSI",
-      total: orderTotal,
-      baris: {
-        create: [
-          { barangId: lanyard.id, jumlah: qtyLanyard, harga: 12000, subtotal: qtyLanyard * 12000 },
-          { barangId: stiker.id, jumlah: qtyStiker, harga: 16000, subtotal: qtyStiker * 16000 },
-          { barangId: goodieBag.id, jumlah: qtyGoodieBag, harga: 29000, subtotal: qtyGoodieBag * 29000 },
-        ],
-      },
-    },
-  });
+  console.log("=== Tahap 3-4: Pengiriman sebagian, lalu sisanya (stok berkurang, jasa tanpa stok) ===");
+  await jalankan("SJ-…-0001: 10 lanyard + 5 stiker → status SEBAGIAN", () =>
+    buatPengiriman(formulir({ pesananId: pesanan.id, gudangId: gudang.id, baris: [
+      { barisPesananId: barisPesanan(lanyard.id).id, barangId: lanyard.id, jumlah: 10 },
+      { barisPesananId: barisPesanan(stiker.id).id, barangId: stiker.id, jumlah: 5 },
+    ] })),
+  );
+  await jalankan("SJ-…-0002: sisa 10 lanyard, 5 stiker, 15 goodie bag, 1 jasa dekorasi → DIPROSES", () =>
+    buatPengiriman(formulir({ pesananId: pesanan.id, gudangId: gudang.id, baris: [
+      { barisPesananId: barisPesanan(lanyard.id).id, barangId: lanyard.id, jumlah: 10 },
+      { barisPesananId: barisPesanan(stiker.id).id, barangId: stiker.id, jumlah: 5 },
+      { barisPesananId: barisPesanan(goodieBag.id).id, barangId: goodieBag.id, jumlah: 15 },
+      { barisPesananId: barisPesanan(jasaDekor.id).id, barangId: jasaDekor.id, jumlah: 1 },
+    ] })),
+  );
 
-  const pesanan = await db.pesananPenjualan.create({
-    data: {
-      nomor: "PSJ-2026-0001",
-      pelangganId: pelanggan.id,
-      penawaranId: q2.id,
-      status: "DRAF",
-      total: orderTotal,
-      baris: {
-        create: [
-          { barangId: lanyard.id, jumlah: qtyLanyard, harga: 12000 },
-          { barangId: stiker.id, jumlah: qtyStiker, harga: 16000 },
-          { barangId: goodieBag.id, jumlah: qtyGoodieBag, harga: 29000 },
-        ],
-      },
-    },
-    include: { baris: true },
-  });
-  console.log("  -> PNW-2026-0002 dikonversi jadi PSJ-2026-0001 (cek halaman Pesanan Penjualan)");
+  console.log("=== Tahap 5: Faktur Penjualan seluruh pesanan (jurnal JU-FJ: piutang, pendapatan per akun, HPP) ===");
+  await jalankan("FJ-…-0001 total Rp 3.335.000", () =>
+    buatFaktur(formulir({ pesananId: pesanan.id, baris: pesanan.baris.map((b) => ({ barangId: b.barangId, jumlah: Number(b.jumlah), harga: Number(b.harga) })) })),
+  );
+  const faktur = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: pesanan.id } });
 
-  const orderLineLanyard = pesanan.baris.find((l) => l.barangId === lanyard.id)!;
-  const orderLineStiker = pesanan.baris.find((l) => l.barangId === stiker.id)!;
-  const orderLineGoodieBag = pesanan.baris.find((l) => l.barangId === goodieBag.id)!;
+  console.log("=== Tahap 6-8: Penerimaan cicilan → retur 2 lanyard → pelunasan ===");
+  await jalankan("TRM-…-0001: Rp 1.667.500 via Bank → SEBAGIAN", () =>
+    buatPenerimaan(formulir({ fakturId: faktur.id, akunId: bank.id, jumlah: 1667500, metodeBayar: "TRANSFER" })),
+  );
+  await jalankan("RJ-…-0001: retur 2 lanyard (Rp 24.000), stok kembali", () =>
+    buatRetur(formulir({ fakturId: faktur.id, gudangId: gudang.id, alasan: "Cetakan lanyard cacat saat pengiriman", baris: [{ barangId: lanyard.id, jumlah: 2 }] })),
+  );
+  await jalankan("TRM-…-0002: pelunasan Rp 1.643.500 tunai → LUNAS", () =>
+    buatPenerimaan(formulir({ fakturId: faktur.id, akunId: kas.id, jumlah: 1643500, metodeBayar: "TUNAI" })),
+  );
 
-  console.log("=== Tahap 3: Pengiriman sebagian (parsial) ===");
-  await db.pengirimanPesanan.create({
-    data: {
-      nomor: "SJ-2026-0001",
-      pesananId: pesanan.id,
-      gudangId: gudang.id,
-      status: "DIPROSES",
-      baris: {
-        create: [
-          { barisPesananId: orderLineLanyard.id, barangId: lanyard.id, jumlah: 10 },
-          { barisPesananId: orderLineStiker.id, barangId: stiker.id, jumlah: 5 },
-        ],
-      },
-    },
-  });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineLanyard.id }, data: { jumlahTerkirim: 10 } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineStiker.id }, data: { jumlahTerkirim: 5 } });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: 10 } },
-  });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: stiker.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: 5 } },
-  });
-  await db.pesananPenjualan.update({ where: { id: pesanan.id }, data: { status: "SEBAGIAN" } });
-  console.log("  -> SJ-2026-0001 (parsial), status Pesanan jadi SEBAGIAN, stok berkurang (cek halaman Pengiriman & Barang)");
+  console.log("=== Tahap 9-11: Pesanan Pembelian → Terima Barang 2× (jurnal JU-TB, harga pokok rata-rata) ===");
+  await jalankan("PSB-…-0001: 50 lanyard @9.000 + 1 hari jasa sound engineer @750.000", () =>
+    buatPesananPembelian(formulir({ pemasokId: pemasok.id, baris: [
+      { barangId: lanyard.id, jumlah: 50, harga: 9000 },
+      { barangId: jasaSound.id, jumlah: 1, harga: 750000 },
+    ] })),
+  );
+  const psb = await db.pesananPembelian.findFirstOrThrow({ where: { pemasokId: pemasok.id }, include: { baris: true } });
+  const barisPsb = (barangId: string) => psb.baris.find((b) => b.barangId === barangId)!;
+  await jalankan("TB-…-0001: 30 lanyard → SEBAGIAN", () =>
+    buatPenerimaanBarang(formulir({ pesananId: psb.id, gudangId: gudang.id, baris: [{ barisPesananId: barisPsb(lanyard.id).id, barangId: lanyard.id, jumlah: 30 }] })),
+  );
+  await jalankan("TB-…-0002: 20 lanyard + jasa sound → DIPROSES", () =>
+    buatPenerimaanBarang(formulir({ pesananId: psb.id, gudangId: gudang.id, baris: [
+      { barisPesananId: barisPsb(lanyard.id).id, barangId: lanyard.id, jumlah: 20 },
+      { barisPesananId: barisPsb(jasaSound.id).id, barangId: jasaSound.id, jumlah: 1 },
+    ] })),
+  );
 
-  console.log("=== Tahap 4: Pengiriman sisa (lengkap) ===");
-  await db.pengirimanPesanan.create({
-    data: {
-      nomor: "SJ-2026-0002",
-      pesananId: pesanan.id,
-      gudangId: gudang.id,
-      status: "DIPROSES",
-      baris: {
-        create: [
-          { barisPesananId: orderLineLanyard.id, barangId: lanyard.id, jumlah: 10 },
-          { barisPesananId: orderLineStiker.id, barangId: stiker.id, jumlah: 5 },
-          { barisPesananId: orderLineGoodieBag.id, barangId: goodieBag.id, jumlah: qtyGoodieBag },
-        ],
-      },
-    },
-  });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineLanyard.id }, data: { jumlahTerkirim: qtyLanyard } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineStiker.id }, data: { jumlahTerkirim: qtyStiker } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineGoodieBag.id }, data: { jumlahTerkirim: qtyGoodieBag } });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: 10 } },
-  });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: stiker.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: 5 } },
-  });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: goodieBag.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: qtyGoodieBag } },
-  });
-  await db.pesananPenjualan.update({ where: { id: pesanan.id }, data: { status: "DIPROSES" } });
-  console.log("  -> SJ-2026-0002 (sisa), status Pesanan jadi DIPROSES, stok Lanyard/Stiker/Goodie Bag berkurang penuh");
+  console.log("=== Tahap 12-15: Faktur Pembelian → bayar sebagian → retur 5 lanyard → pelunasan ===");
+  await jalankan("FB-…-0001 total Rp 1.200.000 (JU-FB: barang belum ditagih + beban jasa)", () =>
+    buatFakturPembelian(formulir({ pesananId: psb.id, baris: psb.baris.map((b) => ({ barangId: b.barangId, jumlah: Number(b.jumlah), harga: Number(b.harga) })) })),
+  );
+  const fakturBeli = await db.fakturPembelian.findFirstOrThrow({ where: { pesananId: psb.id } });
+  await jalankan("BYR-…-0001: Rp 600.000 via Bank → SEBAGIAN", () =>
+    buatPembayaranPembelian(formulir({ fakturId: fakturBeli.id, akunId: bank.id, jumlah: 600000, metodeBayar: "TRANSFER" })),
+  );
+  await jalankan("RB-…-0001: retur 5 lanyard (Rp 45.000) ke vendor", () =>
+    buatReturPembelian(formulir({ fakturId: fakturBeli.id, gudangId: gudang.id, alasan: "Cetakan lanyard buram, dikembalikan ke vendor", baris: [{ barangId: lanyard.id, jumlah: 5 }] })),
+  );
+  await jalankan("BYR-…-0002: pelunasan Rp 555.000 tunai → LUNAS", () =>
+    buatPembayaranPembelian(formulir({ fakturId: fakturBeli.id, akunId: kas.id, jumlah: 555000, metodeBayar: "TUNAI" })),
+  );
 
-  console.log("=== Tahap 5: Faktur Penjualan (untuk seluruh jumlah pesanan) ===");
-  const faktur = await db.fakturPenjualan.create({
-    data: {
-      nomor: "FJ-2026-0001",
-      pelangganId: pelanggan.id,
-      pesananId: pesanan.id,
-      status: "DRAF",
-      total: orderTotal,
-      jatuhTempo: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      baris: {
-        create: [
-          { barangId: lanyard.id, jumlah: qtyLanyard, harga: 12000, subtotal: qtyLanyard * 12000 },
-          { barangId: stiker.id, jumlah: qtyStiker, harga: 16000, subtotal: qtyStiker * 16000 },
-          { barangId: goodieBag.id, jumlah: qtyGoodieBag, harga: 29000, subtotal: qtyGoodieBag * 29000 },
-        ],
-      },
-    },
-  });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineLanyard.id }, data: { jumlahDifaktur: qtyLanyard } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineStiker.id }, data: { jumlahDifaktur: qtyStiker } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineGoodieBag.id }, data: { jumlahDifaktur: qtyGoodieBag } });
-  console.log(`  -> FJ-2026-0001 terbit, total ${orderTotal.toLocaleString("id-ID")} (cek halaman Faktur Penjualan)`);
+  console.log("=== Tahap 16: Kas Keluar - bayar sewa kantor ===");
+  await jalankan("KK: sewa kantor Rp 1.500.000 dari Kas", () =>
+    buatKasKeluar(formulir({ akunKasId: kas.id, akunLawanId: sewa.id, jumlah: 1500000, keterangan: "Bayar sewa kantor bulan ini" })),
+  );
 
-  console.log("=== Tahap 6: Penerimaan sebagian (cicilan pertama) ===");
-  const firstPayment = Math.round(orderTotal / 2);
-  await db.penerimaanPenjualan.create({
-    data: { nomor: "TRM-2026-0001", pelangganId: pelanggan.id, fakturId: faktur.id, akunId: bank.id, jumlah: firstPayment, metodeBayar: "TRANSFER" },
-  });
-  await db.fakturPenjualan.update({ where: { id: faktur.id }, data: { status: "SEBAGIAN" } });
-  console.log(`  -> TRM-2026-0001 (${firstPayment.toLocaleString("id-ID")}), status Faktur jadi SEBAGIAN`);
+  console.log("=== Tahap 17-18: Aset Tetap dibeli dari Bank (JU-AT) → penyusutan periode 2026-08 (JU-PNY) ===");
+  await jalankan("AT-001 Sound System Portabel Rp 6.000.000, sisa 600.000, 36 bulan, dibayar dari Bank", () =>
+    buatAsetTetap(formulir({
+      kode: "AT-001", nama: "Sound System Portabel", tanggalPerolehan: "2026-08-01", hargaPerolehan: 6000000, nilaiSisa: 600000, umurBulan: 36,
+      akunAsetId: peralatan.id, akunBebanPenyusutanId: bebanPenyusutan.id, akunAkumulasiPenyusutanId: akumPenyusutan.id, akunPembayaranId: bank.id,
+    })),
+  );
+  await jalankan("JU-PNY periode 2026-08: Rp 150.000", () => jalankanPenyusutanBulanan(formulir({ periode: "2026-08" })));
 
-  console.log("=== Tahap 7: Penerimaan pelunasan ===");
-  const secondPayment = orderTotal - firstPayment;
-  await db.penerimaanPenjualan.create({
-    data: { nomor: "TRM-2026-0002", pelangganId: pelanggan.id, fakturId: faktur.id, akunId: kas.id, jumlah: secondPayment, metodeBayar: "TUNAI" },
-  });
-  await db.fakturPenjualan.update({ where: { id: faktur.id }, data: { status: "LUNAS" } });
-  console.log(`  -> TRM-2026-0002 (${secondPayment.toLocaleString("id-ID")}), status Faktur jadi LUNAS (cek halaman Penerimaan Penjualan)`);
-
-  console.log("=== Tahap 8: Retur sebagian barang ===");
-  await db.returPenjualan.create({
-    data: {
-      nomor: "RJ-2026-0001",
-      fakturId: faktur.id,
-      gudangId: gudang.id,
-      alasan: "Cetakan lanyard cacat saat pengiriman",
-      baris: { create: [{ barangId: lanyard.id, jumlah: 2 }] },
-    },
-  });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
-    data: { jumlah: { increment: 2 } },
-  });
-  console.log("  -> RJ-2026-0001, stok Lanyard bertambah 2 (cek halaman Retur Penjualan & Barang)");
-
-  console.log("=== Tahap 9: Pesanan Pembelian (restock Lanyard ke pemasok) ===");
-  const qtyBeli = 50;
-  const poTotal = qtyBeli * 9000;
-  const po = await db.pesananPembelian.create({
-    data: {
-      nomor: "PSB-2026-0001",
-      pemasokId: pemasok.id,
-      status: "DRAF",
-      total: poTotal,
-      baris: { create: [{ barangId: lanyard.id, jumlah: qtyBeli, harga: 9000 }] },
-    },
-    include: { baris: true },
-  });
-  const poLine = po.baris[0];
-  console.log("  -> PSB-2026-0001 dibuat (cek halaman Pesanan Pembelian)");
-
-  console.log("=== Tahap 10: Penerimaan Barang sebagian ===");
-  await db.penerimaanBarang.create({
-    data: {
-      nomor: "TB-2026-0001",
-      pesananId: po.id,
-      gudangId: gudang.id,
-      status: "DIPROSES",
-      baris: { create: [{ barisPesananId: poLine.id, barangId: lanyard.id, jumlah: 30 }] },
-    },
-  });
-  await db.barisPesananPembelian.update({ where: { id: poLine.id }, data: { jumlahDiterima: 30 } });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
-    data: { jumlah: { increment: 30 } },
-  });
-  await db.pesananPembelian.update({ where: { id: po.id }, data: { status: "SEBAGIAN" } });
-  console.log("  -> TB-2026-0001 (30 dari 50), status Pesanan Pembelian jadi SEBAGIAN, stok Lanyard bertambah (cek halaman Penerimaan Barang)");
-
-  console.log("=== Tahap 11: Penerimaan Barang sisa ===");
-  await db.penerimaanBarang.create({
-    data: {
-      nomor: "TB-2026-0002",
-      pesananId: po.id,
-      gudangId: gudang.id,
-      status: "DIPROSES",
-      baris: { create: [{ barisPesananId: poLine.id, barangId: lanyard.id, jumlah: 20 }] },
-    },
-  });
-  await db.barisPesananPembelian.update({ where: { id: poLine.id }, data: { jumlahDiterima: qtyBeli } });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
-    data: { jumlah: { increment: 20 } },
-  });
-  await db.pesananPembelian.update({ where: { id: po.id }, data: { status: "DIPROSES" } });
-  console.log("  -> TB-2026-0002 (sisa 20), status Pesanan Pembelian jadi DIPROSES");
-
-  console.log("=== Tahap 12: Faktur Pembelian ===");
-  const fakturPembelian = await db.fakturPembelian.create({
-    data: {
-      nomor: "FB-2026-0001",
-      pemasokId: pemasok.id,
-      pesananId: po.id,
-      status: "DRAF",
-      total: poTotal,
-      jatuhTempo: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      baris: { create: [{ barangId: lanyard.id, jumlah: qtyBeli, harga: 9000, subtotal: poTotal }] },
-    },
-  });
-  await db.barisPesananPembelian.update({ where: { id: poLine.id }, data: { jumlahDifaktur: qtyBeli } });
-  console.log(`  -> FB-2026-0001 terbit, total ${poTotal.toLocaleString("id-ID")} (cek halaman Faktur Pembelian)`);
-
-  console.log("=== Tahap 13: Pembayaran sebagian ke pemasok ===");
-  const firstPurchasePayment = Math.round(poTotal / 2);
-  await db.pembayaranPembelian.create({
-    data: { nomor: "BYR-2026-0001", pemasokId: pemasok.id, fakturId: fakturPembelian.id, akunId: bank.id, jumlah: firstPurchasePayment, metodeBayar: "TRANSFER" },
-  });
-  await db.fakturPembelian.update({ where: { id: fakturPembelian.id }, data: { status: "SEBAGIAN" } });
-  console.log(`  -> BYR-2026-0001 (${firstPurchasePayment.toLocaleString("id-ID")}), status Faktur Pembelian jadi SEBAGIAN (cek halaman Pembayaran Pembelian)`);
-
-  console.log("=== Tahap 14: Pelunasan ke pemasok ===");
-  const secondPurchasePayment = poTotal - firstPurchasePayment;
-  await db.pembayaranPembelian.create({
-    data: { nomor: "BYR-2026-0002", pemasokId: pemasok.id, fakturId: fakturPembelian.id, akunId: kas.id, jumlah: secondPurchasePayment, metodeBayar: "TUNAI" },
-  });
-  await db.fakturPembelian.update({ where: { id: fakturPembelian.id }, data: { status: "LUNAS" } });
-  console.log(`  -> BYR-2026-0002 (${secondPurchasePayment.toLocaleString("id-ID")}), status Faktur Pembelian jadi LUNAS`);
-
-  console.log("=== Tahap 15: Retur sebagian barang ke pemasok ===");
-  await db.returPembelian.create({
-    data: {
-      nomor: "RB-2026-0001",
-      fakturId: fakturPembelian.id,
-      gudangId: gudang.id,
-      alasan: "Cetakan lanyard buram, dikembalikan ke vendor",
-      baris: { create: [{ barangId: lanyard.id, jumlah: 5 }] },
-    },
-  });
-  await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: 5 } },
-  });
-  console.log("  -> RB-2026-0001, stok Lanyard berkurang 5 (cek halaman Retur Pembelian & Barang)");
-
-  console.log("=== Tahap 16: Jurnal Umum - setoran modal awal ===");
-  await db.jurnal.create({
-    data: {
-      nomor: "JU-2026-0001",
-      keterangan: "Setoran modal awal pemilik",
-      sumber: "MANUAL",
-      baris: {
-        create: [
-          { akunId: kas.id, debit: 10000000, kredit: 0, keterangan: "Setoran modal" },
-          { akunId: modal.id, debit: 0, kredit: 10000000, keterangan: "Setoran modal" },
-        ],
-      },
-    },
-  });
-  console.log("  -> JU-2026-0001 (cek halaman Jurnal Umum)");
-
-  console.log("=== Tahap 17: Kas Masuk - setor tunai ke bank ===");
-  await db.jurnal.create({
-    data: {
-      nomor: "KM-2026-0001",
-      keterangan: "Setor tunai ke bank",
-      sumber: "KAS_MASUK",
-      baris: {
-        create: [
-          { akunId: bank.id, debit: 2000000, kredit: 0, keterangan: "Setor tunai ke bank" },
-          { akunId: kas.id, debit: 0, kredit: 2000000, keterangan: "Setor tunai ke bank" },
-        ],
-      },
-    },
-  });
-  console.log("  -> KM-2026-0001 (cek halaman Kas Masuk)");
-
-  console.log("=== Tahap 18: Kas Keluar - bayar sewa tempat ===");
-  await db.jurnal.create({
-    data: {
-      nomor: "KK-2026-0001",
-      keterangan: "Bayar sewa tempat bulan ini",
-      sumber: "KAS_KELUAR",
-      baris: {
-        create: [
-          { akunId: sewa.id, debit: 1500000, kredit: 0, keterangan: "Bayar sewa tempat" },
-          { akunId: kas.id, debit: 0, kredit: 1500000, keterangan: "Bayar sewa tempat" },
-        ],
-      },
-    },
-  });
-  console.log("  -> KK-2026-0001, saldo Kas jadi 10.000.000 - 2.000.000 - 1.500.000 = 6.500.000 (cek halaman Kas Keluar & Buku Besar)");
-
-  console.log("=== Tahap 19: Aset Tetap - beli sound system portabel ===");
-  const soundSystem = await db.asetTetap.create({
-    data: {
-      kode: "AT-001",
-      nama: "Sound System Portabel",
-      tanggalPerolehan: new Date("2026-01-01"),
-      hargaPerolehan: 6000000,
-      nilaiSisa: 600000,
-      umurBulan: 36,
-      akunAsetId: peralatan.id,
-      akunBebanPenyusutanId: bebanPenyusutan.id,
-      akunAkumulasiPenyusutanId: akumPenyusutan.id,
-    },
-  });
-  console.log("  -> AT-001 terdaftar, penyusutan bulanan: (6.000.000-600.000)/36 = 150.000 (cek halaman Daftar Aset)");
-
-  console.log("=== Tahap 20: Jalankan Penyusutan periode 2026-08 ===");
-  const monthlyDepreciation = (Number(soundSystem.hargaPerolehan) - Number(soundSystem.nilaiSisa)) / soundSystem.umurBulan;
-  const depCount = await db.jurnal.count();
-  const depNo = `JU-PNY-2026-${String(depCount + 1).padStart(4, "0")}`;
-  const depJournal = await db.jurnal.create({
-    data: {
-      nomor: depNo,
-      keterangan: "Penyusutan aset periode 2026-08",
-      sumber: "PENYUSUTAN",
-      baris: {
-        create: [
-          { akunId: bebanPenyusutan.id, debit: monthlyDepreciation, kredit: 0, keterangan: "Penyusutan Sound System Portabel" },
-          { akunId: akumPenyusutan.id, debit: 0, kredit: monthlyDepreciation, keterangan: "Akumulasi penyusutan Sound System Portabel" },
-        ],
-      },
-    },
-  });
-  await db.penyusutanAset.create({
-    data: { asetId: soundSystem.id, periode: new Date("2026-08-01"), jumlah: monthlyDepreciation, jurnalId: depJournal.id },
-  });
-  console.log(`  -> ${depNo}, nilai buku Sound System jadi 6.000.000 - 150.000 = 5.850.000 (cek halaman Penyusutan)`);
-
-  console.log("\n=== Selesai. Ringkasan stok akhir ===");
-  const finalStock = await db.stokBarang.findMany({ include: { barang: true }, where: { gudangId: gudang.id } });
-  for (const s of finalStock) {
-    console.log(`  ${s.barang.nama}: ${s.jumlah.toString()}`);
-  }
+  console.log("=== Selesai. Ringkasan & pemeriksaan sinkronisasi ===");
+  const daftarStok = await db.stokBarang.findMany({ include: { barang: true } });
+  for (const s of daftarStok) console.log(`  stok ${s.barang.kode} ${s.barang.nama}: ${rp(s.jumlah)} ${s.barang.satuan} @ ${rp(s.barang.hargaBeli)}`);
+  const saldo = async (kode: string) => {
+    const a = await akun(kode);
+    const agg = await db.barisJurnal.aggregate({ where: { akunId: a.id }, _sum: { debit: true, kredit: true } });
+    return Number(agg._sum.debit ?? 0) - Number(agg._sum.kredit ?? 0);
+  };
+  console.log(`  Kas ${rp(await saldo("1-1100"))} · Bank ${rp(await saldo("1-1210"))} · Persediaan ${rp(await saldo("1-1600"))} · Piutang ${rp(await saldo("1-1300"))} · Hutang ${rp(-(await saldo("2-1100")))}`);
+  const sinkron = await periksaSinkron(db);
+  const laporan = [
+    ["jurnal seimbang", sinkron.seimbang],
+    ["persediaan", sinkron.persediaan.sinkron],
+    ["piutang", sinkron.piutang.sinkron],
+    ["hutang", sinkron.hutang.sinkron],
+    ["barang belum ditagih", sinkron.barangBelumDitagih.sinkron],
+  ] as const;
+  for (const [nama, ok] of laporan) console.log(`  ${ok ? "✔" : "✘"} ${nama}`);
+  if (laporan.some(([, ok]) => !ok)) throw new Error("Seed selesai tapi buku besar TIDAK sinkron — periksa aturan posting");
 }
 
 main()
   .then(() => process.exit(0))
   .catch((err) => {
-    console.error("SEED FAILED", err);
+    console.error("SEED GAGAL", err);
     process.exit(1);
   });

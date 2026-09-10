@@ -13,16 +13,20 @@ export async function simpanPemetaanAkun(dataFormulir: FormData) {
   const hppId = String(dataFormulir.get("hppId") ?? "");
   const pendapatanPenjualanId = String(dataFormulir.get("pendapatanPenjualanId") ?? "");
   const utangUsahaId = String(dataFormulir.get("utangUsahaId") ?? "");
+  const bebanJasaId = String(dataFormulir.get("bebanJasaId") ?? "") || null;
+  const barangBelumDitagihId = String(dataFormulir.get("barangBelumDitagihId") ?? "") || null;
+  const selisihPersediaanId = String(dataFormulir.get("selisihPersediaanId") ?? "") || null;
 
   if (!piutangUsahaId || !persediaanId || !hppId || !pendapatanPenjualanId || !utangUsahaId) {
     throw new Error("Semua pemetaan akun wajib diisi");
   }
-  await pastikanAkunRinci(db, [piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId]);
+  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId };
+  await pastikanAkunRinci(db, [piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...Object.values(opsional).filter((v): v is string => Boolean(v))]);
 
   await db.pemetaanAkun.upsert({
     where: { id: "default" },
-    create: { id: "default", piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId },
-    update: { piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId },
+    create: { id: "default", piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...opsional },
+    update: { piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...opsional },
   });
 
   revalidatePath("/pengaturan/pemetaan-akun");

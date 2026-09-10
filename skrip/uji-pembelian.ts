@@ -44,14 +44,20 @@ async function main() {
   let pemetaanDibuat = false;
   let akunPemetaan: string[] = [];
   if (!pemetaan) {
-    const [piutang, persediaanAkun, hpp, pendapatan, utang] = await Promise.all([
+    const [piutang, persediaanAkun, hpp, pendapatan, utang, bbd, selisih, bebanJasa] = await Promise.all([
       db.akun.create({ data: { kode: "PTEST-PIUTANG", nama: "Piutang Test", jenis: "ASET" } }),
       db.akun.create({ data: { kode: "PTEST-PERSEDIAAN", nama: "Persediaan Test", jenis: "ASET" } }),
       db.akun.create({ data: { kode: "PTEST-HPP", nama: "HPP Test", jenis: "BEBAN" } }),
       db.akun.create({ data: { kode: "PTEST-PENDAPATAN", nama: "Pendapatan Test", jenis: "PENDAPATAN" } }),
       db.akun.create({ data: { kode: "PTEST-UTANG", nama: "Utang Test", jenis: "KEWAJIBAN" } }),
+      db.akun.create({ data: { kode: "PTEST-BBD", nama: "Barang Belum Ditagih Test", jenis: "KEWAJIBAN" } }),
+      db.akun.create({ data: { kode: "PTEST-SELISIH", nama: "Selisih Persediaan Test", jenis: "BEBAN" } }),
+      db.akun.create({ data: { kode: "PTEST-JASA", nama: "Beban Jasa Test", jenis: "BEBAN" } }),
+      db.akun.create({ data: { kode: "TEST-BBD", nama: "Barang Belum Ditagih Test", jenis: "KEWAJIBAN" } }),
+      db.akun.create({ data: { kode: "TEST-SELISIH", nama: "Selisih Persediaan Test", jenis: "BEBAN" } }),
+      db.akun.create({ data: { kode: "TEST-JASA", nama: "Beban Jasa Test", jenis: "BEBAN" } }),
     ]);
-    akunPemetaan = [piutang.id, persediaanAkun.id, hpp.id, pendapatan.id, utang.id];
+    akunPemetaan = [piutang.id, persediaanAkun.id, hpp.id, pendapatan.id, utang.id, bbd.id, selisih.id, bebanJasa.id];
     pemetaan = await db.pemetaanAkun.create({
       data: {
         id: "default",
@@ -60,6 +66,9 @@ async function main() {
         hppId: hpp.id,
         pendapatanPenjualanId: pendapatan.id,
         utangUsahaId: utang.id,
+        barangBelumDitagihId: bbd.id,
+        selisihPersediaanId: selisih.id,
+        bebanJasaId: bebanJasa.id,
       },
     });
     pemetaanDibuat = true;

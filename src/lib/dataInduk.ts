@@ -31,10 +31,15 @@ export async function ambilDaftarOpsi(config: KonfigurasiEntitas): Promise<Dafta
   const daftarOpsi: DaftarOpsi = {};
   for (const bidang of config.bidang) {
     if (!bidang.opsi) continue;
-    const isian = await delegasiBaca(bidang.opsi.model).findMany({ orderBy: [{ [bidang.opsi.bidangLabel]: "asc" }] });
+    const akun = bidang.opsi.model === "akun";
+    const isian = await delegasiBaca(bidang.opsi.model).findMany({
+      where: bidang.opsi.where,
+      orderBy: [{ [akun ? "kode" : bidang.opsi.bidangLabel]: "asc" }],
+    });
     daftarOpsi[bidang.nama] = isian.map((r) => ({
       id: String(r[bidang.opsi!.bidangNilai]),
-      label: String(r[bidang.opsi!.bidangLabel]),
+      // akun ditampilkan "kode - nama" agar mudah dicari
+      label: akun ? `${String(r.kode)} - ${String(r[bidang.opsi!.bidangLabel])}` : String(r[bidang.opsi!.bidangLabel]),
     }));
   }
   return daftarOpsi;

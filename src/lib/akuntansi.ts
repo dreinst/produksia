@@ -1,101 +1,295 @@
 import type { Prisma } from "@/prisma-klien/client";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
-import { D, type Desimal } from "@/lib/uang";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
+import { D, kali, jumlahkan, type Desimal } from "@/lib/uang";
+
+/*
+ * Aturan posting jurnal otomatis. Semua fungsi dipanggil DI DALAM transaksi dokumen,
+ * sehingga dokumen, mutasi stok, dan jurnal selalu tersimpan bersama atau batal bersama.
+ *
+ * Akun dipilih per baris: akun khusus di Barang (akunPendapatan/akunHpp/akunPersediaan/akunBeban)
+ * bila diisi, kalau tidak memakai PemetaanAkun. Baris JASA tidak menyentuh persediaan/HPP.
+ * Keterangan jurnal selalu memuat nomor dokumen agar jejaknya bisa ditelusuri dua arah.
+ */
 
 type Tx = Prisma.TransactionClient;
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan: string };
+export type BarisDokumen = { barangId: string; jumlah: Desimal; harga: Desimal };
+export type SumberOtomatis = "PENJUALAN" | "PEMBELIAN" | "PERSEDIAAN" | "ASET_TETAP" | "PENYUSUTAN";
 
 const NOL = D(0);
-
-async function nomorJurnalBerikutnya(tx: Tx, prefix: string) {
-  return nomorDokumenBerikutnya(tx.jurnal, prefix);
-}
 
 export async function ambilPemetaanAkun(tx: Tx) {
   const pemetaan = await tx.pemetaanAkun.findUnique({ where: { id: "default" } });
   if (!pemetaan) {
     throw new Error(
-      "Pemetaan akun belum diatur. Buka menu Buku Besar > Pemetaan Akun sebelum membuat transaksi ini.",
+      "Pemetaan akun belum diatur. Buka menu Pengaturan > Bagan Akun Standar (terapkan) atau Pemetaan Akun sebelum membuat transaksi ini.",
     );
   }
   return pemetaan;
 }
 
-async function catatJurnal(tx: Tx, prefix: string, keterangan: string, sumber: "PENJUALAN" | "PEMBELIAN", daftarBaris: InputBarisJurnal[]) {
-  await pastikanAkunRinci(tx, daftarBaris.map((b) => b.akunId));
-  const nomor = await nomorJurnalBerikutnya(tx, prefix);
-  await tx.jurnal.create({ data: { nomor, keterangan, sumber, baris: { create: daftarBaris } } });
+type InfoBarang = {
+  id: string;
+  kode: string;
+  nama: string;
+  jenis: "BARANG" | "JASA";
+  hargaBeli: Desimal;
+  akunPendapatanId: string | null;
+  akunHppId: string | null;
+  akunPersediaanId: string | null;
+  akunBebanId: string | null;
+};
+
+async function infoBarang(tx: Tx, daftarId: string[]): Promise<Map<string, InfoBarang>> {
+  const daftar = await tx.barang.findMany({
+    where: { id: { in: [...new Set(daftarId)] } },
+    select: { id: true, kode: true, nama: true, jenis: true, hargaBeli: true, akunPendapatanId: true, akunHppId: true, akunPersediaanId: true, akunBebanId: true },
+  });
+  return new Map(daftar.map((b) => [b.id, { ...b, hargaBeli: D(b.hargaBeli) }]));
 }
 
-/** Faktur Penjualan: Dr Piutang / Cr Pendapatan; plus Dr HPP / Cr Persediaan bila ada harga pokok. */
-export async function catatJurnalFakturPenjualan(tx: Tx, faktur: { total: Desimal | number | string }, hargaPokok: Desimal) {
-  const m = await ambilPemetaanAkun(tx);
-  const total = D(faktur.total);
-  const daftarBaris: InputBarisJurnal[] = [
-    { akunId: m.piutangUsahaId, debit: total, kredit: NOL, keterangan: "Piutang Faktur Penjualan" },
-    { akunId: m.pendapatanPenjualanId, debit: NOL, kredit: total, keterangan: "Pendapatan Penjualan" },
-  ];
-  if (hargaPokok.gt(0)) {
-    daftarBaris.push(
-      { akunId: m.hppId, debit: hargaPokok, kredit: NOL, keterangan: "HPP Penjualan" },
-      { akunId: m.persediaanId, debit: NOL, kredit: hargaPokok, keterangan: "Pengurangan Persediaan" },
-    );
+function ambilInfo(peta: Map<string, InfoBarang>, barangId: string): InfoBarang {
+  const info = peta.get(barangId);
+  if (!info) throw new Error("Barang tidak ditemukan");
+  return info;
+}
+
+/** Penjumlahan per akun (urutan sisip dipertahankan agar jurnal mudah dibaca). */
+function pengumpul() {
+  const peta = new Map<string, Desimal>();
+  return {
+    tambah(akunId: string, jumlah: Desimal) {
+      if (jumlah.isZero()) return;
+      peta.set(akunId, (peta.get(akunId) ?? NOL).plus(jumlah));
+    },
+    daftar(): [string, Desimal][] {
+      return [...peta.entries()].filter(([, v]) => !v.isZero());
+    },
+  };
+}
+
+/** Membuat satu jurnal seimbang; baris bernilai nol dibuang; akun kelompok ditolak. */
+export async function catatJurnal(tx: Tx, prefix: string, keterangan: string, sumber: SumberOtomatis, daftarBaris: InputBarisJurnal[]) {
+  const baris = daftarBaris.filter((b) => !b.debit.isZero() || !b.kredit.isZero());
+  if (baris.length === 0) return null;
+  const totalDebit = jumlahkan(baris.map((b) => b.debit));
+  const totalKredit = jumlahkan(baris.map((b) => b.kredit));
+  if (!totalDebit.equals(totalKredit)) {
+    throw new Error(`Jurnal otomatis ${prefix} tidak seimbang (debit ${totalDebit.toFixed(2)} vs kredit ${totalKredit.toFixed(2)}) — laporkan ke pengembang`);
   }
-  await catatJurnal(tx, "JU-FJ", "Faktur Penjualan", "PENJUALAN", daftarBaris);
+  await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
+  const nomor = await nomorDokumenBerikutnya(tx.jurnal, prefix);
+  return tx.jurnal.create({ data: { nomor, keterangan, sumber, baris: { create: baris } } });
+}
+
+/** Nilai pokok satu baris: hanya BARANG (jasa tidak punya persediaan). */
+export function hargaPokokBaris(info: InfoBarang, jumlah: Desimal): Desimal {
+  return info.jenis === "BARANG" ? kali(jumlah, info.hargaBeli) : NOL;
+}
+
+// ---------- Penjualan ----------
+
+/** Faktur Penjualan: Dr Piutang (total) / Cr Pendapatan per akun; Dr HPP / Cr Persediaan per akun untuk BARANG. */
+export async function catatJurnalFakturPenjualan(tx: Tx, faktur: { nomor: string; total: Desimal | number | string }, daftarBaris: BarisDokumen[]) {
+  const m = await ambilPemetaanAkun(tx);
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, kali(b.jumlah, b.harga));
+    const pokok = hargaPokokBaris(info, b.jumlah);
+    hpp.tambah(info.akunHppId ?? m.hppId, pokok);
+    persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, pokok);
+  }
+  const baris: InputBarisJurnal[] = [
+    { akunId: m.piutangUsahaId, debit: D(faktur.total), kredit: NOL, keterangan: `Piutang ${faktur.nomor}` },
+    ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Pendapatan ${faktur.nomor}` })),
+    ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
+    ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Persediaan keluar ${faktur.nomor}` })),
+  ];
+  return catatJurnal(tx, "JU-FJ", `Faktur Penjualan ${faktur.nomor}`, "PENJUALAN", baris);
 }
 
 /** Penerimaan Penjualan: Dr Kas/Bank pilihan / Cr Piutang. */
-export async function catatJurnalPenerimaanPenjualan(tx: Tx, penerimaan: { akunId: string; jumlah: Desimal | number | string }) {
+export async function catatJurnalPenerimaanPenjualan(tx: Tx, penerimaan: { nomor: string; akunId: string; jumlah: Desimal | number | string }, nomorFaktur?: string) {
   const m = await ambilPemetaanAkun(tx);
   const jumlah = D(penerimaan.jumlah);
-  await catatJurnal(tx, "JU-TRM", "Penerimaan Penjualan", "PENJUALAN", [
-    { akunId: penerimaan.akunId, debit: jumlah, kredit: NOL, keterangan: "Penerimaan dari pelanggan" },
-    { akunId: m.piutangUsahaId, debit: NOL, kredit: jumlah, keterangan: "Pelunasan piutang" },
+  return catatJurnal(tx, "JU-TRM", `Penerimaan ${penerimaan.nomor}${nomorFaktur ? ` untuk ${nomorFaktur}` : ""}`, "PENJUALAN", [
+    { akunId: penerimaan.akunId, debit: jumlah, kredit: NOL, keterangan: `Terima ${penerimaan.nomor}` },
+    { akunId: m.piutangUsahaId, debit: NOL, kredit: jumlah, keterangan: `Pelunasan piutang ${nomorFaktur ?? penerimaan.nomor}` },
   ]);
 }
 
-/** Retur Penjualan: kebalikan faktur (Dr Pendapatan / Cr Piutang; Dr Persediaan / Cr HPP). */
-export async function catatJurnalReturPenjualan(tx: Tx, nilaiRetur: Desimal, hargaPokok: Desimal) {
+/** Retur Penjualan: kebalikan faktur — Dr Pendapatan per akun / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini). */
+export async function catatJurnalReturPenjualan(tx: Tx, retur: { nomor: string; total: Desimal }, daftarBaris: BarisDokumen[]) {
   const m = await ambilPemetaanAkun(tx);
-  const daftarBaris: InputBarisJurnal[] = [
-    { akunId: m.pendapatanPenjualanId, debit: nilaiRetur, kredit: NOL, keterangan: "Retur Penjualan" },
-    { akunId: m.piutangUsahaId, debit: NOL, kredit: nilaiRetur, keterangan: "Pengurangan Piutang" },
-  ];
-  if (hargaPokok.gt(0)) {
-    daftarBaris.push(
-      { akunId: m.persediaanId, debit: hargaPokok, kredit: NOL, keterangan: "Barang retur masuk gudang" },
-      { akunId: m.hppId, debit: NOL, kredit: hargaPokok, keterangan: "Koreksi HPP" },
-    );
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, kali(b.jumlah, b.harga));
+    const pokok = hargaPokokBaris(info, b.jumlah);
+    persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, pokok);
+    hpp.tambah(info.akunHppId ?? m.hppId, pokok);
   }
-  await catatJurnal(tx, "JU-RJ", "Retur Penjualan", "PENJUALAN", daftarBaris);
+  const baris: InputBarisJurnal[] = [
+    ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Retur ${retur.nomor}` })),
+    { akunId: m.piutangUsahaId, debit: NOL, kredit: retur.total, keterangan: `Pengurangan piutang ${retur.nomor}` },
+    ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Barang retur masuk ${retur.nomor}` })),
+    ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Koreksi HPP ${retur.nomor}` })),
+  ];
+  return catatJurnal(tx, "JU-RJ", `Retur Penjualan ${retur.nomor}`, "PENJUALAN", baris);
 }
 
-/** Faktur Pembelian: Dr Persediaan / Cr Utang. */
-export async function catatJurnalFakturPembelian(tx: Tx, faktur: { total: Desimal | number | string }) {
+// ---------- Pembelian ----------
+
+/**
+ * Terima Barang: Dr Persediaan per akun (harga pesanan) / Cr Barang Diterima Belum Ditagih.
+ * Dengan ini nilai persediaan di buku besar naik bersamaan dengan stok fisik, bukan menunggu faktur.
+ * Baris JASA tidak dijurnal di sini (bebannya diakui saat Faktur Pembelian).
+ */
+export async function catatJurnalPenerimaanBarang(tx: Tx, penerimaan: { nomor: string }, daftarBaris: BarisDokumen[]) {
   const m = await ambilPemetaanAkun(tx);
-  const total = D(faktur.total);
-  await catatJurnal(tx, "JU-FB", "Faktur Pembelian", "PEMBELIAN", [
-    { akunId: m.persediaanId, debit: total, kredit: NOL, keterangan: "Penambahan Persediaan" },
-    { akunId: m.utangUsahaId, debit: NOL, kredit: total, keterangan: "Utang Faktur Pembelian" },
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const persediaan = pengumpul();
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    if (info.jenis !== "BARANG") continue;
+    persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, kali(b.jumlah, b.harga));
+  }
+  const daftar = persediaan.daftar();
+  if (daftar.length === 0) return null;
+  if (!m.barangBelumDitagihId) {
+    throw new Error("Pemetaan akun 'Barang Diterima Belum Ditagih' belum diatur (Pengaturan > Pemetaan Akun)");
+  }
+  const total = jumlahkan(daftar.map(([, v]) => v));
+  return catatJurnal(tx, "JU-TB", `Terima Barang ${penerimaan.nomor}`, "PEMBELIAN", [
+    ...daftar.map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Persediaan masuk ${penerimaan.nomor}` })),
+    { akunId: m.barangBelumDitagihId, debit: NOL, kredit: total, keterangan: `Belum ditagih ${penerimaan.nomor}` },
   ]);
 }
 
-/** Pembayaran Pembelian: Dr Utang / Cr Kas/Bank pilihan. */
-export async function catatJurnalPembayaranPembelian(tx: Tx, pembayaran: { akunId: string; jumlah: Desimal | number | string }) {
+/**
+ * Faktur Pembelian: BARANG → Dr Barang Diterima Belum Ditagih (harga pesanan) ± selisih harga ke Persediaan;
+ * JASA → Dr Beban (akun barang / pemetaan bebanJasa / HPP); Cr Hutang Usaha (total faktur).
+ */
+export async function catatJurnalFakturPembelian(
+  tx: Tx,
+  faktur: { nomor: string; total: Desimal | number | string },
+  daftarBaris: BarisDokumen[],
+  hargaPesanan: Map<string, Desimal>,
+) {
+  const m = await ambilPemetaanAkun(tx);
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const belumDitagih = pengumpul(), selisihPersediaan = pengumpul(), beban = pengumpul();
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    if (info.jenis === "BARANG") {
+      const hargaDasar = hargaPesanan.get(b.barangId) ?? b.harga;
+      belumDitagih.tambah("_", kali(b.jumlah, hargaDasar));
+      selisihPersediaan.tambah(info.akunPersediaanId ?? m.persediaanId, kali(b.jumlah, b.harga.minus(hargaDasar)));
+    } else {
+      beban.tambah(info.akunBebanId ?? m.bebanJasaId ?? m.hppId, kali(b.jumlah, b.harga));
+    }
+  }
+  const nilaiBelumDitagih = jumlahkan(belumDitagih.daftar().map(([, v]) => v));
+  if (nilaiBelumDitagih.gt(0) && !m.barangBelumDitagihId) {
+    throw new Error("Pemetaan akun 'Barang Diterima Belum Ditagih' belum diatur (Pengaturan > Pemetaan Akun)");
+  }
+  const baris: InputBarisJurnal[] = [
+    ...(nilaiBelumDitagih.gt(0) && m.barangBelumDitagihId
+      ? [{ akunId: m.barangBelumDitagihId, debit: nilaiBelumDitagih, kredit: NOL, keterangan: `Tagihan barang ${faktur.nomor}` }]
+      : []),
+    ...selisihPersediaan.daftar().map(([akunId, v]) => ({
+      akunId,
+      debit: v.gt(0) ? v : NOL,
+      kredit: v.lt(0) ? v.neg() : NOL,
+      keterangan: `Selisih harga faktur vs pesanan ${faktur.nomor}`,
+    })),
+    ...beban.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Jasa/beban ${faktur.nomor}` })),
+    { akunId: m.utangUsahaId, debit: NOL, kredit: D(faktur.total), keterangan: `Hutang ${faktur.nomor}` },
+  ];
+  return catatJurnal(tx, "JU-FB", `Faktur Pembelian ${faktur.nomor}`, "PEMBELIAN", baris);
+}
+
+/** Pembayaran Pembelian: Dr Hutang / Cr Kas/Bank pilihan. */
+export async function catatJurnalPembayaranPembelian(tx: Tx, pembayaran: { nomor: string; akunId: string; jumlah: Desimal | number | string }, nomorFaktur?: string) {
   const m = await ambilPemetaanAkun(tx);
   const jumlah = D(pembayaran.jumlah);
-  await catatJurnal(tx, "JU-BYR", "Pembayaran Pembelian", "PEMBELIAN", [
-    { akunId: m.utangUsahaId, debit: jumlah, kredit: NOL, keterangan: "Pelunasan utang" },
-    { akunId: pembayaran.akunId, debit: NOL, kredit: jumlah, keterangan: "Pembayaran ke pemasok" },
+  return catatJurnal(tx, "JU-BYR", `Pembayaran ${pembayaran.nomor}${nomorFaktur ? ` untuk ${nomorFaktur}` : ""}`, "PEMBELIAN", [
+    { akunId: m.utangUsahaId, debit: jumlah, kredit: NOL, keterangan: `Pelunasan hutang ${nomorFaktur ?? pembayaran.nomor}` },
+    { akunId: pembayaran.akunId, debit: NOL, kredit: jumlah, keterangan: `Bayar ${pembayaran.nomor}` },
   ]);
 }
 
-/** Retur Pembelian: Dr Utang / Cr Persediaan. */
-export async function catatJurnalReturPembelian(tx: Tx, nilaiRetur: Desimal) {
+/**
+ * Retur Pembelian: Dr Hutang (harga faktur); BARANG → Cr Persediaan (harga pokok rata-rata saat ini),
+ * selisih harga faktur vs pokok → Selisih Persediaan; JASA → Cr Beban.
+ */
+export async function catatJurnalReturPembelian(tx: Tx, retur: { nomor: string; total: Desimal }, daftarBaris: BarisDokumen[]) {
   const m = await ambilPemetaanAkun(tx);
-  await catatJurnal(tx, "JU-RB", "Retur Pembelian", "PEMBELIAN", [
-    { akunId: m.utangUsahaId, debit: nilaiRetur, kredit: NOL, keterangan: "Pengurangan Utang" },
-    { akunId: m.persediaanId, debit: NOL, kredit: nilaiRetur, keterangan: "Barang keluar retur ke pemasok" },
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const persediaan = pengumpul(), beban = pengumpul();
+  let selisih = NOL;
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    const nilaiFaktur = kali(b.jumlah, b.harga);
+    if (info.jenis === "BARANG") {
+      const pokok = hargaPokokBaris(info, b.jumlah);
+      persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, pokok);
+      selisih = selisih.plus(nilaiFaktur.minus(pokok));
+    } else {
+      beban.tambah(info.akunBebanId ?? m.bebanJasaId ?? m.hppId, nilaiFaktur);
+    }
+  }
+  if (!selisih.isZero() && !m.selisihPersediaanId) {
+    throw new Error("Pemetaan akun 'Selisih Persediaan' belum diatur (Pengaturan > Pemetaan Akun)");
+  }
+  const baris: InputBarisJurnal[] = [
+    { akunId: m.utangUsahaId, debit: retur.total, kredit: NOL, keterangan: `Pengurangan hutang ${retur.nomor}` },
+    ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Barang keluar retur ${retur.nomor}` })),
+    ...beban.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Koreksi beban ${retur.nomor}` })),
+    ...(!selisih.isZero() && m.selisihPersediaanId
+      ? [{ akunId: m.selisihPersediaanId, debit: selisih.lt(0) ? selisih.neg() : NOL, kredit: selisih.gt(0) ? selisih : NOL, keterangan: `Selisih harga retur ${retur.nomor}` }]
+      : []),
+  ];
+  return catatJurnal(tx, "JU-RB", `Retur Pembelian ${retur.nomor}`, "PEMBELIAN", baris);
+}
+
+// ---------- Persediaan & Aset Tetap ----------
+
+/** Penyesuaian stok: naik → Dr Persediaan / Cr akun lawan; turun → Dr akun lawan / Cr Persediaan (nilai = selisih × harga satuan). */
+export async function catatJurnalPenyesuaianPersediaan(
+  tx: Tx,
+  penyesuaian: { nomor: string; akunLawanId: string; keterangan?: string | null },
+  daftarBaris: { barangId: string; selisih: Desimal; hargaSatuan: Desimal }[],
+) {
+  const m = await ambilPemetaanAkun(tx);
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const persediaan = pengumpul();
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, kali(b.selisih, b.hargaSatuan));
+  }
+  const daftar = persediaan.daftar();
+  const total = jumlahkan(daftar.map(([, v]) => v));
+  const baris: InputBarisJurnal[] = [
+    ...daftar.map(([akunId, v]) => ({
+      akunId,
+      debit: v.gt(0) ? v : NOL,
+      kredit: v.lt(0) ? v.neg() : NOL,
+      keterangan: `Penyesuaian persediaan ${penyesuaian.nomor}`,
+    })),
+    { akunId: penyesuaian.akunLawanId, debit: total.lt(0) ? total.neg() : NOL, kredit: total.gt(0) ? total : NOL, keterangan: `Lawan penyesuaian ${penyesuaian.nomor}` },
+  ];
+  return catatJurnal(tx, "JU-PS", `Penyesuaian Persediaan ${penyesuaian.nomor}${penyesuaian.keterangan ? ` — ${penyesuaian.keterangan}` : ""}`, "PERSEDIAAN", baris);
+}
+
+/** Perolehan aset tetap: Dr Akun Aset / Cr Kas-Bank atau Hutang. */
+export async function catatJurnalPerolehanAset(tx: Tx, aset: { kode: string; nama: string; hargaPerolehan: Desimal; akunAsetId: string; akunPembayaranId: string }) {
+  return catatJurnal(tx, "JU-AT", `Perolehan aset ${aset.kode} ${aset.nama}`, "ASET_TETAP", [
+    { akunId: aset.akunAsetId, debit: aset.hargaPerolehan, kredit: NOL, keterangan: `Perolehan ${aset.kode}` },
+    { akunId: aset.akunPembayaranId, debit: NOL, kredit: aset.hargaPerolehan, keterangan: `Pembayaran aset ${aset.kode}` },
   ]);
 }

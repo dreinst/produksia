@@ -7,8 +7,9 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, kali, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
-import { kurangiStok, tambahStok, labelBarang } from "@/lib/stok";
+import { kurangiStok, tambahStok, labelBarang, jenisBarang, perbaruiHargaRata, sesuaikanHargaRata } from "@/lib/stok";
 import {
+  catatJurnalPenerimaanBarang,
   catatJurnalFakturPembelian,
   catatJurnalPembayaranPembelian,
   catatJurnalReturPembelian,
@@ -55,6 +56,11 @@ function bacaBarisJumlah<T extends { barangId?: string; jumlah?: string | number
 
 function totalBaris(daftarBaris: BarisInput[]): Desimal {
   return jumlahkan(daftarBaris.map((l) => kali(l.jumlah, l.harga)));
+}
+
+function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" | "SEBAGIAN" | "LUNAS" {
+  if (dibayar.plus(retur).gte(total)) return "LUNAS";
+  return dibayar.gt(0) || retur.gt(0) ? "SEBAGIAN" : "DRAF";
 }
 
 // ---------- Pesanan Pembelian ----------
@@ -109,7 +115,15 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
   const nomor = await nomorDokumenBerikutnya(db.penerimaanBarang, "TB");
 
   await db.$transaction(async (tx) => {
-    await tx.penerimaanBarang.create({
+    const daftarJenis = await jenisBarang(tx, daftarBaris.map((l) => l.barangId));
+    // nilai persediaan yang masuk = harga di pesanan pembelian
+    const barisNilai = daftarBaris.map((l) => ({
+      barangId: l.barangId,
+      jumlah: l.jumlah,
+      harga: D(pesanan.baris.find((ol) => ol.id === l.barisPesananId)?.harga ?? 0),
+    }));
+
+    const penerimaan = await tx.penerimaanBarang.create({
       data: {
         nomor,
         pesananId,
@@ -119,10 +133,18 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
       },
     });
 
-    for (const baris of daftarBaris) {
-      await tambahStok(tx, baris.barangId, gudangId, baris.jumlah);
-      await tx.barisPesananPembelian.update({ where: { id: baris.barisPesananId }, data: { jumlahDiterima: { increment: baris.jumlah } } });
+    for (const baris of barisNilai) {
+      if (daftarJenis.get(baris.barangId) === "BARANG") {
+        await tambahStok(tx, baris.barangId, gudangId, baris.jumlah);
+        await perbaruiHargaRata(tx, baris.barangId, baris.jumlah, baris.harga, true);
+      }
     }
+    for (const l of daftarBaris) {
+      await tx.barisPesananPembelian.update({ where: { id: l.barisPesananId }, data: { jumlahDiterima: { increment: l.jumlah } } });
+    }
+
+    const jurnal = await catatJurnalPenerimaanBarang(tx, penerimaan, barisNilai);
+    if (jurnal) await tx.penerimaanBarang.update({ where: { id: penerimaan.id }, data: { jurnalId: jurnal.id } });
 
     const barisTerbaru = await tx.barisPesananPembelian.findMany({ where: { pesananId } });
     const diterimaSemua = barisTerbaru.every((l) => D(l.jumlahDiterima).gte(l.jumlah));
@@ -154,10 +176,12 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(sisa)}, diminta ${format(l.jumlah)})`);
     }
   }
+  const hargaPesanan = new Map(pesanan.baris.map((ol) => [ol.barangId, D(ol.harga)]));
 
   const nomor = await nomorDokumenBerikutnya(db.fakturPembelian, "FB");
 
   await db.$transaction(async (tx) => {
+    const daftarJenis = await jenisBarang(tx, daftarBaris.map((l) => l.barangId));
     const faktur = await tx.fakturPembelian.create({
       data: {
         nomor,
@@ -177,9 +201,14 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       if (barisPesanan) {
         await tx.barisPesananPembelian.update({ where: { id: barisPesanan.id }, data: { jumlahDifaktur: { increment: l.jumlah } } });
       }
+      // harga faktur beda dari pesanan → selisihnya menyesuaikan harga pokok rata-rata stok
+      if (daftarJenis.get(l.barangId) === "BARANG") {
+        const dasar = hargaPesanan.get(l.barangId) ?? l.harga;
+        await sesuaikanHargaRata(tx, l.barangId, kali(l.jumlah, l.harga.minus(dasar)));
+      }
     }
 
-    await catatJurnalFakturPembelian(tx, faktur);
+    await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan);
   });
 
   revalidatePath("/pembelian/faktur");
@@ -197,15 +226,16 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
   if (!akunId) throw new Error("Akun Kas/Bank sumber wajib dipilih");
   const jumlah = bacaUang(dataFormulir.get("jumlah"), "Jumlah bayar");
 
-  const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true } });
+  const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true, retur: true } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");
 
   const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => p.jumlah));
-  const sisa = D(faktur.total).minus(sudahDibayar);
+  const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
+  const sisa = D(faktur.total).minus(sudahDibayar).minus(sudahDiretur);
   if (jumlah.gt(sisa)) {
     throw new Error(`Jumlah bayar melebihi sisa utang (sisa ${format(sisa)})`);
   }
-  const status = sudahDibayar.plus(jumlah).gte(faktur.total) ? "LUNAS" : "SEBAGIAN";
+  const status = statusFaktur(D(faktur.total), sudahDibayar.plus(jumlah), sudahDiretur);
 
   const nomor = await nomorDokumenBerikutnya(db.pembayaranPembelian, "BYR");
 
@@ -214,7 +244,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
       data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, metodeBayar },
     });
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
-    await catatJurnalPembayaranPembelian(tx, pembayaran);
+    await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor);
   });
 
   revalidatePath("/pembelian/pembayaran");
@@ -236,7 +266,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
 
   const faktur = await db.fakturPembelian.findUniqueOrThrow({
     where: { id: fakturId },
-    include: { baris: true, retur: { include: { baris: true } } },
+    include: { baris: true, retur: { include: { baris: true } }, pembayaran: true },
   });
 
   for (const l of daftarBaris) {
@@ -249,31 +279,48 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     }
   }
 
-  const nilaiRetur = jumlahkan(daftarBaris.map((l) => kali(l.jumlah, faktur.baris.find((il) => il.barangId === l.barangId)?.harga ?? 0)));
+  const barisRetur = daftarBaris.map((l) => ({
+    barangId: l.barangId,
+    jumlah: l.jumlah,
+    harga: D(faktur.baris.find((il) => il.barangId === l.barangId)?.harga ?? 0),
+  }));
+  const total = totalBaris(barisRetur);
+  const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => p.jumlah));
+  const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
+  const status = statusFaktur(D(faktur.total), sudahDibayar, sudahDiretur.plus(total));
 
   const nomor = await nomorDokumenBerikutnya(db.returPembelian, "RB");
 
   await db.$transaction(async (tx) => {
-    const daftarLabel = await labelBarang(tx, daftarBaris.map((l) => l.barangId));
+    const [daftarLabel, daftarJenis] = await Promise.all([
+      labelBarang(tx, daftarBaris.map((l) => l.barangId)),
+      jenisBarang(tx, daftarBaris.map((l) => l.barangId)),
+    ]);
 
-    await tx.returPembelian.create({
+    const retur = await tx.returPembelian.create({
       data: {
         nomor,
         fakturId,
         gudangId,
         alasan: alasan || null,
+        total,
         baris: { create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah })) },
       },
     });
 
     for (const l of daftarBaris) {
-      await kurangiStok(tx, l.barangId, gudangId, l.jumlah, daftarLabel.get(l.barangId) ?? l.barangId);
+      if (daftarJenis.get(l.barangId) === "BARANG") {
+        await kurangiStok(tx, l.barangId, gudangId, l.jumlah, daftarLabel.get(l.barangId) ?? l.barangId);
+      }
     }
+    await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
 
-    await catatJurnalReturPembelian(tx, nilaiRetur);
+    // jurnal dihitung dengan harga pokok rata-rata SEBELUM stok berkurang? Tidak perlu: harga rata-rata tidak berubah saat barang keluar.
+    await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total }, barisRetur);
   });
 
   revalidatePath("/pembelian/retur");
+  revalidatePath("/pembelian/faktur");
   redirect("/pembelian/retur");
 }
 

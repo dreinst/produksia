@@ -48,6 +48,8 @@ enum SumberJurnal {
   PENJUALAN
   PEMBELIAN
   PENYUSUTAN
+  PERSEDIAAN
+  ASET_TETAP
 }
 
 enum StatusAset {
@@ -153,6 +155,7 @@ model Gudang {
   returPenjualan   ReturPenjualan[]
   penerimaanBarang PenerimaanBarang[]
   returPembelian   ReturPembelian[]
+  penyesuaian      PenyesuaianPersediaan[]
 }
 
 model KelompokBarang {
@@ -187,6 +190,18 @@ model Barang {
   barisFakturPembelian    BarisFakturPembelian[]
   barisReturPembelian     BarisReturPembelian[]
   dibuatPada              DateTime @default(now())
+
+  /// Akun khusus per barang (opsional; kosong = pakai PemetaanAkun)
+  akunPendapatanId String?
+  akunPendapatan   Akun? @relation("AkunPendapatanBarang", fields: [akunPendapatanId], references: [id])
+  akunHppId        String?
+  akunHpp          Akun? @relation("AkunHppBarang", fields: [akunHppId], references: [id])
+  akunPersediaanId String?
+  akunPersediaan   Akun? @relation("AkunPersediaanBarang", fields: [akunPersediaanId], references: [id])
+  /// Untuk JASA yang dibeli: beban yang didebit saat Faktur Pembelian
+  akunBebanId      String?
+  akunBeban        Akun? @relation("AkunBebanBarang", fields: [akunBebanId], references: [id])
+  barisPenyesuaian BarisPenyesuaianPersediaan[]
 }
 
 model StokBarang {
@@ -333,6 +348,7 @@ model ReturPenjualan {
   gudangId String
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
+  total    Decimal @default(0) @db.Decimal(18, 2)
 
   baris BarisReturPenjualan[]
 }
@@ -388,6 +404,8 @@ model PenerimaanBarang {
 
   baris  BarisPenerimaanBarang[]
   faktur FakturPembelian[]
+  jurnalId String? @unique
+  jurnal   Jurnal? @relation(fields: [jurnalId], references: [id])
 }
 
 model BarisPenerimaanBarang {
@@ -454,6 +472,7 @@ model ReturPembelian {
   gudangId String
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
+  total    Decimal @default(0) @db.Decimal(18, 2)
 
   baris BarisReturPembelian[]
 }
@@ -496,6 +515,16 @@ model Akun {
   asetSebagaiAkunAset       AsetTetap[] @relation("AkunAsetTetap")
   asetSebagaiAkunBeban      AsetTetap[] @relation("AkunBebanPenyusutan")
   asetSebagaiAkunAkumulasi  AsetTetap[] @relation("AkunAkumulasiPenyusutan")
+
+  barangPendapatan Barang[] @relation("AkunPendapatanBarang")
+  barangHpp        Barang[] @relation("AkunHppBarang")
+  barangPersediaan Barang[] @relation("AkunPersediaanBarang")
+  barangBeban      Barang[] @relation("AkunBebanBarang")
+  pemetaanBebanJasa          PemetaanAkun? @relation("PetaBebanJasa")
+  pemetaanBarangBelumDitagih PemetaanAkun? @relation("PetaBarangBelumDitagih")
+  pemetaanSelisihPersediaan  PemetaanAkun? @relation("PetaSelisihPersediaan")
+  asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
+  penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
 }
 
 model PemetaanAkun {
@@ -515,6 +544,16 @@ model PemetaanAkun {
 
   utangUsahaId String @unique
   utangUsaha   Akun   @relation("PetaUtang", fields: [utangUsahaId], references: [id])
+
+  /// Beban untuk pembelian JASA (kosong = HPP)
+  bebanJasaId String? @unique
+  bebanJasa   Akun?   @relation("PetaBebanJasa", fields: [bebanJasaId], references: [id])
+  /// Kewajiban sementara: barang sudah diterima (TB) tapi belum ditagih (FB)
+  barangBelumDitagihId String? @unique
+  barangBelumDitagih   Akun?   @relation("PetaBarangBelumDitagih", fields: [barangBelumDitagihId], references: [id])
+  /// Selisih nilai persediaan (retur pembelian beda harga, penyesuaian stok)
+  selisihPersediaanId String? @unique
+  selisihPersediaan   Akun?   @relation("PetaSelisihPersediaan", fields: [selisihPersediaanId], references: [id])
 }
 
 model Jurnal {
@@ -526,6 +565,9 @@ model Jurnal {
 
   baris          BarisJurnal[]
   penyusutanAset PenyusutanAset[]
+  perolehanAset         AsetTetap?             @relation("JurnalPerolehanAset")
+  penyesuaianPersediaan PenyesuaianPersediaan?
+  penerimaanBarang      PenerimaanBarang?
 }
 
 model BarisJurnal {
@@ -558,6 +600,12 @@ model AsetTetap {
   akunAkumulasiPenyusutanId String
   akunAkumulasiPenyusutan   Akun   @relation("AkunAkumulasiPenyusutan", fields: [akunAkumulasiPenyusutanId], references: [id])
 
+  /// Kas/Bank atau Hutang yang dikredit saat perolehan (kosong = tidak dijurnal, aset sudah tercatat)
+  akunPembayaranId  String?
+  akunPembayaran    Akun?   @relation("AkunPembayaranAset", fields: [akunPembayaranId], references: [id])
+  jurnalPerolehanId String? @unique
+  jurnalPerolehan   Jurnal? @relation("JurnalPerolehanAset", fields: [jurnalPerolehanId], references: [id])
+
   penyusutan PenyusutanAset[]
 }
 
@@ -571,4 +619,35 @@ model PenyusutanAset {
   jurnal   Jurnal?   @relation(fields: [jurnalId], references: [id])
 
   @@unique([asetId, periode])
+}
+
+// ---------- Persediaan: penyesuaian stok (saldo awal, opname, koreksi) ----------
+
+model PenyesuaianPersediaan {
+  id          String   @id @default(cuid())
+  nomor       String   @unique
+  tanggal     DateTime @default(now())
+  gudangId    String
+  gudang      Gudang   @relation(fields: [gudangId], references: [id])
+  keterangan  String?
+  /// Akun lawan: Modal (saldo awal) atau Selisih Persediaan (opname/koreksi)
+  akunLawanId String
+  akunLawan   Akun     @relation("AkunLawanPenyesuaian", fields: [akunLawanId], references: [id])
+  jurnalId    String?  @unique
+  jurnal      Jurnal?  @relation(fields: [jurnalId], references: [id])
+  dibuatPada  DateTime @default(now())
+
+  baris BarisPenyesuaianPersediaan[]
+}
+
+model BarisPenyesuaianPersediaan {
+  id            String                @id @default(cuid())
+  penyesuaianId String
+  penyesuaian   PenyesuaianPersediaan @relation(fields: [penyesuaianId], references: [id])
+  barangId      String
+  barang        Barang                @relation(fields: [barangId], references: [id])
+  jumlahSebelum Decimal               @db.Decimal(18, 2)
+  jumlahSesudah Decimal               @db.Decimal(18, 2)
+  /// Harga pokok satuan yang dipakai menilai selisih
+  hargaSatuan   Decimal               @db.Decimal(18, 2)
 }

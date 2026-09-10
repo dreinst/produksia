@@ -202,3 +202,13 @@ export type AsetTetap = Prisma.AsetTetapModel
  * 
  */
 export type PenyusutanAset = Prisma.PenyusutanAsetModel
+/**
+ * Model PenyesuaianPersediaan
+ * 
+ */
+export type PenyesuaianPersediaan = Prisma.PenyesuaianPersediaanModel
+/**
+ * Model BarisPenyesuaianPersediaan
+ * 
+ */
+export type BarisPenyesuaianPersediaan = Prisma.BarisPenyesuaianPersediaanModel

@@ -4,7 +4,7 @@ export type KonfigurasiBidang = {
   jenis: "text" | "number" | "select" | "boolean";
   wajib?: boolean;
   nilaiBawaan?: string;
-  opsi?: { model: string; bidangNilai: string; bidangLabel: string };
+  opsi?: { model: string; bidangNilai: string; bidangLabel: string; where?: Record<string, unknown> };
   opsiStatis?: string[];
 };
 
@@ -170,6 +170,30 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
       { nama: "hargaBeli", label: "Harga Beli", jenis: "number", nilaiBawaan: "0" },
       { nama: "hargaJual", label: "Harga Jual", jenis: "number", nilaiBawaan: "0" },
       { nama: "stokMinimum", label: "Stok Minimum", jenis: "number", nilaiBawaan: "0" },
+      {
+        nama: "akunPendapatanId",
+        label: "Akun pendapatan khusus (kosong = pemetaan)",
+        jenis: "select",
+        opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama", where: { jenis: "PENDAPATAN", kelompok: false } },
+      },
+      {
+        nama: "akunPersediaanId",
+        label: "Akun persediaan khusus (BARANG)",
+        jenis: "select",
+        opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama", where: { jenis: "ASET", kelompok: false } },
+      },
+      {
+        nama: "akunHppId",
+        label: "Akun HPP khusus (BARANG)",
+        jenis: "select",
+        opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama", where: { jenis: "BEBAN", kelompok: false } },
+      },
+      {
+        nama: "akunBebanId",
+        label: "Akun beban saat dibeli (JASA)",
+        jenis: "select",
+        opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama", where: { jenis: "BEBAN", kelompok: false } },
+      },
     ],
     kolom: [
       { key: "kode", label: "Kode" },

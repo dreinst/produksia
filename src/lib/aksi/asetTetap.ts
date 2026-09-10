@@ -8,6 +8,7 @@ import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
+import { catatJurnalPerolehanAset } from "@/lib/akuntansi";
 
 export async function buatAsetTetap(dataFormulir: FormData) {
   await wajibHakAksi("aset-tetap.tulis");
@@ -18,6 +19,8 @@ export async function buatAsetTetap(dataFormulir: FormData) {
   const akunAsetId = String(dataFormulir.get("akunAsetId") ?? "");
   const akunBebanPenyusutanId = String(dataFormulir.get("akunBebanPenyusutanId") ?? "");
   const akunAkumulasiPenyusutanId = String(dataFormulir.get("akunAkumulasiPenyusutanId") ?? "");
+  // opsional: Kas/Bank atau Hutang yang dikredit — kosong berarti aset sudah tercatat, tidak dijurnal lagi
+  const akunPembayaranId = String(dataFormulir.get("akunPembayaranId") ?? "") || null;
 
   if (!kode || !nama) throw new Error("Kode dan nama aset wajib diisi");
   const hargaPerolehan = bacaUang(dataFormulir.get("hargaPerolehan"), "Harga perolehan");
@@ -33,20 +36,28 @@ export async function buatAsetTetap(dataFormulir: FormData) {
     throw new Error("Ketiga akun harus berbeda satu sama lain");
   }
 
-  await pastikanAkunRinci(db, [akunAsetId, akunBebanPenyusutanId, akunAkumulasiPenyusutanId]);
+  if (akunPembayaranId && akunPembayaranId === akunAsetId) throw new Error("Akun pembayaran tidak boleh sama dengan akun aset");
+  await pastikanAkunRinci(db, [akunAsetId, akunBebanPenyusutanId, akunAkumulasiPenyusutanId, ...(akunPembayaranId ? [akunPembayaranId] : [])]);
 
-  await db.asetTetap.create({
-    data: {
-      kode,
-      nama,
-      tanggalPerolehan: tanggalPerolehan ? new Date(tanggalPerolehan) : new Date(),
-      hargaPerolehan,
-      nilaiSisa,
-      umurBulan,
-      akunAsetId,
-      akunBebanPenyusutanId,
-      akunAkumulasiPenyusutanId,
-    },
+  await db.$transaction(async (tx) => {
+    const jurnal = akunPembayaranId
+      ? await catatJurnalPerolehanAset(tx, { kode, nama, hargaPerolehan, akunAsetId, akunPembayaranId })
+      : null;
+    await tx.asetTetap.create({
+      data: {
+        kode,
+        nama,
+        tanggalPerolehan: tanggalPerolehan ? new Date(tanggalPerolehan) : new Date(),
+        hargaPerolehan,
+        nilaiSisa,
+        umurBulan,
+        akunAsetId,
+        akunBebanPenyusutanId,
+        akunAkumulasiPenyusutanId,
+        akunPembayaranId,
+        jurnalPerolehanId: jurnal?.id ?? null,
+      },
+    });
   });
 
   revalidatePath("/aset-tetap");

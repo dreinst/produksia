@@ -60,6 +60,15 @@ const operasional: Grup[] = [
   },
 ];
 
+const persediaan: Grup = {
+  judul: "Persediaan",
+  ikon: "inventory_2",
+  tautan: [
+    { href: "/persediaan", label: "Stok per Gudang", hak: "persediaan.lihat" },
+    { href: "/persediaan/penyesuaian", label: "Penyesuaian Stok", kode: "PS", hak: "persediaan.lihat" },
+  ],
+};
+
 const dataInduk: Grup = {
   judul: "Data Induk",
   ikon: "dataset",
@@ -174,7 +183,7 @@ function TautanTunggal({ href, label, ikon, pathname, saatNavigasi }: { href: st
 /** Accordion: satu grup terbuka; grup yang memuat halaman aktif terbuka otomatis (reset via key={pathname}). */
 function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: PenggunaSesi; pathname: string; saatNavigasi: () => void }) {
   const grupOperasional = saringGrup(operasional, pengguna);
-  const grupDataInduk = saringGrup([dataInduk], pengguna);
+  const grupDataInduk = saringGrup([persediaan, dataInduk], pengguna);
   const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna.peran, l.hak));
   const semuaGrup = [...grupOperasional, ...grupDataInduk];
 

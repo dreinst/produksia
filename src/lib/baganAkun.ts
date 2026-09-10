@@ -53,9 +53,23 @@ export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<Hasil
         hppId: id(PEMETAAN_STANDAR.hpp),
         pendapatanPenjualanId: id(PEMETAAN_STANDAR.pendapatanPenjualan),
         utangUsahaId: id(PEMETAAN_STANDAR.utangUsaha),
+        bebanJasaId: id(PEMETAAN_STANDAR.bebanJasa),
+        barangBelumDitagihId: id(PEMETAAN_STANDAR.barangBelumDitagih),
+        selisihPersediaanId: id(PEMETAAN_STANDAR.selisihPersediaan),
       },
     });
     hasil.pemetaanDibuat = true;
+  } else {
+    // Pemetaan lama (5 peran): lengkapi peran opsional yang masih kosong dengan akun standar
+    const ada = await klien.pemetaanAkun.findUniqueOrThrow({ where: { id: "default" } });
+    const lengkap = {
+      bebanJasaId: ada.bebanJasaId ?? idByKode.get(PEMETAAN_STANDAR.bebanJasa),
+      barangBelumDitagihId: ada.barangBelumDitagihId ?? idByKode.get(PEMETAAN_STANDAR.barangBelumDitagih),
+      selisihPersediaanId: ada.selisihPersediaanId ?? idByKode.get(PEMETAAN_STANDAR.selisihPersediaan),
+    };
+    if (lengkap.bebanJasaId !== ada.bebanJasaId || lengkap.barangBelumDitagihId !== ada.barangBelumDitagihId || lengkap.selisihPersediaanId !== ada.selisihPersediaanId) {
+      await klien.pemetaanAkun.update({ where: { id: "default" }, data: lengkap });
+    }
   }
   return hasil;
 }
