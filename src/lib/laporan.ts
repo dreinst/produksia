@@ -4,8 +4,9 @@ import { D, jumlahkan, type Desimal } from "@/lib/uang";
 
 /*
  * Laporan keuangan dari buku besar: Laba Rugi (periode) dan Neraca / posisi keuangan (per tanggal).
- * Belum ada jurnal penutup, jadi laba tahun-tahun sebelumnya dan laba tahun berjalan dihitung
- * langsung dari jurnal (bukan dari akun 3-2000/3-3000) supaya neraca selalu seimbang.
+ * Laba Rugi mengabaikan jurnal penutup (JU-TUTUP) supaya tahun yang sudah ditutup tetap terbaca.
+ * Neraca menyertakannya: tahun yang ditutup sudah pindah ke akun Laba Ditahan, sedangkan laba tahun-tahun
+ * yang belum ditutup dan laba tahun berjalan dihitung langsung dari jurnal supaya neraca selalu seimbang.
  */
 
 export type Periode = { dari: Date; sampai: Date; dariTeks: string; sampaiTeks: string };
@@ -46,13 +47,13 @@ export type AkunSaldo = {
 
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
 
-/** Saldo tiap akun rinci dari jurnal bertanggal dalam [dari, sampai]. */
-export async function saldoAkunPeriode(klien: PrismaClient, dari: Date | null, sampai: Date): Promise<AkunSaldo[]> {
+/** Saldo tiap akun rinci dari jurnal bertanggal dalam [dari, sampai]; `tanpaPenutup` mengabaikan jurnal penutup tahun. */
+export async function saldoAkunPeriode(klien: PrismaClient, dari: Date | null, sampai: Date, tanpaPenutup = false): Promise<AkunSaldo[]> {
   const [daftarAkun, agregat] = await Promise.all([
     klien.akun.findMany({ orderBy: { kode: "asc" } }),
     klien.barisJurnal.groupBy({
       by: ["akunId"],
-      where: { jurnal: { tanggal: { ...(dari ? { gte: dari } : {}), lte: sampai } } },
+      where: { jurnal: { tanggal: { ...(dari ? { gte: dari } : {}), lte: sampai }, ...(tanpaPenutup ? { sumber: { not: "PENUTUP" as const } } : {}) } },
       _sum: { debit: true, kredit: true },
     }),
   ]);
@@ -127,7 +128,7 @@ export type LabaRugi = {
 
 /** Laba Rugi periode: pendapatan − beban pokok (kelompok yang memuat akun HPP) = laba kotor; − beban lain = laba bersih. */
 export async function hitungLabaRugi(klien: PrismaClient = db, periode: Periode): Promise<LabaRugi> {
-  const [daftar, pemetaan] = await Promise.all([saldoAkunPeriode(klien, periode.dari, periode.sampai), klien.pemetaanAkun.findUnique({ where: { id: "default" } })]);
+  const [daftar, pemetaan] = await Promise.all([saldoAkunPeriode(klien, periode.dari, periode.sampai, true), klien.pemetaanAkun.findUnique({ where: { id: "default" } })]);
   const akarPokok = akarDari(daftar, pemetaan?.hppId);
   const pokok = keturunanDari(daftar, akarPokok);
   const pendapatan = susunHierarki(daftar, (a) => a.jenis === "PENDAPATAN");

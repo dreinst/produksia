@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { db } from "../src/lib/db";
 import { bacaPeriode, hitungLabaRugi, hitungNeraca } from "../src/lib/laporan";
+import { hitungArusKas } from "../src/lib/arusKas";
 
 function pastikan(kondisi: unknown, pesan: string) {
   if (!kondisi) {
@@ -53,6 +54,15 @@ async function main() {
     await db.barisJurnal.deleteMany({ where: { jurnalId: jurnalLama.id } });
     await db.jurnal.delete({ where: { id: jurnalLama.id } });
   }
+  console.log("=== 3. Arus kas metode langsung cocok dengan buku besar ===");
+  const arus = await hitungArusKas(db, periode);
+  pastikan(arus.cocok, `kas akhir laporan (${n(arus.kasAkhir)}) = saldo kas/bank buku besar (${n(arus.kasAkhirBukuBesar)})`);
+  pastikan(Math.abs(n(arus.kasAwal) + n(arus.totalOperasi) + n(arus.totalInvestasi) + n(arus.totalPendanaan) - n(arus.kasAkhir)) < 0.01, "kas awal + operasi + investasi + pendanaan = kas akhir");
+  pastikan(arus.pendanaan.some((b) => n(b.jumlah) > 0), "setoran modal tampil sebagai arus pendanaan masuk");
+  pastikan(arus.investasi.some((b) => n(b.jumlah) < 0), "perolehan aset tetap tampil sebagai arus investasi keluar");
+  pastikan(arus.operasi.some((b) => n(b.jumlah) > 0) && arus.operasi.some((b) => n(b.jumlah) < 0), "operasi memuat kas masuk (piutang/DP) dan keluar (hutang/beban)");
+  const arusKosong = await hitungArusKas(db, bacaPeriode({ dari: "2000-01-01", sampai: "2000-12-31" }));
+  pastikan(arusKosong.cocok && n(arusKosong.kenaikan) === 0, "periode tanpa jurnal: arus nol dan tetap cocok");
   console.log("=== DONE, all laporan checks passed ===");
 }
 

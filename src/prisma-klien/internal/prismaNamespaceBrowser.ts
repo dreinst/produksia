@@ -95,6 +95,7 @@ export const ModelName = {
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
+  TutupBuku: 'TutupBuku',
   LogAktivitas: 'LogAktivitas'
 } as const
 
@@ -571,7 +572,8 @@ export const PemetaanAkunScalarFieldEnum = {
   barangBelumDitagihId: 'barangBelumDitagihId',
   selisihPersediaanId: 'selisihPersediaanId',
   barangTerkirimId: 'barangTerkirimId',
-  uangMukaPelangganId: 'uangMukaPelangganId'
+  uangMukaPelangganId: 'uangMukaPelangganId',
+  labaDitahanId: 'labaDitahanId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]
@@ -693,6 +695,18 @@ export const PengaturanPerusahaanScalarFieldEnum = {
 } as const
 
 export type PengaturanPerusahaanScalarFieldEnum = (typeof PengaturanPerusahaanScalarFieldEnum)[keyof typeof PengaturanPerusahaanScalarFieldEnum]
+
+
+export const TutupBukuScalarFieldEnum = {
+  id: 'id',
+  tahun: 'tahun',
+  tanggal: 'tanggal',
+  labaBersih: 'labaBersih',
+  penggunaNama: 'penggunaNama',
+  jurnalId: 'jurnalId'
+} as const
+
+export type TutupBukuScalarFieldEnum = (typeof TutupBukuScalarFieldEnum)[keyof typeof TutupBukuScalarFieldEnum]
 
 
 export const LogAktivitasScalarFieldEnum = {

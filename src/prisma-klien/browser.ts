@@ -238,6 +238,11 @@ export type BarisPenyesuaianPersediaan = Prisma.BarisPenyesuaianPersediaanModel
  */
 export type PengaturanPerusahaan = Prisma.PengaturanPerusahaanModel
 /**
+ * Model TutupBuku
+ * Penutupan tahun buku: pendapatan & beban tahun itu dipindahkan ke Laba Ditahan lewat jurnal JU-TUTUP
+ */
+export type TutupBuku = Prisma.TutupBukuModel
+/**
  * Model LogAktivitas
  * 
  */

@@ -37,6 +37,9 @@ const LABEL_SUMBER: Record<string, string> = {
   PENJUALAN: "Penjualan",
   PEMBELIAN: "Pembelian",
   PENYUSUTAN: "Penyusutan",
+  PERSEDIAAN: "Persediaan",
+  ASET_TETAP: "Aset tetap",
+  PENUTUP: "Penutup tahun",
 };
 export function labelSumberJurnal(v: string) {
   return LABEL_SUMBER[v] ?? v;

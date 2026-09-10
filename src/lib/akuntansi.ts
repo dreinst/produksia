@@ -1,6 +1,7 @@
 import type { Prisma } from "@/prisma-klien/client";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
+import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { D, kali, jumlahkan, type Desimal } from "@/lib/uang";
 
 /*
@@ -79,6 +80,7 @@ export async function catatJurnal(tx: Tx, prefix: string, keterangan: string, su
     throw new Error(`Jurnal otomatis ${prefix} tidak seimbang (debit ${totalDebit.toFixed(2)} vs kredit ${totalKredit.toFixed(2)}) — laporkan ke pengembang`);
   }
   await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
+  await pastikanTahunTerbuka(tx, new Date());
   const nomor = await nomorDokumenBerikutnya(tx.jurnal, prefix);
   return tx.jurnal.create({ data: { nomor, keterangan, sumber, baris: { create: baris } } });
 }

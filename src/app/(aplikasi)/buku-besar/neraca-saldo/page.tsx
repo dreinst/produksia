@@ -24,7 +24,8 @@ export default async function HalamanNeracaSaldo({ searchParams }: { searchParam
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
   const daftarAkun = await db.akun.findMany({
-    include: { barisJurnal: { where: { jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai } } }, select: { debit: true, kredit: true } } },
+    // neraca saldo sebelum penutupan: jurnal penutup tahun (JU-TUTUP) tidak disertakan
+    include: { barisJurnal: { where: { jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai }, sumber: { not: "PENUTUP" } } }, select: { debit: true, kredit: true } } },
     orderBy: { kode: "asc" },
   });
 
@@ -68,7 +69,7 @@ export default async function HalamanNeracaSaldo({ searchParams }: { searchParam
     <div className="space-y-6">
       <div>
         <h1 className="judul-halaman">Neraca Saldo</h1>
-        <p className="subjudul-halaman">Mutasi {periode.dariTeks} s.d. {periode.sampaiTeks}. Akun kelompok (baris tebal) menampilkan subtotal keturunannya; total bawah hanya menjumlahkan akun rinci.</p>
+        <p className="subjudul-halaman">Mutasi {periode.dariTeks} s.d. {periode.sampaiTeks}, sebelum jurnal penutup tahun. Akun kelompok (baris tebal) menampilkan subtotal keturunannya; total bawah hanya menjumlahkan akun rinci.</p>
       </div>
       <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
 

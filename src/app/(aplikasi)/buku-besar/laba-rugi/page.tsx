@@ -45,7 +45,7 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
             <div className="flex justify-between border-t border-slate-200 pt-2 font-semibold"><span>Laba kotor</span><span className="angka">{rp(lr.labaKotor)}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">− Beban operasional & lainnya</span><span className="angka">{rp(lr.totalBebanLain)}</span></div>
             <div className={`flex justify-between border-t-2 border-slate-300 pt-2 font-bold ${untung ? "text-emerald-700" : "text-rose-700"}`}><span>{untung ? "Laba bersih" : "Rugi bersih"}</span><span className="angka">{rp(lr.labaBersih)}</span></div>
-            <p className="text-xs text-slate-500 pt-2">Akun kontra (mis. Potongan Penjualan) tampil negatif pada kelompoknya. Pajak penghasilan belum dihitung otomatis.</p>
+            <p className="text-xs text-slate-500 pt-2">Akun kontra (mis. Potongan Penjualan) tampil negatif pada kelompoknya. Jurnal penutup tahun (JU-TUTUP) tidak disertakan, jadi tahun yang sudah ditutup tetap terbaca. Pajak penghasilan belum dihitung otomatis.</p>
           </div>
         </div>
       </div>

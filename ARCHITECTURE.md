@@ -306,6 +306,12 @@ Tidak ada halaman *edit* dokumen transaksi — mengubah berarti **hapus lalu bua
 ### 6.2e Tahun buku
 `PengaturanPerusahaan.tahunBuku` (kosong = tahun kalender) adalah tahun yang sedang dibuka. `ambilPengaturanPerusahaan` mengembalikannya sudah terselesaikan; `bacaPeriode(param, tahunBuku)` memakainya sebagai bawaan laporan (sampai hari ini bila tahun berjalan, selain itu sampai 31 Des) dan `FilterPeriode` membuat pintasannya. Kartu perusahaan di sidebar (`<details>`) menampilkan mata uang (tunggal, Rupiah), pemilih tahun (aksi `gantiTahunBuku`, hak `pengaturan.tulis`; daftar tahun = tahun yang punya jurnal ± 1 tahun dari sekarang), dan pintasan Laba Rugi/Neraca tahun itu. Penomoran dokumen tetap memakai tanggal transaksi.
 
+### 6.2f Tutup buku & kunci tahun (`src/lib/tutupBuku.ts`, `src/lib/aksi/tutupBuku.ts`)
+`tutupTahun(tahun)` (hak `buku-besar.tulis`): `ringkasanPenutupan` mengambil saldo tiap akun pendapatan/beban rinci tahun itu (tanpa jurnal penutup), lalu satu jurnal `JU-TUTUP` (sumber `PENUTUP`, tanggal 31 Des 23:59:59) mendebit pendapatan, mengkredit beban, dan mengkredit/mendebit Laba Ditahan (`PemetaanAkun.labaDitahanId`) sebesar laba/rugi bersih; catatan `TutupBuku` (tahun unik, laba, pengguna, jurnal). Bila tahun yang ditutup = tahun buku aktif, `tahunBuku` maju satu. `pastikanTahunTerbuka(klien, tanggal)` dipanggil `catatJurnal`, `buatJurnalSeimbang`, penyusutan, dan `hapusJurnal` (hapus dokumen) — jadi tahun yang ditutup tidak bisa menerima maupun kehilangan jurnal. `bukaKembaliTahun` menghapus jurnal penutup & catatannya. `saldoAkunPeriode(..., tanpaPenutup)`: Laba Rugi dan Neraca Saldo mengabaikan `PENUTUP`; Neraca menyertakannya (laba tahun tertutup tampil di akun Laba Ditahan, sisanya tetap dihitung dari jurnal).
+
+### 6.2g Laporan arus kas (`src/lib/arusKas.ts`)
+Metode langsung dari jurnal: semua jurnal berperiode yang punya baris akun `kasBank` diambil; untuk tiap baris **bukan** kas/bank, `kredit − debit` = kas masuk (negatif = keluar), dikumpulkan per akun lawan dan diklasifikasikan `kelasArus`: MODAL & kewajiban `2-2xxx` → pendanaan; aset `1-2xxx`/`1-3xxx` → investasi; lainnya → operasi. Perpindahan antar kas/bank saling meniadakan. Karena tiap jurnal seimbang, kas awal + Σ arus = saldo kas/bank buku besar — dicek (`cocok`) dan ditampilkan.
+
 ### 6.3 Uang & kuantitas (`src/lib/uang.ts`)
 `uang()` membulatkan ke 2 desimal half-up; `bacaUang()` memvalidasi isian form (wajib, angka valid, tidak negatif, default > 0); `jumlahkan`/`kali` mengembalikan Decimal. Perbandingan status (mis. lunas) memakai `.gte()`, bukan `>=` float.
 
@@ -397,6 +403,6 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 11. Batas & arah pengembangan
 
-Belum ada: halaman *edit* dokumen transaksi (pola sekarang: hapus lalu buat ulang), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, jurnal penutup tahun & laporan arus kas, PPh Final/badan & pelaporan SPT (PPN dan PPh 23 sudah), Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
+Belum ada: halaman *edit* dokumen transaksi (pola sekarang: hapus lalu buat ulang), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, PPh Final/badan & pelaporan SPT (PPN dan PPh 23 sudah), Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
 
 Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → aksi (`xxx` + `xxxFormulir`) yang diawali `wajibHakAksi` lalu validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar (`wajibHak`, `bacaParamDaftar`, `KontrolDaftar`) + halaman buat dengan `FormulirAksi` → tambahkan hak baru di `hakAkses.ts` bila perlu dan tautan (dengan `hak`) di `BilahSamping.tsx` → suite regresi.
