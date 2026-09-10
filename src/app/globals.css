@@ -343,3 +343,240 @@ body {
     animation: kilau 1.4s linear infinite;
   }
 }
+
+/* ---------- Kedalaman: kanvas aurora, kartu berlapis, ubin ikon, panel navy, tombol berkilau ---------- */
+@keyframes hanyut-a {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(6vw, 4vh, 0) scale(1.08); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes hanyut-b {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-5vw, 6vh, 0) scale(1.12); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes kilat {
+  from { transform: translateX(-130%) skewX(-18deg); }
+  to { transform: translateX(230%) skewX(-18deg); }
+}
+/* aurora: dua blob gradasi buram di belakang seluruh konten (tetap di kompositor, tidak mengganggu data) */
+body {
+  position: relative;
+  isolation: isolate;
+}
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(11, 33, 65, 0.055) 0.7px, transparent 0.7px);
+  background-size: 22px 22px;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+.aurora::before {
+  width: 52vw;
+  height: 52vw;
+  left: -14vw;
+  top: -22vw;
+  background: radial-gradient(closest-side, rgba(23, 65, 122, 0.22), rgba(23, 65, 122, 0));
+}
+.aurora::after {
+  width: 40vw;
+  height: 40vw;
+  right: -12vw;
+  top: 8vh;
+  background: radial-gradient(closest-side, rgba(248, 110, 24, 0.14), rgba(248, 110, 24, 0));
+}
+.aurora-gelap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora-gelap::before,
+.aurora-gelap::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  will-change: transform;
+}
+.aurora-gelap::before {
+  width: 70%;
+  height: 70%;
+  left: -20%;
+  top: -25%;
+  background: radial-gradient(closest-side, rgba(56, 118, 210, 0.55), rgba(56, 118, 210, 0));
+}
+.aurora-gelap::after {
+  width: 55%;
+  height: 55%;
+  right: -15%;
+  bottom: -20%;
+  background: radial-gradient(closest-side, rgba(248, 110, 24, 0.5), rgba(248, 110, 24, 0));
+}
+.pola-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+@layer components {
+  .kartu {
+    background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+    border-color: rgba(11, 33, 65, 0.09);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 1px 2px rgba(11, 33, 65, 0.05),
+      0 10px 28px -18px rgba(11, 33, 65, 0.22);
+  }
+  /* kartu statistik: garis aksen gradasi di atas, muncul penuh saat hover */
+  .kartu-statistik {
+    position: relative;
+    overflow: hidden;
+  }
+  .kartu-statistik::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-navy), var(--color-navy-terang) 55%, var(--color-oranye));
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+  }
+  .kartu-statistik:hover::before {
+    opacity: 1;
+  }
+  .ubin-ikon {
+    @apply inline-flex items-center justify-center w-7 h-7 rounded-lg text-white shrink-0;
+    background: linear-gradient(135deg, var(--color-navy-terang), var(--color-navy));
+    box-shadow: 0 4px 10px -4px rgba(11, 33, 65, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  .ubin-alur {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .ubin-alur:hover {
+    transform: translateY(-2px);
+    border-color: rgba(23, 65, 122, 0.35);
+    box-shadow: 0 10px 24px -14px rgba(11, 33, 65, 0.35);
+  }
+  .panel-navy {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, #123058 0%, var(--color-navy) 55%, #071a35 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 16px 36px -20px rgba(11, 33, 65, 0.7);
+  }
+  .panel-navy::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: radial-gradient(circle at 20% 0%, #000 0%, transparent 70%);
+  }
+  .panel-navy::after {
+    content: "";
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    right: -20%;
+    top: -30%;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgba(248, 110, 24, 0.28), rgba(248, 110, 24, 0));
+    filter: blur(30px);
+    pointer-events: none;
+  }
+  .panel-navy > * {
+    position: relative;
+  }
+  /* tombol utama & aksen: gradasi tipis + sorot dalam + kilatan saat hover */
+  .tombol-utama,
+  .tombol-aksen {
+    position: relative;
+    overflow: hidden;
+  }
+  .tombol-utama {
+    background: linear-gradient(180deg, #17417a 0%, #0b2141 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px rgba(11, 33, 65, 0.2);
+  }
+  .tombol-utama:hover:not(:disabled) {
+    background: linear-gradient(180deg, #1d4f92 0%, #0f2c56 100%);
+  }
+  .tombol-aksen {
+    background: linear-gradient(180deg, #ff7f2e 0%, #ea5f0c 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(217, 90, 12, 0.3);
+  }
+  .tombol-aksen:hover:not(:disabled) {
+    background: linear-gradient(180deg, #ff8a40 0%, #d95a0c 100%);
+  }
+  .tombol-utama::after,
+  .tombol-aksen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: translateX(-130%) skewX(-18deg);
+    pointer-events: none;
+  }
+  /* tabel: baris sorot dengan garis aksen di kiri */
+  .tabel tbody tr:hover {
+    box-shadow: inset 3px 0 0 rgba(23, 65, 122, 0.45);
+  }
+  /* bilah samping & atas: lapisan kaca tipis */
+  .kaca {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  }
+  .menu-aktif {
+    background: linear-gradient(135deg, #17417a, #0b2141);
+    box-shadow: 0 8px 18px -10px rgba(11, 33, 65, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .aurora::before,
+  .aurora-gelap::before {
+    animation: hanyut-a 22s ease-in-out infinite;
+  }
+  .aurora::after,
+  .aurora-gelap::after {
+    animation: hanyut-b 26s ease-in-out infinite;
+  }
+  .tombol-utama:hover:not(:disabled)::after,
+  .tombol-aksen:hover:not(:disabled)::after {
+    animation: kilat 0.7s ease-out;
+  }
+}
+
+/* ---------- Grafik tren: garis menggambar diri, area & titik memudar masuk ---------- */
+@keyframes gambar-garis {
+  from { stroke-dashoffset: 1600; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes muncul-area {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .grafik-tren .garis {
+    stroke-dasharray: 1600;
+    animation: gambar-garis 1.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .grafik-tren .area {
+    animation: muncul-area 0.9s ease-out 0.5s both;
+  }
+  .grafik-tren .titik {
+    animation: muncul-area 0.4s ease-out 1.2s both;
+  }
+}
