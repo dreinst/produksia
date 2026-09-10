@@ -1,3 +1,4 @@
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -11,6 +12,7 @@ import { konversiPenawaranKePesananFormulir } from "@/lib/aksi/penjualan";
 export default async function HalamanPenawaran({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("penjualan.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
+  const bolehHapus = boleh("dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pelanggan: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarPenawaran] = await Promise.all([
@@ -51,7 +53,7 @@ export default async function HalamanPenawaran({ searchParams }: { searchParams:
               <td>{q.pelanggan.nama}</td>
               <td className="text-right angka">{Number(q.total).toLocaleString("id-ID")}</td>
               <td><LencanaStatus status={q.status} /></td>
-              <td>
+              <td className="space-x-3 whitespace-nowrap">
                 {q.status === "DRAF" && boleh("penjualan.tulis") && (
                   <FormulirAksi
                     aksi={konversiPenawaranKePesananFormulir.bind(null, q.id)}
@@ -62,6 +64,7 @@ export default async function HalamanPenawaran({ searchParams }: { searchParams:
                     </button>
                   </FormulirAksi>
                 )}
+                <TombolHapusDokumen jenis="penawaran" id={q.id} nomor={q.nomor} boleh={bolehHapus} />
               </td>
             </tr>
           ))}

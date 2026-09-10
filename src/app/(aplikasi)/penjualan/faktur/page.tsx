@@ -1,3 +1,4 @@
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -9,6 +10,7 @@ import { db } from "@/lib/db";
 export default async function HalamanFakturPenjualan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("penjualan.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
+  const bolehHapus = boleh("dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pelanggan: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarFaktur] = await Promise.all([
@@ -66,6 +68,7 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
                     Retur
                   </Link>
                   )}
+                  <TombolHapusDokumen jenis="faktur" id={inv.id} nomor={inv.nomor} boleh={bolehHapus} />
                 </td>
               </tr>
             );

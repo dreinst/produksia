@@ -1,3 +1,4 @@
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -9,6 +10,7 @@ import { db } from "@/lib/db";
 export default async function HalamanAsetTetap({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("aset-tetap.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
+  const bolehHapus = boleh("dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ kode: cocokTeks(param.q) }, { nama: cocokTeks(param.q) }] } : undefined;
   const [total, daftarAset] = await Promise.all([
@@ -45,6 +47,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
             <th className="text-right angka">Akumulasi Penyusutan</th>
             <th className="text-right angka">Nilai Buku</th>
             <th>Status</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -60,12 +63,13 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
                 <td className="text-right angka">{accumulated.toLocaleString("id-ID")}</td>
                 <td className="text-right angka font-semibold">{bookValue.toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={a.status} /></td>
+                <td className="text-right"><TombolHapusDokumen jenis="aset" id={a.id} nomor={a.kode} boleh={bolehHapus} /></td>
               </tr>
             );
           })}
           {daftarAset.length === 0 && (
             <tr>
-              <td colSpan={7} className="kosong">
+              <td colSpan={8} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada aset tetap."}
               </td>
             </tr>

@@ -2,7 +2,7 @@
 
 Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber datanya ada di `src/lib/baganAkunStandar.ts`; tabel di bawah dihasilkan oleh `npx tsx skrip/cetak-bagan-akun.ts` — ubah data di kode, lalu cetak ulang, jangan edit tabel ini secara manual.
 
-**Ringkasan:** 113 akun — 24 akun kelompok (induk) dan 89 akun rinci; 40 persis dari catatan asli, 56 usulan sesuai standar akuntansi (SAK EMKM), 17 keputusan atas butir yang semula pending.
+**Ringkasan:** 114 akun — 24 akun kelompok (induk) dan 90 akun rinci; 40 persis dari catatan asli, 57 usulan sesuai standar akuntansi (SAK EMKM), 17 keputusan atas butir yang semula pending.
 
 ## Cara pakai di sistem
 
@@ -26,6 +26,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Pendapatan bawaan Faktur Penjualan | `4-1100` Pendapatan Event Reguler — data contoh mengarahkan merchandise ke `4-2100` lewat akun per barang |
 | Hutang usaha (Faktur Pembelian, Pembayaran, Retur Pembelian) | `2-1100` |
 | Barang Diterima Belum Ditagih (dikredit saat Terima Barang, didebit saat Faktur Pembelian) | `2-1600` |
+| Barang Terkirim Belum Ditagih (didebit saat Surat Jalan, dikredit saat Faktur Penjualan mengakui HPP) | `1-1650` |
 | Beban pembelian jasa (baris JASA di Faktur Pembelian) | `5-1200` Biaya Langsung Event (bawaan; bisa per barang) |
 | Selisih persediaan (beda harga retur pembelian vs harga pokok, opname) | `5-1400` |
 | Akun Kas/Bank (Penerimaan, Pembayaran, Kas Masuk/Keluar, perolehan aset) | `1-1100` Kas, `1-1210` Bank (dan rekening lain yang ditandai kas/bank) |
@@ -79,6 +80,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `1-1400` | &nbsp;&nbsp;&nbsp;Uang Muka ke Vendor / Supplier | Aset |  | **usul** |  |
 | `1-1500` | &nbsp;&nbsp;&nbsp;Biaya Dibayar Dimuka | Aset |  | **usul** | Sewa/asuransi yang dibayar di depan, dibebankan bertahap |
 | `1-1600` | &nbsp;&nbsp;&nbsp;Persediaan | Aset | pemetaan | **usul** | Barang produksi & merchandise yang dijual (dipakai otomatis oleh modul stok) |
+| `1-1650` | &nbsp;&nbsp;&nbsp;Barang Terkirim Belum Ditagih | Aset | pemetaan | **usul** | Aset sementara antara Surat Jalan (SJ) dan Faktur Penjualan (FJ); dipakai otomatis oleh sistem |
 | `1-1700` | &nbsp;&nbsp;&nbsp;Piutang Lain-lain | Aset |  | **usul** | Kasbon karyawan/crew, piutang non-usaha |
 | `1-1800` | &nbsp;&nbsp;&nbsp;PPN Masukan | Aset |  | **usul** | PPN yang dibayar ke vendor (hanya bila PKP); dipakai otomatis oleh Faktur Pembelian |
 | `1-1900` | &nbsp;&nbsp;&nbsp;Pajak Dibayar Dimuka (PPh 23) | Aset |  | **usul** | PPh 23 yang dipotong klien dari pembayaran; dipakai otomatis oleh Penerimaan |

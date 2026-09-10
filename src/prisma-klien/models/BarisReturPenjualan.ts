@@ -28,10 +28,12 @@ export type AggregateBarisReturPenjualan = {
 
 export type BarisReturPenjualanAvgAggregateOutputType = {
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPenjualanSumAggregateOutputType = {
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPenjualanMinAggregateOutputType = {
@@ -39,6 +41,7 @@ export type BarisReturPenjualanMinAggregateOutputType = {
   returId: string | null
   barangId: string | null
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPenjualanMaxAggregateOutputType = {
@@ -46,6 +49,7 @@ export type BarisReturPenjualanMaxAggregateOutputType = {
   returId: string | null
   barangId: string | null
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPenjualanCountAggregateOutputType = {
@@ -53,16 +57,19 @@ export type BarisReturPenjualanCountAggregateOutputType = {
   returId: number
   barangId: number
   jumlah: number
+  hargaPokok: number
   _all: number
 }
 
 
 export type BarisReturPenjualanAvgAggregateInputType = {
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPenjualanSumAggregateInputType = {
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPenjualanMinAggregateInputType = {
@@ -70,6 +77,7 @@ export type BarisReturPenjualanMinAggregateInputType = {
   returId?: true
   barangId?: true
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPenjualanMaxAggregateInputType = {
@@ -77,6 +85,7 @@ export type BarisReturPenjualanMaxAggregateInputType = {
   returId?: true
   barangId?: true
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPenjualanCountAggregateInputType = {
@@ -84,6 +93,7 @@ export type BarisReturPenjualanCountAggregateInputType = {
   returId?: true
   barangId?: true
   jumlah?: true
+  hargaPokok?: true
   _all?: true
 }
 
@@ -178,6 +188,7 @@ export type BarisReturPenjualanGroupByOutputType = {
   returId: string
   barangId: string
   jumlah: runtime.Decimal
+  hargaPokok: runtime.Decimal
   _count: BarisReturPenjualanCountAggregateOutputType | null
   _avg: BarisReturPenjualanAvgAggregateOutputType | null
   _sum: BarisReturPenjualanSumAggregateOutputType | null
@@ -208,6 +219,7 @@ export type BarisReturPenjualanWhereInput = {
   returId?: Prisma.StringFilter<"BarisReturPenjualan"> | string
   barangId?: Prisma.StringFilter<"BarisReturPenjualan"> | string
   jumlah?: Prisma.DecimalFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.XOR<Prisma.ReturPenjualanScalarRelationFilter, Prisma.ReturPenjualanWhereInput>
   barang?: Prisma.XOR<Prisma.BarangScalarRelationFilter, Prisma.BarangWhereInput>
 }
@@ -217,6 +229,7 @@ export type BarisReturPenjualanOrderByWithRelationInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
   retur?: Prisma.ReturPenjualanOrderByWithRelationInput
   barang?: Prisma.BarangOrderByWithRelationInput
 }
@@ -229,6 +242,7 @@ export type BarisReturPenjualanWhereUniqueInput = Prisma.AtLeast<{
   returId?: Prisma.StringFilter<"BarisReturPenjualan"> | string
   barangId?: Prisma.StringFilter<"BarisReturPenjualan"> | string
   jumlah?: Prisma.DecimalFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.XOR<Prisma.ReturPenjualanScalarRelationFilter, Prisma.ReturPenjualanWhereInput>
   barang?: Prisma.XOR<Prisma.BarangScalarRelationFilter, Prisma.BarangWhereInput>
 }, "id">
@@ -238,6 +252,7 @@ export type BarisReturPenjualanOrderByWithAggregationInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
   _count?: Prisma.BarisReturPenjualanCountOrderByAggregateInput
   _avg?: Prisma.BarisReturPenjualanAvgOrderByAggregateInput
   _max?: Prisma.BarisReturPenjualanMaxOrderByAggregateInput
@@ -253,11 +268,13 @@ export type BarisReturPenjualanScalarWhereWithAggregatesInput = {
   returId?: Prisma.StringWithAggregatesFilter<"BarisReturPenjualan"> | string
   barangId?: Prisma.StringWithAggregatesFilter<"BarisReturPenjualan"> | string
   jumlah?: Prisma.DecimalWithAggregatesFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalWithAggregatesFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanCreateInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retur: Prisma.ReturPenjualanCreateNestedOneWithoutBarisInput
   barang: Prisma.BarangCreateNestedOneWithoutBarisReturPenjualanInput
 }
@@ -267,11 +284,13 @@ export type BarisReturPenjualanUncheckedCreateInput = {
   returId: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.ReturPenjualanUpdateOneRequiredWithoutBarisNestedInput
   barang?: Prisma.BarangUpdateOneRequiredWithoutBarisReturPenjualanNestedInput
 }
@@ -281,6 +300,7 @@ export type BarisReturPenjualanUncheckedUpdateInput = {
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanCreateManyInput = {
@@ -288,11 +308,13 @@ export type BarisReturPenjualanCreateManyInput = {
   returId: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUncheckedUpdateManyInput = {
@@ -300,6 +322,7 @@ export type BarisReturPenjualanUncheckedUpdateManyInput = {
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanListRelationFilter = {
@@ -317,10 +340,12 @@ export type BarisReturPenjualanCountOrderByAggregateInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPenjualanAvgOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPenjualanMaxOrderByAggregateInput = {
@@ -328,6 +353,7 @@ export type BarisReturPenjualanMaxOrderByAggregateInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPenjualanMinOrderByAggregateInput = {
@@ -335,10 +361,12 @@ export type BarisReturPenjualanMinOrderByAggregateInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPenjualanSumOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPenjualanCreateNestedManyWithoutBarangInput = {
@@ -428,6 +456,7 @@ export type BarisReturPenjualanUncheckedUpdateManyWithoutReturNestedInput = {
 export type BarisReturPenjualanCreateWithoutBarangInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retur: Prisma.ReturPenjualanCreateNestedOneWithoutBarisInput
 }
 
@@ -435,6 +464,7 @@ export type BarisReturPenjualanUncheckedCreateWithoutBarangInput = {
   id?: string
   returId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanCreateOrConnectWithoutBarangInput = {
@@ -471,11 +501,13 @@ export type BarisReturPenjualanScalarWhereInput = {
   returId?: Prisma.StringFilter<"BarisReturPenjualan"> | string
   barangId?: Prisma.StringFilter<"BarisReturPenjualan"> | string
   jumlah?: Prisma.DecimalFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFilter<"BarisReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanCreateWithoutReturInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
   barang: Prisma.BarangCreateNestedOneWithoutBarisReturPenjualanInput
 }
 
@@ -483,6 +515,7 @@ export type BarisReturPenjualanUncheckedCreateWithoutReturInput = {
   id?: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanCreateOrConnectWithoutReturInput = {
@@ -515,11 +548,13 @@ export type BarisReturPenjualanCreateManyBarangInput = {
   id?: string
   returId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUpdateWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.ReturPenjualanUpdateOneRequiredWithoutBarisNestedInput
 }
 
@@ -527,23 +562,27 @@ export type BarisReturPenjualanUncheckedUpdateWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUncheckedUpdateManyWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanCreateManyReturInput = {
   id?: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUpdateWithoutReturInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   barang?: Prisma.BarangUpdateOneRequiredWithoutBarisReturPenjualanNestedInput
 }
 
@@ -551,12 +590,14 @@ export type BarisReturPenjualanUncheckedUpdateWithoutReturInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPenjualanUncheckedUpdateManyWithoutReturInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -566,6 +607,7 @@ export type BarisReturPenjualanSelect<ExtArgs extends runtime.Types.Extensions.I
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
   retur?: boolean | Prisma.ReturPenjualanDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisReturPenjualan"]>
@@ -575,6 +617,7 @@ export type BarisReturPenjualanSelectCreateManyAndReturn<ExtArgs extends runtime
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
   retur?: boolean | Prisma.ReturPenjualanDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisReturPenjualan"]>
@@ -584,6 +627,7 @@ export type BarisReturPenjualanSelectUpdateManyAndReturn<ExtArgs extends runtime
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
   retur?: boolean | Prisma.ReturPenjualanDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisReturPenjualan"]>
@@ -593,9 +637,10 @@ export type BarisReturPenjualanSelectScalar = {
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
 }
 
-export type BarisReturPenjualanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "returId" | "barangId" | "jumlah", ExtArgs["result"]["barisReturPenjualan"]>
+export type BarisReturPenjualanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "returId" | "barangId" | "jumlah" | "hargaPokok", ExtArgs["result"]["barisReturPenjualan"]>
 export type BarisReturPenjualanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   retur?: boolean | Prisma.ReturPenjualanDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
@@ -620,6 +665,7 @@ export type $BarisReturPenjualanPayload<ExtArgs extends runtime.Types.Extensions
     returId: string
     barangId: string
     jumlah: runtime.Decimal
+    hargaPokok: runtime.Decimal
   }, ExtArgs["result"]["barisReturPenjualan"]>
   composites: {}
 }
@@ -1049,6 +1095,7 @@ export interface BarisReturPenjualanFieldRefs {
   readonly returId: Prisma.FieldRef<"BarisReturPenjualan", 'String'>
   readonly barangId: Prisma.FieldRef<"BarisReturPenjualan", 'String'>
   readonly jumlah: Prisma.FieldRef<"BarisReturPenjualan", 'Decimal'>
+  readonly hargaPokok: Prisma.FieldRef<"BarisReturPenjualan", 'Decimal'>
 }
     
 

@@ -1,3 +1,5 @@
+import { punyaHak } from "@/lib/hakAkses";
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
@@ -8,7 +10,8 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatKasMasukFormulir } from "@/lib/aksi/jurnal";
 
 export default async function HalamanKasMasuk({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await wajibHak("kas-bank.lihat");
+  const pengguna = await wajibHak("kas-bank.lihat");
+  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = { sumber: "KAS_MASUK" as const, ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}) };
   const [daftarAkunKas, daftarAkun, total, daftarJurnal] = await Promise.all([
@@ -75,6 +78,7 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
             <th>Akun Kas/Bank</th>
             <th>Dari Akun</th>
             <th className="text-right angka">Jumlah</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -90,12 +94,13 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
                 <td className="text-right angka">
                   {Number(cashLine?.debit ?? 0).toLocaleString("id-ID")}
                 </td>
+                <td className="text-right"><TombolHapusDokumen jenis="jurnal" id={e.id} nomor={e.nomor} boleh={bolehHapus} /></td>
               </tr>
             );
           })}
           {daftarJurnal.length === 0 && (
             <tr>
-              <td colSpan={5} className="kosong">
+              <td colSpan={6} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada kas masuk."}
               </td>
             </tr>

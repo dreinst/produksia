@@ -1,3 +1,4 @@
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
@@ -9,6 +10,7 @@ import { NomorDokumen } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPenyesuaianPersediaan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("persediaan.lihat");
+  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }, { gudang: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftar] = await Promise.all([
@@ -51,6 +53,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                 <th className="text-right">Baris</th>
                 <th className="text-right">Nilai</th>
                 <th>Jurnal</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -66,12 +69,13 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                     <td className="text-right angka">{p.baris.length}</td>
                     <td className={`text-right angka font-semibold ${nilai < 0 ? "text-rose-700" : "text-emerald-700"}`}>{nilai.toLocaleString("id-ID")}</td>
                     <td className="mono text-slate-500">{p.jurnal?.nomor ?? "—"}</td>
+                    <td className="text-right"><TombolHapusDokumen jenis="penyesuaian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                   </tr>
                 );
               })}
               {daftar.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="kosong">
+                  <td colSpan={9} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada penyesuaian."}
                   </td>
                 </tr>

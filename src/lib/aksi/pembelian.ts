@@ -130,7 +130,14 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
         pesananId,
         gudangId,
         status: "DIPROSES",
-        baris: { create: daftarBaris.map((l) => ({ barisPesananId: l.barisPesananId, barangId: l.barangId, jumlah: l.jumlah })) },
+        baris: {
+          create: barisNilai.map((l, i) => ({
+            barisPesananId: daftarBaris[i].barisPesananId,
+            barangId: l.barangId,
+            jumlah: l.jumlah,
+            hargaSatuan: daftarJenis.get(l.barangId) === "BARANG" ? l.harga : D(0),
+          })),
+        },
       },
     });
 
@@ -216,7 +223,8 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       }
     }
 
-    await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan, pengaturan.akunPpnMasukanId);
+    const jurnal = await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan, pengaturan.akunPpnMasukanId);
+    if (jurnal) await tx.fakturPembelian.update({ where: { id: faktur.id }, data: { jurnalId: jurnal.id } });
   });
 
   revalidatePath("/pembelian/faktur");
@@ -257,7 +265,8 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
       data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, potonganPajak, metodeBayar },
     });
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
-    await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor, pengaturan.akunPph23DipotongId);
+    const jurnal = await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor, pengaturan.akunPph23DipotongId);
+    if (jurnal) await tx.pembayaranPembelian.update({ where: { id: pembayaran.id }, data: { jurnalId: jurnal.id } });
   });
 
   revalidatePath("/pembelian/pembayaran");
@@ -308,10 +317,12 @@ export async function buatReturPembelian(dataFormulir: FormData) {
   const nomor = await nomorDokumenBerikutnya(db.returPembelian, "RB");
 
   await db.$transaction(async (tx) => {
-    const [daftarLabel, daftarJenis] = await Promise.all([
+    const [daftarLabel, daftarJenis, daftarBarangRetur] = await Promise.all([
       labelBarang(tx, daftarBaris.map((l) => l.barangId)),
       jenisBarang(tx, daftarBaris.map((l) => l.barangId)),
+      tx.barang.findMany({ where: { id: { in: daftarBaris.map((l) => l.barangId) } }, select: { id: true, hargaBeli: true } }),
     ]);
+    const hargaPokokBarang = new Map(daftarBarangRetur.map((b) => [b.id, D(b.hargaBeli)]));
 
     const retur = await tx.returPembelian.create({
       data: {
@@ -322,7 +333,13 @@ export async function buatReturPembelian(dataFormulir: FormData) {
         total,
         dpp,
         ppn,
-        baris: { create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah })) },
+        baris: {
+          create: daftarBaris.map((l) => ({
+            barangId: l.barangId,
+            jumlah: l.jumlah,
+            hargaPokok: daftarJenis.get(l.barangId) === "BARANG" ? (hargaPokokBarang.get(l.barangId) ?? D(0)) : D(0),
+          })),
+        },
       },
     });
 
@@ -333,8 +350,9 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     }
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
 
-    // jurnal dihitung dengan harga pokok rata-rata SEBELUM stok berkurang? Tidak perlu: harga rata-rata tidak berubah saat barang keluar.
-    await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnMasukanId);
+    // harga pokok rata-rata tidak berubah saat barang keluar, jadi jurnal aman dihitung setelah stok berkurang
+    const jurnal = await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnMasukanId);
+    if (jurnal) await tx.returPembelian.update({ where: { id: retur.id }, data: { jurnalId: jurnal.id } });
   });
 
   revalidatePath("/pembelian/retur");

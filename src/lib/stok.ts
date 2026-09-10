@@ -72,3 +72,19 @@ export async function jenisBarang(tx: Tx, itemIds: string[]): Promise<Map<string
   const daftar = await tx.barang.findMany({ where: { id: { in: [...new Set(itemIds)] } }, select: { id: true, jenis: true } });
   return new Map(daftar.map((b) => [b.id, b.jenis]));
 }
+
+/**
+ * Mengubah jumlah & nilai stok sekaligus (dipakai saat MEMBALIK dokumen): harga pokok rata-rata baru
+ * = (nilai lama + selisihNilai) / (jumlah lama + selisihJumlah). Stok fisik per gudang diubah oleh pemanggil.
+ */
+export async function ubahNilaiStok(tx: Tx, barangId: string, selisihJumlah: Desimal, selisihNilai: Desimal) {
+  const barang = await tx.barang.findUniqueOrThrow({ where: { id: barangId }, select: { jenis: true, hargaBeli: true } });
+  if (barang.jenis !== "BARANG") return;
+  const agregat = await tx.stokBarang.aggregate({ where: { barangId }, _sum: { jumlah: true } });
+  const stokTotal = D(agregat._sum.jumlah ?? 0); // sudah termasuk selisihJumlah bila pemanggil mengubah stok lebih dulu
+  const stokLama = stokTotal.minus(selisihJumlah);
+  const nilaiBaru = kali(stokLama.gt(0) ? stokLama : D(0), barang.hargaBeli).plus(selisihNilai);
+  if (stokTotal.lte(0)) return;
+  const hargaBaru = uang(nilaiBaru.div(stokTotal));
+  await tx.barang.update({ where: { id: barangId }, data: { hargaBeli: hargaBaru.lt(0) ? D(0) : hargaBaru } });
+}

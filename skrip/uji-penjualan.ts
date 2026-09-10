@@ -51,7 +51,7 @@ async function main() {
   let pemetaanDibuat = false;
   let akunPemetaan: string[] = [];
   if (!pemetaan) {
-    const [piutang, persediaanAkun, hpp, pendapatan, utang, bbd, selisih, bebanJasa] = await Promise.all([
+    const [piutang, persediaanAkun, hpp, pendapatan, utang, bbd, selisih, bebanJasa, transit] = await Promise.all([
       db.akun.create({ data: { kode: "TEST-PIUTANG", nama: "Piutang Test", jenis: "ASET" } }),
       db.akun.create({ data: { kode: "TEST-PERSEDIAAN", nama: "Persediaan Test", jenis: "ASET" } }),
       db.akun.create({ data: { kode: "TEST-HPP", nama: "HPP Test", jenis: "BEBAN" } }),
@@ -60,8 +60,9 @@ async function main() {
       db.akun.create({ data: { kode: "TEST-BBD", nama: "Barang Belum Ditagih Test", jenis: "KEWAJIBAN" } }),
       db.akun.create({ data: { kode: "TEST-SELISIH", nama: "Selisih Persediaan Test", jenis: "BEBAN" } }),
       db.akun.create({ data: { kode: "TEST-JASA", nama: "Beban Jasa Test", jenis: "BEBAN" } }),
+      db.akun.create({ data: { kode: "TEST-TRANSIT-" + Date.now(), nama: "Barang Terkirim Test", jenis: "ASET" } }),
     ]);
-    akunPemetaan = [piutang.id, persediaanAkun.id, hpp.id, pendapatan.id, utang.id, bbd.id, selisih.id, bebanJasa.id];
+    akunPemetaan = [piutang.id, persediaanAkun.id, hpp.id, pendapatan.id, utang.id, bbd.id, selisih.id, bebanJasa.id, transit.id];
     pemetaan = await db.pemetaanAkun.create({
       data: {
         id: "default",
@@ -73,6 +74,7 @@ async function main() {
         barangBelumDitagihId: bbd.id,
         selisihPersediaanId: selisih.id,
         bebanJasaId: bebanJasa.id,
+        barangTerkirimId: transit.id,
       },
     });
     pemetaanDibuat = true;

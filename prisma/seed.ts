@@ -216,6 +216,7 @@ async function main() {
     ["piutang", sinkron.piutang.sinkron],
     ["hutang", sinkron.hutang.sinkron],
     ["barang belum ditagih", sinkron.barangBelumDitagih.sinkron],
+    ["barang terkirim belum ditagih", sinkron.barangTerkirim.sinkron],
   ] as const;
   for (const [nama, ok] of laporan) console.log(`  ${ok ? "✔" : "✘"} ${nama}`);
   if (laporan.some(([, ok]) => !ok)) throw new Error("Seed selesai tapi buku besar TIDAK sinkron — periksa aturan posting");

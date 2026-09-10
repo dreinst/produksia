@@ -1,3 +1,4 @@
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
@@ -7,6 +8,7 @@ import { jalankanPenyusutanBulananFormulir } from "@/lib/aksi/asetTetap";
 export default async function HalamanPenyusutan() {
   const pengguna = await wajibHak("aset-tetap.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
+  const bolehHapus = boleh("dokumen.hapus");
   const daftarPenyusutan = await db.penyusutanAset.findMany({
     include: { aset: true },
     orderBy: { periode: "desc" },
@@ -42,6 +44,7 @@ export default async function HalamanPenyusutan() {
             <th>Periode</th>
             <th>Aset</th>
             <th className="text-right angka">Jumlah Penyusutan</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -50,11 +53,12 @@ export default async function HalamanPenyusutan() {
               <td>{d.periode.toLocaleDateString("id-ID", { year: "numeric", month: "long" })}</td>
               <td>{d.aset.nama}</td>
               <td className="text-right angka">{Number(d.jumlah).toLocaleString("id-ID")}</td>
+              <td className="text-right">{d.jurnalId && <TombolHapusDokumen jenis="penyusutan" id={d.jurnalId} nomor={`penyusutan ${d.periode.toLocaleDateString("id-ID", { year: "numeric", month: "long" })}`} boleh={bolehHapus} />}</td>
             </tr>
           ))}
           {daftarPenyusutan.length === 0 && (
             <tr>
-              <td colSpan={3} className="kosong">
+              <td colSpan={4} className="kosong">
                 Belum ada penyusutan yang dijalankan.
               </td>
             </tr>

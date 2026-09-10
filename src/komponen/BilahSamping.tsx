@@ -92,6 +92,7 @@ const tautanPengaturan: (TautanNavigasi & { ikon: string })[] = [
   { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pengaturan.tulis" },
   { href: "/pengaturan/bagan-akun", label: "Bagan Akun Standar", ikon: "account_tree", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
+  { href: "/pengaturan/log-aktivitas", label: "Log Aktivitas", ikon: "history", hak: "dokumen.hapus" },
 ];
 
 /** Menyaring grup & tautan sesuai hak peran; grup tanpa tautan tersisa disembunyikan. */

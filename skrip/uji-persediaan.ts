@@ -47,8 +47,8 @@ async function saldo(akunId: string) {
 }
 async function pastikanSinkron(label: string) {
   const s = await periksaSinkron(db);
-  const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron;
-  pastikan(ok, `sinkron setelah ${label} (persediaan BB ${Number(s.persediaan.bukuBesar)} vs stok ${Number(s.persediaan.dokumen)}; BBD ${Number(s.barangBelumDitagih.bukuBesar)} vs ${Number(s.barangBelumDitagih.dokumen)})`);
+  const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron && s.barangTerkirim.sinkron;
+  pastikan(ok, `sinkron setelah ${label} (persediaan BB ${Number(s.persediaan.bukuBesar)} vs stok ${Number(s.persediaan.dokumen)}; BBD ${Number(s.barangBelumDitagih.bukuBesar)} vs ${Number(s.barangBelumDitagih.dokumen)}; terkirim ${Number(s.barangTerkirim.bukuBesar)} vs ${Number(s.barangTerkirim.dokumen)})`);
 }
 
 async function main() {
@@ -87,6 +87,7 @@ async function main() {
   await jalankan("SJ 4 barang + 1 jasa", () => buatPengiriman(formulir({ pesananId: pesanan.id, gudangId: gudang.id, baris: [{ barisPesananId: bp(barang.id).id, barangId: barang.id, jumlah: 4 }, { barisPesananId: bp(jasa.id).id, barangId: jasa.id, jumlah: 1 }] })));
   const stok2 = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barang.id, gudangId: gudang.id } } });
   pastikan(Number(stok2.jumlah) === 6, `stok barang 6 setelah SJ (jasa tidak mengurangi stok): ${Number(stok2.jumlah)}`);
+  await pastikanSinkron("surat jalan (barang terkirim belum ditagih 4 × 8.000)");
   pastikan((await db.stokBarang.count({ where: { barangId: jasa.id } })) === 0, "tidak ada baris stok untuk JASA");
   await jalankan("FJ seluruh pesanan", () => buatFaktur(formulir({ pesananId: pesanan.id, baris: pesanan.baris.map((b) => ({ barangId: b.barangId, jumlah: Number(b.jumlah), harga: Number(b.harga) })) })));
   const jurnalFj = await db.jurnal.findFirstOrThrow({ where: { nomor: { startsWith: "JU-FJ" }, tanggal: { gte: mulaiUji } }, include: { baris: true }, orderBy: { tanggal: "desc" } });

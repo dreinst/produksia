@@ -436,7 +436,8 @@ export const ModelName = {
   PenyusutanAset: 'PenyusutanAset',
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
-  PengaturanPerusahaan: 'PengaturanPerusahaan'
+  PengaturanPerusahaan: 'PengaturanPerusahaan',
+  LogAktivitas: 'LogAktivitas'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -452,7 +453,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3416,6 +3417,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LogAktivitas: {
+      payload: Prisma.$LogAktivitasPayload<ExtArgs>
+      fields: Prisma.LogAktivitasFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LogAktivitasFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LogAktivitasFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>
+        }
+        findFirst: {
+          args: Prisma.LogAktivitasFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LogAktivitasFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>
+        }
+        findMany: {
+          args: Prisma.LogAktivitasFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>[]
+        }
+        create: {
+          args: Prisma.LogAktivitasCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>
+        }
+        createMany: {
+          args: Prisma.LogAktivitasCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LogAktivitasCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>[]
+        }
+        delete: {
+          args: Prisma.LogAktivitasDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>
+        }
+        update: {
+          args: Prisma.LogAktivitasUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>
+        }
+        deleteMany: {
+          args: Prisma.LogAktivitasDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LogAktivitasUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LogAktivitasUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>[]
+        }
+        upsert: {
+          args: Prisma.LogAktivitasUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LogAktivitasPayload>
+        }
+        aggregate: {
+          args: Prisma.LogAktivitasAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLogAktivitas>
+        }
+        groupBy: {
+          args: Prisma.LogAktivitasGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LogAktivitasGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LogAktivitasCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LogAktivitasCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3640,7 +3715,8 @@ export const PengirimanPesananScalarFieldEnum = {
   tanggal: 'tanggal',
   pesananId: 'pesananId',
   gudangId: 'gudangId',
-  status: 'status'
+  status: 'status',
+  jurnalId: 'jurnalId'
 } as const
 
 export type PengirimanPesananScalarFieldEnum = (typeof PengirimanPesananScalarFieldEnum)[keyof typeof PengirimanPesananScalarFieldEnum]
@@ -3651,7 +3727,9 @@ export const BarisPengirimanScalarFieldEnum = {
   pengirimanId: 'pengirimanId',
   barisPesananId: 'barisPesananId',
   barangId: 'barangId',
-  jumlah: 'jumlah'
+  jumlah: 'jumlah',
+  hargaPokok: 'hargaPokok',
+  jumlahDifaktur: 'jumlahDifaktur'
 } as const
 
 export type BarisPengirimanScalarFieldEnum = (typeof BarisPengirimanScalarFieldEnum)[keyof typeof BarisPengirimanScalarFieldEnum]
@@ -3669,7 +3747,8 @@ export const FakturPenjualanScalarFieldEnum = {
   total: 'total',
   dpp: 'dpp',
   ppnPersen: 'ppnPersen',
-  ppn: 'ppn'
+  ppn: 'ppn',
+  jurnalId: 'jurnalId'
 } as const
 
 export type FakturPenjualanScalarFieldEnum = (typeof FakturPenjualanScalarFieldEnum)[keyof typeof FakturPenjualanScalarFieldEnum]
@@ -3696,6 +3775,7 @@ export const PenerimaanPenjualanScalarFieldEnum = {
   akunId: 'akunId',
   jumlah: 'jumlah',
   potonganPajak: 'potonganPajak',
+  jurnalId: 'jurnalId',
   metodeBayar: 'metodeBayar'
 } as const
 
@@ -3711,7 +3791,8 @@ export const ReturPenjualanScalarFieldEnum = {
   alasan: 'alasan',
   total: 'total',
   dpp: 'dpp',
-  ppn: 'ppn'
+  ppn: 'ppn',
+  jurnalId: 'jurnalId'
 } as const
 
 export type ReturPenjualanScalarFieldEnum = (typeof ReturPenjualanScalarFieldEnum)[keyof typeof ReturPenjualanScalarFieldEnum]
@@ -3721,7 +3802,8 @@ export const BarisReturPenjualanScalarFieldEnum = {
   id: 'id',
   returId: 'returId',
   barangId: 'barangId',
-  jumlah: 'jumlah'
+  jumlah: 'jumlah',
+  hargaPokok: 'hargaPokok'
 } as const
 
 export type BarisReturPenjualanScalarFieldEnum = (typeof BarisReturPenjualanScalarFieldEnum)[keyof typeof BarisReturPenjualanScalarFieldEnum]
@@ -3770,7 +3852,8 @@ export const BarisPenerimaanBarangScalarFieldEnum = {
   penerimaanId: 'penerimaanId',
   barisPesananId: 'barisPesananId',
   barangId: 'barangId',
-  jumlah: 'jumlah'
+  jumlah: 'jumlah',
+  hargaSatuan: 'hargaSatuan'
 } as const
 
 export type BarisPenerimaanBarangScalarFieldEnum = (typeof BarisPenerimaanBarangScalarFieldEnum)[keyof typeof BarisPenerimaanBarangScalarFieldEnum]
@@ -3788,7 +3871,8 @@ export const FakturPembelianScalarFieldEnum = {
   total: 'total',
   dpp: 'dpp',
   ppnPersen: 'ppnPersen',
-  ppn: 'ppn'
+  ppn: 'ppn',
+  jurnalId: 'jurnalId'
 } as const
 
 export type FakturPembelianScalarFieldEnum = (typeof FakturPembelianScalarFieldEnum)[keyof typeof FakturPembelianScalarFieldEnum]
@@ -3815,6 +3899,7 @@ export const PembayaranPembelianScalarFieldEnum = {
   akunId: 'akunId',
   jumlah: 'jumlah',
   potonganPajak: 'potonganPajak',
+  jurnalId: 'jurnalId',
   metodeBayar: 'metodeBayar'
 } as const
 
@@ -3830,7 +3915,8 @@ export const ReturPembelianScalarFieldEnum = {
   alasan: 'alasan',
   total: 'total',
   dpp: 'dpp',
-  ppn: 'ppn'
+  ppn: 'ppn',
+  jurnalId: 'jurnalId'
 } as const
 
 export type ReturPembelianScalarFieldEnum = (typeof ReturPembelianScalarFieldEnum)[keyof typeof ReturPembelianScalarFieldEnum]
@@ -3840,7 +3926,8 @@ export const BarisReturPembelianScalarFieldEnum = {
   id: 'id',
   returId: 'returId',
   barangId: 'barangId',
-  jumlah: 'jumlah'
+  jumlah: 'jumlah',
+  hargaPokok: 'hargaPokok'
 } as const
 
 export type BarisReturPembelianScalarFieldEnum = (typeof BarisReturPembelianScalarFieldEnum)[keyof typeof BarisReturPembelianScalarFieldEnum]
@@ -3869,7 +3956,8 @@ export const PemetaanAkunScalarFieldEnum = {
   utangUsahaId: 'utangUsahaId',
   bebanJasaId: 'bebanJasaId',
   barangBelumDitagihId: 'barangBelumDitagihId',
-  selisihPersediaanId: 'selisihPersediaanId'
+  selisihPersediaanId: 'selisihPersediaanId',
+  barangTerkirimId: 'barangTerkirimId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]
@@ -3967,6 +4055,20 @@ export const PengaturanPerusahaanScalarFieldEnum = {
 } as const
 
 export type PengaturanPerusahaanScalarFieldEnum = (typeof PengaturanPerusahaanScalarFieldEnum)[keyof typeof PengaturanPerusahaanScalarFieldEnum]
+
+
+export const LogAktivitasScalarFieldEnum = {
+  id: 'id',
+  waktu: 'waktu',
+  penggunaId: 'penggunaId',
+  penggunaNama: 'penggunaNama',
+  aksi: 'aksi',
+  jenis: 'jenis',
+  nomor: 'nomor',
+  keterangan: 'keterangan'
+} as const
+
+export type LogAktivitasScalarFieldEnum = (typeof LogAktivitasScalarFieldEnum)[keyof typeof LogAktivitasScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -4350,6 +4452,7 @@ export type GlobalOmitConfig = {
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanOmit
   barisPenyesuaianPersediaan?: Prisma.BarisPenyesuaianPersediaanOmit
   pengaturanPerusahaan?: Prisma.PengaturanPerusahaanOmit
+  logAktivitas?: Prisma.LogAktivitasOmit
 }
 
 /* Types for Logging */

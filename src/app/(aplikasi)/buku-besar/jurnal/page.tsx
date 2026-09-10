@@ -1,3 +1,4 @@
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -9,6 +10,7 @@ import { db } from "@/lib/db";
 export default async function HalamanJurnal({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("buku-besar.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna.peran, hak);
+  const bolehHapus = boleh("dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
   const [total, daftarJurnal] = await Promise.all([
@@ -41,7 +43,10 @@ export default async function HalamanJurnal({ searchParams }: { searchParams: Pr
                   <span className="font-medium">{e.nomor}</span> &middot; {e.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })} &middot;{" "}
                   <span className="text-slate-500">{labelSumberJurnal(e.sumber)}</span>
                 </div>
-                <div className="font-medium">{total.toLocaleString("id-ID")}</div>
+                <div className="flex items-center gap-3">
+                  <div className="font-medium">{total.toLocaleString("id-ID")}</div>
+                  {["MANUAL", "KAS_MASUK", "KAS_KELUAR"].includes(e.sumber) && <TombolHapusDokumen jenis="jurnal" id={e.id} nomor={e.nomor} boleh={bolehHapus} />}
+                </div>
               </div>
               {e.keterangan && <div className="text-sm text-slate-500 mb-2">{e.keterangan}</div>}
               <div className="kartu kartu-tabel"><div className="bungkus-tabel">

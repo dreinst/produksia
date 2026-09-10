@@ -26,6 +26,7 @@ export type Hak =
   | "persediaan.lihat" // Stok per gudang
   | "persediaan.tulis" // Penyesuaian stok (saldo awal, opname)
   | "pengaturan.tulis" // Pemetaan akun
+  | "dokumen.hapus" // Menghapus dokumen transaksi (membalik stok & jurnal)
   | "pengguna.kelola"; // Kelola akun pengguna
 
 export const SEMUA_HAK: readonly Hak[] = [
@@ -46,6 +47,7 @@ export const SEMUA_HAK: readonly Hak[] = [
   "persediaan.lihat",
   "persediaan.tulis",
   "pengaturan.tulis",
+  "dokumen.hapus",
   "pengguna.kelola",
 ];
 
@@ -78,8 +80,8 @@ export const LABEL_PERAN: Record<PeranPengguna, string> = {
 };
 
 export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
-  PEMILIK: "Akses penuh, termasuk mengelola akun pemilik lain.",
-  ADMIN: "Akses penuh ke semua modul; tidak bisa mengubah akun berperan Pemilik.",
+  PEMILIK: "Akses penuh, termasuk menghapus dokumen dan mengelola akun pemilik lain.",
+  ADMIN: "Akses penuh ke semua modul termasuk menghapus dokumen; tidak bisa mengubah akun berperan Pemilik.",
   KASIR: "Penjualan, pembelian, kas & bank, data induk; buku besar & aset hanya lihat.",
   GUDANG: "Surat jalan, terima barang, dan data induk barang/gudang; tanpa modul keuangan.",
 };

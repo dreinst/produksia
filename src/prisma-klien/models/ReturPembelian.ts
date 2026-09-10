@@ -48,6 +48,7 @@ export type ReturPembelianMinAggregateOutputType = {
   total: runtime.Decimal | null
   dpp: runtime.Decimal | null
   ppn: runtime.Decimal | null
+  jurnalId: string | null
 }
 
 export type ReturPembelianMaxAggregateOutputType = {
@@ -60,6 +61,7 @@ export type ReturPembelianMaxAggregateOutputType = {
   total: runtime.Decimal | null
   dpp: runtime.Decimal | null
   ppn: runtime.Decimal | null
+  jurnalId: string | null
 }
 
 export type ReturPembelianCountAggregateOutputType = {
@@ -72,6 +74,7 @@ export type ReturPembelianCountAggregateOutputType = {
   total: number
   dpp: number
   ppn: number
+  jurnalId: number
   _all: number
 }
 
@@ -98,6 +101,7 @@ export type ReturPembelianMinAggregateInputType = {
   total?: true
   dpp?: true
   ppn?: true
+  jurnalId?: true
 }
 
 export type ReturPembelianMaxAggregateInputType = {
@@ -110,6 +114,7 @@ export type ReturPembelianMaxAggregateInputType = {
   total?: true
   dpp?: true
   ppn?: true
+  jurnalId?: true
 }
 
 export type ReturPembelianCountAggregateInputType = {
@@ -122,6 +127,7 @@ export type ReturPembelianCountAggregateInputType = {
   total?: true
   dpp?: true
   ppn?: true
+  jurnalId?: true
   _all?: true
 }
 
@@ -221,6 +227,7 @@ export type ReturPembelianGroupByOutputType = {
   total: runtime.Decimal
   dpp: runtime.Decimal
   ppn: runtime.Decimal
+  jurnalId: string | null
   _count: ReturPembelianCountAggregateOutputType | null
   _avg: ReturPembelianAvgAggregateOutputType | null
   _sum: ReturPembelianSumAggregateOutputType | null
@@ -256,8 +263,10 @@ export type ReturPembelianWhereInput = {
   total?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.StringNullableFilter<"ReturPembelian"> | string | null
   faktur?: Prisma.XOR<Prisma.FakturPembelianScalarRelationFilter, Prisma.FakturPembelianWhereInput>
   gudang?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
+  jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   baris?: Prisma.BarisReturPembelianListRelationFilter
 }
 
@@ -271,14 +280,17 @@ export type ReturPembelianOrderByWithRelationInput = {
   total?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
   faktur?: Prisma.FakturPembelianOrderByWithRelationInput
   gudang?: Prisma.GudangOrderByWithRelationInput
+  jurnal?: Prisma.JurnalOrderByWithRelationInput
   baris?: Prisma.BarisReturPembelianOrderByRelationAggregateInput
 }
 
 export type ReturPembelianWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   nomor?: string
+  jurnalId?: string
   AND?: Prisma.ReturPembelianWhereInput | Prisma.ReturPembelianWhereInput[]
   OR?: Prisma.ReturPembelianWhereInput[]
   NOT?: Prisma.ReturPembelianWhereInput | Prisma.ReturPembelianWhereInput[]
@@ -291,8 +303,9 @@ export type ReturPembelianWhereUniqueInput = Prisma.AtLeast<{
   ppn?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur?: Prisma.XOR<Prisma.FakturPembelianScalarRelationFilter, Prisma.FakturPembelianWhereInput>
   gudang?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
+  jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   baris?: Prisma.BarisReturPembelianListRelationFilter
-}, "id" | "nomor">
+}, "id" | "nomor" | "jurnalId">
 
 export type ReturPembelianOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -304,6 +317,7 @@ export type ReturPembelianOrderByWithAggregationInput = {
   total?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ReturPembelianCountOrderByAggregateInput
   _avg?: Prisma.ReturPembelianAvgOrderByAggregateInput
   _max?: Prisma.ReturPembelianMaxOrderByAggregateInput
@@ -324,6 +338,7 @@ export type ReturPembelianScalarWhereWithAggregatesInput = {
   total?: Prisma.DecimalWithAggregatesFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalWithAggregatesFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalWithAggregatesFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.StringNullableWithAggregatesFilter<"ReturPembelian"> | string | null
 }
 
 export type ReturPembelianCreateInput = {
@@ -336,6 +351,7 @@ export type ReturPembelianCreateInput = {
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur: Prisma.FakturPembelianCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPembelianInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPembelianInput
   baris?: Prisma.BarisReturPembelianCreateNestedManyWithoutReturInput
 }
 
@@ -349,6 +365,7 @@ export type ReturPembelianUncheckedCreateInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
   baris?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutReturInput
 }
 
@@ -362,6 +379,7 @@ export type ReturPembelianUpdateInput = {
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPembelianNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutReturPembelianNestedInput
   baris?: Prisma.BarisReturPembelianUpdateManyWithoutReturNestedInput
 }
 
@@ -375,6 +393,7 @@ export type ReturPembelianUncheckedUpdateInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutReturNestedInput
 }
 
@@ -388,6 +407,7 @@ export type ReturPembelianCreateManyInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
 }
 
 export type ReturPembelianUpdateManyMutationInput = {
@@ -410,6 +430,7 @@ export type ReturPembelianUncheckedUpdateManyInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ReturPembelianListRelationFilter = {
@@ -432,6 +453,7 @@ export type ReturPembelianCountOrderByAggregateInput = {
   total?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrder
 }
 
 export type ReturPembelianAvgOrderByAggregateInput = {
@@ -450,6 +472,7 @@ export type ReturPembelianMaxOrderByAggregateInput = {
   total?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrder
 }
 
 export type ReturPembelianMinOrderByAggregateInput = {
@@ -462,6 +485,7 @@ export type ReturPembelianMinOrderByAggregateInput = {
   total?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrder
 }
 
 export type ReturPembelianSumOrderByAggregateInput = {
@@ -473,6 +497,11 @@ export type ReturPembelianSumOrderByAggregateInput = {
 export type ReturPembelianScalarRelationFilter = {
   is?: Prisma.ReturPembelianWhereInput
   isNot?: Prisma.ReturPembelianWhereInput
+}
+
+export type ReturPembelianNullableScalarRelationFilter = {
+  is?: Prisma.ReturPembelianWhereInput | null
+  isNot?: Prisma.ReturPembelianWhereInput | null
 }
 
 export type ReturPembelianCreateNestedManyWithoutGudangInput = {
@@ -573,6 +602,38 @@ export type ReturPembelianUpdateOneRequiredWithoutBarisNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReturPembelianUpdateToOneWithWhereWithoutBarisInput, Prisma.ReturPembelianUpdateWithoutBarisInput>, Prisma.ReturPembelianUncheckedUpdateWithoutBarisInput>
 }
 
+export type ReturPembelianCreateNestedOneWithoutJurnalInput = {
+  create?: Prisma.XOR<Prisma.ReturPembelianCreateWithoutJurnalInput, Prisma.ReturPembelianUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.ReturPembelianCreateOrConnectWithoutJurnalInput
+  connect?: Prisma.ReturPembelianWhereUniqueInput
+}
+
+export type ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput = {
+  create?: Prisma.XOR<Prisma.ReturPembelianCreateWithoutJurnalInput, Prisma.ReturPembelianUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.ReturPembelianCreateOrConnectWithoutJurnalInput
+  connect?: Prisma.ReturPembelianWhereUniqueInput
+}
+
+export type ReturPembelianUpdateOneWithoutJurnalNestedInput = {
+  create?: Prisma.XOR<Prisma.ReturPembelianCreateWithoutJurnalInput, Prisma.ReturPembelianUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.ReturPembelianCreateOrConnectWithoutJurnalInput
+  upsert?: Prisma.ReturPembelianUpsertWithoutJurnalInput
+  disconnect?: Prisma.ReturPembelianWhereInput | boolean
+  delete?: Prisma.ReturPembelianWhereInput | boolean
+  connect?: Prisma.ReturPembelianWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReturPembelianUpdateToOneWithWhereWithoutJurnalInput, Prisma.ReturPembelianUpdateWithoutJurnalInput>, Prisma.ReturPembelianUncheckedUpdateWithoutJurnalInput>
+}
+
+export type ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput = {
+  create?: Prisma.XOR<Prisma.ReturPembelianCreateWithoutJurnalInput, Prisma.ReturPembelianUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.ReturPembelianCreateOrConnectWithoutJurnalInput
+  upsert?: Prisma.ReturPembelianUpsertWithoutJurnalInput
+  disconnect?: Prisma.ReturPembelianWhereInput | boolean
+  delete?: Prisma.ReturPembelianWhereInput | boolean
+  connect?: Prisma.ReturPembelianWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReturPembelianUpdateToOneWithWhereWithoutJurnalInput, Prisma.ReturPembelianUpdateWithoutJurnalInput>, Prisma.ReturPembelianUncheckedUpdateWithoutJurnalInput>
+}
+
 export type ReturPembelianCreateWithoutGudangInput = {
   id?: string
   nomor: string
@@ -582,6 +643,7 @@ export type ReturPembelianCreateWithoutGudangInput = {
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur: Prisma.FakturPembelianCreateNestedOneWithoutReturInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPembelianInput
   baris?: Prisma.BarisReturPembelianCreateNestedManyWithoutReturInput
 }
 
@@ -594,6 +656,7 @@ export type ReturPembelianUncheckedCreateWithoutGudangInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
   baris?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutReturInput
 }
 
@@ -636,6 +699,7 @@ export type ReturPembelianScalarWhereInput = {
   total?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFilter<"ReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.StringNullableFilter<"ReturPembelian"> | string | null
 }
 
 export type ReturPembelianCreateWithoutFakturInput = {
@@ -647,6 +711,7 @@ export type ReturPembelianCreateWithoutFakturInput = {
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   gudang: Prisma.GudangCreateNestedOneWithoutReturPembelianInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPembelianInput
   baris?: Prisma.BarisReturPembelianCreateNestedManyWithoutReturInput
 }
 
@@ -659,6 +724,7 @@ export type ReturPembelianUncheckedCreateWithoutFakturInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
   baris?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutReturInput
 }
 
@@ -698,6 +764,7 @@ export type ReturPembelianCreateWithoutBarisInput = {
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur: Prisma.FakturPembelianCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPembelianInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPembelianInput
 }
 
 export type ReturPembelianUncheckedCreateWithoutBarisInput = {
@@ -710,6 +777,7 @@ export type ReturPembelianUncheckedCreateWithoutBarisInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
 }
 
 export type ReturPembelianCreateOrConnectWithoutBarisInput = {
@@ -738,6 +806,7 @@ export type ReturPembelianUpdateWithoutBarisInput = {
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPembelianNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutReturPembelianNestedInput
 }
 
 export type ReturPembelianUncheckedUpdateWithoutBarisInput = {
@@ -750,6 +819,75 @@ export type ReturPembelianUncheckedUpdateWithoutBarisInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ReturPembelianCreateWithoutJurnalInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  alasan?: string | null
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  faktur: Prisma.FakturPembelianCreateNestedOneWithoutReturInput
+  gudang: Prisma.GudangCreateNestedOneWithoutReturPembelianInput
+  baris?: Prisma.BarisReturPembelianCreateNestedManyWithoutReturInput
+}
+
+export type ReturPembelianUncheckedCreateWithoutJurnalInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  fakturId: string
+  gudangId: string
+  alasan?: string | null
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  baris?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutReturInput
+}
+
+export type ReturPembelianCreateOrConnectWithoutJurnalInput = {
+  where: Prisma.ReturPembelianWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReturPembelianCreateWithoutJurnalInput, Prisma.ReturPembelianUncheckedCreateWithoutJurnalInput>
+}
+
+export type ReturPembelianUpsertWithoutJurnalInput = {
+  update: Prisma.XOR<Prisma.ReturPembelianUpdateWithoutJurnalInput, Prisma.ReturPembelianUncheckedUpdateWithoutJurnalInput>
+  create: Prisma.XOR<Prisma.ReturPembelianCreateWithoutJurnalInput, Prisma.ReturPembelianUncheckedCreateWithoutJurnalInput>
+  where?: Prisma.ReturPembelianWhereInput
+}
+
+export type ReturPembelianUpdateToOneWithWhereWithoutJurnalInput = {
+  where?: Prisma.ReturPembelianWhereInput
+  data: Prisma.XOR<Prisma.ReturPembelianUpdateWithoutJurnalInput, Prisma.ReturPembelianUncheckedUpdateWithoutJurnalInput>
+}
+
+export type ReturPembelianUpdateWithoutJurnalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutReturNestedInput
+  gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPembelianNestedInput
+  baris?: Prisma.BarisReturPembelianUpdateManyWithoutReturNestedInput
+}
+
+export type ReturPembelianUncheckedUpdateWithoutJurnalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fakturId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  baris?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutReturNestedInput
 }
 
 export type ReturPembelianCreateManyGudangInput = {
@@ -761,6 +899,7 @@ export type ReturPembelianCreateManyGudangInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
 }
 
 export type ReturPembelianUpdateWithoutGudangInput = {
@@ -772,6 +911,7 @@ export type ReturPembelianUpdateWithoutGudangInput = {
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutReturNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutReturPembelianNestedInput
   baris?: Prisma.BarisReturPembelianUpdateManyWithoutReturNestedInput
 }
 
@@ -784,6 +924,7 @@ export type ReturPembelianUncheckedUpdateWithoutGudangInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutReturNestedInput
 }
 
@@ -796,6 +937,7 @@ export type ReturPembelianUncheckedUpdateManyWithoutGudangInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ReturPembelianCreateManyFakturInput = {
@@ -807,6 +949,7 @@ export type ReturPembelianCreateManyFakturInput = {
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
 }
 
 export type ReturPembelianUpdateWithoutFakturInput = {
@@ -818,6 +961,7 @@ export type ReturPembelianUpdateWithoutFakturInput = {
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPembelianNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutReturPembelianNestedInput
   baris?: Prisma.BarisReturPembelianUpdateManyWithoutReturNestedInput
 }
 
@@ -830,6 +974,7 @@ export type ReturPembelianUncheckedUpdateWithoutFakturInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutReturNestedInput
 }
 
@@ -842,6 +987,7 @@ export type ReturPembelianUncheckedUpdateManyWithoutFakturInput = {
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -885,8 +1031,10 @@ export type ReturPembelianSelect<ExtArgs extends runtime.Types.Extensions.Intern
   total?: boolean
   dpp?: boolean
   ppn?: boolean
+  jurnalId?: boolean
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.ReturPembelian$jurnalArgs<ExtArgs>
   baris?: boolean | Prisma.ReturPembelian$barisArgs<ExtArgs>
   _count?: boolean | Prisma.ReturPembelianCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["returPembelian"]>
@@ -901,8 +1049,10 @@ export type ReturPembelianSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   total?: boolean
   dpp?: boolean
   ppn?: boolean
+  jurnalId?: boolean
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.ReturPembelian$jurnalArgs<ExtArgs>
 }, ExtArgs["result"]["returPembelian"]>
 
 export type ReturPembelianSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -915,8 +1065,10 @@ export type ReturPembelianSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   total?: boolean
   dpp?: boolean
   ppn?: boolean
+  jurnalId?: boolean
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.ReturPembelian$jurnalArgs<ExtArgs>
 }, ExtArgs["result"]["returPembelian"]>
 
 export type ReturPembelianSelectScalar = {
@@ -929,22 +1081,26 @@ export type ReturPembelianSelectScalar = {
   total?: boolean
   dpp?: boolean
   ppn?: boolean
+  jurnalId?: boolean
 }
 
-export type ReturPembelianOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "fakturId" | "gudangId" | "alasan" | "total" | "dpp" | "ppn", ExtArgs["result"]["returPembelian"]>
+export type ReturPembelianOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "fakturId" | "gudangId" | "alasan" | "total" | "dpp" | "ppn" | "jurnalId", ExtArgs["result"]["returPembelian"]>
 export type ReturPembelianInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.ReturPembelian$jurnalArgs<ExtArgs>
   baris?: boolean | Prisma.ReturPembelian$barisArgs<ExtArgs>
   _count?: boolean | Prisma.ReturPembelianCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReturPembelianIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.ReturPembelian$jurnalArgs<ExtArgs>
 }
 export type ReturPembelianIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.ReturPembelian$jurnalArgs<ExtArgs>
 }
 
 export type $ReturPembelianPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -952,6 +1108,7 @@ export type $ReturPembelianPayload<ExtArgs extends runtime.Types.Extensions.Inte
   objects: {
     faktur: Prisma.$FakturPembelianPayload<ExtArgs>
     gudang: Prisma.$GudangPayload<ExtArgs>
+    jurnal: Prisma.$JurnalPayload<ExtArgs> | null
     baris: Prisma.$BarisReturPembelianPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -964,6 +1121,7 @@ export type $ReturPembelianPayload<ExtArgs extends runtime.Types.Extensions.Inte
     total: runtime.Decimal
     dpp: runtime.Decimal
     ppn: runtime.Decimal
+    jurnalId: string | null
   }, ExtArgs["result"]["returPembelian"]>
   composites: {}
 }
@@ -1360,6 +1518,7 @@ export interface Prisma__ReturPembelianClient<T, Null = never, ExtArgs extends r
   readonly [Symbol.toStringTag]: "PrismaPromise"
   faktur<T extends Prisma.FakturPembelianDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FakturPembelianDefaultArgs<ExtArgs>>): Prisma.Prisma__FakturPembelianClient<runtime.Types.Result.GetResult<Prisma.$FakturPembelianPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   gudang<T extends Prisma.GudangDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GudangDefaultArgs<ExtArgs>>): Prisma.Prisma__GudangClient<runtime.Types.Result.GetResult<Prisma.$GudangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  jurnal<T extends Prisma.ReturPembelian$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturPembelian$jurnalArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   baris<T extends Prisma.ReturPembelian$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturPembelian$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisReturPembelianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1399,6 +1558,7 @@ export interface ReturPembelianFieldRefs {
   readonly total: Prisma.FieldRef<"ReturPembelian", 'Decimal'>
   readonly dpp: Prisma.FieldRef<"ReturPembelian", 'Decimal'>
   readonly ppn: Prisma.FieldRef<"ReturPembelian", 'Decimal'>
+  readonly jurnalId: Prisma.FieldRef<"ReturPembelian", 'String'>
 }
     
 
@@ -1797,6 +1957,25 @@ export type ReturPembelianDeleteManyArgs<ExtArgs extends runtime.Types.Extension
    * Limit how many ReturPembelians to delete.
    */
   limit?: number
+}
+
+/**
+ * ReturPembelian.jurnal
+ */
+export type ReturPembelian$jurnalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Jurnal
+   */
+  select?: Prisma.JurnalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Jurnal
+   */
+  omit?: Prisma.JurnalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JurnalInclude<ExtArgs> | null
+  where?: Prisma.JurnalWhereInput
 }
 
 /**
