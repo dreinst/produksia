@@ -56,6 +56,7 @@ export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<Hasil
         bebanJasaId: id(PEMETAAN_STANDAR.bebanJasa),
         barangBelumDitagihId: id(PEMETAAN_STANDAR.barangBelumDitagih),
         selisihPersediaanId: id(PEMETAAN_STANDAR.selisihPersediaan),
+        barangTerkirimId: id(PEMETAAN_STANDAR.barangTerkirim),
       },
     });
     hasil.pemetaanDibuat = true;
@@ -66,8 +67,14 @@ export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<Hasil
       bebanJasaId: ada.bebanJasaId ?? idByKode.get(PEMETAAN_STANDAR.bebanJasa),
       barangBelumDitagihId: ada.barangBelumDitagihId ?? idByKode.get(PEMETAAN_STANDAR.barangBelumDitagih),
       selisihPersediaanId: ada.selisihPersediaanId ?? idByKode.get(PEMETAAN_STANDAR.selisihPersediaan),
+      barangTerkirimId: ada.barangTerkirimId ?? idByKode.get(PEMETAAN_STANDAR.barangTerkirim),
     };
-    if (lengkap.bebanJasaId !== ada.bebanJasaId || lengkap.barangBelumDitagihId !== ada.barangBelumDitagihId || lengkap.selisihPersediaanId !== ada.selisihPersediaanId) {
+    if (
+      lengkap.bebanJasaId !== ada.bebanJasaId ||
+      lengkap.barangBelumDitagihId !== ada.barangBelumDitagihId ||
+      lengkap.selisihPersediaanId !== ada.selisihPersediaanId ||
+      lengkap.barangTerkirimId !== ada.barangTerkirimId
+    ) {
       await klien.pemetaanAkun.update({ where: { id: "default" }, data: lengkap });
     }
   }

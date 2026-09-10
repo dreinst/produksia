@@ -28,10 +28,12 @@ export type AggregateBarisReturPembelian = {
 
 export type BarisReturPembelianAvgAggregateOutputType = {
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPembelianSumAggregateOutputType = {
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPembelianMinAggregateOutputType = {
@@ -39,6 +41,7 @@ export type BarisReturPembelianMinAggregateOutputType = {
   returId: string | null
   barangId: string | null
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPembelianMaxAggregateOutputType = {
@@ -46,6 +49,7 @@ export type BarisReturPembelianMaxAggregateOutputType = {
   returId: string | null
   barangId: string | null
   jumlah: runtime.Decimal | null
+  hargaPokok: runtime.Decimal | null
 }
 
 export type BarisReturPembelianCountAggregateOutputType = {
@@ -53,16 +57,19 @@ export type BarisReturPembelianCountAggregateOutputType = {
   returId: number
   barangId: number
   jumlah: number
+  hargaPokok: number
   _all: number
 }
 
 
 export type BarisReturPembelianAvgAggregateInputType = {
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPembelianSumAggregateInputType = {
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPembelianMinAggregateInputType = {
@@ -70,6 +77,7 @@ export type BarisReturPembelianMinAggregateInputType = {
   returId?: true
   barangId?: true
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPembelianMaxAggregateInputType = {
@@ -77,6 +85,7 @@ export type BarisReturPembelianMaxAggregateInputType = {
   returId?: true
   barangId?: true
   jumlah?: true
+  hargaPokok?: true
 }
 
 export type BarisReturPembelianCountAggregateInputType = {
@@ -84,6 +93,7 @@ export type BarisReturPembelianCountAggregateInputType = {
   returId?: true
   barangId?: true
   jumlah?: true
+  hargaPokok?: true
   _all?: true
 }
 
@@ -178,6 +188,7 @@ export type BarisReturPembelianGroupByOutputType = {
   returId: string
   barangId: string
   jumlah: runtime.Decimal
+  hargaPokok: runtime.Decimal
   _count: BarisReturPembelianCountAggregateOutputType | null
   _avg: BarisReturPembelianAvgAggregateOutputType | null
   _sum: BarisReturPembelianSumAggregateOutputType | null
@@ -208,6 +219,7 @@ export type BarisReturPembelianWhereInput = {
   returId?: Prisma.StringFilter<"BarisReturPembelian"> | string
   barangId?: Prisma.StringFilter<"BarisReturPembelian"> | string
   jumlah?: Prisma.DecimalFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.XOR<Prisma.ReturPembelianScalarRelationFilter, Prisma.ReturPembelianWhereInput>
   barang?: Prisma.XOR<Prisma.BarangScalarRelationFilter, Prisma.BarangWhereInput>
 }
@@ -217,6 +229,7 @@ export type BarisReturPembelianOrderByWithRelationInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
   retur?: Prisma.ReturPembelianOrderByWithRelationInput
   barang?: Prisma.BarangOrderByWithRelationInput
 }
@@ -229,6 +242,7 @@ export type BarisReturPembelianWhereUniqueInput = Prisma.AtLeast<{
   returId?: Prisma.StringFilter<"BarisReturPembelian"> | string
   barangId?: Prisma.StringFilter<"BarisReturPembelian"> | string
   jumlah?: Prisma.DecimalFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.XOR<Prisma.ReturPembelianScalarRelationFilter, Prisma.ReturPembelianWhereInput>
   barang?: Prisma.XOR<Prisma.BarangScalarRelationFilter, Prisma.BarangWhereInput>
 }, "id">
@@ -238,6 +252,7 @@ export type BarisReturPembelianOrderByWithAggregationInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
   _count?: Prisma.BarisReturPembelianCountOrderByAggregateInput
   _avg?: Prisma.BarisReturPembelianAvgOrderByAggregateInput
   _max?: Prisma.BarisReturPembelianMaxOrderByAggregateInput
@@ -253,11 +268,13 @@ export type BarisReturPembelianScalarWhereWithAggregatesInput = {
   returId?: Prisma.StringWithAggregatesFilter<"BarisReturPembelian"> | string
   barangId?: Prisma.StringWithAggregatesFilter<"BarisReturPembelian"> | string
   jumlah?: Prisma.DecimalWithAggregatesFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalWithAggregatesFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianCreateInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retur: Prisma.ReturPembelianCreateNestedOneWithoutBarisInput
   barang: Prisma.BarangCreateNestedOneWithoutBarisReturPembelianInput
 }
@@ -267,11 +284,13 @@ export type BarisReturPembelianUncheckedCreateInput = {
   returId: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.ReturPembelianUpdateOneRequiredWithoutBarisNestedInput
   barang?: Prisma.BarangUpdateOneRequiredWithoutBarisReturPembelianNestedInput
 }
@@ -281,6 +300,7 @@ export type BarisReturPembelianUncheckedUpdateInput = {
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianCreateManyInput = {
@@ -288,11 +308,13 @@ export type BarisReturPembelianCreateManyInput = {
   returId: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUncheckedUpdateManyInput = {
@@ -300,6 +322,7 @@ export type BarisReturPembelianUncheckedUpdateManyInput = {
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianListRelationFilter = {
@@ -317,10 +340,12 @@ export type BarisReturPembelianCountOrderByAggregateInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPembelianAvgOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPembelianMaxOrderByAggregateInput = {
@@ -328,6 +353,7 @@ export type BarisReturPembelianMaxOrderByAggregateInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPembelianMinOrderByAggregateInput = {
@@ -335,10 +361,12 @@ export type BarisReturPembelianMinOrderByAggregateInput = {
   returId?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPembelianSumOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
+  hargaPokok?: Prisma.SortOrder
 }
 
 export type BarisReturPembelianCreateNestedManyWithoutBarangInput = {
@@ -428,6 +456,7 @@ export type BarisReturPembelianUncheckedUpdateManyWithoutReturNestedInput = {
 export type BarisReturPembelianCreateWithoutBarangInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
   retur: Prisma.ReturPembelianCreateNestedOneWithoutBarisInput
 }
 
@@ -435,6 +464,7 @@ export type BarisReturPembelianUncheckedCreateWithoutBarangInput = {
   id?: string
   returId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianCreateOrConnectWithoutBarangInput = {
@@ -471,11 +501,13 @@ export type BarisReturPembelianScalarWhereInput = {
   returId?: Prisma.StringFilter<"BarisReturPembelian"> | string
   barangId?: Prisma.StringFilter<"BarisReturPembelian"> | string
   jumlah?: Prisma.DecimalFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFilter<"BarisReturPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianCreateWithoutReturInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
   barang: Prisma.BarangCreateNestedOneWithoutBarisReturPembelianInput
 }
 
@@ -483,6 +515,7 @@ export type BarisReturPembelianUncheckedCreateWithoutReturInput = {
   id?: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianCreateOrConnectWithoutReturInput = {
@@ -515,11 +548,13 @@ export type BarisReturPembelianCreateManyBarangInput = {
   id?: string
   returId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUpdateWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   retur?: Prisma.ReturPembelianUpdateOneRequiredWithoutBarisNestedInput
 }
 
@@ -527,23 +562,27 @@ export type BarisReturPembelianUncheckedUpdateWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUncheckedUpdateManyWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   returId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianCreateManyReturInput = {
   id?: string
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUpdateWithoutReturInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   barang?: Prisma.BarangUpdateOneRequiredWithoutBarisReturPembelianNestedInput
 }
 
@@ -551,12 +590,14 @@ export type BarisReturPembelianUncheckedUpdateWithoutReturInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisReturPembelianUncheckedUpdateManyWithoutReturInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -566,6 +607,7 @@ export type BarisReturPembelianSelect<ExtArgs extends runtime.Types.Extensions.I
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
   retur?: boolean | Prisma.ReturPembelianDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisReturPembelian"]>
@@ -575,6 +617,7 @@ export type BarisReturPembelianSelectCreateManyAndReturn<ExtArgs extends runtime
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
   retur?: boolean | Prisma.ReturPembelianDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisReturPembelian"]>
@@ -584,6 +627,7 @@ export type BarisReturPembelianSelectUpdateManyAndReturn<ExtArgs extends runtime
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
   retur?: boolean | Prisma.ReturPembelianDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisReturPembelian"]>
@@ -593,9 +637,10 @@ export type BarisReturPembelianSelectScalar = {
   returId?: boolean
   barangId?: boolean
   jumlah?: boolean
+  hargaPokok?: boolean
 }
 
-export type BarisReturPembelianOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "returId" | "barangId" | "jumlah", ExtArgs["result"]["barisReturPembelian"]>
+export type BarisReturPembelianOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "returId" | "barangId" | "jumlah" | "hargaPokok", ExtArgs["result"]["barisReturPembelian"]>
 export type BarisReturPembelianInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   retur?: boolean | Prisma.ReturPembelianDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
@@ -620,6 +665,7 @@ export type $BarisReturPembelianPayload<ExtArgs extends runtime.Types.Extensions
     returId: string
     barangId: string
     jumlah: runtime.Decimal
+    hargaPokok: runtime.Decimal
   }, ExtArgs["result"]["barisReturPembelian"]>
   composites: {}
 }
@@ -1049,6 +1095,7 @@ export interface BarisReturPembelianFieldRefs {
   readonly returId: Prisma.FieldRef<"BarisReturPembelian", 'String'>
   readonly barangId: Prisma.FieldRef<"BarisReturPembelian", 'String'>
   readonly jumlah: Prisma.FieldRef<"BarisReturPembelian", 'Decimal'>
+  readonly hargaPokok: Prisma.FieldRef<"BarisReturPembelian", 'Decimal'>
 }
     
 

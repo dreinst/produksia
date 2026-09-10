@@ -43,6 +43,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "1-1400", nama: "Uang Muka ke Vendor / Supplier", jenis: A, induk: "1-1000", asal: "USUL" },
   { kode: "1-1500", nama: "Biaya Dibayar Dimuka", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Sewa/asuransi yang dibayar di depan, dibebankan bertahap" },
   { kode: "1-1600", nama: "Persediaan", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Barang produksi & merchandise yang dijual (dipakai otomatis oleh modul stok)" },
+  { kode: "1-1650", nama: "Barang Terkirim Belum Ditagih", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Aset sementara antara Surat Jalan (SJ) dan Faktur Penjualan (FJ); dipakai otomatis oleh sistem" },
   { kode: "1-1700", nama: "Piutang Lain-lain", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Kasbon karyawan/crew, piutang non-usaha" },
   { kode: "1-1800", nama: "PPN Masukan", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "PPN yang dibayar ke vendor (hanya bila PKP); dipakai otomatis oleh Faktur Pembelian" },
   { kode: "1-1900", nama: "Pajak Dibayar Dimuka (PPh 23)", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "PPh 23 yang dipotong klien dari pembayaran; dipakai otomatis oleh Penerimaan" },
@@ -181,6 +182,7 @@ export const PEMETAAN_STANDAR = {
   bebanJasa: "5-1200",
   barangBelumDitagih: "2-1600",
   selisihPersediaan: "5-1400",
+  barangTerkirim: "1-1650",
 } as const;
 
 /** Butir yang semula "pending" di catatan, beserta keputusan kurasinya (ditampilkan di halaman Bagan Akun). */

@@ -31,6 +31,7 @@ export type PengirimanPesananMinAggregateOutputType = {
   pesananId: string | null
   gudangId: string | null
   status: $Enums.StatusDokumen | null
+  jurnalId: string | null
 }
 
 export type PengirimanPesananMaxAggregateOutputType = {
@@ -40,6 +41,7 @@ export type PengirimanPesananMaxAggregateOutputType = {
   pesananId: string | null
   gudangId: string | null
   status: $Enums.StatusDokumen | null
+  jurnalId: string | null
 }
 
 export type PengirimanPesananCountAggregateOutputType = {
@@ -49,6 +51,7 @@ export type PengirimanPesananCountAggregateOutputType = {
   pesananId: number
   gudangId: number
   status: number
+  jurnalId: number
   _all: number
 }
 
@@ -60,6 +63,7 @@ export type PengirimanPesananMinAggregateInputType = {
   pesananId?: true
   gudangId?: true
   status?: true
+  jurnalId?: true
 }
 
 export type PengirimanPesananMaxAggregateInputType = {
@@ -69,6 +73,7 @@ export type PengirimanPesananMaxAggregateInputType = {
   pesananId?: true
   gudangId?: true
   status?: true
+  jurnalId?: true
 }
 
 export type PengirimanPesananCountAggregateInputType = {
@@ -78,6 +83,7 @@ export type PengirimanPesananCountAggregateInputType = {
   pesananId?: true
   gudangId?: true
   status?: true
+  jurnalId?: true
   _all?: true
 }
 
@@ -160,6 +166,7 @@ export type PengirimanPesananGroupByOutputType = {
   pesananId: string
   gudangId: string
   status: $Enums.StatusDokumen
+  jurnalId: string | null
   _count: PengirimanPesananCountAggregateOutputType | null
   _min: PengirimanPesananMinAggregateOutputType | null
   _max: PengirimanPesananMaxAggregateOutputType | null
@@ -190,8 +197,10 @@ export type PengirimanPesananWhereInput = {
   pesananId?: Prisma.StringFilter<"PengirimanPesanan"> | string
   gudangId?: Prisma.StringFilter<"PengirimanPesanan"> | string
   status?: Prisma.EnumStatusDokumenFilter<"PengirimanPesanan"> | $Enums.StatusDokumen
+  jurnalId?: Prisma.StringNullableFilter<"PengirimanPesanan"> | string | null
   pesanan?: Prisma.XOR<Prisma.PesananPenjualanScalarRelationFilter, Prisma.PesananPenjualanWhereInput>
   gudang?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
+  jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   baris?: Prisma.BarisPengirimanListRelationFilter
   faktur?: Prisma.FakturPenjualanListRelationFilter
 }
@@ -203,8 +212,10 @@ export type PengirimanPesananOrderByWithRelationInput = {
   pesananId?: Prisma.SortOrder
   gudangId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
   pesanan?: Prisma.PesananPenjualanOrderByWithRelationInput
   gudang?: Prisma.GudangOrderByWithRelationInput
+  jurnal?: Prisma.JurnalOrderByWithRelationInput
   baris?: Prisma.BarisPengirimanOrderByRelationAggregateInput
   faktur?: Prisma.FakturPenjualanOrderByRelationAggregateInput
 }
@@ -212,6 +223,7 @@ export type PengirimanPesananOrderByWithRelationInput = {
 export type PengirimanPesananWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   nomor?: string
+  jurnalId?: string
   AND?: Prisma.PengirimanPesananWhereInput | Prisma.PengirimanPesananWhereInput[]
   OR?: Prisma.PengirimanPesananWhereInput[]
   NOT?: Prisma.PengirimanPesananWhereInput | Prisma.PengirimanPesananWhereInput[]
@@ -221,9 +233,10 @@ export type PengirimanPesananWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumStatusDokumenFilter<"PengirimanPesanan"> | $Enums.StatusDokumen
   pesanan?: Prisma.XOR<Prisma.PesananPenjualanScalarRelationFilter, Prisma.PesananPenjualanWhereInput>
   gudang?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
+  jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   baris?: Prisma.BarisPengirimanListRelationFilter
   faktur?: Prisma.FakturPenjualanListRelationFilter
-}, "id" | "nomor">
+}, "id" | "nomor" | "jurnalId">
 
 export type PengirimanPesananOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -232,6 +245,7 @@ export type PengirimanPesananOrderByWithAggregationInput = {
   pesananId?: Prisma.SortOrder
   gudangId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PengirimanPesananCountOrderByAggregateInput
   _max?: Prisma.PengirimanPesananMaxOrderByAggregateInput
   _min?: Prisma.PengirimanPesananMinOrderByAggregateInput
@@ -247,6 +261,7 @@ export type PengirimanPesananScalarWhereWithAggregatesInput = {
   pesananId?: Prisma.StringWithAggregatesFilter<"PengirimanPesanan"> | string
   gudangId?: Prisma.StringWithAggregatesFilter<"PengirimanPesanan"> | string
   status?: Prisma.EnumStatusDokumenWithAggregatesFilter<"PengirimanPesanan"> | $Enums.StatusDokumen
+  jurnalId?: Prisma.StringNullableWithAggregatesFilter<"PengirimanPesanan"> | string | null
 }
 
 export type PengirimanPesananCreateInput = {
@@ -256,6 +271,7 @@ export type PengirimanPesananCreateInput = {
   status?: $Enums.StatusDokumen
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutPengirimanInput
   gudang: Prisma.GudangCreateNestedOneWithoutPengirimanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPengirimanInput
   baris?: Prisma.BarisPengirimanCreateNestedManyWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPengirimanInput
 }
@@ -267,6 +283,7 @@ export type PengirimanPesananUncheckedCreateInput = {
   pesananId: string
   gudangId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
   baris?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPengirimanInput
 }
@@ -278,6 +295,7 @@ export type PengirimanPesananUpdateInput = {
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutPengirimanNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPengirimanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPengirimanNestedInput
   baris?: Prisma.BarisPengirimanUpdateManyWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPengirimanNestedInput
 }
@@ -289,6 +307,7 @@ export type PengirimanPesananUncheckedUpdateInput = {
   pesananId?: Prisma.StringFieldUpdateOperationsInput | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPengirimanNestedInput
 }
@@ -300,6 +319,7 @@ export type PengirimanPesananCreateManyInput = {
   pesananId: string
   gudangId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
 }
 
 export type PengirimanPesananUpdateManyMutationInput = {
@@ -316,6 +336,7 @@ export type PengirimanPesananUncheckedUpdateManyInput = {
   pesananId?: Prisma.StringFieldUpdateOperationsInput | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PengirimanPesananListRelationFilter = {
@@ -335,6 +356,7 @@ export type PengirimanPesananCountOrderByAggregateInput = {
   pesananId?: Prisma.SortOrder
   gudangId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrder
 }
 
 export type PengirimanPesananMaxOrderByAggregateInput = {
@@ -344,6 +366,7 @@ export type PengirimanPesananMaxOrderByAggregateInput = {
   pesananId?: Prisma.SortOrder
   gudangId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrder
 }
 
 export type PengirimanPesananMinOrderByAggregateInput = {
@@ -353,6 +376,7 @@ export type PengirimanPesananMinOrderByAggregateInput = {
   pesananId?: Prisma.SortOrder
   gudangId?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  jurnalId?: Prisma.SortOrder
 }
 
 export type PengirimanPesananScalarRelationFilter = {
@@ -479,12 +503,45 @@ export type PengirimanPesananUpdateOneWithoutFakturNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PengirimanPesananUpdateToOneWithWhereWithoutFakturInput, Prisma.PengirimanPesananUpdateWithoutFakturInput>, Prisma.PengirimanPesananUncheckedUpdateWithoutFakturInput>
 }
 
+export type PengirimanPesananCreateNestedOneWithoutJurnalInput = {
+  create?: Prisma.XOR<Prisma.PengirimanPesananCreateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.PengirimanPesananCreateOrConnectWithoutJurnalInput
+  connect?: Prisma.PengirimanPesananWhereUniqueInput
+}
+
+export type PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput = {
+  create?: Prisma.XOR<Prisma.PengirimanPesananCreateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.PengirimanPesananCreateOrConnectWithoutJurnalInput
+  connect?: Prisma.PengirimanPesananWhereUniqueInput
+}
+
+export type PengirimanPesananUpdateOneWithoutJurnalNestedInput = {
+  create?: Prisma.XOR<Prisma.PengirimanPesananCreateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.PengirimanPesananCreateOrConnectWithoutJurnalInput
+  upsert?: Prisma.PengirimanPesananUpsertWithoutJurnalInput
+  disconnect?: Prisma.PengirimanPesananWhereInput | boolean
+  delete?: Prisma.PengirimanPesananWhereInput | boolean
+  connect?: Prisma.PengirimanPesananWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PengirimanPesananUpdateToOneWithWhereWithoutJurnalInput, Prisma.PengirimanPesananUpdateWithoutJurnalInput>, Prisma.PengirimanPesananUncheckedUpdateWithoutJurnalInput>
+}
+
+export type PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput = {
+  create?: Prisma.XOR<Prisma.PengirimanPesananCreateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedCreateWithoutJurnalInput>
+  connectOrCreate?: Prisma.PengirimanPesananCreateOrConnectWithoutJurnalInput
+  upsert?: Prisma.PengirimanPesananUpsertWithoutJurnalInput
+  disconnect?: Prisma.PengirimanPesananWhereInput | boolean
+  delete?: Prisma.PengirimanPesananWhereInput | boolean
+  connect?: Prisma.PengirimanPesananWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PengirimanPesananUpdateToOneWithWhereWithoutJurnalInput, Prisma.PengirimanPesananUpdateWithoutJurnalInput>, Prisma.PengirimanPesananUncheckedUpdateWithoutJurnalInput>
+}
+
 export type PengirimanPesananCreateWithoutGudangInput = {
   id?: string
   nomor: string
   tanggal?: Date | string
   status?: $Enums.StatusDokumen
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutPengirimanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPengirimanInput
   baris?: Prisma.BarisPengirimanCreateNestedManyWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPengirimanInput
 }
@@ -495,6 +552,7 @@ export type PengirimanPesananUncheckedCreateWithoutGudangInput = {
   tanggal?: Date | string
   pesananId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
   baris?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPengirimanInput
 }
@@ -535,6 +593,7 @@ export type PengirimanPesananScalarWhereInput = {
   pesananId?: Prisma.StringFilter<"PengirimanPesanan"> | string
   gudangId?: Prisma.StringFilter<"PengirimanPesanan"> | string
   status?: Prisma.EnumStatusDokumenFilter<"PengirimanPesanan"> | $Enums.StatusDokumen
+  jurnalId?: Prisma.StringNullableFilter<"PengirimanPesanan"> | string | null
 }
 
 export type PengirimanPesananCreateWithoutPesananInput = {
@@ -543,6 +602,7 @@ export type PengirimanPesananCreateWithoutPesananInput = {
   tanggal?: Date | string
   status?: $Enums.StatusDokumen
   gudang: Prisma.GudangCreateNestedOneWithoutPengirimanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPengirimanInput
   baris?: Prisma.BarisPengirimanCreateNestedManyWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPengirimanInput
 }
@@ -553,6 +613,7 @@ export type PengirimanPesananUncheckedCreateWithoutPesananInput = {
   tanggal?: Date | string
   gudangId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
   baris?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPengirimanInput
 }
@@ -590,6 +651,7 @@ export type PengirimanPesananCreateWithoutBarisInput = {
   status?: $Enums.StatusDokumen
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutPengirimanInput
   gudang: Prisma.GudangCreateNestedOneWithoutPengirimanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPengirimanInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPengirimanInput
 }
 
@@ -600,6 +662,7 @@ export type PengirimanPesananUncheckedCreateWithoutBarisInput = {
   pesananId: string
   gudangId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPengirimanInput
 }
 
@@ -626,6 +689,7 @@ export type PengirimanPesananUpdateWithoutBarisInput = {
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutPengirimanNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPengirimanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPengirimanNestedInput
 }
 
@@ -636,6 +700,7 @@ export type PengirimanPesananUncheckedUpdateWithoutBarisInput = {
   pesananId?: Prisma.StringFieldUpdateOperationsInput | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPengirimanNestedInput
 }
 
@@ -646,6 +711,7 @@ export type PengirimanPesananCreateWithoutFakturInput = {
   status?: $Enums.StatusDokumen
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutPengirimanInput
   gudang: Prisma.GudangCreateNestedOneWithoutPengirimanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPengirimanInput
   baris?: Prisma.BarisPengirimanCreateNestedManyWithoutPengirimanInput
 }
 
@@ -656,6 +722,7 @@ export type PengirimanPesananUncheckedCreateWithoutFakturInput = {
   pesananId: string
   gudangId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
   baris?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutPengirimanInput
 }
 
@@ -682,6 +749,7 @@ export type PengirimanPesananUpdateWithoutFakturInput = {
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutPengirimanNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPengirimanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPengirimanNestedInput
   baris?: Prisma.BarisPengirimanUpdateManyWithoutPengirimanNestedInput
 }
 
@@ -692,7 +760,68 @@ export type PengirimanPesananUncheckedUpdateWithoutFakturInput = {
   pesananId?: Prisma.StringFieldUpdateOperationsInput | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutPengirimanNestedInput
+}
+
+export type PengirimanPesananCreateWithoutJurnalInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  status?: $Enums.StatusDokumen
+  pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutPengirimanInput
+  gudang: Prisma.GudangCreateNestedOneWithoutPengirimanInput
+  baris?: Prisma.BarisPengirimanCreateNestedManyWithoutPengirimanInput
+  faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPengirimanInput
+}
+
+export type PengirimanPesananUncheckedCreateWithoutJurnalInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pesananId: string
+  gudangId: string
+  status?: $Enums.StatusDokumen
+  baris?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutPengirimanInput
+  faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPengirimanInput
+}
+
+export type PengirimanPesananCreateOrConnectWithoutJurnalInput = {
+  where: Prisma.PengirimanPesananWhereUniqueInput
+  create: Prisma.XOR<Prisma.PengirimanPesananCreateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedCreateWithoutJurnalInput>
+}
+
+export type PengirimanPesananUpsertWithoutJurnalInput = {
+  update: Prisma.XOR<Prisma.PengirimanPesananUpdateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedUpdateWithoutJurnalInput>
+  create: Prisma.XOR<Prisma.PengirimanPesananCreateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedCreateWithoutJurnalInput>
+  where?: Prisma.PengirimanPesananWhereInput
+}
+
+export type PengirimanPesananUpdateToOneWithWhereWithoutJurnalInput = {
+  where?: Prisma.PengirimanPesananWhereInput
+  data: Prisma.XOR<Prisma.PengirimanPesananUpdateWithoutJurnalInput, Prisma.PengirimanPesananUncheckedUpdateWithoutJurnalInput>
+}
+
+export type PengirimanPesananUpdateWithoutJurnalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutPengirimanNestedInput
+  gudang?: Prisma.GudangUpdateOneRequiredWithoutPengirimanNestedInput
+  baris?: Prisma.BarisPengirimanUpdateManyWithoutPengirimanNestedInput
+  faktur?: Prisma.FakturPenjualanUpdateManyWithoutPengirimanNestedInput
+}
+
+export type PengirimanPesananUncheckedUpdateWithoutJurnalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  baris?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutPengirimanNestedInput
+  faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPengirimanNestedInput
 }
 
 export type PengirimanPesananCreateManyGudangInput = {
@@ -701,6 +830,7 @@ export type PengirimanPesananCreateManyGudangInput = {
   tanggal?: Date | string
   pesananId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
 }
 
 export type PengirimanPesananUpdateWithoutGudangInput = {
@@ -709,6 +839,7 @@ export type PengirimanPesananUpdateWithoutGudangInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutPengirimanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPengirimanNestedInput
   baris?: Prisma.BarisPengirimanUpdateManyWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPengirimanNestedInput
 }
@@ -719,6 +850,7 @@ export type PengirimanPesananUncheckedUpdateWithoutGudangInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pesananId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPengirimanNestedInput
 }
@@ -729,6 +861,7 @@ export type PengirimanPesananUncheckedUpdateManyWithoutGudangInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pesananId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PengirimanPesananCreateManyPesananInput = {
@@ -737,6 +870,7 @@ export type PengirimanPesananCreateManyPesananInput = {
   tanggal?: Date | string
   gudangId: string
   status?: $Enums.StatusDokumen
+  jurnalId?: string | null
 }
 
 export type PengirimanPesananUpdateWithoutPesananInput = {
@@ -745,6 +879,7 @@ export type PengirimanPesananUpdateWithoutPesananInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPengirimanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPengirimanNestedInput
   baris?: Prisma.BarisPengirimanUpdateManyWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPengirimanNestedInput
 }
@@ -755,6 +890,7 @@ export type PengirimanPesananUncheckedUpdateWithoutPesananInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutPengirimanNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPengirimanNestedInput
 }
@@ -765,6 +901,7 @@ export type PengirimanPesananUncheckedUpdateManyWithoutPesananInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStatusDokumenFieldUpdateOperationsInput | $Enums.StatusDokumen
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -814,8 +951,10 @@ export type PengirimanPesananSelect<ExtArgs extends runtime.Types.Extensions.Int
   pesananId?: boolean
   gudangId?: boolean
   status?: boolean
+  jurnalId?: boolean
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>
   baris?: boolean | Prisma.PengirimanPesanan$barisArgs<ExtArgs>
   faktur?: boolean | Prisma.PengirimanPesanan$fakturArgs<ExtArgs>
   _count?: boolean | Prisma.PengirimanPesananCountOutputTypeDefaultArgs<ExtArgs>
@@ -828,8 +967,10 @@ export type PengirimanPesananSelectCreateManyAndReturn<ExtArgs extends runtime.T
   pesananId?: boolean
   gudangId?: boolean
   status?: boolean
+  jurnalId?: boolean
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>
 }, ExtArgs["result"]["pengirimanPesanan"]>
 
 export type PengirimanPesananSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -839,8 +980,10 @@ export type PengirimanPesananSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   pesananId?: boolean
   gudangId?: boolean
   status?: boolean
+  jurnalId?: boolean
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>
 }, ExtArgs["result"]["pengirimanPesanan"]>
 
 export type PengirimanPesananSelectScalar = {
@@ -850,12 +993,14 @@ export type PengirimanPesananSelectScalar = {
   pesananId?: boolean
   gudangId?: boolean
   status?: boolean
+  jurnalId?: boolean
 }
 
-export type PengirimanPesananOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pesananId" | "gudangId" | "status", ExtArgs["result"]["pengirimanPesanan"]>
+export type PengirimanPesananOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pesananId" | "gudangId" | "status" | "jurnalId", ExtArgs["result"]["pengirimanPesanan"]>
 export type PengirimanPesananInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>
   baris?: boolean | Prisma.PengirimanPesanan$barisArgs<ExtArgs>
   faktur?: boolean | Prisma.PengirimanPesanan$fakturArgs<ExtArgs>
   _count?: boolean | Prisma.PengirimanPesananCountOutputTypeDefaultArgs<ExtArgs>
@@ -863,10 +1008,12 @@ export type PengirimanPesananInclude<ExtArgs extends runtime.Types.Extensions.In
 export type PengirimanPesananIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>
 }
 export type PengirimanPesananIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  jurnal?: boolean | Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>
 }
 
 export type $PengirimanPesananPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -874,6 +1021,7 @@ export type $PengirimanPesananPayload<ExtArgs extends runtime.Types.Extensions.I
   objects: {
     pesanan: Prisma.$PesananPenjualanPayload<ExtArgs>
     gudang: Prisma.$GudangPayload<ExtArgs>
+    jurnal: Prisma.$JurnalPayload<ExtArgs> | null
     baris: Prisma.$BarisPengirimanPayload<ExtArgs>[]
     faktur: Prisma.$FakturPenjualanPayload<ExtArgs>[]
   }
@@ -884,6 +1032,7 @@ export type $PengirimanPesananPayload<ExtArgs extends runtime.Types.Extensions.I
     pesananId: string
     gudangId: string
     status: $Enums.StatusDokumen
+    jurnalId: string | null
   }, ExtArgs["result"]["pengirimanPesanan"]>
   composites: {}
 }
@@ -1280,6 +1429,7 @@ export interface Prisma__PengirimanPesananClient<T, Null = never, ExtArgs extend
   readonly [Symbol.toStringTag]: "PrismaPromise"
   pesanan<T extends Prisma.PesananPenjualanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PesananPenjualanDefaultArgs<ExtArgs>>): Prisma.Prisma__PesananPenjualanClient<runtime.Types.Result.GetResult<Prisma.$PesananPenjualanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   gudang<T extends Prisma.GudangDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GudangDefaultArgs<ExtArgs>>): Prisma.Prisma__GudangClient<runtime.Types.Result.GetResult<Prisma.$GudangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  jurnal<T extends Prisma.PengirimanPesanan$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PengirimanPesanan$jurnalArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   baris<T extends Prisma.PengirimanPesanan$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PengirimanPesanan$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPengirimanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faktur<T extends Prisma.PengirimanPesanan$fakturArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PengirimanPesanan$fakturArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FakturPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1317,6 +1467,7 @@ export interface PengirimanPesananFieldRefs {
   readonly pesananId: Prisma.FieldRef<"PengirimanPesanan", 'String'>
   readonly gudangId: Prisma.FieldRef<"PengirimanPesanan", 'String'>
   readonly status: Prisma.FieldRef<"PengirimanPesanan", 'StatusDokumen'>
+  readonly jurnalId: Prisma.FieldRef<"PengirimanPesanan", 'String'>
 }
     
 
@@ -1715,6 +1866,25 @@ export type PengirimanPesananDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many PengirimanPesanans to delete.
    */
   limit?: number
+}
+
+/**
+ * PengirimanPesanan.jurnal
+ */
+export type PengirimanPesanan$jurnalArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Jurnal
+   */
+  select?: Prisma.JurnalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Jurnal
+   */
+  omit?: Prisma.JurnalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.JurnalInclude<ExtArgs> | null
+  where?: Prisma.JurnalWhereInput
 }
 
 /**

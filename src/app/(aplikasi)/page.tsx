@@ -481,6 +481,7 @@ export default async function Beranda() {
                 { t: "Piutang = sisa faktur penjualan", ok: sinkron.piutang.sinkron, d: `Buku besar ${rp(Number(sinkron.piutang.bukuBesar))} · dokumen ${rp(Number(sinkron.piutang.dokumen))}` },
                 { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
                 { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
+                { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
                 { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
               ].map(({ t, ok, d }) => (
                 <div key={t} className="flex items-start gap-2.5">

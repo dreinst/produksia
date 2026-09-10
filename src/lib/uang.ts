@@ -48,3 +48,11 @@ export function bacaUang(raw: FormDataEntryValue | null, label: string, opts: { 
 export function format(v: NilaiDesimal): string {
   return D(v).toNumber().toLocaleString("id-ID");
 }
+
+/** Nilai terkecil / terbesar dari dua Decimal (Prisma.Decimal tidak menyediakan min/max statis pada alias D). */
+export function terkecil(a: Desimal, b: Desimal): Desimal {
+  return a.lte(b) ? a : b;
+}
+export function terbesar(a: Desimal, b: Desimal): Desimal {
+  return a.gte(b) ? a : b;
+}

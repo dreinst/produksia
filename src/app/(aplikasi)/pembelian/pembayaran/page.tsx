@@ -1,3 +1,5 @@
+import { punyaHak } from "@/lib/hakAkses";
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
@@ -5,7 +7,8 @@ import { db } from "@/lib/db";
 import { NomorDokumen, labelMetodeBayar } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPembayaranPembelian({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await wajibHak("pembelian.lihat");
+  const pengguna = await wajibHak("pembelian.lihat");
+  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { faktur: { nomor: cocokTeks(param.q) } }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
   const [total, daftarPembayaran] = await Promise.all([
@@ -32,6 +35,7 @@ export default async function HalamanPembayaranPembelian({ searchParams }: { sea
             <th>Pemasok</th>
             <th className="text-right">Jumlah</th>
             <th>Metode</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -43,11 +47,12 @@ export default async function HalamanPembayaranPembelian({ searchParams }: { sea
               <td>{p.pemasok.nama}</td>
               <td className="text-right angka">{Number(p.jumlah).toLocaleString("id-ID")}</td>
               <td>{labelMetodeBayar(p.metodeBayar)}</td>
+              <td className="text-right"><TombolHapusDokumen jenis="pembayaran" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
             </tr>
           ))}
           {daftarPembayaran.length === 0 && (
             <tr>
-              <td colSpan={6} className="kosong">
+              <td colSpan={7} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada pembayaran."}
               </td>
             </tr>

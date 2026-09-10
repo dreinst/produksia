@@ -1,3 +1,5 @@
+import { punyaHak } from "@/lib/hakAkses";
+import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
@@ -5,7 +7,8 @@ import { db } from "@/lib/db";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPenerimaanBarang({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await wajibHak("pembelian.lihat");
+  const pengguna = await wajibHak("pembelian.lihat");
+  const bolehHapus = punyaHak(pengguna.peran, "dokumen.hapus");
   const param = await bacaParamDaftar(searchParams);
   const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pesanan: { nomor: cocokTeks(param.q) } }, { pesanan: { pemasok: { nama: cocokTeks(param.q) } } }] } : undefined;
   const [total, daftarPenerimaan] = await Promise.all([
@@ -32,6 +35,7 @@ export default async function HalamanPenerimaanBarang({ searchParams }: { search
             <th>Pemasok</th>
             <th>Gudang</th>
             <th>Status</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -43,11 +47,12 @@ export default async function HalamanPenerimaanBarang({ searchParams }: { search
               <td>{r.pesanan.pemasok.nama}</td>
               <td>{r.gudang.nama}</td>
               <td><LencanaStatus status={r.status} /></td>
+              <td className="text-right"><TombolHapusDokumen jenis="penerimaanBarang" id={r.id} nomor={r.nomor} boleh={bolehHapus} /></td>
             </tr>
           ))}
           {daftarPenerimaan.length === 0 && (
             <tr>
-              <td colSpan={6} className="kosong">
+              <td colSpan={7} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada penerimaan barang."}
               </td>
             </tr>

@@ -217,3 +217,8 @@ export type BarisPenyesuaianPersediaan = Prisma.BarisPenyesuaianPersediaanModel
  * 
  */
 export type PengaturanPerusahaan = Prisma.PengaturanPerusahaanModel
+/**
+ * Model LogAktivitas
+ * 
+ */
+export type LogAktivitas = Prisma.LogAktivitasModel

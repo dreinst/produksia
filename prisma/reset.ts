@@ -3,6 +3,7 @@ import { db } from "../src/lib/db";
 
 async function main() {
   console.log("=== Menghapus semua data transaksi & master data ===");
+  await db.logAktivitas.deleteMany();
   await db.barisPenyesuaianPersediaan.deleteMany();
   await db.penyesuaianPersediaan.deleteMany();
   await db.penyusutanAset.deleteMany();

@@ -12,6 +12,7 @@ async function main() {
     ["Piutang = sisa faktur penjualan", s.piutang.sinkron, `buku besar ${rp(s.piutang.bukuBesar)} · dokumen ${rp(s.piutang.dokumen)}`],
     ["Hutang = sisa faktur pembelian", s.hutang.sinkron, `buku besar ${rp(s.hutang.bukuBesar)} · dokumen ${rp(s.hutang.dokumen)}`],
     ["Barang diterima belum ditagih", s.barangBelumDitagih.sinkron, `buku besar ${rp(s.barangBelumDitagih.bukuBesar)} · TB belum difaktur ${rp(s.barangBelumDitagih.dokumen)}`],
+    ["Barang terkirim belum ditagih", s.barangTerkirim.sinkron, `buku besar ${rp(s.barangTerkirim.bukuBesar)} · SJ belum difaktur ${rp(s.barangTerkirim.dokumen)}`],
   ] as const;
   let gagal = 0;
   for (const [nama, ok, detail] of baris) {

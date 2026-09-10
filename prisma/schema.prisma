@@ -279,6 +279,8 @@ model PengirimanPesanan {
   gudangId  String
   gudang    Gudang           @relation(fields: [gudangId], references: [id])
   status    StatusDokumen    @default(DRAF)
+  jurnalId  String?          @unique
+  jurnal    Jurnal?          @relation("JurnalPengiriman", fields: [jurnalId], references: [id])
 
   baris  BarisPengiriman[]
   faktur FakturPenjualan[]
@@ -293,6 +295,10 @@ model BarisPengiriman {
   barangId       String
   barang         Barang                @relation(fields: [barangId], references: [id])
   jumlah         Decimal               @db.Decimal(18, 2)
+  /// harga pokok rata-rata saat barang keluar (menilai akun Barang Terkirim Belum Ditagih)
+  hargaPokok     Decimal               @default(0) @db.Decimal(18, 2)
+  /// bagian dari baris ini yang sudah dikonsumsi Faktur Penjualan (HPP sudah diakui)
+  jumlahDifaktur Decimal               @default(0) @db.Decimal(18, 2)
 }
 
 model FakturPenjualan {
@@ -312,6 +318,8 @@ model FakturPenjualan {
   dpp        Decimal @default(0) @db.Decimal(18, 2)
   ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
   ppn        Decimal @default(0) @db.Decimal(18, 2)
+  jurnalId   String? @unique
+  jurnal     Jurnal? @relation("JurnalFakturPenjualan", fields: [jurnalId], references: [id])
 
   baris      BarisFakturPenjualan[]
   penerimaan PenerimaanPenjualan[]
@@ -342,6 +350,8 @@ model PenerimaanPenjualan {
   jumlah      Decimal         @db.Decimal(18, 2)
   /// PPh 23 yang dipotong pelanggan (mengurangi piutang, dicatat sebagai pajak dibayar dimuka)
   potonganPajak Decimal @default(0) @db.Decimal(18, 2)
+  jurnalId      String? @unique
+  jurnal        Jurnal? @relation("JurnalPenerimaanPenjualan", fields: [jurnalId], references: [id])
   metodeBayar String          @default("TUNAI")
 }
 
@@ -357,6 +367,8 @@ model ReturPenjualan {
   total    Decimal @default(0) @db.Decimal(18, 2)
   dpp      Decimal @default(0) @db.Decimal(18, 2)
   ppn      Decimal @default(0) @db.Decimal(18, 2)
+  jurnalId String? @unique
+  jurnal   Jurnal? @relation("JurnalReturPenjualan", fields: [jurnalId], references: [id])
 
   baris BarisReturPenjualan[]
 }
@@ -368,6 +380,7 @@ model BarisReturPenjualan {
   barangId String
   barang   Barang         @relation(fields: [barangId], references: [id])
   jumlah   Decimal        @db.Decimal(18, 2)
+  hargaPokok Decimal      @default(0) @db.Decimal(18, 2)
 }
 
 // ---------- Siklus Pembelian ----------
@@ -425,6 +438,8 @@ model BarisPenerimaanBarang {
   barangId       String
   barang         Barang                @relation(fields: [barangId], references: [id])
   jumlah         Decimal               @db.Decimal(18, 2)
+  /// harga satuan (dari pesanan) yang dipakai menilai persediaan masuk
+  hargaSatuan    Decimal               @default(0) @db.Decimal(18, 2)
 }
 
 model FakturPembelian {
@@ -443,6 +458,8 @@ model FakturPembelian {
   dpp        Decimal @default(0) @db.Decimal(18, 2)
   ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
   ppn        Decimal @default(0) @db.Decimal(18, 2)
+  jurnalId   String? @unique
+  jurnal     Jurnal? @relation("JurnalFakturPembelian", fields: [jurnalId], references: [id])
 
   baris      BarisFakturPembelian[]
   pembayaran PembayaranPembelian[]
@@ -473,6 +490,8 @@ model PembayaranPembelian {
   jumlah      Decimal         @db.Decimal(18, 2)
   /// PPh 23 yang kita potong dari vendor (mengurangi hutang, dicatat sebagai hutang PPh 23)
   potonganPajak Decimal @default(0) @db.Decimal(18, 2)
+  jurnalId      String? @unique
+  jurnal        Jurnal? @relation("JurnalPembayaranPembelian", fields: [jurnalId], references: [id])
   metodeBayar String          @default("TRANSFER")
 }
 
@@ -488,6 +507,8 @@ model ReturPembelian {
   total    Decimal @default(0) @db.Decimal(18, 2)
   dpp      Decimal @default(0) @db.Decimal(18, 2)
   ppn      Decimal @default(0) @db.Decimal(18, 2)
+  jurnalId String? @unique
+  jurnal   Jurnal? @relation("JurnalReturPembelian", fields: [jurnalId], references: [id])
 
   baris BarisReturPembelian[]
 }
@@ -499,6 +520,7 @@ model BarisReturPembelian {
   barangId String
   barang   Barang         @relation(fields: [barangId], references: [id])
   jumlah   Decimal        @db.Decimal(18, 2)
+  hargaPokok Decimal      @default(0) @db.Decimal(18, 2)
 }
 
 // ---------- Buku Besar & Kas/Bank ----------
@@ -538,6 +560,7 @@ model Akun {
   pemetaanBebanJasa          PemetaanAkun? @relation("PetaBebanJasa")
   pemetaanBarangBelumDitagih PemetaanAkun? @relation("PetaBarangBelumDitagih")
   pemetaanSelisihPersediaan  PemetaanAkun? @relation("PetaSelisihPersediaan")
+  pemetaanBarangTerkirim     PemetaanAkun? @relation("PetaBarangTerkirim")
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
@@ -573,6 +596,9 @@ model PemetaanAkun {
   /// Selisih nilai persediaan (retur pembelian beda harga, penyesuaian stok)
   selisihPersediaanId String? @unique
   selisihPersediaan   Akun?   @relation("PetaSelisihPersediaan", fields: [selisihPersediaanId], references: [id])
+  /// Aset sementara: barang sudah dikirim (SJ) tapi belum difaktur (FJ)
+  barangTerkirimId String? @unique
+  barangTerkirim   Akun?   @relation("PetaBarangTerkirim", fields: [barangTerkirimId], references: [id])
 }
 
 model Jurnal {
@@ -587,6 +613,13 @@ model Jurnal {
   perolehanAset         AsetTetap?             @relation("JurnalPerolehanAset")
   penyesuaianPersediaan PenyesuaianPersediaan?
   penerimaanBarang      PenerimaanBarang?
+  pengiriman            PengirimanPesanan?     @relation("JurnalPengiriman")
+  fakturPenjualan       FakturPenjualan?       @relation("JurnalFakturPenjualan")
+  penerimaanPenjualan   PenerimaanPenjualan?   @relation("JurnalPenerimaanPenjualan")
+  returPenjualan        ReturPenjualan?        @relation("JurnalReturPenjualan")
+  fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
+  pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
+  returPembelian        ReturPembelian?        @relation("JurnalReturPembelian")
 }
 
 model BarisJurnal {
@@ -692,4 +725,21 @@ model PengaturanPerusahaan {
   /// PPh 23 yang kita potong dari vendor (kewajiban: hutang PPh 23)
   akunPph23DipotongId String? @unique
   akunPph23Dipotong   Akun?   @relation("PetaPph23Dipotong", fields: [akunPph23DipotongId], references: [id])
+}
+
+// ---------- Jejak audit ----------
+
+model LogAktivitas {
+  id           String   @id @default(cuid())
+  waktu        DateTime @default(now())
+  penggunaId   String?
+  penggunaNama String
+  /// HAPUS, TUTUP_BUKU, dll.
+  aksi         String
+  /// jenis dokumen (FakturPenjualan, PenerimaanBarang, ...)
+  jenis        String
+  nomor        String
+  keterangan   String?
+
+  @@index([waktu])
 }

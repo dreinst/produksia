@@ -90,31 +90,77 @@ export function hargaPokokBaris(info: InfoBarang, jumlah: Desimal): Desimal {
 
 // ---------- Penjualan ----------
 
-/** Faktur Penjualan: Dr Piutang (total) / Cr Pendapatan per akun; Dr HPP / Cr Persediaan per akun untuk BARANG. */
+/** Baris surat jalan yang dinilai: harga pokok saat kirim dan porsi yang sudah lebih dulu difaktur. */
+export type BarisKirim = { barangId: string; jumlah: Desimal; hargaPokok: Desimal; sudahDifaktur: Desimal };
+
+/**
+ * Surat Jalan: Cr Persediaan (qty × harga pokok saat kirim) — nilai stok turun bersamaan dengan fisiknya.
+ * Debitnya: HPP untuk porsi yang sudah difaktur lebih dulu, Barang Terkirim Belum Ditagih untuk sisanya
+ * (diakui sebagai HPP nanti saat Faktur Penjualan mengonsumsinya).
+ */
+export async function catatJurnalPengiriman(tx: Tx, pengiriman: { nomor: string }, daftarBaris: BarisKirim[]) {
+  const m = await ambilPemetaanAkun(tx);
+  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
+  const persediaan = pengumpul(), hpp = pengumpul();
+  let transit = NOL;
+  for (const b of daftarBaris) {
+    const info = ambilInfo(peta, b.barangId);
+    if (info.jenis !== "BARANG") continue;
+    const nilai = kali(b.jumlah, b.hargaPokok);
+    const nilaiHpp = kali(b.sudahDifaktur, b.hargaPokok);
+    persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, nilai);
+    hpp.tambah(info.akunHppId ?? m.hppId, nilaiHpp);
+    transit = transit.plus(nilai.minus(nilaiHpp));
+  }
+  if (persediaan.daftar().length === 0) return null;
+  if (transit.gt(0) && !m.barangTerkirimId) {
+    throw new Error("Pemetaan akun 'Barang Terkirim Belum Ditagih' belum diatur (Pengaturan > Pemetaan Akun)");
+  }
+  const baris: InputBarisJurnal[] = [
+    ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP (sudah difaktur) ${pengiriman.nomor}` })),
+    ...(transit.gt(0) && m.barangTerkirimId ? [{ akunId: m.barangTerkirimId, debit: transit, kredit: NOL, keterangan: `Barang terkirim ${pengiriman.nomor}` }] : []),
+    ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Persediaan keluar ${pengiriman.nomor}` })),
+  ];
+  return catatJurnal(tx, "JU-SJ", `Surat Jalan ${pengiriman.nomor}`, "PENJUALAN", baris);
+}
+
+/**
+ * Faktur Penjualan: Dr Piutang (DPP + PPN) / Cr Pendapatan per akun (+ PPN Keluaran).
+ * HPP diakui untuk barang yang sudah dikirim: Dr HPP / Cr Barang Terkirim Belum Ditagih (nilai dari baris SJ).
+ * Barang yang difaktur sebelum dikirim: HPP-nya diakui nanti saat Surat Jalan.
+ */
 export async function catatJurnalFakturPenjualan(
   tx: Tx,
   faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string },
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
+  konsumsiTransit: { barangId: string; jumlah: Desimal; hargaPokok: Desimal }[] = [],
 ) {
   const m = await ambilPemetaanAkun(tx);
   const ppn = D(faktur.ppn ?? 0);
   if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
-  const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
-  const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
+  const peta = await infoBarang(tx, [...daftarBaris.map((b) => b.barangId), ...konsumsiTransit.map((k) => k.barangId)]);
+  const pendapatan = pengumpul(), hpp = pengumpul();
   for (const b of daftarBaris) {
     const info = ambilInfo(peta, b.barangId);
     pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, kali(b.jumlah, b.harga));
-    const pokok = hargaPokokBaris(info, b.jumlah);
-    hpp.tambah(info.akunHppId ?? m.hppId, pokok);
-    persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, pokok);
+  }
+  let transit = NOL;
+  for (const k of konsumsiTransit) {
+    const info = ambilInfo(peta, k.barangId);
+    const nilai = kali(k.jumlah, k.hargaPokok);
+    hpp.tambah(info.akunHppId ?? m.hppId, nilai);
+    transit = transit.plus(nilai);
+  }
+  if (transit.gt(0) && !m.barangTerkirimId) {
+    throw new Error("Pemetaan akun 'Barang Terkirim Belum Ditagih' belum diatur (Pengaturan > Pemetaan Akun)");
   }
   const baris: InputBarisJurnal[] = [
     { akunId: m.piutangUsahaId, debit: D(faktur.total), kredit: NOL, keterangan: `Piutang ${faktur.nomor}` },
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Pendapatan ${faktur.nomor}` })),
     ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: NOL, kredit: ppn, keterangan: `PPN keluaran ${faktur.nomor}` }] : []),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
-    ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Persediaan keluar ${faktur.nomor}` })),
+    ...(transit.gt(0) && m.barangTerkirimId ? [{ akunId: m.barangTerkirimId, debit: NOL, kredit: transit, keterangan: `Barang terkirim ditagih ${faktur.nomor}` }] : []),
   ];
   return catatJurnal(tx, "JU-FJ", `Faktur Penjualan ${faktur.nomor}`, "PENJUALAN", baris);
 }
