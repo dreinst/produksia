@@ -10,7 +10,25 @@ import { D, uang, type Desimal } from "@/lib/uang";
  *  - setiap baris diberi sidik jari (akun + tanggal + masuk + keluar + keterangan) supaya impor ulang tidak menggandakan
  */
 export type BarisMutasi = { tanggal: Date; keterangan: string; referensi: string | null; masuk: Desimal; keluar: Desimal; saldo: Desimal | null };
-export type HasilBaca = { tajuk: string[]; peta: PetaKolom; baris: BarisMutasi[]; diabaikan: { nomor: number; alasan: string; isi: string }[]; format: "csv" | "html" };
+/**
+ * Sudut pandang kolom Debit/Kredit:
+ *  - "bank"  = rekening koran: KREDIT bank = uang masuk ke kita (= DEBIT akun kas/bank di buku), DEBIT bank = uang keluar
+ *  - "buku"  = sudah dari sisi akuntansi kita: DEBIT = uang masuk, KREDIT = uang keluar
+ *  - "otomatis" = ditebak dari pergerakan kolom Saldo (bila ada); tanpa saldo dianggap "bank"
+ * Hasil bacaan SELALU disimpan dari sisi buku: `masuk` → Dr akun kas/bank, `keluar` → Cr akun kas/bank.
+ */
+export type SudutPandang = "otomatis" | "bank" | "buku";
+export type HasilBaca = {
+  tajuk: string[];
+  peta: PetaKolom;
+  baris: BarisMutasi[];
+  diabaikan: { nomor: number; alasan: string; isi: string }[];
+  format: "csv" | "html";
+  /** sudut pandang yang dipakai setelah deteksi */
+  sudutPandang: "bank" | "buku";
+  /** penjelasan deteksi untuk ditampilkan ke pengguna */
+  keteranganSudut: string;
+};
 export type PetaKolom = { tanggal: number; keterangan: number; referensi: number | null; masuk: number | null; keluar: number | null; jumlah: number | null; saldo: number | null };
 
 const NAMA_KOLOM: Record<keyof PetaKolom, RegExp> = {
@@ -131,7 +149,7 @@ export function petakanKolom(tajuk: string[], manual: Partial<Record<keyof PetaK
 }
 
 /** Membaca isi berkas (CSV/TSV/HTML) menjadi baris mutasi ternormalisasi. */
-export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Record<keyof PetaKolom, number | null>> = {}): HasilBaca {
+export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Record<keyof PetaKolom, number | null>> = {}, sudutPandang: SudutPandang = "otomatis"): HasilBaca {
   const teks = isi.replace(/^﻿/, "");
   const html = /<table/i.test(teks) || /\.html?$/i.test(namaBerkas);
   let sel: string[][];
@@ -150,7 +168,8 @@ export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Reco
   if (peta.masuk === null && peta.keluar === null && peta.jumlah === null) {
     throw new Error(`Kolom jumlah tidak ditemukan. Tajuk terbaca: ${tajuk.join(" | ")}. Pakai tajuk Debit/Kredit atau Jumlah.`);
   }
-  const baris: BarisMutasi[] = [];
+  // Baca dulu apa adanya: `kolomA` = kolom masuk/kredit, `kolomB` = kolom keluar/debit (sudut bank); dibalik nanti bila perlu
+  const mentah: (BarisMutasi & { dariJumlah: boolean })[] = [];
   const diabaikan: HasilBaca["diabaikan"] = [];
   for (let i = indeksTajuk + 1; i < sel.length; i++) {
     const r = sel[i];
@@ -171,9 +190,37 @@ export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Reco
     }
     if (masuk.isZero() && keluar.isZero()) { diabaikan.push({ nomor: i + 1, alasan: "nominal nol", isi }); continue; }
     const saldo = peta.saldo !== null ? bacaAngka(r[peta.saldo] ?? "") : null;
-    baris.push({ tanggal, keterangan: (r[peta.keterangan] ?? "").trim() || "(tanpa keterangan)", referensi: peta.referensi !== null ? (r[peta.referensi] ?? "").trim() || null : null, masuk, keluar, saldo });
+    mentah.push({ tanggal, keterangan: (r[peta.keterangan] ?? "").trim() || "(tanpa keterangan)", referensi: peta.referensi !== null ? (r[peta.referensi] ?? "").trim() || null : null, masuk, keluar, saldo, dariJumlah: peta.jumlah !== null && peta.masuk === null && peta.keluar === null });
   }
-  return { tajuk, peta, baris, diabaikan, format: html ? "html" : "csv" };
+  // Tentukan sudut pandang kolom Debit/Kredit. Kolom Jumlah bertanda selalu: positif = uang masuk.
+  const pakaiKolomTerpisah = mentah.some((b) => !b.dariJumlah);
+  let sudut: "bank" | "buku" = sudutPandang === "buku" ? "buku" : "bank";
+  let keteranganSudut = sudutPandang === "buku"
+    ? "Dipaksa sudut buku: kolom Debit = uang masuk (Dr kas/bank), Kredit = uang keluar."
+    : sudutPandang === "bank"
+      ? "Dipaksa sudut rekening koran: kolom Kredit bank = uang masuk (Dr kas/bank di buku), Debit bank = uang keluar."
+      : "Tanpa kolom Saldo yang bisa dipakai — dianggap rekening koran: Kredit bank = uang masuk (Dr kas/bank), Debit bank = uang keluar.";
+  if (sudutPandang === "otomatis" && pakaiKolomTerpisah) {
+    // Bandingkan pergerakan saldo antar baris berurutan dengan (masuk − keluar) versi bank vs versi buku
+    let cocokBank = 0, cocokBuku = 0;
+    for (let i = 1; i < mentah.length; i++) {
+      const a = mentah[i - 1].saldo, b = mentah[i].saldo;
+      if (a === null || b === null) continue;
+      const gerak = b.minus(a);
+      const bank = mentah[i].masuk.minus(mentah[i].keluar);
+      if (gerak.equals(bank)) cocokBank++;
+      else if (gerak.equals(bank.neg())) cocokBuku++;
+    }
+    if (cocokBank + cocokBuku > 0) {
+      sudut = cocokBuku > cocokBank ? "buku" : "bank";
+      keteranganSudut = sudut === "buku"
+        ? `Terdeteksi dari kolom Saldo (${cocokBuku} dari ${cocokBank + cocokBuku} pergerakan cocok): berkas memakai sudut buku — Debit = uang masuk (Dr kas/bank), Kredit = uang keluar.`
+        : `Terdeteksi dari kolom Saldo (${cocokBank} dari ${cocokBank + cocokBuku} pergerakan cocok): rekening koran — Kredit bank = uang masuk (Dr kas/bank di buku), Debit bank = uang keluar.`;
+    }
+  }
+  if (!pakaiKolomTerpisah) keteranganSudut = "Kolom Jumlah bertanda: positif = uang masuk (Dr kas/bank), negatif/DB = uang keluar (Cr kas/bank).";
+  const baris: BarisMutasi[] = mentah.map(({ dariJumlah, ...b }) => (sudut === "buku" && !dariJumlah ? { ...b, masuk: b.keluar, keluar: b.masuk } : b));
+  return { tajuk, peta, baris, diabaikan, format: html ? "html" : "csv", sudutPandang: sudut, keteranganSudut };
 }
 
 /** Sidik jari baris untuk menolak impor ganda. */

@@ -63,6 +63,17 @@ async function main() {
   const h = bacaMutasi(html, "mutasi.html");
   pastikan(h.format === "html" && h.baris.length === 2 && h.baris[0].keterangan === "SETORAN & TRF" && n(h.baris[1].keluar) === 6500, "HTML tabel terbaca dengan entitas HTML dibersihkan");
   await harusDitolak("tanpa kolom jumlah", async () => bacaMutasi("Tanggal;Keterangan\n01/09/2026;x", "x.csv"), "Kolom jumlah tidak ditemukan");
+  console.log("=== 1b. Sudut pandang Debit/Kredit → sudut buku ===");
+  pastikan(csv.sudutPandang === "bank" && n(csv.baris[0].masuk) === 1000000 && n(csv.baris[1].keluar) === 6500, "contoh (kredit bank = masuk) terdeteksi sudut rekening koran dari saldo yang turun setelah debit bank");
+  const csvBuku = "Tanggal;Keterangan;Debit;Kredit;Saldo\n01/09/2026;Setoran modal;1.000.000;;1.000.000\n02/09/2026;Bayar admin;;6.500;993.500";
+  const buku = bacaMutasi(csvBuku, "buku.csv");
+  pastikan(buku.sudutPandang === "buku" && n(buku.baris[0].masuk) === 1000000 && n(buku.baris[1].keluar) === 6500, "berkas sudut buku (Debit = masuk) terdeteksi dari saldo dan dibalik dengan benar");
+  const tanpaSaldo = "Tanggal;Keterangan;Debit;Kredit\n01/09/2026;Setoran;1.000.000;\n02/09/2026;Admin;;6.500";
+  const bawaan = bacaMutasi(tanpaSaldo, "x.csv");
+  const dipaksaBuku = bacaMutasi(tanpaSaldo, "x.csv", {}, "buku");
+  const dipaksaBank = bacaMutasi(tanpaSaldo, "x.csv", {}, "bank");
+  pastikan(bawaan.sudutPandang === "bank" && n(bawaan.baris[0].keluar) === 1000000 && n(dipaksaBuku.baris[0].masuk) === 1000000 && n(dipaksaBuku.baris[1].keluar) === 6500 && n(dipaksaBank.baris[0].keluar) === 1000000, "tanpa saldo: bawaan rekening koran (Debit bank = keluar); dipaksa buku membalik; dipaksa bank tetap");
+  pastikan(n(en.baris[0].masuk) === 1000000 && bacaMutasi(csvInggris, "s.csv", {}, "buku").baris[0].masuk.equals(en.baris[0].masuk), "kolom Jumlah bertanda tidak terpengaruh sudut pandang (positif selalu masuk)");
   const b0 = csv.baris[0];
   pastikan(sidikMutasi("A", b0) === sidikMutasi("A", { ...b0, keterangan: b0.keterangan.toUpperCase() }) && sidikMutasi("A", b0) !== sidikMutasi("B", b0), "sidik stabil per akun (huruf besar/kecil diabaikan)");
 

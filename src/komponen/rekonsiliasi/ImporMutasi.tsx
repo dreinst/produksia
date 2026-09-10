@@ -40,6 +40,15 @@ export default function ImporMutasi({ daftarAkun, contohCsv }: { daftarAkun: Aku
           <span className="petunjuk">Ekspor “mutasi rekening” dari internet banking (CSV atau HTML/XLS berisi tabel), maks 2 MB</span>
         </div>
         <div className="bidang md:col-span-2">
+          <label className="label" htmlFor="sudutPandang">Arti kolom Debit/Kredit di berkas</label>
+          <select id="sudutPandang" name="sudutPandang" defaultValue="otomatis" className="isian">
+            <option value="otomatis">Otomatis — tebak dari kolom Saldo (bawaan: rekening koran)</option>
+            <option value="bank">Rekening koran — Kredit bank = uang masuk, Debit bank = uang keluar</option>
+            <option value="buku">Sudut buku kas — Debit = uang masuk, Kredit = uang keluar</option>
+          </select>
+          <span className="petunjuk">Mutasi bank ditulis dari sudut bank (uang masuk tampil di kolom Kredit). Sistem membaliknya otomatis: uang masuk → Debit akun kas/bank di buku, uang keluar → Kredit — sesuai jurnal Kas Masuk/Keluar.</span>
+        </div>
+        <div className="bidang md:col-span-2">
           <label className="label" htmlFor="isi">…atau tempel isi mutasi (baris tajuk + data)</label>
           <textarea id="isi" name="isi" rows={5} className="isian font-mono text-xs" placeholder={contohCsv} />
         </div>
@@ -66,6 +75,7 @@ export default function ImporMutasi({ daftarAkun, contohCsv }: { daftarAkun: Aku
           {statusImpor.ok && !statusImpor.galat && <div role="status" className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Mutasi tersimpan. Buka Rekonsiliasi Kas/Bank untuk mencocokkan.</div>}
           <input type="hidden" name="isi" value={p.isi} />
           <input type="hidden" name="namaBerkas" value={p.nama} />
+          <input type="hidden" name="sudutPandang" value={p.sudutDiminta} />
           {KOLOM.map((k) => (
             <input key={k.kunci} type="hidden" name={`kolom_${k.kunci}`} value={p.peta[k.kunci] === null ? "-" : String(p.peta[k.kunci])} />
           ))}
@@ -73,6 +83,7 @@ export default function ImporMutasi({ daftarAkun, contohCsv }: { daftarAkun: Aku
             <div>
               <h2 className="judul-kartu">Pratinjau {p.nama} <span className="lencana lencana-slate">{p.format.toUpperCase()}</span></h2>
               <p className="subjudul-kartu">{p.baris.length} baris terbaca · masuk Rp {angka(p.totalMasuk)} · keluar Rp {angka(p.totalKeluar)}{p.diabaikan.length ? ` · ${p.diabaikan.length} baris diabaikan` : ""}. Tajuk: {p.tajuk.join(" | ")}</p>
+              <p className={`text-xs mt-1 ${p.sudutPandang === "buku" ? "text-amber-700" : "text-slate-600"}`}><strong>{p.sudutPandang === "bank" ? "Sudut rekening koran" : "Sudut buku"}</strong> — {p.keteranganSudut} Kolom “Buku” di bawah menunjukkan jurnal yang akan dicocokkan.</p>
             </div>
             <label className="flex items-center gap-2 text-sm">
               <span>Simpan ke akun</span>
@@ -86,10 +97,10 @@ export default function ImporMutasi({ daftarAkun, contohCsv }: { daftarAkun: Aku
           </div>
           <div className="bungkus-tabel">
             <table className="tabel text-xs">
-              <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Ref</th><th className="text-right">Masuk</th><th className="text-right">Keluar</th><th className="text-right">Saldo</th></tr></thead>
+              <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Ref</th><th className="text-right">Uang masuk</th><th className="text-right">Uang keluar</th><th className="text-right">Saldo</th><th>Buku (akun kas/bank)</th></tr></thead>
               <tbody>
                 {p.baris.slice(0, 200).map((b, i) => (
-                  <tr key={i}><td className="whitespace-nowrap">{b.tanggal}</td><td>{b.keterangan}</td><td className="mono">{b.referensi ?? ""}</td><td className="text-right angka text-emerald-700">{b.masuk ? angka(b.masuk) : ""}</td><td className="text-right angka text-rose-700">{b.keluar ? angka(b.keluar) : ""}</td><td className="text-right angka text-slate-500">{b.saldo === null ? "" : angka(b.saldo)}</td></tr>
+                  <tr key={i}><td className="whitespace-nowrap">{b.tanggal}</td><td>{b.keterangan}</td><td className="mono">{b.referensi ?? ""}</td><td className="text-right angka text-emerald-700">{b.masuk ? angka(b.masuk) : ""}</td><td className="text-right angka text-rose-700">{b.keluar ? angka(b.keluar) : ""}</td><td className="text-right angka text-slate-500">{b.saldo === null ? "" : angka(b.saldo)}</td><td className="whitespace-nowrap">{b.masuk ? <span className="lencana lencana-emerald">Dr {angka(b.masuk)}</span> : <span className="lencana lencana-rose">Cr {angka(b.keluar)}</span>}</td></tr>
                 ))}
               </tbody>
             </table>
