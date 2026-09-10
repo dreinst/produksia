@@ -717,6 +717,8 @@ model PengaturanPerusahaan {
   tarifPpnPersen Decimal @default(11) @db.Decimal(5, 2)
   /// Jatuh tempo bawaan faktur (hari)
   terminHari     Int     @default(14)
+  /// Tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
+  tahunBuku      Int?
 
   akunPpnKeluaranId String? @unique
   akunPpnKeluaran   Akun?   @relation("PetaPpnKeluaran", fields: [akunPpnKeluaranId], references: [id])

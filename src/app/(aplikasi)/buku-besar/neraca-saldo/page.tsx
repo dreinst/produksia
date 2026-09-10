@@ -1,5 +1,6 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { bacaPeriode } from "@/lib/laporan";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 
@@ -20,7 +21,8 @@ type BarisNeraca = {
 
 export default async function HalamanNeracaSaldo({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await wajibHak("buku-besar.lihat");
-  const periode = bacaPeriode(await searchParams);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
   const daftarAkun = await db.akun.findMany({
     include: { barisJurnal: { where: { jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai } } }, select: { debit: true, kredit: true } } },
     orderBy: { kode: "asc" },
@@ -68,7 +70,7 @@ export default async function HalamanNeracaSaldo({ searchParams }: { searchParam
         <h1 className="judul-halaman">Neraca Saldo</h1>
         <p className="subjudul-halaman">Mutasi {periode.dariTeks} s.d. {periode.sampaiTeks}. Akun kelompok (baris tebal) menampilkan subtotal keturunannya; total bawah hanya menjumlahkan akun rinci.</p>
       </div>
-      <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} />
+      <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
 
       <div className="kartu kartu-tabel"><div className="bungkus-tabel">
         <table className="tabel min-w-[36rem]">

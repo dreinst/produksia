@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import KerangkaAplikasi from "@/komponen/KerangkaAplikasi";
+import { db } from "@/lib/db";
 import { penggunaSaatIni } from "@/lib/otentikasi";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 
@@ -12,9 +13,14 @@ import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 export default async function TataLetakAplikasi({ children }: { children: ReactNode }) {
   const pengguna = await penggunaSaatIni();
   if (!pengguna) redirect("/masuk");
-  const perusahaan = await ambilPengaturanPerusahaan();
+  const [perusahaan, tahunJurnal] = await Promise.all([
+    ambilPengaturanPerusahaan(),
+    db.$queryRaw<{ tahun: number }[]>`SELECT DISTINCT EXTRACT(YEAR FROM "tanggal")::int AS tahun FROM "Jurnal" ORDER BY 1`,
+  ]);
+  const tahunIni = new Date().getFullYear();
+  const daftarTahun = [...new Set([...tahunJurnal.map((t) => t.tahun), perusahaan.tahunBuku, tahunIni - 1, tahunIni, tahunIni + 1])].sort((a, b) => b - a);
   return (
-    <KerangkaAplikasi pengguna={pengguna} namaPerusahaan={perusahaan.nama}>
+    <KerangkaAplikasi pengguna={pengguna} namaPerusahaan={perusahaan.nama} tahunBuku={perusahaan.tahunBuku} daftarTahun={daftarTahun}>
       {children}
     </KerangkaAplikasi>
   );

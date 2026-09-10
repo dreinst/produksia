@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { bacaPeriode, hitungNeraca } from "@/lib/laporan";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -10,7 +11,8 @@ const tanggal = (t: string) => new Date(`${t}T00:00:00`).toLocaleDateString("id-
 
 export default async function HalamanNeraca({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await wajibHak("buku-besar.lihat");
-  const periode = bacaPeriode(await searchParams);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
   const n = await hitungNeraca(db, periode.sampai, periode.sampaiTeks);
 
   return (
@@ -21,7 +23,7 @@ export default async function HalamanNeraca({ searchParams }: { searchParams: Pr
         subjudul={`Per ${tanggal(periode.sampaiTeks)} — laba tahun-tahun lalu dan tahun berjalan dihitung dari jurnal (belum ada jurnal penutup).`}
         lencana={<span className={`lencana ${n.seimbang ? "lencana-emerald" : "lencana-rose"}`}>{n.seimbang ? "Aset = Kewajiban + Ekuitas" : "TIDAK SEIMBANG"}</span>}
       />
-      <FilterPeriode sampai={periode.sampaiTeks} hanyaSampai />
+      <FilterPeriode sampai={periode.sampaiTeks} hanyaSampai tahunBuku={pengaturan.tahunBuku} />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="kartu p-5"><div className="teks-label">Total aset</div><div className="font-heading text-xl font-bold angka mt-1">{rp(n.totalAset)}</div></div>

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { bacaPeriode, hitungLabaRugi } from "@/lib/laporan";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -10,7 +11,8 @@ const tanggal = (t: string) => new Date(`${t}T00:00:00`).toLocaleDateString("id-
 
 export default async function HalamanLabaRugi({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await wajibHak("buku-besar.lihat");
-  const periode = bacaPeriode(await searchParams);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
   const lr = await hitungLabaRugi(db, periode);
   const untung = lr.labaBersih.gte(0);
 
@@ -21,7 +23,7 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
         judul="Laporan Laba Rugi"
         subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)} — dihitung langsung dari jurnal.`}
       />
-      <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} />
+      <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="kartu p-5"><div className="teks-label">Pendapatan</div><div className="font-heading text-xl font-bold angka mt-1">{rp(lr.totalPendapatan)}</div></div>

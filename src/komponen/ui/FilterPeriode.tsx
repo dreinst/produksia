@@ -2,21 +2,23 @@ import Ikon from "@/komponen/ui/Ikon";
 
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-/** Pemilih periode laporan (GET, tanpa JavaScript): dari–sampai atau hanya "per tanggal". */
-export default function FilterPeriode({ dari, sampai, hanyaSampai = false }: { dari?: string; sampai: string; hanyaSampai?: boolean }) {
+/** Pemilih periode laporan (GET, tanpa JavaScript): dari–sampai atau hanya "per tanggal". Pintasan mengikuti tahun buku. */
+export default function FilterPeriode({ dari, sampai, hanyaSampai = false, tahunBuku }: { dari?: string; sampai: string; hanyaSampai?: boolean; tahunBuku?: number }) {
   const hariIni = new Date();
+  const tahun = tahunBuku ?? hariIni.getFullYear();
+  const tahunBerjalan = tahun === hariIni.getFullYear();
+  const akhirTahunBuku = tahunBerjalan ? iso(hariIni) : `${tahun}-12-31`;
   const awalBulan = iso(new Date(hariIni.getFullYear(), hariIni.getMonth(), 1));
-  const awalTahun = `${hariIni.getFullYear()}-01-01`;
-  const akhirTahunLalu = `${hariIni.getFullYear() - 1}-12-31`;
   const pintas = hanyaSampai
     ? [
         { label: "Hari ini", href: `?sampai=${iso(hariIni)}` },
-        { label: "Akhir tahun lalu", href: `?sampai=${akhirTahunLalu}` },
+        { label: `Akhir tahun buku ${tahun}`, href: `?sampai=${tahun}-12-31` },
+        { label: `Akhir ${tahun - 1}`, href: `?sampai=${tahun - 1}-12-31` },
       ]
     : [
         { label: "Bulan ini", href: `?dari=${awalBulan}&sampai=${iso(hariIni)}` },
-        { label: "Tahun ini", href: `?dari=${awalTahun}&sampai=${iso(hariIni)}` },
-        { label: "Tahun lalu", href: `?dari=${hariIni.getFullYear() - 1}-01-01&sampai=${akhirTahunLalu}` },
+        { label: `Tahun buku ${tahun}`, href: `?dari=${tahun}-01-01&sampai=${akhirTahunBuku}` },
+        { label: `Tahun ${tahun - 1}`, href: `?dari=${tahun - 1}-01-01&sampai=${tahun - 1}-12-31` },
         { label: "Semua", href: `?dari=2000-01-01&sampai=${iso(hariIni)}` },
       ];
 
@@ -38,7 +40,7 @@ export default function FilterPeriode({ dari, sampai, hanyaSampai = false }: { d
       </button>
       <div className="flex flex-wrap items-center gap-1.5 sm:ml-auto text-xs">
         {pintas.map((p) => (
-          <a key={p.label} href={p.href} className="tombol tombol-lembut tombol-kecil">
+          <a key={p.label} href={p.href} className="tombol tombol-garis tombol-kecil">
             {p.label}
           </a>
         ))}

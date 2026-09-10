@@ -9,6 +9,8 @@ export type PengaturanPajak = {
   pkp: boolean;
   tarifPpnPersen: Desimal;
   terminHari: number;
+  /** Tahun buku yang dibuka (sudah diselesaikan: bila tidak diatur = tahun kalender) */
+  tahunBuku: number;
   akunPpnKeluaranId: string | null;
   akunPpnMasukanId: string | null;
   akunPph23DimukaId: string | null;
@@ -20,6 +22,7 @@ export const PENGATURAN_BAWAAN: PengaturanPajak = {
   pkp: false,
   tarifPpnPersen: D(11),
   terminHari: 14,
+  tahunBuku: new Date().getFullYear(),
   akunPpnKeluaranId: null,
   akunPpnMasukanId: null,
   akunPph23DimukaId: null,
@@ -35,6 +38,7 @@ export async function ambilPengaturanPerusahaan(klien: Klien = db): Promise<Peng
     pkp: p.pkp,
     tarifPpnPersen: D(p.tarifPpnPersen),
     terminHari: p.terminHari,
+    tahunBuku: p.tahunBuku ?? new Date().getFullYear(),
     akunPpnKeluaranId: p.akunPpnKeluaranId,
     akunPpnMasukanId: p.akunPpnMasukanId,
     akunPph23DimukaId: p.akunPph23DimukaId,

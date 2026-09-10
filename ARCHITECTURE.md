@@ -301,6 +301,9 @@ Tidak ada halaman *edit* dokumen transaksi — mengubah berarti **hapus lalu bua
 ### 6.2d Pajak (`src/lib/pengaturanPerusahaan.ts`)
 `PengaturanPerusahaan` (singleton) menyimpan nama, `pkp`, `tarifPpnPersen`, `terminHari`, dan empat akun pajak. `bacaTarifPpn` menolak PPN > 0 bila non-PKP; `hitungPpn` membulatkan 2 desimal; faktur menyimpan `dpp`, `ppnPersen`, `ppn`, `total = dpp + ppn`, retur menyimpan `dpp`/`ppn` proporsional tarif faktur. `potonganPajak` pada Penerimaan/Pembayaran mengurangi piutang/hutang bersama nominal bayar (dipakai `periksaSinkron`, status faktur, dan KPI). Nama perusahaan dari pengaturan yang sama tampil di sidebar.
 
+### 6.2e Tahun buku
+`PengaturanPerusahaan.tahunBuku` (kosong = tahun kalender) adalah tahun yang sedang dibuka. `ambilPengaturanPerusahaan` mengembalikannya sudah terselesaikan; `bacaPeriode(param, tahunBuku)` memakainya sebagai bawaan laporan (sampai hari ini bila tahun berjalan, selain itu sampai 31 Des) dan `FilterPeriode` membuat pintasannya. Kartu perusahaan di sidebar (`<details>`) menampilkan mata uang (tunggal, Rupiah), pemilih tahun (aksi `gantiTahunBuku`, hak `pengaturan.tulis`; daftar tahun = tahun yang punya jurnal ± 1 tahun dari sekarang), dan pintasan Laba Rugi/Neraca tahun itu. Penomoran dokumen tetap memakai tanggal transaksi.
+
 ### 6.3 Uang & kuantitas (`src/lib/uang.ts`)
 `uang()` membulatkan ke 2 desimal half-up; `bacaUang()` memvalidasi isian form (wajib, angka valid, tidak negatif, default > 0); `jumlahkan`/`kali` mengembalikan Decimal. Perbandingan status (mis. lunas) memakai `.gte()`, bukan `>=` float.
 

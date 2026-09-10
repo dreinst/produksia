@@ -13,12 +13,15 @@ export type Periode = { dari: Date; sampai: Date; dariTeks: string; sampaiTeks: 
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 /** ?dari=YYYY-MM-DD&sampai=YYYY-MM-DD — bawaan: awal tahun berjalan s.d. hari ini (waktu lokal server). */
-export function bacaPeriode(p: Record<string, string | string[] | undefined>): Periode {
+/** Periode laporan dari query string; bawaan = tahun buku (sampai hari ini bila tahun berjalan, selain itu sampai 31 Des). */
+export function bacaPeriode(p: Record<string, string | string[] | undefined>, tahunBuku?: number): Periode {
   const ambil = (k: string) => {
     const v = Array.isArray(p[k]) ? p[k][0] : p[k];
     return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
   };
-  const sampaiTeks = ambil("sampai") ?? iso(new Date());
+  const hariIni = new Date();
+  const akhirBawaan = tahunBuku && tahunBuku !== hariIni.getFullYear() ? `${tahunBuku}-12-31` : iso(hariIni);
+  const sampaiTeks = ambil("sampai") ?? akhirBawaan;
   const dariTeks = ambil("dari") ?? `${sampaiTeks.slice(0, 4)}-01-01`;
   return {
     dari: new Date(`${dariTeks}T00:00:00`),
