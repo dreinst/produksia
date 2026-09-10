@@ -38,7 +38,7 @@ export default async function HalamanImporMutasi() {
               <li><strong>Tajuk kolom</strong> (baris pertama): <code>Tanggal</code>, <code>Keterangan</code>, <code>Referensi</code> (opsional), lalu <code>Debit</code> &amp; <code>Kredit</code> terpisah <em>atau</em> satu kolom <code>Jumlah</code> bertanda (−/DB = keluar), <code>Saldo</code> (opsional). Nama Inggris (Date, Description, Debit/Credit, Amount, Balance) juga dikenali.</li>
               <li><strong>Pembatas</strong> CSV dideteksi otomatis (<code>;</code> <code>,</code> tab). Angka boleh <code>1.234.567,89</code> atau <code>1,234,567.89</code>; tanggal <code>dd/mm/yyyy</code>, <code>yyyy-mm-dd</code>, atau <code>05 Sep 2026</code>.</li>
               <li><strong>HTML</strong>: file hasil “simpan sebagai” dari internet banking yang berisi <code>&lt;table&gt;</code>; tabel dengan baris terbanyak dipakai.</li>
-              <li>Arah dilihat dari <strong>sudut rekening</strong>: kredit rekening = uang masuk ke kita.</li>
+              <li><strong>Debit/Kredit dibalik otomatis ke sudut buku.</strong> Di rekening koran uang masuk ada di kolom <em>Kredit</em> (sudut bank); di buku kita uang masuk = <em>Debit</em> akun kas/bank. Sistem membaca kolom Kredit bank sebagai Dr kas/bank dan Debit bank sebagai Cr kas/bank, lalu mencocokkannya dengan jurnal KM/KK/TRM/BYR. Bila berkas Anda sudah memakai sudut buku, pilih “Sudut buku kas” atau biarkan otomatis (dideteksi dari kolom Saldo).</li>
             </ul>
             <pre className="text-[11px] bg-slate-50 border border-slate-200 rounded p-2 overflow-x-auto">{CONTOH_CSV}</pre>
           </div>

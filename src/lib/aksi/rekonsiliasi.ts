@@ -4,7 +4,12 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { wajibHakAksi } from "@/lib/otentikasi";
-import { bacaMutasi, sidikMutasi, type PetaKolom } from "@/lib/mutasiBank";
+import { bacaMutasi, sidikMutasi, type PetaKolom, type SudutPandang } from "@/lib/mutasiBank";
+
+function bacaSudutPandang(dataFormulir: FormData): SudutPandang {
+  const v = String(dataFormulir.get("sudutPandang") ?? "otomatis");
+  return v === "bank" || v === "buku" ? v : "otomatis";
+}
 import { D } from "@/lib/uang";
 
 const HALAMAN = "/rekonsiliasi/kas-bank";
@@ -30,7 +35,7 @@ export async function pratinjauMutasi(dataFormulir: FormData) {
     const v = dataFormulir.get(`kolom_${k}`);
     if (typeof v === "string" && v !== "") manual[k] = v === "-" ? null : Number(v);
   }
-  return { nama, hasil: bacaMutasi(isi, nama, manual), isi };
+  return { nama, hasil: bacaMutasi(isi, nama, manual, bacaSudutPandang(dataFormulir)), isi };
 }
 
 /** Tahap 2 impor: simpan baris terbaca ke MutasiBank; baris yang sidiknya sudah ada dilewati. */
@@ -47,7 +52,7 @@ export async function imporMutasi(dataFormulir: FormData) {
     const v = dataFormulir.get(`kolom_${k}`);
     if (typeof v === "string" && v !== "") manual[k] = v === "-" ? null : Number(v);
   }
-  const hasil = bacaMutasi(isi, nama, manual);
+  const hasil = bacaMutasi(isi, nama, manual, bacaSudutPandang(dataFormulir));
   if (hasil.baris.length === 0) throw new Error("Tidak ada baris mutasi yang bisa dibaca");
   let baru = 0, ganda = 0;
   for (const b of hasil.baris) {
@@ -57,7 +62,7 @@ export async function imporMutasi(dataFormulir: FormData) {
     await db.mutasiBank.create({ data: { akunId, tanggal: b.tanggal, keterangan: b.keterangan, referensi: b.referensi, masuk: b.masuk, keluar: b.keluar, saldo: b.saldo, sidik, berkas: nama, penggunaNama: pengguna.nama } });
     baru++;
   }
-  await catat(pengguna, "IMPOR", akun.kode, `${baru} mutasi baru dari ${nama} (${ganda} ganda dilewati, ${hasil.diabaikan.length} baris diabaikan)`);
+  await catat(pengguna, "IMPOR", akun.kode, `${baru} mutasi baru dari ${nama} (${ganda} ganda dilewati, ${hasil.diabaikan.length} baris diabaikan; sudut ${hasil.sudutPandang === "bank" ? "rekening koran" : "buku"})`);
   revalidatePath(HALAMAN);
   revalidatePath("/rekonsiliasi/mutasi");
   return { baru, ganda, diabaikan: hasil.diabaikan.length };
@@ -194,6 +199,9 @@ export type StatusPratinjau = StatusFormulir & {
     isi: string;
     akunId: string;
     format: "csv" | "html";
+    sudutPandang: "bank" | "buku";
+    sudutDiminta: SudutPandang;
+    keteranganSudut: string;
     tajuk: string[];
     peta: PetaKolom;
     baris: { tanggal: string; keterangan: string; referensi: string | null; masuk: number; keluar: number; saldo: number | null }[];
@@ -210,7 +218,7 @@ export async function pratinjauMutasiFormulir(_sebelumnya: StatusPratinjau, data
     return {
       galat: null,
       ok: true,
-      pratinjau: { nama, isi, akunId: String(dataFormulir.get("akunId") ?? ""), format: hasil.format, tajuk: hasil.tajuk, peta: hasil.peta, baris, diabaikan: hasil.diabaikan, totalMasuk: baris.reduce((s, b) => s + b.masuk, 0), totalKeluar: baris.reduce((s, b) => s + b.keluar, 0) },
+      pratinjau: { nama, isi, akunId: String(dataFormulir.get("akunId") ?? ""), format: hasil.format, sudutPandang: hasil.sudutPandang, sudutDiminta: bacaSudutPandang(dataFormulir), keteranganSudut: hasil.keteranganSudut, tajuk: hasil.tajuk, peta: hasil.peta, baris, diabaikan: hasil.diabaikan, totalMasuk: baris.reduce((s, b) => s + b.masuk, 0), totalKeluar: baris.reduce((s, b) => s + b.keluar, 0) },
     };
   } catch (galat) {
     return { galat: (galat as { message?: string })?.message ?? "Berkas tidak bisa dibaca" };
