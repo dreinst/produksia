@@ -1,6 +1,7 @@
 import { wajibMasuk } from "@/lib/otentikasi";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import { periksaSinkron } from "@/lib/sinkron";
+import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import Ikon from "@/komponen/ui/Ikon";
@@ -61,7 +62,7 @@ export default async function Beranda() {
     db.pembayaranPembelian.findMany({ include: { pemasok: true }, orderBy: { tanggal: "desc" }, take: 2 }),
   ]);
 
-  const sinkron = await periksaSinkron(db);
+  const [sinkron, pengaturan] = await Promise.all([periksaSinkron(db), ambilPengaturanPerusahaan(db)]);
 
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
@@ -178,6 +179,10 @@ export default async function Beranda() {
             <div className="flex flex-wrap items-center gap-2.5 mb-1.5 text-xs text-slate-500">
               <span className="lencana lencana-emerald">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Transaksi atomik aktif
+              </span>
+              <span className="text-slate-400">•</span>
+              <span>
+                Tahun Buku: <strong className="text-slate-700 font-medium">{pengaturan.tahunBuku}</strong>
               </span>
               <span className="text-slate-400">•</span>
               <span>

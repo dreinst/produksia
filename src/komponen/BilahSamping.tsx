@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
+import FormulirAksi from "@/komponen/FormulirAksi";
+import { gantiTahunBukuFormulir } from "@/lib/aksi/pengaturan";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
 type TautanNavigasi = { href: string; label: string; kode?: string; hak: Hak };
@@ -264,9 +266,12 @@ function StatusBasisData() {
   );
 }
 
-export default function BilahSamping({ pengguna, namaPerusahaan, open, saatTutup }: { pengguna: PenggunaSesi; namaPerusahaan: string; open: boolean; saatTutup: () => void }) {
+export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daftarTahun, open, saatTutup }: { pengguna: PenggunaSesi; namaPerusahaan: string; tahunBuku: number; daftarTahun: number[]; open: boolean; saatTutup: () => void }) {
   const pathname = usePathname();
-  const tahun = new Date().getFullYear();
+  const hariIni = new Date();
+  const tahunBerjalan = tahunBuku === hariIni.getFullYear();
+  const akhirTahunBuku = tahunBerjalan ? `${tahunBuku}-${String(hariIni.getMonth() + 1).padStart(2, "0")}-${String(hariIni.getDate()).padStart(2, "0")}` : `${tahunBuku}-12-31`;
+  const bolehGantiTahun = punyaHak(pengguna.peran, "pengaturan.tulis");
 
   return (
     <>
@@ -305,16 +310,52 @@ export default function BilahSamping({ pengguna, namaPerusahaan, open, saatTutup
           </div>
         </div>
 
-        {/* Perusahaan / periode */}
-        <div className="p-3 shrink-0">
-          <div className="bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
+        {/* Perusahaan / tahun buku */}
+        <details className="p-3 shrink-0 relative group">
+          <summary
+            className="bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 flex items-center justify-between list-none cursor-pointer select-none hover:bg-slate-100 [&::-webkit-details-marker]:hidden"
+            aria-label="Perusahaan & tahun buku"
+          >
             <div className="flex flex-col min-w-0">
               <span className="text-xs font-semibold text-slate-900 truncate">{namaPerusahaan}</span>
-              <span className="text-[11px] text-slate-500 font-medium">Tahun Buku {tahun} • Rupiah</span>
+              <span className="text-[11px] text-slate-500 font-medium">Tahun Buku {tahunBuku} • Rupiah</span>
             </div>
-            <Ikon nama="unfold_more" className="!text-[18px] text-slate-400" />
+            <Ikon nama="unfold_more" className="!text-[18px] text-slate-400 group-open:rotate-180 transition-transform" />
+          </summary>
+          <div className="absolute left-3 right-3 z-40 mt-1 rounded-xl border border-slate-200 bg-white p-2 space-y-1" style={{ boxShadow: "var(--shadow-pop)" }}>
+            <div className="px-2 py-1.5 text-[11px] text-slate-500 space-y-0.5 border-b border-slate-100">
+              <div className="text-xs font-semibold text-slate-900 truncate">{namaPerusahaan}</div>
+              <div>Mata uang: <span className="font-medium text-slate-700">Rupiah (IDR)</span> · satu mata uang</div>
+              <div>Tahun buku dibuka: <span className="font-medium text-slate-700">{tahunBuku}</span>{tahunBerjalan ? " (berjalan)" : ""}</div>
+            </div>
+            {bolehGantiTahun ? (
+              <FormulirAksi aksi={gantiTahunBukuFormulir} className="px-2 py-1.5 flex flex-wrap items-center gap-2" pesanSukses={`Tahun buku dibuka.`}>
+                <label className="text-[11px] font-semibold text-slate-600" htmlFor="tahunBuku">Buka tahun</label>
+                <select id="tahunBuku" name="tahunBuku" defaultValue={tahunBuku} className="isian isian-kecil w-auto">
+                  {daftarTahun.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+                <button type="submit" className="tombol tombol-utama tombol-kecil">Buka</button>
+              </FormulirAksi>
+            ) : (
+              <div className="px-2 py-1.5 text-[11px] text-slate-500">Tahun buku diatur oleh Superadmin/Pemilik/Admin.</div>
+            )}
+            <div className="border-t border-slate-100 pt-1">
+              <Link href={`/buku-besar/laba-rugi?dari=${tahunBuku}-01-01&sampai=${akhirTahunBuku}`} onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
+                <Ikon nama="trending_up" className="!text-[16px] text-slate-400" /> Laba Rugi {tahunBuku}
+              </Link>
+              <Link href={`/buku-besar/neraca?sampai=${akhirTahunBuku}`} onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
+                <Ikon nama="balance" className="!text-[16px] text-slate-400" /> Neraca per {akhirTahunBuku}
+              </Link>
+              {bolehGantiTahun && (
+                <Link href="/pengaturan/perusahaan" onClick={saatTutup} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-50">
+                  <Ikon nama="settings" className="!text-[16px] text-slate-400" /> Perusahaan &amp; Pajak
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
+        </details>
 
         {/* Menu */}
         <div className="px-3 py-1 flex-1 overflow-y-auto">

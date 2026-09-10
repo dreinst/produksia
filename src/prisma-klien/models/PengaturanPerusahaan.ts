@@ -29,11 +29,13 @@ export type AggregatePengaturanPerusahaan = {
 export type PengaturanPerusahaanAvgAggregateOutputType = {
   tarifPpnPersen: runtime.Decimal | null
   terminHari: number | null
+  tahunBuku: number | null
 }
 
 export type PengaturanPerusahaanSumAggregateOutputType = {
   tarifPpnPersen: runtime.Decimal | null
   terminHari: number | null
+  tahunBuku: number | null
 }
 
 export type PengaturanPerusahaanMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type PengaturanPerusahaanMinAggregateOutputType = {
   pkp: boolean | null
   tarifPpnPersen: runtime.Decimal | null
   terminHari: number | null
+  tahunBuku: number | null
   akunPpnKeluaranId: string | null
   akunPpnMasukanId: string | null
   akunPph23DimukaId: string | null
@@ -54,6 +57,7 @@ export type PengaturanPerusahaanMaxAggregateOutputType = {
   pkp: boolean | null
   tarifPpnPersen: runtime.Decimal | null
   terminHari: number | null
+  tahunBuku: number | null
   akunPpnKeluaranId: string | null
   akunPpnMasukanId: string | null
   akunPph23DimukaId: string | null
@@ -66,6 +70,7 @@ export type PengaturanPerusahaanCountAggregateOutputType = {
   pkp: number
   tarifPpnPersen: number
   terminHari: number
+  tahunBuku: number
   akunPpnKeluaranId: number
   akunPpnMasukanId: number
   akunPph23DimukaId: number
@@ -77,11 +82,13 @@ export type PengaturanPerusahaanCountAggregateOutputType = {
 export type PengaturanPerusahaanAvgAggregateInputType = {
   tarifPpnPersen?: true
   terminHari?: true
+  tahunBuku?: true
 }
 
 export type PengaturanPerusahaanSumAggregateInputType = {
   tarifPpnPersen?: true
   terminHari?: true
+  tahunBuku?: true
 }
 
 export type PengaturanPerusahaanMinAggregateInputType = {
@@ -90,6 +97,7 @@ export type PengaturanPerusahaanMinAggregateInputType = {
   pkp?: true
   tarifPpnPersen?: true
   terminHari?: true
+  tahunBuku?: true
   akunPpnKeluaranId?: true
   akunPpnMasukanId?: true
   akunPph23DimukaId?: true
@@ -102,6 +110,7 @@ export type PengaturanPerusahaanMaxAggregateInputType = {
   pkp?: true
   tarifPpnPersen?: true
   terminHari?: true
+  tahunBuku?: true
   akunPpnKeluaranId?: true
   akunPpnMasukanId?: true
   akunPph23DimukaId?: true
@@ -114,6 +123,7 @@ export type PengaturanPerusahaanCountAggregateInputType = {
   pkp?: true
   tarifPpnPersen?: true
   terminHari?: true
+  tahunBuku?: true
   akunPpnKeluaranId?: true
   akunPpnMasukanId?: true
   akunPph23DimukaId?: true
@@ -213,6 +223,7 @@ export type PengaturanPerusahaanGroupByOutputType = {
   pkp: boolean
   tarifPpnPersen: runtime.Decimal
   terminHari: number
+  tahunBuku: number | null
   akunPpnKeluaranId: string | null
   akunPpnMasukanId: string | null
   akunPph23DimukaId: string | null
@@ -248,6 +259,7 @@ export type PengaturanPerusahaanWhereInput = {
   pkp?: Prisma.BoolFilter<"PengaturanPerusahaan"> | boolean
   tarifPpnPersen?: Prisma.DecimalFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFilter<"PengaturanPerusahaan"> | number
+  tahunBuku?: Prisma.IntNullableFilter<"PengaturanPerusahaan"> | number | null
   akunPpnKeluaranId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
   akunPpnMasukanId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
   akunPph23DimukaId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
@@ -264,6 +276,7 @@ export type PengaturanPerusahaanOrderByWithRelationInput = {
   pkp?: Prisma.SortOrder
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPpnKeluaranId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPpnMasukanId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPph23DimukaId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -287,6 +300,7 @@ export type PengaturanPerusahaanWhereUniqueInput = Prisma.AtLeast<{
   pkp?: Prisma.BoolFilter<"PengaturanPerusahaan"> | boolean
   tarifPpnPersen?: Prisma.DecimalFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFilter<"PengaturanPerusahaan"> | number
+  tahunBuku?: Prisma.IntNullableFilter<"PengaturanPerusahaan"> | number | null
   akunPpnKeluaran?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPpnMasukan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPph23Dimuka?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
@@ -299,6 +313,7 @@ export type PengaturanPerusahaanOrderByWithAggregationInput = {
   pkp?: Prisma.SortOrder
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPpnKeluaranId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPpnMasukanId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPph23DimukaId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -319,6 +334,7 @@ export type PengaturanPerusahaanScalarWhereWithAggregatesInput = {
   pkp?: Prisma.BoolWithAggregatesFilter<"PengaturanPerusahaan"> | boolean
   tarifPpnPersen?: Prisma.DecimalWithAggregatesFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntWithAggregatesFilter<"PengaturanPerusahaan"> | number
+  tahunBuku?: Prisma.IntNullableWithAggregatesFilter<"PengaturanPerusahaan"> | number | null
   akunPpnKeluaranId?: Prisma.StringNullableWithAggregatesFilter<"PengaturanPerusahaan"> | string | null
   akunPpnMasukanId?: Prisma.StringNullableWithAggregatesFilter<"PengaturanPerusahaan"> | string | null
   akunPph23DimukaId?: Prisma.StringNullableWithAggregatesFilter<"PengaturanPerusahaan"> | string | null
@@ -331,6 +347,7 @@ export type PengaturanPerusahaanCreateInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaran?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnKeluaranInput
   akunPpnMasukan?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnMasukanInput
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
@@ -343,6 +360,7 @@ export type PengaturanPerusahaanUncheckedCreateInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaranId?: string | null
   akunPpnMasukanId?: string | null
   akunPph23DimukaId?: string | null
@@ -355,6 +373,7 @@ export type PengaturanPerusahaanUpdateInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaran?: Prisma.AkunUpdateOneWithoutPengaturanPpnKeluaranNestedInput
   akunPpnMasukan?: Prisma.AkunUpdateOneWithoutPengaturanPpnMasukanNestedInput
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
@@ -367,6 +386,7 @@ export type PengaturanPerusahaanUncheckedUpdateInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -379,6 +399,7 @@ export type PengaturanPerusahaanCreateManyInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaranId?: string | null
   akunPpnMasukanId?: string | null
   akunPph23DimukaId?: string | null
@@ -391,6 +412,7 @@ export type PengaturanPerusahaanUpdateManyMutationInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type PengaturanPerusahaanUncheckedUpdateManyInput = {
@@ -399,6 +421,7 @@ export type PengaturanPerusahaanUncheckedUpdateManyInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -416,6 +439,7 @@ export type PengaturanPerusahaanCountOrderByAggregateInput = {
   pkp?: Prisma.SortOrder
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrder
   akunPpnKeluaranId?: Prisma.SortOrder
   akunPpnMasukanId?: Prisma.SortOrder
   akunPph23DimukaId?: Prisma.SortOrder
@@ -425,6 +449,7 @@ export type PengaturanPerusahaanCountOrderByAggregateInput = {
 export type PengaturanPerusahaanAvgOrderByAggregateInput = {
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrder
 }
 
 export type PengaturanPerusahaanMaxOrderByAggregateInput = {
@@ -433,6 +458,7 @@ export type PengaturanPerusahaanMaxOrderByAggregateInput = {
   pkp?: Prisma.SortOrder
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrder
   akunPpnKeluaranId?: Prisma.SortOrder
   akunPpnMasukanId?: Prisma.SortOrder
   akunPph23DimukaId?: Prisma.SortOrder
@@ -445,6 +471,7 @@ export type PengaturanPerusahaanMinOrderByAggregateInput = {
   pkp?: Prisma.SortOrder
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrder
   akunPpnKeluaranId?: Prisma.SortOrder
   akunPpnMasukanId?: Prisma.SortOrder
   akunPph23DimukaId?: Prisma.SortOrder
@@ -454,6 +481,7 @@ export type PengaturanPerusahaanMinOrderByAggregateInput = {
 export type PengaturanPerusahaanSumOrderByAggregateInput = {
   tarifPpnPersen?: Prisma.SortOrder
   terminHari?: Prisma.SortOrder
+  tahunBuku?: Prisma.SortOrder
 }
 
 export type PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput = {
@@ -584,12 +612,21 @@ export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DipotongNested
   update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput = {
   id?: string
   nama?: string
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnMasukan?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnMasukanInput
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
@@ -601,6 +638,7 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnMasukanId?: string | null
   akunPph23DimukaId?: string | null
   akunPph23DipotongId?: string | null
@@ -617,6 +655,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaran?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnKeluaranInput
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
@@ -628,6 +667,7 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaranId?: string | null
   akunPph23DimukaId?: string | null
   akunPph23DipotongId?: string | null
@@ -644,6 +684,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaran?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnKeluaranInput
   akunPpnMasukan?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnMasukanInput
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
@@ -655,6 +696,7 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaranId?: string | null
   akunPpnMasukanId?: string | null
   akunPph23DipotongId?: string | null
@@ -671,6 +713,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaran?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnKeluaranInput
   akunPpnMasukan?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnMasukanInput
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
@@ -682,6 +725,7 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput = {
   pkp?: boolean
   tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: number
+  tahunBuku?: number | null
   akunPpnKeluaranId?: string | null
   akunPpnMasukanId?: string | null
   akunPph23DimukaId?: string | null
@@ -709,6 +753,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnMasukan?: Prisma.AkunUpdateOneWithoutPengaturanPpnMasukanNestedInput
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
@@ -720,6 +765,7 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -742,6 +788,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaran?: Prisma.AkunUpdateOneWithoutPengaturanPpnKeluaranNestedInput
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
@@ -753,6 +800,7 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -775,6 +823,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaran?: Prisma.AkunUpdateOneWithoutPengaturanPpnKeluaranNestedInput
   akunPpnMasukan?: Prisma.AkunUpdateOneWithoutPengaturanPpnMasukanNestedInput
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
@@ -786,6 +835,7 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -808,6 +858,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaran?: Prisma.AkunUpdateOneWithoutPengaturanPpnKeluaranNestedInput
   akunPpnMasukan?: Prisma.AkunUpdateOneWithoutPengaturanPpnMasukanNestedInput
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
@@ -819,6 +870,7 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput = {
   pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -832,6 +884,7 @@ export type PengaturanPerusahaanSelect<ExtArgs extends runtime.Types.Extensions.
   pkp?: boolean
   tarifPpnPersen?: boolean
   terminHari?: boolean
+  tahunBuku?: boolean
   akunPpnKeluaranId?: boolean
   akunPpnMasukanId?: boolean
   akunPph23DimukaId?: boolean
@@ -848,6 +901,7 @@ export type PengaturanPerusahaanSelectCreateManyAndReturn<ExtArgs extends runtim
   pkp?: boolean
   tarifPpnPersen?: boolean
   terminHari?: boolean
+  tahunBuku?: boolean
   akunPpnKeluaranId?: boolean
   akunPpnMasukanId?: boolean
   akunPph23DimukaId?: boolean
@@ -864,6 +918,7 @@ export type PengaturanPerusahaanSelectUpdateManyAndReturn<ExtArgs extends runtim
   pkp?: boolean
   tarifPpnPersen?: boolean
   terminHari?: boolean
+  tahunBuku?: boolean
   akunPpnKeluaranId?: boolean
   akunPpnMasukanId?: boolean
   akunPph23DimukaId?: boolean
@@ -880,13 +935,14 @@ export type PengaturanPerusahaanSelectScalar = {
   pkp?: boolean
   tarifPpnPersen?: boolean
   terminHari?: boolean
+  tahunBuku?: boolean
   akunPpnKeluaranId?: boolean
   akunPpnMasukanId?: boolean
   akunPph23DimukaId?: boolean
   akunPph23DipotongId?: boolean
 }
 
-export type PengaturanPerusahaanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama" | "pkp" | "tarifPpnPersen" | "terminHari" | "akunPpnKeluaranId" | "akunPpnMasukanId" | "akunPph23DimukaId" | "akunPph23DipotongId", ExtArgs["result"]["pengaturanPerusahaan"]>
+export type PengaturanPerusahaanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama" | "pkp" | "tarifPpnPersen" | "terminHari" | "tahunBuku" | "akunPpnKeluaranId" | "akunPpnMasukanId" | "akunPph23DimukaId" | "akunPph23DipotongId", ExtArgs["result"]["pengaturanPerusahaan"]>
 export type PengaturanPerusahaanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
   akunPpnMasukan?: boolean | Prisma.PengaturanPerusahaan$akunPpnMasukanArgs<ExtArgs>
@@ -926,6 +982,10 @@ export type $PengaturanPerusahaanPayload<ExtArgs extends runtime.Types.Extension
      * Jatuh tempo bawaan faktur (hari)
      */
     terminHari: number
+    /**
+     * Tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
+     */
+    tahunBuku: number | null
     akunPpnKeluaranId: string | null
     akunPpnMasukanId: string | null
     /**
@@ -1368,6 +1428,7 @@ export interface PengaturanPerusahaanFieldRefs {
   readonly pkp: Prisma.FieldRef<"PengaturanPerusahaan", 'Boolean'>
   readonly tarifPpnPersen: Prisma.FieldRef<"PengaturanPerusahaan", 'Decimal'>
   readonly terminHari: Prisma.FieldRef<"PengaturanPerusahaan", 'Int'>
+  readonly tahunBuku: Prisma.FieldRef<"PengaturanPerusahaan", 'Int'>
   readonly akunPpnKeluaranId: Prisma.FieldRef<"PengaturanPerusahaan", 'String'>
   readonly akunPpnMasukanId: Prisma.FieldRef<"PengaturanPerusahaan", 'String'>
   readonly akunPph23DimukaId: Prisma.FieldRef<"PengaturanPerusahaan", 'String'>

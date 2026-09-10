@@ -4049,6 +4049,7 @@ export const PengaturanPerusahaanScalarFieldEnum = {
   pkp: 'pkp',
   tarifPpnPersen: 'tarifPpnPersen',
   terminHari: 'terminHari',
+  tahunBuku: 'tahunBuku',
   akunPpnKeluaranId: 'akunPpnKeluaranId',
   akunPpnMasukanId: 'akunPpnMasukanId',
   akunPph23DimukaId: 'akunPph23DimukaId',

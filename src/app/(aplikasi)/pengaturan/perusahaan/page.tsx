@@ -47,7 +47,7 @@ export default async function HalamanPengaturanPerusahaan() {
       <KepalaHalaman
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }]}
         judul="Perusahaan & Pajak"
-        subjudul="Identitas perusahaan, status PKP, tarif PPN, termin faktur, dan akun pajak yang dipakai jurnal otomatis."
+        subjudul="Identitas perusahaan, tahun buku, status PKP, tarif PPN, termin faktur, dan akun pajak yang dipakai jurnal otomatis."
         lencana={<span className={`lencana ${tersimpan ? "lencana-emerald" : "lencana-amber"}`}>{tersimpan ? "Tersimpan" : "Masih bawaan"}</span>}
       />
 
@@ -62,6 +62,18 @@ export default async function HalamanPengaturanPerusahaan() {
           <label className="label" htmlFor="terminHari">Termin jatuh tempo faktur (hari)</label>
           <input id="terminHari" name="terminHari" type="number" min={0} max={365} defaultValue={pengaturan.terminHari} className="isian" />
           <span className="petunjuk">TOP bawaan: tanggal faktur + termin</span>
+        </div>
+
+        <div className="bidang">
+          <label className="label" htmlFor="tahunBuku">Tahun buku yang dibuka</label>
+          <input id="tahunBuku" name="tahunBuku" type="number" min={2000} max={2100} defaultValue={tersimpan?.tahunBuku ?? ""} placeholder={String(new Date().getFullYear())} className="isian" />
+          <span className="petunjuk">Bawaan periode laporan & pintasan; kosongkan untuk mengikuti tahun kalender. Bisa diganti cepat dari kartu perusahaan di sidebar</span>
+        </div>
+
+        <div className="bidang">
+          <label className="label" htmlFor="mataUang">Mata uang</label>
+          <input id="mataUang" value="Rupiah (IDR)" readOnly className="isian bg-slate-50" />
+          <span className="petunjuk">Sistem berjalan satu mata uang</span>
         </div>
 
         <div className="bidang">

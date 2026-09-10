@@ -59,6 +59,26 @@ export async function terapkanBaganAkunFormulir(): Promise<StatusFormulir> {
 
 // ---------- Perusahaan & pajak ----------
 
+/** Kosong = mengikuti tahun kalender. */
+function bacaTahunBuku(nilai: string): number | null {
+  if (!nilai) return null;
+  const tahun = Number(nilai);
+  if (!Number.isInteger(tahun) || tahun < 2000 || tahun > 2100) throw new Error("Tahun buku harus tahun antara 2000 dan 2100");
+  return tahun;
+}
+
+/** Ganti tahun buku yang dibuka (dipakai dari kartu perusahaan di sidebar). */
+export async function gantiTahunBuku(dataFormulir: FormData) {
+  await wajibHakAksi("pengaturan.tulis");
+  const tahunBuku = bacaTahunBuku(String(dataFormulir.get("tahunBuku") ?? "").trim());
+  await db.pengaturanPerusahaan.upsert({ where: { id: "default" }, create: { id: "default", tahunBuku }, update: { tahunBuku } });
+  revalidatePath("/", "layout");
+}
+
+export async function gantiTahunBukuFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => gantiTahunBuku(dataFormulir));
+}
+
 export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
   await wajibHakAksi("pengaturan.tulis");
   const teks = (k: string) => String(dataFormulir.get(k) ?? "").trim();
@@ -69,6 +89,7 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
   if (tarifPpnPersen.gt(100)) throw new Error("Tarif PPN maksimal 100%");
   const terminHari = Number(teks("terminHari") || "14");
   if (!Number.isInteger(terminHari) || terminHari < 0 || terminHari > 365) throw new Error("Termin jatuh tempo harus 0–365 hari");
+  const tahunBuku = bacaTahunBuku(teks("tahunBuku"));
   const akun = {
     akunPpnKeluaranId: teks("akunPpnKeluaranId") || null,
     akunPpnMasukanId: teks("akunPpnMasukanId") || null,
@@ -82,8 +103,8 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
 
   await db.pengaturanPerusahaan.upsert({
     where: { id: "default" },
-    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, ...akun },
-    update: { nama, pkp, tarifPpnPersen, terminHari, ...akun },
+    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, tahunBuku, ...akun },
+    update: { nama, pkp, tarifPpnPersen, terminHari, tahunBuku, ...akun },
   });
   revalidatePath("/pengaturan/perusahaan");
   revalidatePath("/", "layout");
