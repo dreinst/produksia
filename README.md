@@ -120,6 +120,8 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 
 ## Desain (Precision Ledger)
 
+Gerak halus (`src/app/globals.css`, bagian *Gerak*): halaman dan kartu muncul dengan fade-up bertahap (`.animasi-masuk`), tombol/kartu/isian punya transisi hover & tekan, kerangka pemuatan berkilau (`.kerlip`, `src/app/(aplikasi)/loading.tsx`). Semua dimatikan otomatis bila sistem pengguna menyetel *kurangi gerakan* (`prefers-reduced-motion`).
+
 UI mengikuti design system dari paket Stitch (`stitch_creative_architecture_portfolio.zip` di folder induk — tidak ikut repo). Aturan praktisnya:
 
 - Pakai **kelas komponen** di `src/app/globals.css`, bukan utility lepas: `kartu`, `kartu-tabel` + `bungkus-tabel`, `tombol tombol-utama|aksen|garis|lembut|bahaya|kecil`, `isian`/`isian-kecil`, `label`, `petunjuk`, `bidang`, `tabel`/`tabel-polos`, `lencana lencana-emerald|amber|rose|slate|blue`, `angka` (rata kanan, tabular), `mono`, `teks-label`.
@@ -157,7 +159,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/aksi/pengaturan.ts` — pemetaan akun standar (`PemetaanAkun`) dan **pemetaan akun tambahan** (`PemetaanAkunTambahan`: nama peran bebas → akun, dibaca modul lewat `akunPemetaanTambahan(db, kunci)`); halaman `pengaturan/pemetaan-akun` (hak `pemetaan.tulis`, termasuk Admin)
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,lupa-kata-sandi,pelepasan-aset,proyek,rekonsiliasi,prive,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi (`npm run uji`; `UJI_PERAN=KASIR` dsb. meniru peran lain); `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,lupa-kata-sandi,pelepasan-aset,proyek,rekonsiliasi,prive,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi (`npm run uji`; `UJI_PERAN=KASIR` dsb. meniru peran lain; pembantu bersama di `skrip/bantuan.ts`); `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 21 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.

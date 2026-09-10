@@ -9,48 +9,12 @@ import { buatPenawaran } from "../src/lib/aksi/penjualan";
 import { tambahPemetaanTambahan, ubahPemetaanTambahan, hapusPemetaanTambahan } from "../src/lib/aksi/pengaturan";
 import { akunPemetaanTambahan } from "../src/lib/baganAkun";
 import { hitungLaporanPrive } from "../src/lib/laporanPrive";
+import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
 /*
  * Prive (PRV: Dr Prive / Cr Kas), laporan prive per pemilik, pemetaan akun tambahan (kunci "prive"),
  * dan aturan nego harga: di bawah harga jual perlu hak "harga.nego", di bawah harga minimum hanya Pemilik/Superadmin.
  */
-async function jalankan(label: string, fn: () => Promise<unknown>) {
-  try {
-    await fn();
-  } catch (err) {
-    const digest = (err as { digest?: string })?.digest ?? "";
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
-function formulir(isian: Record<string, string | number | object>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
-  return fd;
-}
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (pesan.includes("static generation store missing")) {
-      console.error(`[FAIL] ${label}: aksi lolos (tidak ditolak)`);
-      process.exit(1);
-    }
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label}: aksi lolos (tidak ditolak)`);
-  process.exit(1);
-}
 const hariIni = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;

@@ -87,6 +87,8 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 - Pemetaan Akun: tabel pemetaan tambahan (tambah nama peran, ganti akun, hapus) untuk Admin ke atas (`pemetaan.tulis`), dipakai Prive sebagai akun bawaan.
 - Skrip uji: `uji-prive.ts` baru (prive, laporan, pemetaan tambahan, nego per peran lewat `UJI_PERAN`), `uji-rekonsiliasi.ts` memeriksa tanda perlu perhatian & konfirmasi, `uji-hak-akses.ts` menghitung `HAK_LAIN` dari sumbernya; 21 suite lulus, `tsc`, `eslint`, `next build` bersih.
 - Nama sistem diganti menjadi **Produksia** (UI, metadata, dokumen, `package.json`, bawaan nama perusahaan); repo dipindah ke `github.com/dreinst/produksia`.
+- Polesan UI: animasi masuk halaman/kartu bertahap, transisi hover & tekan pada tombol, kartu, isian, tautan sidebar, kerangka pemuatan berkilau; semua hormat `prefers-reduced-motion`.
+- Kode diringkas tanpa mengubah perilaku: 4 ekspor tanpa pemakai dihapus (`labelStatus`, `bacaPenyesuaianHak`, `whereAkunRinci`, `statusFormulirAwal`); pembantu skrip uji (`jalankan`, `formulir`, `pastikan`, `harusDitolak`) disatukan ke `skrip/bantuan.ts` (−433 baris, `harusDitolak` kini juga menganggap redirect sebagai "tidak ditolak"); 21 suite + walkthrough browser lulus setelahnya.
 
 ### 10–11 September 2026 (lanjutan 3) — uang muka, pindah barang, tutup buku, arus kas, pajak & SPT, hak akses per dokumen, lupa kata sandi, pelepasan aset, proyek/LPJ, rekonsiliasi kas/bank, laporan tambahan, tahun buku, nama pengguna
 

@@ -98,11 +98,6 @@ export async function pastikanAkunRinci(klien: Klien, daftarAkunId: string[]): P
   }
 }
 
-/** Akun yang boleh dipilih di formulir (bukan kelompok), opsional dibatasi jenis. */
-export function whereAkunRinci(jenis?: Prisma.AkunWhereInput["jenis"]): Prisma.AkunWhereInput {
-  return { kelompok: false, ...(jenis ? { jenis } : {}) };
-}
-
 /** Pilihan akun Kas/Bank: yang ditandai kasBank; bila belum ada yang ditandai, semua akun aset rinci. */
 export async function daftarAkunKasBank(klien: Klien = db) {
   const ditandai = await klien.akun.findMany({ where: { kasBank: true, kelompok: false }, orderBy: { kode: "asc" } });

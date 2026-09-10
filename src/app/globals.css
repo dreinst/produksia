@@ -245,3 +245,92 @@ body {
     @apply inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold font-mono leading-4;
   }
 }
+
+/* ---------- Gerak: animasi halus, dimatikan bila pengguna memilih "kurangi gerakan" ---------- */
+@keyframes muncul {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes kilau {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+.kerlip {
+  border-radius: 0.5rem;
+  background: #f1f5f9;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .animasi-masuk > *,
+  .animasi-masuk .grid > .kartu,
+  .muncul {
+    animation: muncul 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .animasi-masuk > *:nth-child(2),
+  .animasi-masuk .grid > .kartu:nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .animasi-masuk > *:nth-child(3),
+  .animasi-masuk .grid > .kartu:nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .animasi-masuk > *:nth-child(4),
+  .animasi-masuk .grid > .kartu:nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .animasi-masuk > *:nth-child(5),
+  .animasi-masuk .grid > .kartu:nth-child(5) {
+    animation-delay: 160ms;
+  }
+  .animasi-masuk > *:nth-child(n + 6),
+  .animasi-masuk .grid > .kartu:nth-child(n + 6) {
+    animation-delay: 200ms;
+  }
+  .kartu {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+  a.kartu:hover,
+  .kartu-interaktif:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-pop);
+    border-color: #cbd5e1;
+  }
+  .tombol {
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .tombol:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .tombol-utama,
+  .tombol-aksen {
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+  }
+  .tombol-utama:hover:not(:disabled),
+  .tombol-aksen:hover:not(:disabled) {
+    box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.28);
+    transform: translateY(-1px);
+  }
+  .isian {
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .isian:hover:not(:focus-visible):not(:disabled):not([readonly]) {
+    border-color: #94a3b8;
+  }
+  .lencana {
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .kerlip {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: kilau 1.4s linear infinite;
+  }
+}

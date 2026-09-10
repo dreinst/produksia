@@ -181,8 +181,8 @@ function GrupNavigasi({
                 href={l.href}
                 onClick={saatNavigasi}
                 aria-current={aktif ? "page" : undefined}
-                className={`flex items-center justify-between gap-2 py-1.5 px-2 rounded-md transition-colors ${
-                  aktif ? "bg-slate-100 text-slate-900 font-semibold" : "text-slate-500 hover:text-blue-600 hover:bg-slate-50"
+                className={`flex items-center justify-between gap-2 py-1.5 px-2 rounded-md transition-all duration-150 ${
+                  aktif ? "bg-slate-100 text-slate-900 font-semibold" : "text-slate-500 hover:text-blue-600 hover:bg-slate-50 hover:translate-x-0.5"
                 }`}
               >
                 <span className="truncate">{l.label}</span>
@@ -204,7 +204,7 @@ function TautanTunggal({ href, label, ikon, pathname, saatNavigasi }: { href: st
       onClick={saatNavigasi}
       aria-current={aktif ? "page" : undefined}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-        aktif ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+        aktif ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-0.5"
       }`}
     >
       <Ikon nama={ikon} className={`!text-[20px] ${aktif ? "" : "text-slate-400"}`} />

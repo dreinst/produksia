@@ -5,44 +5,12 @@ import { db } from "../src/lib/db";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { buatAsetTetap, jalankanPenyusutanBulanan, lepasAset } from "../src/lib/aksi/asetTetap";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
+import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
 /*
  * Pelepasan aset: dijual (laba/rugi vs nilai buku) atau dihapusbukukan; jurnal JU-LPS mengeluarkan aset &
  * akumulasi penyusutan; aset yang dilepas tidak ikut penyusutan; pembatalan memulihkan status & jurnal.
  */
-async function jalankan(label: string, fn: () => Promise<void>) {
-  try {
-    await fn();
-  } catch (err) {
-    const digest = (err as { digest?: string })?.digest ?? "";
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
-function formulir(isian: Record<string, string | number | object>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
-  return fd;
-}
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? String(err);
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label} TIDAK ditolak`);
-  process.exit(1);
-}
 const n = (v: { toString(): string }) => Number(v);
 async function saldoDebit(akunId: string) {
   const agg = await db.barisJurnal.aggregate({ where: { akunId }, _sum: { debit: true, kredit: true } });

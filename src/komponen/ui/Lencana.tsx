@@ -16,10 +16,6 @@ const GAYA_STATUS: Record<string, { cls: string; label: string }> = {
   OPEN: { cls: "lencana-blue", label: "Berjalan" },
 };
 
-export function labelStatus(status: string) {
-  return GAYA_STATUS[status]?.label ?? status;
-}
-
 export function LencanaStatus({ status }: { status: string }) {
   const s = GAYA_STATUS[status] ?? { cls: "lencana-slate", label: status };
   return <span className={`lencana ${s.cls}`}>{s.label}</span>;

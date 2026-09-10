@@ -33,12 +33,12 @@ export default function FormulirAksi({ aksi, children, className, pesanKonfirmas
       aria-busy={sedangProses}
     >
       {status.galat && (
-        <div role="alert" className="md:col-span-2 rounded border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+        <div role="alert" className="muncul md:col-span-2 rounded border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
           {status.galat}
         </div>
       )}
       {pesanSukses && status.ok && !status.galat && (
-        <div role="status" className="md:col-span-2 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <div role="status" className="muncul md:col-span-2 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
           {pesanSukses}
         </div>
       )}

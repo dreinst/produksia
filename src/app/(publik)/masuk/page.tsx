@@ -13,7 +13,7 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
+      <div className="animasi-masuk w-full max-w-md space-y-6">
         <div className="flex items-center justify-center gap-3">
           <span className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-heading font-bold text-lg">
             P

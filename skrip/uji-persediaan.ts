@@ -7,40 +7,8 @@ import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import { buatPesanan, buatPengiriman, buatFaktur } from "../src/lib/aksi/penjualan";
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
 import { buatAsetTetap } from "../src/lib/aksi/asetTetap";
+import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
-async function jalankan(label: string, fn: () => Promise<void>) {
-  try {
-    await fn();
-  } catch (err) {
-    const digest = (err as { digest?: string })?.digest ?? "";
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
-function formulir(isian: Record<string, string | number | object>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
-  return fd;
-}
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? String(err);
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label} TIDAK ditolak`);
-  process.exit(1);
-}
 async function saldo(akunId: string) {
   const agg = await db.barisJurnal.aggregate({ where: { akunId }, _sum: { debit: true, kredit: true } });
   return Number(agg._sum.debit ?? 0) - Number(agg._sum.kredit ?? 0);

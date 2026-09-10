@@ -6,45 +6,13 @@ import { periksaSinkron } from "../src/lib/sinkron";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { buatPesanan, buatFaktur, buatPenerimaan, buatUangMuka } from "../src/lib/aksi/penjualan";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
+import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
 /*
  * Uang muka pelanggan (DP pesanan): JU-UM (Dr Kas / Cr Uang Muka Pelanggan), dipakai FIFO saat faktur
  * (Dr Piutang − DP, Dr Uang Muka Pelanggan), status faktur & sisa tagihan memperhitungkannya,
  * penghapusan faktur mengembalikan DP, DP yang terpakai tidak bisa dihapus, buku besar selalu sinkron.
  */
-async function jalankan(label: string, fn: () => Promise<void>) {
-  try {
-    await fn();
-  } catch (err) {
-    const digest = (err as { digest?: string })?.digest ?? "";
-    const pesan = (err as { message?: string })?.message ?? "";
-    if (!digest.startsWith("NEXT_REDIRECT") && !pesan.includes("static generation store missing")) throw err;
-  }
-  console.log(`[ok] ${label}`);
-}
-function formulir(isian: Record<string, string | number | object>): FormData {
-  const fd = new FormData();
-  for (const [k, v] of Object.entries(isian)) fd.set(k, typeof v === "object" ? JSON.stringify(v) : String(v));
-  return fd;
-}
-function pastikan(kondisi: unknown, pesan: string) {
-  if (!kondisi) {
-    console.error(`[FAIL] ${pesan}`);
-    process.exit(1);
-  }
-  console.log(`[ok] ${pesan}`);
-}
-async function harusDitolak(label: string, fn: () => Promise<unknown>, potongan: string) {
-  try {
-    await fn();
-  } catch (err) {
-    const pesan = (err as { message?: string })?.message ?? String(err);
-    pastikan(pesan.includes(potongan), `${label} ditolak: "${pesan}"`);
-    return;
-  }
-  console.error(`[FAIL] ${label} TIDAK ditolak`);
-  process.exit(1);
-}
 async function pastikanSinkron(label: string) {
   const s = await periksaSinkron(db);
   const ok = s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.hutang.sinkron && s.barangBelumDitagih.sinkron && s.barangTerkirim.sinkron && s.uangMuka.sinkron;
