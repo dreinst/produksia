@@ -64,7 +64,7 @@ export default async function HalamanImporMutasi() {
                       </td>
                     </tr>
                   ))}
-                  {berkas.length === 0 && <tr><td colSpan={6} className="kosong">Belum ada.</td></tr>}
+                  {berkas.length === 0 && <tr><td colSpan={6} className="kosong">Belum ada berkas mutasi. Impor lewat formulir di atas.</td></tr>}
                 </tbody>
               </table>
             </div>
