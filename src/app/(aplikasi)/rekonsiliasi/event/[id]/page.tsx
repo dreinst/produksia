@@ -66,9 +66,9 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
         <Kartu judul="Proposal ter-acc / kontrak" nilai={`Rp ${angka(kontrak)}`} sub={p.nilaiKontrak ? `Pesanan Rp ${angka(m.totalPesanan)}` : "= total pesanan (nilai kontrak belum diisi)"} />
         <Kartu judul="Ditagih (faktur) + DP" nilai={`Rp ${angka(m.totalFaktur)}`} sub={`DP diterima Rp ${angka(m.totalUangMuka)}`} />
         <Kartu judul="Kas masuk (TRM + DP)" nilai={`Rp ${angka(m.totalDiterima.plus(m.totalUangMuka))}`} sub={`Sisa piutang (TOP) Rp ${angka(m.sisaPiutang)}`} warna={m.sisaPiutang.gt(0) ? "text-amber-700" : "text-emerald-700"} />
-        <Kartu judul="Anggaran biaya" nilai={`Rp ${angka(p.anggaranBiaya)}`} sub={selisihAnggaran ? `${selisihAnggaran.gte(0) ? "Sisa" : "Lebih"} Rp ${angka(selisihAnggaran.abs())}` : "belum diisi"} warna={selisihAnggaran && selisihAnggaran.lt(0) ? "text-rose-700" : undefined} />
-        <Kartu judul="Realisasi biaya" nilai={`Rp ${angka(realisasiBiaya)}`} sub={`Kas keluar Rp ${angka(kas.keluar)} · sisa hutang Rp ${angka(k.sisaHutang)}`} />
-        <Kartu judul={lr.laba.gte(0) ? "Laba event" : "Rugi event"} nilai={`Rp ${angka(lr.laba.abs())}`} sub={`Kas bersih event Rp ${angka(kas.bersih)}`} warna={lr.laba.gte(0) ? "text-emerald-700" : "text-rose-700"} />
+        <Kartu judul="Anggaran biaya" nilai={`Rp ${angka(p.anggaranBiaya)}`} sub={selisihAnggaran ? `${selisihAnggaran.gte(0) ? "Sisa" : "Lebih"} Rp ${angka(selisihAnggaran.abs())}` : "belum diisi"} warna={selisihAnggaran && selisihAnggaran.lt(0) ? "text-rose-700" : "text-blue-700"} />
+        <Kartu judul="Biaya dikeluarkan" nilai={`Rp ${angka(realisasiBiaya)}`} sub={`Kas keluar Rp ${angka(kas.keluar)} · sisa hutang Rp ${angka(k.sisaHutang)}`} warna="text-blue-700" />
+        <Kartu judul="Laba/Rugi" nilai={`${lr.laba.lt(0) ? "− " : ""}Rp ${angka(lr.laba.abs())}`} sub={`${lr.laba.gte(0) ? "Laba" : "Rugi"} · kas bersih event Rp ${angka(kas.bersih)}`} warna={lr.laba.gte(0) ? "text-emerald-700" : "text-rose-700"} />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -131,11 +131,11 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
               <thead><tr><th>PSB</th><th>Pemasok</th><th className="text-right">Pesanan</th><th className="text-right">Faktur (nota)</th><th className="text-right">Dibayar</th><th className="text-right">Sisa hutang</th></tr></thead>
               <tbody>
                 {k.pesananPembelian.map((b) => (
-                  <tr key={b.id}><td><NomorDokumen nomor={b.nomor} /></td><td>{b.pemasok}</td><td className="text-right angka">{angka(b.total)}</td><td className="text-right angka">{angka(b.faktur)}</td><td className="text-right angka">{angka(b.dibayar)}</td><td className={`text-right angka ${b.sisaHutang.gt(0) ? "text-amber-700 font-semibold" : ""}`}>{angka(b.sisaHutang)}</td></tr>
+                  <tr key={b.id}><td><NomorDokumen nomor={b.nomor} /></td><td>{b.pemasok}</td><td className="text-right angka text-blue-700">{angka(b.total)}</td><td className="text-right angka text-blue-700">{angka(b.faktur)}</td><td className="text-right angka text-blue-700">{angka(b.dibayar)}</td><td className={`text-right angka ${b.sisaHutang.gt(0) ? "text-amber-700 font-semibold" : ""}`}>{angka(b.sisaHutang)}</td></tr>
                 ))}
                 {k.pesananPembelian.length === 0 && <tr><td colSpan={6} className="kosong">Belum ada pesanan pembelian bertanda event ini.</td></tr>}
               </tbody>
-              <tfoot><tr className="font-semibold"><td colSpan={2}>Total</td><td className="text-right angka">{angka(k.totalPesananPembelian)}</td><td className="text-right angka">{angka(k.totalFakturPembelian)}</td><td className="text-right angka">{angka(k.totalDibayar)}</td><td className="text-right angka">{angka(k.sisaHutang)}</td></tr></tfoot>
+              <tfoot><tr className="font-semibold"><td colSpan={2}>Total</td><td className="text-right angka text-blue-700">{angka(k.totalPesananPembelian)}</td><td className="text-right angka text-blue-700">{angka(k.totalFakturPembelian)}</td><td className="text-right angka text-blue-700">{angka(k.totalDibayar)}</td><td className="text-right angka">{angka(k.sisaHutang)}</td></tr></tfoot>
             </table>
           </Langkah>
           <Langkah nomor="2" judul="Beban-biaya langsung (nota kas keluar / jurnal)" keterangan="Kas keluar dan jurnal manual yang diberi tanda event ini">
@@ -143,21 +143,21 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
               <thead><tr><th>Nota</th><th>Tanggal</th><th>Keterangan</th><th className="text-right">Jumlah</th></tr></thead>
               <tbody>
                 {k.bebanLain.map((b) => (
-                  <tr key={b.id}><td><NomorDokumen nomor={b.nomor} /></td><td className="text-slate-500">{tgl(b.tanggal)}</td><td className="text-slate-600">{b.keterangan ?? "—"}</td><td className="text-right angka">{angka(b.jumlah)}</td></tr>
+                  <tr key={b.id}><td><NomorDokumen nomor={b.nomor} /></td><td className="text-slate-500">{tgl(b.tanggal)}</td><td className="text-slate-600">{b.keterangan ?? "—"}</td><td className="text-right angka text-blue-700">{angka(b.jumlah)}</td></tr>
                 ))}
                 {k.bebanLain.length === 0 && <tr><td colSpan={4} className="kosong">Belum ada kas keluar/jurnal beban bertanda event ini.</td></tr>}
               </tbody>
-              <tfoot><tr className="font-semibold"><td colSpan={3}>Total beban langsung lewat kas/jurnal</td><td className="text-right angka">{angka(k.totalBebanLain)}</td></tr></tfoot>
+              <tfoot><tr className="font-semibold"><td colSpan={3}>Total beban langsung lewat kas/jurnal</td><td className="text-right angka text-blue-700">{angka(k.totalBebanLain)}</td></tr></tfoot>
             </table>
           </Langkah>
           <Langkah nomor="3" judul="Cash flow keluar & beban diakui" keterangan="Uang yang benar-benar keluar vs biaya yang diakui di L/R (termasuk HPP barang yang dipakai)">
             <table className="tabel">
               <tbody>
-                <tr><td>Kas/bank keluar untuk event (jurnal bertanda event)</td><td className="text-right angka font-semibold text-rose-700">{angka(kas.keluar)}</td></tr>
+                <tr><td>Kas/bank keluar untuk event (jurnal bertanda event)</td><td className="text-right angka font-semibold text-blue-700">{angka(kas.keluar)}</td></tr>
                 {lr.beban.map((x) => (
-                  <tr key={x.kode} className="text-slate-600"><td className="pl-6"><span className="mono">{x.kode}</span> {x.nama}</td><td className="text-right angka">{angka(x.jumlah)}</td></tr>
+                  <tr key={x.kode} className="text-slate-600"><td className="pl-6"><span className="mono">{x.kode}</span> {x.nama}</td><td className="text-right angka text-blue-700">{angka(x.jumlah)}</td></tr>
                 ))}
-                <tr className="font-semibold"><td>Total beban diakui (akrual)</td><td className="text-right angka">{angka(lr.totalBeban)}</td></tr>
+                <tr className="font-semibold"><td>Total beban diakui (akrual)</td><td className="text-right angka text-blue-700">{angka(lr.totalBeban)}</td></tr>
               </tbody>
             </table>
           </Langkah>
@@ -165,21 +165,28 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
       </div>
 
       <div className="kartu space-y-3">
-        <h2 className="judul-kartu">Rekonsiliasi laba ↔ kas event</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="judul-kartu">Rekonsiliasi Laba/Rugi ↔ kas event</h2>
+          <div className="flex flex-wrap gap-4 text-xs text-slate-500">
+            <span><span className="inline-block w-3 h-3 rounded-sm bg-blue-600 align-middle mr-1" />Biaya yang dikeluarkan</span>
+            <span><span className="inline-block w-3 h-3 rounded-sm bg-emerald-600 align-middle mr-1" />Laba</span>
+            <span><span className="inline-block w-3 h-3 rounded-sm bg-rose-600 align-middle mr-1" />Rugi</span>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <table className="tabel">
             <tbody>
               <tr><td>Pendapatan diakui</td><td className="text-right angka">{angka(lr.totalPendapatan)}</td></tr>
-              <tr><td>− Beban diakui</td><td className="text-right angka">{angka(lr.totalBeban)}</td></tr>
-              <tr className="font-semibold border-t border-slate-200"><td>Laba (rugi) event — masuk ke Laporan Laba Rugi</td><td className={`text-right angka ${lr.laba.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(lr.laba)}</td></tr>
+              <tr><td>− Biaya dikeluarkan (beban diakui)</td><td className="text-right angka text-blue-700">{angka(lr.totalBeban)}</td></tr>
+              <tr className="font-semibold border-t border-slate-200"><td>Laba/Rugi event — masuk ke Laporan Laba Rugi</td><td className={`text-right angka ${lr.laba.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(lr.laba)}</td></tr>
             </tbody>
           </table>
           <table className="tabel">
             <tbody>
               <tr><td>Kas/bank masuk</td><td className="text-right angka">{angka(kas.masuk)}</td></tr>
-              <tr><td>− Kas/bank keluar</td><td className="text-right angka">{angka(kas.keluar)}</td></tr>
+              <tr><td>− Kas/bank keluar</td><td className="text-right angka text-blue-700">{angka(kas.keluar)}</td></tr>
               <tr className="font-semibold border-t border-slate-200"><td>Kas bersih event — masuk ke Neraca (kas/bank)</td><td className={`text-right angka ${kas.bersih.gte(0) ? "text-emerald-700" : "text-rose-700"}`}>{angka(kas.bersih)}</td></tr>
-              <tr className="text-xs text-slate-500"><td>Selisih laba vs kas</td><td className="text-right angka">{angka(lr.laba.minus(kas.bersih))}</td></tr>
+              <tr className="text-xs text-slate-500"><td>Selisih Laba/Rugi vs kas</td><td className="text-right angka">{angka(lr.laba.minus(kas.bersih))}</td></tr>
             </tbody>
           </table>
         </div>
