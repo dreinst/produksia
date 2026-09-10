@@ -26,6 +26,16 @@ Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (li
 
 Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak ada kunci rahasia lain yang perlu diatur.
 
+### Menjalankan
+
+```bash
+npm run dev      # migrasi + generate Prisma Client otomatis, lalu server dev di :3000
+npm run seed     # kosongkan & isi data contoh (perusahaan D'Production Event Organizer)
+npm run uji      # semua suite regresi
+```
+
+Setiap `npm run dev`/`build`/`start` menjalankan `npm run siapkan` (`prisma migrate deploy` + `prisma generate`) lebih dulu, jadi setelah `git pull` skema basis data langsung sinkron. Bila folder proyek atau PostgreSQL dipindahkan, hentikan server & PostgreSQL dulu, pindahkan, lalu jalankan lagi dari lokasi baru.
+
 ### Masuk pertama kali
 
 - **Basis data kosong** (belum ada pengguna): halaman `/masuk` otomatis menampilkan formulir **pemasangan awal** untuk membuat akun Pemilik pertama.
