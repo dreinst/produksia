@@ -47,7 +47,7 @@ export default async function Beranda() {
     db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" } }, include: { pembayaran: true, retur: { select: { total: true } } } }),
     db.akun.findMany({ include: { barisJurnal: true }, orderBy: { kode: "asc" } }),
     db.stokBarang.findMany({ include: { barang: true, gudang: true } }),
-    db.barang.count(),
+    db.barang.count({ where: { jenis: "BARANG" } }),
     db.asetTetap.findMany({ where: { status: "AKTIF" }, include: { penyusutan: true } }),
     db.penawaranPenjualan.findMany({ where: { status: "DRAF" } }),
     db.pesananPenjualan.findMany({ where: { status: { in: ["DRAF", "SEBAGIAN"] } } }),
