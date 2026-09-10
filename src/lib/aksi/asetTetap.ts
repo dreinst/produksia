@@ -4,6 +4,7 @@ import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
@@ -31,6 +32,8 @@ export async function buatAsetTetap(dataFormulir: FormData) {
   if (new Set([akunAsetId, akunBebanPenyusutanId, akunAkumulasiPenyusutanId]).size !== 3) {
     throw new Error("Ketiga akun harus berbeda satu sama lain");
   }
+
+  await pastikanAkunRinci(db, [akunAsetId, akunBebanPenyusutanId, akunAkumulasiPenyusutanId]);
 
   await db.asetTetap.create({
     data: {
@@ -93,6 +96,7 @@ export async function jalankanPenyusutanBulanan(dataFormulir: FormData) {
 
   await db.$transaction(async (tx) => {
     const nomor = await nomorDokumenBerikutnya(tx.jurnal, "JU-PNY");
+    await pastikanAkunRinci(tx, daftarBaris.map((b) => b.akunId));
     const jurnal = await tx.jurnal.create({
       data: { nomor, keterangan: `Penyusutan aset periode ${teksPeriode}`, sumber: "PENYUSUTAN", baris: { create: daftarBaris } },
     });

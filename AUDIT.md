@@ -43,10 +43,18 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 20. **[FIXED] Lint bersih.** 2 error React Compiler (setKeadaan dalam effect di BilahSamping; mutasi variabel luar di Buku Besar) diperbaiki; `tsc --noEmit` dan `eslint` lulus tanpa error.
 21. **[FIXED] Belum ada CI/commit.** Semua pekerjaan di-commit ke `github.com/dreinst/accuratecopy` (main). `.github/workflows/ci.yml`: PostgreSQL 16 sebagai service → `prisma migrate deploy` + `generate` → `tsc` → `eslint` → seed → 5 suite regresi (`UJI_TANPA_SESI=1`) → `next build`.
 24. **[FIXED] Sisa nama Inggris di kode** setelah butir 19f: fungsi halaman (`InvoicesPage` → `HalamanFakturPenjualan`, `Home` → `Beranda`, dst.), tipe (`OrderLine` → `BarisPesananOpsi`, `ItemOption` → `OpsiBarang`, `InvoiceLine` → `BarisFakturOpsi`, `AccountOption` → `OpsiAkun`), kelas CSS sisa (`page-subjudul` → `subjudul-halaman`), dan dokumentasi yang masih menyebut `pgctl.sh awal`/`skrip/uji-penjualan*.ts` (artefak penggantian otomatis).
+
+25. **[FIXED] Bagan akun standar EO/WO** (10 Sep 2026, dari `coa-draft-eo-wo.md`). Kurasi 108 akun bernomor ala Accurate (41 asli, 52 usulan standar, 15 keputusan atas butir pending — semua dicatat di `BAGAN-AKUN.md` dan tampil di `/pengaturan/bagan-akun`). Skema `Akun` mendapat `kelompok`, `kasBank`, `keterangan` (migrasi `bagan_akun`). Penerapan idempoten (`terapkanBaganAkunStandar`), pemetaan akun otomatis terisi. **Pengaman baru:** akun kelompok ditolak di jurnal umum, kas masuk/keluar, jurnal otomatis penjualan/pembelian, penyusutan, dan pemetaan (`pastikanAkunRinci`); pilihan akun di semua formulir hanya akun rinci; pilihan kas/bank hanya akun bertanda. Neraca Saldo kini berjenjang dengan subtotal per kelompok. Seed & data induk akun (bidang boolean) disesuaikan. Suite regresi baru `skrip/uji-bagan-akun.ts`. Sisa: satu akun pendapatan untuk semua faktur (belum per barang/jasa), pajak belum dihitung otomatis.
 22. **[OPEN] Skrip regresi memakai database yang sama dengan data seed.** Sudah aman (cleanup berbasis waktu), tapi idealnya `DATABASE_URL` terpisah untuk test.
 23. **[OPEN] Turbopack tidak me-reload Prisma Client setelah `prisma generate`** — restart `npm run dev` setiap ganti skema (sudah dicatat di README).
 
 ## Verifikasi yang dilakukan
+
+### 10 September 2026 — bagan akun EO/WO
+
+- `npx tsc --noEmit` ✔ · `npx eslint` ✔ · 6 suite regresi lulus (baru: `uji-bagan-akun` — idempotensi, akun hilang dibuat ulang dengan induk, penolakan akun kelompok di jurnal/kas/pemetaan, daftar kas/bank)
+- Seed ulang: 108 akun + pemetaan; buku besar tetap seimbang
+- Browser headless: halaman Bagan Akun Standar, Neraca Saldo berjenjang, pilihan kas/bank di Kas Masuk; suite login/peran & paginasi tetap lulus
 
 ### 7 September 2026 — login & hak akses, ubah data induk, pencarian & paginasi, subset font, CI
 

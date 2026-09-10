@@ -29,6 +29,9 @@ export type AkunMinAggregateOutputType = {
   kode: string | null
   nama: string | null
   jenis: $Enums.JenisAkun | null
+  kelompok: boolean | null
+  kasBank: boolean | null
+  keterangan: string | null
   indukId: string | null
 }
 
@@ -37,6 +40,9 @@ export type AkunMaxAggregateOutputType = {
   kode: string | null
   nama: string | null
   jenis: $Enums.JenisAkun | null
+  kelompok: boolean | null
+  kasBank: boolean | null
+  keterangan: string | null
   indukId: string | null
 }
 
@@ -45,6 +51,9 @@ export type AkunCountAggregateOutputType = {
   kode: number
   nama: number
   jenis: number
+  kelompok: number
+  kasBank: number
+  keterangan: number
   indukId: number
   _all: number
 }
@@ -55,6 +64,9 @@ export type AkunMinAggregateInputType = {
   kode?: true
   nama?: true
   jenis?: true
+  kelompok?: true
+  kasBank?: true
+  keterangan?: true
   indukId?: true
 }
 
@@ -63,6 +75,9 @@ export type AkunMaxAggregateInputType = {
   kode?: true
   nama?: true
   jenis?: true
+  kelompok?: true
+  kasBank?: true
+  keterangan?: true
   indukId?: true
 }
 
@@ -71,6 +86,9 @@ export type AkunCountAggregateInputType = {
   kode?: true
   nama?: true
   jenis?: true
+  kelompok?: true
+  kasBank?: true
+  keterangan?: true
   indukId?: true
   _all?: true
 }
@@ -152,6 +170,9 @@ export type AkunGroupByOutputType = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok: boolean
+  kasBank: boolean
+  keterangan: string | null
   indukId: string | null
   _count: AkunCountAggregateOutputType | null
   _min: AkunMinAggregateOutputType | null
@@ -181,6 +202,9 @@ export type AkunWhereInput = {
   kode?: Prisma.StringFilter<"Akun"> | string
   nama?: Prisma.StringFilter<"Akun"> | string
   jenis?: Prisma.EnumJenisAkunFilter<"Akun"> | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFilter<"Akun"> | boolean
+  kasBank?: Prisma.BoolFilter<"Akun"> | boolean
+  keterangan?: Prisma.StringNullableFilter<"Akun"> | string | null
   indukId?: Prisma.StringNullableFilter<"Akun"> | string | null
   induk?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   anak?: Prisma.AkunListRelationFilter
@@ -202,6 +226,9 @@ export type AkunOrderByWithRelationInput = {
   kode?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   jenis?: Prisma.SortOrder
+  kelompok?: Prisma.SortOrder
+  kasBank?: Prisma.SortOrder
+  keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   indukId?: Prisma.SortOrderInput | Prisma.SortOrder
   induk?: Prisma.AkunOrderByWithRelationInput
   anak?: Prisma.AkunOrderByRelationAggregateInput
@@ -226,6 +253,9 @@ export type AkunWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AkunWhereInput | Prisma.AkunWhereInput[]
   nama?: Prisma.StringFilter<"Akun"> | string
   jenis?: Prisma.EnumJenisAkunFilter<"Akun"> | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFilter<"Akun"> | boolean
+  kasBank?: Prisma.BoolFilter<"Akun"> | boolean
+  keterangan?: Prisma.StringNullableFilter<"Akun"> | string | null
   indukId?: Prisma.StringNullableFilter<"Akun"> | string | null
   induk?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   anak?: Prisma.AkunListRelationFilter
@@ -247,6 +277,9 @@ export type AkunOrderByWithAggregationInput = {
   kode?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   jenis?: Prisma.SortOrder
+  kelompok?: Prisma.SortOrder
+  kasBank?: Prisma.SortOrder
+  keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   indukId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AkunCountOrderByAggregateInput
   _max?: Prisma.AkunMaxOrderByAggregateInput
@@ -261,6 +294,9 @@ export type AkunScalarWhereWithAggregatesInput = {
   kode?: Prisma.StringWithAggregatesFilter<"Akun"> | string
   nama?: Prisma.StringWithAggregatesFilter<"Akun"> | string
   jenis?: Prisma.EnumJenisAkunWithAggregatesFilter<"Akun"> | $Enums.JenisAkun
+  kelompok?: Prisma.BoolWithAggregatesFilter<"Akun"> | boolean
+  kasBank?: Prisma.BoolWithAggregatesFilter<"Akun"> | boolean
+  keterangan?: Prisma.StringNullableWithAggregatesFilter<"Akun"> | string | null
   indukId?: Prisma.StringNullableWithAggregatesFilter<"Akun"> | string | null
 }
 
@@ -269,6 +305,9 @@ export type AkunCreateInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -289,6 +328,9 @@ export type AkunUncheckedCreateInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -309,6 +351,9 @@ export type AkunUpdateInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -329,6 +374,9 @@ export type AkunUncheckedUpdateInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -349,6 +397,9 @@ export type AkunCreateManyInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
 }
 
@@ -357,6 +408,9 @@ export type AkunUpdateManyMutationInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type AkunUncheckedUpdateManyInput = {
@@ -364,6 +418,9 @@ export type AkunUncheckedUpdateManyInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -392,6 +449,9 @@ export type AkunCountOrderByAggregateInput = {
   kode?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   jenis?: Prisma.SortOrder
+  kelompok?: Prisma.SortOrder
+  kasBank?: Prisma.SortOrder
+  keterangan?: Prisma.SortOrder
   indukId?: Prisma.SortOrder
 }
 
@@ -400,6 +460,9 @@ export type AkunMaxOrderByAggregateInput = {
   kode?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   jenis?: Prisma.SortOrder
+  kelompok?: Prisma.SortOrder
+  kasBank?: Prisma.SortOrder
+  keterangan?: Prisma.SortOrder
   indukId?: Prisma.SortOrder
 }
 
@@ -408,6 +471,9 @@ export type AkunMinOrderByAggregateInput = {
   kode?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   jenis?: Prisma.SortOrder
+  kelompok?: Prisma.SortOrder
+  kasBank?: Prisma.SortOrder
+  keterangan?: Prisma.SortOrder
   indukId?: Prisma.SortOrder
 }
 
@@ -632,6 +698,9 @@ export type AkunCreateWithoutPenerimaanPenjualanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -651,6 +720,9 @@ export type AkunUncheckedCreateWithoutPenerimaanPenjualanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -686,6 +758,9 @@ export type AkunUpdateWithoutPenerimaanPenjualanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -705,6 +780,9 @@ export type AkunUncheckedUpdateWithoutPenerimaanPenjualanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -724,6 +802,9 @@ export type AkunCreateWithoutPembayaranPembelianInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -743,6 +824,9 @@ export type AkunUncheckedCreateWithoutPembayaranPembelianInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -778,6 +862,9 @@ export type AkunUpdateWithoutPembayaranPembelianInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -797,6 +884,9 @@ export type AkunUncheckedUpdateWithoutPembayaranPembelianInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -816,6 +906,9 @@ export type AkunCreateWithoutAnakInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutAkunInput
@@ -835,6 +928,9 @@ export type AkunUncheckedCreateWithoutAnakInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutAkunInput
@@ -859,6 +955,9 @@ export type AkunCreateWithoutIndukInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutAkunInput
@@ -878,6 +977,9 @@ export type AkunUncheckedCreateWithoutIndukInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutAkunInput
@@ -918,6 +1020,9 @@ export type AkunUpdateWithoutAnakInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutAkunNestedInput
@@ -937,6 +1042,9 @@ export type AkunUncheckedUpdateWithoutAnakInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutAkunNestedInput
@@ -975,6 +1083,9 @@ export type AkunScalarWhereInput = {
   kode?: Prisma.StringFilter<"Akun"> | string
   nama?: Prisma.StringFilter<"Akun"> | string
   jenis?: Prisma.EnumJenisAkunFilter<"Akun"> | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFilter<"Akun"> | boolean
+  kasBank?: Prisma.BoolFilter<"Akun"> | boolean
+  keterangan?: Prisma.StringNullableFilter<"Akun"> | string | null
   indukId?: Prisma.StringNullableFilter<"Akun"> | string | null
 }
 
@@ -983,6 +1094,9 @@ export type AkunCreateWithoutPemetaanPiutangInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1002,6 +1116,9 @@ export type AkunUncheckedCreateWithoutPemetaanPiutangInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1026,6 +1143,9 @@ export type AkunCreateWithoutPemetaanPersediaanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1045,6 +1165,9 @@ export type AkunUncheckedCreateWithoutPemetaanPersediaanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1069,6 +1192,9 @@ export type AkunCreateWithoutPemetaanHppInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1088,6 +1214,9 @@ export type AkunUncheckedCreateWithoutPemetaanHppInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1112,6 +1241,9 @@ export type AkunCreateWithoutPemetaanPendapatanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1131,6 +1263,9 @@ export type AkunUncheckedCreateWithoutPemetaanPendapatanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1155,6 +1290,9 @@ export type AkunCreateWithoutPemetaanUtangInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1174,6 +1312,9 @@ export type AkunUncheckedCreateWithoutPemetaanUtangInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1209,6 +1350,9 @@ export type AkunUpdateWithoutPemetaanPiutangInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1228,6 +1372,9 @@ export type AkunUncheckedUpdateWithoutPemetaanPiutangInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1258,6 +1405,9 @@ export type AkunUpdateWithoutPemetaanPersediaanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1277,6 +1427,9 @@ export type AkunUncheckedUpdateWithoutPemetaanPersediaanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1307,6 +1460,9 @@ export type AkunUpdateWithoutPemetaanHppInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1326,6 +1482,9 @@ export type AkunUncheckedUpdateWithoutPemetaanHppInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1356,6 +1515,9 @@ export type AkunUpdateWithoutPemetaanPendapatanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1375,6 +1537,9 @@ export type AkunUncheckedUpdateWithoutPemetaanPendapatanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1405,6 +1570,9 @@ export type AkunUpdateWithoutPemetaanUtangInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1424,6 +1592,9 @@ export type AkunUncheckedUpdateWithoutPemetaanUtangInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1443,6 +1614,9 @@ export type AkunCreateWithoutBarisJurnalInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutAkunInput
@@ -1462,6 +1636,9 @@ export type AkunUncheckedCreateWithoutBarisJurnalInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutAkunInput
@@ -1497,6 +1674,9 @@ export type AkunUpdateWithoutBarisJurnalInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutAkunNestedInput
@@ -1516,6 +1696,9 @@ export type AkunUncheckedUpdateWithoutBarisJurnalInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutAkunNestedInput
@@ -1535,6 +1718,9 @@ export type AkunCreateWithoutAsetSebagaiAkunAsetInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1554,6 +1740,9 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunAsetInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1578,6 +1767,9 @@ export type AkunCreateWithoutAsetSebagaiAkunBebanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1597,6 +1789,9 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunBebanInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1621,6 +1816,9 @@ export type AkunCreateWithoutAsetSebagaiAkunAkumulasiInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
   anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
@@ -1640,6 +1838,9 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunAkumulasiInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
   indukId?: string | null
   anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
   barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
@@ -1675,6 +1876,9 @@ export type AkunUpdateWithoutAsetSebagaiAkunAsetInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1694,6 +1898,9 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunAsetInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1724,6 +1931,9 @@ export type AkunUpdateWithoutAsetSebagaiAkunBebanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1743,6 +1953,9 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunBebanInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1773,6 +1986,9 @@ export type AkunUpdateWithoutAsetSebagaiAkunAkumulasiInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
@@ -1792,6 +2008,9 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunAkumulasiInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
@@ -1811,6 +2030,9 @@ export type AkunCreateManyIndukInput = {
   kode: string
   nama: string
   jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
 }
 
 export type AkunUpdateWithoutIndukInput = {
@@ -1818,6 +2040,9 @@ export type AkunUpdateWithoutIndukInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutAkunNestedInput
@@ -1837,6 +2062,9 @@ export type AkunUncheckedUpdateWithoutIndukInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
   barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutAkunNestedInput
@@ -1856,6 +2084,9 @@ export type AkunUncheckedUpdateManyWithoutIndukInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1948,6 +2179,9 @@ export type AkunSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   kode?: boolean
   nama?: boolean
   jenis?: boolean
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: boolean
   indukId?: boolean
   induk?: boolean | Prisma.Akun$indukArgs<ExtArgs>
   anak?: boolean | Prisma.Akun$anakArgs<ExtArgs>
@@ -1970,6 +2204,9 @@ export type AkunSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   kode?: boolean
   nama?: boolean
   jenis?: boolean
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: boolean
   indukId?: boolean
   induk?: boolean | Prisma.Akun$indukArgs<ExtArgs>
 }, ExtArgs["result"]["akun"]>
@@ -1979,6 +2216,9 @@ export type AkunSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   kode?: boolean
   nama?: boolean
   jenis?: boolean
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: boolean
   indukId?: boolean
   induk?: boolean | Prisma.Akun$indukArgs<ExtArgs>
 }, ExtArgs["result"]["akun"]>
@@ -1988,10 +2228,13 @@ export type AkunSelectScalar = {
   kode?: boolean
   nama?: boolean
   jenis?: boolean
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: boolean
   indukId?: boolean
 }
 
-export type AkunOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "jenis" | "indukId", ExtArgs["result"]["akun"]>
+export type AkunOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "jenis" | "kelompok" | "kasBank" | "keterangan" | "indukId", ExtArgs["result"]["akun"]>
 export type AkunInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   induk?: boolean | Prisma.Akun$indukArgs<ExtArgs>
   anak?: boolean | Prisma.Akun$anakArgs<ExtArgs>
@@ -2037,6 +2280,15 @@ export type $AkunPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     kode: string
     nama: string
     jenis: $Enums.JenisAkun
+    /**
+     * Akun kelompok/induk: hanya wadah untuk anak-anaknya, tidak boleh menerima jurnal
+     */
+    kelompok: boolean
+    /**
+     * Tampil sebagai pilihan akun Kas/Bank (penerimaan, pembayaran, kas masuk/keluar)
+     */
+    kasBank: boolean
+    keterangan: string | null
     indukId: string | null
   }, ExtArgs["result"]["akun"]>
   composites: {}
@@ -2478,6 +2730,9 @@ export interface AkunFieldRefs {
   readonly kode: Prisma.FieldRef<"Akun", 'String'>
   readonly nama: Prisma.FieldRef<"Akun", 'String'>
   readonly jenis: Prisma.FieldRef<"Akun", 'JenisAkun'>
+  readonly kelompok: Prisma.FieldRef<"Akun", 'Boolean'>
+  readonly kasBank: Prisma.FieldRef<"Akun", 'Boolean'>
+  readonly keterangan: Prisma.FieldRef<"Akun", 'String'>
   readonly indukId: Prisma.FieldRef<"Akun", 'String'>
 }
     

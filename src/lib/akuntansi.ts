@@ -1,6 +1,7 @@
 import type { Prisma } from "@/prisma-klien/client";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { D, type Desimal } from "@/lib/uang";
+import { pastikanAkunRinci } from "@/lib/baganAkun";
 
 type Tx = Prisma.TransactionClient;
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan: string };
@@ -22,6 +23,7 @@ export async function ambilPemetaanAkun(tx: Tx) {
 }
 
 async function catatJurnal(tx: Tx, prefix: string, keterangan: string, sumber: "PENJUALAN" | "PEMBELIAN", daftarBaris: InputBarisJurnal[]) {
+  await pastikanAkunRinci(tx, daftarBaris.map((b) => b.akunId));
   const nomor = await nomorJurnalBerikutnya(tx, prefix);
   await tx.jurnal.create({ data: { nomor, keterangan, sumber, baris: { create: daftarBaris } } });
 }

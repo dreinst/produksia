@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
+import { pastikanAkunRinci } from "@/lib/baganAkun";
 import type { SumberJurnal } from "@/prisma-klien/enums";
 
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan?: string };
@@ -44,6 +45,7 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
     throw new Error(`Jurnal tidak seimbang: total debit ${format(totalDebit)} vs kredit ${format(totalKredit)}`);
   }
   if (totalDebit.isZero()) throw new Error("Jumlah jurnal tidak boleh nol");
+  await pastikanAkunRinci(db, daftarBaris.map((l) => l.akunId));
 
   const nomor = await nomorDokumenBerikutnya(db.jurnal, prefix);
 

@@ -47,7 +47,12 @@ export default function FormulirDataInduk({
                 {bidang.wajib && <span className="text-rose-500"> *</span>}
               </span>
             </label>
-            {bidang.jenis === "select" ? (
+            {bidang.jenis === "boolean" ? (
+              <label className="flex items-center gap-2 h-9 text-sm text-slate-800" htmlFor={id}>
+                <input id={id} type="checkbox" name={bidang.nama} defaultChecked={nilai?.[bidang.nama] === true} className="h-4 w-4 rounded border-slate-300" />
+                Ya
+              </label>
+            ) : bidang.jenis === "select" ? (
               <select id={id} name={bidang.nama} defaultValue={bacaAwal(bidang.nama, bidang.nilaiBawaan)} className="isian">
                 <option value="">-</option>
                 {(bidang.opsiStatis

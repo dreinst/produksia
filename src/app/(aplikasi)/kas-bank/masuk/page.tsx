@@ -2,6 +2,7 @@ import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatKasMasukFormulir } from "@/lib/aksi/jurnal";
@@ -10,8 +11,9 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
   await wajibHak("kas-bank.lihat");
   const param = await bacaParamDaftar(searchParams);
   const where = { sumber: "KAS_MASUK" as const, ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}) };
-  const [daftarAkun, total, daftarJurnal] = await Promise.all([
-    db.akun.findMany({ orderBy: { kode: "asc" } }),
+  const [daftarAkunKas, daftarAkun, total, daftarJurnal] = await Promise.all([
+    daftarAkunKasBank(),
+    db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } }),
     db.jurnal.count({ where }),
     db.jurnal.findMany({ where, include: { baris: { include: { akun: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
   ]);
@@ -25,7 +27,7 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
           <label className="label" htmlFor="akunKasId">Akun Kas/Bank Penerima *</label>
           <select id="akunKasId" name="akunKasId" required className="isian">
             <option value="">-</option>
-            {daftarAkun.map((a) => (
+            {daftarAkunKas.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.kode} - {a.nama}
               </option>

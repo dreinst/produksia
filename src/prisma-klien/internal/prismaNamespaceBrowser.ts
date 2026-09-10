@@ -483,6 +483,9 @@ export const AkunScalarFieldEnum = {
   kode: 'kode',
   nama: 'nama',
   jenis: 'jenis',
+  kelompok: 'kelompok',
+  kasBank: 'kasBank',
+  keterangan: 'keterangan',
   indukId: 'indukId'
 } as const
 

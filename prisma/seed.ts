@@ -1,6 +1,8 @@
 import "dotenv/config";
 import { db } from "../src/lib/db";
 import { hashKataSandi } from "../src/lib/kataSandi";
+import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
+import { BAGAN_AKUN_STANDAR } from "../src/lib/baganAkunStandar";
 
 /**
  * Satu alur cerita tunggal yang melewati SETIAP tahap siklus penjualan,
@@ -20,68 +22,41 @@ async function main() {
   });
 
   console.log("=== Master data ===");
-  const dept = await db.departemen.create({ data: { nama: "Penjualan" } });
+  const dept = await db.departemen.create({ data: { nama: "Marketing & Event" } });
   const penjual = await db.karyawan.create({
     data: { kode: "SLS-01", nama: "Rudi Hartono", departemenId: dept.id },
   });
   const pelanggan = await db.pelanggan.create({
     data: {
       kode: "CUST-001",
-      nama: "Toko Kue Manis",
-      alamat: "Jl. Melati No. 7, Jakarta",
+      nama: "PT Cahaya Nusantara",
+      alamat: "Jl. Sudirman Kav. 12, Jakarta",
       telepon: "021-5551234",
       penjualId: penjual.id,
     },
   });
   const pemasok = await db.pemasok.create({
-    data: { kode: "SUP-001", nama: "PT Sumber Tepung Jaya", alamat: "Kawasan Industri Pulogadung", telepon: "021-4449876" },
+    data: { kode: "SUP-001", nama: "CV Sinar Dekorasi", alamat: "Jl. Pahlawan No. 5, Bekasi", telepon: "021-4449876" },
   });
   const gudang = await db.gudang.create({
-    data: { kode: "WH-01", nama: "Gudang Utama", alamat: "Jl. Raya Bekasi KM 20" },
+    data: { kode: "WH-01", nama: "Gudang Peralatan", alamat: "Jl. Raya Bekasi KM 20" },
   });
-  const kelompok = await db.kelompokBarang.create({ data: { nama: "Bahan Baku" } });
+  const kelompok = await db.kelompokBarang.create({ data: { nama: "Merchandise & Produksi" } });
   await db.proyek.create({
-    data: { kode: "PRJ-001", nama: "Pesanan Ulang Tahun", pelangganId: pelanggan.id, status: "BERJALAN" },
+    data: { kode: "PRJ-001", nama: "Wedding Andi & Sari", pelangganId: pelanggan.id, status: "BERJALAN" },
   });
 
-  console.log("=== Daftar Akun (Chart of Accounts) ===");
-  const accountDefs = [
-    { kode: "1-1000", nama: "Kas", jenis: "ASET" as const },
-    { kode: "1-1100", nama: "Bank", jenis: "ASET" as const },
-    { kode: "1-1200", nama: "Piutang Usaha", jenis: "ASET" as const },
-    { kode: "1-1300", nama: "Persediaan Barang Dagang", jenis: "ASET" as const },
-    { kode: "2-1000", nama: "Utang Usaha", jenis: "KEWAJIBAN" as const },
-    { kode: "3-1000", nama: "Modal Pemilik", jenis: "MODAL" as const },
-    { kode: "4-1000", nama: "Pendapatan Penjualan", jenis: "PENDAPATAN" as const },
-    { kode: "5-1000", nama: "Harga Pokok Penjualan", jenis: "BEBAN" as const },
-    { kode: "5-2000", nama: "Beban Sewa", jenis: "BEBAN" as const },
-    { kode: "5-2100", nama: "Beban Listrik & Air", jenis: "BEBAN" as const },
-    { kode: "1-2000", nama: "Peralatan Dapur", jenis: "ASET" as const },
-    { kode: "1-2100", nama: "Akumulasi Penyusutan Peralatan", jenis: "ASET" as const },
-    { kode: "5-3000", nama: "Beban Penyusutan", jenis: "BEBAN" as const },
-  ];
-  const daftarAkun: Record<string, Awaited<ReturnType<typeof db.akun.create>>> = {};
-  for (const def of accountDefs) {
-    daftarAkun[def.kode] = await db.akun.create({ data: def });
-  }
-  const [kas, bank, piutang, persediaanAkun, utang, modal, pendapatan, hpp, sewa, , peralatan, akumPenyusutan, bebanPenyusutan] =
-    Object.values(daftarAkun);
-
-  await db.pemetaanAkun.create({
-    data: {
-      id: "default",
-      piutangUsahaId: piutang.id,
-      persediaanId: persediaanAkun.id,
-      hppId: hpp.id,
-      pendapatanPenjualanId: pendapatan.id,
-      utangUsahaId: utang.id,
-    },
-  });
+  console.log(`=== Bagan Akun Standar EO/WO (${BAGAN_AKUN_STANDAR.length} akun) + pemetaan akun ===`);
+  await terapkanBaganAkunStandar(db);
+  const akun = (kode: string) => db.akun.findUniqueOrThrow({ where: { kode } });
+  const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan] = await Promise.all(
+    ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540"].map(akun),
+  );
 
   const itemDefs = [
-    { kode: "BRG-001", nama: "Tepung Terigu 1kg", satuan: "pack", hargaBeli: 9000, hargaJual: 12000 },
-    { kode: "BRG-002", nama: "Gula Pasir 1kg", satuan: "pack", hargaBeli: 13000, hargaJual: 16000 },
-    { kode: "BRG-003", nama: "Telur Ayam 1kg", satuan: "pack", hargaBeli: 24000, hargaJual: 29000 },
+    { kode: "BRG-001", nama: "Lanyard & ID Card", satuan: "pcs", hargaBeli: 9000, hargaJual: 12000 },
+    { kode: "BRG-002", nama: "Stiker & Kupon Event", satuan: "pack", hargaBeli: 13000, hargaJual: 16000 },
+    { kode: "BRG-003", nama: "Goodie Bag Peserta", satuan: "pcs", hargaBeli: 24000, hargaJual: 29000 },
   ];
   const daftarBarang: Record<string, Awaited<ReturnType<typeof db.barang.create>>> = {};
   for (const def of itemDefs) {
@@ -91,9 +66,9 @@ async function main() {
     daftarBarang[def.kode] = barang;
     await db.stokBarang.create({ data: { barangId: barang.id, gudangId: gudang.id, jumlah: 100 } });
   }
-  const tepung = daftarBarang["BRG-001"];
-  const gula = daftarBarang["BRG-002"];
-  const telur = daftarBarang["BRG-003"];
+  const lanyard = daftarBarang["BRG-001"];
+  const stiker = daftarBarang["BRG-002"];
+  const goodieBag = daftarBarang["BRG-003"];
 
   console.log("=== Tahap 1: Penawaran Penjualan (draft, belum dikonversi) ===");
   await db.penawaranPenjualan.create({
@@ -104,8 +79,8 @@ async function main() {
       total: 5 * 12000 + 5 * 16000,
       baris: {
         create: [
-          { barangId: tepung.id, jumlah: 5, harga: 12000, subtotal: 60000 },
-          { barangId: gula.id, jumlah: 5, harga: 16000, subtotal: 80000 },
+          { barangId: lanyard.id, jumlah: 5, harga: 12000, subtotal: 60000 },
+          { barangId: stiker.id, jumlah: 5, harga: 16000, subtotal: 80000 },
         ],
       },
     },
@@ -113,10 +88,10 @@ async function main() {
   console.log("  -> PNW-2026-0001 dibuat (cek halaman Penawaran Penjualan)");
 
   console.log("=== Tahap 2: Penawaran kedua, dikonversi jadi Pesanan ===");
-  const qtyTepung = 20;
-  const qtyGula = 10;
-  const qtyTelur = 15;
-  const orderTotal = qtyTepung * 12000 + qtyGula * 16000 + qtyTelur * 29000;
+  const qtyLanyard = 20;
+  const qtyStiker = 10;
+  const qtyGoodieBag = 15;
+  const orderTotal = qtyLanyard * 12000 + qtyStiker * 16000 + qtyGoodieBag * 29000;
 
   const q2 = await db.penawaranPenjualan.create({
     data: {
@@ -126,9 +101,9 @@ async function main() {
       total: orderTotal,
       baris: {
         create: [
-          { barangId: tepung.id, jumlah: qtyTepung, harga: 12000, subtotal: qtyTepung * 12000 },
-          { barangId: gula.id, jumlah: qtyGula, harga: 16000, subtotal: qtyGula * 16000 },
-          { barangId: telur.id, jumlah: qtyTelur, harga: 29000, subtotal: qtyTelur * 29000 },
+          { barangId: lanyard.id, jumlah: qtyLanyard, harga: 12000, subtotal: qtyLanyard * 12000 },
+          { barangId: stiker.id, jumlah: qtyStiker, harga: 16000, subtotal: qtyStiker * 16000 },
+          { barangId: goodieBag.id, jumlah: qtyGoodieBag, harga: 29000, subtotal: qtyGoodieBag * 29000 },
         ],
       },
     },
@@ -143,9 +118,9 @@ async function main() {
       total: orderTotal,
       baris: {
         create: [
-          { barangId: tepung.id, jumlah: qtyTepung, harga: 12000 },
-          { barangId: gula.id, jumlah: qtyGula, harga: 16000 },
-          { barangId: telur.id, jumlah: qtyTelur, harga: 29000 },
+          { barangId: lanyard.id, jumlah: qtyLanyard, harga: 12000 },
+          { barangId: stiker.id, jumlah: qtyStiker, harga: 16000 },
+          { barangId: goodieBag.id, jumlah: qtyGoodieBag, harga: 29000 },
         ],
       },
     },
@@ -153,9 +128,9 @@ async function main() {
   });
   console.log("  -> PNW-2026-0002 dikonversi jadi PSJ-2026-0001 (cek halaman Pesanan Penjualan)");
 
-  const orderLineTepung = pesanan.baris.find((l) => l.barangId === tepung.id)!;
-  const orderLineGula = pesanan.baris.find((l) => l.barangId === gula.id)!;
-  const orderLineTelur = pesanan.baris.find((l) => l.barangId === telur.id)!;
+  const orderLineLanyard = pesanan.baris.find((l) => l.barangId === lanyard.id)!;
+  const orderLineStiker = pesanan.baris.find((l) => l.barangId === stiker.id)!;
+  const orderLineGoodieBag = pesanan.baris.find((l) => l.barangId === goodieBag.id)!;
 
   console.log("=== Tahap 3: Pengiriman sebagian (parsial) ===");
   await db.pengirimanPesanan.create({
@@ -166,20 +141,20 @@ async function main() {
       status: "DIPROSES",
       baris: {
         create: [
-          { barisPesananId: orderLineTepung.id, barangId: tepung.id, jumlah: 10 },
-          { barisPesananId: orderLineGula.id, barangId: gula.id, jumlah: 5 },
+          { barisPesananId: orderLineLanyard.id, barangId: lanyard.id, jumlah: 10 },
+          { barisPesananId: orderLineStiker.id, barangId: stiker.id, jumlah: 5 },
         ],
       },
     },
   });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineTepung.id }, data: { jumlahTerkirim: 10 } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineGula.id }, data: { jumlahTerkirim: 5 } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineLanyard.id }, data: { jumlahTerkirim: 10 } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineStiker.id }, data: { jumlahTerkirim: 5 } });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: tepung.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
     data: { jumlah: { decrement: 10 } },
   });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: gula.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: stiker.id, gudangId: gudang.id } },
     data: { jumlah: { decrement: 5 } },
   });
   await db.pesananPenjualan.update({ where: { id: pesanan.id }, data: { status: "SEBAGIAN" } });
@@ -194,30 +169,30 @@ async function main() {
       status: "DIPROSES",
       baris: {
         create: [
-          { barisPesananId: orderLineTepung.id, barangId: tepung.id, jumlah: 10 },
-          { barisPesananId: orderLineGula.id, barangId: gula.id, jumlah: 5 },
-          { barisPesananId: orderLineTelur.id, barangId: telur.id, jumlah: qtyTelur },
+          { barisPesananId: orderLineLanyard.id, barangId: lanyard.id, jumlah: 10 },
+          { barisPesananId: orderLineStiker.id, barangId: stiker.id, jumlah: 5 },
+          { barisPesananId: orderLineGoodieBag.id, barangId: goodieBag.id, jumlah: qtyGoodieBag },
         ],
       },
     },
   });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineTepung.id }, data: { jumlahTerkirim: qtyTepung } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineGula.id }, data: { jumlahTerkirim: qtyGula } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineTelur.id }, data: { jumlahTerkirim: qtyTelur } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineLanyard.id }, data: { jumlahTerkirim: qtyLanyard } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineStiker.id }, data: { jumlahTerkirim: qtyStiker } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineGoodieBag.id }, data: { jumlahTerkirim: qtyGoodieBag } });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: tepung.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
     data: { jumlah: { decrement: 10 } },
   });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: gula.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: stiker.id, gudangId: gudang.id } },
     data: { jumlah: { decrement: 5 } },
   });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: telur.id, gudangId: gudang.id } },
-    data: { jumlah: { decrement: qtyTelur } },
+    where: { barangId_gudangId: { barangId: goodieBag.id, gudangId: gudang.id } },
+    data: { jumlah: { decrement: qtyGoodieBag } },
   });
   await db.pesananPenjualan.update({ where: { id: pesanan.id }, data: { status: "DIPROSES" } });
-  console.log("  -> SJ-2026-0002 (sisa), status Pesanan jadi DIPROSES, stok Tepung/Gula/Telur berkurang penuh");
+  console.log("  -> SJ-2026-0002 (sisa), status Pesanan jadi DIPROSES, stok Lanyard/Stiker/Goodie Bag berkurang penuh");
 
   console.log("=== Tahap 5: Faktur Penjualan (untuk seluruh jumlah pesanan) ===");
   const faktur = await db.fakturPenjualan.create({
@@ -230,16 +205,16 @@ async function main() {
       jatuhTempo: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       baris: {
         create: [
-          { barangId: tepung.id, jumlah: qtyTepung, harga: 12000, subtotal: qtyTepung * 12000 },
-          { barangId: gula.id, jumlah: qtyGula, harga: 16000, subtotal: qtyGula * 16000 },
-          { barangId: telur.id, jumlah: qtyTelur, harga: 29000, subtotal: qtyTelur * 29000 },
+          { barangId: lanyard.id, jumlah: qtyLanyard, harga: 12000, subtotal: qtyLanyard * 12000 },
+          { barangId: stiker.id, jumlah: qtyStiker, harga: 16000, subtotal: qtyStiker * 16000 },
+          { barangId: goodieBag.id, jumlah: qtyGoodieBag, harga: 29000, subtotal: qtyGoodieBag * 29000 },
         ],
       },
     },
   });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineTepung.id }, data: { jumlahDifaktur: qtyTepung } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineGula.id }, data: { jumlahDifaktur: qtyGula } });
-  await db.barisPesananPenjualan.update({ where: { id: orderLineTelur.id }, data: { jumlahDifaktur: qtyTelur } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineLanyard.id }, data: { jumlahDifaktur: qtyLanyard } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineStiker.id }, data: { jumlahDifaktur: qtyStiker } });
+  await db.barisPesananPenjualan.update({ where: { id: orderLineGoodieBag.id }, data: { jumlahDifaktur: qtyGoodieBag } });
   console.log(`  -> FJ-2026-0001 terbit, total ${orderTotal.toLocaleString("id-ID")} (cek halaman Faktur Penjualan)`);
 
   console.log("=== Tahap 6: Penerimaan sebagian (cicilan pertama) ===");
@@ -264,17 +239,17 @@ async function main() {
       nomor: "RJ-2026-0001",
       fakturId: faktur.id,
       gudangId: gudang.id,
-      alasan: "Kemasan tepung rusak saat pengiriman",
-      baris: { create: [{ barangId: tepung.id, jumlah: 2 }] },
+      alasan: "Cetakan lanyard cacat saat pengiriman",
+      baris: { create: [{ barangId: lanyard.id, jumlah: 2 }] },
     },
   });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: tepung.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
     data: { jumlah: { increment: 2 } },
   });
-  console.log("  -> RJ-2026-0001, stok Tepung bertambah 2 (cek halaman Retur Penjualan & Barang)");
+  console.log("  -> RJ-2026-0001, stok Lanyard bertambah 2 (cek halaman Retur Penjualan & Barang)");
 
-  console.log("=== Tahap 9: Pesanan Pembelian (restock Tepung ke pemasok) ===");
+  console.log("=== Tahap 9: Pesanan Pembelian (restock Lanyard ke pemasok) ===");
   const qtyBeli = 50;
   const poTotal = qtyBeli * 9000;
   const po = await db.pesananPembelian.create({
@@ -283,7 +258,7 @@ async function main() {
       pemasokId: pemasok.id,
       status: "DRAF",
       total: poTotal,
-      baris: { create: [{ barangId: tepung.id, jumlah: qtyBeli, harga: 9000 }] },
+      baris: { create: [{ barangId: lanyard.id, jumlah: qtyBeli, harga: 9000 }] },
     },
     include: { baris: true },
   });
@@ -297,16 +272,16 @@ async function main() {
       pesananId: po.id,
       gudangId: gudang.id,
       status: "DIPROSES",
-      baris: { create: [{ barisPesananId: poLine.id, barangId: tepung.id, jumlah: 30 }] },
+      baris: { create: [{ barisPesananId: poLine.id, barangId: lanyard.id, jumlah: 30 }] },
     },
   });
   await db.barisPesananPembelian.update({ where: { id: poLine.id }, data: { jumlahDiterima: 30 } });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: tepung.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
     data: { jumlah: { increment: 30 } },
   });
   await db.pesananPembelian.update({ where: { id: po.id }, data: { status: "SEBAGIAN" } });
-  console.log("  -> TB-2026-0001 (30 dari 50), status Pesanan Pembelian jadi SEBAGIAN, stok Tepung bertambah (cek halaman Penerimaan Barang)");
+  console.log("  -> TB-2026-0001 (30 dari 50), status Pesanan Pembelian jadi SEBAGIAN, stok Lanyard bertambah (cek halaman Penerimaan Barang)");
 
   console.log("=== Tahap 11: Penerimaan Barang sisa ===");
   await db.penerimaanBarang.create({
@@ -315,12 +290,12 @@ async function main() {
       pesananId: po.id,
       gudangId: gudang.id,
       status: "DIPROSES",
-      baris: { create: [{ barisPesananId: poLine.id, barangId: tepung.id, jumlah: 20 }] },
+      baris: { create: [{ barisPesananId: poLine.id, barangId: lanyard.id, jumlah: 20 }] },
     },
   });
   await db.barisPesananPembelian.update({ where: { id: poLine.id }, data: { jumlahDiterima: qtyBeli } });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: tepung.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
     data: { jumlah: { increment: 20 } },
   });
   await db.pesananPembelian.update({ where: { id: po.id }, data: { status: "DIPROSES" } });
@@ -335,7 +310,7 @@ async function main() {
       status: "DRAF",
       total: poTotal,
       jatuhTempo: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      baris: { create: [{ barangId: tepung.id, jumlah: qtyBeli, harga: 9000, subtotal: poTotal }] },
+      baris: { create: [{ barangId: lanyard.id, jumlah: qtyBeli, harga: 9000, subtotal: poTotal }] },
     },
   });
   await db.barisPesananPembelian.update({ where: { id: poLine.id }, data: { jumlahDifaktur: qtyBeli } });
@@ -363,15 +338,15 @@ async function main() {
       nomor: "RB-2026-0001",
       fakturId: fakturPembelian.id,
       gudangId: gudang.id,
-      alasan: "Tepung apek, dikembalikan ke pemasok",
-      baris: { create: [{ barangId: tepung.id, jumlah: 5 }] },
+      alasan: "Cetakan lanyard buram, dikembalikan ke vendor",
+      baris: { create: [{ barangId: lanyard.id, jumlah: 5 }] },
     },
   });
   await db.stokBarang.update({
-    where: { barangId_gudangId: { barangId: tepung.id, gudangId: gudang.id } },
+    where: { barangId_gudangId: { barangId: lanyard.id, gudangId: gudang.id } },
     data: { jumlah: { decrement: 5 } },
   });
-  console.log("  -> RB-2026-0001, stok Tepung berkurang 5 (cek halaman Retur Pembelian & Barang)");
+  console.log("  -> RB-2026-0001, stok Lanyard berkurang 5 (cek halaman Retur Pembelian & Barang)");
 
   console.log("=== Tahap 16: Jurnal Umum - setoran modal awal ===");
   await db.jurnal.create({
@@ -421,11 +396,11 @@ async function main() {
   });
   console.log("  -> KK-2026-0001, saldo Kas jadi 10.000.000 - 2.000.000 - 1.500.000 = 6.500.000 (cek halaman Kas Keluar & Buku Besar)");
 
-  console.log("=== Tahap 19: Aset Tetap - beli mixer adonan ===");
-  const mixer = await db.asetTetap.create({
+  console.log("=== Tahap 19: Aset Tetap - beli sound system portabel ===");
+  const soundSystem = await db.asetTetap.create({
     data: {
       kode: "AT-001",
-      nama: "Mixer Adonan Industrial",
+      nama: "Sound System Portabel",
       tanggalPerolehan: new Date("2026-01-01"),
       hargaPerolehan: 6000000,
       nilaiSisa: 600000,
@@ -438,7 +413,7 @@ async function main() {
   console.log("  -> AT-001 terdaftar, penyusutan bulanan: (6.000.000-600.000)/36 = 150.000 (cek halaman Daftar Aset)");
 
   console.log("=== Tahap 20: Jalankan Penyusutan periode 2026-08 ===");
-  const monthlyDepreciation = (Number(mixer.hargaPerolehan) - Number(mixer.nilaiSisa)) / mixer.umurBulan;
+  const monthlyDepreciation = (Number(soundSystem.hargaPerolehan) - Number(soundSystem.nilaiSisa)) / soundSystem.umurBulan;
   const depCount = await db.jurnal.count();
   const depNo = `JU-PNY-2026-${String(depCount + 1).padStart(4, "0")}`;
   const depJournal = await db.jurnal.create({
@@ -448,16 +423,16 @@ async function main() {
       sumber: "PENYUSUTAN",
       baris: {
         create: [
-          { akunId: bebanPenyusutan.id, debit: monthlyDepreciation, kredit: 0, keterangan: "Penyusutan Mixer Adonan Industrial" },
-          { akunId: akumPenyusutan.id, debit: 0, kredit: monthlyDepreciation, keterangan: "Akumulasi penyusutan Mixer Adonan Industrial" },
+          { akunId: bebanPenyusutan.id, debit: monthlyDepreciation, kredit: 0, keterangan: "Penyusutan Sound System Portabel" },
+          { akunId: akumPenyusutan.id, debit: 0, kredit: monthlyDepreciation, keterangan: "Akumulasi penyusutan Sound System Portabel" },
         ],
       },
     },
   });
   await db.penyusutanAset.create({
-    data: { asetId: mixer.id, periode: new Date("2026-08-01"), jumlah: monthlyDepreciation, jurnalId: depJournal.id },
+    data: { asetId: soundSystem.id, periode: new Date("2026-08-01"), jumlah: monthlyDepreciation, jurnalId: depJournal.id },
   });
-  console.log(`  -> ${depNo}, nilai buku Mixer jadi 6.000.000 - 150.000 = 5.850.000 (cek halaman Penyusutan)`);
+  console.log(`  -> ${depNo}, nilai buku Sound System jadi 6.000.000 - 150.000 = 5.850.000 (cek halaman Penyusutan)`);
 
   console.log("\n=== Selesai. Ringkasan stok akhir ===");
   const finalStock = await db.stokBarang.findMany({ include: { barang: true }, where: { gudangId: gudang.id } });
