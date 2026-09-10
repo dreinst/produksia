@@ -37,7 +37,8 @@ export type JenisDokumen =
   | "pindahBarang"
   | "pphFinal"
   | "aset"
-  | "penyusutan";
+  | "penyusutan"
+  | "pelepasanAset";
 
 const LABEL: Record<JenisDokumen, string> = {
   penawaran: "Penawaran Penjualan",
@@ -58,6 +59,7 @@ const LABEL: Record<JenisDokumen, string> = {
   pphFinal: "PPh Final Bulanan",
   aset: "Aset Tetap",
   penyusutan: "Penyusutan",
+  pelepasanAset: "Pelepasan Aset",
 };
 
 const JALUR: Record<JenisDokumen, string[]> = {
@@ -79,6 +81,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   pphFinal: ["/buku-besar/pajak", "/buku-besar/jurnal"],
   aset: ["/aset-tetap"],
   penyusutan: ["/aset-tetap/penyusutan", "/aset-tetap"],
+  pelepasanAset: ["/aset-tetap", "/buku-besar/jurnal"],
 };
 
 function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" | "SEBAGIAN" | "LUNAS" {
@@ -141,6 +144,7 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal">, Hak> = {
   pphFinal: "pph-final.hapus",
   aset: "aset.hapus",
   penyusutan: "penyusutan.hapus",
+  pelepasanAset: "pelepasan-aset.hapus",
 };
 
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
@@ -385,11 +389,20 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         return;
       }
       case "aset": {
-        const d = await tx.asetTetap.findUniqueOrThrow({ where: { id }, include: { penyusutan: true } });
+        const d = await tx.asetTetap.findUniqueOrThrow({ where: { id }, include: { penyusutan: true, pelepasan: true } });
+        if (d.pelepasan) throw new Error(`${d.kode} sudah dilepas (${d.status}); hapus pelepasannya dulu`);
         if (d.penyusutan.length) throw new Error(`${d.kode} sudah punya ${d.penyusutan.length} penyusutan; hapus penyusutannya dulu`);
         await tx.asetTetap.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalPerolehanId);
         await catatLog(tx, pengguna, jenis, d.kode, d.jurnalPerolehanId ? "Aset dan jurnal perolehannya dihapus" : "Aset dihapus");
+        return;
+      }
+      case "pelepasanAset": {
+        const d = await tx.pelepasanAset.findUniqueOrThrow({ where: { id }, include: { aset: true, jurnal: { select: { nomor: true } } } });
+        await tx.pelepasanAset.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        await tx.asetTetap.update({ where: { id: d.asetId }, data: { status: "AKTIF" } });
+        await catatLog(tx, pengguna, jenis, d.jurnal?.nomor ?? d.aset.kode, `Pelepasan ${d.aset.kode} dibatalkan; aset kembali AKTIF, jurnal pelepasan dihapus`);
         return;
       }
       case "penyusutan": {

@@ -232,6 +232,11 @@ export type BarisJurnal = Prisma.BarisJurnalModel
  */
 export type AsetTetap = Prisma.AsetTetapModel
 /**
+ * Model PelepasanAset
+ * Pelepasan aset (dijual / dihapusbukukan): akumulasi penyusutan & aset dikeluarkan, selisih harga jual vs nilai buku = laba/rugi
+ */
+export type PelepasanAset = Prisma.PelepasanAsetModel
+/**
  * Model PenyusutanAset
  * 
  */

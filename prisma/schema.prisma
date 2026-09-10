@@ -612,6 +612,8 @@ model Akun {
   pemetaanUangMuka           PemetaanAkun? @relation("PetaUangMuka")
   pemetaanLabaDitahan        PemetaanAkun? @relation("PetaLabaDitahan")
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
+  pelepasanPenerimaan        PelepasanAset[] @relation("AkunPenerimaanPelepasan")
+  pelepasanLabaRugi          PelepasanAset[] @relation("AkunLabaRugiPelepasan")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
   pengaturanPpnMasukan    PengaturanPerusahaan? @relation("PetaPpnMasukan")
@@ -677,6 +679,7 @@ model Jurnal {
   uangMukaPelanggan     UangMukaPelanggan?     @relation("JurnalUangMuka")
   tutupBuku             TutupBuku?             @relation("JurnalTutupBuku")
   pphFinal              PphFinalBulanan?       @relation("JurnalPphFinal")
+  pelepasanAset         PelepasanAset?         @relation("JurnalPelepasanAset")
   returPenjualan        ReturPenjualan?        @relation("JurnalReturPenjualan")
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
@@ -720,8 +723,31 @@ model AsetTetap {
   jurnalPerolehan   Jurnal? @relation("JurnalPerolehanAset", fields: [jurnalPerolehanId], references: [id])
 
   penyusutan PenyusutanAset[]
+  pelepasan  PelepasanAset?
 }
 
+/// Pelepasan aset (dijual / dihapusbukukan): akumulasi penyusutan & aset dikeluarkan, selisih harga jual vs nilai buku = laba/rugi
+model PelepasanAset {
+  id      String     @id @default(cuid())
+  asetId  String     @unique
+  aset    AsetTetap  @relation(fields: [asetId], references: [id])
+  tanggal DateTime   @default(now())
+  jenis   StatusAset
+  hargaJual Decimal @default(0) @db.Decimal(18, 2)
+  /// Kas/Bank atau Piutang yang menerima hasil penjualan (kosong bila dihapusbukukan tanpa hasil)
+  akunPenerimaanId String?
+  akunPenerimaan   Akun?   @relation("AkunPenerimaanPelepasan", fields: [akunPenerimaanId], references: [id])
+  /// Akun laba/rugi pelepasan (dikredit bila laba, didebit bila rugi)
+  akunLabaRugiId String
+  akunLabaRugi   Akun   @relation("AkunLabaRugiPelepasan", fields: [akunLabaRugiId], references: [id])
+  nilaiBuku  Decimal @db.Decimal(18, 2)
+  labaRugi   Decimal @db.Decimal(18, 2)
+  keterangan String?
+  jurnalId   String? @unique
+  jurnal     Jurnal? @relation("JurnalPelepasanAset", fields: [jurnalId], references: [id])
+  penggunaNama String
+  dibuatPada   DateTime @default(now())
+}
 model PenyusutanAset {
   id       String    @id @default(cuid())
   asetId   String
