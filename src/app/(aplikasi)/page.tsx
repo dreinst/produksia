@@ -5,6 +5,9 @@ import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import Ikon from "@/komponen/ui/Ikon";
+import AngkaBergerak from "@/komponen/ui/AngkaBergerak";
+import GrafikTren from "@/komponen/ui/GrafikTren";
+import { hitungLabaRugiBulanan } from "@/lib/laporan";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 
 const rp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
@@ -67,6 +70,7 @@ export default async function Beranda() {
     ambilPengaturanPerusahaan(db),
     boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
   ]);
+  const tren = boleh("buku-besar.lihat") ? await hitungLabaRugiBulanan(db, pengaturan.tahunBuku) : null;
 
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
@@ -233,8 +237,9 @@ export default async function Beranda() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <Ringkasan
           judul="Piutang Usaha"
+          ikon="receipt_long"
           lencana={{ teks: `${fakturJualBelumLunas.length} Faktur`, cls: fakturJualBelumLunas.length ? "lencana-amber" : "lencana-emerald" }}
-          nilai={rp(ar)}
+          nilai={ar}
           catatan="Faktur penjualan belum lunas"
           isian={[
             { k: "Lancar", v: rp(ar - piutangLewatTempo) },
@@ -243,8 +248,9 @@ export default async function Beranda() {
         />
         <Ringkasan
           judul="Utang Usaha"
+          ikon="request_quote"
           lencana={{ teks: jumlahUtangLewatTempo ? `${jumlahUtangLewatTempo} Faktur Tempo` : `${fakturBeliBelumLunas.length} Faktur`, cls: jumlahUtangLewatTempo ? "lencana-amber" : "lencana-slate" }}
-          nilai={rp(ap)}
+          nilai={ap}
           catatan="Faktur pembelian belum lunas"
           isian={[
             { k: "Faktur aktif", v: `${fakturBeliBelumLunas.length}` },
@@ -253,15 +259,17 @@ export default async function Beranda() {
         />
         <Ringkasan
           judul="Kas & Bank Tersedia"
+          ikon="account_balance"
           lencana={{ teks: `${akunKas.length} Akun`, cls: "lencana-blue" }}
-          nilai={rp(kas)}
+          nilai={kas}
           catatan={akunKas.map((a) => a.nama).join(" + ") || "Belum ada akun kas/bank"}
           isian={akunKas.slice(0, 2).map((a) => ({ k: a.nama, v: rp(a.balance) }))}
         />
         <Ringkasan
           judul="Nilai Persediaan"
+          ikon="inventory_2"
           lencana={{ teks: `${jumlahBarang} Barang`, cls: "lencana-slate" }}
-          nilai={rp(nilaiPersediaan)}
+          nilai={nilaiPersediaan}
           catatan="Σ jumlah × harga pokok, semua gudang"
           isian={[
             ...perGudang.map((w) => ({ k: w.nama, v: rp(w.nilai) })),
@@ -283,7 +291,7 @@ export default async function Beranda() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
           {tahapan.map((s) => (
-            <div key={s.kode} className={`p-3.5 rounded-xl border ${s.sorot ? "bg-blue-50/40 border-blue-100" : "bg-slate-50/70 border-slate-100"}`}>
+            <div key={s.kode} className={`ubin-alur p-3.5 rounded-xl border ${s.sorot ? "bg-blue-50/40 border-blue-100" : "bg-slate-50/70 border-slate-100"}`}>
               <div className="flex items-center justify-between mb-2">
                 <span className={`text-xs font-bold font-mono ${s.sorot ? "text-blue-700" : "text-slate-700"}`}>{s.kode}</span>
                 <span className={`text-[11px] ${s.sorot ? "font-semibold text-blue-600" : "text-slate-400"}`}>{s.tanda}</span>
@@ -298,6 +306,23 @@ export default async function Beranda() {
           ))}
         </div>
       </div>
+
+      {tren && (
+        <div className="kartu">
+          <div className="kepala-kartu">
+            <div>
+              <h2 className="judul-kartu">Tren Pendapatan &amp; Beban {pengaturan.tahunBuku}</h2>
+              <p className="kartu-subjudul">Per bulan dari jurnal, tanpa jurnal penutup. Arahkan kursor ke titik untuk angkanya.</p>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-slate-600">
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-navy-terang" /> Pendapatan {rp(Number(tren.total.pendapatan))}</span>
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-oranye" /> Beban {rp(Number(tren.total.bebanPokok) + Number(tren.total.bebanLain))}</span>
+              <Link href={`/buku-besar/laba-rugi?dari=${pengaturan.tahunBuku}-01-01&sampai=${pengaturan.tahunBuku}-12-31&tampilan=bulanan`} className="tombol tombol-lembut tombol-kecil">Laba Rugi per bulan</Link>
+            </div>
+          </div>
+          <GrafikTren bulan={tren.bulan} tahun={pengaturan.tahunBuku} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 daftarBarang-awal">
         {/* Kiri */}
@@ -483,7 +508,7 @@ export default async function Beranda() {
             )}
           </div>
 
-          <div className="rounded-2xl bg-navy-lembut text-slate-300 p-6 space-y-4">
+          <div className="panel-navy rounded-2xl text-slate-300 p-6 space-y-4">
             <div className="flex items-center gap-2.5 text-white">
               <Ikon nama="verified_user" className="!text-[22px] text-blue-400" />
               <h3 className="text-sm font-bold">Integritas &amp; Sinkronisasi</h3>
@@ -524,23 +549,28 @@ function Ringkasan({
   judul,
   lencana,
   nilai,
+  ikon,
   catatan,
   isian,
 }: {
   judul: string;
   lencana: { teks: string; cls: string };
-  nilai: string;
+  nilai: number;
+  ikon: string;
   catatan: string;
   isian: { k: string; v: string; cls?: string }[];
 }) {
   return (
-    <div className="kartu p-5 flex flex-col justify-between hover:border-slate-300 transition-colors">
+    <div className="kartu kartu-statistik p-5 flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-3 gap-2">
-          <span className="text-xs font-semibold text-slate-500">{judul}</span>
+          <span className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+            <span className="ubin-ikon"><Ikon nama={ikon} className="!text-[16px]" /></span>
+            {judul}
+          </span>
           <span className={`lencana ${lencana.cls}`}>{lencana.teks}</span>
         </div>
-        <div className="font-heading text-2xl font-bold tracking-tight text-slate-900 angka">{nilai}</div>
+        <div className="font-heading text-2xl font-bold tracking-tight text-slate-900 angka"><AngkaBergerak nilai={nilai} /></div>
         <div className="text-[11px] text-slate-400 mt-1 font-mono truncate">{catatan}</div>
       </div>
       <div className="mt-4 pt-3 border-t border-slate-100 text-xs space-y-1.5">

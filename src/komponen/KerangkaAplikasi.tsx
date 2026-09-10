@@ -15,6 +15,7 @@ export default function KerangkaAplikasi({ pengguna, namaPerusahaan, tahunBuku, 
 
   return (
     <div className="min-h-screen bg-canvas">
+      <div className="aurora" aria-hidden="true" />
       <BilahSamping pengguna={pengguna} namaPerusahaan={namaPerusahaan} tahunBuku={tahunBuku} daftarTahun={daftarTahun} open={lacaTerbuka} saatTutup={() => setLacaTerbuka(false)} />
       <div className="md:pl-64 min-h-screen flex flex-col">
         <BilahAtas pengguna={pengguna} saatMenu={() => setLacaTerbuka(true)} />

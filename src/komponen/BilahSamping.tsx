@@ -205,7 +205,7 @@ function TautanTunggal({ href, label, ikon, pathname, saatNavigasi }: { href: st
       onClick={saatNavigasi}
       aria-current={aktif ? "page" : undefined}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-        aktif ? "bg-navy text-white shadow-sm" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-0.5"
+        aktif ? "menu-aktif text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-0.5"
       }`}
     >
       <Ikon nama={ikon} className={`!text-[20px] ${aktif ? "" : "text-slate-400"}`} />
@@ -307,7 +307,7 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
 
       <aside
         aria-label="Navigasi utama"
-        className={`fixed left-0 top-0 z-50 h-full w-72 max-w-[85vw] md:w-64 md:max-w-none bg-white border-r border-slate-100 flex flex-col
+        className={`fixed left-0 top-0 z-50 h-full w-72 max-w-[85vw] md:w-64 md:max-w-none kaca border-r border-slate-200/60 flex flex-col
           transition-transform duration-200 md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Merek */}

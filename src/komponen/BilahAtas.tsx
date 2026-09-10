@@ -38,7 +38,7 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 md:px-8 flex items-center justify-between gap-3 md:gap-6">
+    <header className="kaca sticky top-0 z-30 h-16 border-b border-slate-200/60 px-4 md:px-8 flex items-center justify-between gap-3 md:gap-6">
       <div className="flex items-center gap-3 flex-1 min-w-0 max-w-lg">
         <button
           type="button"

@@ -78,6 +78,16 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 
 ## Verifikasi yang dilakukan
 
+### 11 September 2026 (lanjutan 5): audit menyeluruh + desain berdimensi & animasi
+
+Acuan: pola dari 21st.dev (aurora/mesh gradient di kompositor, lapisan kaca tipis, border & kartu bercahaya, tombol berkilau, angka berjalan) dan Dribbble (kartu statistik bergradasi, grafik area bergradasi, panel gelap bercahaya). Diterapkan tanpa pustaka tambahan.
+
+- Kanvas aurora + pola titik, kartu berlapis dengan sorot dalam dan bayangan navy, kartu statistik bergaris aksen gradasi dan ubin ikon gradasi, panel Integritas navy bertekstur grid + cahaya oranye, bilah samping/atas kaca, menu aktif gradasi, tombol utama/aksen gradasi + kilatan hover, baris tabel bersorot dengan garis aksen kiri.
+- Halaman masuk dua panel: panel merek navy beraurora dengan tiga poin fitur (desktop), formulir di kanan; di HP tetap satu kolom.
+- Beranda: angka ringkasan berjalan naik saat tampil (`AngkaBergerak`, hormat `prefers-reduced-motion`, state awal = nilai server sehingga tanpa hydration mismatch), grafik tren pendapatan vs beban 12 bulan (`GrafikTren`: SVG kurva halus, area bergradasi, garis menggambar diri, tooltip per bulan, tautan ke Laba Rugi per bulan; hanya untuk pemegang `buku-besar.lihat`).
+- Semua animasi dimatikan otomatis pada `prefers-reduced-motion: reduce`; elemen dekoratif `aria-hidden`; grafik punya `aria-label`.
+- Audit fungsional setelah perubahan: `tsc` dan `eslint` bersih (termasuk aturan `react-hooks/set-state-in-effect`), 21 suite regresi lulus, walkthrough browser fitur (21 cek, Pemilik/Kasir/Admin/HP) dan LPJ lulus, 0 galat konsol di beranda & masuk (desktop dan HP 390 px), tanpa scroll horizontal, `next build` bersih.
+
 ### 11 September 2026 (lanjutan 4): audit salinan UI, prive, nego harga, pemetaan akun tambahan, rekonsiliasi perlu perhatian, ganti nama Produksia
 
 - Seluruh teks UI disederhanakan untuk karyawan baru: subjudul satu-dua kalimat, tanpa tanda pisah panjang, catatan panjang di Pajak & SPT, Pemetaan Akun, Hak Akses, Pengguna, dan laporan dipangkas; placeholder pilihan konsisten ("Tanpa event", "-").
