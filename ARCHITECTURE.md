@@ -63,7 +63,7 @@ app/
 │  │  │  ├─ penjualan/…        # penawaran, pesanan, pengiriman, faktur, penerimaan, retur (+ /baru)
 │  │  │  ├─ pembelian/…        # pesanan, penerimaan-barang, faktur, pembayaran, retur (+ /baru)
 │  │  │  ├─ kas-bank/…         # masuk, keluar
-│  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo
+│  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo, laba-rugi, neraca
 │  │  │  ├─ aset-tetap/…       # daftar, baru, penyusutan
 │  │  │  ├─ persediaan/…       # stok per gudang, penyesuaian (+ /baru)
 │  │  │  ├─ pengaturan/        # pemetaan-akun, bagan-akun (terapkan standar), pengguna (+ [id]/)
@@ -75,7 +75,7 @@ app/
 │  │  ├─ PenyusunFaktur.tsx    # form faktur dengan pratinjau jurnal (client)
 │  │  ├─ data-induk/FormulirDataInduk.tsx     # form tambah/ubah dari konfigurasi entitas
 │  │  ├─ penjualan/*, pembelian/*, buku-besar/*   # editor baris & pemilih (client)
-│  │  └─ ui/                   # Ikon, KepalaHalaman, Lencana, KontrolDaftar (cari + paginasi)
+│  │  └─ ui/                   # Ikon, KepalaHalaman, Lencana, KontrolDaftar (cari + paginasi), FilterPeriode
 │  ├─ lib/
 │  │  ├─ db.ts                 # singleton PrismaClient + adapter pg
 │  │  ├─ otentikasi.ts         # sesi (cookie ↔ tabel Sesi), penggunaSaatIni, wajibMasuk/wajibHak/wajibHakAksi
@@ -84,6 +84,7 @@ app/
 │  │  ├─ baganAkunStandar.ts   # data 108 akun EO/WO + keputusan kurasi (BAGAN-AKUN.md)
 │  │  ├─ baganAkun.ts          # terapkanBaganAkunStandar (idempoten), pastikanAkunRinci, daftarAkunKasBank
 │  │  ├─ sinkron.ts            # periksaSinkron: buku besar ↔ stok/piutang/hutang/barang belum ditagih
+│  │  ├─ laporan.ts            # bacaPeriode, saldoAkunPeriode, hitungLabaRugi, hitungNeraca (berjenjang)
 │  │  ├─ daftar.ts             # bacaParamDaftar(?q,?hal) untuk halaman daftar
 │  │  ├─ dataInduk.ts          # pembacaan generik data induk (opsi, include, pencarian)
 │  │  ├─ konfigurasiDataInduk.ts   # definisi entitas data induk (bidang, kolom, bagian)
@@ -289,6 +290,9 @@ Semua posting terjadi **di dalam transaksi yang sama** dengan dokumen sumbernya,
 ### 6.2b Sinkronisasi buku besar (`src/lib/sinkron.ts`)
 `periksaSinkron` mencocokkan saldo buku besar dengan sumber lain: Persediaan ↔ Σ stok × harga pokok; Piutang ↔ Σ (total faktur − penerimaan − retur); Hutang ↔ Σ (total faktur pembelian − pembayaran − retur); Barang Diterima Belum Ditagih ↔ Σ (diterima − difaktur) × harga pesanan; plus Σ debit = Σ kredit. Dipakai kartu *Integritas & Sinkronisasi* di beranda, halaman Stok per Gudang, akhir seed (gagal = seed berhenti), dan `skrip/uji-sinkron.ts` (dijalankan terakhir di CI). Selisih ≠ 0 = ada jalur yang tidak menjurnal atau menjurnal ganda — diperlakukan sebagai bug, bukan dibiarkan.
 
+### 6.2c Laporan keuangan (`src/lib/laporan.ts`)
+`saldoAkunPeriode` mengagregasi `BarisJurnal` per akun dalam rentang tanggal (`groupBy`), lalu `susunHierarki` membuat baris berjenjang dengan subtotal kelompok. **Laba Rugi** = pendapatan − beban pokok (kelompok akar yang memuat akun HPP dari pemetaan) = laba kotor, − beban lain = laba bersih. **Neraca** per tanggal: aset, kewajiban, ekuitas (akun), plus dua baris hitungan — laba tahun-tahun sebelumnya (jurnal sebelum 1 Januari tahun tanggal laporan) dan laba tahun berjalan — sehingga Aset = Kewajiban + Ekuitas tanpa jurnal penutup. Neraca Saldo memakai filter periode yang sama.
+
 ### 6.3 Uang & kuantitas (`src/lib/uang.ts`)
 `uang()` membulatkan ke 2 desimal half-up; `bacaUang()` memvalidasi isian form (wajib, angka valid, tidak negatif, default > 0); `jumlahkan`/`kali` mengembalikan Decimal. Perbandingan status (mis. lunas) memakai `.gte()`, bukan `>=` float.
 
@@ -380,6 +384,6 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 11. Batas & arah pengembangan
 
-Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya), Pindah Barang antar gudang, PPN/PPh di dokumen, Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
+Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, jurnal penutup tahun & laporan arus kas, Pindah Barang antar gudang, PPN/PPh di dokumen, Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
 
 Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → aksi (`xxx` + `xxxFormulir`) yang diawali `wajibHakAksi` lalu validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar (`wajibHak`, `bacaParamDaftar`, `KontrolDaftar`) + halaman buat dengan `FormulirAksi` → tambahkan hak baru di `hakAkses.ts` bila perlu dan tautan (dengan `hak`) di `BilahSamping.tsx` → suite regresi.

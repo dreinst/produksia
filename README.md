@@ -3,7 +3,7 @@
 Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, dibangun mengikuti alur modul Accurate 5:
 - **Penjualan**: Penawaran → Pesanan → Pengiriman → Faktur → Penerimaan → Retur
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
-- **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, Kas Masuk/Keluar
+- **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, **Laba Rugi**, **Neraca**, Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
 - **Pengguna & hak akses**: login email + kata sandi, empat peran (Pemilik, Admin, Kasir, Gudang), kelola pengguna
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
@@ -60,7 +60,7 @@ Semua dokumen yang memengaruhi uang atau stok menjurnal otomatis lewat `src/lib/
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 8 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 9 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -100,7 +100,8 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
 - `src/lib/baganAkunStandar.ts` (data 111 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
 - `src/lib/akuntansi.ts` (semua aturan posting), `src/lib/sinkron.ts` (pencocokan buku besar ↔ dokumen/stok), `src/lib/aksi/persediaan.ts` + `persediaan/` (stok per gudang, penyesuaian)
-- `skrip/uji-{sinkron,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
+- `skrip/uji-{sinkron,laporan,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
@@ -121,6 +122,6 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 - **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Belum ada: lupa-kata-sandi via email (diatur ulang oleh Pemilik/Admin), 2FA, pembatasan percobaan login.
 - **Hak akses per modul**, bukan per dokumen/gudang. Peran Gudang bisa *melihat* semua daftar penjualan/pembelian (perlu untuk membuat SJ/TB).
 - **Dokumen transaksi belum bisa diubah/dihapus** dari UI (data induk sudah bisa: tombol Ubah/Hapus; yang masih dipakai transaksi ditolak DB dengan pesan jelas).
-- **Belum ada Pindah Barang antar gudang**, laporan laba-rugi & neraca (Neraca Saldo sudah jadi bahannya).
+- **Laporan Laba Rugi & Neraca dihitung langsung dari jurnal** (belum ada jurnal penutup tahun: laba tahun-tahun lalu & tahun berjalan tampil sebagai baris hitungan di ekuitas). Belum ada Pindah Barang antar gudang dan arus kas.
 - **Skrip regresi** memakai basis data yang sama dengan data contoh (bersih-bersih berbasis waktu mulai uji) dan menyetel `UJI_TANPA_SESI=1` agar aksi server bisa dipanggil tanpa HTTP — pintu ini hanya terbuka di luar `NODE_ENV=production`.
 - **Prisma 7.10.0** dipakai sengaja (bukan 8.0 rc yang merupakan CLI platform Prisma).
