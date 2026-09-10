@@ -18,6 +18,7 @@ export type HasilSinkron = {
   hutang: Perbandingan;
   barangBelumDitagih: Perbandingan;
   barangTerkirim: Perbandingan;
+  uangMuka: Perbandingan;
 };
 
 const TOLERANSI = D(1); // pembulatan harga rata-rata ke 2 desimal
@@ -36,7 +37,7 @@ async function saldoAkun(klien: PrismaClient, akunIds: string[], normalDebit: bo
 }
 
 export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSinkron> {
-  const [pemetaan, total, daftarStok, akunPersediaanBarang, fakturJual, fakturBeli, tb, barisSj] = await Promise.all([
+  const [pemetaan, total, daftarStok, akunPersediaanBarang, fakturJual, fakturBeli, tb, barisSj, daftarUangMuka] = await Promise.all([
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     klien.barisJurnal.aggregate({ _sum: { debit: true, kredit: true } }),
     klien.stokBarang.findMany({ include: { barang: { select: { jenis: true, hargaBeli: true } } } }),
@@ -45,13 +46,14 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
     klien.fakturPembelian.findMany({ include: { pembayaran: { select: { jumlah: true, potonganPajak: true } }, retur: { select: { total: true } } } }),
     klien.penerimaanBarang.findMany({ include: { baris: { include: { barang: { select: { jenis: true } }, barisPesanan: { select: { harga: true, jumlahDifaktur: true, jumlah: true } } } } } }),
     klien.barisPengiriman.findMany({ include: { barang: { select: { jenis: true } } } }),
+    klien.uangMukaPelanggan.findMany({ select: { jumlah: true, jumlahDipakai: true } }),
   ]);
   const totalDebit = D(total._sum.debit ?? 0);
   const totalKredit = D(total._sum.kredit ?? 0);
   const nol = D(0);
   const kosong = banding(nol, nol);
   if (!pemetaan) {
-    return { pemetaanAda: false, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan: kosong, piutang: kosong, hutang: kosong, barangBelumDitagih: kosong, barangTerkirim: kosong };
+    return { pemetaanAda: false, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan: kosong, piutang: kosong, hutang: kosong, barangBelumDitagih: kosong, barangTerkirim: kosong, uangMuka: kosong };
   }
 
   // Persediaan: saldo akun persediaan (pemetaan + akun khusus barang) vs Σ stok × harga pokok
@@ -59,8 +61,8 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
   const nilaiStok = jumlahkan(daftarStok.filter((s) => s.barang.jenis === "BARANG").map((s) => kali(s.jumlah, s.barang.hargaBeli)));
   const persediaan = banding(await saldoAkun(klien, akunPersediaan, true), nilaiStok);
 
-  // Piutang: saldo akun piutang vs Σ (total faktur − penerimaan − retur)
-  const sisaPiutang = jumlahkan(fakturJual.map((f) => D(f.total).minus(jumlahkan(f.penerimaan.map((p) => D(p.jumlah).plus(p.potonganPajak)))).minus(jumlahkan(f.retur.map((r) => r.total)))));
+  // Piutang: saldo akun piutang vs Σ (total faktur − uang muka dipakai − penerimaan − retur)
+  const sisaPiutang = jumlahkan(fakturJual.map((f) => D(f.total).minus(f.uangMuka).minus(jumlahkan(f.penerimaan.map((p) => D(p.jumlah).plus(p.potonganPajak)))).minus(jumlahkan(f.retur.map((r) => r.total)))));
   const piutang = banding(await saldoAkun(klien, [pemetaan.piutangUsahaId], true), sisaPiutang);
 
   // Hutang: saldo akun hutang vs Σ (total faktur − pembayaran − retur)
@@ -87,5 +89,9 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
   const nilaiTerkirim = jumlahkan(barisSj.filter((b) => b.barang.jenis === "BARANG").map((b) => kali(D(b.jumlah).minus(b.jumlahDifaktur), b.hargaPokok)));
   const barangTerkirim = pemetaan.barangTerkirimId ? banding(await saldoAkun(klien, [pemetaan.barangTerkirimId], true), nilaiTerkirim) : kosong;
 
-  return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim };
+  // Uang muka pelanggan: saldo akun (kredit) vs Σ (DP diterima − dipakai faktur)
+  const nilaiUangMuka = jumlahkan(daftarUangMuka.map((u) => D(u.jumlah).minus(u.jumlahDipakai)));
+  const uangMuka = pemetaan.uangMukaPelangganId ? banding(await saldoAkun(klien, [pemetaan.uangMukaPelangganId], false), nilaiUangMuka) : kosong;
+
+  return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim, uangMuka };
 }

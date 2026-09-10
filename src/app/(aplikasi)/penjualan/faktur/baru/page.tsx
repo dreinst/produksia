@@ -14,7 +14,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
   const pesanan = pesananId
     ? await db.pesananPenjualan.findUnique({
         where: { id: pesananId },
-        include: { pelanggan: true, baris: { include: { barang: true } }, pengiriman: { orderBy: { tanggal: "asc" } } },
+        include: { pelanggan: true, baris: { include: { barang: true } }, pengiriman: { orderBy: { tanggal: "asc" } }, uangMuka: true },
       })
     : null;
 
@@ -36,7 +36,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
   const [pemetaan, nomorBerikut] = await Promise.all([
     db.pemetaanAkun.findUnique({
       where: { id: "default" },
-      include: { piutangUsaha: true, pendapatanPenjualan: true, hpp: true, persediaan: true },
+      include: { piutangUsaha: true, pendapatanPenjualan: true, hpp: true, persediaan: true, barangTerkirim: true, uangMukaPelanggan: true },
     }),
     nomorDokumenBerikutnya(db.fakturPenjualan, "FJ"),
   ]);
@@ -79,11 +79,14 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
               hpp: label(pemetaan.hpp),
               persediaan: label(pemetaan.persediaan),
               ppn: akunPpn ? label(akunPpn) : undefined,
+              barangTerkirim: pemetaan.barangTerkirim ? label(pemetaan.barangTerkirim) : undefined,
+              uangMuka: pemetaan.uangMukaPelanggan ? label(pemetaan.uangMukaPelanggan) : undefined,
             }
           : null
       }
       pajak={{ pkp: pengaturan.pkp, tarif: Number(pengaturan.tarifPpnPersen) }}
       terminHari={pengaturan.terminHari}
+      uangMukaTersedia={pesanan.uangMuka.reduce((s, u) => s + Number(u.jumlah) - Number(u.jumlahDipakai), 0)}
     />
   );
 }

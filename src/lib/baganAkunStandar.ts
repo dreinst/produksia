@@ -67,7 +67,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   // ---------- 2. KEWAJIBAN ----------
   { kode: "2-1000", nama: "Kewajiban Lancar", jenis: K, kelompok: true, asal: "ASLI" },
   { kode: "2-1100", nama: "Hutang Usaha", jenis: K, induk: "2-1000", asal: "ASLI", keterangan: "Tagihan vendor yang belum dibayar (dipakai otomatis oleh Faktur Pembelian)" },
-  { kode: "2-1200", nama: "Uang Muka Pelanggan / DP Klien", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "DP yang diterima sebelum event; dicatat lewat Kas Masuk" },
+  { kode: "2-1200", nama: "Uang Muka Pelanggan / DP Klien", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "DP yang diterima sebelum event lewat menu Uang Muka (Penjualan); dipakai mengurangi piutang saat Faktur Penjualan" },
   { kode: "2-1300", nama: "Hutang Pajak", jenis: K, induk: "2-1000", kelompok: true, asal: "USUL" },
   { kode: "2-1310", nama: "Hutang PPh 21", jenis: K, induk: "2-1300", asal: "USUL", keterangan: "Potongan pajak gaji/honor yang belum disetor" },
   { kode: "2-1320", nama: "Hutang PPh 23 / Final", jenis: K, induk: "2-1300", asal: "USUL", keterangan: "PPh 23 yang kita potong dari vendor; dipakai otomatis oleh Pembayaran Pembelian" },
@@ -183,6 +183,7 @@ export const PEMETAAN_STANDAR = {
   barangBelumDitagih: "2-1600",
   selisihPersediaan: "5-1400",
   barangTerkirim: "1-1650",
+  uangMukaPelanggan: "2-1200",
 } as const;
 
 /** Butir yang semula "pending" di catatan, beserta keputusan kurasinya (ditampilkan di halaman Bagan Akun). */

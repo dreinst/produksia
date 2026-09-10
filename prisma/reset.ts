@@ -17,11 +17,13 @@ async function main() {
   await db.penerimaanBarang.deleteMany();
   await db.barisPesananPembelian.deleteMany();
   await db.pesananPembelian.deleteMany();
+  await db.pemakaianUangMuka.deleteMany();
   await db.barisReturPenjualan.deleteMany();
   await db.returPenjualan.deleteMany();
   await db.penerimaanPenjualan.deleteMany();
   await db.barisFakturPenjualan.deleteMany();
   await db.fakturPenjualan.deleteMany();
+  await db.uangMukaPelanggan.deleteMany();
   await db.barisPengiriman.deleteMany();
   await db.pengirimanPesanan.deleteMany();
   await db.barisPesananPenjualan.deleteMany();

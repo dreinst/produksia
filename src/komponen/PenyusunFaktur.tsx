@@ -37,10 +37,14 @@ export type PropsPenyusun = {
     hpp?: string;
     persediaan?: string;
     ppn?: string; // PPN Keluaran (penjualan) / PPN Masukan (pembelian)
+    barangTerkirim?: string; // penjualan: lawan HPP untuk barang yang sudah dikirim (SJ)
+    uangMuka?: string; // penjualan: Uang Muka Pelanggan
   };
   /** status PKP perusahaan & tarif bawaan; non-PKP selalu 0% */
   pajak: { pkp: boolean; tarif: number };
   terminHari: number;
+  /** Penjualan: sisa uang muka pesanan yang bisa dipakai mengurangi piutang faktur ini */
+  uangMukaTersedia?: number;
 };
 
 const format = (n: number) => n.toLocaleString("id-ID");
@@ -51,14 +55,18 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
   const [status, aksiFormulir, sedangProses] = useActionState(p.aksi, { galat: null });
   const [isian, setIsian] = useState(p.daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.sisa, harga: b.harga })));
   const [ppnPersen, setPpnPersen] = useState(p.pajak.pkp ? p.pajak.tarif : 0);
+  const uangMukaTersedia = adalahPenjualan ? (p.uangMukaTersedia ?? 0) : 0;
+  const [uangMukaInput, setUangMukaInput] = useState(uangMukaTersedia);
 
   const hitung = useMemo(() => {
     const subtotal = isian.reduce((s, r) => s + r.jumlah * r.harga, 0);
     const hargaPokok = isian.reduce((s, r, i) => s + r.jumlah * p.daftarBaris[i].hargaBeli, 0);
     const jumlahValid = isian.every((r, i) => r.jumlah >= 0 && r.jumlah <= p.daftarBaris[i].sisa) && isian.some((r) => r.jumlah > 0);
     const ppn = Math.round(subtotal * ppnPersen) / 100;
-    return { subtotal, hargaPokok, ppn, total: subtotal + ppn, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
-  }, [isian, ppnPersen, p.daftarBaris]);
+    const total = subtotal + ppn;
+    const uangMuka = Math.max(0, Math.min(uangMukaInput, uangMukaTersedia, total));
+    return { subtotal, hargaPokok, ppn, total, uangMuka, piutang: total - uangMuka, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
+  }, [isian, ppnPersen, p.daftarBaris, uangMukaInput, uangMukaTersedia]);
 
   const ubahJumlah = (i: number, jumlah: number) => setIsian((sebelumnya) => sebelumnya.map((r, k) => (k === i ? { ...r, jumlah } : r)));
 
@@ -68,11 +76,12 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
 
   const barisJurnalPratinjau = adalahPenjualan
     ? [
-        { akun: p.pemetaan?.akunLawan ?? "Piutang Usaha", catatan: "Tagihan bruto pelanggan (DPP + PPN)", debit: hitung.total, kredit: 0 },
-        { akun: p.pemetaan?.hpp ?? "HPP", catatan: "Harga pokok terjual (Σ jumlah × harga pokok, barang saja)", debit: hitung.hargaPokok, kredit: 0 },
+        { akun: p.pemetaan?.akunLawan ?? "Piutang Usaha", catatan: hitung.uangMuka > 0 ? "Tagihan bruto (DPP + PPN) dikurangi uang muka" : "Tagihan bruto pelanggan (DPP + PPN)", debit: hitung.piutang, kredit: 0 },
+        { akun: p.pemetaan?.uangMuka ?? "Uang Muka Pelanggan", catatan: "DP pesanan yang dipakai mengurangi piutang", debit: hitung.uangMuka, kredit: 0 },
+        { akun: p.pemetaan?.hpp ?? "HPP", catatan: "Harga pokok barang yang sudah dikirim (dari surat jalan; perkiraan)", debit: hitung.hargaPokok, kredit: 0 },
         { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Pendapatan Penjualan", catatan: "Pendapatan diakui (akun per barang bila diatur)", debit: 0, kredit: hitung.subtotal },
         { akun: p.pemetaan?.ppn ?? "PPN Keluaran", catatan: `PPN dipungut ${ppnPersen}%`, debit: 0, kredit: hitung.ppn },
-        { akun: p.pemetaan?.persediaan ?? "Persediaan", catatan: "Pengurangan nilai persediaan", debit: 0, kredit: hitung.hargaPokok },
+        { akun: p.pemetaan?.barangTerkirim ?? "Barang Terkirim Belum Ditagih", catatan: "Menutup nilai barang yang sudah keluar di SJ (persediaan sudah dikredit saat kirim)", debit: 0, kredit: hitung.hargaPokok },
       ].filter((r) => r.debit > 0 || r.kredit > 0 || hitung.subtotal === 0)
     : [
         { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Barang Diterima Belum Ditagih", catatan: "Menutup nilai Terima Barang (baris jasa → beban)", debit: hitung.subtotal, kredit: 0 },
@@ -87,6 +96,9 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     { ok: !!p.pemetaan, teks: p.pemetaan ? "Pemetaan akun terpasang (5 peran akun)" : "Pemetaan akun belum diatur — buka Buku Besar › Pemetaan Akun" },
     { ok: true, teks: teks.catatanStok },
     { ok: true, teks: p.pajak.pkp ? `Perusahaan PKP — PPN ${ppnPersen}% dipungut pada faktur ini` : "Perusahaan non-PKP — faktur tanpa PPN" },
+    ...(adalahPenjualan
+      ? [{ ok: true, teks: uangMukaTersedia > 0 ? `Uang muka pesanan tersedia Rp ${format(uangMukaTersedia)} — dipakai Rp ${format(hitung.uangMuka)}, sisa piutang Rp ${format(hitung.piutang)}` : "Tidak ada uang muka pada pesanan ini" }]
+      : []),
   ];
   const bisaKirim = hitung.jumlahValid && !!p.pemetaan && !sedangProses;
 
@@ -103,6 +115,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
       <input type="hidden" name="pesananId" value={p.pesanan.id} />
       <input type="hidden" name="baris" value={JSON.stringify(isian)} />
       <input type="hidden" name="ppnPersen" value={ppnPersen} />
+      {adalahPenjualan && <input type="hidden" name="uangMuka" value={hitung.uangMuka} />}
 
       {/* Kepala halaman */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -328,6 +341,26 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                   </div>
                   <div className="font-mono text-xl font-bold tracking-tight text-slate-900">Rp {format(hitung.total)}</div>
                 </div>
+                {adalahPenjualan && uangMukaTersedia > 0 && (
+                  <div className="mt-2 p-3 rounded-lg bg-emerald-50/60 border border-emerald-100 flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-2">
+                      <label htmlFor="uangMukaDipakai" className="teks-label">Uang muka dipakai</label>
+                      <input
+                        id="uangMukaDipakai"
+                        type="number"
+                        min={0}
+                        max={Math.min(uangMukaTersedia, hitung.total)}
+                        step="0.01"
+                        value={uangMukaInput}
+                        onChange={(e) => setUangMukaInput(Number(e.target.value))}
+                        className="isian isian-kecil w-32 text-right"
+                        aria-label="Uang muka dipakai"
+                      />
+                    </div>
+                    <div className="flex justify-between text-slate-500"><span>Tersedia dari pesanan</span><span className="angka">Rp {format(uangMukaTersedia)}</span></div>
+                    <div className="flex justify-between font-semibold text-slate-900 pt-1 border-t border-dashed border-emerald-200"><span>Sisa piutang</span><span className="angka">Rp {format(hitung.piutang)}</span></div>
+                  </div>
+                )}
               </div>
             </section>
 

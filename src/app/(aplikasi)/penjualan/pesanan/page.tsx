@@ -64,6 +64,11 @@ export default async function HalamanPesananPenjualan({ searchParams }: { search
                     </Link>
                   )}
                   {!difakturSemua && boleh("penjualan.tulis") && (
+                    <Link href={`/penjualan/uang-muka/baru?pesananId=${o.id}`} className="tombol-tautan">
+                      Uang Muka
+                    </Link>
+                  )}
+                  {!difakturSemua && boleh("penjualan.tulis") && (
                     <Link
                       href={`/penjualan/faktur/baru?pesananId=${o.id}`}
                       className="tombol-tautan"

@@ -18,6 +18,7 @@ const operasional: Grup[] = [
     tautan: [
       { href: "/penjualan/penawaran", label: "Penawaran", kode: "PNW", hak: "penjualan.lihat" },
       { href: "/penjualan/pesanan", label: "Pesanan", kode: "PSJ", hak: "penjualan.lihat" },
+      { href: "/penjualan/uang-muka", label: "Uang Muka", kode: "UM", hak: "penjualan.lihat" },
       { href: "/penjualan/pengiriman", label: "Pengiriman", kode: "SJ", hak: "penjualan.lihat" },
       { href: "/penjualan/faktur", label: "Faktur Penjualan", kode: "FJ", hak: "penjualan.lihat" },
       { href: "/penjualan/penerimaan", label: "Penerimaan", kode: "TRM", hak: "penjualan.lihat" },

@@ -7,7 +7,7 @@ import { hashKataSandi } from "../src/lib/kataSandi";
 import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
 import { BAGAN_AKUN_STANDAR } from "../src/lib/baganAkunStandar";
 import { periksaSinkron } from "../src/lib/sinkron";
-import { buatPenawaran, konversiPenawaranKePesanan, buatPengiriman, buatFaktur, buatPenerimaan, buatRetur } from "../src/lib/aksi/penjualan";
+import { buatPenawaran, konversiPenawaranKePesanan, buatPengiriman, buatFaktur, buatPenerimaan, buatRetur, buatUangMuka } from "../src/lib/aksi/penjualan";
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatPembayaranPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
 import { buatJurnalManual, buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { buatAsetTetap, jalankanPenyusutanBulanan } from "../src/lib/aksi/asetTetap";
@@ -124,6 +124,11 @@ async function main() {
   const pesanan = await db.pesananPenjualan.findFirstOrThrow({ where: { penawaranId: pnw2.id }, include: { baris: true } });
   const barisPesanan = (barangId: string) => pesanan.baris.find((b) => b.barangId === barangId)!;
 
+  console.log("=== Tahap 2b: Uang muka (DP) klien Rp 1.000.000 ke Bank (jurnal JU-UM: Dr Bank / Cr Uang Muka Pelanggan) ===");
+  await jalankan("UM-…-0001: DP 30% Rp 1.000.000 via transfer", () =>
+    buatUangMuka(formulir({ pesananId: pesanan.id, akunId: bank.id, jumlah: 1000000, metodeBayar: "TRANSFER", keterangan: "DP 30% wedding Andi & Sari" })),
+  );
+
   console.log("=== Tahap 3-4: Pengiriman sebagian, lalu sisanya (stok berkurang, jasa tanpa stok) ===");
   await jalankan("SJ-…-0001: 10 lanyard + 5 stiker → status SEBAGIAN", () =>
     buatPengiriman(formulir({ pesananId: pesanan.id, gudangId: gudang.id, baris: [
@@ -140,15 +145,15 @@ async function main() {
     ] })),
   );
 
-  console.log("=== Tahap 5: Faktur Penjualan seluruh pesanan (jurnal JU-FJ: piutang, pendapatan per akun, HPP) ===");
-  await jalankan("FJ-…-0001 total Rp 3.335.000", () =>
-    buatFaktur(formulir({ pesananId: pesanan.id, baris: pesanan.baris.map((b) => ({ barangId: b.barangId, jumlah: Number(b.jumlah), harga: Number(b.harga) })) })),
+  console.log("=== Tahap 5: Faktur Penjualan seluruh pesanan, memakai DP (jurnal JU-FJ: piutang − DP, uang muka, pendapatan per akun, HPP) ===");
+  await jalankan("FJ-…-0001 total Rp 3.335.000, uang muka Rp 1.000.000 → piutang Rp 2.335.000", () =>
+    buatFaktur(formulir({ pesananId: pesanan.id, uangMuka: 1000000, baris: pesanan.baris.map((b) => ({ barangId: b.barangId, jumlah: Number(b.jumlah), harga: Number(b.harga) })) })),
   );
   const faktur = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: pesanan.id } });
 
   console.log("=== Tahap 6-8: Penerimaan cicilan → retur 2 lanyard → pelunasan ===");
-  await jalankan("TRM-…-0001: Rp 1.667.500 via Bank → SEBAGIAN", () =>
-    buatPenerimaan(formulir({ fakturId: faktur.id, akunId: bank.id, jumlah: 1667500, metodeBayar: "TRANSFER" })),
+  await jalankan("TRM-…-0001: Rp 667.500 via Bank → SEBAGIAN", () =>
+    buatPenerimaan(formulir({ fakturId: faktur.id, akunId: bank.id, jumlah: 667500, metodeBayar: "TRANSFER" })),
   );
   await jalankan("RJ-…-0001: retur 2 lanyard (Rp 24.000), stok kembali", () =>
     buatRetur(formulir({ fakturId: faktur.id, gudangId: gudang.id, alasan: "Cetakan lanyard cacat saat pengiriman", baris: [{ barangId: lanyard.id, jumlah: 2 }] })),
@@ -222,6 +227,7 @@ async function main() {
     ["hutang", sinkron.hutang.sinkron],
     ["barang belum ditagih", sinkron.barangBelumDitagih.sinkron],
     ["barang terkirim belum ditagih", sinkron.barangTerkirim.sinkron],
+    ["uang muka pelanggan", sinkron.uangMuka.sinkron],
   ] as const;
   for (const [nama, ok] of laporan) console.log(`  ${ok ? "✔" : "✘"} ${nama}`);
   if (laporan.some(([, ok]) => !ok)) throw new Error("Seed selesai tapi buku besar TIDAK sinkron — periksa aturan posting");

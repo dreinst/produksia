@@ -8,7 +8,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, kali, bacaUang, jumlahkan, terkecil, terbesar, type Desimal } from "@/lib/uang";
 import { kurangiStok, tambahStok, labelBarang, jenisBarang } from "@/lib/stok";
-import { catatJurnalPengiriman, catatJurnalFakturPenjualan, catatJurnalPenerimaanPenjualan, catatJurnalReturPenjualan } from "@/lib/akuntansi";
+import { catatJurnalPengiriman, catatJurnalFakturPenjualan, catatJurnalPenerimaanPenjualan, catatJurnalReturPenjualan, catatJurnalUangMuka } from "@/lib/akuntansi";
 
 const NOL = D(0);
 import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
@@ -239,8 +239,13 @@ export async function buatFaktur(dataFormulir: FormData) {
   const dpp = totalBaris(daftarBaris);
   const ppn = hitungPpn(dpp, ppnPersen);
   const total = dpp.plus(ppn);
+  const uangMukaMentah = dataFormulir.get("uangMuka");
+  const uangMuka = typeof uangMukaMentah === "string" && uangMukaMentah.trim() !== "" ? bacaUang(uangMukaMentah, "Uang muka dipakai", { allowZero: true }) : NOL;
 
-  const pesanan = await db.pesananPenjualan.findUniqueOrThrow({ where: { id: pesananId }, include: { baris: true } });
+  const pesanan = await db.pesananPenjualan.findUniqueOrThrow({ where: { id: pesananId }, include: { baris: true, uangMuka: true } });
+  const uangMukaTersedia = jumlahkan(pesanan.uangMuka.map((u) => D(u.jumlah).minus(u.jumlahDipakai)));
+  if (uangMuka.gt(uangMukaTersedia)) throw new Error(`Uang muka yang dipakai melebihi sisa uang muka pesanan (tersedia ${format(uangMukaTersedia)})`);
+  if (uangMuka.gt(total)) throw new Error(`Uang muka yang dipakai melebihi total faktur (${format(total)})`);
 
   // tidak boleh menagih lebih dari sisa jumlah pesanan (per barang)
   for (const l of daftarBaris) {
@@ -265,6 +270,8 @@ export async function buatFaktur(dataFormulir: FormData) {
         dpp,
         ppnPersen,
         ppn,
+        uangMuka,
+        status: statusFaktur(total, uangMuka, NOL),
         jatuhTempo: tanggalJatuhTempo(pengaturan.terminHari),
         baris: {
           create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah, harga: l.harga, subtotal: kali(l.jumlah, l.harga) })),
@@ -297,6 +304,21 @@ export async function buatFaktur(dataFormulir: FormData) {
       }
     }
 
+    // Uang muka pesanan dipakai urut tanggal (FIFO); dibaca ulang di dalam transaksi supaya dua faktur bersamaan tidak memakai DP yang sama
+    let sisaUangMuka = uangMuka;
+    if (sisaUangMuka.gt(0)) {
+      const daftarUm = await tx.uangMukaPelanggan.findMany({ where: { pesananId }, orderBy: { tanggal: "asc" } });
+      for (const um of daftarUm) {
+        if (sisaUangMuka.lte(0)) break;
+        const bisa = terkecil(D(um.jumlah).minus(um.jumlahDipakai), sisaUangMuka);
+        if (bisa.lte(0)) continue;
+        await tx.uangMukaPelanggan.update({ where: { id: um.id }, data: { jumlahDipakai: { increment: bisa } } });
+        await tx.pemakaianUangMuka.create({ data: { uangMukaId: um.id, fakturId: faktur.id, jumlah: bisa } });
+        sisaUangMuka = sisaUangMuka.minus(bisa);
+      }
+      if (sisaUangMuka.gt(0)) throw new Error("Sisa uang muka pesanan berubah; muat ulang halaman lalu coba lagi");
+    }
+
     const jurnal = await catatJurnalFakturPenjualan(tx, faktur, daftarBaris, pengaturan.akunPpnKeluaranId, konsumsiTransit);
     if (jurnal) await tx.fakturPenjualan.update({ where: { id: faktur.id }, data: { jurnalId: jurnal.id } });
   });
@@ -325,12 +347,12 @@ export async function buatPenerimaan(dataFormulir: FormData) {
 
   const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => D(r.jumlah).plus(r.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
-  const sisa = D(faktur.total).minus(sudahDibayar).minus(sudahDiretur);
+  const sisa = D(faktur.total).minus(faktur.uangMuka).minus(sudahDibayar).minus(sudahDiretur);
   const bayarBruto = jumlah.plus(potonganPajak);
   if (bayarBruto.gt(sisa)) {
     throw new Error(`Jumlah bayar + potongan pajak melebihi sisa tagihan (sisa ${format(sisa)})`);
   }
-  const status = statusFaktur(D(faktur.total), sudahDibayar.plus(bayarBruto), sudahDiretur);
+  const status = statusFaktur(D(faktur.total), D(faktur.uangMuka).plus(sudahDibayar).plus(bayarBruto), sudahDiretur);
 
   const nomor = await nomorDokumenBerikutnya(db.penerimaanPenjualan, "TRM");
 
@@ -388,7 +410,7 @@ export async function buatRetur(dataFormulir: FormData) {
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => D(r.jumlah).plus(r.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
-  const status = statusFaktur(D(faktur.total), sudahDibayar, sudahDiretur.plus(total));
+  const status = statusFaktur(D(faktur.total), D(faktur.uangMuka).plus(sudahDibayar), sudahDiretur.plus(total));
 
   const nomor = await nomorDokumenBerikutnya(db.returPenjualan, "RJ");
 
@@ -431,6 +453,41 @@ export async function buatRetur(dataFormulir: FormData) {
   redirect("/penjualan/retur");
 }
 
+// ---------- Uang Muka Pelanggan (DP pesanan) ----------
+
+/** DP diterima di muka atas sebuah pesanan: Dr Kas/Bank / Cr Uang Muka Pelanggan; dipakai mengurangi piutang saat faktur dibuat. */
+export async function buatUangMuka(dataFormulir: FormData) {
+  await wajibHakAksi("penjualan.tulis");
+  const pesananId = String(dataFormulir.get("pesananId") ?? "");
+  const akunId = String(dataFormulir.get("akunId") ?? "");
+  const metodeBayar = String(dataFormulir.get("metodeBayar") ?? "TRANSFER");
+  const keterangan = String(dataFormulir.get("keterangan") ?? "").trim() || null;
+  if (!pesananId) throw new Error("Pesanan wajib dipilih");
+  if (!akunId) throw new Error("Akun Kas/Bank penerima wajib dipilih");
+  const jumlah = bacaUang(dataFormulir.get("jumlah"), "Jumlah uang muka");
+
+  const pesanan = await db.pesananPenjualan.findUniqueOrThrow({ where: { id: pesananId }, include: { baris: true, uangMuka: true } });
+  if (pesanan.baris.every((b) => D(b.jumlahDifaktur).gte(b.jumlah))) throw new Error(`${pesanan.nomor} sudah difaktur seluruhnya; uang muka tidak lagi bisa ditambahkan`);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  // Batas wajar: seluruh DP ≤ nilai pesanan (termasuk PPN bila PKP)
+  const nilaiBruto = D(pesanan.total).plus(pengaturan.pkp ? hitungPpn(D(pesanan.total), pengaturan.tarifPpnPersen) : NOL);
+  const batas = nilaiBruto.minus(jumlahkan(pesanan.uangMuka.map((u) => u.jumlah)));
+  if (jumlah.gt(batas)) throw new Error(`Uang muka melebihi nilai pesanan yang belum tertutup DP (maks ${format(terbesar(batas, NOL))})`);
+
+  const nomor = await nomorDokumenBerikutnya(db.uangMukaPelanggan, "UM");
+  await db.$transaction(async (tx) => {
+    const uangMuka = await tx.uangMukaPelanggan.create({
+      data: { nomor, pelangganId: pesanan.pelangganId, pesananId, akunId, jumlah, metodeBayar, keterangan },
+    });
+    const jurnal = await catatJurnalUangMuka(tx, uangMuka, pesanan.nomor);
+    if (jurnal) await tx.uangMukaPelanggan.update({ where: { id: uangMuka.id }, data: { jurnalId: jurnal.id } });
+  });
+
+  revalidatePath("/penjualan/uang-muka");
+  revalidatePath("/penjualan/pesanan");
+  redirect("/penjualan/uang-muka");
+}
+
 // ---------- Varian untuk <FormulirAksi> (mengembalikan pesan error, bukan throw) ----------
 
 export async function buatPenawaranFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
@@ -454,4 +511,7 @@ export async function buatPenerimaanFormulir(_sebelumnya: StatusFormulir, dataFo
 }
 export async function buatReturFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => buatRetur(dataFormulir));
+}
+export async function buatUangMukaFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => buatUangMuka(dataFormulir));
 }

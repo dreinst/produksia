@@ -66,7 +66,7 @@ export default async function Beranda() {
 
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
-    sisa: Number(i.total) - i.penerimaan.reduce((s, r) => s + Number(r.jumlah) + Number(r.potonganPajak), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
+    sisa: Number(i.total) - Number(i.uangMuka) - i.penerimaan.reduce((s, r) => s + Number(r.jumlah) + Number(r.potonganPajak), 0) - i.retur.reduce((s, r) => s + Number(r.total), 0),
     overdue: !!i.jatuhTempo && i.jatuhTempo < now,
   }));
   const ar = barisPiutang.reduce((s, r) => s + r.sisa, 0);
@@ -487,6 +487,7 @@ export default async function Beranda() {
                 { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
                 { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
                 { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
+                { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
                 { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
               ].map(({ t, ok, d }) => (
                 <div key={t} className="flex items-start gap-2.5">
