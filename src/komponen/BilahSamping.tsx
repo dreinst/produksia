@@ -71,6 +71,7 @@ const persediaan: Grup = {
   tautan: [
     { href: "/persediaan", label: "Stok per Gudang", hak: "persediaan.lihat" },
     { href: "/persediaan/penyesuaian", label: "Penyesuaian Stok", kode: "PS", hak: "persediaan.lihat" },
+    { href: "/persediaan/pindah", label: "Pindah Barang", kode: "PB", hak: "persediaan.lihat" },
   ],
 };
 

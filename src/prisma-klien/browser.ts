@@ -213,6 +213,16 @@ export type AsetTetap = Prisma.AsetTetapModel
  */
 export type PenyusutanAset = Prisma.PenyusutanAsetModel
 /**
+ * Model PindahBarang
+ * Pindah barang antar gudang: stok fisik berpindah, nilai persediaan tetap (tanpa jurnal)
+ */
+export type PindahBarang = Prisma.PindahBarangModel
+/**
+ * Model BarisPindahBarang
+ * 
+ */
+export type BarisPindahBarang = Prisma.BarisPindahBarangModel
+/**
  * Model PenyesuaianPersediaan
  * 
  */

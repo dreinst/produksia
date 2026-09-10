@@ -436,6 +436,8 @@ export const ModelName = {
   BarisJurnal: 'BarisJurnal',
   AsetTetap: 'AsetTetap',
   PenyusutanAset: 'PenyusutanAset',
+  PindahBarang: 'PindahBarang',
+  BarisPindahBarang: 'BarisPindahBarang',
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
@@ -455,7 +457,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3345,6 +3347,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PindahBarang: {
+      payload: Prisma.$PindahBarangPayload<ExtArgs>
+      fields: Prisma.PindahBarangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PindahBarangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PindahBarangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>
+        }
+        findFirst: {
+          args: Prisma.PindahBarangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PindahBarangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>
+        }
+        findMany: {
+          args: Prisma.PindahBarangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>[]
+        }
+        create: {
+          args: Prisma.PindahBarangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>
+        }
+        createMany: {
+          args: Prisma.PindahBarangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PindahBarangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>[]
+        }
+        delete: {
+          args: Prisma.PindahBarangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>
+        }
+        update: {
+          args: Prisma.PindahBarangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>
+        }
+        deleteMany: {
+          args: Prisma.PindahBarangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PindahBarangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PindahBarangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>[]
+        }
+        upsert: {
+          args: Prisma.PindahBarangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PindahBarangPayload>
+        }
+        aggregate: {
+          args: Prisma.PindahBarangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePindahBarang>
+        }
+        groupBy: {
+          args: Prisma.PindahBarangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PindahBarangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PindahBarangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PindahBarangCountAggregateOutputType> | number
+        }
+      }
+    }
+    BarisPindahBarang: {
+      payload: Prisma.$BarisPindahBarangPayload<ExtArgs>
+      fields: Prisma.BarisPindahBarangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BarisPindahBarangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BarisPindahBarangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>
+        }
+        findFirst: {
+          args: Prisma.BarisPindahBarangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BarisPindahBarangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>
+        }
+        findMany: {
+          args: Prisma.BarisPindahBarangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>[]
+        }
+        create: {
+          args: Prisma.BarisPindahBarangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>
+        }
+        createMany: {
+          args: Prisma.BarisPindahBarangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BarisPindahBarangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>[]
+        }
+        delete: {
+          args: Prisma.BarisPindahBarangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>
+        }
+        update: {
+          args: Prisma.BarisPindahBarangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>
+        }
+        deleteMany: {
+          args: Prisma.BarisPindahBarangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BarisPindahBarangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BarisPindahBarangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>[]
+        }
+        upsert: {
+          args: Prisma.BarisPindahBarangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisPindahBarangPayload>
+        }
+        aggregate: {
+          args: Prisma.BarisPindahBarangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBarisPindahBarang>
+        }
+        groupBy: {
+          args: Prisma.BarisPindahBarangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BarisPindahBarangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BarisPindahBarangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BarisPindahBarangCountAggregateOutputType> | number
+        }
+      }
+    }
     PenyesuaianPersediaan: {
       payload: Prisma.$PenyesuaianPersediaanPayload<ExtArgs>
       fields: Prisma.PenyesuaianPersediaanFieldRefs
@@ -4196,6 +4346,29 @@ export const PenyusutanAsetScalarFieldEnum = {
 export type PenyusutanAsetScalarFieldEnum = (typeof PenyusutanAsetScalarFieldEnum)[keyof typeof PenyusutanAsetScalarFieldEnum]
 
 
+export const PindahBarangScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  tanggal: 'tanggal',
+  gudangAsalId: 'gudangAsalId',
+  gudangTujuanId: 'gudangTujuanId',
+  keterangan: 'keterangan',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PindahBarangScalarFieldEnum = (typeof PindahBarangScalarFieldEnum)[keyof typeof PindahBarangScalarFieldEnum]
+
+
+export const BarisPindahBarangScalarFieldEnum = {
+  id: 'id',
+  pindahId: 'pindahId',
+  barangId: 'barangId',
+  jumlah: 'jumlah'
+} as const
+
+export type BarisPindahBarangScalarFieldEnum = (typeof BarisPindahBarangScalarFieldEnum)[keyof typeof BarisPindahBarangScalarFieldEnum]
+
+
 export const PenyesuaianPersediaanScalarFieldEnum = {
   id: 'id',
   nomor: 'nomor',
@@ -4632,6 +4805,8 @@ export type GlobalOmitConfig = {
   barisJurnal?: Prisma.BarisJurnalOmit
   asetTetap?: Prisma.AsetTetapOmit
   penyusutanAset?: Prisma.PenyusutanAsetOmit
+  pindahBarang?: Prisma.PindahBarangOmit
+  barisPindahBarang?: Prisma.BarisPindahBarangOmit
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanOmit
   barisPenyesuaianPersediaan?: Prisma.BarisPenyesuaianPersediaanOmit
   pengaturanPerusahaan?: Prisma.PengaturanPerusahaanOmit

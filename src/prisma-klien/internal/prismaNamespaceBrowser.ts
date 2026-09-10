@@ -90,6 +90,8 @@ export const ModelName = {
   BarisJurnal: 'BarisJurnal',
   AsetTetap: 'AsetTetap',
   PenyusutanAset: 'PenyusutanAset',
+  PindahBarang: 'PindahBarang',
+  BarisPindahBarang: 'BarisPindahBarang',
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
@@ -626,6 +628,29 @@ export const PenyusutanAsetScalarFieldEnum = {
 } as const
 
 export type PenyusutanAsetScalarFieldEnum = (typeof PenyusutanAsetScalarFieldEnum)[keyof typeof PenyusutanAsetScalarFieldEnum]
+
+
+export const PindahBarangScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  tanggal: 'tanggal',
+  gudangAsalId: 'gudangAsalId',
+  gudangTujuanId: 'gudangTujuanId',
+  keterangan: 'keterangan',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PindahBarangScalarFieldEnum = (typeof PindahBarangScalarFieldEnum)[keyof typeof PindahBarangScalarFieldEnum]
+
+
+export const BarisPindahBarangScalarFieldEnum = {
+  id: 'id',
+  pindahId: 'pindahId',
+  barangId: 'barangId',
+  jumlah: 'jumlah'
+} as const
+
+export type BarisPindahBarangScalarFieldEnum = (typeof BarisPindahBarangScalarFieldEnum)[keyof typeof BarisPindahBarangScalarFieldEnum]
 
 
 export const PenyesuaianPersediaanScalarFieldEnum = {

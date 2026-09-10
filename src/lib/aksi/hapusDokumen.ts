@@ -33,6 +33,7 @@ export type JenisDokumen =
   | "returPembelian"
   | "jurnal"
   | "penyesuaian"
+  | "pindahBarang"
   | "aset"
   | "penyusutan";
 
@@ -51,6 +52,7 @@ const LABEL: Record<JenisDokumen, string> = {
   returPembelian: "Retur Pembelian",
   jurnal: "Jurnal",
   penyesuaian: "Penyesuaian Stok",
+  pindahBarang: "Pindah Barang",
   aset: "Aset Tetap",
   penyusutan: "Penyusutan",
 };
@@ -70,6 +72,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   returPembelian: ["/pembelian/retur", "/pembelian/faktur", "/persediaan"],
   jurnal: ["/buku-besar/jurnal", "/kas-bank/masuk", "/kas-bank/keluar"],
   penyesuaian: ["/persediaan/penyesuaian", "/persediaan"],
+  pindahBarang: ["/persediaan/pindah", "/persediaan"],
   aset: ["/aset-tetap"],
   penyusutan: ["/aset-tetap/penyusutan", "/aset-tetap"],
 };
@@ -330,6 +333,19 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await tx.penyesuaianPersediaan.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalId);
         await catatLog(tx, pengguna, jenis, d.nomor, "Selisih stok dibalik, jurnal penyesuaian dihapus");
+        return;
+      }
+      case "pindahBarang": {
+        const d = await tx.pindahBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, gudangTujuan: true } });
+        const label = await labelBarang(tx, d.baris.map((b) => b.barangId));
+        for (const b of d.baris) {
+          // stok harus masih ada di gudang tujuan; bila sudah terpakai, kurangiStok menolak dengan pesan jelas
+          await kurangiStok(tx, b.barangId, d.gudangTujuanId, D(b.jumlah), `${label.get(b.barangId) ?? b.barangId} (gudang ${d.gudangTujuan.nama})`);
+          await tambahStok(tx, b.barangId, d.gudangAsalId, D(b.jumlah));
+        }
+        await tx.barisPindahBarang.deleteMany({ where: { pindahId: id } });
+        await tx.pindahBarang.delete({ where: { id } });
+        await catatLog(tx, pengguna, jenis, d.nomor, "Stok dikembalikan ke gudang asal");
         return;
       }
       case "aset": {
