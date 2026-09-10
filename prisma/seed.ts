@@ -62,6 +62,11 @@ async function main() {
   console.log(`=== Bagan Akun Standar EO/WO (${BAGAN_AKUN_STANDAR.length} akun) + pemetaan akun ===`);
   await terapkanBaganAkunStandar(db);
   const akun = (kode: string) => db.akun.findUniqueOrThrow({ where: { kode } });
+  // Identitas & pajak: usaha kecil non-PKP (faktur tanpa PPN), akun PPh 23 disiapkan agar potongan pajak klien/vendor bisa dicatat
+  const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang] = await Promise.all(["2-1330", "1-1800", "1-1900", "2-1320"].map(akun));
+  await db.pengaturanPerusahaan.create({
+    data: { id: "default", nama: "Cahaya Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id },
+  });
   const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan, biayaEvent, pendapatanEvent, pendapatanProduksi] = await Promise.all(
     ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540", "5-1200", "4-1100", "4-2100"].map(akun),
   );

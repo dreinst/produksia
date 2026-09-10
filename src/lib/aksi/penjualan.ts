@@ -9,6 +9,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, kali, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
 import { kurangiStok, tambahStok, labelBarang, jenisBarang } from "@/lib/stok";
 import { catatJurnalFakturPenjualan, catatJurnalPenerimaanPenjualan, catatJurnalReturPenjualan } from "@/lib/akuntansi";
+import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
 
@@ -209,7 +210,11 @@ export async function buatFaktur(dataFormulir: FormData) {
   const pengirimanId = String(dataFormulir.get("pengirimanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
-  const total = totalBaris(daftarBaris);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const ppnPersen = bacaTarifPpn(dataFormulir.get("ppnPersen"), pengaturan);
+  const dpp = totalBaris(daftarBaris);
+  const ppn = hitungPpn(dpp, ppnPersen);
+  const total = dpp.plus(ppn);
 
   const pesanan = await db.pesananPenjualan.findUniqueOrThrow({ where: { id: pesananId }, include: { baris: true } });
 
@@ -233,7 +238,10 @@ export async function buatFaktur(dataFormulir: FormData) {
         pesananId,
         pengirimanId,
         total,
-        jatuhTempo: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        dpp,
+        ppnPersen,
+        ppn,
+        jatuhTempo: tanggalJatuhTempo(pengaturan.terminHari),
         baris: {
           create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah, harga: l.harga, subtotal: kali(l.jumlah, l.harga) })),
         },
@@ -247,7 +255,7 @@ export async function buatFaktur(dataFormulir: FormData) {
       }
     }
 
-    await catatJurnalFakturPenjualan(tx, faktur, daftarBaris);
+    await catatJurnalFakturPenjualan(tx, faktur, daftarBaris, pengaturan.akunPpnKeluaranId);
   });
 
   revalidatePath("/penjualan/faktur");
@@ -264,26 +272,31 @@ export async function buatPenerimaan(dataFormulir: FormData) {
   if (!fakturId) throw new Error("Faktur wajib dipilih");
   if (!akunId) throw new Error("Akun Kas/Bank penerima wajib dipilih");
   const jumlah = bacaUang(dataFormulir.get("jumlah"), "Jumlah bayar");
+  const potonganMentah = dataFormulir.get("potonganPajak");
+  const potonganPajak = typeof potonganMentah === "string" && potonganMentah.trim() !== "" ? bacaUang(potonganMentah, "Potongan PPh 23", { allowZero: true }) : D(0);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  if (potonganPajak.gt(0) && !pengaturan.akunPph23DimukaId) throw new Error("Akun Pajak Dibayar Dimuka (PPh 23) belum diatur di Pengaturan > Perusahaan & Pajak");
 
   const faktur = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fakturId }, include: { penerimaan: true, retur: true } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");
 
-  const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => r.jumlah));
+  const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => D(r.jumlah).plus(r.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
   const sisa = D(faktur.total).minus(sudahDibayar).minus(sudahDiretur);
-  if (jumlah.gt(sisa)) {
-    throw new Error(`Jumlah bayar melebihi sisa tagihan (sisa ${format(sisa)})`);
+  const bayarBruto = jumlah.plus(potonganPajak);
+  if (bayarBruto.gt(sisa)) {
+    throw new Error(`Jumlah bayar + potongan pajak melebihi sisa tagihan (sisa ${format(sisa)})`);
   }
-  const status = statusFaktur(D(faktur.total), sudahDibayar.plus(jumlah), sudahDiretur);
+  const status = statusFaktur(D(faktur.total), sudahDibayar.plus(bayarBruto), sudahDiretur);
 
   const nomor = await nomorDokumenBerikutnya(db.penerimaanPenjualan, "TRM");
 
   await db.$transaction(async (tx) => {
     const penerimaan = await tx.penerimaanPenjualan.create({
-      data: { nomor, pelangganId: faktur.pelangganId, fakturId, akunId, jumlah, metodeBayar },
+      data: { nomor, pelangganId: faktur.pelangganId, fakturId, akunId, jumlah, potonganPajak, metodeBayar },
     });
     await tx.fakturPenjualan.update({ where: { id: fakturId }, data: { status } });
-    await catatJurnalPenerimaanPenjualan(tx, penerimaan, faktur.nomor);
+    await catatJurnalPenerimaanPenjualan(tx, penerimaan, faktur.nomor, pengaturan.akunPph23DimukaId);
   });
 
   revalidatePath("/penjualan/penerimaan");
@@ -325,8 +338,11 @@ export async function buatRetur(dataFormulir: FormData) {
     jumlah: l.jumlah,
     harga: D(faktur.baris.find((il) => il.barangId === l.barangId)?.harga ?? 0),
   }));
-  const total = totalBaris(barisRetur);
-  const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => r.jumlah));
+  const dpp = totalBaris(barisRetur);
+  const ppn = hitungPpn(dpp, D(faktur.ppnPersen));
+  const total = dpp.plus(ppn);
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => D(r.jumlah).plus(r.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
   const status = statusFaktur(D(faktur.total), sudahDibayar, sudahDiretur.plus(total));
 
@@ -341,6 +357,8 @@ export async function buatRetur(dataFormulir: FormData) {
         gudangId,
         alasan: alasan || null,
         total,
+        dpp,
+        ppn,
         baris: { create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah })) },
       },
     });
@@ -350,7 +368,7 @@ export async function buatRetur(dataFormulir: FormData) {
     }
     await tx.fakturPenjualan.update({ where: { id: fakturId }, data: { status } });
 
-    await catatJurnalReturPenjualan(tx, { nomor: retur.nomor, total }, barisRetur);
+    await catatJurnalReturPenjualan(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnKeluaranId);
   });
 
   revalidatePath("/penjualan/retur");

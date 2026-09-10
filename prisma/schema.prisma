@@ -308,6 +308,10 @@ model FakturPenjualan {
   pengiriman   PengirimanPesanan? @relation(fields: [pengirimanId], references: [id])
   status       StatusDokumen      @default(DRAF)
   total        Decimal            @default(0) @db.Decimal(18, 2)
+  /// Dasar pengenaan pajak (Σ baris) dan PPN; total = dpp + ppn
+  dpp        Decimal @default(0) @db.Decimal(18, 2)
+  ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
+  ppn        Decimal @default(0) @db.Decimal(18, 2)
 
   baris      BarisFakturPenjualan[]
   penerimaan PenerimaanPenjualan[]
@@ -336,6 +340,8 @@ model PenerimaanPenjualan {
   akunId      String
   akun        Akun            @relation("AkunPenerimaanPenjualan", fields: [akunId], references: [id])
   jumlah      Decimal         @db.Decimal(18, 2)
+  /// PPh 23 yang dipotong pelanggan (mengurangi piutang, dicatat sebagai pajak dibayar dimuka)
+  potonganPajak Decimal @default(0) @db.Decimal(18, 2)
   metodeBayar String          @default("TUNAI")
 }
 
@@ -349,6 +355,8 @@ model ReturPenjualan {
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
   total    Decimal @default(0) @db.Decimal(18, 2)
+  dpp      Decimal @default(0) @db.Decimal(18, 2)
+  ppn      Decimal @default(0) @db.Decimal(18, 2)
 
   baris BarisReturPenjualan[]
 }
@@ -432,6 +440,9 @@ model FakturPembelian {
   penerimaan   PenerimaanBarang? @relation(fields: [penerimaanId], references: [id])
   status       StatusDokumen     @default(DRAF)
   total        Decimal           @default(0) @db.Decimal(18, 2)
+  dpp        Decimal @default(0) @db.Decimal(18, 2)
+  ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
+  ppn        Decimal @default(0) @db.Decimal(18, 2)
 
   baris      BarisFakturPembelian[]
   pembayaran PembayaranPembelian[]
@@ -460,6 +471,8 @@ model PembayaranPembelian {
   akunId      String
   akun        Akun            @relation("AkunPembayaranPembelian", fields: [akunId], references: [id])
   jumlah      Decimal         @db.Decimal(18, 2)
+  /// PPh 23 yang kita potong dari vendor (mengurangi hutang, dicatat sebagai hutang PPh 23)
+  potonganPajak Decimal @default(0) @db.Decimal(18, 2)
   metodeBayar String          @default("TRANSFER")
 }
 
@@ -473,6 +486,8 @@ model ReturPembelian {
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
   total    Decimal @default(0) @db.Decimal(18, 2)
+  dpp      Decimal @default(0) @db.Decimal(18, 2)
+  ppn      Decimal @default(0) @db.Decimal(18, 2)
 
   baris BarisReturPembelian[]
 }
@@ -525,6 +540,10 @@ model Akun {
   pemetaanSelisihPersediaan  PemetaanAkun? @relation("PetaSelisihPersediaan")
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
+  pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
+  pengaturanPpnMasukan    PengaturanPerusahaan? @relation("PetaPpnMasukan")
+  pengaturanPph23Dimuka   PengaturanPerusahaan? @relation("PetaPph23Dimuka")
+  pengaturanPph23Dipotong PengaturanPerusahaan? @relation("PetaPph23Dipotong")
 }
 
 model PemetaanAkun {
@@ -650,4 +669,27 @@ model BarisPenyesuaianPersediaan {
   jumlahSesudah Decimal               @db.Decimal(18, 2)
   /// Harga pokok satuan yang dipakai menilai selisih
   hargaSatuan   Decimal               @db.Decimal(18, 2)
+}
+
+// ---------- Pengaturan perusahaan & pajak (singleton id = "default") ----------
+
+model PengaturanPerusahaan {
+  id             String  @id @default("default")
+  nama           String  @default("Accurate Copy")
+  /// Pengusaha Kena Pajak: faktur memungut PPN
+  pkp            Boolean @default(false)
+  tarifPpnPersen Decimal @default(11) @db.Decimal(5, 2)
+  /// Jatuh tempo bawaan faktur (hari)
+  terminHari     Int     @default(14)
+
+  akunPpnKeluaranId String? @unique
+  akunPpnKeluaran   Akun?   @relation("PetaPpnKeluaran", fields: [akunPpnKeluaranId], references: [id])
+  akunPpnMasukanId  String? @unique
+  akunPpnMasukan    Akun?   @relation("PetaPpnMasukan", fields: [akunPpnMasukanId], references: [id])
+  /// PPh 23 yang dipotong pelanggan dari pembayaran kita (aset: pajak dibayar dimuka)
+  akunPph23DimukaId String? @unique
+  akunPph23Dimuka   Akun?   @relation("PetaPph23Dimuka", fields: [akunPph23DimukaId], references: [id])
+  /// PPh 23 yang kita potong dari vendor (kewajiban: hutang PPh 23)
+  akunPph23DipotongId String? @unique
+  akunPph23Dipotong   Akun?   @relation("PetaPph23Dipotong", fields: [akunPph23DipotongId], references: [id])
 }

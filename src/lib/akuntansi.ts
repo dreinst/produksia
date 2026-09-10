@@ -91,8 +91,15 @@ export function hargaPokokBaris(info: InfoBarang, jumlah: Desimal): Desimal {
 // ---------- Penjualan ----------
 
 /** Faktur Penjualan: Dr Piutang (total) / Cr Pendapatan per akun; Dr HPP / Cr Persediaan per akun untuk BARANG. */
-export async function catatJurnalFakturPenjualan(tx: Tx, faktur: { nomor: string; total: Desimal | number | string }, daftarBaris: BarisDokumen[]) {
+export async function catatJurnalFakturPenjualan(
+  tx: Tx,
+  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string },
+  daftarBaris: BarisDokumen[],
+  akunPpnKeluaranId?: string | null,
+) {
   const m = await ambilPemetaanAkun(tx);
+  const ppn = D(faktur.ppn ?? 0);
+  if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
   for (const b of daftarBaris) {
@@ -105,6 +112,7 @@ export async function catatJurnalFakturPenjualan(tx: Tx, faktur: { nomor: string
   const baris: InputBarisJurnal[] = [
     { akunId: m.piutangUsahaId, debit: D(faktur.total), kredit: NOL, keterangan: `Piutang ${faktur.nomor}` },
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Pendapatan ${faktur.nomor}` })),
+    ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: NOL, kredit: ppn, keterangan: `PPN keluaran ${faktur.nomor}` }] : []),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
     ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Persediaan keluar ${faktur.nomor}` })),
   ];
@@ -112,18 +120,33 @@ export async function catatJurnalFakturPenjualan(tx: Tx, faktur: { nomor: string
 }
 
 /** Penerimaan Penjualan: Dr Kas/Bank pilihan / Cr Piutang. */
-export async function catatJurnalPenerimaanPenjualan(tx: Tx, penerimaan: { nomor: string; akunId: string; jumlah: Desimal | number | string }, nomorFaktur?: string) {
+export async function catatJurnalPenerimaanPenjualan(
+  tx: Tx,
+  penerimaan: { nomor: string; akunId: string; jumlah: Desimal | number | string; potonganPajak?: Desimal | number | string },
+  nomorFaktur?: string,
+  akunPph23DimukaId?: string | null,
+) {
   const m = await ambilPemetaanAkun(tx);
   const jumlah = D(penerimaan.jumlah);
+  const potongan = D(penerimaan.potonganPajak ?? 0);
+  if (potongan.gt(0) && !akunPph23DimukaId) throw new Error("Akun Pajak Dibayar Dimuka (PPh 23) belum diatur (Pengaturan > Perusahaan & Pajak)");
   return catatJurnal(tx, "JU-TRM", `Penerimaan ${penerimaan.nomor}${nomorFaktur ? ` untuk ${nomorFaktur}` : ""}`, "PENJUALAN", [
     { akunId: penerimaan.akunId, debit: jumlah, kredit: NOL, keterangan: `Terima ${penerimaan.nomor}` },
-    { akunId: m.piutangUsahaId, debit: NOL, kredit: jumlah, keterangan: `Pelunasan piutang ${nomorFaktur ?? penerimaan.nomor}` },
+    ...(potongan.gt(0) && akunPph23DimukaId ? [{ akunId: akunPph23DimukaId, debit: potongan, kredit: NOL, keterangan: `PPh 23 dipotong pelanggan ${penerimaan.nomor}` }] : []),
+    { akunId: m.piutangUsahaId, debit: NOL, kredit: jumlah.plus(potongan), keterangan: `Pelunasan piutang ${nomorFaktur ?? penerimaan.nomor}` },
   ]);
 }
 
 /** Retur Penjualan: kebalikan faktur — Dr Pendapatan per akun / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini). */
-export async function catatJurnalReturPenjualan(tx: Tx, retur: { nomor: string; total: Desimal }, daftarBaris: BarisDokumen[]) {
+export async function catatJurnalReturPenjualan(
+  tx: Tx,
+  retur: { nomor: string; total: Desimal; ppn?: Desimal },
+  daftarBaris: BarisDokumen[],
+  akunPpnKeluaranId?: string | null,
+) {
   const m = await ambilPemetaanAkun(tx);
+  const ppn = retur.ppn ?? NOL;
+  if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
   for (const b of daftarBaris) {
@@ -135,6 +158,7 @@ export async function catatJurnalReturPenjualan(tx: Tx, retur: { nomor: string; 
   }
   const baris: InputBarisJurnal[] = [
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Retur ${retur.nomor}` })),
+    ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: ppn, kredit: NOL, keterangan: `PPN keluaran dibalik ${retur.nomor}` }] : []),
     { akunId: m.piutangUsahaId, debit: NOL, kredit: retur.total, keterangan: `Pengurangan piutang ${retur.nomor}` },
     ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Barang retur masuk ${retur.nomor}` })),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Koreksi HPP ${retur.nomor}` })),
@@ -176,11 +200,14 @@ export async function catatJurnalPenerimaanBarang(tx: Tx, penerimaan: { nomor: s
  */
 export async function catatJurnalFakturPembelian(
   tx: Tx,
-  faktur: { nomor: string; total: Desimal | number | string },
+  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string },
   daftarBaris: BarisDokumen[],
   hargaPesanan: Map<string, Desimal>,
+  akunPpnMasukanId?: string | null,
 ) {
   const m = await ambilPemetaanAkun(tx);
+  const ppn = D(faktur.ppn ?? 0);
+  if (ppn.gt(0) && !akunPpnMasukanId) throw new Error("Akun PPN Masukan belum diatur (Pengaturan > Perusahaan & Pajak)");
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const belumDitagih = pengumpul(), selisihPersediaan = pengumpul(), beban = pengumpul();
   for (const b of daftarBaris) {
@@ -208,18 +235,27 @@ export async function catatJurnalFakturPembelian(
       keterangan: `Selisih harga faktur vs pesanan ${faktur.nomor}`,
     })),
     ...beban.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Jasa/beban ${faktur.nomor}` })),
+    ...(ppn.gt(0) && akunPpnMasukanId ? [{ akunId: akunPpnMasukanId, debit: ppn, kredit: NOL, keterangan: `PPN masukan ${faktur.nomor}` }] : []),
     { akunId: m.utangUsahaId, debit: NOL, kredit: D(faktur.total), keterangan: `Hutang ${faktur.nomor}` },
   ];
   return catatJurnal(tx, "JU-FB", `Faktur Pembelian ${faktur.nomor}`, "PEMBELIAN", baris);
 }
 
 /** Pembayaran Pembelian: Dr Hutang / Cr Kas/Bank pilihan. */
-export async function catatJurnalPembayaranPembelian(tx: Tx, pembayaran: { nomor: string; akunId: string; jumlah: Desimal | number | string }, nomorFaktur?: string) {
+export async function catatJurnalPembayaranPembelian(
+  tx: Tx,
+  pembayaran: { nomor: string; akunId: string; jumlah: Desimal | number | string; potonganPajak?: Desimal | number | string },
+  nomorFaktur?: string,
+  akunPph23DipotongId?: string | null,
+) {
   const m = await ambilPemetaanAkun(tx);
   const jumlah = D(pembayaran.jumlah);
+  const potongan = D(pembayaran.potonganPajak ?? 0);
+  if (potongan.gt(0) && !akunPph23DipotongId) throw new Error("Akun Hutang PPh 23 belum diatur (Pengaturan > Perusahaan & Pajak)");
   return catatJurnal(tx, "JU-BYR", `Pembayaran ${pembayaran.nomor}${nomorFaktur ? ` untuk ${nomorFaktur}` : ""}`, "PEMBELIAN", [
-    { akunId: m.utangUsahaId, debit: jumlah, kredit: NOL, keterangan: `Pelunasan hutang ${nomorFaktur ?? pembayaran.nomor}` },
+    { akunId: m.utangUsahaId, debit: jumlah.plus(potongan), kredit: NOL, keterangan: `Pelunasan hutang ${nomorFaktur ?? pembayaran.nomor}` },
     { akunId: pembayaran.akunId, debit: NOL, kredit: jumlah, keterangan: `Bayar ${pembayaran.nomor}` },
+    ...(potongan.gt(0) && akunPph23DipotongId ? [{ akunId: akunPph23DipotongId, debit: NOL, kredit: potongan, keterangan: `PPh 23 dipotong ${pembayaran.nomor}` }] : []),
   ]);
 }
 
@@ -227,8 +263,15 @@ export async function catatJurnalPembayaranPembelian(tx: Tx, pembayaran: { nomor
  * Retur Pembelian: Dr Hutang (harga faktur); BARANG → Cr Persediaan (harga pokok rata-rata saat ini),
  * selisih harga faktur vs pokok → Selisih Persediaan; JASA → Cr Beban.
  */
-export async function catatJurnalReturPembelian(tx: Tx, retur: { nomor: string; total: Desimal }, daftarBaris: BarisDokumen[]) {
+export async function catatJurnalReturPembelian(
+  tx: Tx,
+  retur: { nomor: string; total: Desimal; ppn?: Desimal },
+  daftarBaris: BarisDokumen[],
+  akunPpnMasukanId?: string | null,
+) {
   const m = await ambilPemetaanAkun(tx);
+  const ppn = retur.ppn ?? NOL;
+  if (ppn.gt(0) && !akunPpnMasukanId) throw new Error("Akun PPN Masukan belum diatur (Pengaturan > Perusahaan & Pajak)");
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const persediaan = pengumpul(), beban = pengumpul();
   let selisih = NOL;
@@ -250,6 +293,7 @@ export async function catatJurnalReturPembelian(tx: Tx, retur: { nomor: string; 
     { akunId: m.utangUsahaId, debit: retur.total, kredit: NOL, keterangan: `Pengurangan hutang ${retur.nomor}` },
     ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Barang keluar retur ${retur.nomor}` })),
     ...beban.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Koreksi beban ${retur.nomor}` })),
+    ...(ppn.gt(0) && akunPpnMasukanId ? [{ akunId: akunPpnMasukanId, debit: NOL, kredit: ppn, keterangan: `PPN masukan dibalik ${retur.nomor}` }] : []),
     ...(!selisih.isZero() && m.selisihPersediaanId
       ? [{ akunId: m.selisihPersediaanId, debit: selisih.lt(0) ? selisih.neg() : NOL, kredit: selisih.gt(0) ? selisih : NOL, keterangan: `Selisih harga retur ${retur.nomor}` }]
       : []),

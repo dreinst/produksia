@@ -40,8 +40,8 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
     klien.barisJurnal.aggregate({ _sum: { debit: true, kredit: true } }),
     klien.stokBarang.findMany({ include: { barang: { select: { jenis: true, hargaBeli: true } } } }),
     klien.barang.findMany({ where: { akunPersediaanId: { not: null } }, select: { akunPersediaanId: true } }),
-    klien.fakturPenjualan.findMany({ include: { penerimaan: { select: { jumlah: true } }, retur: { select: { total: true } } } }),
-    klien.fakturPembelian.findMany({ include: { pembayaran: { select: { jumlah: true } }, retur: { select: { total: true } } } }),
+    klien.fakturPenjualan.findMany({ include: { penerimaan: { select: { jumlah: true, potonganPajak: true } }, retur: { select: { total: true } } } }),
+    klien.fakturPembelian.findMany({ include: { pembayaran: { select: { jumlah: true, potonganPajak: true } }, retur: { select: { total: true } } } }),
     klien.penerimaanBarang.findMany({ include: { baris: { include: { barang: { select: { jenis: true } }, barisPesanan: { select: { harga: true, jumlahDifaktur: true, jumlah: true } } } } } }),
   ]);
   const totalDebit = D(total._sum.debit ?? 0);
@@ -58,11 +58,11 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
   const persediaan = banding(await saldoAkun(klien, akunPersediaan, true), nilaiStok);
 
   // Piutang: saldo akun piutang vs Σ (total faktur − penerimaan − retur)
-  const sisaPiutang = jumlahkan(fakturJual.map((f) => D(f.total).minus(jumlahkan(f.penerimaan.map((p) => p.jumlah))).minus(jumlahkan(f.retur.map((r) => r.total)))));
+  const sisaPiutang = jumlahkan(fakturJual.map((f) => D(f.total).minus(jumlahkan(f.penerimaan.map((p) => D(p.jumlah).plus(p.potonganPajak)))).minus(jumlahkan(f.retur.map((r) => r.total)))));
   const piutang = banding(await saldoAkun(klien, [pemetaan.piutangUsahaId], true), sisaPiutang);
 
   // Hutang: saldo akun hutang vs Σ (total faktur − pembayaran − retur)
-  const sisaHutang = jumlahkan(fakturBeli.map((f) => D(f.total).minus(jumlahkan(f.pembayaran.map((p) => p.jumlah))).minus(jumlahkan(f.retur.map((r) => r.total)))));
+  const sisaHutang = jumlahkan(fakturBeli.map((f) => D(f.total).minus(jumlahkan(f.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak)))).minus(jumlahkan(f.retur.map((r) => r.total)))));
   const hutang = banding(await saldoAkun(klien, [pemetaan.utangUsahaId], false), sisaHutang);
 
   // Barang diterima belum ditagih: saldo akun vs Σ (BARANG diterima − difaktur) × harga pesanan

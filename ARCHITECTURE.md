@@ -42,7 +42,7 @@ flowchart LR
 app/
 ├─ prisma/
 │  ├─ schema.prisma            # seluruh model data (§3) + Pengguna/Sesi (§6.4)
-│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna, bagan_akun, sinkron_akuntansi
+│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna, bagan_akun, sinkron_akuntansi, pajak_perusahaan
 │  ├─ seed.ts                  # 4 pengguna + bagan akun + alur cerita lewat AKSI SERVER sungguhan, diakhiri periksaSinkron
 │  └─ reset.ts                 # kosongkan semua tabel (urutan aman terhadap FK)
 ├─ skrip/
@@ -66,7 +66,7 @@ app/
 │  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo, laba-rugi, neraca
 │  │  │  ├─ aset-tetap/…       # daftar, baru, penyusutan
 │  │  │  ├─ persediaan/…       # stok per gudang, penyesuaian (+ /baru)
-│  │  │  ├─ pengaturan/        # pemetaan-akun, bagan-akun (terapkan standar), pengguna (+ [id]/)
+│  │  │  ├─ pengaturan/        # perusahaan (pajak), pemetaan-akun, bagan-akun (terapkan standar), pengguna (+ [id]/)
 │  │  │  ├─ profil/ · tanpa-akses/ · cari/
 │  │  └─ api/status/           # cek koneksi DB (butuh sesi)
 │  ├─ komponen/
@@ -85,6 +85,7 @@ app/
 │  │  ├─ baganAkun.ts          # terapkanBaganAkunStandar (idempoten), pastikanAkunRinci, daftarAkunKasBank
 │  │  ├─ sinkron.ts            # periksaSinkron: buku besar ↔ stok/piutang/hutang/barang belum ditagih
 │  │  ├─ laporan.ts            # bacaPeriode, saldoAkunPeriode, hitungLabaRugi, hitungNeraca (berjenjang)
+│  │  ├─ pengaturanPerusahaan.ts # PKP, tarif PPN, termin, akun pajak; bacaTarifPpn, hitungPpn, tanggalJatuhTempo
 │  │  ├─ daftar.ts             # bacaParamDaftar(?q,?hal) untuk halaman daftar
 │  │  ├─ dataInduk.ts          # pembacaan generik data induk (opsi, include, pencarian)
 │  │  ├─ konfigurasiDataInduk.ts   # definisi entitas data induk (bidang, kolom, bagian)
@@ -274,13 +275,13 @@ Sebelum baris jurnal ditulis, `pastikanAkunRinci` (`src/lib/baganAkun.ts`) menol
 
 | Peristiwa | Debit | Kredit |
 |---|---|---|
-| Faktur Penjualan (JU-FJ) | Piutang Usaha (total) · HPP per akun (Σ qty × harga pokok, BARANG saja) | Pendapatan per akun barang/pemetaan · Persediaan per akun (HPP) |
-| Penerimaan Penjualan (JU-TRM) | Akun kas/bank yang dipilih | Piutang Usaha |
-| Retur Penjualan (JU-RJ) | Pendapatan per akun (harga faktur) · Persediaan (harga pokok) | Piutang Usaha (total retur) · HPP |
+| Faktur Penjualan (JU-FJ) | Piutang Usaha (DPP + PPN) · HPP per akun (Σ qty × harga pokok, BARANG saja) | Pendapatan per akun barang/pemetaan (DPP) · PPN Keluaran (bila PKP) · Persediaan per akun (HPP) |
+| Penerimaan Penjualan (JU-TRM) | Akun kas/bank yang dipilih · Pajak Dibayar Dimuka (potongan PPh 23 oleh klien) | Piutang Usaha (bayar + potongan) |
+| Retur Penjualan (JU-RJ) | Pendapatan per akun (harga faktur) · PPN Keluaran (proporsional tarif faktur) · Persediaan (harga pokok) | Piutang Usaha (DPP + PPN retur) · HPP |
 | Terima Barang (JU-TB) | Persediaan per akun (qty × harga pesanan, BARANG) | Barang Diterima Belum Ditagih |
-| Faktur Pembelian (JU-FB) | Barang Diterima Belum Ditagih (harga pesanan) · Persediaan (selisih harga, bisa kredit) · Beban jasa per akun (JASA) | Hutang Usaha (total) |
-| Pembayaran Pembelian (JU-BYR) | Hutang Usaha | Akun kas/bank yang dipilih |
-| Retur Pembelian (JU-RB) | Hutang Usaha (harga faktur) · Selisih Persediaan (bila rugi) | Persediaan (harga pokok) · Beban jasa (JASA) · Selisih Persediaan (bila untung) |
+| Faktur Pembelian (JU-FB) | Barang Diterima Belum Ditagih (harga pesanan) · Persediaan (selisih harga, bisa kredit) · Beban jasa per akun (JASA) · PPN Masukan (bila PKP) | Hutang Usaha (DPP + PPN) |
+| Pembayaran Pembelian (JU-BYR) | Hutang Usaha (bayar + potongan) | Akun kas/bank yang dipilih · Hutang PPh 23 (potongan yang kita lakukan) |
+| Retur Pembelian (JU-RB) | Hutang Usaha (DPP + PPN retur) · Selisih Persediaan (bila rugi) | Persediaan (harga pokok) · Beban jasa (JASA) · PPN Masukan (proporsional) · Selisih Persediaan (bila untung) |
 | Penyesuaian Stok (JU-PS) | Persediaan (selisih × harga satuan; kredit bila turun) | Akun lawan: Modal (saldo awal) / Selisih Persediaan (opname) |
 | Perolehan Aset (JU-AT) | Akun aset tetap | Kas/Bank atau Hutang yang dipilih (opsional) |
 | Penyusutan (JU-PNY) | Beban Penyusutan (per aset) | Akumulasi Penyusutan (per aset) |
@@ -292,6 +293,9 @@ Semua posting terjadi **di dalam transaksi yang sama** dengan dokumen sumbernya,
 
 ### 6.2c Laporan keuangan (`src/lib/laporan.ts`)
 `saldoAkunPeriode` mengagregasi `BarisJurnal` per akun dalam rentang tanggal (`groupBy`), lalu `susunHierarki` membuat baris berjenjang dengan subtotal kelompok. **Laba Rugi** = pendapatan − beban pokok (kelompok akar yang memuat akun HPP dari pemetaan) = laba kotor, − beban lain = laba bersih. **Neraca** per tanggal: aset, kewajiban, ekuitas (akun), plus dua baris hitungan — laba tahun-tahun sebelumnya (jurnal sebelum 1 Januari tahun tanggal laporan) dan laba tahun berjalan — sehingga Aset = Kewajiban + Ekuitas tanpa jurnal penutup. Neraca Saldo memakai filter periode yang sama.
+
+### 6.2d Pajak (`src/lib/pengaturanPerusahaan.ts`)
+`PengaturanPerusahaan` (singleton) menyimpan nama, `pkp`, `tarifPpnPersen`, `terminHari`, dan empat akun pajak. `bacaTarifPpn` menolak PPN > 0 bila non-PKP; `hitungPpn` membulatkan 2 desimal; faktur menyimpan `dpp`, `ppnPersen`, `ppn`, `total = dpp + ppn`, retur menyimpan `dpp`/`ppn` proporsional tarif faktur. `potonganPajak` pada Penerimaan/Pembayaran mengurangi piutang/hutang bersama nominal bayar (dipakai `periksaSinkron`, status faktur, dan KPI). Nama perusahaan dari pengaturan yang sama tampil di sidebar.
 
 ### 6.3 Uang & kuantitas (`src/lib/uang.ts`)
 `uang()` membulatkan ke 2 desimal half-up; `bacaUang()` memvalidasi isian form (wajib, angka valid, tidak negatif, default > 0); `jumlahkan`/`kali` mengembalikan Decimal. Perbandingan status (mis. lunas) memakai `.gte()`, bukan `>=` float.
@@ -384,6 +388,6 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 11. Batas & arah pengembangan
 
-Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, jurnal penutup tahun & laporan arus kas, Pindah Barang antar gudang, PPN/PPh di dokumen, Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
+Belum ada: halaman **ubah/hapus dokumen transaksi** (data induk sudah bisa), hak akses per dokumen/gudang (sekarang per modul), lupa-kata-sandi lewat email & pembatasan percobaan masuk, jurnal penutup tahun & laporan arus kas, Pindah Barang antar gudang, PPh Final/badan & pelaporan SPT (PPN dan PPh 23 sudah), Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
 
 Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → aksi (`xxx` + `xxxFormulir`) yang diawali `wajibHakAksi` lalu validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar (`wajibHak`, `bacaParamDaftar`, `KontrolDaftar`) + halaman buat dengan `FormulirAksi` → tambahkan hak baru di `hakAkses.ts` bila perlu dan tautan (dengan `hak`) di `BilahSamping.tsx` → suite regresi.

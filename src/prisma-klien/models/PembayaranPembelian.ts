@@ -28,10 +28,12 @@ export type AggregatePembayaranPembelian = {
 
 export type PembayaranPembelianAvgAggregateOutputType = {
   jumlah: runtime.Decimal | null
+  potonganPajak: runtime.Decimal | null
 }
 
 export type PembayaranPembelianSumAggregateOutputType = {
   jumlah: runtime.Decimal | null
+  potonganPajak: runtime.Decimal | null
 }
 
 export type PembayaranPembelianMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type PembayaranPembelianMinAggregateOutputType = {
   fakturId: string | null
   akunId: string | null
   jumlah: runtime.Decimal | null
+  potonganPajak: runtime.Decimal | null
   metodeBayar: string | null
 }
 
@@ -53,6 +56,7 @@ export type PembayaranPembelianMaxAggregateOutputType = {
   fakturId: string | null
   akunId: string | null
   jumlah: runtime.Decimal | null
+  potonganPajak: runtime.Decimal | null
   metodeBayar: string | null
 }
 
@@ -64,6 +68,7 @@ export type PembayaranPembelianCountAggregateOutputType = {
   fakturId: number
   akunId: number
   jumlah: number
+  potonganPajak: number
   metodeBayar: number
   _all: number
 }
@@ -71,10 +76,12 @@ export type PembayaranPembelianCountAggregateOutputType = {
 
 export type PembayaranPembelianAvgAggregateInputType = {
   jumlah?: true
+  potonganPajak?: true
 }
 
 export type PembayaranPembelianSumAggregateInputType = {
   jumlah?: true
+  potonganPajak?: true
 }
 
 export type PembayaranPembelianMinAggregateInputType = {
@@ -85,6 +92,7 @@ export type PembayaranPembelianMinAggregateInputType = {
   fakturId?: true
   akunId?: true
   jumlah?: true
+  potonganPajak?: true
   metodeBayar?: true
 }
 
@@ -96,6 +104,7 @@ export type PembayaranPembelianMaxAggregateInputType = {
   fakturId?: true
   akunId?: true
   jumlah?: true
+  potonganPajak?: true
   metodeBayar?: true
 }
 
@@ -107,6 +116,7 @@ export type PembayaranPembelianCountAggregateInputType = {
   fakturId?: true
   akunId?: true
   jumlah?: true
+  potonganPajak?: true
   metodeBayar?: true
   _all?: true
 }
@@ -205,6 +215,7 @@ export type PembayaranPembelianGroupByOutputType = {
   fakturId: string
   akunId: string
   jumlah: runtime.Decimal
+  potonganPajak: runtime.Decimal
   metodeBayar: string
   _count: PembayaranPembelianCountAggregateOutputType | null
   _avg: PembayaranPembelianAvgAggregateOutputType | null
@@ -239,6 +250,7 @@ export type PembayaranPembelianWhereInput = {
   fakturId?: Prisma.StringFilter<"PembayaranPembelian"> | string
   akunId?: Prisma.StringFilter<"PembayaranPembelian"> | string
   jumlah?: Prisma.DecimalFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFilter<"PembayaranPembelian"> | string
   pemasok?: Prisma.XOR<Prisma.PemasokScalarRelationFilter, Prisma.PemasokWhereInput>
   faktur?: Prisma.XOR<Prisma.FakturPembelianScalarRelationFilter, Prisma.FakturPembelianWhereInput>
@@ -253,6 +265,7 @@ export type PembayaranPembelianOrderByWithRelationInput = {
   fakturId?: Prisma.SortOrder
   akunId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
   metodeBayar?: Prisma.SortOrder
   pemasok?: Prisma.PemasokOrderByWithRelationInput
   faktur?: Prisma.FakturPembelianOrderByWithRelationInput
@@ -270,6 +283,7 @@ export type PembayaranPembelianWhereUniqueInput = Prisma.AtLeast<{
   fakturId?: Prisma.StringFilter<"PembayaranPembelian"> | string
   akunId?: Prisma.StringFilter<"PembayaranPembelian"> | string
   jumlah?: Prisma.DecimalFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFilter<"PembayaranPembelian"> | string
   pemasok?: Prisma.XOR<Prisma.PemasokScalarRelationFilter, Prisma.PemasokWhereInput>
   faktur?: Prisma.XOR<Prisma.FakturPembelianScalarRelationFilter, Prisma.FakturPembelianWhereInput>
@@ -284,6 +298,7 @@ export type PembayaranPembelianOrderByWithAggregationInput = {
   fakturId?: Prisma.SortOrder
   akunId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
   metodeBayar?: Prisma.SortOrder
   _count?: Prisma.PembayaranPembelianCountOrderByAggregateInput
   _avg?: Prisma.PembayaranPembelianAvgOrderByAggregateInput
@@ -303,6 +318,7 @@ export type PembayaranPembelianScalarWhereWithAggregatesInput = {
   fakturId?: Prisma.StringWithAggregatesFilter<"PembayaranPembelian"> | string
   akunId?: Prisma.StringWithAggregatesFilter<"PembayaranPembelian"> | string
   jumlah?: Prisma.DecimalWithAggregatesFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalWithAggregatesFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringWithAggregatesFilter<"PembayaranPembelian"> | string
 }
 
@@ -311,6 +327,7 @@ export type PembayaranPembelianCreateInput = {
   nomor: string
   tanggal?: Date | string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   pemasok: Prisma.PemasokCreateNestedOneWithoutPembayaranInput
   faktur: Prisma.FakturPembelianCreateNestedOneWithoutPembayaranInput
@@ -325,6 +342,7 @@ export type PembayaranPembelianUncheckedCreateInput = {
   fakturId: string
   akunId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -333,6 +351,7 @@ export type PembayaranPembelianUpdateInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   pemasok?: Prisma.PemasokUpdateOneRequiredWithoutPembayaranNestedInput
   faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutPembayaranNestedInput
@@ -347,6 +366,7 @@ export type PembayaranPembelianUncheckedUpdateInput = {
   fakturId?: Prisma.StringFieldUpdateOperationsInput | string
   akunId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -358,6 +378,7 @@ export type PembayaranPembelianCreateManyInput = {
   fakturId: string
   akunId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -366,6 +387,7 @@ export type PembayaranPembelianUpdateManyMutationInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -377,6 +399,7 @@ export type PembayaranPembelianUncheckedUpdateManyInput = {
   fakturId?: Prisma.StringFieldUpdateOperationsInput | string
   akunId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -398,11 +421,13 @@ export type PembayaranPembelianCountOrderByAggregateInput = {
   fakturId?: Prisma.SortOrder
   akunId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
   metodeBayar?: Prisma.SortOrder
 }
 
 export type PembayaranPembelianAvgOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
 }
 
 export type PembayaranPembelianMaxOrderByAggregateInput = {
@@ -413,6 +438,7 @@ export type PembayaranPembelianMaxOrderByAggregateInput = {
   fakturId?: Prisma.SortOrder
   akunId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
   metodeBayar?: Prisma.SortOrder
 }
 
@@ -424,11 +450,13 @@ export type PembayaranPembelianMinOrderByAggregateInput = {
   fakturId?: Prisma.SortOrder
   akunId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
   metodeBayar?: Prisma.SortOrder
 }
 
 export type PembayaranPembelianSumOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
+  potonganPajak?: Prisma.SortOrder
 }
 
 export type PembayaranPembelianCreateNestedManyWithoutPemasokInput = {
@@ -562,6 +590,7 @@ export type PembayaranPembelianCreateWithoutPemasokInput = {
   nomor: string
   tanggal?: Date | string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   faktur: Prisma.FakturPembelianCreateNestedOneWithoutPembayaranInput
   akun: Prisma.AkunCreateNestedOneWithoutPembayaranPembelianInput
@@ -574,6 +603,7 @@ export type PembayaranPembelianUncheckedCreateWithoutPemasokInput = {
   fakturId: string
   akunId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -614,6 +644,7 @@ export type PembayaranPembelianScalarWhereInput = {
   fakturId?: Prisma.StringFilter<"PembayaranPembelian"> | string
   akunId?: Prisma.StringFilter<"PembayaranPembelian"> | string
   jumlah?: Prisma.DecimalFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFilter<"PembayaranPembelian"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFilter<"PembayaranPembelian"> | string
 }
 
@@ -622,6 +653,7 @@ export type PembayaranPembelianCreateWithoutFakturInput = {
   nomor: string
   tanggal?: Date | string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   pemasok: Prisma.PemasokCreateNestedOneWithoutPembayaranInput
   akun: Prisma.AkunCreateNestedOneWithoutPembayaranPembelianInput
@@ -634,6 +666,7 @@ export type PembayaranPembelianUncheckedCreateWithoutFakturInput = {
   pemasokId: string
   akunId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -668,6 +701,7 @@ export type PembayaranPembelianCreateWithoutAkunInput = {
   nomor: string
   tanggal?: Date | string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   pemasok: Prisma.PemasokCreateNestedOneWithoutPembayaranInput
   faktur: Prisma.FakturPembelianCreateNestedOneWithoutPembayaranInput
@@ -680,6 +714,7 @@ export type PembayaranPembelianUncheckedCreateWithoutAkunInput = {
   pemasokId: string
   fakturId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -716,6 +751,7 @@ export type PembayaranPembelianCreateManyPemasokInput = {
   fakturId: string
   akunId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -724,6 +760,7 @@ export type PembayaranPembelianUpdateWithoutPemasokInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutPembayaranNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutPembayaranPembelianNestedInput
@@ -736,6 +773,7 @@ export type PembayaranPembelianUncheckedUpdateWithoutPemasokInput = {
   fakturId?: Prisma.StringFieldUpdateOperationsInput | string
   akunId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -746,6 +784,7 @@ export type PembayaranPembelianUncheckedUpdateManyWithoutPemasokInput = {
   fakturId?: Prisma.StringFieldUpdateOperationsInput | string
   akunId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -756,6 +795,7 @@ export type PembayaranPembelianCreateManyFakturInput = {
   pemasokId: string
   akunId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -764,6 +804,7 @@ export type PembayaranPembelianUpdateWithoutFakturInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   pemasok?: Prisma.PemasokUpdateOneRequiredWithoutPembayaranNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutPembayaranPembelianNestedInput
@@ -776,6 +817,7 @@ export type PembayaranPembelianUncheckedUpdateWithoutFakturInput = {
   pemasokId?: Prisma.StringFieldUpdateOperationsInput | string
   akunId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -786,6 +828,7 @@ export type PembayaranPembelianUncheckedUpdateManyWithoutFakturInput = {
   pemasokId?: Prisma.StringFieldUpdateOperationsInput | string
   akunId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -796,6 +839,7 @@ export type PembayaranPembelianCreateManyAkunInput = {
   pemasokId: string
   fakturId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
 }
 
@@ -804,6 +848,7 @@ export type PembayaranPembelianUpdateWithoutAkunInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   pemasok?: Prisma.PemasokUpdateOneRequiredWithoutPembayaranNestedInput
   faktur?: Prisma.FakturPembelianUpdateOneRequiredWithoutPembayaranNestedInput
@@ -816,6 +861,7 @@ export type PembayaranPembelianUncheckedUpdateWithoutAkunInput = {
   pemasokId?: Prisma.StringFieldUpdateOperationsInput | string
   fakturId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -826,6 +872,7 @@ export type PembayaranPembelianUncheckedUpdateManyWithoutAkunInput = {
   pemasokId?: Prisma.StringFieldUpdateOperationsInput | string
   fakturId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  potonganPajak?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -839,6 +886,7 @@ export type PembayaranPembelianSelect<ExtArgs extends runtime.Types.Extensions.I
   fakturId?: boolean
   akunId?: boolean
   jumlah?: boolean
+  potonganPajak?: boolean
   metodeBayar?: boolean
   pemasok?: boolean | Prisma.PemasokDefaultArgs<ExtArgs>
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
@@ -853,6 +901,7 @@ export type PembayaranPembelianSelectCreateManyAndReturn<ExtArgs extends runtime
   fakturId?: boolean
   akunId?: boolean
   jumlah?: boolean
+  potonganPajak?: boolean
   metodeBayar?: boolean
   pemasok?: boolean | Prisma.PemasokDefaultArgs<ExtArgs>
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
@@ -867,6 +916,7 @@ export type PembayaranPembelianSelectUpdateManyAndReturn<ExtArgs extends runtime
   fakturId?: boolean
   akunId?: boolean
   jumlah?: boolean
+  potonganPajak?: boolean
   metodeBayar?: boolean
   pemasok?: boolean | Prisma.PemasokDefaultArgs<ExtArgs>
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
@@ -881,10 +931,11 @@ export type PembayaranPembelianSelectScalar = {
   fakturId?: boolean
   akunId?: boolean
   jumlah?: boolean
+  potonganPajak?: boolean
   metodeBayar?: boolean
 }
 
-export type PembayaranPembelianOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pemasokId" | "fakturId" | "akunId" | "jumlah" | "metodeBayar", ExtArgs["result"]["pembayaranPembelian"]>
+export type PembayaranPembelianOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pemasokId" | "fakturId" | "akunId" | "jumlah" | "potonganPajak" | "metodeBayar", ExtArgs["result"]["pembayaranPembelian"]>
 export type PembayaranPembelianInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pemasok?: boolean | Prisma.PemasokDefaultArgs<ExtArgs>
   faktur?: boolean | Prisma.FakturPembelianDefaultArgs<ExtArgs>
@@ -916,6 +967,10 @@ export type $PembayaranPembelianPayload<ExtArgs extends runtime.Types.Extensions
     fakturId: string
     akunId: string
     jumlah: runtime.Decimal
+    /**
+     * PPh 23 yang kita potong dari vendor (mengurangi hutang, dicatat sebagai hutang PPh 23)
+     */
+    potonganPajak: runtime.Decimal
     metodeBayar: string
   }, ExtArgs["result"]["pembayaranPembelian"]>
   composites: {}
@@ -1350,6 +1405,7 @@ export interface PembayaranPembelianFieldRefs {
   readonly fakturId: Prisma.FieldRef<"PembayaranPembelian", 'String'>
   readonly akunId: Prisma.FieldRef<"PembayaranPembelian", 'String'>
   readonly jumlah: Prisma.FieldRef<"PembayaranPembelian", 'Decimal'>
+  readonly potonganPajak: Prisma.FieldRef<"PembayaranPembelian", 'Decimal'>
   readonly metodeBayar: Prisma.FieldRef<"PembayaranPembelian", 'String'>
 }
     

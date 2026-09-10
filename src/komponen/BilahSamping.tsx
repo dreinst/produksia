@@ -88,6 +88,7 @@ const dataInduk: Grup = {
 };
 
 const tautanPengaturan: (TautanNavigasi & { ikon: string })[] = [
+  { href: "/pengaturan/perusahaan", label: "Perusahaan & Pajak", ikon: "domain", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pengaturan.tulis" },
   { href: "/pengaturan/bagan-akun", label: "Bagan Akun Standar", ikon: "account_tree", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
@@ -262,7 +263,7 @@ function StatusBasisData() {
   );
 }
 
-export default function BilahSamping({ pengguna, open, saatTutup }: { pengguna: PenggunaSesi; open: boolean; saatTutup: () => void }) {
+export default function BilahSamping({ pengguna, namaPerusahaan, open, saatTutup }: { pengguna: PenggunaSesi; namaPerusahaan: string; open: boolean; saatTutup: () => void }) {
   const pathname = usePathname();
   const tahun = new Date().getFullYear();
 
@@ -307,7 +308,7 @@ export default function BilahSamping({ pengguna, open, saatTutup }: { pengguna: 
         <div className="p-3 shrink-0">
           <div className="bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 flex items-center justify-between">
             <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold text-slate-900 truncate">Accurate Copy</span>
+              <span className="text-xs font-semibold text-slate-900 truncate">{namaPerusahaan}</span>
               <span className="text-[11px] text-slate-500 font-medium">Tahun Buku {tahun} • Rupiah</span>
             </div>
             <Ikon nama="unfold_more" className="!text-[18px] text-slate-400" />

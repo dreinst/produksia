@@ -2,6 +2,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
+import { ambilPengaturanPerusahaan, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 import { buatFakturPembelianFormulir } from "@/lib/aksi/pembelian";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -37,8 +38,13 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
     nomorDokumenBerikutnya(db.fakturPembelian, "FB"),
   ]);
 
+  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const [akunPpn, akunBelumDitagih] = await Promise.all([
+    pengaturan.akunPpnMasukanId ? db.akun.findUnique({ where: { id: pengaturan.akunPpnMasukanId } }) : null,
+    pemetaan?.barangBelumDitagihId ? db.akun.findUnique({ where: { id: pemetaan.barangBelumDitagihId } }) : null,
+  ]);
   const hariIni = new Date();
-  const tempo = new Date(hariIni.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const tempo = tanggalJatuhTempo(pengaturan.terminHari, hariIni);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const label = (a: { kode: string; nama: string }) => `${a.kode} • ${a.nama}`;
 
@@ -65,7 +71,17 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
         hargaBeli: Number(l.barang.hargaBeli),
       }))}
       dokumenSebelumnya={pesanan.penerimaanBarang.map((r) => ({ nomor: r.nomor, tanggal: r.tanggal.toISOString() }))}
-      pemetaan={pemetaan ? { akunLawan: label(pemetaan.utangUsaha), pendapatanAtauPersediaan: label(pemetaan.persediaan) } : null}
+      pemetaan={
+        pemetaan
+          ? {
+              akunLawan: label(pemetaan.utangUsaha),
+              pendapatanAtauPersediaan: label(akunBelumDitagih ?? pemetaan.persediaan),
+              ppn: akunPpn ? label(akunPpn) : undefined,
+            }
+          : null
+      }
+      pajak={{ pkp: pengaturan.pkp, tarif: Number(pengaturan.tarifPpnPersen) }}
+      terminHari={pengaturan.terminHari}
     />
   );
 }

@@ -8,6 +8,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Pengguna & hak akses**: login email + kata sandi, empat peran (Pemilik, Admin, Kasir, Gudang), kelola pengguna
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
+- **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
 
 Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (lihat `ARCHITECTURE.md`).
 
@@ -42,6 +43,10 @@ Bagan akun standar 111 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputu
 
 Semua dokumen yang memengaruhi uang atau stok menjurnal otomatis lewat `src/lib/akuntansi.ts` di dalam transaksi yang sama: Faktur Penjualan (piutang, pendapatan per akun barang, HPP), Penerimaan, Retur Penjualan, **Terima Barang** (persediaan ↔ Barang Diterima Belum Ditagih), Faktur Pembelian (menutup akun belum ditagih, selisih harga ke persediaan, jasa ke beban), Pembayaran, Retur Pembelian (selisih harga ke Selisih Persediaan), **Penyesuaian Stok**, **perolehan aset tetap**, dan penyusutan. Harga pokok barang memakai rata-rata bergerak, sehingga Σ stok × harga pokok selalu sama dengan saldo akun Persediaan. Kartu *Integritas & Sinkronisasi* di beranda dan `npx tsx skrip/uji-sinkron.ts` mencocokkan buku besar dengan dokumen & stok; selisih ≠ 0 diperlakukan sebagai bug.
 
+## Pajak
+
+Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**, tarif PPN (bawaan 11%), termin jatuh tempo, dan empat akun pajak. Bila PKP aktif, komposer faktur menampilkan pilihan PPN (0% atau tarif) dan total = DPP + PPN; jurnalnya menambah baris PPN Keluaran (penjualan) / PPN Masukan (pembelian), retur membalik PPN proporsional. Non-PKP tidak bisa memungut PPN (ditolak server). **PPh 23**: di Penerimaan isi potongan yang dilakukan klien (Dr Pajak Dibayar Dimuka), di Pembayaran isi potongan yang kita lakukan ke vendor (Cr Hutang PPh 23); piutang/hutang berkurang sebesar bayar + potongan. Belum otomatis: PPh Final UMKM/badan dan pelaporan SPT.
+
 ## Data contoh
 
 - `npx tsx prisma/reset.ts` — hapus semua data (transaksi, data induk, pengguna & sesi)
@@ -60,7 +65,7 @@ Semua dokumen yang memengaruhi uang atau stok menjurnal otomatis lewat `src/lib/
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 9 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 10 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -101,7 +106,8 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/baganAkunStandar.ts` (data 111 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
 - `src/lib/akuntansi.ts` (semua aturan posting), `src/lib/sinkron.ts` (pencocokan buku besar ↔ dokumen/stok), `src/lib/aksi/persediaan.ts` + `persediaan/` (stok per gudang, penyesuaian)
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
-- `skrip/uji-{sinkron,laporan,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
+- `skrip/uji-{sinkron,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
@@ -119,6 +125,7 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
 - **Jurnal otomatis** untuk Faktur/Penerimaan/Pembayaran/Retur via `src/lib/akuntansi.ts` memakai pemetaan akun (Piutang, Persediaan, HPP, Pendapatan, Utang). Aturan: Faktur Penjualan → Dr Piutang/Cr Pendapatan + Dr HPP/Cr Persediaan; Penerimaan → Dr Kas-Bank/Cr Piutang; Retur Penjualan → kebalikannya; Faktur Pembelian → Dr Persediaan/Cr Utang; Pembayaran → Dr Utang/Cr Kas-Bank; Retur Pembelian → Dr Utang/Cr Persediaan.
 - **Aset Tetap: hanya garis lurus.** Perolehan aset dijurnal (Dr Aset / Cr Kas-Bank atau Hutang) bila akun pembayaran dipilih; belum ada pelepasan aset.
+- **Pajak**: PPN & PPh 23 dihitung dari dokumen (lihat bagian Pajak); PPh Final UMKM/badan dicatat manual.
 - **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Belum ada: lupa-kata-sandi via email (diatur ulang oleh Pemilik/Admin), 2FA, pembatasan percobaan login.
 - **Hak akses per modul**, bukan per dokumen/gudang. Peran Gudang bisa *melihat* semua daftar penjualan/pembelian (perlu untuk membuat SJ/TB).
 - **Dokumen transaksi belum bisa diubah/dihapus** dari UI (data induk sudah bisa: tombol Ubah/Hapus; yang masih dipakai transaksi ditolak DB dengan pesan jelas).

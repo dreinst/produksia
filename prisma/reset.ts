@@ -3,6 +3,8 @@ import { db } from "../src/lib/db";
 
 async function main() {
   console.log("=== Menghapus semua data transaksi & master data ===");
+  await db.barisPenyesuaianPersediaan.deleteMany();
+  await db.penyesuaianPersediaan.deleteMany();
   await db.penyusutanAset.deleteMany();
   await db.asetTetap.deleteMany();
   await db.barisReturPembelian.deleteMany();
@@ -37,6 +39,7 @@ async function main() {
   await db.barisJurnal.deleteMany();
   await db.jurnal.deleteMany();
   await db.pemetaanAkun.deleteMany();
+  await db.pengaturanPerusahaan.deleteMany();
   await db.akun.deleteMany();
   await db.sesi.deleteMany();
   await db.pengguna.deleteMany();
