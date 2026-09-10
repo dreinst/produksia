@@ -193,6 +193,7 @@ export type JurnalWhereInput = {
   uangMukaPelanggan?: Prisma.XOR<Prisma.UangMukaPelangganNullableScalarRelationFilter, Prisma.UangMukaPelangganWhereInput> | null
   tutupBuku?: Prisma.XOR<Prisma.TutupBukuNullableScalarRelationFilter, Prisma.TutupBukuWhereInput> | null
   pphFinal?: Prisma.XOR<Prisma.PphFinalBulananNullableScalarRelationFilter, Prisma.PphFinalBulananWhereInput> | null
+  pelepasanAset?: Prisma.XOR<Prisma.PelepasanAsetNullableScalarRelationFilter, Prisma.PelepasanAsetWhereInput> | null
   returPenjualan?: Prisma.XOR<Prisma.ReturPenjualanNullableScalarRelationFilter, Prisma.ReturPenjualanWhereInput> | null
   fakturPembelian?: Prisma.XOR<Prisma.FakturPembelianNullableScalarRelationFilter, Prisma.FakturPembelianWhereInput> | null
   pembayaranPembelian?: Prisma.XOR<Prisma.PembayaranPembelianNullableScalarRelationFilter, Prisma.PembayaranPembelianWhereInput> | null
@@ -216,6 +217,7 @@ export type JurnalOrderByWithRelationInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganOrderByWithRelationInput
   tutupBuku?: Prisma.TutupBukuOrderByWithRelationInput
   pphFinal?: Prisma.PphFinalBulananOrderByWithRelationInput
+  pelepasanAset?: Prisma.PelepasanAsetOrderByWithRelationInput
   returPenjualan?: Prisma.ReturPenjualanOrderByWithRelationInput
   fakturPembelian?: Prisma.FakturPembelianOrderByWithRelationInput
   pembayaranPembelian?: Prisma.PembayaranPembelianOrderByWithRelationInput
@@ -242,6 +244,7 @@ export type JurnalWhereUniqueInput = Prisma.AtLeast<{
   uangMukaPelanggan?: Prisma.XOR<Prisma.UangMukaPelangganNullableScalarRelationFilter, Prisma.UangMukaPelangganWhereInput> | null
   tutupBuku?: Prisma.XOR<Prisma.TutupBukuNullableScalarRelationFilter, Prisma.TutupBukuWhereInput> | null
   pphFinal?: Prisma.XOR<Prisma.PphFinalBulananNullableScalarRelationFilter, Prisma.PphFinalBulananWhereInput> | null
+  pelepasanAset?: Prisma.XOR<Prisma.PelepasanAsetNullableScalarRelationFilter, Prisma.PelepasanAsetWhereInput> | null
   returPenjualan?: Prisma.XOR<Prisma.ReturPenjualanNullableScalarRelationFilter, Prisma.ReturPenjualanWhereInput> | null
   fakturPembelian?: Prisma.XOR<Prisma.FakturPembelianNullableScalarRelationFilter, Prisma.FakturPembelianWhereInput> | null
   pembayaranPembelian?: Prisma.XOR<Prisma.PembayaranPembelianNullableScalarRelationFilter, Prisma.PembayaranPembelianWhereInput> | null
@@ -287,6 +290,7 @@ export type JurnalCreateInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -310,6 +314,7 @@ export type JurnalUncheckedCreateInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -333,6 +338,7 @@ export type JurnalUpdateInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -356,6 +362,7 @@ export type JurnalUncheckedUpdateInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -598,6 +605,22 @@ export type JurnalUpdateOneWithoutPerolehanAsetNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPerolehanAsetInput, Prisma.JurnalUpdateWithoutPerolehanAsetInput>, Prisma.JurnalUncheckedUpdateWithoutPerolehanAsetInput>
 }
 
+export type JurnalCreateNestedOneWithoutPelepasanAsetInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPelepasanAsetInput, Prisma.JurnalUncheckedCreateWithoutPelepasanAsetInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPelepasanAsetInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutPelepasanAsetNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPelepasanAsetInput, Prisma.JurnalUncheckedCreateWithoutPelepasanAsetInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPelepasanAsetInput
+  upsert?: Prisma.JurnalUpsertWithoutPelepasanAsetInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPelepasanAsetInput, Prisma.JurnalUpdateWithoutPelepasanAsetInput>, Prisma.JurnalUncheckedUpdateWithoutPelepasanAsetInput>
+}
+
 export type JurnalCreateNestedOneWithoutPenyusutanAsetInput = {
   create?: Prisma.XOR<Prisma.JurnalCreateWithoutPenyusutanAsetInput, Prisma.JurnalUncheckedCreateWithoutPenyusutanAsetInput>
   connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPenyusutanAsetInput
@@ -678,6 +701,7 @@ export type JurnalCreateWithoutPengirimanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -700,6 +724,7 @@ export type JurnalUncheckedCreateWithoutPengirimanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -738,6 +763,7 @@ export type JurnalUpdateWithoutPengirimanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -760,6 +786,7 @@ export type JurnalUncheckedUpdateWithoutPengirimanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -782,6 +809,7 @@ export type JurnalCreateWithoutFakturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -804,6 +832,7 @@ export type JurnalUncheckedCreateWithoutFakturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -842,6 +871,7 @@ export type JurnalUpdateWithoutFakturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -864,6 +894,7 @@ export type JurnalUncheckedUpdateWithoutFakturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -886,6 +917,7 @@ export type JurnalCreateWithoutUangMukaPelangganInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -908,6 +940,7 @@ export type JurnalUncheckedCreateWithoutUangMukaPelangganInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -946,6 +979,7 @@ export type JurnalUpdateWithoutUangMukaPelangganInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -968,6 +1002,7 @@ export type JurnalUncheckedUpdateWithoutUangMukaPelangganInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -990,6 +1025,7 @@ export type JurnalCreateWithoutPenerimaanPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1012,6 +1048,7 @@ export type JurnalUncheckedCreateWithoutPenerimaanPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1050,6 +1087,7 @@ export type JurnalUpdateWithoutPenerimaanPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -1072,6 +1110,7 @@ export type JurnalUncheckedUpdateWithoutPenerimaanPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1095,6 +1134,7 @@ export type JurnalCreateWithoutReturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
@@ -1117,6 +1157,7 @@ export type JurnalUncheckedCreateWithoutReturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1155,6 +1196,7 @@ export type JurnalUpdateWithoutReturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
@@ -1177,6 +1219,7 @@ export type JurnalUncheckedUpdateWithoutReturPenjualanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1198,6 +1241,7 @@ export type JurnalCreateWithoutPenerimaanBarangInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1220,6 +1264,7 @@ export type JurnalUncheckedCreateWithoutPenerimaanBarangInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1258,6 +1303,7 @@ export type JurnalUpdateWithoutPenerimaanBarangInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -1280,6 +1326,7 @@ export type JurnalUncheckedUpdateWithoutPenerimaanBarangInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1303,6 +1350,7 @@ export type JurnalCreateWithoutFakturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
@@ -1325,6 +1373,7 @@ export type JurnalUncheckedCreateWithoutFakturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1363,6 +1412,7 @@ export type JurnalUpdateWithoutFakturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
@@ -1385,6 +1435,7 @@ export type JurnalUncheckedUpdateWithoutFakturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1407,6 +1458,7 @@ export type JurnalCreateWithoutPembayaranPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
@@ -1429,6 +1481,7 @@ export type JurnalUncheckedCreateWithoutPembayaranPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1467,6 +1520,7 @@ export type JurnalUpdateWithoutPembayaranPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
@@ -1489,6 +1543,7 @@ export type JurnalUncheckedUpdateWithoutPembayaranPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1511,6 +1566,7 @@ export type JurnalCreateWithoutReturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1533,6 +1589,7 @@ export type JurnalUncheckedCreateWithoutReturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1571,6 +1628,7 @@ export type JurnalUpdateWithoutReturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -1593,6 +1651,7 @@ export type JurnalUncheckedUpdateWithoutReturPembelianInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1614,6 +1673,7 @@ export type JurnalCreateWithoutBarisInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1636,6 +1696,7 @@ export type JurnalUncheckedCreateWithoutBarisInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1674,6 +1735,7 @@ export type JurnalUpdateWithoutBarisInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -1696,6 +1758,7 @@ export type JurnalUncheckedUpdateWithoutBarisInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1718,6 +1781,7 @@ export type JurnalCreateWithoutPerolehanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1740,6 +1804,7 @@ export type JurnalUncheckedCreateWithoutPerolehanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1778,6 +1843,7 @@ export type JurnalUpdateWithoutPerolehanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -1792,6 +1858,115 @@ export type JurnalUncheckedUpdateWithoutPerolehanAsetInput = {
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutPelepasanAsetInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutPelepasanAsetInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutPelepasanAsetInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPelepasanAsetInput, Prisma.JurnalUncheckedCreateWithoutPelepasanAsetInput>
+}
+
+export type JurnalUpsertWithoutPelepasanAsetInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutPelepasanAsetInput, Prisma.JurnalUncheckedUpdateWithoutPelepasanAsetInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPelepasanAsetInput, Prisma.JurnalUncheckedCreateWithoutPelepasanAsetInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutPelepasanAsetInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutPelepasanAsetInput, Prisma.JurnalUncheckedUpdateWithoutPelepasanAsetInput>
+}
+
+export type JurnalUpdateWithoutPelepasanAsetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutPelepasanAsetInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
   penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
   pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1822,6 +1997,7 @@ export type JurnalCreateWithoutPenyusutanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1844,6 +2020,7 @@ export type JurnalUncheckedCreateWithoutPenyusutanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1882,6 +2059,7 @@ export type JurnalUpdateWithoutPenyusutanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -1904,6 +2082,7 @@ export type JurnalUncheckedUpdateWithoutPenyusutanAsetInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -1926,6 +2105,7 @@ export type JurnalCreateWithoutPenyesuaianPersediaanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -1948,6 +2128,7 @@ export type JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -1986,6 +2167,7 @@ export type JurnalUpdateWithoutPenyesuaianPersediaanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -2008,6 +2190,7 @@ export type JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput = {
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -2030,6 +2213,7 @@ export type JurnalCreateWithoutTutupBukuInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -2052,6 +2236,7 @@ export type JurnalUncheckedCreateWithoutTutupBukuInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -2090,6 +2275,7 @@ export type JurnalUpdateWithoutTutupBukuInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -2112,6 +2298,7 @@ export type JurnalUncheckedUpdateWithoutTutupBukuInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -2134,6 +2321,7 @@ export type JurnalCreateWithoutPphFinalInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
@@ -2156,6 +2344,7 @@ export type JurnalUncheckedCreateWithoutPphFinalInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
   tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
@@ -2194,6 +2383,7 @@ export type JurnalUpdateWithoutPphFinalInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
@@ -2216,6 +2406,7 @@ export type JurnalUncheckedUpdateWithoutPphFinalInput = {
   penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
   tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
   fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
@@ -2279,6 +2470,7 @@ export type JurnalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   uangMukaPelanggan?: boolean | Prisma.Jurnal$uangMukaPelangganArgs<ExtArgs>
   tutupBuku?: boolean | Prisma.Jurnal$tutupBukuArgs<ExtArgs>
   pphFinal?: boolean | Prisma.Jurnal$pphFinalArgs<ExtArgs>
+  pelepasanAset?: boolean | Prisma.Jurnal$pelepasanAsetArgs<ExtArgs>
   returPenjualan?: boolean | Prisma.Jurnal$returPenjualanArgs<ExtArgs>
   fakturPembelian?: boolean | Prisma.Jurnal$fakturPembelianArgs<ExtArgs>
   pembayaranPembelian?: boolean | Prisma.Jurnal$pembayaranPembelianArgs<ExtArgs>
@@ -2323,6 +2515,7 @@ export type JurnalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   uangMukaPelanggan?: boolean | Prisma.Jurnal$uangMukaPelangganArgs<ExtArgs>
   tutupBuku?: boolean | Prisma.Jurnal$tutupBukuArgs<ExtArgs>
   pphFinal?: boolean | Prisma.Jurnal$pphFinalArgs<ExtArgs>
+  pelepasanAset?: boolean | Prisma.Jurnal$pelepasanAsetArgs<ExtArgs>
   returPenjualan?: boolean | Prisma.Jurnal$returPenjualanArgs<ExtArgs>
   fakturPembelian?: boolean | Prisma.Jurnal$fakturPembelianArgs<ExtArgs>
   pembayaranPembelian?: boolean | Prisma.Jurnal$pembayaranPembelianArgs<ExtArgs>
@@ -2346,6 +2539,7 @@ export type $JurnalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     uangMukaPelanggan: Prisma.$UangMukaPelangganPayload<ExtArgs> | null
     tutupBuku: Prisma.$TutupBukuPayload<ExtArgs> | null
     pphFinal: Prisma.$PphFinalBulananPayload<ExtArgs> | null
+    pelepasanAset: Prisma.$PelepasanAsetPayload<ExtArgs> | null
     returPenjualan: Prisma.$ReturPenjualanPayload<ExtArgs> | null
     fakturPembelian: Prisma.$FakturPembelianPayload<ExtArgs> | null
     pembayaranPembelian: Prisma.$PembayaranPembelianPayload<ExtArgs> | null
@@ -2762,6 +2956,7 @@ export interface Prisma__JurnalClient<T, Null = never, ExtArgs extends runtime.T
   uangMukaPelanggan<T extends Prisma.Jurnal$uangMukaPelangganArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$uangMukaPelangganArgs<ExtArgs>>): Prisma.Prisma__UangMukaPelangganClient<runtime.Types.Result.GetResult<Prisma.$UangMukaPelangganPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   tutupBuku<T extends Prisma.Jurnal$tutupBukuArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$tutupBukuArgs<ExtArgs>>): Prisma.Prisma__TutupBukuClient<runtime.Types.Result.GetResult<Prisma.$TutupBukuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pphFinal<T extends Prisma.Jurnal$pphFinalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$pphFinalArgs<ExtArgs>>): Prisma.Prisma__PphFinalBulananClient<runtime.Types.Result.GetResult<Prisma.$PphFinalBulananPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  pelepasanAset<T extends Prisma.Jurnal$pelepasanAsetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$pelepasanAsetArgs<ExtArgs>>): Prisma.Prisma__PelepasanAsetClient<runtime.Types.Result.GetResult<Prisma.$PelepasanAsetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   returPenjualan<T extends Prisma.Jurnal$returPenjualanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$returPenjualanArgs<ExtArgs>>): Prisma.Prisma__ReturPenjualanClient<runtime.Types.Result.GetResult<Prisma.$ReturPenjualanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   fakturPembelian<T extends Prisma.Jurnal$fakturPembelianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$fakturPembelianArgs<ExtArgs>>): Prisma.Prisma__FakturPembelianClient<runtime.Types.Result.GetResult<Prisma.$FakturPembelianPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pembayaranPembelian<T extends Prisma.Jurnal$pembayaranPembelianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$pembayaranPembelianArgs<ExtArgs>>): Prisma.Prisma__PembayaranPembelianClient<runtime.Types.Result.GetResult<Prisma.$PembayaranPembelianPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -3409,6 +3604,25 @@ export type Jurnal$pphFinalArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.PphFinalBulananInclude<ExtArgs> | null
   where?: Prisma.PphFinalBulananWhereInput
+}
+
+/**
+ * Jurnal.pelepasanAset
+ */
+export type Jurnal$pelepasanAsetArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PelepasanAset
+   */
+  select?: Prisma.PelepasanAsetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PelepasanAset
+   */
+  omit?: Prisma.PelepasanAsetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PelepasanAsetInclude<ExtArgs> | null
+  where?: Prisma.PelepasanAsetWhereInput
 }
 
 /**

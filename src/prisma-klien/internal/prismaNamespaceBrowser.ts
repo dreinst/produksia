@@ -89,6 +89,7 @@ export const ModelName = {
   Jurnal: 'Jurnal',
   BarisJurnal: 'BarisJurnal',
   AsetTetap: 'AsetTetap',
+  PelepasanAset: 'PelepasanAset',
   PenyusutanAset: 'PenyusutanAset',
   PindahBarang: 'PindahBarang',
   BarisPindahBarang: 'BarisPindahBarang',
@@ -622,6 +623,25 @@ export const AsetTetapScalarFieldEnum = {
 } as const
 
 export type AsetTetapScalarFieldEnum = (typeof AsetTetapScalarFieldEnum)[keyof typeof AsetTetapScalarFieldEnum]
+
+
+export const PelepasanAsetScalarFieldEnum = {
+  id: 'id',
+  asetId: 'asetId',
+  tanggal: 'tanggal',
+  jenis: 'jenis',
+  hargaJual: 'hargaJual',
+  akunPenerimaanId: 'akunPenerimaanId',
+  akunLabaRugiId: 'akunLabaRugiId',
+  nilaiBuku: 'nilaiBuku',
+  labaRugi: 'labaRugi',
+  keterangan: 'keterangan',
+  jurnalId: 'jurnalId',
+  penggunaNama: 'penggunaNama',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PelepasanAsetScalarFieldEnum = (typeof PelepasanAsetScalarFieldEnum)[keyof typeof PelepasanAsetScalarFieldEnum]
 
 
 export const PenyusutanAsetScalarFieldEnum = {

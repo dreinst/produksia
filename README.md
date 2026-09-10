@@ -4,7 +4,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Penjualan**: Penawaran → Pesanan (+ **Uang Muka**/DP) → Pengiriman → Faktur → Penerimaan → Retur
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, **Laba Rugi**, **Neraca**, **Arus Kas** (metode langsung), **Tutup Buku tahunan** (jurnal penutup ke Laba Ditahan + kunci tahun), Kas Masuk/Keluar
-- **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
+- **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal, **Pelepasan aset** (dijual/dihapusbukukan dengan laba-rugi vs nilai buku)
 - **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna, **hak akses per dokumen** (lihat/buat/hapus tiap jenis dokumen per peran, diatur Superadmin/Pemilik di Pengaturan → Hak Akses)
 - **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
@@ -89,7 +89,7 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 17 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 18 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -132,7 +132,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`
 - `src/lib/pengaturanPerusahaan.ts` (PKP, tarif PPN, termin, akun pajak), halaman `pengaturan/perusahaan`
 - `src/lib/aksi/hapusDokumen.ts` (hapus dokumen dengan pembalikan efek), `pengaturan/log-aktivitas` (jejak audit)
-- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,lupa-kata-sandi,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
+- `skrip/uji-{sinkron,uang-muka,pindah-barang,tutup-buku,pph-final,hak-akses,lupa-kata-sandi,pelepasan-aset,hapus,laporan,pajak,persediaan,bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
@@ -149,7 +149,7 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 ## Keputusan & batasan yang perlu diketahui
 
 - **Jurnal otomatis** untuk Faktur/Penerimaan/Pembayaran/Retur via `src/lib/akuntansi.ts` memakai pemetaan akun (Piutang, Persediaan, HPP, Pendapatan, Utang). Aturan: Faktur Penjualan → Dr Piutang/Cr Pendapatan + Dr HPP/Cr Persediaan; Penerimaan → Dr Kas-Bank/Cr Piutang; Retur Penjualan → kebalikannya; Faktur Pembelian → Dr Persediaan/Cr Utang; Pembayaran → Dr Utang/Cr Kas-Bank; Retur Pembelian → Dr Utang/Cr Persediaan.
-- **Aset Tetap: hanya garis lurus.** Perolehan aset dijurnal (Dr Aset / Cr Kas-Bank atau Hutang) bila akun pembayaran dipilih; belum ada pelepasan aset.
+- **Aset Tetap: hanya garis lurus.** Perolehan aset dijurnal (Dr Aset / Cr Kas-Bank atau Hutang) bila akun pembayaran dipilih. Pelepasan (tombol **Lepas** di daftar aset): Dr Kas/Bank harga jual · Dr Akumulasi Penyusutan · Cr Aset harga perolehan · selisih ke akun laba/rugi pelepasan (bawaan 4-9200); aset yang dilepas tidak ikut penyusutan; pelepasan bisa dibatalkan (Hapus). Belum ada: metode penyusutan lain, penjualan sebagian.
 - **Pajak**: PPN, PPh 23, dan PPh Final UMKM dihitung dari dokumen; PPh badan (tarif umum), ambang omzet UMKM, dan e-Faktur/e-Bupot belum dihitung/terhubung otomatis.
 - **Tutup buku** hanya memindahkan laba ke Laba Ditahan; belum ada jurnal penyesuaian akhir tahun otomatis (akrual, prive ke modal).
 - **Otentikasi buatan sendiri, tanpa pustaka luar**: kata sandi di-hash scrypt (Node `crypto`) + garam per pengguna; sesi disimpan di tabel `Sesi` (cookie hanya token acak, tabel menyimpan SHA-256-nya), umur 30 hari; ganti kata sandi / nonaktifkan akun mencabut semua sesi. Lupa kata sandi ditangani lewat tautan sekali pakai dari Superadmin/Pemilik/Admin (tanpa email). Belum ada: pengiriman tautan via email (butuh SMTP), 2FA, pembatasan percobaan login.

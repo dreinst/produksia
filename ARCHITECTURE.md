@@ -288,6 +288,7 @@ Sebelum baris jurnal ditulis, `pastikanAkunRinci` (`src/lib/baganAkun.ts`) menol
 | Penyesuaian Stok (JU-PS) | Persediaan (selisih × harga satuan; kredit bila turun) | Akun lawan: Modal (saldo awal) / Selisih Persediaan (opname) |
 | Perolehan Aset (JU-AT) | Akun aset tetap | Kas/Bank atau Hutang yang dipilih (opsional) |
 | Penyusutan (JU-PNY) | Beban Penyusutan (per aset) | Akumulasi Penyusutan (per aset) |
+| Pelepasan Aset (JU-LPS) | Kas/Bank (harga jual) · Akumulasi Penyusutan (yang sudah disusutkan) · akun laba/rugi pelepasan bila rugi | Akun aset (harga perolehan) · akun laba/rugi pelepasan bila laba |
 
 Semua posting terjadi **di dalam transaksi yang sama** dengan dokumen sumbernya, keterangan jurnal memuat nomor dokumen, dan `catatJurnal` menolak jurnal tidak seimbang atau ke akun kelompok. Data seed memanggil aksi server yang sama sehingga jurnal contoh identik dengan yang dibuat pengguna. Setiap dokumen menyimpan `jurnalId` jurnal otomatisnya (unik) supaya bisa dibalik saat dokumen dihapus.
 
@@ -405,6 +406,6 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 11. Batas & arah pengembangan
 
-Belum ada: halaman *edit* dokumen transaksi (pola sekarang: hapus lalu buat ulang), hak akses per gudang/pelanggan (sekarang per dokumen & peran), pengiriman tautan atur ulang lewat email (butuh SMTP; alur tautan sekali pakai sudah ada) & pembatasan percobaan masuk, PPh badan tarif umum & ekspor CSV/e-Faktur/e-Bupot (ringkasan SPT, PPN, PPh 23, PPh Final sudah), Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus, pelepasan aset. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
+Belum ada: halaman *edit* dokumen transaksi (pola sekarang: hapus lalu buat ulang), hak akses per gudang/pelanggan (sekarang per dokumen & peran), pengiriman tautan atur ulang lewat email (butuh SMTP; alur tautan sekali pakai sudah ada) & pembatasan percobaan masuk, PPh badan tarif umum & ekspor CSV/e-Faktur/e-Bupot (ringkasan SPT, PPN, PPh 23, PPh Final sudah), Proyek sebagai dimensi transaksi, e-Faktur (butuh integrasi DJP), metode penyusutan selain garis lurus. Daftar lengkap & prioritasnya: `AUDIT.md` bagian **[OPEN]**.
 
 Cara menambah modul baru mengikuti pola yang sudah ada: model + migrasi → aksi (`xxx` + `xxxFormulir`) yang diawali `wajibHakAksi` lalu validasi & `$transaction` → aturan posting di `akuntansi.ts` bila menyentuh uang → halaman daftar (`wajibHak`, `bacaParamDaftar`, `KontrolDaftar`) + halaman buat dengan `FormulirAksi` → tambahkan hak baru di `hakAkses.ts` bila perlu dan tautan (dengan `hak`) di `BilahSamping.tsx` → suite regresi.

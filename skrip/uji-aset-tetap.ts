@@ -102,6 +102,8 @@ async function main() {
   const cleanupJournalIds = (
     await db.jurnal.findMany({ where: { tanggal: { gte: mulaiUji } }, select: { id: true } })
   ).map((j) => j.id);
+  // penyusutan periode uji juga mengenai aset lain (seed) — buang catatannya agar akumulasi aset seed tetap = buku besar
+  await db.penyusutanAset.deleteMany({ where: { jurnalId: { in: cleanupJournalIds } } });
   await db.barisJurnal.deleteMany({ where: { jurnalId: { in: cleanupJournalIds } } });
   await db.jurnal.deleteMany({ where: { id: { in: cleanupJournalIds } } });
   await db.akun.deleteMany({ where: { id: { in: [assetAcc.id, expenseAcc.id, accumAcc.id] } } });

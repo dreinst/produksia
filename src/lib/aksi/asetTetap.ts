@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { D, uang, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
+import { D, uang, bacaUang, jumlahkan, format, type Desimal } from "@/lib/uang";
 import { catatJurnalPerolehanAset } from "@/lib/akuntansi";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 
@@ -133,4 +133,68 @@ export async function buatAsetTetapFormulir(_sebelumnya: StatusFormulir, dataFor
 }
 export async function jalankanPenyusutanBulananFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => jalankanPenyusutanBulanan(dataFormulir));
+}
+
+// ---------- Pelepasan aset (dijual / dihapusbukukan) ----------
+
+/**
+ * Mengeluarkan aset dari pembukuan: Dr Kas/Bank (harga jual) · Dr Akumulasi Penyusutan (yang sudah disusutkan)
+ * · Dr/Cr akun laba-rugi pelepasan (selisih harga jual vs nilai buku) · Cr akun Aset (harga perolehan).
+ * Status aset menjadi DIJUAL/DIHAPUS sehingga tidak ikut penyusutan berikutnya.
+ */
+export async function lepasAset(dataFormulir: FormData) {
+  const pengguna = await wajibHakAksi("pelepasan-aset.buat");
+  const asetId = String(dataFormulir.get("asetId") ?? "");
+  const jenis = String(dataFormulir.get("jenis") ?? "DIJUAL");
+  const tanggalTeks = String(dataFormulir.get("tanggal") ?? "");
+  const akunPenerimaanId = String(dataFormulir.get("akunPenerimaanId") ?? "") || null;
+  const akunLabaRugiId = String(dataFormulir.get("akunLabaRugiId") ?? "");
+  const keterangan = String(dataFormulir.get("keterangan") ?? "").trim() || null;
+  if (!asetId) throw new Error("Aset wajib dipilih");
+  if (jenis !== "DIJUAL" && jenis !== "DIHAPUS") throw new Error("Jenis pelepasan harus DIJUAL atau DIHAPUS");
+  if (!akunLabaRugiId) throw new Error("Akun laba/rugi pelepasan wajib dipilih");
+  const hargaJual = jenis === "DIJUAL" ? bacaUang(dataFormulir.get("hargaJual"), "Harga jual", { allowZero: true }) : D(0);
+  if (jenis === "DIJUAL" && hargaJual.gt(0) && !akunPenerimaanId) throw new Error("Akun Kas/Bank penerima hasil penjualan wajib dipilih");
+  const tanggal = tanggalTeks ? new Date(`${tanggalTeks}T12:00:00`) : new Date();
+  if (Number.isNaN(tanggal.getTime())) throw new Error("Tanggal pelepasan tidak valid");
+  if (tanggal > new Date()) throw new Error("Tanggal pelepasan tidak boleh di masa depan");
+  await pastikanAkunRinci(db, [akunLabaRugiId, ...(akunPenerimaanId ? [akunPenerimaanId] : [])]);
+
+  await db.$transaction(async (tx) => {
+    const aset = await tx.asetTetap.findUniqueOrThrow({ where: { id: asetId }, include: { penyusutan: true, pelepasan: true } });
+    if (aset.status !== "AKTIF" || aset.pelepasan) throw new Error(`${aset.kode} sudah dilepas (${aset.status})`);
+    if (tanggal < aset.tanggalPerolehan) throw new Error("Tanggal pelepasan tidak boleh sebelum tanggal perolehan");
+    await pastikanTahunTerbuka(tx, tanggal);
+    const akumulasi = jumlahkan(aset.penyusutan.map((p) => p.jumlah));
+    const nilaiBuku = D(aset.hargaPerolehan).minus(akumulasi);
+    const labaRugi = hargaJual.minus(nilaiBuku);
+    const zero = D(0);
+    const baris = [
+      ...(hargaJual.gt(0) && akunPenerimaanId ? [{ akunId: akunPenerimaanId, debit: hargaJual, kredit: zero, keterangan: `Hasil penjualan ${aset.kode}` }] : []),
+      ...(akumulasi.gt(0) ? [{ akunId: aset.akunAkumulasiPenyusutanId, debit: akumulasi, kredit: zero, keterangan: `Akumulasi penyusutan ${aset.kode} dikeluarkan` }] : []),
+      ...(labaRugi.lt(0) ? [{ akunId: akunLabaRugiId, debit: labaRugi.neg(), kredit: zero, keterangan: `Rugi pelepasan ${aset.kode}` }] : []),
+      { akunId: aset.akunAsetId, debit: zero, kredit: D(aset.hargaPerolehan), keterangan: `Pelepasan ${aset.kode} ${aset.nama}` },
+      ...(labaRugi.gt(0) ? [{ akunId: akunLabaRugiId, debit: zero, kredit: labaRugi, keterangan: `Laba pelepasan ${aset.kode}` }] : []),
+    ];
+    await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
+    const nomor = await nomorDokumenBerikutnya(tx.jurnal, "JU-LPS");
+    const jurnal = await tx.jurnal.create({
+      data: { nomor, tanggal, keterangan: `${jenis === "DIJUAL" ? "Penjualan" : "Penghapusbukuan"} aset ${aset.kode} ${aset.nama} (nilai buku ${format(nilaiBuku)}, ${labaRugi.gte(0) ? "laba" : "rugi"} ${format(labaRugi.abs())})`, sumber: "ASET_TETAP", baris: { create: baris } },
+    });
+    await tx.pelepasanAset.create({
+      data: { asetId, tanggal, jenis, hargaJual, akunPenerimaanId: hargaJual.gt(0) ? akunPenerimaanId : null, akunLabaRugiId, nilaiBuku, labaRugi, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama },
+    });
+    await tx.asetTetap.update({ where: { id: asetId }, data: { status: jenis } });
+    await tx.logAktivitas.create({
+      data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "LEPAS", jenis: "Pelepasan Aset", nomor: jurnal.nomor, keterangan: `${aset.kode} ${jenis === "DIJUAL" ? `dijual ${format(hargaJual)}` : "dihapusbukukan"}; nilai buku ${format(nilaiBuku)}, ${labaRugi.gte(0) ? "laba" : "rugi"} ${format(labaRugi.abs())}` },
+    });
+  });
+
+  revalidatePath("/aset-tetap");
+  revalidatePath("/buku-besar/jurnal");
+  redirect("/aset-tetap");
+}
+
+export async function lepasAsetFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => lepasAset(dataFormulir));
 }

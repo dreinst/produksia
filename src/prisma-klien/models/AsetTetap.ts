@@ -294,6 +294,7 @@ export type AsetTetapWhereInput = {
   akunPembayaran?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   jurnalPerolehan?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   penyusutan?: Prisma.PenyusutanAsetListRelationFilter
+  pelepasan?: Prisma.XOR<Prisma.PelepasanAsetNullableScalarRelationFilter, Prisma.PelepasanAsetWhereInput> | null
 }
 
 export type AsetTetapOrderByWithRelationInput = {
@@ -316,6 +317,7 @@ export type AsetTetapOrderByWithRelationInput = {
   akunPembayaran?: Prisma.AkunOrderByWithRelationInput
   jurnalPerolehan?: Prisma.JurnalOrderByWithRelationInput
   penyusutan?: Prisma.PenyusutanAsetOrderByRelationAggregateInput
+  pelepasan?: Prisma.PelepasanAsetOrderByWithRelationInput
 }
 
 export type AsetTetapWhereUniqueInput = Prisma.AtLeast<{
@@ -341,6 +343,7 @@ export type AsetTetapWhereUniqueInput = Prisma.AtLeast<{
   akunPembayaran?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   jurnalPerolehan?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   penyusutan?: Prisma.PenyusutanAsetListRelationFilter
+  pelepasan?: Prisma.XOR<Prisma.PelepasanAsetNullableScalarRelationFilter, Prisma.PelepasanAsetWhereInput> | null
 }, "id" | "kode" | "jurnalPerolehanId">
 
 export type AsetTetapOrderByWithAggregationInput = {
@@ -398,6 +401,7 @@ export type AsetTetapCreateInput = {
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
   jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
   penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateInput = {
@@ -415,6 +419,7 @@ export type AsetTetapUncheckedCreateInput = {
   akunPembayaranId?: string | null
   jurnalPerolehanId?: string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUpdateInput = {
@@ -432,6 +437,7 @@ export type AsetTetapUpdateInput = {
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
   jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
   penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateInput = {
@@ -449,6 +455,7 @@ export type AsetTetapUncheckedUpdateInput = {
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapCreateManyInput = {
@@ -786,6 +793,20 @@ export type EnumStatusAsetFieldUpdateOperationsInput = {
   set?: $Enums.StatusAset
 }
 
+export type AsetTetapCreateNestedOneWithoutPelepasanInput = {
+  create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPelepasanInput, Prisma.AsetTetapUncheckedCreateWithoutPelepasanInput>
+  connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPelepasanInput
+  connect?: Prisma.AsetTetapWhereUniqueInput
+}
+
+export type AsetTetapUpdateOneRequiredWithoutPelepasanNestedInput = {
+  create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPelepasanInput, Prisma.AsetTetapUncheckedCreateWithoutPelepasanInput>
+  connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPelepasanInput
+  upsert?: Prisma.AsetTetapUpsertWithoutPelepasanInput
+  connect?: Prisma.AsetTetapWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AsetTetapUpdateToOneWithWhereWithoutPelepasanInput, Prisma.AsetTetapUpdateWithoutPelepasanInput>, Prisma.AsetTetapUncheckedUpdateWithoutPelepasanInput>
+}
+
 export type AsetTetapCreateNestedOneWithoutPenyusutanInput = {
   create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPenyusutanInput, Prisma.AsetTetapUncheckedCreateWithoutPenyusutanInput>
   connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPenyusutanInput
@@ -814,6 +835,7 @@ export type AsetTetapCreateWithoutAkunAsetInput = {
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
   jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
   penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateWithoutAkunAsetInput = {
@@ -830,6 +852,7 @@ export type AsetTetapUncheckedCreateWithoutAkunAsetInput = {
   akunPembayaranId?: string | null
   jurnalPerolehanId?: string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapCreateOrConnectWithoutAkunAsetInput = {
@@ -856,6 +879,7 @@ export type AsetTetapCreateWithoutAkunBebanPenyusutanInput = {
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
   jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
   penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateWithoutAkunBebanPenyusutanInput = {
@@ -872,6 +896,7 @@ export type AsetTetapUncheckedCreateWithoutAkunBebanPenyusutanInput = {
   akunPembayaranId?: string | null
   jurnalPerolehanId?: string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapCreateOrConnectWithoutAkunBebanPenyusutanInput = {
@@ -898,6 +923,7 @@ export type AsetTetapCreateWithoutAkunAkumulasiPenyusutanInput = {
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
   jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
   penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateWithoutAkunAkumulasiPenyusutanInput = {
@@ -914,6 +940,7 @@ export type AsetTetapUncheckedCreateWithoutAkunAkumulasiPenyusutanInput = {
   akunPembayaranId?: string | null
   jurnalPerolehanId?: string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapCreateOrConnectWithoutAkunAkumulasiPenyusutanInput = {
@@ -940,6 +967,7 @@ export type AsetTetapCreateWithoutAkunPembayaranInput = {
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
   jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
   penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateWithoutAkunPembayaranInput = {
@@ -956,6 +984,7 @@ export type AsetTetapUncheckedCreateWithoutAkunPembayaranInput = {
   akunAkumulasiPenyusutanId: string
   jurnalPerolehanId?: string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapCreateOrConnectWithoutAkunPembayaranInput = {
@@ -1065,6 +1094,7 @@ export type AsetTetapCreateWithoutJurnalPerolehanInput = {
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
   penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateWithoutJurnalPerolehanInput = {
@@ -1081,6 +1111,7 @@ export type AsetTetapUncheckedCreateWithoutJurnalPerolehanInput = {
   akunAkumulasiPenyusutanId: string
   akunPembayaranId?: string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapCreateOrConnectWithoutJurnalPerolehanInput = {
@@ -1113,6 +1144,7 @@ export type AsetTetapUpdateWithoutJurnalPerolehanInput = {
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
   penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateWithoutJurnalPerolehanInput = {
@@ -1128,6 +1160,91 @@ export type AsetTetapUncheckedUpdateWithoutJurnalPerolehanInput = {
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
+}
+
+export type AsetTetapCreateWithoutPelepasanInput = {
+  id?: string
+  kode: string
+  nama: string
+  tanggalPerolehan?: Date | string
+  hargaPerolehan: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan: number
+  status?: $Enums.StatusAset
+  akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
+  akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
+  akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
+  akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
+  jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
+  penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+}
+
+export type AsetTetapUncheckedCreateWithoutPelepasanInput = {
+  id?: string
+  kode: string
+  nama: string
+  tanggalPerolehan?: Date | string
+  hargaPerolehan: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan: number
+  status?: $Enums.StatusAset
+  akunAsetId: string
+  akunBebanPenyusutanId: string
+  akunAkumulasiPenyusutanId: string
+  akunPembayaranId?: string | null
+  jurnalPerolehanId?: string | null
+  penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+}
+
+export type AsetTetapCreateOrConnectWithoutPelepasanInput = {
+  where: Prisma.AsetTetapWhereUniqueInput
+  create: Prisma.XOR<Prisma.AsetTetapCreateWithoutPelepasanInput, Prisma.AsetTetapUncheckedCreateWithoutPelepasanInput>
+}
+
+export type AsetTetapUpsertWithoutPelepasanInput = {
+  update: Prisma.XOR<Prisma.AsetTetapUpdateWithoutPelepasanInput, Prisma.AsetTetapUncheckedUpdateWithoutPelepasanInput>
+  create: Prisma.XOR<Prisma.AsetTetapCreateWithoutPelepasanInput, Prisma.AsetTetapUncheckedCreateWithoutPelepasanInput>
+  where?: Prisma.AsetTetapWhereInput
+}
+
+export type AsetTetapUpdateToOneWithWhereWithoutPelepasanInput = {
+  where?: Prisma.AsetTetapWhereInput
+  data: Prisma.XOR<Prisma.AsetTetapUpdateWithoutPelepasanInput, Prisma.AsetTetapUncheckedUpdateWithoutPelepasanInput>
+}
+
+export type AsetTetapUpdateWithoutPelepasanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalPerolehan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hargaPerolehan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
+  akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
+  akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
+  akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
+  jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
+  penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+}
+
+export type AsetTetapUncheckedUpdateWithoutPelepasanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalPerolehan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hargaPerolehan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
 }
 
@@ -1145,6 +1262,7 @@ export type AsetTetapCreateWithoutPenyusutanInput = {
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
   jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapUncheckedCreateWithoutPenyusutanInput = {
@@ -1161,6 +1279,7 @@ export type AsetTetapUncheckedCreateWithoutPenyusutanInput = {
   akunAkumulasiPenyusutanId: string
   akunPembayaranId?: string | null
   jurnalPerolehanId?: string | null
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
 }
 
 export type AsetTetapCreateOrConnectWithoutPenyusutanInput = {
@@ -1193,6 +1312,7 @@ export type AsetTetapUpdateWithoutPenyusutanInput = {
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
   jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateWithoutPenyusutanInput = {
@@ -1209,6 +1329,7 @@ export type AsetTetapUncheckedUpdateWithoutPenyusutanInput = {
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapCreateManyAkunAsetInput = {
@@ -1285,6 +1406,7 @@ export type AsetTetapUpdateWithoutAkunAsetInput = {
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
   jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
   penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateWithoutAkunAsetInput = {
@@ -1301,6 +1423,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunAsetInput = {
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateManyWithoutAkunAsetInput = {
@@ -1332,6 +1455,7 @@ export type AsetTetapUpdateWithoutAkunBebanPenyusutanInput = {
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
   jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
   penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateWithoutAkunBebanPenyusutanInput = {
@@ -1348,6 +1472,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunBebanPenyusutanInput = {
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateManyWithoutAkunBebanPenyusutanInput = {
@@ -1379,6 +1504,7 @@ export type AsetTetapUpdateWithoutAkunAkumulasiPenyusutanInput = {
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
   jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
   penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateWithoutAkunAkumulasiPenyusutanInput = {
@@ -1395,6 +1521,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunAkumulasiPenyusutanInput = {
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateManyWithoutAkunAkumulasiPenyusutanInput = {
@@ -1426,6 +1553,7 @@ export type AsetTetapUpdateWithoutAkunPembayaranInput = {
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
   jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
   penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateWithoutAkunPembayaranInput = {
@@ -1442,6 +1570,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunPembayaranInput = {
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
 }
 
 export type AsetTetapUncheckedUpdateManyWithoutAkunPembayaranInput = {
@@ -1510,6 +1639,7 @@ export type AsetTetapSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   akunPembayaran?: boolean | Prisma.AsetTetap$akunPembayaranArgs<ExtArgs>
   jurnalPerolehan?: boolean | Prisma.AsetTetap$jurnalPerolehanArgs<ExtArgs>
   penyusutan?: boolean | Prisma.AsetTetap$penyusutanArgs<ExtArgs>
+  pelepasan?: boolean | Prisma.AsetTetap$pelepasanArgs<ExtArgs>
   _count?: boolean | Prisma.AsetTetapCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["asetTetap"]>
 
@@ -1579,6 +1709,7 @@ export type AsetTetapInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   akunPembayaran?: boolean | Prisma.AsetTetap$akunPembayaranArgs<ExtArgs>
   jurnalPerolehan?: boolean | Prisma.AsetTetap$jurnalPerolehanArgs<ExtArgs>
   penyusutan?: boolean | Prisma.AsetTetap$penyusutanArgs<ExtArgs>
+  pelepasan?: boolean | Prisma.AsetTetap$pelepasanArgs<ExtArgs>
   _count?: boolean | Prisma.AsetTetapCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AsetTetapIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1605,6 +1736,7 @@ export type $AsetTetapPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     akunPembayaran: Prisma.$AkunPayload<ExtArgs> | null
     jurnalPerolehan: Prisma.$JurnalPayload<ExtArgs> | null
     penyusutan: Prisma.$PenyusutanAsetPayload<ExtArgs>[]
+    pelepasan: Prisma.$PelepasanAsetPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2023,6 +2155,7 @@ export interface Prisma__AsetTetapClient<T, Null = never, ExtArgs extends runtim
   akunPembayaran<T extends Prisma.AsetTetap$akunPembayaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AsetTetap$akunPembayaranArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   jurnalPerolehan<T extends Prisma.AsetTetap$jurnalPerolehanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AsetTetap$jurnalPerolehanArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   penyusutan<T extends Prisma.AsetTetap$penyusutanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AsetTetap$penyusutanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenyusutanAsetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pelepasan<T extends Prisma.AsetTetap$pelepasanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AsetTetap$pelepasanArgs<ExtArgs>>): Prisma.Prisma__PelepasanAsetClient<runtime.Types.Result.GetResult<Prisma.$PelepasanAsetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2525,6 +2658,25 @@ export type AsetTetap$penyusutanArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.PenyusutanAsetScalarFieldEnum | Prisma.PenyusutanAsetScalarFieldEnum[]
+}
+
+/**
+ * AsetTetap.pelepasan
+ */
+export type AsetTetap$pelepasanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PelepasanAset
+   */
+  select?: Prisma.PelepasanAsetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PelepasanAset
+   */
+  omit?: Prisma.PelepasanAsetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PelepasanAsetInclude<ExtArgs> | null
+  where?: Prisma.PelepasanAsetWhereInput
 }
 
 /**
