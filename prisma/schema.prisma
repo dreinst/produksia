@@ -474,6 +474,11 @@ model Akun {
   kode    String    @unique
   nama    String
   jenis   JenisAkun
+  /// Akun kelompok/induk: hanya wadah untuk anak-anaknya, tidak boleh menerima jurnal
+  kelompok   Boolean @default(false)
+  /// Tampil sebagai pilihan akun Kas/Bank (penerimaan, pembayaran, kas masuk/keluar)
+  kasBank    Boolean @default(false)
+  keterangan String?
   indukId String?
   induk   Akun?     @relation("PohonAkun", fields: [indukId], references: [id])
   anak    Akun[]    @relation("PohonAkun")

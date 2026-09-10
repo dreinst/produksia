@@ -1,5 +1,6 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { daftarAkunKasBank } from "@/lib/baganAkun";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatPembayaranPembelianFormulir } from "@/lib/aksi/pembelian";
 
@@ -18,7 +19,7 @@ export default async function HalamanPembayaranPembelianBaru({
           include: { pemasok: true, pembayaran: true },
         })
       : null,
-    db.akun.findMany({ where: { jenis: "ASET" }, orderBy: { kode: "asc" } }),
+    daftarAkunKasBank(),
   ]);
 
   if (!fakturId || !faktur) {

@@ -12,7 +12,7 @@ export default async function HalamanBukuBesarMutasi({
   await wajibHak("buku-besar.lihat");
   const { akunId } = await searchParams;
 
-  const daftarAkun = await db.akun.findMany({ orderBy: { kode: "asc" } });
+  const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
   const akun = akunId ? daftarAkun.find((a) => a.id === akunId) : daftarAkun[0];
 
   const daftarBaris = akun

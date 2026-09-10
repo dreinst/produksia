@@ -6,6 +6,7 @@ Aplikasi internal penjualan, pembelian, persediaan & akuntansi untuk tim kecil, 
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), Neraca Saldo, Kas Masuk/Keluar
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal
 - **Pengguna & hak akses**: login email + kata sandi, empat peran (Pemilik, Admin, Kasir, Gudang), kelola pengguna
+- **Bagan akun standar EO/WO**: 108 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 
 Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (lihat `ARCHITECTURE.md`).
 
@@ -32,23 +33,28 @@ Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak a
 
 Matriks lengkapnya ada di `src/lib/hakAkses.ts`. Pengguna baru ditambah lewat **Pengguna** di sidebar (Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**.
 
+## Bagan akun (Event/Wedding Organizer)
+
+Bagan akun standar 108 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
+
 ## Data contoh
 
 - `npx tsx prisma/reset.ts` — hapus semua data (transaksi, data induk, pengguna & sesi)
-- `npx tsx prisma/seed.ts` — 4 pengguna + satu alur cerita 20 tahap yang melewati SEMUA modul (Penawaran draft → dikonversi → Pesanan → 2× Pengiriman parsial → Faktur → 2× Penerimaan cicilan → Retur; restock: Pesanan Pembelian → 2× Penerimaan Barang → Faktur → 2× Pembayaran → Retur; modal awal, setor bank, bayar sewa; aset + satu penyusutan), supaya tiap halaman langsung punya contoh data yang saling terhubung.
+- `npx tsx prisma/seed.ts` — 4 pengguna + bagan akun standar EO/WO + satu alur cerita 20 tahap berlatar usaha event (klien PT Cahaya Nusantara, vendor CV Sinar Dekorasi, merchandise lanyard/stiker/goodie bag, aset sound system) yang melewati SEMUA modul (Penawaran draft → dikonversi → Pesanan → 2× Pengiriman parsial → Faktur → 2× Penerimaan cicilan → Retur; restock: Pesanan Pembelian → 2× Penerimaan Barang → Faktur → 2× Pembayaran → Retur; modal awal, setor bank, bayar sewa; aset + satu penyusutan), supaya tiap halaman langsung punya contoh data yang saling terhubung.
 
 **Penting:** setiap kali `prisma/schema.prisma` berubah dan kamu migrate, **restart dev server** (`npm run dev`) — Turbopack tidak otomatis memuat ulang Prisma Client yang di-generate ulang; gejalanya "Cannot read properties of undefined (reading 'findMany')".
 
 ## Pola yang wajib diikuti saat menambah fitur
 
 - **Hak akses di dua tempat.** Halaman memanggil `await wajibHak("modul.lihat")` (mengalihkan ke `/masuk` atau `/tanpa-akses`); aksi server memanggil `await wajibHakAksi("modul.tulis")` sebagai pernyataan pertama (melempar galat yang tampil di formulir). Sidebar/menu hanya *menyembunyikan* tautan lewat `punyaHak` — bukan pengaman. Semua di `src/lib/otentikasi.ts` & `src/lib/hakAkses.ts`.
+- **Akun kelompok tidak boleh dijurnal.** Setiap pembuatan jurnal memanggil `pastikanAkunRinci` (`src/lib/baganAkun.ts`); pilihan akun di formulir memakai `where: { kelompok: false }` dan pilihan kas/bank memakai `daftarAkunKasBank()`.
 - **Form → `<FormulirAksi aksi={xxxFormulir}>`**, bukan `<form action={xxx}>`. Setiap aksi server punya dua versi: `xxx(dataFormulir)` (melempar galat, dipakai skrip regresi) dan `xxxFormulir(sebelumnya, dataFormulir)` (membungkus dengan `jalankanFormulir`, mengembalikan `{ galat }`). Alasannya: di produksi Next.js menyamarkan galat yang di-throw dari aksi server, jadi pesan validasi hanya sampai ke pengguna kalau **dikembalikan** sebagai status. Lihat `src/lib/statusFormulir.ts`, `src/komponen/FormulirAksi.tsx`.
 - **Halaman daftar → `bacaParamDaftar(searchParams)` + `<KontrolDaftar>`** (`src/lib/daftar.ts`, `src/komponen/ui/KontrolDaftar.tsx`): pencarian `?q=` dan paginasi `?hal=` 25 baris, tanpa JavaScript klien. Kueri memakai `count` + `findMany({ where, skip, take })`.
 - **Nomor dokumen → `nomorDokumenBerikutnya(db.model, "PREFIX")`** (`src/lib/penomoran.ts`), jangan `count()+1`.
 - **Uang & kuantitas → `Prisma.Decimal`** lewat `src/lib/uang.ts` (`uang()`, `jumlahkan()`, `kali()`, `bacaUang()`), jangan `Number()` untuk nilai yang disimpan/dibandingkan.
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 5 suite di `skrip/uji-*.ts` — jalankan semua sebelum commit:
+- Skrip regresi: 6 suite di `skrip/uji-*.ts` — jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -86,14 +92,15 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/app/(aplikasi)/pengaturan/pengguna` — kelola akun; `profil` — ganti kata sandi; `tanpa-akses` — halaman 403
 - `src/lib/aksi/*.ts` — logika bisnis per modul (`penjualan`, `pembelian`, `jurnal`, `asetTetap`, `dataInduk`, `pengaturan`, `otentikasi`, `pengguna`)
 - `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
-- `skrip/uji-{penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon
+- `src/lib/baganAkunStandar.ts` (data 108 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
+- `skrip/uji-{bagan-akun,penjualan,pembelian,buku-besar,aset-tetap,pengaman}.ts` — regresi; `skrip/subset-font-ikon.sh` — pangkas font ikon; `skrip/cetak-bagan-akun.ts` — tabel bagan akun untuk BAGAN-AKUN.md
 - `.github/workflows/ci.yml` — CI: tsc, eslint, migrasi + seed di PostgreSQL, 5 suite regresi, `next build`
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
 ## Alur kerja
 
-1. Masuk sebagai Pemilik/Admin, isi **Pengaturan > Pemetaan Akun** (wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat).
+1. Masuk sebagai Pemilik/Admin, terapkan **Pengaturan → Bagan Akun Standar** (sekaligus mengisi Pemetaan Akun; keduanya wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat). Ganti nama rekening bank 1-1210 sesuai kenyataan.
 2. Buat **Pelanggan**, **Barang**, **Gudang** di Data Induk; stok awal lewat pembelian (Pesanan Pembelian → Terima Barang) atau Prisma Studio (`npx prisma studio`) — belum ada halaman "Penyesuaian Persediaan".
 3. Buat **Penawaran Penjualan** (opsional) → konversi jadi **Pesanan Penjualan**, atau langsung buat Pesanan.
 4. Dari daftar Pesanan, **Kirim** untuk membuat Surat Jalan (stok berkurang; bisa parsial), lalu **Fakturkan**.

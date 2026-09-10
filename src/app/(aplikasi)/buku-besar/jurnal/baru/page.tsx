@@ -6,7 +6,7 @@ import EditorBarisJurnal from "@/komponen/buku-besar/EditorBarisJurnal";
 
 export default async function HalamanJurnalBaru() {
   await wajibHak("buku-besar.tulis");
-  const daftarAkun = await db.akun.findMany({ orderBy: { kode: "asc" } });
+  const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
 
   return (
     <div className="space-y-6 max-w-3xl">

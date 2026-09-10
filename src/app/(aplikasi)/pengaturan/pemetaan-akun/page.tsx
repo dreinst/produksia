@@ -14,7 +14,7 @@ const FIELDS = [
 export default async function HalamanPemetaanAkun() {
   await wajibHak("pengaturan.tulis");
   const [daftarAkun, pemetaan] = await Promise.all([
-    db.akun.findMany({ orderBy: { kode: "asc" } }),
+    db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } }),
     db.pemetaanAkun.findUnique({ where: { id: "default" } }),
   ]);
 

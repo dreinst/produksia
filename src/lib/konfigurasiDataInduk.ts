@@ -1,7 +1,7 @@
 export type KonfigurasiBidang = {
   nama: string;
   label: string;
-  jenis: "text" | "number" | "select";
+  jenis: "text" | "number" | "select" | "boolean";
   wajib?: boolean;
   nilaiBawaan?: string;
   opsi?: { model: string; bidangNilai: string; bidangLabel: string };
@@ -200,12 +200,17 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
         jenis: "select",
         opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama" },
       },
+      { nama: "kelompok", label: "Akun kelompok (induk; tidak bisa dijurnal)", jenis: "boolean" },
+      { nama: "kasBank", label: "Akun Kas/Bank", jenis: "boolean" },
+      { nama: "keterangan", label: "Keterangan", jenis: "text" },
     ],
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
       { key: "jenis", label: "Tipe" },
       { key: "induk.nama", label: "Induk" },
+      { key: "kelompok", label: "Kelompok" },
+      { key: "kasBank", label: "Kas/Bank" },
     ],
   },
 ];

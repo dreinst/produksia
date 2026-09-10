@@ -35,6 +35,10 @@ function bacaData(config: KonfigurasiEntitas, dataFormulir: FormData, untukUbah:
   for (const bidang of config.bidang) {
     const mentah = dataFormulir.get(bidang.nama);
     const nilai = typeof mentah === "string" ? mentah.trim() : "";
+    if (bidang.jenis === "boolean") {
+      data[bidang.nama] = mentah === "on";
+      continue;
+    }
 
     if (!nilai) {
       if (bidang.wajib) throw new Error(`${bidang.label} wajib diisi`);

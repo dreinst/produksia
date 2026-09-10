@@ -42,13 +42,13 @@ flowchart LR
 app/
 ├─ prisma/
 │  ├─ schema.prisma            # seluruh model data (§3) + Pengguna/Sesi (§6.4)
-│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna
+│  ├─ migrations/              # awal (semua tabel + CHECK stok), sesi_pengguna, bagan_akun
 │  ├─ seed.ts                  # 4 pengguna + 1 alur cerita 20 tahap yang melewati semua modul
 │  └─ reset.ts                 # kosongkan semua tabel (urutan aman terhadap FK)
 ├─ skrip/
-│  ├─ uji-*.ts                 # 5 suite regresi: penjualan, pembelian, buku-besar, aset-tetap, pengaman
+│  ├─ uji-*.ts                 #  6 suite regresi: bagan-akun, penjualan, pembelian, buku-besar, aset-tetap, pengaman
 │  └─ subset-font-ikon.sh      # pangkas font ikon ke ikon yang dipakai
-├─ .github/workflows/ci.yml    # tsc · eslint · migrasi+seed di PostgreSQL · 5 suite · next build
+├─ .github/workflows/ci.yml    # tsc · eslint · migrasi+seed di PostgreSQL · 6 suite · next build
 ├─ src/
 │  ├─ proxy.ts                 # tepi: tanpa cookie sesi → /masuk (tanpa sentuh DB)
 │  ├─ app/                     # routing (App Router)
@@ -65,7 +65,7 @@ app/
 │  │  │  ├─ kas-bank/…         # masuk, keluar
 │  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo
 │  │  │  ├─ aset-tetap/…       # daftar, baru, penyusutan
-│  │  │  ├─ pengaturan/        # pemetaan-akun, pengguna (+ [id]/)
+│  │  │  ├─ pengaturan/        # pemetaan-akun, bagan-akun (terapkan standar), pengguna (+ [id]/)
 │  │  │  ├─ profil/ · tanpa-akses/ · cari/
 │  │  └─ api/status/           # cek koneksi DB (butuh sesi)
 │  ├─ komponen/
@@ -80,6 +80,8 @@ app/
 │  │  ├─ otentikasi.ts         # sesi (cookie ↔ tabel Sesi), penggunaSaatIni, wajibMasuk/wajibHak/wajibHakAksi
 │  │  ├─ hakAkses.ts           # matriks peran → hak (aman untuk komponen client), label peran
 │  │  ├─ kataSandi.ts          # hash/verifikasi scrypt, aturan kekuatan
+│  │  ├─ baganAkunStandar.ts   # data 108 akun EO/WO + keputusan kurasi (BAGAN-AKUN.md)
+│  │  ├─ baganAkun.ts          # terapkanBaganAkunStandar (idempoten), pastikanAkunRinci, daftarAkunKasBank
 │  │  ├─ daftar.ts             # bacaParamDaftar(?q,?hal) untuk halaman daftar
 │  │  ├─ dataInduk.ts          # pembacaan generik data induk (opsi, include, pencarian)
 │  │  ├─ konfigurasiDataInduk.ts   # definisi entitas data induk (bidang, kolom, bagian)
@@ -109,7 +111,7 @@ app/
 
 ## 3. Model data
 
-Skema dibagi lima kelompok. Semua nilai uang/qty `Decimal(18,2)`; semua id `cuid`; setiap dokumen punya `no` unik (§5).
+Skema dibagi lima kelompok. Semua nilai uang/qty `Decimal(18,2)`; semua id `cuid`; setiap dokumen punya `nomor` unik (§5).
 
 ```mermaid
 erDiagram
@@ -168,7 +170,7 @@ Pola seragam **header + baris**: header punya `no`, `date`, `status`, `total`, r
 Status (`StatusDokumen`): `DRAF` → `SEBAGIAN` → `DIPROSES` untuk pesanan (berdasar qty terkirim/diterima); `DRAF` → `SEBAGIAN` → `LUNAS` untuk faktur (berdasar pembayaran); `DRAF` → `DIKONVERSI` untuk penawaran.
 
 ### 3.4 Buku besar
-`Jurnal` (`no`, `date`, `memo`, `source`: MANUAL/KAS_MASUK/KAS_KELUAR/PENJUALAN/PEMBELIAN/PENYUSUTAN) dan `BarisJurnal` (`akunId`, `debit`, `credit`). Setiap entry **wajib seimbang** — dijaga di aplikasi (§6). `PemetaanAkun` adalah **singleton** (`id = "default"`) yang memetakan 5 peran akun: Piutang Usaha, Persediaan, HPP, Pendapatan Penjualan, Utang Usaha.
+`Akun` (`kode` unik, `nama`, `jenis` ASET/KEWAJIBAN/MODAL/PENDAPATAN/BEBAN, `indukId` pohon, `kelompok` = akun induk yang tidak boleh dijurnal, `kasBank` = tampil di pilihan kas/bank, `keterangan`). `Jurnal` (`nomor`, `tanggal`, `keterangan`, `sumber`: MANUAL/KAS_MASUK/KAS_KELUAR/PENJUALAN/PEMBELIAN/PENYUSUTAN) dan `BarisJurnal` (`akunId`, `debit`, `kredit`). Setiap jurnal **wajib seimbang** dan **hanya ke akun rinci** — dijaga di aplikasi (§6). Bagan akun standar EO/WO (108 akun) ada di `src/lib/baganAkunStandar.ts` dan diterapkan dari `/pengaturan/bagan-akun` (lihat `BAGAN-AKUN.md`). `PemetaanAkun` adalah **singleton** (`id = "default"`) yang memetakan 5 peran akun: Piutang Usaha, Persediaan, HPP, Pendapatan Penjualan, Utang Usaha.
 
 ### 3.5 Aset tetap
 `AsetTetap` (harga perolehan, nilai sisa, umur bulan, 3 akun) dan `PenyusutanAset` (unik per `asetId + period`, terhubung ke jurnalnya).
@@ -264,6 +266,8 @@ flowchart TB
 
 ### 6.2 Posting jurnal otomatis (`src/lib/akuntansi.ts`)
 
+Sebelum baris jurnal ditulis, `pastikanAkunRinci` (`src/lib/baganAkun.ts`) menolak akun bertanda `kelompok` — berlaku untuk jurnal otomatis ini, jurnal umum, kas masuk/keluar, penyusutan, dan pemetaan akun.
+
 | Peristiwa | Debit | Kredit |
 |---|---|---|
 | Faktur Penjualan | Piutang Usaha (total) · HPP (Σ qty×hargaBeli) | Pendapatan Penjualan (total) · Persediaan (HPP) |
@@ -348,7 +352,7 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 9. Data uji & regresi
 
-- `prisma/seed.ts` — **satu alur cerita** 20 tahap yang menyentuh semua halaman: penawaran draft → dikonversi → pesanan → 2 pengiriman → faktur → 2 penerimaan → retur; restock via pembelian penuh; modal awal, setor bank, bayar sewa; aset + satu penyusutan. Angka akhirnya deterministik (mis. stok Tepung 127, Kas 6.500.000) sehingga mudah dicek manual.
+- `prisma/seed.ts` — 4 pengguna, bagan akun standar EO/WO, lalu **satu alur cerita** 20 tahap berlatar usaha event (klien PT Cahaya Nusantara, vendor CV Sinar Dekorasi, merchandise lanyard/stiker/goodie bag, aset sound system) yang menyentuh semua halaman: penawaran draft → dikonversi → pesanan → 2 pengiriman → faktur → 2 penerimaan → retur; restock via pembelian penuh; modal awal, setor bank, bayar sewa; aset + satu penyusutan. Angka akhirnya deterministik (mis. stok Lanyard 127, Kas 6.500.000) sehingga mudah dicek manual.
 - `prisma/reset.ts` — hapus semua tabel dalam urutan aman FK.
 - `skrip/uji-penjualan*.ts` — memanggil action **sungguhan** dengan `FormData`, memverifikasi stok/status/saldo, lalu membersihkan datanya sendiri (jurnal dihapus berdasarkan waktu mulai test, bukan memo). Suite `pengaman` khusus menguji penolakan: stok kurang, qty melebihi pesanan/faktur/retur, bayar berlebih, faktur lunas, presisi desimal (3×0,1 = 0,3), dan constraint DB.
 
