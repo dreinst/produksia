@@ -6,8 +6,8 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import Ikon from "@/komponen/ui/Ikon";
 import AngkaBergerak from "@/komponen/ui/AngkaBergerak";
-import GrafikTren from "@/komponen/ui/GrafikTren";
-import { hitungLabaRugiBulanan } from "@/lib/laporan";
+import { Suspense } from "react";
+import PanelTren, { KerangkaTren } from "@/komponen/beranda/PanelTren";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 
 const rp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
@@ -33,6 +33,7 @@ export default async function Beranda() {
     fakturJualBelumLunas,
     fakturBeliBelumLunas,
     daftarAkun,
+    agregatAkun,
     daftarStok,
     jumlahBarang,
     daftarAset,
@@ -49,7 +50,8 @@ export default async function Beranda() {
   ] = await Promise.all([
     db.fakturPenjualan.findMany({ where: { status: { not: "LUNAS" } }, include: { penerimaan: true, retur: { select: { total: true } } } }),
     db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" } }, include: { pembayaran: true, retur: { select: { total: true } } } }),
-    db.akun.findMany({ include: { barisJurnal: true }, orderBy: { kode: "asc" } }),
+    db.akun.findMany({ orderBy: { kode: "asc" } }),
+    db.barisJurnal.groupBy({ by: ["akunId"], _sum: { debit: true, kredit: true } }),
     db.stokBarang.findMany({ include: { barang: true, gudang: true } }),
     db.barang.count({ where: { jenis: "BARANG" } }),
     db.asetTetap.findMany({ where: { status: "AKTIF" }, include: { penyusutan: true } }),
@@ -70,7 +72,6 @@ export default async function Beranda() {
     ambilPengaturanPerusahaan(db),
     boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
   ]);
-  const tren = boleh("buku-besar.lihat") ? await hitungLabaRugiBulanan(db, pengaturan.tahunBuku) : null;
 
   // ---- KPI 1: Piutang ----
   const barisPiutang = fakturJualBelumLunas.map((i) => ({
@@ -89,9 +90,9 @@ export default async function Beranda() {
   const jumlahUtangLewatTempo = barisUtang.filter((r) => r.overdue).length;
 
   // ---- Saldo per akun & KPI 3: Kas & Bank (akun ASET bernama kas/bank) ----
+  const jumlahPerAkun = new Map(agregatAkun.map((g) => [g.akunId, { debit: Number(g._sum.debit ?? 0), kredit: Number(g._sum.kredit ?? 0) }]));
   const saldoAkun = daftarAkun.map((a) => {
-    const debit = a.barisJurnal.reduce((s, l) => s + Number(l.debit), 0);
-    const kredit = a.barisJurnal.reduce((s, l) => s + Number(l.kredit), 0);
+    const { debit, kredit } = jumlahPerAkun.get(a.id) ?? { debit: 0, kredit: 0 };
     return { ...a, debit, kredit, balance: NORMAL_DEBIT.has(a.jenis) ? debit - kredit : kredit - debit };
   });
   // akun bertanda kas/bank; kalau belum ada yang ditandai, tebak dari nama
@@ -307,21 +308,10 @@ export default async function Beranda() {
         </div>
       </div>
 
-      {tren && (
-        <div className="kartu">
-          <div className="kepala-kartu">
-            <div>
-              <h2 className="judul-kartu">Tren Pendapatan &amp; Beban {pengaturan.tahunBuku}</h2>
-              <p className="kartu-subjudul">Per bulan dari jurnal, tanpa jurnal penutup. Arahkan kursor ke titik untuk angkanya.</p>
-            </div>
-            <div className="flex items-center gap-4 text-xs text-slate-600">
-              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-navy-terang" /> Pendapatan {rp(Number(tren.total.pendapatan))}</span>
-              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-oranye" /> Beban {rp(Number(tren.total.bebanPokok) + Number(tren.total.bebanLain))}</span>
-              <Link href={`/buku-besar/laba-rugi?dari=${pengaturan.tahunBuku}-01-01&sampai=${pengaturan.tahunBuku}-12-31&tampilan=bulanan`} className="tombol tombol-lembut tombol-kecil">Laba Rugi per bulan</Link>
-            </div>
-          </div>
-          <GrafikTren bulan={tren.bulan} tahun={pengaturan.tahunBuku} />
-        </div>
+      {boleh("buku-besar.lihat") && (
+        <Suspense fallback={<KerangkaTren />}>
+          <PanelTren tahun={pengaturan.tahunBuku} />
+        </Suspense>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 daftarBarang-awal">

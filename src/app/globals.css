@@ -373,59 +373,27 @@ body {
   background-image: radial-gradient(rgba(11, 33, 65, 0.055) 0.7px, transparent 0.7px);
   background-size: 22px 22px;
 }
+/* tanpa filter: blur() (mahal di GPU perangkat lemah); kelembutan datang dari gradasi radial itu sendiri */
 .aurora::before,
 .aurora::after {
   content: "";
   position: absolute;
   border-radius: 9999px;
-  filter: blur(70px);
   will-change: transform;
 }
 .aurora::before {
-  width: 52vw;
-  height: 52vw;
-  left: -14vw;
-  top: -22vw;
-  background: radial-gradient(closest-side, rgba(23, 65, 122, 0.22), rgba(23, 65, 122, 0));
+  width: 64vw;
+  height: 64vw;
+  left: -20vw;
+  top: -30vw;
+  background: radial-gradient(closest-side, rgba(23, 65, 122, 0.18), rgba(23, 65, 122, 0.06) 55%, rgba(23, 65, 122, 0));
 }
 .aurora::after {
-  width: 40vw;
-  height: 40vw;
-  right: -12vw;
-  top: 8vh;
-  background: radial-gradient(closest-side, rgba(248, 110, 24, 0.14), rgba(248, 110, 24, 0));
-}
-.aurora-gelap {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.aurora-gelap::before,
-.aurora-gelap::after {
-  content: "";
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(60px);
-  will-change: transform;
-}
-.aurora-gelap::before {
-  width: 70%;
-  height: 70%;
-  left: -20%;
-  top: -25%;
-  background: radial-gradient(closest-side, rgba(56, 118, 210, 0.55), rgba(56, 118, 210, 0));
-}
-.aurora-gelap::after {
-  width: 55%;
-  height: 55%;
-  right: -15%;
-  bottom: -20%;
-  background: radial-gradient(closest-side, rgba(248, 110, 24, 0.5), rgba(248, 110, 24, 0));
-}
-.pola-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 36px 36px;
+  width: 52vw;
+  height: 52vw;
+  right: -18vw;
+  top: 4vh;
+  background: radial-gradient(closest-side, rgba(248, 110, 24, 0.11), rgba(248, 110, 24, 0.035) 55%, rgba(248, 110, 24, 0));
 }
 
 @layer components {
@@ -490,8 +458,7 @@ body {
     right: -20%;
     top: -30%;
     border-radius: 9999px;
-    background: radial-gradient(closest-side, rgba(248, 110, 24, 0.28), rgba(248, 110, 24, 0));
-    filter: blur(30px);
+    background: radial-gradient(closest-side, rgba(248, 110, 24, 0.24), rgba(248, 110, 24, 0.08) 55%, rgba(248, 110, 24, 0));
     pointer-events: none;
   }
   .panel-navy > * {
@@ -545,12 +512,10 @@ body {
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .aurora::before,
-  .aurora-gelap::before {
+  .aurora::before {
     animation: hanyut-a 22s ease-in-out infinite;
   }
-  .aurora::after,
-  .aurora-gelap::after {
+  .aurora::after {
     animation: hanyut-b 26s ease-in-out infinite;
   }
   .tombol-utama:hover:not(:disabled)::after,
@@ -579,4 +544,11 @@ body {
   .grafik-tren .titik {
     animation: muncul-area 0.4s ease-out 1.2s both;
   }
+}
+
+/* ---------- Halaman masuk: latar ringan, satu sorot navy sangat lembut ---------- */
+.latar-masuk {
+  background:
+    radial-gradient(60vw 40vh at 50% -10%, rgba(23, 65, 122, 0.1), transparent 70%),
+    var(--color-canvas);
 }

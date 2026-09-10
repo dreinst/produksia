@@ -22,11 +22,14 @@ type Props = {
  */
 export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses }: Props) {
   const [status, aksiFormulir, sedangProses] = useActionState(aksi, { galat: null });
+  // Isian dibungkus <fieldset class="contents"> (agar bisa dinonaktifkan sekaligus), jadi jarak "space-y-*"
+  // milik <form> tidak sampai ke isian. Diterjemahkan ke flex kolom + gap yang berlaku untuk anak fieldset.
+  const kelas = className?.replace(/(^|\s)space-y-(\d+(?:\.\d+)?)(?=\s|$)/g, "$1flex flex-col gap-$2");
 
   return (
     <form
       action={aksiFormulir}
-      className={className}
+      className={kelas}
       onSubmit={(e) => {
         if (pesanKonfirmasi && !window.confirm(pesanKonfirmasi)) e.preventDefault();
       }}

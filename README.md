@@ -168,6 +168,14 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 
 Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
+## Deploy & kinerja
+
+- **Build**: `npm run build` (menjalankan migrasi + generate lebih dulu) menghasilkan `.next/standalone` (`output: "standalone"`): jalankan `node .next/standalone/server.js` (salin `.next/static` dan `public` ke sebelahnya) atau cukup `npm start`. Untuk beberapa proses/instance, pasang di belakang reverse proxy (nginx/Caddy) dengan HTTPS.
+- **Basis data**: PostgreSQL 14+. Semua kolom relasi (FK) dan kolom yang sering difilter (`tanggal`, `status`, `kedaluwarsa`) sudah berindeks (107 indeks). Pool koneksi per proses bawaan 10, atur lewat `DB_POOL_MAX`; pastikan `max_connections` PostgreSQL ≥ jumlah proses × pool + cadangan.
+- **Beban ringan per permintaan**: halaman tidak memuat baris jurnal ke memori. Saldo akun, laporan, tren bulanan, dan pemeriksaan integritas dihitung dengan `GROUP BY`/`SUM` di PostgreSQL (`saldoAkunPeriode`, `hitungLabaRugiBulanan`, `periksaSinkron`, kartu beranda). Rentang tahun di sidebar memakai MIN/MAX berindeks. Kartu tren beranda dialirkan lewat `<Suspense>` sehingga kerangka halaman tampil lebih dulu. Pengaturan perusahaan di-`cache()` per permintaan; sesi kedaluwarsa dibersihkan saat ada yang masuk.
+- **Zona waktu**: pengelompokan per bulan di SQL memakai `ZONA_WAKTU` (bawaan `Asia/Jakarta`); samakan `TZ` server dengannya.
+- **Uji beban lokal**: `npx tsx skrip/beban.ts` terhadap `npm start` (port 3100); angka terakhir ada di AUDIT.md bagian kesiapan deploy.
+
 ## Alur kerja
 
 1. Masuk sebagai Pemilik/Admin, terapkan **Pengaturan → Bagan Akun Standar** (sekaligus mengisi Pemetaan Akun; keduanya wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat). Ganti nama rekening bank 1-1210 sesuai kenyataan.

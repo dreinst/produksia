@@ -412,6 +412,7 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 - **Ubah skema:** edit `prisma/schema.prisma` → `npx prisma migrate dev --name … --config prisma7.config.ts` → **restart `npm run dev`** (Turbopack tidak memuat ulang Prisma Client yang di-generate ulang; gejalanya `Cannot read properties of undefined (reading 'findMany')`). Constraint yang tidak didukung Prisma (mis. `CHECK`) ditulis manual di file migrasi (`--create-only`).
 - **Sebelum commit:** `npx tsc --noEmit && npx eslint && for s in skrip/uji-*.ts; do npx tsx $s; done` — hal yang sama dijalankan CI (`.github/workflows/ci.yml`) di PostgreSQL 16 sekali pakai, ditambah `next build`.
 - **Menambah ikon:** `skrip/subset-font-ikon.sh` (butuh `pip install fonttools brotli`).
+- **Kinerja:** aturan baku: jangan memuat baris jurnal/dokumen ke memori untuk dijumlahkan; pakai `aggregate`/`groupBy`/`$queryRaw` dengan `SUM` dan `GROUP BY` (contoh `src/lib/sinkron.ts`, `hitungLabaRugiBulanan`). Setiap kolom relasi baru wajib diberi `@@index` (PostgreSQL tidak membuat indeks FK otomatis). Bagian halaman yang mahal dan tidak kritis dialirkan lewat `<Suspense>` (contoh `src/komponen/beranda/PanelTren.tsx`). Deploy: `output: "standalone"`, pool `DB_POOL_MAX`, zona waktu `ZONA_WAKTU`, uji beban `skrip/beban.ts`.
 - **Repo:** `github.com/dreinst/produksia` (folder `app/` saja). Commit hanya atas nama `dreinst`; hook `commit-msg` lokal membuang trailer atribusi alat apa pun.
 
 ---

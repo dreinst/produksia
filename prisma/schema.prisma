@@ -89,6 +89,7 @@ model Sesi {
   dibuatPada  DateTime @default(now())
 
   @@index([penggunaId])
+  @@index([kedaluwarsa])
 }
 
 // ---------- Data induk ----------
@@ -109,6 +110,7 @@ model Karyawan {
   pengguna     Pengguna?   @relation(fields: [penggunaId], references: [id])
   pelanggan    Pelanggan[]
   dibuatPada   DateTime    @default(now())
+  @@index([departemenId])
 }
 
 model Pelanggan {
@@ -128,6 +130,7 @@ model Pelanggan {
   proyek     Proyek[]
   uangMuka   UangMukaPelanggan[]
   dibuatPada DateTime @default(now())
+  @@index([penjualId])
 }
 
 model Pemasok {
@@ -162,6 +165,7 @@ model Proyek {
   pesanan          PesananPenjualan[]
   pesananPembelian PesananPembelian[]
   jurnal           Jurnal[]
+  @@index([pelangganId])
 }
 
 model Gudang {
@@ -187,6 +191,7 @@ model KelompokBarang {
   induk   KelompokBarang?  @relation("PohonKelompok", fields: [indukId], references: [id])
   anak    KelompokBarang[] @relation("PohonKelompok")
   barang  Barang[]
+  @@index([indukId])
 }
 
 model Barang {
@@ -227,6 +232,11 @@ model Barang {
   akunBeban        Akun? @relation("AkunBebanBarang", fields: [akunBebanId], references: [id])
   barisPenyesuaian BarisPenyesuaianPersediaan[]
   barisPindah      BarisPindahBarang[]
+  @@index([kelompokId])
+  @@index([akunPendapatanId])
+  @@index([akunHppId])
+  @@index([akunPersediaanId])
+  @@index([akunBebanId])
 }
 
 model StokBarang {
@@ -237,6 +247,8 @@ model StokBarang {
   jumlah   Decimal @default(0) @db.Decimal(18, 2)
 
   @@id([barangId, gudangId])
+  @@index([barangId])
+  @@index([gudangId])
 }
 
 // ---------- Siklus Penjualan ----------
@@ -254,6 +266,10 @@ model PenawaranPenjualan {
 
   baris   BarisPenawaranPenjualan[]
   pesanan PesananPenjualan?
+  @@index([pelangganId])
+  @@index([proyekId])
+  @@index([status])
+  @@index([tanggal])
 }
 
 model BarisPenawaranPenjualan {
@@ -265,6 +281,8 @@ model BarisPenawaranPenjualan {
   jumlah      Decimal            @db.Decimal(18, 2)
   harga       Decimal            @db.Decimal(18, 2)
   subtotal    Decimal            @db.Decimal(18, 2)
+  @@index([penawaranId])
+  @@index([barangId])
 }
 
 model PesananPenjualan {
@@ -284,6 +302,10 @@ model PesananPenjualan {
   pengiriman PengirimanPesanan[]
   faktur     FakturPenjualan[]
   uangMuka   UangMukaPelanggan[]
+  @@index([pelangganId])
+  @@index([proyekId])
+  @@index([status])
+  @@index([tanggal])
 }
 
 model BarisPesananPenjualan {
@@ -298,6 +320,8 @@ model BarisPesananPenjualan {
   jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
   barisPengiriman BarisPengiriman[]
+  @@index([pesananId])
+  @@index([barangId])
 }
 
 model PengirimanPesanan {
@@ -314,6 +338,9 @@ model PengirimanPesanan {
 
   baris  BarisPengiriman[]
   faktur FakturPenjualan[]
+  @@index([pesananId])
+  @@index([gudangId])
+  @@index([tanggal])
 }
 
 model BarisPengiriman {
@@ -329,6 +356,9 @@ model BarisPengiriman {
   hargaPokok     Decimal               @default(0) @db.Decimal(18, 2)
   /// bagian dari baris ini yang sudah dikonsumsi Faktur Penjualan (HPP sudah diakui)
   jumlahDifaktur Decimal               @default(0) @db.Decimal(18, 2)
+  @@index([pengirimanId])
+  @@index([barisPesananId])
+  @@index([barangId])
 }
 
 model FakturPenjualan {
@@ -357,6 +387,11 @@ model FakturPenjualan {
   baris      BarisFakturPenjualan[]
   penerimaan PenerimaanPenjualan[]
   retur      ReturPenjualan[]
+  @@index([pelangganId])
+  @@index([pesananId])
+  @@index([pengirimanId])
+  @@index([status])
+  @@index([tanggal])
 }
 
 model BarisFakturPenjualan {
@@ -368,6 +403,8 @@ model BarisFakturPenjualan {
   jumlah   Decimal         @db.Decimal(18, 2)
   harga    Decimal         @db.Decimal(18, 2)
   subtotal Decimal         @db.Decimal(18, 2)
+  @@index([fakturId])
+  @@index([barangId])
 }
 
 model UangMukaPelanggan {
@@ -389,6 +426,10 @@ model UangMukaPelanggan {
   jurnal        Jurnal? @relation("JurnalUangMuka", fields: [jurnalId], references: [id])
 
   pemakaian PemakaianUangMuka[]
+  @@index([pelangganId])
+  @@index([pesananId])
+  @@index([akunId])
+  @@index([tanggal])
 }
 
 /// Jejak DP mana yang dipakai faktur mana (dibalik saat faktur dihapus)
@@ -401,6 +442,7 @@ model PemakaianUangMuka {
   jumlah     Decimal           @db.Decimal(18, 2)
 
   @@index([fakturId])
+  @@index([uangMukaId])
 }
 
 model PenerimaanPenjualan {
@@ -419,6 +461,10 @@ model PenerimaanPenjualan {
   jurnalId      String? @unique
   jurnal        Jurnal? @relation("JurnalPenerimaanPenjualan", fields: [jurnalId], references: [id])
   metodeBayar String          @default("TUNAI")
+  @@index([pelangganId])
+  @@index([fakturId])
+  @@index([akunId])
+  @@index([tanggal])
 }
 
 model ReturPenjualan {
@@ -437,6 +483,8 @@ model ReturPenjualan {
   jurnal   Jurnal? @relation("JurnalReturPenjualan", fields: [jurnalId], references: [id])
 
   baris BarisReturPenjualan[]
+  @@index([fakturId])
+  @@index([gudangId])
 }
 
 model BarisReturPenjualan {
@@ -447,6 +495,8 @@ model BarisReturPenjualan {
   barang   Barang         @relation(fields: [barangId], references: [id])
   jumlah   Decimal        @db.Decimal(18, 2)
   hargaPokok Decimal      @default(0) @db.Decimal(18, 2)
+  @@index([returId])
+  @@index([barangId])
 }
 
 // ---------- Siklus Pembelian ----------
@@ -465,6 +515,10 @@ model PesananPembelian {
   baris            BarisPesananPembelian[]
   penerimaanBarang PenerimaanBarang[]
   faktur           FakturPembelian[]
+  @@index([pemasokId])
+  @@index([proyekId])
+  @@index([status])
+  @@index([tanggal])
 }
 
 model BarisPesananPembelian {
@@ -479,6 +533,8 @@ model BarisPesananPembelian {
   jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
   barisPenerimaan BarisPenerimaanBarang[]
+  @@index([pesananId])
+  @@index([barangId])
 }
 
 model PenerimaanBarang {
@@ -495,6 +551,9 @@ model PenerimaanBarang {
   faktur FakturPembelian[]
   jurnalId String? @unique
   jurnal   Jurnal? @relation(fields: [jurnalId], references: [id])
+  @@index([pesananId])
+  @@index([gudangId])
+  @@index([tanggal])
 }
 
 model BarisPenerimaanBarang {
@@ -508,6 +567,9 @@ model BarisPenerimaanBarang {
   jumlah         Decimal               @db.Decimal(18, 2)
   /// harga satuan (dari pesanan) yang dipakai menilai persediaan masuk
   hargaSatuan    Decimal               @default(0) @db.Decimal(18, 2)
+  @@index([penerimaanId])
+  @@index([barisPesananId])
+  @@index([barangId])
 }
 
 model FakturPembelian {
@@ -532,6 +594,11 @@ model FakturPembelian {
   baris      BarisFakturPembelian[]
   pembayaran PembayaranPembelian[]
   retur      ReturPembelian[]
+  @@index([pemasokId])
+  @@index([pesananId])
+  @@index([penerimaanId])
+  @@index([status])
+  @@index([tanggal])
 }
 
 model BarisFakturPembelian {
@@ -543,6 +610,8 @@ model BarisFakturPembelian {
   jumlah   Decimal         @db.Decimal(18, 2)
   harga    Decimal         @db.Decimal(18, 2)
   subtotal Decimal         @db.Decimal(18, 2)
+  @@index([fakturId])
+  @@index([barangId])
 }
 
 model PembayaranPembelian {
@@ -561,6 +630,10 @@ model PembayaranPembelian {
   jurnalId      String? @unique
   jurnal        Jurnal? @relation("JurnalPembayaranPembelian", fields: [jurnalId], references: [id])
   metodeBayar String          @default("TRANSFER")
+  @@index([pemasokId])
+  @@index([fakturId])
+  @@index([akunId])
+  @@index([tanggal])
 }
 
 model ReturPembelian {
@@ -579,6 +652,8 @@ model ReturPembelian {
   jurnal   Jurnal? @relation("JurnalReturPembelian", fields: [jurnalId], references: [id])
 
   baris BarisReturPembelian[]
+  @@index([fakturId])
+  @@index([gudangId])
 }
 
 model BarisReturPembelian {
@@ -589,6 +664,8 @@ model BarisReturPembelian {
   barang   Barang         @relation(fields: [barangId], references: [id])
   jumlah   Decimal        @db.Decimal(18, 2)
   hargaPokok Decimal      @default(0) @db.Decimal(18, 2)
+  @@index([returId])
+  @@index([barangId])
 }
 
 // ---------- Buku Besar & Kas/Bank ----------
@@ -646,6 +723,7 @@ model Akun {
   pengaturanPph23Dipotong PengaturanPerusahaan? @relation("PetaPph23Dipotong")
   pengaturanBebanPphFinal  PengaturanPerusahaan? @relation("PetaBebanPphFinal")
   pengaturanHutangPphFinal PengaturanPerusahaan? @relation("PetaHutangPphFinal")
+  @@index([indukId])
 }
 
 model PemetaanAkun {
@@ -713,6 +791,8 @@ model Jurnal {
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
   returPembelian        ReturPembelian?        @relation("JurnalReturPembelian")
+  @@index([proyekId])
+  @@index([tanggal])
 }
 
 model BarisJurnal {
@@ -727,6 +807,8 @@ model BarisJurnal {
   /// Rekonsiliasi kas/bank: kapan baris ini dicocokkan dengan mutasi rekening
   rekonsiliasiPada DateTime?
   mutasiBank       MutasiBank?
+  @@index([jurnalId])
+  @@index([akunId])
 }
 
 // ---------- Aset Tetap ----------
@@ -756,6 +838,10 @@ model AsetTetap {
 
   penyusutan PenyusutanAset[]
   pelepasan  PelepasanAset?
+  @@index([akunAsetId])
+  @@index([akunBebanPenyusutanId])
+  @@index([akunAkumulasiPenyusutanId])
+  @@index([akunPembayaranId])
 }
 
 /// Pelepasan aset (dijual / dihapusbukukan): akumulasi penyusutan & aset dikeluarkan, selisih harga jual vs nilai buku = laba/rugi
@@ -779,6 +865,8 @@ model PelepasanAset {
   jurnal     Jurnal? @relation("JurnalPelepasanAset", fields: [jurnalId], references: [id])
   penggunaNama String
   dibuatPada   DateTime @default(now())
+  @@index([akunPenerimaanId])
+  @@index([akunLabaRugiId])
 }
 model PenyusutanAset {
   id       String    @id @default(cuid())
@@ -790,6 +878,7 @@ model PenyusutanAset {
   jurnal   Jurnal?   @relation(fields: [jurnalId], references: [id])
 
   @@unique([asetId, periode])
+  @@index([jurnalId])
 }
 
 // ---------- Persediaan: penyesuaian stok (saldo awal, opname, koreksi) ----------
@@ -807,6 +896,8 @@ model PindahBarang {
   dibuatPada     DateTime @default(now())
 
   baris BarisPindahBarang[]
+  @@index([gudangAsalId])
+  @@index([gudangTujuanId])
 }
 model BarisPindahBarang {
   id       String       @id @default(cuid())
@@ -815,6 +906,8 @@ model BarisPindahBarang {
   barangId String
   barang   Barang       @relation(fields: [barangId], references: [id])
   jumlah   Decimal      @db.Decimal(18, 2)
+  @@index([pindahId])
+  @@index([barangId])
 }
 model PenyesuaianPersediaan {
   id          String   @id @default(cuid())
@@ -831,6 +924,8 @@ model PenyesuaianPersediaan {
   dibuatPada  DateTime @default(now())
 
   baris BarisPenyesuaianPersediaan[]
+  @@index([gudangId])
+  @@index([akunLawanId])
 }
 
 model BarisPenyesuaianPersediaan {
@@ -843,6 +938,8 @@ model BarisPenyesuaianPersediaan {
   jumlahSesudah Decimal               @db.Decimal(18, 2)
   /// Harga pokok satuan yang dipakai menilai selisih
   hargaSatuan   Decimal               @db.Decimal(18, 2)
+  @@index([penyesuaianId])
+  @@index([barangId])
 }
 
 // ---------- Pengaturan perusahaan & pajak (singleton id = "default") ----------
@@ -927,6 +1024,7 @@ model PermintaanAturUlang {
   selesaiPada   DateTime?
 
   @@index([status])
+  @@index([penggunaId])
 }
 
 /// Mutasi rekening koran hasil impor (CSV/HTML) per akun kas/bank; dicocokkan ke baris jurnal saat rekonsiliasi
@@ -970,6 +1068,9 @@ model Prive {
   jurnal      Jurnal?  @relation("JurnalPrive", fields: [jurnalId], references: [id])
   penggunaNama String
   dibuatPada   DateTime @default(now())
+  @@index([akunKasId])
+  @@index([akunPriveId])
+  @@index([tanggal])
 }
 
 /// Pemetaan akun tambahan buatan pengguna (mis. "prive" → 3-4000) untuk peran yang belum ada di PemetaanAkun
@@ -982,6 +1083,7 @@ model PemetaanAkunTambahan {
   keterangan String?
   dibuatOleh String
   dibuatPada DateTime @default(now())
+  @@index([akunId])
 }
 
 model LogAktivitas {

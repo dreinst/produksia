@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { D, uang, type Desimal } from "@/lib/uang";
@@ -37,7 +38,8 @@ export const PENGATURAN_BAWAAN: PengaturanPajak = {
 };
 
 /** Pengaturan perusahaan (singleton); bila belum pernah disimpan, kembalikan bawaan (non-PKP). */
-export async function ambilPengaturanPerusahaan(klien: Klien = db): Promise<PengaturanPajak> {
+// React cache(): layout dan halaman yang sama-sama memanggilnya dalam satu permintaan cukup satu kueri
+export const ambilPengaturanPerusahaan = cache(async (klien: Klien = db): Promise<PengaturanPajak> => {
   const p = await klien.pengaturanPerusahaan.findUnique({ where: { id: "default" } });
   if (!p) return PENGATURAN_BAWAAN;
   return {
@@ -54,7 +56,7 @@ export async function ambilPengaturanPerusahaan(klien: Klien = db): Promise<Peng
     akunBebanPphFinalId: p.akunBebanPphFinalId,
     akunHutangPphFinalId: p.akunHutangPphFinalId,
   };
-}
+});
 
 /** Membaca tarif PPN yang diminta formulir dan memastikannya sah untuk status PKP perusahaan. */
 export function bacaTarifPpn(nilai: FormDataEntryValue | null, pengaturan: PengaturanPajak): Desimal {

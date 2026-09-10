@@ -25,6 +25,8 @@ function hashToken(token: string): string {
 export async function buatSesi(penggunaId: string): Promise<void> {
   const token = randomBytes(32).toString("base64url");
   const kedaluwarsa = new Date(Date.now() + UMUR_SESI_MS);
+  // sesi kedaluwarsa dibersihkan saat ada yang masuk, supaya tabel Sesi tidak tumbuh tanpa batas
+  await db.sesi.deleteMany({ where: { kedaluwarsa: { lt: new Date() } } });
   await db.sesi.create({ data: { tokenHash: hashToken(token), penggunaId, kedaluwarsa } });
   (await cookies()).set(NAMA_COOKIE_SESI, token, {
     httpOnly: true,
