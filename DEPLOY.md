@@ -142,3 +142,17 @@ Setelah Vercel hidup, kontainer `app` di VPS tidak diperlukan lagi: `docker comp
 ### Firewall lanjutan (jalur B/C)
 
 `bash deploy/docker/pasang-fail2ban.sh` memasang jail fail2ban: **pgbouncer** (5 gagal auth / 10 mnt → ban 1 jam di rantai DOCKER-USER, IP internal & Tailscale dikecualikan), **recidive** (pelanggar berulang → ban 1 minggu), dan mematikan `X11Forwarding` sshd. PgBouncer harus logging ke file (sudah diatur di `pgbouncer.ini` + mount `log/`).
+
+### Buka blokir IP (superadmin)
+
+Bila karyawan/klien salah terblokir, jalankan di server sebagai root:
+
+```bash
+cd /data/produksia/app
+bash deploy/docker/unban.sh <IP>          # lihat status + BUKTI (aman, read-only)
+bash deploy/docker/unban.sh <IP> lepas    # buka blokir dari semua lapisan
+bash deploy/docker/unban.sh <IP> percaya  # buka + jadikan tepercaya (tak diblokir lagi)
+bash deploy/docker/unban.sh daftar        # daftar semua IP yang diblokir
+```
+
+Alat menampilkan jumlah percobaan gagal, contoh barisnya, dan pemilik IP, supaya Anda membedakan karyawan (sedikit gagal, lokasi wajar) dari peretas (ratusan percobaan, IP asing) sebelum membuka. Sengaja tidak ada tombol unban di web app: memberi aplikasi Vercel kendali firewall VPS justru berbahaya bila app diretas.
