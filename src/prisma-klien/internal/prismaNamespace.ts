@@ -399,6 +399,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Pengguna: 'Pengguna',
   Sesi: 'Sesi',
+  PercobaanMasuk: 'PercobaanMasuk',
   Departemen: 'Departemen',
   Karyawan: 'Karyawan',
   Pelanggan: 'Pelanggan',
@@ -465,7 +466,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "pemetaanAkunTambahan" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "pemetaanAkunTambahan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -614,6 +615,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SesiCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SesiCountAggregateOutputType> | number
+        }
+      }
+    }
+    PercobaanMasuk: {
+      payload: Prisma.$PercobaanMasukPayload<ExtArgs>
+      fields: Prisma.PercobaanMasukFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PercobaanMasukFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PercobaanMasukFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>
+        }
+        findFirst: {
+          args: Prisma.PercobaanMasukFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PercobaanMasukFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>
+        }
+        findMany: {
+          args: Prisma.PercobaanMasukFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>[]
+        }
+        create: {
+          args: Prisma.PercobaanMasukCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>
+        }
+        createMany: {
+          args: Prisma.PercobaanMasukCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PercobaanMasukCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>[]
+        }
+        delete: {
+          args: Prisma.PercobaanMasukDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>
+        }
+        update: {
+          args: Prisma.PercobaanMasukUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>
+        }
+        deleteMany: {
+          args: Prisma.PercobaanMasukDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PercobaanMasukUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PercobaanMasukUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>[]
+        }
+        upsert: {
+          args: Prisma.PercobaanMasukUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PercobaanMasukPayload>
+        }
+        aggregate: {
+          args: Prisma.PercobaanMasukAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePercobaanMasuk>
+        }
+        groupBy: {
+          args: Prisma.PercobaanMasukGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PercobaanMasukGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PercobaanMasukCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PercobaanMasukCountAggregateOutputType> | number
         }
       }
     }
@@ -4455,6 +4530,16 @@ export const SesiScalarFieldEnum = {
 export type SesiScalarFieldEnum = (typeof SesiScalarFieldEnum)[keyof typeof SesiScalarFieldEnum]
 
 
+export const PercobaanMasukScalarFieldEnum = {
+  id: 'id',
+  namaPengguna: 'namaPengguna',
+  ip: 'ip',
+  waktu: 'waktu'
+} as const
+
+export type PercobaanMasukScalarFieldEnum = (typeof PercobaanMasukScalarFieldEnum)[keyof typeof PercobaanMasukScalarFieldEnum]
+
+
 export const DepartemenScalarFieldEnum = {
   id: 'id',
   nama: 'nama'
@@ -5502,6 +5587,7 @@ export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaC
 export type GlobalOmitConfig = {
   pengguna?: Prisma.PenggunaOmit
   sesi?: Prisma.SesiOmit
+  percobaanMasuk?: Prisma.PercobaanMasukOmit
   departemen?: Prisma.DepartemenOmit
   karyawan?: Prisma.KaryawanOmit
   pelanggan?: Prisma.PelangganOmit

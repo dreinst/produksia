@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Pengguna: 'Pengguna',
   Sesi: 'Sesi',
+  PercobaanMasuk: 'PercobaanMasuk',
   Departemen: 'Departemen',
   Karyawan: 'Karyawan',
   Pelanggan: 'Pelanggan',
@@ -145,6 +146,16 @@ export const SesiScalarFieldEnum = {
 } as const
 
 export type SesiScalarFieldEnum = (typeof SesiScalarFieldEnum)[keyof typeof SesiScalarFieldEnum]
+
+
+export const PercobaanMasukScalarFieldEnum = {
+  id: 'id',
+  namaPengguna: 'namaPengguna',
+  ip: 'ip',
+  waktu: 'waktu'
+} as const
+
+export type PercobaanMasukScalarFieldEnum = (typeof PercobaanMasukScalarFieldEnum)[keyof typeof PercobaanMasukScalarFieldEnum]
 
 
 export const DepartemenScalarFieldEnum = {

@@ -5,6 +5,7 @@ import { timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
+import { bacaIpKlien, pastikanBolehCoba, catatKegagalanMasuk, resetPercobaanMasuk } from "@/lib/batasMasuk";
 import {
   buatSesi,
   hapusSemuaSesiPengguna,
@@ -30,14 +31,22 @@ export async function masuk(dataFormulir: FormData) {
   const kataSandi = bacaTeks(dataFormulir, "kataSandi");
   if (!namaPengguna || !kataSandi) throw new Error("Nama pengguna dan kata sandi wajib diisi");
 
+  // Batasi laju: tolak lebih awal bila akun/IP terkunci karena terlalu banyak percobaan gagal (anti brute-force).
+  const ip = await bacaIpKlien();
+  await pastikanBolehCoba(namaPengguna, ip);
+
   const pengguna = await db.pengguna.findUnique({ where: { namaPengguna } });
   // Tetap hitung hash walau akun tidak ada, supaya lama respons tidak membocorkan keberadaan akun
   const cocok = pengguna
     ? await verifikasiKataSandi(kataSandi, pengguna.kataSandiHash)
     : (await hashKataSandi(kataSandi), false);
-  if (!pengguna || !cocok) throw new Error("Nama pengguna atau kata sandi salah");
+  if (!pengguna || !cocok) {
+    await catatKegagalanMasuk(namaPengguna, ip);
+    throw new Error("Nama pengguna atau kata sandi salah");
+  }
   if (!pengguna.aktif) throw new Error("Akun ini dinonaktifkan. Hubungi pemilik atau admin.");
 
+  await resetPercobaanMasuk(namaPengguna);
   await buatSesi(pengguna.id);
   redirect(tujuanAman(bacaTeks(dataFormulir, "kembali")));
 }

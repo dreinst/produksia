@@ -28,6 +28,12 @@ export type Pengguna = Prisma.PenggunaModel
  */
 export type Sesi = Prisma.SesiModel
 /**
+ * Model PercobaanMasuk
+ * Catatan percobaan masuk yang GAGAL, untuk membatasi laju (anti brute-force/credential-stuffing).
+ * Dikunci per akun DAN per IP; baris lama dibersihkan otomatis saat percobaan baru dicatat.
+ */
+export type PercobaanMasuk = Prisma.PercobaanMasukModel
+/**
  * Model Departemen
  * 
  */
