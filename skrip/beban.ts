@@ -15,7 +15,13 @@ const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.
 const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 
 async function main() {
-  const pengguna = await db.pengguna.findUniqueOrThrow({ where: { namaPengguna: "owner" } });
+  // pakai akun "owner" (seed) bila ada; kalau basis data kosong (produksi baru), buat pengguna uji sementara
+  let pengguna = await db.pengguna.findUnique({ where: { namaPengguna: "owner" } });
+  let penggunaSementara = false;
+  if (!pengguna) {
+    pengguna = await db.pengguna.create({ data: { nama: "Uji Beban", namaPengguna: `beban-uji-${Date.now()}`, kataSandiHash: "scrypt$tidak-bisa-dipakai$0", peran: "PEMILIK", aktif: true } });
+    penggunaSementara = true;
+  }
   const token = randomBytes(32).toString("base64url");
   await db.sesi.create({ data: { tokenHash: hash(token), penggunaId: pengguna.id, kedaluwarsa: new Date(Date.now() + 3600_000) } });
   const cookie = `sesi_ac=${token}`;
@@ -50,6 +56,7 @@ async function main() {
     console.log(`\nCampuran ${serentak * 2} permintaan serentak ke ${halaman.length} halaman: ${campur.filter((s) => s === 200).length}/${serentak * 2} sukses dalam ${Math.round(performance.now() - t0)} ms.`);
   } finally {
     await db.sesi.deleteMany({ where: { tokenHash: hash(token) } });
+    if (penggunaSementara) await db.pengguna.delete({ where: { id: pengguna.id } });
     await db.$disconnect();
   }
 }
