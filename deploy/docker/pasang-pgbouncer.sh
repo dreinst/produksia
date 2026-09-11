@@ -8,12 +8,16 @@ cd "$(dirname "$0")/../.."
 IP="${IP_SERVER:-$(curl -fsS --max-time 10 https://api.ipify.org || hostname -I | awk '{print $1}')}"
 DIR="${PGBOUNCER_DIR:-/data/produksia/pgbouncer}"
 IMAGE="${PGBOUNCER_IMAGE:-edoburu/pgbouncer:v1.25.2-p0}"
+# Host yang dipakai klien HARUS nama DNS (bukan IP): driver pg tidak mengirim nama server untuk host IP sehingga
+# verifikasi sertifikat gagal. Bawaan nama sslip.io (selalu mengarah ke IP ini); isi DB_HOST_PUBLIK bila punya domain sendiri
+# (nama itu ikut dimasukkan ke SAN sertifikat saat pertama dibuat).
+HOST_DB="${DB_HOST_PUBLIK:-produksia.$IP.sslip.io}"
 set -a; . ./.env.docker; set +a
 mkdir -p "$DIR/tls"
 if [ ! -f "$DIR/tls/server.crt" ]; then
   openssl req -x509 -newkey rsa:2048 -nodes -days 3650 -sha256 \
     -keyout "$DIR/tls/server.key" -out "$DIR/tls/server.crt" \
-    -subj "/CN=$IP/O=Produksia" -addext "subjectAltName=IP:$IP,DNS:produksia.$IP.sslip.io"
+    -subj "/CN=$IP/O=Produksia" -addext "subjectAltName=IP:$IP,DNS:produksia.$IP.sslip.io${DB_HOST_PUBLIK:+,DNS:$DB_HOST_PUBLIK}"
   echo "sertifikat TLS dibuat untuk $IP"
 fi
 cp deploy/pgbouncer/pgbouncer.ini "$DIR/pgbouncer.ini"
@@ -28,8 +32,8 @@ CA_SATU_BARIS="$(awk 'NF {printf "%s\\n", $0}' "$DIR/tls/server.crt")"
 KELUARAN=/data/produksia/vercel-env.txt
 {
   echo "# Nilai Environment Variables untuk proyek Vercel (Production). Jangan bagikan berkas ini."
-  echo "DATABASE_URL=postgresql://produksia:${DB_PASSWORD}@${IP}:6432/produksia?schema=public"
-  echo "DATABASE_URL_MIGRASI=postgresql://produksia:${DB_PASSWORD}@${IP}:6432/produksia_migrasi?schema=public&sslmode=require&sslaccept=accept_invalid_certs"
+  echo "DATABASE_URL=postgresql://produksia:${DB_PASSWORD}@${HOST_DB}:6432/produksia?schema=public"
+  echo "DATABASE_URL_MIGRASI=postgresql://produksia:${DB_PASSWORD}@${HOST_DB}:6432/produksia_migrasi?schema=public&sslmode=require&sslaccept=accept_invalid_certs"
   echo "DB_POOL_MAX=3"
   echo "ZONA_WAKTU=Asia/Jakarta"
   echo "DB_SSL_CA=${CA_SATU_BARIS}"
