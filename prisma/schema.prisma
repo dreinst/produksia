@@ -92,6 +92,18 @@ model Sesi {
   @@index([kedaluwarsa])
 }
 
+/// Catatan percobaan masuk yang GAGAL, untuk membatasi laju (anti brute-force/credential-stuffing).
+/// Dikunci per akun DAN per IP; baris lama dibersihkan otomatis saat percobaan baru dicatat.
+model PercobaanMasuk {
+  id           String   @id @default(cuid())
+  namaPengguna String
+  ip           String
+  waktu        DateTime @default(now())
+
+  @@index([namaPengguna, waktu])
+  @@index([ip, waktu])
+}
+
 // ---------- Data induk ----------
 
 model Departemen {

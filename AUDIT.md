@@ -78,6 +78,20 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 
 ## Verifikasi yang dilakukan
 
+### 11 September 2026 (lanjutan 9): audit multi-agen (temukan→perbaiki→review) + penerapan kurasi
+
+Workflow `audit-keamanan-produksia`: 22 agen pemeriksa read-only paralel di seluruh dimensi (auth, otorisasi per halaman/aksi, gerbang setup, SQL injection, logika bisnis, XSS/parser impor, CSRF/middleware, rahasia, reset sandi, brute-force login, dependensi, header/CSP, kebocoran error, jejak audit, skema, Docker, PgBouncer/TLS, skrip shell, CI/hooks, firewall, app tetangga), lalu verifikasi adversarial 2-skeptik, lalu perbaikan berurutan + review + eskalasi. Menghasilkan 25 kandidat perbaikan.
+
+Penerapan bertanggung jawab (sistem uang): changeset otomatis penuh (39 file) MEMECAH 7/21 suite regresi (perubahan perilaku akuntansi + satu regresi seed). Karena itu TIDAK digabung mentah; disimpan utuh di branch `audit-otomatis-wip` untuk triase. Yang diterapkan ke main hanyalah subset **kurasi** yang mandiri, jelas benar, dan terbukti hijau (21/21 suite + build):
+
+- **Rate-limit login** (`src/lib/batasMasuk.ts`, tabel `PercobaanMasuk`, hook di `masuk()`): kunci per akun (5/15 mnt) & per IP (20/15 mnt) dengan backoff; berbasis DB agar berlaku lintas instance di Vercel. Uji baru `skrip/uji-batas-masuk.ts`.
+- **Parser mutasi bank** (`mutasiBank.ts`): batas ukuran, anti-ReDoS, sanitasi formula CSV.
+- **Sanitasi pesan galat** (`statusFormulir.ts`): galat internal/driver (Prisma/pg/TypeError) tak bocor ke pengguna di produksi; galat sengaja tetap tampil.
+- **Validasi data induk** (`dataInduk.ts`): tolak angka negatif/di luar batas Decimal; + jejak audit.
+- **Pencarian global** (`cari/page.tsx`): penanganan input diperketat.
+
+Ditahan untuk keputusan/triase (di branch `audit-otomatis-wip`): penjaga hapus-faktur vs PPh Final, `onDelete: Restrict` pada Proyek, penulisan ulang alur lupa-sandi + token di-hash + anti-enumerasi timing, penambahan jejak audit meluas, hardening deploy (CI/pgbouncer/migrasi). Ini perubahan perilaku/lintas-modul yang perlu penyesuaian tes dan sebagian keputusan produk.
+
 ### 11 September 2026 (lanjutan 8): aplikasi ke Vercel, basis data tetap di VPS, firewall
 
 - **PgBouncer 1.25 dengan TLS** di VPS (port 6432, `edoburu/pgbouncer`, konfigurasi `deploy/pgbouncer/pgbouncer.ini`): pool `produksia` mode transaksi untuk aplikasi (serverless), `produksia_migrasi` mode session untuk `prisma migrate deploy`; TLS wajib (`client_tls_sslmode=require`), autentikasi SCRAM, sandi acak 48 karakter; PostgreSQL 5432 tidak pernah dipublikasikan.

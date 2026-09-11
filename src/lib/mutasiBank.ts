@@ -72,7 +72,8 @@ function pecahCsv(baris: string, pembatas: string): string[] {
 function bersihkanHtml(s: string): string {
   return s
     .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]+>/g, "")
+    // pola non-backtracking ([^<>] menolak '<' di dalam tag) agar tidak kuadratik untuk deretan '<' tanpa penutup
+    .replace(/<[^<>]*>/g, "")
     .replace(/&nbsp;/g, " ")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
@@ -83,12 +84,60 @@ function bersihkanHtml(s: string): string {
     .trim();
 }
 
+/**
+ * Memindai potongan HTML dari `buka` sampai penutup `tutup`, satu blok per kemunculan, secara linear.
+ * Memakai indexOf (bukan regex lazy `[\s\S]*?`) supaya masukan patologis — banyak tag pembuka tanpa
+ * penutup — tidak memicu pemindaian ulang O(n^2) yang bisa membekukan event loop (DoS).
+ */
+function potongBlok(teks: string, bawah: string, buka: string, tutup: string, mulai: number): { isi: string; berikut: number } | null {
+  const a = bawah.indexOf(buka, mulai);
+  if (a < 0) return null;
+  const b = bawah.indexOf(tutup, a + buka.length);
+  if (b < 0) return null;
+  return { isi: teks.slice(a + buka.length, b), berikut: b + tutup.length };
+}
+
+/** Mengambil sel <td>/<th> dari satu baris secara linear (tanpa regex lazy bertumpuk). */
+function ambilSel(baris: string): string[] {
+  const bawah = baris.toLowerCase();
+  const sel: string[] = [];
+  let i = 0;
+  while (i < baris.length) {
+    const td = bawah.indexOf("<td", i), th = bawah.indexOf("<th", i);
+    const a = td < 0 ? th : th < 0 ? td : Math.min(td, th);
+    if (a < 0) break;
+    const buka = baris.indexOf(">", a);
+    if (buka < 0) break;
+    const etd = bawah.indexOf("</td>", buka), eth = bawah.indexOf("</th>", buka);
+    const b = etd < 0 ? eth : eth < 0 ? etd : Math.min(etd, eth);
+    if (b < 0) break;
+    sel.push(bersihkanHtml(baris.slice(buka + 1, b)));
+    i = b + 5; // panjang "</td>" / "</th>"
+  }
+  return sel;
+}
+
 /** Mengambil baris tabel dari HTML (tabel dengan baris terbanyak yang dianggap tabel mutasi). */
 function bacaTabelHtml(teks: string): string[][] {
-  const tabel = [...teks.matchAll(/<table[\s\S]*?<\/table>/gi)].map((m) => m[0]);
+  const bawah = teks.toLowerCase();
+  // Kumpulkan blok <table>...</table> secara linear; bila tak ada yang lengkap, pakai seluruh teks.
+  const tabel: string[] = [];
+  for (let i = 0; ; ) {
+    const blok = potongBlok(teks, bawah, "<table", "</table>", i);
+    if (!blok) break;
+    tabel.push(blok.isi);
+    i = blok.berikut;
+  }
   let terbaik: string[][] = [];
   for (const t of tabel.length ? tabel : [teks]) {
-    const baris = [...t.matchAll(/<tr[\s\S]*?<\/tr>/gi)].map((m) => [...m[0].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map((c) => bersihkanHtml(c[1])));
+    const bawahT = t.toLowerCase();
+    const baris: string[][] = [];
+    for (let j = 0; ; ) {
+      const bl = potongBlok(t, bawahT, "<tr", "</tr>", j);
+      if (!bl) break;
+      baris.push(ambilSel(bl.isi));
+      j = bl.berikut;
+    }
     if (baris.length > terbaik.length) terbaik = baris;
   }
   return terbaik;
@@ -148,8 +197,13 @@ export function petakanKolom(tajuk: string[], manual: Partial<Record<keyof PetaK
   return { tanggal: cari("tanggal") ?? 0, keterangan: cari("keterangan") ?? 1, referensi: cari("referensi"), masuk: cari("masuk"), keluar: cari("keluar"), jumlah: cari("jumlah"), saldo: cari("saldo") };
 }
 
+/** Batas ukuran isi mutasi yang boleh diproses (2 MB), berlaku untuk semua jalur (unggah maupun tempel). */
+export const BATAS_ISI_MUTASI = 2 * 1024 * 1024;
+
 /** Membaca isi berkas (CSV/TSV/HTML) menjadi baris mutasi ternormalisasi. */
 export function bacaMutasi(isi: string, namaBerkas: string, manual: Partial<Record<keyof PetaKolom, number | null>> = {}, sudutPandang: SudutPandang = "otomatis"): HasilBaca {
+  // Batasi ukuran sebelum parsing supaya masukan besar tidak membebani event loop (cegah DoS); berlaku untuk pratinjau maupun impor.
+  if (isi.length > BATAS_ISI_MUTASI) throw new Error("Isi mutasi terlalu besar (maksimal 2 MB)");
   const teks = isi.replace(/^﻿/, "");
   const html = /<table/i.test(teks) || /\.html?$/i.test(namaBerkas);
   let sel: string[][];

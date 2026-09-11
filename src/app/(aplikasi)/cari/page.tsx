@@ -1,4 +1,5 @@
 import { wajibMasuk } from "@/lib/otentikasi";
+import { punyaHak, type Hak } from "@/lib/hakAkses";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -7,29 +8,32 @@ import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 type Hit = { nomor: string; tanggal?: Date; status?: string; siapa?: string; href: string; jenis: string };
 
 export default async function HalamanCari({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
-  await wajibMasuk();
+  const pengguna = await wajibMasuk();
+  const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const { q = "" } = await searchParams;
   const term = q.trim();
   const ci = { contains: term, mode: "insensitive" as const };
 
+  // Tiap kelompok hasil hanya dikueri bila pemanggil punya hak-lihat modul terkait,
+  // supaya /cari tidak membocorkan dokumen (mis. jurnal & mutasi kas) ke peran yang dilarang.
   const [sq, so, dov, inv, rcp, ret, po, gr, pinv, pp, pret, ju, daftarPelanggan, daftarPemasok, daftarBarang, daftarAkun] = term
     ? await Promise.all([
-        db.penawaranPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }),
-        db.pesananPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }),
-        db.pengirimanPesanan.findMany({ where: { nomor: ci }, include: { pesanan: { include: { pelanggan: true } } }, take: 10 }),
-        db.fakturPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }),
-        db.penerimaanPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }),
-        db.returPenjualan.findMany({ where: { nomor: ci }, include: { faktur: { include: { pelanggan: true } } }, take: 10 }),
-        db.pesananPembelian.findMany({ where: { nomor: ci }, include: { pemasok: true }, take: 10 }),
-        db.penerimaanBarang.findMany({ where: { nomor: ci }, include: { pesanan: { include: { pemasok: true } } }, take: 10 }),
-        db.fakturPembelian.findMany({ where: { nomor: ci }, include: { pemasok: true }, take: 10 }),
-        db.pembayaranPembelian.findMany({ where: { nomor: ci }, include: { pemasok: true }, take: 10 }),
-        db.returPembelian.findMany({ where: { nomor: ci }, include: { faktur: { include: { pemasok: true } } }, take: 10 }),
-        db.jurnal.findMany({ where: { OR: [{ nomor: ci }, { keterangan: ci }] }, take: 10 }),
-        db.pelanggan.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }),
-        db.pemasok.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }),
-        db.barang.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }),
-        db.akun.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }),
+        boleh("penawaran.lihat") ? db.penawaranPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }) : [],
+        boleh("pesanan.lihat") ? db.pesananPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }) : [],
+        boleh("pengiriman.lihat") ? db.pengirimanPesanan.findMany({ where: { nomor: ci }, include: { pesanan: { include: { pelanggan: true } } }, take: 10 }) : [],
+        boleh("faktur.lihat") ? db.fakturPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }) : [],
+        boleh("penerimaan.lihat") ? db.penerimaanPenjualan.findMany({ where: { nomor: ci }, include: { pelanggan: true }, take: 10 }) : [],
+        boleh("retur-penjualan.lihat") ? db.returPenjualan.findMany({ where: { nomor: ci }, include: { faktur: { include: { pelanggan: true } } }, take: 10 }) : [],
+        boleh("pesanan-pembelian.lihat") ? db.pesananPembelian.findMany({ where: { nomor: ci }, include: { pemasok: true }, take: 10 }) : [],
+        boleh("penerimaan-barang.lihat") ? db.penerimaanBarang.findMany({ where: { nomor: ci }, include: { pesanan: { include: { pemasok: true } } }, take: 10 }) : [],
+        boleh("faktur-pembelian.lihat") ? db.fakturPembelian.findMany({ where: { nomor: ci }, include: { pemasok: true }, take: 10 }) : [],
+        boleh("pembayaran.lihat") ? db.pembayaranPembelian.findMany({ where: { nomor: ci }, include: { pemasok: true }, take: 10 }) : [],
+        boleh("retur-pembelian.lihat") ? db.returPembelian.findMany({ where: { nomor: ci }, include: { faktur: { include: { pemasok: true } } }, take: 10 }) : [],
+        boleh("jurnal.lihat") ? db.jurnal.findMany({ where: { OR: [{ nomor: ci }, { keterangan: ci }] }, take: 10 }) : [],
+        boleh("data-induk.lihat") ? db.pelanggan.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
+        boleh("data-induk.lihat") ? db.pemasok.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
+        boleh("data-induk.lihat") ? db.barang.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
+        boleh("data-induk.lihat") ? db.akun.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
       ])
     : [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
 
