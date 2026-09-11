@@ -2,6 +2,8 @@
 # (proxy Coolify) lewat jaringan `coolify` dengan HTTPS Let's Encrypt otomatis.
 #   cp .env.docker.example .env.docker  (isi DOMAIN & DB_PASSWORD)
 #   docker compose --env-file .env.docker up -d --build
+name: produksia
+
 services:
   db:
     image: postgres:16-alpine
