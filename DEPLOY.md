@@ -136,3 +136,5 @@ Setelah Vercel hidup, kontainer `app` di VPS tidak diperlukan lagi: `docker comp
 - Port 6432 terbuka untuk internet karena alamat keluar Vercel tidak tetap. Perlindungannya: TLS wajib, sandi acak 48 karakter, autentikasi SCRAM, dan aplikasi memverifikasi sertifikat server (pinned). PostgreSQL sendiri (5432) tidak pernah dipublikasikan.
 - `ufw-docker` membuat aturan ufw berlaku juga untuk port yang dipublikasikan kontainer (bawaan Docker menembus ufw). Coolify UI (8000) dan realtime (6001-6002) kini hanya dari Tailscale dan `TRUSTED_IPS`.
 - Ganti sandi basis data: ubah `DB_PASSWORD` di `.env.docker`, `ALTER ROLE produksia PASSWORD '…'` di PostgreSQL, jalankan ulang `pasang-pgbouncer.sh`, perbarui env di Vercel.
+
+> **Keamanan pemasangan awal:** DB awal kosong → `/masuk` menampilkan pembuatan Pemilik pertama. Di produksi ini butuh env `KUNCI_PEMASANGAN` (teks acak). Setel di Vercel (Production), buat akun Pemilik dengan kunci itu, lalu HAPUS variabelnya dan redeploy.
