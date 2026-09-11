@@ -55,7 +55,16 @@ export default async function HalamanBaganAkunStandar() {
             <div className="flex justify-between"><span className="text-slate-500">Akun rinci (bisa dijurnal)</span><span className="angka">{BAGAN_AKUN_STANDAR.length - jumlahKelompok}</span></div>
             <div className="flex justify-between border-t border-slate-200 pt-1.5"><span className="text-slate-500">Sudah ada di sistem</span><span className="angka">{BAGAN_AKUN_STANDAR.length - belumAda.length}</span></div>
             <div className="flex justify-between"><span className="text-slate-500">Akan dibuat</span><span className={`angka font-semibold ${belumAda.length ? "text-blue-700" : "text-emerald-700"}`}>{belumAda.length}</span></div>
-            <div className="flex justify-between"><span className="text-slate-500">Pemetaan akun</span><span className={pemetaan ? "text-emerald-700" : "text-amber-700"}>{pemetaan ? "sudah diatur" : `akan diisi (${Object.values(PEMETAAN_STANDAR).join(", ")})`}</span></div>
+            <div className="border-t border-slate-200 pt-1.5">
+              {pemetaan ? (
+                <div className="flex justify-between"><span className="text-slate-500">Pemetaan akun</span><span className="text-emerald-700">sudah diatur</span></div>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <span className="text-slate-500">Pemetaan akun</span>
+                  <span className="text-amber-700 leading-relaxed">akan diisi: {Object.values(PEMETAAN_STANDAR).join(", ")}</span>
+                </div>
+              )}
+            </div>
           </div>
           <button type="submit" className="tombol tombol-utama w-full" disabled={belumAda.length === 0 && Boolean(pemetaan)}>
             <Ikon nama="account_tree" className="!text-[18px]" />
