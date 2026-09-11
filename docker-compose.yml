@@ -1,0 +1,73 @@
+# Produksia di server Docker/Coolify: PostgreSQL sendiri (volume), migrasi sekali jalan, aplikasi dirutekan Traefik
+# (proxy Coolify) lewat jaringan `coolify` dengan HTTPS Let's Encrypt otomatis.
+#   cp .env.docker.example .env.docker  (isi DOMAIN & DB_PASSWORD)
+#   docker compose --env-file .env.docker up -d --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: produksia
+      POSTGRES_USER: produksia
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?isi DB_PASSWORD di .env.docker}
+      TZ: Asia/Jakarta
+    volumes:
+      - produksia-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U produksia -d produksia"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [internal]
+
+  migrasi:
+    build:
+      context: .
+      target: build
+    command: npx prisma migrate deploy --config prisma7.config.ts
+    environment:
+      DATABASE_URL: postgresql://produksia:${DB_PASSWORD}@db:5432/produksia?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+    restart: "no"
+
+  app:
+    build:
+      context: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://produksia:${DB_PASSWORD}@db:5432/produksia?schema=public
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      ZONA_WAKTU: Asia/Jakarta
+      TZ: Asia/Jakarta
+    depends_on:
+      migrasi:
+        condition: service_completed_successfully
+    networks: [internal, coolify]
+    labels:
+      # meniru label yang dipasang Coolify pada aplikasinya (middleware gzip & redirect didefinisikan ulang di sini)
+      traefik.enable: "true"
+      traefik.docker.network: coolify
+      traefik.http.middlewares.gzip.compress: "true"
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
+      traefik.http.routers.http-produksia.rule: Host(`${DOMAIN:?isi DOMAIN di .env.docker}`) && PathPrefix(`/`)
+      traefik.http.routers.http-produksia.entrypoints: http
+      traefik.http.routers.http-produksia.middlewares: redirect-to-https
+      traefik.http.routers.http-produksia.service: produksia
+      traefik.http.routers.https-produksia.rule: Host(`${DOMAIN}`) && PathPrefix(`/`)
+      traefik.http.routers.https-produksia.entrypoints: https
+      traefik.http.routers.https-produksia.middlewares: gzip
+      traefik.http.routers.https-produksia.tls: "true"
+      traefik.http.routers.https-produksia.tls.certresolver: letsencrypt
+      traefik.http.routers.https-produksia.service: produksia
+      traefik.http.services.produksia.loadbalancer.server.port: "3000"
+
+networks:
+  internal: {}
+  coolify:
+    external: true
+
+volumes:
+  produksia-db: {}
