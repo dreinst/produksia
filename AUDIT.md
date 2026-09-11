@@ -78,6 +78,13 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 
 ## Verifikasi yang dilakukan
 
+### 11 September 2026 (lanjutan 7): pemasangan di VPS 187.53.129.205 (host Coolify bersama)
+
+- Server ternyata sudah memakai Docker + Coolify (Traefik di 80/443, Supabase, Nextcloud, beberapa aplikasi lain), jadi jalur systemd+Caddy tidak dipakai. Dibuat jalur B: `Dockerfile` multi-tahap (standalone, non-root, healthcheck), `docker-compose.yml` proyek `produksia` (db PostgreSQL 16 di volume `produksia_produksia-db`, `migrasi` sekali jalan, `app` dengan label Traefik seperti aplikasi Coolify), `deploy/docker/deploy.sh` & `backup.sh` (cron root 02:30).
+- Terpasang di `/data/produksia/app`, dirutekan Traefik ke https://produksia.187.53.129.205.sslip.io (sertifikat Let's Encrypt terbit otomatis, HTTP dialihkan ke HTTPS). `/api/sehat` ok; halaman masuk menampilkan pemasangan awal (basis data kosong) tanpa galat konsol, muat 1,2 detik dari Jakarta lewat TLS.
+- Uji beban di dalam jaringan Docker server (30 serentak per halaman, host 2 vCPU yang dipakai bersama banyak kontainer): semua 30/30 sukses; beranda p50 2,2 s (30 permintaan dashboard di detik yang sama), halaman lain p50 0,5 sampai 0,9 s; campuran 60 permintaan 1,7 s. Tidak ada kegagalan atau antrean koneksi; angka lebih lambat daripada mesin pengembangan karena CPU dibagi dengan layanan lain di host.
+- Kunci deploy khusus untuk GitHub Actions dibuat dan diizinkan untuk root; rahasia/variabel repo diisi pemilik (`VPS_HOST`, `VPS_SSH_KEY`, `VPS_USER=root`, `DEPLOY_CMD=bash /data/produksia/app/deploy/docker/deploy.sh`).
+
 ### 11 September 2026 (lanjutan 6): kesiapan deploy & kinerja saat banyak pengguna serentak
 
 Temuan dan perbaikan:
