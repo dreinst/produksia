@@ -6,16 +6,17 @@
     "node": ">=22"
   },
   "scripts": {
-    "siapkan": "prisma migrate deploy --config prisma7.config.ts && prisma generate --config prisma7.config.ts",
-    "predev": "npm run siapkan",
+    "siapkan": "prisma generate --config prisma7.config.ts",
+    "predev": "npm run migrasi",
     "dev": "next dev",
     "prebuild": "npm run siapkan",
     "build": "next build",
-    "prestart": "npm run siapkan",
+    "prestart": "npm run migrasi",
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/reset.ts && tsx prisma/seed.ts",
-    "uji": "for s in skrip/uji-*.ts; do npx tsx \"$s\" || exit 1; done"
+    "uji": "for s in skrip/uji-*.ts; do npx tsx \"$s\" || exit 1; done",
+    "migrasi": "prisma migrate deploy --config prisma7.config.ts && prisma generate --config prisma7.config.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
