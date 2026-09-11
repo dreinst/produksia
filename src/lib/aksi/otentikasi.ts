@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
@@ -51,8 +52,24 @@ export async function keluar() {
 }
 
 /** Dipakai sekali saat basis data belum punya pengguna sama sekali (pemasangan awal). */
+/** Bandingkan dua string dengan waktu tetap (cegah timing attack pada kunci pemasangan). */
+function samaAman(a: string, b: string): boolean {
+  const ba = Buffer.from(a), bb = Buffer.from(b);
+  if (ba.length !== bb.length) return false;
+  return timingSafeEqual(ba, bb);
+}
+
 export async function buatPemilikPertama(dataFormulir: FormData) {
   if ((await db.pengguna.count()) > 0) throw new Error("Akun pemilik sudah ada. Silakan masuk.");
+
+  // Cegah perebutan akun: di produksi, membuat Pemilik pertama wajib memakai KUNCI_PEMASANGAN dari server.
+  // Basis data kosong yang terekspos internet tidak bisa direbut anonim. Setel env di server, buat akun, lalu hapus env-nya.
+  if (process.env.NODE_ENV === "production") {
+    const kunciServer = process.env.KUNCI_PEMASANGAN ?? "";
+    if (!kunciServer) throw new Error("Pemasangan awal dinonaktifkan. Minta admin server menyetel KUNCI_PEMASANGAN, lalu muat ulang.");
+    const kunciKirim = String(dataFormulir.get("kunciPemasangan") ?? "");
+    if (!samaAman(kunciKirim, kunciServer)) throw new Error("Kunci pemasangan salah.");
+  }
 
   const nama = bacaTeks(dataFormulir, "nama");
   const namaPengguna = bacaNamaPengguna(bacaTeks(dataFormulir, "namaPengguna"));
