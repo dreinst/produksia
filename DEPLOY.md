@@ -118,6 +118,8 @@ bash deploy/docker/pasang-pgbouncer.sh     # sertifikat TLS, userlist, pgbouncer
 TRUSTED_IPS="IP.mac.anda" bash deploy/docker/firewall.sh   # ufw + ufw-docker: hanya 22/80/443/6432 publik
 ```
 
+Host basis data di URL memakai nama DNS `produksia.<IP>.sslip.io` (ada di SAN sertifikat), bukan IP, karena driver `pg` hanya memverifikasi sertifikat dengan benar untuk host bernama. Punya domain sendiri? Jalankan ulang dengan `DB_HOST_PUBLIK=db.domain.id` (sebelum sertifikat dibuat, atau hapus `/data/produksia/pgbouncer/tls` dulu).
+
 `pasang-pgbouncer.sh` menulis semua nilai lingkungan untuk Vercel ke `/data/produksia/vercel-env.txt` (hanya root): `DATABASE_URL` (pool transaksi, tanpa `sslmode` karena TLS dipasang lewat `DB_SSL_CA`), `DATABASE_URL_MIGRASI` (basis data `produksia_migrasi`, mode session, dipakai `prisma migrate deploy` saat build), `DB_POOL_MAX=3`, `ZONA_WAKTU`, dan `DB_SSL_CA` (sertifikat server PgBouncer; aplikasi memverifikasi TLS secara ketat terhadap sertifikat ini, lihat `src/lib/db.ts`).
 
 ### Di Vercel (sekali)
