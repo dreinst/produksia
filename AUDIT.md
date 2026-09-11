@@ -78,6 +78,14 @@ Status tiap temuan: **[FIXED]** sudah diperbaiki di audit ini · **[OPEN]** seng
 
 ## Verifikasi yang dilakukan
 
+### 11 September 2026 (lanjutan 8): aplikasi ke Vercel, basis data tetap di VPS, firewall
+
+- **PgBouncer 1.25 dengan TLS** di VPS (port 6432, `edoburu/pgbouncer`, konfigurasi `deploy/pgbouncer/pgbouncer.ini`): pool `produksia` mode transaksi untuk aplikasi (serverless), `produksia_migrasi` mode session untuk `prisma migrate deploy`; TLS wajib (`client_tls_sslmode=require`), autentikasi SCRAM, sandi acak 48 karakter; PostgreSQL 5432 tidak pernah dipublikasikan.
+- **Verifikasi TLS ketat di aplikasi**: `src/lib/db.ts` menerima `DB_SSL_CA` (PEM sertifikat server) → `ssl: { ca, rejectUnauthorized: true }`. Temuan: driver `pg` tidak mengirim nama server untuk host IP sehingga Node memverifikasi terhadap "localhost"; solusinya host di URL memakai nama DNS yang ada di SAN (`produksia.<IP>.sslip.io`, atau `DB_HOST_PUBLIK`). `prisma7.config.ts` memakai `DATABASE_URL_MIGRASI` bila ada.
+- Uji dari luar server: psql `sslmode=verify-full` ok; `prisma migrate status` via pool session ok; runtime Prisma dengan CA pinned ok (20 kueri serentak lewat pool 3 koneksi ≈ 0,8 s dari Surabaya, RTT 54 ms); sertifikat lain ditolak; koneksi polos ditolak (`SSL required`).
+- **Firewall** (`deploy/docker/firewall.sh`): ufw + `ufw-docker` (rantai DOCKER-USER) sehingga port yang dipublikasikan kontainer tidak lagi menembus ufw. Sebelum: Coolify UI 8000 dan realtime 6001 terbuka untuk semua IP meski ufw "membatasinya". Sesudah: publik hanya 22 (rate-limit), 80, 443 (tcp+udp), 6432; Coolify UI/realtime hanya dari Tailscale (100.64.0.0/10) dan IP tepercaya; situs lain di Traefik tetap hidup (dicek dari IP luar). Catatan: `LIMIT 22/tcp` menolak IP yang membuka lebih dari 6 koneksi SSH dalam 30 detik selama ±30 detik.
+- Vercel: `vercel.json` region `sin1` (VPS di Kuala Lumpur), `output: standalone` dimatikan saat `VERCEL`, `engines.node >= 22`; nilai lingkungan siap di `/data/produksia/vercel-env.txt` (server) dan disalin ke Mac pemilik. Langkah di DEPLOY.md bagian 8.
+
 ### 11 September 2026 (lanjutan 7): pemasangan di VPS 187.53.129.205 (host Coolify bersama)
 
 - Server ternyata sudah memakai Docker + Coolify (Traefik di 80/443, Supabase, Nextcloud, beberapa aplikasi lain), jadi jalur systemd+Caddy tidak dipakai. Dibuat jalur B: `Dockerfile` multi-tahap (standalone, non-root, healthcheck), `docker-compose.yml` proyek `produksia` (db PostgreSQL 16 di volume `produksia_produksia-db`, `migrasi` sekali jalan, `app` dengan label Traefik seperti aplikasi Coolify), `deploy/docker/deploy.sh` & `backup.sh` (cron root 02:30).
