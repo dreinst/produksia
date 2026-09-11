@@ -413,7 +413,8 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 - **Sebelum commit:** `npx tsc --noEmit && npx eslint && for s in skrip/uji-*.ts; do npx tsx $s; done` — hal yang sama dijalankan CI (`.github/workflows/ci.yml`) di PostgreSQL 16 sekali pakai, ditambah `next build`.
 - **Menambah ikon:** `skrip/subset-font-ikon.sh` (butuh `pip install fonttools brotli`).
 - **Kinerja:** aturan baku: jangan memuat baris jurnal/dokumen ke memori untuk dijumlahkan; pakai `aggregate`/`groupBy`/`$queryRaw` dengan `SUM` dan `GROUP BY` (contoh `src/lib/sinkron.ts`, `hitungLabaRugiBulanan`). Setiap kolom relasi baru wajib diberi `@@index` (PostgreSQL tidak membuat indeks FK otomatis). Bagian halaman yang mahal dan tidak kritis dialirkan lewat `<Suspense>` (contoh `src/komponen/beranda/PanelTren.tsx`). Deploy: `output: "standalone"`, pool `DB_POOL_MAX`, zona waktu `ZONA_WAKTU`, uji beban `skrip/beban.ts`.
-- **Repo:** `github.com/dreinst/produksia` (folder `app/` saja). Commit hanya atas nama `dreinst`; hook `commit-msg` lokal membuang trailer atribusi alat apa pun.
+- **Repo:** `github.com/dreinst/produksia` (folder `app/` saja).
+- **Produksi:** VPS Ubuntu + PostgreSQL lokal + Caddy; layanan systemd menjalankan `.next/standalone/server.js` di 127.0.0.1:3000; rute `/api/sehat` (publik, `SELECT 1`) dipakai deploy & pemantauan; berkas dan langkahnya di `DEPLOY.md` dan `deploy/`. Commit hanya atas nama `dreinst`; hook `commit-msg` lokal membuang trailer atribusi alat apa pun.
 
 ---
 

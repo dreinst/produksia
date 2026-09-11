@@ -1,0 +1,7 @@
+[Unit]
+Description=Backup basis data Produksia
+
+[Service]
+Type=oneshot
+User=produksia
+ExecStart=/usr/bin/bash /srv/produksia/app/deploy/backup.sh

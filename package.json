@@ -2,6 +2,9 @@
   "name": "produksia",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "siapkan": "prisma migrate deploy --config prisma7.config.ts && prisma generate --config prisma7.config.ts",
     "predev": "npm run siapkan",
@@ -12,7 +15,7 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx prisma/reset.ts && tsx prisma/seed.ts",
-    "uji": "for s in skrip/uji-*.ts; do npx tsx  || exit 1; done"
+    "uji": "for s in skrip/uji-*.ts; do npx tsx \"$s\" || exit 1; done"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

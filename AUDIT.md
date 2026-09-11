@@ -95,6 +95,8 @@ Temuan dan perbaikan:
 11. **[FIXED] Menu Transaksi Baru tetap terbuka setelah diklik.** Kini muncul saat kursor di atasnya dan hilang saat kursor pergi; klik/Enter tetap membuka (layar sentuh), Escape dan pindah fokus menutup.
 12. **[FIXED] Halaman masuk terlalu ramai.** Kembali satu kolom di tengah, latar ringan, hanya nama pengguna, kata sandi, tombol, dan tautan lupa kata sandi.
 
+13. **[FIXED] Belum ada paket deploy.** Ditambah `deploy/` (skrip pasang server Ubuntu 24.04 sekali jalan, `deploy.sh` untuk pembaruan, unit systemd, timer backup `pg_dump` harian 30 hari + rclone opsional, Caddyfile HTTPS dengan header keamanan dan cache aset), `.github/workflows/deploy.yml` (SSH setelah CI sukses), rute publik `/api/sehat` (`SELECT 1`), `.env.example`, dan `DEPLOY.md`. Keluaran `next build` standalone diuji lokal: `/api/sehat` ok, halaman masuk 200, tanpa galat, 55 MB. Skrip `npm run uji` yang kehilangan `$s` diperbaiki; `engines.node >= 22`.
+
 Batas yang disadari (belum perlu untuk skala usaha ini): pencarian `contains` tanpa indeks trigram; tanpa cache antar permintaan (data selalu segar); satu proses Node per instance (skalakan horizontal di belakang reverse proxy).
 
 Uji beban lokal (`skrip/beban.ts`, build produksi `next start`, PostgreSQL 18 di mesin yang sama, data seed, 30 permintaan serentak per halaman; sukses = 200 dan benar-benar halaman aplikasi, bukan pengalihan):

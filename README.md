@@ -170,6 +170,8 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
 ## Deploy & kinerja
 
+Panduan lengkap VPS (skrip pasang sekali jalan, systemd, Caddy HTTPS, backup harian, deploy otomatis dari GitHub) ada di **`DEPLOY.md`** dan folder `deploy/`.
+
 - **Build**: `npm run build` (menjalankan migrasi + generate lebih dulu) menghasilkan `.next/standalone` (`output: "standalone"`): jalankan `node .next/standalone/server.js` (salin `.next/static` dan `public` ke sebelahnya) atau cukup `npm start`. Untuk beberapa proses/instance, pasang di belakang reverse proxy (nginx/Caddy) dengan HTTPS.
 - **Basis data**: PostgreSQL 14+. Semua kolom relasi (FK) dan kolom yang sering difilter (`tanggal`, `status`, `kedaluwarsa`) sudah berindeks (107 indeks). Pool koneksi per proses bawaan 10, atur lewat `DB_POOL_MAX`; pastikan `max_connections` PostgreSQL ≥ jumlah proses × pool + cadangan.
 - **Beban ringan per permintaan**: halaman tidak memuat baris jurnal ke memori. Saldo akun, laporan, tren bulanan, dan pemeriksaan integritas dihitung dengan `GROUP BY`/`SUM` di PostgreSQL (`saldoAkunPeriode`, `hitungLabaRugiBulanan`, `periksaSinkron`, kartu beranda). Rentang tahun di sidebar memakai MIN/MAX berindeks. Kartu tren beranda dialirkan lewat `<Suspense>` sehingga kerangka halaman tampil lebih dulu. Pengaturan perusahaan di-`cache()` per permintaan; sesi kedaluwarsa dibersihkan saat ada yang masuk.
