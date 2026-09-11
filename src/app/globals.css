@@ -3,13 +3,13 @@
 /*
  * Design system "Precision Ledger" (dari paket Stitch, lihat DESIGN.md):
  * - Kanvas #f8fafc, kartu putih dengan border tipis & bayangan sangat halus
- * - Inter untuk teks, Hanken Grotesk untuk judul, JetBrains Mono untuk angka & nomor dokumen
+ * - Helvetica untuk seluruh teks (judul, isi, angka); angka memakai tabular-nums agar rata di tabel
  * - Satu tema terang; sinyal finansial: emerald (kredit/lunas), rose (debit/jatuh tempo), amber (draft/menunggu)
  */
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-hanken), var(--font-inter), ui-sans-serif, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-heading: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --color-canvas: #f8fafc;
   /* Identitas merek Produksia: navy sebagai warna utama, oranye sebagai aksen tindakan */
   --color-navy: #0b2141;

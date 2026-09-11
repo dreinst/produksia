@@ -42,10 +42,14 @@ export default function ImporMutasi({ daftarAkun, contohCsv }: { daftarAkun: Aku
             ))}
           </select>
         </div>
-        <div className="bidang">
-          <label className="label" htmlFor="berkas">Berkas mutasi</label>
-          <input id="berkas" name="berkas" type="file" accept=".csv,.txt,.tsv,.html,.htm,text/csv,text/html,text/plain" className="isian" />
-          <span className="petunjuk">CSV, TSV, atau HTML. Maksimal 2 MB.</span>
+        <div className="bidang md:col-span-2">
+          <label className="label" htmlFor="berkas">Unggah berkas mutasi</label>
+          <label htmlFor="berkas" className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/60 px-4 py-7 text-center cursor-pointer transition-colors hover:border-navy-terang hover:bg-slate-50">
+            <span className="w-12 h-12 rounded-full bg-white border border-slate-200 flex items-center justify-center text-navy-terang"><Ikon nama="upload_file" className="!text-[26px]" /></span>
+            <span className="text-sm font-semibold text-slate-700">Klik di sini untuk memilih berkas mutasi</span>
+            <span className="text-xs text-slate-500">Ekspor rekening koran dari internet banking sebagai CSV/TSV/HTML, lalu pilih di sini. Maksimal 2 MB.</span>
+          </label>
+          <input id="berkas" name="berkas" type="file" accept=".csv,.txt,.tsv,.html,.htm,text/csv,text/html,text/plain" className="isian mt-2" />
         </div>
         <div className="bidang md:col-span-2">
           <label className="label" htmlFor="sudutPandang">Arti kolom Debit/Kredit</label>
@@ -57,8 +61,9 @@ export default function ImporMutasi({ daftarAkun, contohCsv }: { daftarAkun: Aku
           <span className="petunjuk">Biarkan otomatis. Sistem menyimpan uang masuk sebagai Debit kas/bank, sesuai jurnal.</span>
         </div>
         <div className="bidang md:col-span-2">
-          <label className="label" htmlFor="isi">Atau tempel isi mutasi</label>
-          <textarea id="isi" name="isi" rows={4} className="isian font-mono text-xs" placeholder={contohCsv} />
+          <label className="label" htmlFor="isi"><span className="flex items-center gap-1.5"><Ikon nama="content_paste" className="!text-[16px] text-slate-400" /> Atau tempel isi mutasi di sini</span></label>
+          <textarea id="isi" name="isi" rows={12} className="isian font-mono text-xs leading-relaxed min-h-[220px]" placeholder={contohCsv} />
+          <span className="petunjuk">Tempel langsung dari Excel atau salinan rekening koran. Kolom yang dikenali: Tanggal, Keterangan, Referensi, Debit/Kredit (atau satu kolom Jumlah bertanda), Saldo. Baris pertama boleh berupa judul kolom; pemisah koma/titik-koma/tab dideteksi otomatis.</span>
         </div>
         <details className="md:col-span-2 text-sm">
           <summary className="cursor-pointer text-slate-600">Atur kolom sendiri (jika tajuk tidak dikenali)</summary>
