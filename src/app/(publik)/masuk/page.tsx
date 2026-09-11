@@ -29,6 +29,11 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
               </p>
             </div>
             <div className="bidang">
+              <label className="label" htmlFor="kunciPemasangan">Kunci pemasangan server</label>
+              <input id="kunciPemasangan" name="kunciPemasangan" autoComplete="off" autoCapitalize="none" spellCheck={false} className="isian" />
+              <span className="petunjuk">Dari admin server (env KUNCI_PEMASANGAN). Wajib di produksi.</span>
+            </div>
+            <div className="bidang">
               <label className="label" htmlFor="nama">Nama</label>
               <input id="nama" name="nama" required autoComplete="name" className="isian" />
             </div>
