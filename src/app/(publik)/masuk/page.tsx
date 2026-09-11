@@ -6,6 +6,7 @@ import { buatPemilikPertamaFormulir, masukFormulir } from "@/lib/aksi/otentikasi
 import FormulirAksi from "@/komponen/FormulirAksi";
 import Logo from "@/komponen/ui/Logo";
 import Ikon from "@/komponen/ui/Ikon";
+import KakiHalaman from "@/komponen/ui/KakiHalaman";
 
 export default async function HalamanMasuk({ searchParams }: { searchParams: Promise<{ kembali?: string }> }) {
   const { kembali } = await searchParams;
@@ -82,6 +83,7 @@ export default async function HalamanMasuk({ searchParams }: { searchParams: Pro
         <p className="text-center text-xs">
           <Link href="/lupa-kata-sandi" className="text-slate-500 hover:text-navy hover:underline">Lupa kata sandi?</Link>
         </p>
+        <KakiHalaman />
       </div>
     </div>
   );

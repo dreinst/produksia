@@ -3,6 +3,7 @@ import { PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
 import { pakaiTautanAturUlangFormulir, periksaTautanAturUlang } from "@/lib/aksi/otentikasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import Ikon from "@/komponen/ui/Ikon";
+import KakiHalaman from "@/komponen/ui/KakiHalaman";
 
 export default async function HalamanAturUlang({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -40,6 +41,7 @@ export default async function HalamanAturUlang({ params }: { params: Promise<{ t
             </button>
           </FormulirAksi>
         )}
+        <KakiHalaman />
       </div>
     </div>
   );

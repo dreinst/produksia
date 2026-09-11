@@ -4,6 +4,7 @@ import { penggunaSaatIni } from "@/lib/otentikasi";
 import { mintaAturUlangFormulir } from "@/lib/aksi/otentikasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import Ikon from "@/komponen/ui/Ikon";
+import KakiHalaman from "@/komponen/ui/KakiHalaman";
 
 export default async function HalamanLupaKataSandi() {
   if (await penggunaSaatIni()) redirect("/profil");
@@ -34,6 +35,7 @@ export default async function HalamanLupaKataSandi() {
         <p className="text-center text-xs text-slate-400">
           <Link href="/masuk" className="text-blue-600 hover:underline">Kembali ke halaman masuk</Link>
         </p>
+        <KakiHalaman />
       </div>
     </div>
   );
