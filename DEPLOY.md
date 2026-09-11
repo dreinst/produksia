@@ -156,3 +156,5 @@ bash deploy/docker/unban.sh daftar        # daftar semua IP yang diblokir
 ```
 
 Alat menampilkan jumlah percobaan gagal, contoh barisnya, dan pemilik IP, supaya Anda membedakan karyawan (sedikit gagal, lokasi wajar) dari peretas (ratusan percobaan, IP asing) sebelum membuka. Sengaja tidak ada tombol unban di web app: memberi aplikasi Vercel kendali firewall VPS justru berbahaya bila app diretas.
+
+> **Penting build Vercel:** build Vercel HANYA menjalankan `prisma generate` (lihat skrip `prebuild`/`siapkan`), TIDAK menjalankan `prisma migrate deploy` — supaya build tak bergantung koneksi DB. Migrasi ke DB produksi dijalankan terpisah: dari VPS `cd /data/produksia/app && docker compose --env-file .env.docker run --rm --build migrasi`, atau dari mesin lain `npm run migrasi` dengan `DATABASE_URL` produksi. Jalankan ini setiap kali ada migrasi baru SEBELUM/也 saat rilis.
