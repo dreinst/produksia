@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // DATABASE_URL_MIGRASI: koneksi khusus migrasi (mis. lewat PgBouncer mode session dengan sslmode=require);
+    // bila kosong memakai DATABASE_URL yang sama dengan aplikasi.
+    url: process.env["DATABASE_URL_MIGRASI"] ?? process.env["DATABASE_URL"],
   },
 });

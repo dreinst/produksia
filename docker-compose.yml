@@ -22,6 +22,20 @@ services:
       retries: 30
     networks: [internal]
 
+  pgbouncer:
+    # pooler untuk klien di luar server (Vercel): TLS wajib, mode transaksi; konfigurasi di ${PGBOUNCER_DIR}
+    # (dibuat oleh deploy/docker/pasang-pgbouncer.sh). Port 6432 dipublikasikan; firewall.sh mengizinkannya.
+    image: edoburu/pgbouncer:v1.25.2-p0
+    restart: unless-stopped
+    ports:
+      - "6432:6432"
+    volumes:
+      - ${PGBOUNCER_DIR:-/data/produksia/pgbouncer}:/etc/pgbouncer:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+
   migrasi:
     build:
       context: .

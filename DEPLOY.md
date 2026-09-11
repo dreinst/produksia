@@ -3,6 +3,7 @@
 Ada dua jalur, pilih sesuai server:
 
 - **Jalur A, VPS kosong**: systemd + Caddy + PostgreSQL di host (bagian 1 sampai 6 di bawah).
+- **Jalur C, aplikasi di Vercel + basis data di VPS** (PgBouncer TLS di port 6432, bagian 8). Ini yang dipakai sekarang.
 - **Jalur B, server yang sudah memakai Docker/Coolify/Traefik** (port 80/443 sudah dipakai proxy): stack `docker-compose.yml` dengan PostgreSQL sendiri di volume, dirutekan Traefik lewat jaringan `coolify` dengan HTTPS otomatis (bagian 7). Server `187.53.129.205` (host Coolify) memakai jalur ini.
 
 ## Jalur A
@@ -104,3 +105,32 @@ Traefik Coolify membaca label kontainer `app` di jaringan `coolify` dan meminta 
 - **Log**: `docker compose --env-file .env.docker logs -f app` (atau `migrasi`, `db`).
 - **Backup**: `deploy/docker/backup.sh` (pasang di cron root pukul 02:30; simpan 30 hari; `RCLONE_REMOTE` opsional di `.env.docker`). Pulihkan: `docker compose --env-file .env.docker exec -T db pg_restore -U produksia -d produksia --clean --if-exists < backup/produksia-YYYYMMDD-HHMM.dump`.
 - **Pindah ke Coolify UI** (opsional): buat resource baru tipe Docker Compose dari repo ini; Coolify akan memasang labelnya sendiri, hapus blok `labels` dan jaringan `coolify` dari compose bila memakai jalur itu.
+
+## 8. Jalur C: aplikasi di Vercel, basis data di VPS
+
+Pilihan saat ini: aplikasi berjalan di Vercel (akun `dreinst`, region `sin1` Singapura, dekat VPS Kuala Lumpur), basis data PostgreSQL tetap di VPS di balik **PgBouncer** dengan TLS (port 6432). Fungsi serverless membuka koneksi pendek dalam jumlah besar, PgBouncer (mode transaksi) menjaganya tetap di bawah batas PostgreSQL.
+
+### Di VPS (sudah dipasang)
+
+```bash
+cd /data/produksia/app
+bash deploy/docker/pasang-pgbouncer.sh     # sertifikat TLS, userlist, pgbouncer.ini, kontainer pgbouncer, berkas nilai env Vercel
+TRUSTED_IPS="IP.mac.anda" bash deploy/docker/firewall.sh   # ufw + ufw-docker: hanya 22/80/443/6432 publik
+```
+
+`pasang-pgbouncer.sh` menulis semua nilai lingkungan untuk Vercel ke `/data/produksia/vercel-env.txt` (hanya root): `DATABASE_URL` (pool transaksi, tanpa `sslmode` karena TLS dipasang lewat `DB_SSL_CA`), `DATABASE_URL_MIGRASI` (basis data `produksia_migrasi`, mode session, dipakai `prisma migrate deploy` saat build), `DB_POOL_MAX=3`, `ZONA_WAKTU`, dan `DB_SSL_CA` (sertifikat server PgBouncer; aplikasi memverifikasi TLS secara ketat terhadap sertifikat ini, lihat `src/lib/db.ts`).
+
+### Di Vercel (sekali)
+
+1. Vercel → Add New Project → impor repo GitHub `dreinst/produksia`. Framework Next.js terdeteksi; `vercel.json` sudah menetapkan region `sin1`. Node 22 diambil dari `engines` di `package.json`.
+2. Environment Variables (centang hanya **Production**): salin isi `/data/produksia/vercel-env.txt` baris per baris. Untuk `DB_SSL_CA` tempel apa adanya (berisi `\n`; kode mengembalikannya menjadi baris baru).
+3. Deploy. Saat build, `prebuild` menjalankan `prisma migrate deploy` lewat `DATABASE_URL_MIGRASI`, lalu `next build`.
+4. Settings → Git: matikan deploy otomatis untuk cabang selain `main` (Preview) supaya build pratinjau tidak menjalankan migrasi ke basis data produksi, atau beri Preview basis data terpisah.
+5. Domain: tambahkan domain di Vercel dan arahkan DNS-nya (CNAME ke `cname.vercel-dns.com`).
+
+Setelah Vercel hidup, kontainer `app` di VPS tidak diperlukan lagi: `docker compose --env-file .env.docker stop app` (basis data dan PgBouncer tetap jalan). Menjalankannya kembali kapan saja dengan `up -d app`.
+
+### Catatan keamanan
+- Port 6432 terbuka untuk internet karena alamat keluar Vercel tidak tetap. Perlindungannya: TLS wajib, sandi acak 48 karakter, autentikasi SCRAM, dan aplikasi memverifikasi sertifikat server (pinned). PostgreSQL sendiri (5432) tidak pernah dipublikasikan.
+- `ufw-docker` membuat aturan ufw berlaku juga untuk port yang dipublikasikan kontainer (bawaan Docker menembus ufw). Coolify UI (8000) dan realtime (6001-6002) kini hanya dari Tailscale dan `TRUSTED_IPS`.
+- Ganti sandi basis data: ubah `DB_PASSWORD` di `.env.docker`, `ALTER ROLE produksia PASSWORD '…'` di PostgreSQL, jalankan ulang `pasang-pgbouncer.sh`, perbarui env di Vercel.
