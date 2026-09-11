@@ -74,9 +74,10 @@ export async function buatPemilikPertama(dataFormulir: FormData) {
   // Cegah perebutan akun: di produksi, membuat Pemilik pertama wajib memakai KUNCI_PEMASANGAN dari server.
   // Basis data kosong yang terekspos internet tidak bisa direbut anonim. Setel env di server, buat akun, lalu hapus env-nya.
   if (process.env.NODE_ENV === "production") {
-    const kunciServer = process.env.KUNCI_PEMASANGAN ?? "";
+    // trim kedua sisi: spasi/baris-baru tak sengaja (di env server maupun tempelan pengguna) tidak boleh menggagalkan kunci
+    const kunciServer = (process.env.KUNCI_PEMASANGAN ?? "").trim();
     if (!kunciServer) throw new Error("Pemasangan awal dinonaktifkan. Minta admin server menyetel KUNCI_PEMASANGAN, lalu muat ulang.");
-    const kunciKirim = String(dataFormulir.get("kunciPemasangan") ?? "");
+    const kunciKirim = String(dataFormulir.get("kunciPemasangan") ?? "").trim();
     if (!samaAman(kunciKirim, kunciServer)) throw new Error("Kunci pemasangan salah.");
   }
 
