@@ -31,6 +31,7 @@ services:
       - "6432:6432"
     volumes:
       - ${PGBOUNCER_DIR:-/data/produksia/pgbouncer}:/etc/pgbouncer:ro
+      - ${PGBOUNCER_DIR:-/data/produksia/pgbouncer}/log:/var/log/pgbouncer
     depends_on:
       db:
         condition: service_healthy
