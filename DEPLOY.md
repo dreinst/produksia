@@ -1,5 +1,12 @@
 # Deploy Produksia ke VPS
 
+Ada dua jalur, pilih sesuai server:
+
+- **Jalur A, VPS kosong**: systemd + Caddy + PostgreSQL di host (bagian 1 sampai 6 di bawah).
+- **Jalur B, server yang sudah memakai Docker/Coolify/Traefik** (port 80/443 sudah dipakai proxy): stack `docker-compose.yml` dengan PostgreSQL sendiri di volume, dirutekan Traefik lewat jaringan `coolify` dengan HTTPS otomatis (bagian 7). Server `187.53.129.205` (host Coolify) memakai jalur ini.
+
+## Jalur A
+
 Target: satu VPS Ubuntu 24.04 LTS (2 vCPU, 4 GB RAM cukup untuk puluhan pengguna serentak), PostgreSQL di mesin yang sama, Caddy sebagai reverse proxy dengan HTTPS otomatis, aplikasi berjalan sebagai layanan systemd. Semua berkasnya ada di folder `deploy/`.
 
 ## 1. Sekali jalan: pasang server
@@ -74,3 +81,26 @@ sudo systemctl start produksia
 - **HTTPS belum aktif**: DNS belum mengarah ke server atau port 80/443 tertutup. Cek `journalctl -u caddy -n 50`.
 - **`/api/sehat` menjawab 503**: PostgreSQL mati atau `DATABASE_URL` salah. `systemctl status postgresql`.
 - **Port 3000 dipakai proses lain**: ubah `PORT` di unit systemd dan di Caddyfile.
+
+## 7. Jalur B: server Docker/Coolify (Traefik di 80/443)
+
+Berkas: `Dockerfile` (multi-tahap, keluaran standalone, berjalan sebagai pengguna non-root, healthcheck `/api/sehat`), `docker-compose.yml` (layanan `db` PostgreSQL 16 dengan volume `produksia-db`, `migrasi` sekali jalan `prisma migrate deploy`, `app` dengan label Traefik seperti aplikasi Coolify), `deploy/docker/deploy.sh`, `deploy/docker/backup.sh`.
+
+Pasang pertama kali (sebagai root):
+
+```bash
+mkdir -p /data/produksia && cd /data/produksia
+git clone https://github.com/dreinst/produksia.git app && cd app
+cp .env.docker.example .env.docker
+# isi DOMAIN (domain Anda, atau sementara produksia.<IP>.sslip.io) dan DB_PASSWORD acak, misalnya:
+#   sed -i "s/^DOMAIN=.*/DOMAIN=produksia.contoh.id/; s/^DB_PASSWORD=.*/DB_PASSWORD=$(openssl rand -hex 24)/" .env.docker
+docker compose --env-file .env.docker up -d --build
+```
+
+Traefik Coolify membaca label kontainer `app` di jaringan `coolify` dan meminta sertifikat Let's Encrypt untuk `DOMAIN` (DNS harus sudah mengarah ke server). Cek: `curl -s https://DOMAIN/api/sehat` → `{"ok":true}`.
+
+- **Perbarui**: `bash /data/produksia/app/deploy/docker/deploy.sh` (dipakai juga workflow Deploy; set Variables repo `VPS_USER=root`, `DEPLOY_CMD=bash /data/produksia/app/deploy/docker/deploy.sh`).
+- **Ganti domain**: ubah `DOMAIN` di `.env.docker`, lalu `docker compose --env-file .env.docker up -d` (kontainer `app` dibuat ulang dengan label baru, data tidak tersentuh).
+- **Log**: `docker compose --env-file .env.docker logs -f app` (atau `migrasi`, `db`).
+- **Backup**: `deploy/docker/backup.sh` (pasang di cron root pukul 02:30; simpan 30 hari; `RCLONE_REMOTE` opsional di `.env.docker`). Pulihkan: `docker compose --env-file .env.docker exec -T db pg_restore -U produksia -d produksia --clean --if-exists < backup/produksia-YYYYMMDD-HHMM.dump`.
+- **Pindah ke Coolify UI** (opsional): buat resource baru tipe Docker Compose dari repo ini; Coolify akan memasang labelnya sendiri, hapus blok `labels` dan jaringan `coolify` dari compose bila memakai jalur itu.

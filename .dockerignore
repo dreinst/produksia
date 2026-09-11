@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.github
+.claude
+.agents
+.env
+.env.*
+!.env.example
+out*
+*.log
+deploy
+DEPLOY.md
+AUDIT.md
+ARCHITECTURE.md
+README.md
+BAGAN-AKUN.md

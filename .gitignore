@@ -49,3 +49,6 @@ out*/
 /.claude/
 /.agents/
 /CLAUDE.md
+
+# konfigurasi docker compose di server
+.env.docker
