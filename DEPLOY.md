@@ -138,3 +138,7 @@ Setelah Vercel hidup, kontainer `app` di VPS tidak diperlukan lagi: `docker comp
 - Ganti sandi basis data: ubah `DB_PASSWORD` di `.env.docker`, `ALTER ROLE produksia PASSWORD '…'` di PostgreSQL, jalankan ulang `pasang-pgbouncer.sh`, perbarui env di Vercel.
 
 > **Keamanan pemasangan awal:** DB awal kosong → `/masuk` menampilkan pembuatan Pemilik pertama. Di produksi ini butuh env `KUNCI_PEMASANGAN` (teks acak). Setel di Vercel (Production), buat akun Pemilik dengan kunci itu, lalu HAPUS variabelnya dan redeploy.
+
+### Firewall lanjutan (jalur B/C)
+
+`bash deploy/docker/pasang-fail2ban.sh` memasang jail fail2ban: **pgbouncer** (5 gagal auth / 10 mnt → ban 1 jam di rantai DOCKER-USER, IP internal & Tailscale dikecualikan), **recidive** (pelanggar berulang → ban 1 minggu), dan mematikan `X11Forwarding` sshd. PgBouncer harus logging ke file (sudah diatur di `pgbouncer.ini` + mount `log/`).
