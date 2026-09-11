@@ -1,0 +1,26 @@
+# Reverse proxy Produksia. DOMAIN_PRODUKSIA diganti oleh deploy/pasang-server.sh.
+DOMAIN_PRODUKSIA {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	@statis path /_next/static/* /logo/* /fonts/*
+	header @statis Cache-Control "public, max-age=31536000, immutable"
+
+	reverse_proxy 127.0.0.1:3000 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	log {
+		output file /var/log/caddy/produksia.log {
+			roll_size 20mb
+			roll_keep 5
+		}
+	}
+}

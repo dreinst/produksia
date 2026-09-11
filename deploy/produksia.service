@@ -1,0 +1,27 @@
+[Unit]
+Description=Produksia (Next.js standalone)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=produksia
+Group=produksia
+WorkingDirectory=/srv/produksia/app
+EnvironmentFile=/srv/produksia/app/.env
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+ExecStart=/usr/bin/node .next/standalone/server.js
+Restart=always
+RestartSec=3
+# batas & pengerasan ringan
+LimitNOFILE=65536
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/srv/produksia
+
+[Install]
+WantedBy=multi-user.target
