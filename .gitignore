@@ -52,3 +52,6 @@ out*/
 
 # konfigurasi docker compose di server
 .env.docker
+
+# folder aset logo lokal (bukan bagian aplikasi)
+/Produksia-logo/
