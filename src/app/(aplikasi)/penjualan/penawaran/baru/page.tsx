@@ -3,6 +3,7 @@ import { punyaHak, PERAN_TERTINGGI } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
 import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatPenawaranFormulir } from "@/lib/aksi/penjualan";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
 
@@ -26,7 +27,7 @@ export default async function HalamanPenawaranBaru() {
     <div className="space-y-6 max-w-3xl">
       <h1 className="judul-halaman">Penawaran Penjualan Baru</h1>
 
-      <FormulirAksi aksi={buatPenawaranFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormulirAksi aksi={buatPenawaranFormulir} verifikasi={{ judul: "Periksa penawaran", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bidang">
           <label className="label" htmlFor="pelangganId">Pelanggan *</label>
           <select id="pelangganId" name="pelangganId" required className="isian">

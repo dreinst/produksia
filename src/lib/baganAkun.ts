@@ -59,30 +59,21 @@ export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<Hasil
         barangTerkirimId: id(PEMETAAN_STANDAR.barangTerkirim),
         uangMukaPelangganId: id(PEMETAAN_STANDAR.uangMukaPelanggan),
         labaDitahanId: id(PEMETAAN_STANDAR.labaDitahan),
+        diskonPenjualanId: id(PEMETAAN_STANDAR.diskonPenjualan),
+        pendapatanLainId: id(PEMETAAN_STANDAR.pendapatanLain),
       },
     });
     hasil.pemetaanDibuat = true;
   } else {
-    // Pemetaan lama (5 peran): lengkapi peran opsional yang masih kosong dengan akun standar
-    const ada = await klien.pemetaanAkun.findUniqueOrThrow({ where: { id: "default" } });
-    const lengkap = {
-      bebanJasaId: ada.bebanJasaId ?? idByKode.get(PEMETAAN_STANDAR.bebanJasa),
-      barangBelumDitagihId: ada.barangBelumDitagihId ?? idByKode.get(PEMETAAN_STANDAR.barangBelumDitagih),
-      selisihPersediaanId: ada.selisihPersediaanId ?? idByKode.get(PEMETAAN_STANDAR.selisihPersediaan),
-      barangTerkirimId: ada.barangTerkirimId ?? idByKode.get(PEMETAAN_STANDAR.barangTerkirim),
-      uangMukaPelangganId: ada.uangMukaPelangganId ?? idByKode.get(PEMETAAN_STANDAR.uangMukaPelanggan),
-      labaDitahanId: ada.labaDitahanId ?? idByKode.get(PEMETAAN_STANDAR.labaDitahan),
-    };
-    if (
-      lengkap.bebanJasaId !== ada.bebanJasaId ||
-      lengkap.barangBelumDitagihId !== ada.barangBelumDitagihId ||
-      lengkap.selisihPersediaanId !== ada.selisihPersediaanId ||
-      lengkap.barangTerkirimId !== ada.barangTerkirimId ||
-      lengkap.uangMukaPelangganId !== ada.uangMukaPelangganId ||
-      lengkap.labaDitahanId !== ada.labaDitahanId
-    ) {
-      await klien.pemetaanAkun.update({ where: { id: "default" }, data: lengkap });
+    // Peran yang masih kosong pada pemetaan lama (mis. peran baru setelah pembaruan) diisi dari standar; yang sudah diatur tidak diubah
+    const lama = (await klien.pemetaanAkun.findUniqueOrThrow({ where: { id: "default" } })) as unknown as Record<string, unknown>;
+    const isi: Record<string, string> = {};
+    for (const [peran, kode] of Object.entries(PEMETAAN_STANDAR)) {
+      const kolom = `${peran}Id`;
+      const akunId = idByKode.get(kode);
+      if (!lama[kolom] && akunId) isi[kolom] = akunId;
     }
+    if (Object.keys(isi).length > 0) await klien.pemetaanAkun.update({ where: { id: "default" }, data: isi });
   }
   return hasil;
 }

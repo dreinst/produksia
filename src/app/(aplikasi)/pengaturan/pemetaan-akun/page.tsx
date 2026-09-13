@@ -21,12 +21,14 @@ const FIELDS = [
   { nama: "barangTerkirimId", label: "Barang Terkirim Belum Ditagih (akun Aset)", filterType: "ASET", wajib: false, petunjuk: "Dipakai Surat Jalan dan Faktur Penjualan" },
   { nama: "uangMukaPelangganId", label: "Uang Muka Pelanggan (akun Kewajiban)", filterType: "KEWAJIBAN", wajib: false, petunjuk: "DP pesanan, dipakai saat Faktur Penjualan" },
   { nama: "labaDitahanId", label: "Laba Ditahan (akun Modal)", filterType: "MODAL", wajib: false, petunjuk: "Tujuan jurnal penutup tahun" },
+  { nama: "diskonPenjualanId", label: "Diskon Penjualan (akun Pendapatan, kontra)", filterType: "PENDAPATAN", wajib: false, petunjuk: "Potongan harga di Faktur Penjualan; kelompok akun ini tidak dihitung sebagai omzet" },
+  { nama: "pendapatanLainId", label: "Pendapatan Lain-lain (kelompok akun Pendapatan)", filterType: "PENDAPATAN", wajib: false, kelompok: true, petunjuk: "Bunga bank, laba pelepasan aset, dsb. Di luar omzet usaha untuk PPh Final" },
 ] as const;
 
 export default async function HalamanPemetaanAkun() {
   await wajibHak("pemetaan.tulis");
   const [daftarAkun, pemetaan, tambahan] = await Promise.all([
-    db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } }),
+    db.akun.findMany({ orderBy: { kode: "asc" } }),
     db.pemetaanAkun.findUnique({ where: { id: "default" } }),
     db.pemetaanAkunTambahan.findMany({ include: { akun: true }, orderBy: { label: "asc" } }),
   ]);
@@ -59,7 +61,7 @@ export default async function HalamanPemetaanAkun() {
             >
               <option value="">-</option>
               {daftarAkun
-                .filter((a) => a.jenis === bidang.filterType)
+                .filter((a) => a.jenis === bidang.filterType && a.kelompok === ("kelompok" in bidang && bidang.kelompok))
                 .map((a) => (
                   <option key={a.id} value={a.id}>{labelAkun(a)}</option>
                 ))}

@@ -3,6 +3,7 @@ import { punyaHak, PERAN_TERTINGGI } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
 import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatPesananFormulir } from "@/lib/aksi/penjualan";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
 
@@ -26,7 +27,7 @@ export default async function HalamanPesananPenjualanBaru() {
     <div className="space-y-6 max-w-3xl">
       <h1 className="judul-halaman">Pesanan Penjualan Baru</h1>
 
-      <FormulirAksi aksi={buatPesananFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormulirAksi aksi={buatPesananFormulir} verifikasi={{ judul: "Periksa pesanan penjualan", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bidang">
           <label className="label" htmlFor="pelangganId">Pelanggan *</label>
           <select id="pelangganId" name="pelangganId" required className="isian">
@@ -55,10 +56,14 @@ export default async function HalamanPesananPenjualanBaru() {
 
         <EditorBarisBarang daftarBarang={opsiBarang} bolehNego={punyaHak(pengguna, "harga.nego")} bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)} />
 
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 flex flex-wrap items-center gap-2">
           <button type="submit" className="tombol tombol-utama">
             Simpan Pesanan
           </button>
+          <button type="submit" name="lanjut" value="faktur" className="tombol tombol-garis">
+            Simpan &amp; Buat Faktur
+          </button>
+          <span className="petunjuk">Untuk jasa yang sudah selesai dikerjakan: pesanan tercatat, lalu langsung ke faktur (SJ hanya perlu bila ada barang fisik).</span>
         </div>
       </FormulirAksi>
     </div>

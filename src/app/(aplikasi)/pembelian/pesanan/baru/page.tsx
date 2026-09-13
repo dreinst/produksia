@@ -2,6 +2,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatPesananPembelianFormulir } from "@/lib/aksi/pembelian";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
 
@@ -24,7 +25,7 @@ export default async function HalamanPesananPembelianBaru() {
     <div className="space-y-6 max-w-3xl">
       <h1 className="judul-halaman">Pesanan Pembelian Baru</h1>
 
-      <FormulirAksi aksi={buatPesananPembelianFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormulirAksi aksi={buatPesananPembelianFormulir} verifikasi={{ judul: "Periksa pesanan pembelian", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bidang">
           <label className="label" htmlFor="pemasokId">Pemasok *</label>
           <select id="pemasokId" name="pemasokId" required className="isian">

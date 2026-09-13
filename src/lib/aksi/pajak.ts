@@ -33,7 +33,7 @@ export async function catatPphFinal(dataFormulir: FormData) {
   await db.$transaction(async (tx) => {
     const ringkasan = await ringkasanPajak(tx, tahun, pengaturan.pphFinalPersen);
     const data = ringkasan.bulan[bulan - 1];
-    if (data.omzet.lte(0)) throw new Error(`Tidak ada omzet pada periode ${periode} (DPP faktur − retur = ${format(data.omzet)})`);
+    if (data.omzet.lte(0)) throw new Error(`Tidak ada omzet pada periode ${periode} (omzet bruto usaha di buku besar = ${format(data.omzet)})`);
     if (data.pphFinal.lte(0)) throw new Error(`PPh Final periode ${periode} nol (tarif ${format(pengaturan.pphFinalPersen)}%)`);
     const tanggal = sampai < new Date() ? sampai : new Date();
     await pastikanTahunTerbuka(tx, tanggal);

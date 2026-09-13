@@ -4739,6 +4739,7 @@ export const FakturPenjualanScalarFieldEnum = {
   pengirimanId: 'pengirimanId',
   status: 'status',
   total: 'total',
+  diskon: 'diskon',
   dpp: 'dpp',
   ppnPersen: 'ppnPersen',
   ppn: 'ppn',
@@ -4812,6 +4813,7 @@ export const ReturPenjualanScalarFieldEnum = {
   gudangId: 'gudangId',
   alasan: 'alasan',
   total: 'total',
+  diskon: 'diskon',
   dpp: 'dpp',
   ppn: 'ppn',
   jurnalId: 'jurnalId'
@@ -4982,7 +4984,9 @@ export const PemetaanAkunScalarFieldEnum = {
   selisihPersediaanId: 'selisihPersediaanId',
   barangTerkirimId: 'barangTerkirimId',
   uangMukaPelangganId: 'uangMukaPelangganId',
-  labaDitahanId: 'labaDitahanId'
+  labaDitahanId: 'labaDitahanId',
+  diskonPenjualanId: 'diskonPenjualanId',
+  pendapatanLainId: 'pendapatanLainId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]

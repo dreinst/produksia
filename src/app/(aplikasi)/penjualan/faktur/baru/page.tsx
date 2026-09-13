@@ -7,6 +7,11 @@ import { buatFakturFormulir } from "@/lib/aksi/penjualan";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
+/** Pendapatan diakui setelah acara (PSAK 72): event tanpa tanggal selesai dianggap boleh difaktur. */
+function eventSudahSelesai(tanggalSelesai: Date | null) {
+  return !tanggalSelesai || tanggalSelesai.getTime() <= Date.now();
+}
+
 export default async function HalamanFakturPenjualanBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string }> }) {
   await wajibHak("faktur.buat");
   const { pesananId } = await searchParams;
@@ -14,7 +19,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
   const pesanan = pesananId
     ? await db.pesananPenjualan.findUnique({
         where: { id: pesananId },
-        include: { pelanggan: true, baris: { include: { barang: true } }, pengiriman: { orderBy: { tanggal: "asc" } }, uangMuka: true },
+        include: { pelanggan: true, baris: { include: { barang: true } }, pengiriman: { orderBy: { tanggal: "asc" } }, uangMuka: true, proyek: { select: { kode: true, nama: true, tanggalSelesai: true } } },
       })
     : null;
 
@@ -36,7 +41,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
   const [pemetaan, nomorBerikut] = await Promise.all([
     db.pemetaanAkun.findUnique({
       where: { id: "default" },
-      include: { piutangUsaha: true, pendapatanPenjualan: true, hpp: true, persediaan: true, barangTerkirim: true, uangMukaPelanggan: true },
+      include: { piutangUsaha: true, pendapatanPenjualan: true, hpp: true, persediaan: true, barangTerkirim: true, uangMukaPelanggan: true, diskonPenjualan: true },
     }),
     nomorDokumenBerikutnya(db.fakturPenjualan, "FJ"),
   ]);
@@ -50,6 +55,16 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
 
   return (
     <PenyusunFaktur
+      event={
+        pesanan.proyek
+          ? {
+              kode: pesanan.proyek.kode,
+              nama: pesanan.proyek.nama,
+              tanggalSelesai: pesanan.proyek.tanggalSelesai ? pesanan.proyek.tanggalSelesai.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : null,
+              selesai: eventSudahSelesai(pesanan.proyek.tanggalSelesai),
+            }
+          : null
+      }
       mode="penjualan"
       aksi={buatFakturFormulir}
       tautanKembali="/penjualan/pesanan"
@@ -81,6 +96,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
               ppn: akunPpn ? label(akunPpn) : undefined,
               barangTerkirim: pemetaan.barangTerkirim ? label(pemetaan.barangTerkirim) : undefined,
               uangMuka: pemetaan.uangMukaPelanggan ? label(pemetaan.uangMukaPelanggan) : undefined,
+              diskon: pemetaan.diskonPenjualan ? label(pemetaan.diskonPenjualan) : undefined,
             }
           : null
       }

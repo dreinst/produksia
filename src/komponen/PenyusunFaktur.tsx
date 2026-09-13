@@ -39,12 +39,15 @@ export type PropsPenyusun = {
     ppn?: string; // PPN Keluaran (penjualan) / PPN Masukan (pembelian)
     barangTerkirim?: string; // penjualan: lawan HPP untuk barang yang sudah dikirim (SJ)
     uangMuka?: string; // penjualan: Uang Muka Pelanggan
+    diskon?: string; // penjualan: Diskon Penjualan (kontra-pendapatan)
   };
   /** status PKP perusahaan & tarif bawaan; non-PKP selalu 0% */
   pajak: { pkp: boolean; tarif: number };
   terminHari: number;
   /** Penjualan: sisa uang muka pesanan yang bisa dipakai mengurangi piutang faktur ini */
   uangMukaTersedia?: number;
+  /** Penjualan: event pesanan; pendapatan sebaiknya diakui (difaktur) setelah acara selesai (PSAK 72) */
+  event?: { kode: string; nama: string; tanggalSelesai: string | null; selesai: boolean } | null;
 };
 
 const format = (n: number) => n.toLocaleString("id-ID");
@@ -57,16 +60,20 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
   const [ppnPersen, setPpnPersen] = useState(p.pajak.pkp ? p.pajak.tarif : 0);
   const uangMukaTersedia = adalahPenjualan ? (p.uangMukaTersedia ?? 0) : 0;
   const [uangMukaInput, setUangMukaInput] = useState(uangMukaTersedia);
+  const [diskonInput, setDiskonInput] = useState(0);
 
   const hitung = useMemo(() => {
     const subtotal = isian.reduce((s, r) => s + r.jumlah * r.harga, 0);
     const hargaPokok = isian.reduce((s, r, i) => s + r.jumlah * p.daftarBaris[i].hargaBeli, 0);
     const jumlahValid = isian.every((r, i) => r.jumlah >= 0 && r.jumlah <= p.daftarBaris[i].sisa) && isian.some((r) => r.jumlah > 0);
-    const ppn = Math.round(subtotal * ppnPersen) / 100;
-    const total = subtotal + ppn;
+    // Diskon faktur (penjualan): DPP PPN = subtotal − diskon; pendapatan tetap dijurnal bruto, diskon ke akun kontra
+    const diskon = adalahPenjualan ? Math.max(0, Math.min(diskonInput, subtotal)) : 0;
+    const dpp = subtotal - diskon;
+    const ppn = Math.round(dpp * ppnPersen) / 100;
+    const total = dpp + ppn;
     const uangMuka = Math.max(0, Math.min(uangMukaInput, uangMukaTersedia, total));
-    return { subtotal, hargaPokok, ppn, total, uangMuka, piutang: total - uangMuka, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
-  }, [isian, ppnPersen, p.daftarBaris, uangMukaInput, uangMukaTersedia]);
+    return { subtotal, diskon, dpp, hargaPokok, ppn, total, uangMuka, piutang: total - uangMuka, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
+  }, [isian, ppnPersen, p.daftarBaris, uangMukaInput, uangMukaTersedia, diskonInput, adalahPenjualan]);
 
   const ubahJumlah = (i: number, jumlah: number) => setIsian((sebelumnya) => sebelumnya.map((r, k) => (k === i ? { ...r, jumlah } : r)));
 
@@ -78,6 +85,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     ? [
         { akun: p.pemetaan?.akunLawan ?? "Piutang Usaha", catatan: hitung.uangMuka > 0 ? "Tagihan bruto (DPP + PPN) dikurangi uang muka" : "Tagihan bruto pelanggan (DPP + PPN)", debit: hitung.piutang, kredit: 0 },
         { akun: p.pemetaan?.uangMuka ?? "Uang Muka Pelanggan", catatan: "DP pesanan yang dipakai mengurangi piutang", debit: hitung.uangMuka, kredit: 0 },
+        { akun: p.pemetaan?.diskon ?? "Diskon Penjualan", catatan: "Potongan harga di faktur (kontra-pendapatan; pendapatan tetap bruto)", debit: hitung.diskon, kredit: 0 },
         { akun: p.pemetaan?.hpp ?? "HPP", catatan: "Harga pokok barang yang sudah dikirim (dari surat jalan; perkiraan)", debit: hitung.hargaPokok, kredit: 0 },
         { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Pendapatan Penjualan", catatan: "Pendapatan diakui (akun per barang bila diatur)", debit: 0, kredit: hitung.subtotal },
         { akun: p.pemetaan?.ppn ?? "PPN Keluaran", catatan: `PPN dipungut ${ppnPersen}%`, debit: 0, kredit: hitung.ppn },
@@ -97,7 +105,18 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     { ok: true, teks: teks.catatanStok },
     { ok: true, teks: p.pajak.pkp ? `PKP: PPN ${ppnPersen}% dipungut` : "Non-PKP: tanpa PPN" },
     ...(adalahPenjualan
-      ? [{ ok: true, teks: uangMukaTersedia > 0 ? `Uang muka Rp ${format(uangMukaTersedia)}, dipakai Rp ${format(hitung.uangMuka)}, sisa piutang Rp ${format(hitung.piutang)}` : "Tidak ada uang muka" }]
+      ? [
+          { ok: true, teks: uangMukaTersedia > 0 ? `Uang muka Rp ${format(uangMukaTersedia)}, dipakai Rp ${format(hitung.uangMuka)}, sisa piutang Rp ${format(hitung.piutang)}` : "Tidak ada uang muka" },
+          { ok: diskonInput <= hitung.subtotal, teks: hitung.diskon > 0 ? `Diskon Rp ${format(hitung.diskon)}: DPP PPN setelah diskon, omzet PPh Final tetap bruto` : "Tanpa diskon" },
+          {
+            ok: !p.event || p.event.selesai,
+            teks: !p.event
+              ? "Pesanan tanpa tanda event: faktur tidak masuk Laba Rugi per event / LPJ"
+              : p.event.selesai
+                ? `Event ${p.event.kode} sudah selesai${p.event.tanggalSelesai ? ` (${p.event.tanggalSelesai})` : ""}: pendapatan boleh diakui`
+                : `Event ${p.event.kode} baru selesai ${p.event.tanggalSelesai}: pendapatan sebaiknya diakui setelah acara (PSAK 72). Sebelum itu catat uang klien sebagai Uang Muka`,
+          },
+        ]
       : []),
   ];
   const bisaKirim = hitung.jumlahValid && !!p.pemetaan && !sedangProses;
@@ -116,6 +135,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
       <input type="hidden" name="baris" value={JSON.stringify(isian)} />
       <input type="hidden" name="ppnPersen" value={ppnPersen} />
       {adalahPenjualan && <input type="hidden" name="uangMuka" value={hitung.uangMuka} />}
+      {adalahPenjualan && <input type="hidden" name="diskon" value={hitung.diskon} />}
 
       {/* Kepala halaman */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -318,8 +338,25 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
               </div>
               <div className="flex flex-col gap-2 text-[13px]">
                 <div className="flex justify-between text-slate-500"><span>Subtotal ({hitung.banyakBaris} baris)</span><span className="angka text-slate-900">Rp {format(hitung.subtotal)}</span></div>
-                <div className="flex justify-between text-slate-500"><span>Diskon</span><span className="angka text-slate-400">-</span></div>
-                <div className="flex justify-between text-slate-500 pt-1 border-t border-dashed border-slate-200"><span className="font-semibold text-slate-900">Dasar Pengenaan Pajak</span><span className="angka font-semibold text-slate-900">Rp {format(hitung.subtotal)}</span></div>
+                <div className="flex justify-between items-center text-slate-500">
+                  <label htmlFor="diskonFaktur">Diskon</label>
+                  {adalahPenjualan ? (
+                    <input
+                      id="diskonFaktur"
+                      type="number"
+                      min={0}
+                      max={hitung.subtotal}
+                      step="0.01"
+                      value={diskonInput}
+                      onChange={(e) => setDiskonInput(Number(e.target.value))}
+                      className="isian isian-kecil w-32 text-right"
+                      aria-label="Diskon faktur"
+                    />
+                  ) : (
+                    <span className="angka text-slate-400">-</span>
+                  )}
+                </div>
+                <div className="flex justify-between text-slate-500 pt-1 border-t border-dashed border-slate-200"><span className="font-semibold text-slate-900">Dasar Pengenaan Pajak</span><span className="angka font-semibold text-slate-900">Rp {format(hitung.dpp)}</span></div>
                 <div className="flex justify-between items-center text-slate-500">
                   <span>PPN</span>
                   {p.pajak.pkp ? (

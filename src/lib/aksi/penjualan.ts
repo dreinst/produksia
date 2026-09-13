@@ -164,7 +164,7 @@ export async function buatPesanan(dataFormulir: FormData) {
   const proyekId = await bacaProyekId(dataFormulir);
   const nomor = await nomorDokumenBerikutnya(db.pesananPenjualan, "PSJ");
 
-  await db.pesananPenjualan.create({
+  const pesanan = await db.pesananPenjualan.create({
     data: {
       nomor,
       pelangganId,
@@ -175,6 +175,8 @@ export async function buatPesanan(dataFormulir: FormData) {
   });
 
   revalidatePath("/penjualan/pesanan");
+  // Jalan pintas "Simpan & Buat Faktur": pesanan tetap tercatat (kontrak), langsung ke komposer faktur pesanan ini
+  if (String(dataFormulir.get("lanjut") ?? "") === "faktur") redirect(`/penjualan/faktur/baru?pesananId=${pesanan.id}`);
   redirect("/penjualan/pesanan");
 }
 
@@ -273,7 +275,12 @@ export async function buatFaktur(dataFormulir: FormData) {
   const daftarBaris = bacaBaris(dataFormulir);
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const ppnPersen = bacaTarifPpn(dataFormulir.get("ppnPersen"), pengaturan);
-  const dpp = totalBaris(daftarBaris);
+  const subtotal = totalBaris(daftarBaris);
+  // Diskon faktur: kontra-pendapatan; DPP PPN = subtotal − diskon (UU PPN Pasal 1 angka 18), omzet PPh Final tetap bruto
+  const diskonMentah = dataFormulir.get("diskon");
+  const diskon = typeof diskonMentah === "string" && diskonMentah.trim() !== "" ? bacaUang(diskonMentah, "Diskon", { allowZero: true }) : NOL;
+  if (diskon.gt(subtotal)) throw new Error(`Diskon (${format(diskon)}) melebihi subtotal faktur (${format(subtotal)})`);
+  const dpp = subtotal.minus(diskon);
   const ppn = hitungPpn(dpp, ppnPersen);
   const total = dpp.plus(ppn);
   const uangMukaMentah = dataFormulir.get("uangMuka");
@@ -304,6 +311,7 @@ export async function buatFaktur(dataFormulir: FormData) {
         pesananId,
         pengirimanId,
         total,
+        diskon,
         dpp,
         ppnPersen,
         ppn,
@@ -443,7 +451,11 @@ export async function buatRetur(dataFormulir: FormData) {
     jumlah: l.jumlah,
     harga: D(faktur.baris.find((il) => il.barangId === l.barangId)?.harga ?? 0),
   }));
-  const dpp = totalBaris(barisRetur);
+  const bruto = totalBaris(barisRetur);
+  // diskon faktur ikut dibalik prorata nilai baris yang diretur (cara Accurate: alokasi diskon per barang)
+  const brutoFaktur = D(faktur.dpp).plus(faktur.diskon);
+  const diskon = brutoFaktur.gt(0) ? uang(D(faktur.diskon).mul(bruto).div(brutoFaktur)) : NOL;
+  const dpp = bruto.minus(diskon);
   const ppn = hitungPpn(dpp, D(faktur.ppnPersen));
   const total = dpp.plus(ppn);
   const pengaturan = await ambilPengaturanPerusahaan(db);
@@ -466,6 +478,7 @@ export async function buatRetur(dataFormulir: FormData) {
         gudangId,
         alasan: alasan || null,
         total,
+        diskon,
         dpp,
         ppn,
         baris: {
@@ -483,7 +496,7 @@ export async function buatRetur(dataFormulir: FormData) {
     }
     await tx.fakturPenjualan.update({ where: { id: fakturId }, data: { status } });
 
-    const jurnal = await catatJurnalReturPenjualan(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnKeluaranId);
+    const jurnal = await catatJurnalReturPenjualan(tx, { nomor: retur.nomor, total, ppn, diskon }, barisRetur, pengaturan.akunPpnKeluaranId);
     if (jurnal) await tx.returPenjualan.update({ where: { id: retur.id }, data: { jurnalId: jurnal.id } });
     await tandaiProyek(tx, jurnal, faktur.pesanan?.proyekId);
   });

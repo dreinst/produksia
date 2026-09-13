@@ -5,6 +5,7 @@ process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { hashKataSandi } from "../src/lib/kataSandi";
 import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
+import { terapkanDataFlagship } from "../src/lib/flagshipStandar";
 import { BAGAN_AKUN_STANDAR } from "../src/lib/baganAkunStandar";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { buatPenawaran, konversiPenawaranKePesanan, buatPengiriman, buatFaktur, buatPenerimaan, buatRetur, buatUangMuka } from "../src/lib/aksi/penjualan";
@@ -71,6 +72,7 @@ async function main() {
 
   console.log(`=== Bagan Akun Standar EO/WO (${BAGAN_AKUN_STANDAR.length} akun) + pemetaan akun ===`);
   await terapkanBaganAkunStandar(db);
+  await terapkanDataFlagship(db); // jasa tiket/sponsor/booth + Pelanggan Umum
   const akun = (kode: string) => db.akun.findUniqueOrThrow({ where: { kode } });
   // Identitas & pajak: usaha kecil non-PKP (faktur tanpa PPN), akun PPh 23 disiapkan agar potongan pajak klien/vendor bisa dicatat
   const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang, bebanPphFinal] = await Promise.all(["2-1330", "1-1800", "1-1900", "2-1320", "5-9100"].map(akun));

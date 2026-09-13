@@ -10,7 +10,7 @@ import { D, jumlahkan, type Desimal } from "@/lib/uang";
  */
 
 /** Zona waktu usaha untuk pengelompokan per bulan di SQL (tanggal tersimpan UTC). */
-const ZONA_WAKTU = process.env.ZONA_WAKTU ?? "Asia/Jakarta";
+export const ZONA_WAKTU = process.env.ZONA_WAKTU ?? "Asia/Jakarta";
 
 export type Periode = { dari: Date; sampai: Date; dariTeks: string; sampaiTeks: string };
 
@@ -99,14 +99,14 @@ export function susunHierarki(daftar: AkunSaldo[], pilih: (a: AkunSaldo) => bool
   return { baris, total };
 }
 
-function akarDari(daftar: AkunSaldo[], id: string | undefined): string | null {
+export function akarDari(daftar: AkunSaldo[], id: string | undefined): string | null {
   if (!id) return null;
   const byId = new Map(daftar.map((a) => [a.id, a]));
   let x = byId.get(id);
   while (x?.indukId) x = byId.get(x.indukId);
   return x?.id ?? null;
 }
-function keturunanDari(daftar: AkunSaldo[], akarId: string | null): Set<string> {
+export function keturunanDari(daftar: AkunSaldo[], akarId: string | null): Set<string> {
   const hasil = new Set<string>();
   if (!akarId) return hasil;
   const byInduk = new Map<string, AkunSaldo[]>();

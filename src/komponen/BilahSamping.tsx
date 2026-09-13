@@ -64,6 +64,7 @@ const operasional: Grup[] = [
       { href: "/laporan/hutang", label: "Laporan Hutang", hak: "buku-besar.lihat" },
       { href: "/buku-besar/neraca", label: "Neraca", hak: "buku-besar.lihat" },
       { href: "/buku-besar/laba-rugi", label: "Laba Rugi (per event / per waktu)", hak: "buku-besar.lihat" },
+      { href: "/laporan/pendapatan", label: "Ringkasan Pendapatan", hak: "buku-besar.lihat" },
       { href: "/laporan/perubahan-modal", label: "Perubahan Modal", hak: "buku-besar.lihat" },
       { href: "/laporan/prive", label: "Laporan Prive", hak: "buku-besar.lihat" },
       { href: "/buku-besar/arus-kas", label: "Arus Kas", hak: "buku-besar.lihat" },

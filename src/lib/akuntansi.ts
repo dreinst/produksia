@@ -133,13 +133,14 @@ export async function catatJurnalPengiriman(tx: Tx, pengiriman: { nomor: string 
 }
 
 /**
- * Faktur Penjualan: Dr Piutang (DPP + PPN) / Cr Pendapatan per akun (+ PPN Keluaran).
+ * Faktur Penjualan: Dr Piutang (total − uang muka) / Cr Pendapatan per akun (bruto, Σ baris) (+ Cr PPN Keluaran).
+ * Diskon faktur: Dr Diskon Penjualan (kontra-pendapatan) sehingga pendapatan bruto tetap terlihat; total = (Σ baris − diskon) + PPN.
  * HPP diakui untuk barang yang sudah dikirim: Dr HPP / Cr Barang Terkirim Belum Ditagih (nilai dari baris SJ).
  * Barang yang difaktur sebelum dikirim: HPP-nya diakui nanti saat Surat Jalan.
  */
 export async function catatJurnalFakturPenjualan(
   tx: Tx,
-  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string; uangMuka?: Desimal | number | string },
+  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string; uangMuka?: Desimal | number | string; diskon?: Desimal | number | string },
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
   konsumsiTransit: { barangId: string; jumlah: Desimal; hargaPokok: Desimal }[] = [],
@@ -150,6 +151,8 @@ export async function catatJurnalFakturPenjualan(
   // Uang muka pesanan yang dipakai: mengurangi piutang, membalik kewajiban Uang Muka Pelanggan
   const uangMuka = D(faktur.uangMuka ?? 0);
   if (uangMuka.gt(0) && !m.uangMukaPelangganId) throw new Error("Pemetaan akun 'Uang Muka Pelanggan' belum diatur (Pengaturan > Pemetaan Akun)");
+  const diskon = D(faktur.diskon ?? 0);
+  if (diskon.gt(0) && !m.diskonPenjualanId) throw new Error("Pemetaan akun 'Diskon Penjualan' belum diatur (Pengaturan > Pemetaan Akun)");
   const peta = await infoBarang(tx, [...daftarBaris.map((b) => b.barangId), ...konsumsiTransit.map((k) => k.barangId)]);
   const pendapatan = pengumpul(), hpp = pengumpul();
   for (const b of daftarBaris) {
@@ -169,6 +172,7 @@ export async function catatJurnalFakturPenjualan(
   const baris: InputBarisJurnal[] = [
     { akunId: m.piutangUsahaId, debit: D(faktur.total).minus(uangMuka), kredit: NOL, keterangan: `Piutang ${faktur.nomor}` },
     ...(uangMuka.gt(0) && m.uangMukaPelangganId ? [{ akunId: m.uangMukaPelangganId, debit: uangMuka, kredit: NOL, keterangan: `Uang muka dipakai ${faktur.nomor}` }] : []),
+    ...(diskon.gt(0) && m.diskonPenjualanId ? [{ akunId: m.diskonPenjualanId, debit: diskon, kredit: NOL, keterangan: `Diskon ${faktur.nomor}` }] : []),
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Pendapatan ${faktur.nomor}` })),
     ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: NOL, kredit: ppn, keterangan: `PPN keluaran ${faktur.nomor}` }] : []),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
@@ -206,16 +210,21 @@ export async function catatJurnalUangMuka(tx: Tx, uangMuka: { nomor: string; aku
   ]);
 }
 
-/** Retur Penjualan: kebalikan faktur, Dr Pendapatan per akun / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini). */
+/**
+ * Retur Penjualan: kebalikan faktur, Dr Pendapatan per akun (bruto) / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini).
+ * Diskon faktur yang prorata ikut dibalik: Cr Diskon Penjualan.
+ */
 export async function catatJurnalReturPenjualan(
   tx: Tx,
-  retur: { nomor: string; total: Desimal; ppn?: Desimal },
+  retur: { nomor: string; total: Desimal; ppn?: Desimal; diskon?: Desimal },
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
 ) {
   const m = await ambilPemetaanAkun(tx);
   const ppn = retur.ppn ?? NOL;
   if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
+  const diskon = retur.diskon ?? NOL;
+  if (diskon.gt(0) && !m.diskonPenjualanId) throw new Error("Pemetaan akun 'Diskon Penjualan' belum diatur (Pengaturan > Pemetaan Akun)");
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
   for (const b of daftarBaris) {
@@ -228,6 +237,7 @@ export async function catatJurnalReturPenjualan(
   const baris: InputBarisJurnal[] = [
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Retur ${retur.nomor}` })),
     ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: ppn, kredit: NOL, keterangan: `PPN keluaran dibalik ${retur.nomor}` }] : []),
+    ...(diskon.gt(0) && m.diskonPenjualanId ? [{ akunId: m.diskonPenjualanId, debit: NOL, kredit: diskon, keterangan: `Diskon dibalik ${retur.nomor}` }] : []),
     { akunId: m.piutangUsahaId, debit: NOL, kredit: retur.total, keterangan: `Pengurangan piutang ${retur.nomor}` },
     ...persediaan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Barang retur masuk ${retur.nomor}` })),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Koreksi HPP ${retur.nomor}` })),

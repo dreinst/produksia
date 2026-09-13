@@ -46,7 +46,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="kartu p-5"><div className="teks-label">Omzet (DPP) {tahun}</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(r.total.omzet)}</div></div>
+        <div className="kartu p-5"><div className="teks-label">Omzet bruto usaha {tahun}</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(r.total.omzet)}</div><div className="text-xs text-slate-500">Faktur − retur {angka(r.total.omzetFaktur)}{r.total.omzetLain.isZero() ? "" : ` · di luar faktur ${angka(r.total.omzetLain)}`}</div></div>
         <div className="kartu p-5"><div className="teks-label">PPN kurang (lebih) bayar</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(r.total.ppnKurangBayar)}</div><div className="text-xs text-slate-500">Keluaran {angka(r.total.ppnKeluaran)} − masukan {angka(r.total.ppnMasukan)}</div></div>
         <div className="kartu p-5"><div className="teks-label">PPh 23 dipotong klien / kita potong</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(r.total.pph23DipotongKlien)} / {angka(r.total.pph23KitaPotong)}</div></div>
         <div className="kartu p-5"><div className="teks-label">PPh Final {angka(pengaturan.pphFinalPersen)}% (tercatat)</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(r.total.pphFinal)} <span className="text-sm text-slate-500">({angka(r.totalPphFinalTercatat)})</span></div></div>
@@ -59,7 +59,8 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
             <thead>
               <tr>
                 <th>Masa</th>
-                <th className="text-right">Omzet (DPP)</th>
+                <th className="text-right">Omzet bruto</th>
+                <th className="text-right">Di luar faktur</th>
                 <th className="text-right">PPN keluaran</th>
                 <th className="text-right">PPN masukan</th>
                 <th className="text-right">PPN kurang/(lebih)</th>
@@ -74,6 +75,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
                 <tr key={b.periode} className={!bulanBerjalan(b.bulan) ? "text-slate-400" : undefined}>
                   <td className="whitespace-nowrap">{NAMA_BULAN[b.bulan - 1]} <span className="mono text-xs text-slate-400">{b.periode}</span></td>
                   <td className="text-right angka">{angka(b.omzet)}</td>
+                  <td className="text-right angka text-slate-500">{b.omzetLain.isZero() ? "" : angka(b.omzetLain)}</td>
                   <td className="text-right angka">{angka(b.ppnKeluaran)}</td>
                   <td className="text-right angka">{angka(b.ppnMasukan)}</td>
                   <td className={`text-right angka ${b.ppnKurangBayar.lt(0) ? "text-emerald-700" : ""}`}>{angka(b.ppnKurangBayar)}</td>
@@ -103,6 +105,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
               <tr className="font-semibold">
                 <td>Total {tahun}</td>
                 <td className="text-right angka">{angka(r.total.omzet)}</td>
+                <td className="text-right angka text-slate-500">{angka(r.total.omzetLain)}</td>
                 <td className="text-right angka">{angka(r.total.ppnKeluaran)}</td>
                 <td className="text-right angka">{angka(r.total.ppnMasukan)}</td>
                 <td className="text-right angka">{angka(r.total.ppnKurangBayar)}</td>
@@ -128,7 +131,8 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
         <div className="kartu space-y-2">
           <h2 className="judul-kartu">Catatan</h2>
           <ul className="list-disc pl-5 space-y-1 text-slate-600">
-            <li>Omzet = faktur penjualan bulan itu dikurangi retur, bukan kas yang diterima.</li>
+            <li>Omzet bruto usaha = seluruh akun pendapatan usaha di buku besar bulan itu (faktur − retur, ditambah pendapatan yang dicatat lewat Kas Masuk atau jurnal umum), <strong>sebelum diskon</strong> (PP 55/2022 Pasal 60), tanpa kelompok Pendapatan Lain-lain seperti bunga bank (sudah kena pajak final sendiri). Bukan kas yang diterima.</li>
+            <li>Kolom &quot;Di luar faktur&quot; menunjukkan omzet yang tidak lewat faktur; periksa apakah seharusnya dibuatkan faktur (wajib bila PKP).</li>
             <li>Bila dokumen bulan itu berubah setelah dicatat, hapus catatan PPh Final lalu catat ulang.</li>
             <li>Tahun yang sudah ditutup bukunya tidak bisa dicatat atau dihapus.</li>
             <li>Batas omzet UMKM Rp 4,8 miliar/tahun tidak dihitung otomatis.</li>

@@ -1,19 +1,21 @@
 # Produksia
 
 Sistem informasi akuntansi untuk usaha event/wedding organizer: penjualan, pembelian, persediaan, kas/bank, buku besar, laporan, dan rekonsiliasi. Alur modulnya mengikuti kebiasaan software akuntansi pada umumnya:
-- **Penjualan**: Penawaran → Pesanan (+ **Uang Muka**/DP) → Pengiriman → Faktur → Penerimaan → Retur
+- **Penjualan**: Penawaran → Pesanan (+ **Uang Muka**/DP) → Pengiriman → Faktur → Penerimaan → Retur; tombol **Simpan & Buat Faktur** di pesanan (jasa yang sudah selesai); **diskon faktur** ke akun kontra Diskon Penjualan (DPP PPN setelah diskon, omzet PPh Final tetap bruto, retur membalik diskon prorata); komposer faktur memperingatkan bila event belum selesai (PSAK 72)
 - **Pembelian**: Pesanan → Penerimaan Barang → Faktur → Pembayaran → Retur (cermin dari Penjualan)
 - **Buku Besar & Kas/Bank**: Daftar Akun, Jurnal Umum, Buku Besar (saldo berjalan per akun), **Tutup Buku tahunan** (jurnal penutup ke Laba Ditahan + kunci tahun), Kas Masuk/Keluar
-- **Laporan** (Admin/Pemilik/Superadmin): Neraca Saldo, **Laporan Piutang & Hutang** (umur per pelanggan/pemasok), Neraca, **Laba Rugi per event / per waktu** (mingguan, bulanan, tahunan; tabel 12 bulan), **Perubahan Modal** (Harta = Utang + Modal; setoran, laba, prive), **Laporan Prive** (per pemilik), Arus Kas (metode langsung), Pajak & SPT
+- **Laporan** (Admin/Pemilik/Superadmin): Neraca Saldo, **Laporan Piutang & Hutang** (umur per pelanggan/pemasok), Neraca, **Laba Rugi per event / per waktu** (bawaan **basis kas**: uang masuk dari pelanggan, penerimaan lain, uang keluar operasi, surplus kas operasi; pilihan akrual/fiskal; mingguan, bulanan, tahunan; tabel 12 bulan), **Ringkasan Pendapatan** (bawaan basis kas: uang diterima per pelanggan (DP, pelunasan) dan per jenis layanan; pilihan basis faktur yang totalnya = Pendapatan di Laba Rugi akrual), **Perubahan Modal** (Harta = Utang + Modal; setoran, laba, prive), **Laporan Prive** (per pemilik), Arus Kas (metode langsung), Pajak & SPT
 - **Prive** (Kas & Bank → Prive): pengambilan pribadi pemilik, jurnal PRV (Dr Prive / Cr Kas), akun prive bawaan dari **pemetaan akun tambahan** (`prive`)
 - **Harga jual, margin, dan nego**: Stok per Gudang menampilkan harga pokok, harga jual, dan margin (Rp dan %) per barang; di Penawaran/Pesanan harga di bawah harga jual hanya bisa diisi pemegang hak `harga.nego` (bawaan Kasir/Admin/Pemilik), dan di bawah **harga minimum** barang hanya Pemilik/Superadmin
 - **Rekonsiliasi**: **Rekonsiliasi Event (LPJ)** per proyek — pemasukan (proposal ter-acc/pesanan → LPJ faktur & TOP → kas masuk → laba/rugi) dan pengeluaran (pengadaan/pembelian/beban → nota → cash flow → neraca & L/R); **Rekonsiliasi Kas/Bank** dengan **impor mutasi rekening** (CSV/HTML), pencocokan otomatis & manual
 - **Proyek/Event sebagai dimensi transaksi**: penawaran, pesanan penjualan/pembelian, kas, dan jurnal manual bisa diberi event; semua jurnal turunannya bertanda event
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal, **Pelepasan aset** (dijual/dihapusbukukan dengan laba-rugi vs nilai buku)
 - **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna, **hak akses per dokumen** (lihat/buat/hapus tiap jenis dokumen per peran, diatur Superadmin/Pemilik di Pengaturan → Hak Akses)
-- **Bagan akun standar EO/WO**: 111 akun hasil kurasi catatan pemilik, diterapkan satu klik; akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
+- **Bagan akun standar EO/WO**: 117 akun hasil kurasi catatan pemilik (termasuk pendapatan flagship: Tiket 4-1300, Sponsor 4-1400, Tenant & Booth 4-1500), diterapkan satu klik bersama data induk flagship (jasa tiket/paket sponsor/booth, pelanggan "Pelanggan Umum"); akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
+- **Kebijakan akuntansi** (`KEBIJAKAN-AKUNTANSI.md`): buku besar akrual (wajib pajak) + laporan manajemen basis kas, alur penjualan EO yang dibakukan (kontrak → DP/termin sebagai kewajiban → faktur setelah acara → pelunasan), SOP tiket/sponsor/tenant, diskon, omzet pajak, tanda event
+- **Verifikasi sebelum simpan**: formulir Penawaran, Pesanan Penjualan/Pembelian, Kas Masuk/Keluar, dan Jurnal Umum menampilkan dialog ringkasan isian + peringatan (tanpa event; kas masuk langsung ke akun pendapatan) sebelum tersimpan
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
-- **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, **PPh Final UMKM** bulanan dari omzet, ringkasan **Pajak & SPT** per masa (omzet, PPN kurang/lebih bayar, PPh 23, PPh Final), termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
+- **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, **PPh Final UMKM** bulanan dari omzet bruto usaha (buku besar: sebelum diskon, tanpa kelompok Pendapatan Lain-lain, termasuk pendapatan tanpa faktur), ringkasan **Pajak & SPT** per masa (omzet bruto + kolom di luar faktur, PPN kurang/lebih bayar, PPh 23, PPh Final), termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
 - **Tahun buku**: kartu perusahaan di sidebar membuka tahun buku (Superadmin/Pemilik/Admin) dan pintasan Laba Rugi/Neraca tahun itu; laporan & pintasan periode mengikutinya; mata uang tunggal Rupiah
 - **Hapus dokumen dengan pembalikan penuh** (Pemilik/Admin): stok, harga pokok, jurnal, dan progres/status dokumen induk dibalik dalam satu transaksi; turunannya harus dihapus dulu; semuanya tercatat di Log Aktivitas
 
@@ -58,7 +60,7 @@ Bawaan hak tiap peran ada di `src/lib/hakAkses.ts` (`HAK_BAWAAN`); Superadmin/Pe
 
 ## Bagan akun (Event/Wedding Organizer)
 
-Bagan akun standar 111 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
+Bagan akun standar 117 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
 
 ## Sinkronisasi buku besar
 
@@ -70,7 +72,7 @@ Dari daftar Pesanan Penjualan → **Uang Muka**: DP diterima ke kas/bank dan dic
 
 ## Pajak & SPT
 
-**Buku Besar → Pajak & SPT**: tabel per masa pajak (bulan) untuk tahun yang dipilih — omzet (DPP faktur penjualan − retur), PPN keluaran/masukan dan kurang/(lebih) bayar (PKP), PPh 23 yang dipotong klien dan yang kita potong, serta **PPh Final UMKM** = omzet × tarif (bawaan 0,5%, PP 55/2022). Tombol *Catat* per bulan membuat jurnal `JU-PPHF` (sumber `PAJAK`, hanya bisa dihapus dari halaman ini) Dr Beban PPh Final (5-9100) / Cr Hutang PPh Final (2-1320) bertanggal akhir bulan; catatan `PphFinalBulanan` menyimpan omzet & tarif saat itu dan bisa dihapus (pembalikan jurnal). Penyetoran ke DJP dicatat lewat Kas Keluar dengan akun lawan Hutang PPh Final.
+**Buku Besar → Pajak & SPT**: tabel per masa pajak (bulan) untuk tahun yang dipilih — omzet bruto usaha dari buku besar (akun pendapatan usaha tanpa kelompok Diskon Penjualan & Pendapatan Lain-lain; = bruto faktur − retur + pendapatan tanpa faktur, kolom "Di luar faktur" menunjukkan bagian yang tidak lewat faktur), PPN keluaran/masukan dan kurang/(lebih) bayar (PKP), PPh 23 yang dipotong klien dan yang kita potong, serta **PPh Final UMKM** = omzet × tarif (bawaan 0,5%, PP 55/2022). Tombol *Catat* per bulan membuat jurnal `JU-PPHF` (sumber `PAJAK`, hanya bisa dihapus dari halaman ini) Dr Beban PPh Final (5-9100) / Cr Hutang PPh Final (2-1320) bertanggal akhir bulan; catatan `PphFinalBulanan` menyimpan omzet & tarif saat itu dan bisa dihapus (pembalikan jurnal). Penyetoran ke DJP dicatat lewat Kas Keluar dengan akun lawan Hutang PPh Final.
 
 ## Rekonsiliasi & laporan per event
 
@@ -157,7 +159,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/app/(aplikasi)/pengaturan/pengguna` — kelola akun; `profil` — ganti kata sandi; `tanpa-akses` — halaman 403
 - `src/lib/aksi/*.ts` — logika bisnis per modul (`penjualan`, `pembelian`, `jurnal`, `asetTetap`, `dataInduk`, `pengaturan`, `otentikasi`, `pengguna`)
 - `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
-- `src/lib/baganAkunStandar.ts` (data 111 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
+- `src/lib/baganAkunStandar.ts` (data 117 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
 - `src/lib/akuntansi.ts` (semua aturan posting), `src/lib/sinkron.ts` (pencocokan buku besar ↔ dokumen/stok), `src/lib/aksi/persediaan.ts` + `persediaan/` (stok per gudang, penyesuaian)
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`; `src/lib/laporanPrive.ts` + `src/lib/aksi/prive.ts` (prive & laporannya)
 - `src/lib/aksi/pengaturan.ts` — pemetaan akun standar (`PemetaanAkun`) dan **pemetaan akun tambahan** (`PemetaanAkunTambahan`: nama peran bebas → akun, dibaca modul lewat `akunPemetaanTambahan(db, kunci)`); halaman `pengaturan/pemetaan-akun` (hak `pemetaan.tulis`, termasuk Admin)

@@ -8,6 +8,7 @@ import { daftarProyekAktif } from "@/lib/proyek";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatKasKeluarFormulir } from "@/lib/aksi/jurnal";
 
 export default async function HalamanKasKeluar({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -29,7 +30,7 @@ export default async function HalamanKasKeluar({ searchParams }: { searchParams:
       <h1 className="judul-halaman">Kas Keluar</h1>
 
       {bolehBuat && (
-      <FormulirAksi aksi={buatKasKeluarFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+      <FormulirAksi aksi={buatKasKeluarFormulir} verifikasi={{ judul: "Periksa kas keluar", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div className="bidang">
           <label className="label" htmlFor="akunKasId">Akun Kas/Bank Sumber *</label>
           <select id="akunKasId" name="akunKasId" required className="isian">
@@ -47,7 +48,7 @@ export default async function HalamanKasKeluar({ searchParams }: { searchParams:
           <select id="akunLawanId" name="akunLawanId" required className="isian">
             <option value="">-</option>
             {daftarAkun.map((a) => (
-              <option key={a.id} value={a.id}>
+              <option key={a.id} value={a.id} data-jenis={a.jenis}>
                 {a.kode} - {a.nama}
               </option>
             ))}

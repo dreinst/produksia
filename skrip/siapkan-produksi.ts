@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { db } from "../src/lib/db";
 import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
+import { terapkanDataFlagship } from "../src/lib/flagshipStandar";
 
 /*
  * Menyiapkan buku PRODUKSI (tanpa data dummy): terapkan Bagan Akun Standar EO/WO + pemetaan akun,
@@ -9,6 +10,7 @@ import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
  */
 async function main() {
   const hasil = await terapkanBaganAkunStandar(db);
+  const flagship = await terapkanDataFlagship(db);
   const akun = (kode: string) => db.akun.findUniqueOrThrow({ where: { kode } });
   const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang, bebanPphFinal] = await Promise.all(
     ["2-1330", "1-1800", "1-1900", "2-1320", "5-9100"].map(akun),
@@ -23,6 +25,6 @@ async function main() {
     },
   });
   const jml = await db.akun.count();
-  console.log(`OK — akun dibuat: ${hasil.dibuat ?? "?"}, total akun: ${jml}, perusahaan: D'Production Event Organizer, pemetaan diterapkan`);
+  console.log(`OK — akun dibuat: ${hasil.dibuat ?? "?"}, total akun: ${jml}, perusahaan: D'Production Event Organizer, pemetaan diterapkan, jasa flagship dibuat: ${flagship.jasaDibuat}, Pelanggan Umum ${flagship.pelangganUmumDibuat ? "dibuat" : "sudah ada"}`);
 }
 main().catch((e) => { console.error("GAGAL:", String(e).slice(0, 300)); process.exit(1); }).finally(() => db.$disconnect());

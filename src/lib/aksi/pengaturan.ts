@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { bacaUang } from "@/lib/uang";
 import { pastikanAkunRinci, terapkanBaganAkunStandar } from "@/lib/baganAkun";
+import { terapkanDataFlagship } from "@/lib/flagshipStandar";
 
 export async function simpanPemetaanAkun(dataFormulir: FormData) {
   await wajibHakAksi("pemetaan.tulis");
@@ -20,17 +21,24 @@ export async function simpanPemetaanAkun(dataFormulir: FormData) {
   const barangTerkirimId = String(dataFormulir.get("barangTerkirimId") ?? "") || null;
   const uangMukaPelangganId = String(dataFormulir.get("uangMukaPelangganId") ?? "") || null;
   const labaDitahanId = String(dataFormulir.get("labaDitahanId") ?? "") || null;
+  const diskonPenjualanId = String(dataFormulir.get("diskonPenjualanId") ?? "") || null;
+  const pendapatanLainId = String(dataFormulir.get("pendapatanLainId") ?? "") || null;
 
   if (!piutangUsahaId || !persediaanId || !hppId || !pendapatanPenjualanId || !utangUsahaId) {
     throw new Error("Semua pemetaan akun wajib diisi");
   }
-  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId, barangTerkirimId, uangMukaPelangganId, labaDitahanId };
+  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId, barangTerkirimId, uangMukaPelangganId, labaDitahanId, diskonPenjualanId };
   await pastikanAkunRinci(db, [piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...Object.values(opsional).filter((v): v is string => Boolean(v))]);
+  // Pendapatan Lain-lain adalah KELOMPOK akun pendapatan (seluruh keturunannya dikecualikan dari omzet)
+  if (pendapatanLainId) {
+    const a = await db.akun.findUnique({ where: { id: pendapatanLainId } });
+    if (!a || a.jenis !== "PENDAPATAN") throw new Error("Pendapatan Lain-lain harus akun jenis Pendapatan");
+  }
 
   await db.pemetaanAkun.upsert({
     where: { id: "default" },
-    create: { id: "default", piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...opsional },
-    update: { piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...opsional },
+    create: { id: "default", piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...opsional, pendapatanLainId },
+    update: { piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...opsional, pendapatanLainId },
   });
 
   revalidatePath("/pengaturan/pemetaan-akun");
@@ -44,13 +52,16 @@ export async function simpanPemetaanAkunFormulir(_sebelumnya: StatusFormulir, da
 
 // ---------- Bagan Akun Standar EO/WO ----------
 
-/** Membuat akun standar yang belum ada (idempoten) dan pemetaan akun bila belum diatur. */
+/** Membuat akun standar yang belum ada (idempoten), pemetaan akun bila belum diatur, plus data induk flagship (jasa tiket/sponsor/booth, Pelanggan Umum). */
 export async function terapkanBaganAkun() {
   await wajibHakAksi("pengaturan.tulis");
   const hasil = await terapkanBaganAkunStandar(db);
+  await terapkanDataFlagship(db);
   revalidatePath("/pengaturan/bagan-akun");
   revalidatePath("/pengaturan/pemetaan-akun");
   revalidatePath("/data-induk/akun");
+  revalidatePath("/data-induk/barang");
+  revalidatePath("/data-induk/pelanggan");
   return hasil;
 }
 

@@ -386,7 +386,9 @@ model FakturPenjualan {
   pengiriman   PengirimanPesanan? @relation(fields: [pengirimanId], references: [id])
   status       StatusDokumen      @default(DRAF)
   total        Decimal            @default(0) @db.Decimal(18, 2)
-  /// Dasar pengenaan pajak (Σ baris) dan PPN; total = dpp + ppn
+  /// Diskon faktur (kontra-pendapatan, akun Diskon Penjualan); dpp = Σ baris − diskon
+  diskon     Decimal @default(0) @db.Decimal(18, 2)
+  /// Dasar pengenaan pajak (Σ baris − diskon) dan PPN; total = dpp + ppn
   dpp        Decimal @default(0) @db.Decimal(18, 2)
   ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
   ppn        Decimal @default(0) @db.Decimal(18, 2)
@@ -489,6 +491,8 @@ model ReturPenjualan {
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
   total    Decimal @default(0) @db.Decimal(18, 2)
+  /// Bagian diskon faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon
+  diskon   Decimal @default(0) @db.Decimal(18, 2)
   dpp      Decimal @default(0) @db.Decimal(18, 2)
   ppn      Decimal @default(0) @db.Decimal(18, 2)
   jurnalId String? @unique
@@ -721,6 +725,8 @@ model Akun {
   pemetaanBarangTerkirim     PemetaanAkun? @relation("PetaBarangTerkirim")
   pemetaanUangMuka           PemetaanAkun? @relation("PetaUangMuka")
   pemetaanLabaDitahan        PemetaanAkun? @relation("PetaLabaDitahan")
+  pemetaanDiskonPenjualan    PemetaanAkun? @relation("PetaDiskonPenjualan")
+  pemetaanPendapatanLain     PemetaanAkun? @relation("PetaPendapatanLain")
   asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
   pelepasanPenerimaan        PelepasanAset[] @relation("AkunPenerimaanPelepasan")
   pelepasanLabaRugi          PelepasanAset[] @relation("AkunLabaRugiPelepasan")
@@ -774,6 +780,12 @@ model PemetaanAkun {
   /// Ekuitas: tujuan jurnal penutup tahun (laba/rugi bersih dipindahkan ke sini)
   labaDitahanId String? @unique
   labaDitahan   Akun?   @relation("PetaLabaDitahan", fields: [labaDitahanId], references: [id])
+  /// Kontra-pendapatan: diskon faktur penjualan (saldo normal debit); kelompoknya tidak dihitung sebagai omzet
+  diskonPenjualanId String? @unique
+  diskonPenjualan   Akun?   @relation("PetaDiskonPenjualan", fields: [diskonPenjualanId], references: [id])
+  /// Kelompok pendapatan non-usaha (bunga bank, laba pelepasan aset, dst.): bukan omzet PPh Final
+  pendapatanLainId String? @unique
+  pendapatanLain   Akun?   @relation("PetaPendapatanLain", fields: [pendapatanLainId], references: [id])
 }
 
 model Jurnal {

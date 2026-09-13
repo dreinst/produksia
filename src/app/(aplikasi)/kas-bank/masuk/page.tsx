@@ -8,6 +8,7 @@ import { daftarProyekAktif } from "@/lib/proyek";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import { PERINGATAN_PENDAPATAN_TANPA_FAKTUR, PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatKasMasukFormulir } from "@/lib/aksi/jurnal";
 
 export default async function HalamanKasMasuk({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -29,7 +30,7 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
       <h1 className="judul-halaman">Kas Masuk</h1>
 
       {bolehBuat && (
-      <FormulirAksi aksi={buatKasMasukFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+      <FormulirAksi aksi={buatKasMasukFormulir} verifikasi={{ judul: "Periksa kas masuk", peringatan: [PERINGATAN_PENDAPATAN_TANPA_FAKTUR, PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <div className="bidang">
           <label className="label" htmlFor="akunKasId">Akun Kas/Bank Penerima *</label>
           <select id="akunKasId" name="akunKasId" required className="isian">
@@ -47,7 +48,7 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
           <select id="akunLawanId" name="akunLawanId" required className="isian">
             <option value="">-</option>
             {daftarAkun.map((a) => (
-              <option key={a.id} value={a.id}>
+              <option key={a.id} value={a.id} data-jenis={a.jenis}>
                 {a.kode} - {a.nama}
               </option>
             ))}

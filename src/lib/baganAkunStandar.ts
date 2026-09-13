@@ -90,7 +90,10 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   // ---------- 4. PENDAPATAN ----------
   { kode: "4-1000", nama: "Pendapatan Event", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Matriks catatan: Reguler/Flagship × Event/Produksi/Sewa → tiap jenis layanan punya anak Reguler & Flagship" },
   { kode: "4-1100", nama: "Pendapatan Event Reguler", jenis: P, induk: "4-1000", asal: "KEPUTUSAN", keterangan: "Event pesanan klien (wedding, gathering, launching). Akun bawaan Faktur Penjualan" },
-  { kode: "4-1200", nama: "Pendapatan Event Flagship", jenis: P, induk: "4-1000", asal: "KEPUTUSAN", keterangan: "Program unggulan milik sendiri (festival/konser tahunan), pendapatan tiket & sponsor" },
+  { kode: "4-1200", nama: "Pendapatan Event Flagship", jenis: P, induk: "4-1000", asal: "KEPUTUSAN", keterangan: "Program unggulan milik sendiri (festival/konser tahunan): pendapatan flagship yang bukan tiket, sponsor, atau tenant" },
+  { kode: "4-1300", nama: "Pendapatan Tiket (Flagship)", jenis: P, induk: "4-1000", asal: "KEPUTUSAN", keterangan: "Penjualan tiket program flagship (presale, reguler, VIP); uang tiket sebelum acara = Uang Muka, diakui saat acara" },
+  { kode: "4-1400", nama: "Pendapatan Sponsor (Flagship)", jenis: P, induk: "4-1000", asal: "KEPUTUSAN", keterangan: "Paket sponsorship (platinum/gold/silver); difakturkan ke sponsor, diakui saat acara berlangsung" },
+  { kode: "4-1500", nama: "Pendapatan Tenant & Booth (Flagship)", jenis: P, induk: "4-1000", asal: "KEPUTUSAN", keterangan: "Sewa booth/lapak tenant dalam program flagship" },
   { kode: "4-2000", nama: "Pendapatan Produksi", jenis: P, kelompok: true, asal: "KEPUTUSAN", keterangan: "Dekorasi, dokumentasi, konten, cetak & merchandise" },
   { kode: "4-2100", nama: "Pendapatan Produksi Reguler", jenis: P, induk: "4-2000", asal: "KEPUTUSAN" },
   { kode: "4-2200", nama: "Pendapatan Produksi Flagship", jenis: P, induk: "4-2000", asal: "KEPUTUSAN" },
@@ -185,6 +188,8 @@ export const PEMETAAN_STANDAR = {
   barangTerkirim: "1-1650",
   uangMukaPelanggan: "2-1200",
   labaDitahan: "3-2000",
+  diskonPenjualan: "4-8100",
+  pendapatanLain: "4-9000",
 } as const;
 
 /** Butir yang semula "pending" di catatan, beserta keputusan kurasinya (ditampilkan di halaman Bagan Akun). */
@@ -195,6 +200,7 @@ export const KEPUTUSAN_KURASI: readonly { butir: string; keputusan: string }[] =
   { butir: "Coretan di bawah \"Kas\"", keputusan: "Dibaca 'Bank' (1-1200), dibuat sebagai kelompok dengan satu rekening contoh (1-1210) supaya tiap rekening bank bisa punya akun sendiri." },
   { butir: "Redaksi \"Claim/Gagal Produksi\"", keputusan: "Klaim & Gagal Produksi (5-7100): ganti rugi atau pengerjaan ulang akibat komplain klien / produksi gagal. Tetap di Beban Pemasaran sesuai catatan." },
   { butir: "Diskon & Cashback", keputusan: "Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi." },
+  { butir: "Pendapatan Flagship: tiket, sponsor, tenant", keputusan: "Dirinci jadi tiga akun rinci di bawah Pendapatan Event: 4-1300 Tiket, 4-1400 Sponsor, 4-1500 Tenant & Booth (14 Sep 2026). Uang tiket/sponsor sebelum acara dicatat sebagai Uang Muka Pelanggan dan diakui saat acara (PSAK 72). Jasa standar (tiket, paket sponsor, booth) dan pelanggan 'Pelanggan Umum' untuk rekap tiket ritel diterapkan bersama bagan akun." },
   { butir: "Beban Lain-lain (1) & (2)", keputusan: "Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500)." },
   { butir: "Penomoran kode akun", keputusan: "Format Accurate X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan." },
   { butir: "Obligasi & Investasi", keputusan: "Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft." },

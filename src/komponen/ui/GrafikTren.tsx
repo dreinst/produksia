@@ -23,14 +23,14 @@ const ringkas = (n: number) => (n >= 1e9 ? `${(n / 1e9).toLocaleString("id-ID", 
  * Grafik area 12 bulan: pendapatan (navy) dan beban (oranye), gradasi lembut, garis "menggambar" saat tampil.
  * SVG murni tanpa pustaka; tiap bulan punya <title> untuk tooltip bawaan browser.
  */
-export default function GrafikTren({ bulan, tahun }: { bulan: LabaRugiBulan[]; tahun: number }) {
+export default function GrafikTren({ bulan, tahun, label = { masuk: "pendapatan", keluar: "beban" } }: { bulan: LabaRugiBulan[]; tahun: number; label?: { masuk: string; keluar: string } }) {
   const pendapatan = bulan.map((b) => Number(b.pendapatan));
   const beban = bulan.map((b) => Number(b.bebanPokok) + Number(b.bebanLain));
   const maks = Math.max(1, ...pendapatan, ...beban) * 1.12;
   const p = jalur(pendapatan, maks), b = jalur(beban, maks);
   const bulanIni = new Date().getFullYear() === tahun ? new Date().getMonth() : 11;
   return (
-    <svg viewBox={`0 0 ${L} ${T}`} className="w-full h-auto grafik-tren" role="img" aria-label={`Pendapatan dan beban per bulan ${tahun}`}>
+    <svg viewBox={`0 0 ${L} ${T}`} className="w-full h-auto grafik-tren" role="img" aria-label={`${label.masuk} dan ${label.keluar} per bulan ${tahun}`}>
       <defs>
         <linearGradient id="tren-p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#17417a" stopOpacity="0.35" /><stop offset="1" stopColor="#17417a" stopOpacity="0" /></linearGradient>
         <linearGradient id="tren-b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#f86e18" stopOpacity="0.3" /><stop offset="1" stopColor="#f86e18" stopOpacity="0" /></linearGradient>
@@ -44,7 +44,7 @@ export default function GrafikTren({ bulan, tahun }: { bulan: LabaRugiBulan[]; t
       <path d={p.garis} fill="none" stroke="#17417a" strokeWidth="2.5" strokeLinecap="round" className="garis" />
       {p.titik.map(([x, y], i) => (
         <g key={i}>
-          <title>{`${BULAN[i]} ${tahun}: pendapatan Rp ${pendapatan[i].toLocaleString("id-ID")}, beban Rp ${beban[i].toLocaleString("id-ID")}`}</title>
+          <title>{`${BULAN[i]} ${tahun}: ${label.masuk} Rp ${pendapatan[i].toLocaleString("id-ID")}, ${label.keluar} Rp ${beban[i].toLocaleString("id-ID")}`}</title>
           <circle cx={x} cy={y} r={i === bulanIni ? 5 : 3} fill="#fff" stroke="#17417a" strokeWidth="2" className="titik" />
           <circle cx={b.titik[i][0]} cy={b.titik[i][1]} r={i === bulanIni ? 4 : 2.5} fill="#fff" stroke="#f86e18" strokeWidth="2" className="titik" />
           <rect x={x - 30} y={ATAS} width="60" height={T - ATAS - BAWAH} fill="transparent" />

@@ -2,7 +2,7 @@
 
 Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber datanya ada di `src/lib/baganAkunStandar.ts`; tabel di bawah dihasilkan oleh `npx tsx skrip/cetak-bagan-akun.ts` — ubah data di kode, lalu cetak ulang, jangan edit tabel ini secara manual.
 
-**Ringkasan:** 114 akun — 24 akun kelompok (induk) dan 90 akun rinci; 40 persis dari catatan asli, 57 usulan sesuai standar akuntansi (SAK EMKM), 17 keputusan atas butir yang semula pending.
+**Ringkasan:** 117 akun — 24 akun kelompok (induk) dan 93 akun rinci; 40 persis dari catatan asli, 57 usulan sesuai standar akuntansi (SAK EMKM), 20 keputusan atas butir yang semula pending.
 
 ## Cara pakai di sistem
 
@@ -62,10 +62,11 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 |---|---|
 | Struktur Pendapatan (Reguler/Flagship × Event/Produksi/Sewa) | Dibaca sebagai matriks: tiga kelompok layanan (Event 4-1000, Produksi 4-2000, Sewa 4-3000), masing-masing punya anak Reguler dan Flagship. Reguler = pesanan klien; Flagship = program unggulan milik sendiri. Faktur Penjualan memakai 4-1100 sebagai bawaan. |
 | Arti "Adm. Permit Udf." | Administrasi Perizinan (5-3600): biaya pengurusan izin keramaian, izin venue, kepolisian, dan surat-surat event. |
-| Arti "TOP" | Term of Payment — di sistem ini terwujud sebagai tanggal jatuh tempo Faktur Penjualan (bawaan 14 hari) dan status Sebagian/Lunas dari Penerimaan. |
+| Arti "TOP" | Term of Payment, di sistem ini terwujud sebagai tanggal jatuh tempo Faktur Penjualan (bawaan 14 hari) dan status Sebagian/Lunas dari Penerimaan. |
 | Coretan di bawah "Kas" | Dibaca 'Bank' (1-1200), dibuat sebagai kelompok dengan satu rekening contoh (1-1210) supaya tiap rekening bank bisa punya akun sendiri. |
 | Redaksi "Claim/Gagal Produksi" | Klaim & Gagal Produksi (5-7100): ganti rugi atau pengerjaan ulang akibat komplain klien / produksi gagal. Tetap di Beban Pemasaran sesuai catatan. |
 | Diskon & Cashback | Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi. |
+| Pendapatan Flagship: tiket, sponsor, tenant | Dirinci jadi tiga akun rinci di bawah Pendapatan Event: 4-1300 Tiket, 4-1400 Sponsor, 4-1500 Tenant & Booth (14 Sep 2026). Uang tiket/sponsor sebelum acara dicatat sebagai Uang Muka Pelanggan dan diakui saat acara (PSAK 72). Jasa standar (tiket, paket sponsor, booth) dan pelanggan 'Pelanggan Umum' untuk rekap tiket ritel diterapkan bersama bagan akun. |
 | Beban Lain-lain (1) & (2) | Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500). |
 | Penomoran kode akun | Format Accurate X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan. |
 | Obligasi & Investasi | Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft. |
@@ -97,7 +98,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `1-2930` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akumulasi Penyusutan Kendaraan | Aset |  | **usul** |  |
 | `1-2940` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akumulasi Penyusutan Peralatan Event | Aset |  | **usul** |  |
 | `1-2950` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Akumulasi Penyusutan Inventaris Kantor | Aset |  | **usul** |  |
-| `1-3000` | **Investasi Jangka Panjang** | Aset | kelompok | **usul** | Obligasi & investasi dipindah dari Aset Tetap — bukan aset operasional |
+| `1-3000` | **Investasi Jangka Panjang** | Aset | kelompok | **usul** | Obligasi & investasi dipindah dari Aset Tetap, bukan aset operasional |
 | `1-3100` | &nbsp;&nbsp;&nbsp;Obligasi | Aset |  | asli |  |
 | `1-3200` | &nbsp;&nbsp;&nbsp;Investasi Lainnya | Aset |  | asli | Saham, reksa dana, deposito > 1 tahun |
 | `2-1000` | **Kewajiban Lancar** | Kewajiban | kelompok | asli |  |
@@ -115,21 +116,24 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `2-2200` | &nbsp;&nbsp;&nbsp;Hutang Pihak Berelasi | Kewajiban |  | **usul** | Pinjaman dari pemilik/keluarga/afiliasi |
 | `2-2300` | &nbsp;&nbsp;&nbsp;Hutang Leasing / Pembiayaan Kendaraan | Kewajiban |  | **usul** |  |
 | `3-1000` | Modal Disetor / Modal Pemilik | Ekuitas |  | **usul** |  |
-| `3-2000` | Laba Ditahan | Ekuitas |  | **usul** | Akumulasi laba tahun-tahun sebelumnya |
+| `3-2000` | Laba Ditahan | Ekuitas | pemetaan | **usul** | Akumulasi laba tahun-tahun sebelumnya |
 | `3-3000` | Laba / Rugi Tahun Berjalan | Ekuitas |  | **usul** |  |
 | `3-4000` | Prive | Ekuitas |  | **usul** | Pengambilan pribadi pemilik (saldo normal debit) |
 | `4-1000` | **Pendapatan Event** | Pendapatan | kelompok | **keputusan** | Matriks catatan: Reguler/Flagship × Event/Produksi/Sewa → tiap jenis layanan punya anak Reguler & Flagship |
 | `4-1100` | &nbsp;&nbsp;&nbsp;Pendapatan Event Reguler | Pendapatan | pemetaan | **keputusan** | Event pesanan klien (wedding, gathering, launching). Akun bawaan Faktur Penjualan |
-| `4-1200` | &nbsp;&nbsp;&nbsp;Pendapatan Event Flagship | Pendapatan |  | **keputusan** | Program unggulan milik sendiri (festival/konser tahunan), pendapatan tiket & sponsor |
+| `4-1200` | &nbsp;&nbsp;&nbsp;Pendapatan Event Flagship | Pendapatan |  | **keputusan** | Program unggulan milik sendiri (festival/konser tahunan): pendapatan flagship yang bukan tiket, sponsor, atau tenant |
+| `4-1300` | &nbsp;&nbsp;&nbsp;Pendapatan Tiket (Flagship) | Pendapatan |  | **keputusan** | Penjualan tiket program flagship (presale, reguler, VIP); uang tiket sebelum acara = Uang Muka, diakui saat acara |
+| `4-1400` | &nbsp;&nbsp;&nbsp;Pendapatan Sponsor (Flagship) | Pendapatan |  | **keputusan** | Paket sponsorship (platinum/gold/silver); difakturkan ke sponsor, diakui saat acara berlangsung |
+| `4-1500` | &nbsp;&nbsp;&nbsp;Pendapatan Tenant & Booth (Flagship) | Pendapatan |  | **keputusan** | Sewa booth/lapak tenant dalam program flagship |
 | `4-2000` | **Pendapatan Produksi** | Pendapatan | kelompok | **keputusan** | Dekorasi, dokumentasi, konten, cetak & merchandise |
 | `4-2100` | &nbsp;&nbsp;&nbsp;Pendapatan Produksi Reguler | Pendapatan |  | **keputusan** |  |
 | `4-2200` | &nbsp;&nbsp;&nbsp;Pendapatan Produksi Flagship | Pendapatan |  | **keputusan** |  |
 | `4-3000` | **Pendapatan Sewa** | Pendapatan | kelompok | **keputusan** | Sewa peralatan event & venue |
 | `4-3100` | &nbsp;&nbsp;&nbsp;Pendapatan Sewa Reguler | Pendapatan |  | **keputusan** |  |
 | `4-3200` | &nbsp;&nbsp;&nbsp;Pendapatan Sewa Flagship | Pendapatan |  | **keputusan** |  |
-| `4-8000` | **Potongan Penjualan** | Pendapatan | kelompok | **keputusan** | Kontra-pendapatan (saldo normal debit) — sesuai standar, diskon mengurangi pendapatan, bukan beban pemasaran |
-| `4-8100` | &nbsp;&nbsp;&nbsp;Diskon Penjualan | Pendapatan |  | **keputusan** | Dipindah dari Beban Pemasaran (catatan asli) |
-| `4-9000` | **Pendapatan Lain-lain** | Pendapatan | kelompok | **usul** |  |
+| `4-8000` | **Potongan Penjualan** | Pendapatan | kelompok | **keputusan** | Kontra-pendapatan (saldo normal debit), sesuai standar, diskon mengurangi pendapatan, bukan beban pemasaran |
+| `4-8100` | &nbsp;&nbsp;&nbsp;Diskon Penjualan | Pendapatan | pemetaan | **keputusan** | Dipindah dari Beban Pemasaran (catatan asli) |
+| `4-9000` | **Pendapatan Lain-lain** | Pendapatan | kelompok, pemetaan | **usul** |  |
 | `4-9100` | &nbsp;&nbsp;&nbsp;Pendapatan Bunga Bank | Pendapatan |  | **usul** |  |
 | `4-9200` | &nbsp;&nbsp;&nbsp;Pendapatan Lainnya | Pendapatan |  | **usul** | Selisih kurs, penjualan aset, dll. |
 | `5-1000` | **Beban Pokok Pendapatan** | Beban | kelompok | **usul** | Biaya yang melekat langsung pada pendapatan; menghasilkan laba kotor |
@@ -172,11 +176,11 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | `5-7100` | &nbsp;&nbsp;&nbsp;Klaim & Gagal Produksi | Beban |  | **keputusan** | Ganti rugi/pengerjaan ulang karena komplain klien atau produksi gagal |
 | `5-7200` | &nbsp;&nbsp;&nbsp;Cashback Pelanggan | Beban |  | asli |  |
 | `5-7400` | &nbsp;&nbsp;&nbsp;Iklan & Promosi | Beban |  | **usul** | Iklan media sosial, cetak brosur, endorsement |
-| `5-8000` | **Beban Sosial & Sponsorship** | Beban | kelompok | **keputusan** | 'Beban Lain-lain (1)' — tetap dipisah dari (2), diberi nama sesuai isinya |
+| `5-8000` | **Beban Sosial & Sponsorship** | Beban | kelompok | **keputusan** | 'Beban Lain-lain (1)', tetap dipisah dari (2), diberi nama sesuai isinya |
 | `5-8100` | &nbsp;&nbsp;&nbsp;Sumbangan | Beban |  | asli |  |
 | `5-8200` | &nbsp;&nbsp;&nbsp;Keperluan Rumah Tangga Kantor | Beban |  | asli |  |
 | `5-8300` | &nbsp;&nbsp;&nbsp;Sponsorship (Diberikan) | Beban |  | asli |  |
-| `5-8500` | **Beban Administrasi Bank** | Beban | kelompok | **keputusan** | 'Beban Lain-lain (2)' — dipisah karena sifatnya biaya keuangan, bukan sosial |
+| `5-8500` | **Beban Administrasi Bank** | Beban | kelompok | **keputusan** | 'Beban Lain-lain (2)', dipisah karena sifatnya biaya keuangan, bukan sosial |
 | `5-8510` | &nbsp;&nbsp;&nbsp;Administrasi Bank – Rekening Operasional | Beban |  | asli | Satu akun per rekening, sejajar dengan 1-12x0 |
 | `5-8520` | &nbsp;&nbsp;&nbsp;Pajak Bunga Bank | Beban |  | asli |  |
 | `5-9000` | **Beban Pajak** | Beban | kelompok | asli |  |

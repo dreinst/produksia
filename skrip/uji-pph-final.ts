@@ -10,7 +10,8 @@ import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { jalankan, formulir, pastikan, harusDitolak } from "./bantuan";
 
 /*
- * Ringkasan pajak per masa & PPh Final UMKM: omzet = DPP faktur − retur bulan itu, PPh Final = omzet × tarif,
+ * Ringkasan pajak per masa & PPh Final UMKM: omzet bruto usaha dari buku besar (akun pendapatan usaha, tanpa kelompok
+ * Diskon Penjualan & Pendapatan Lain-lain) = bruto faktur − retur (+ pendapatan tanpa faktur), PPh Final = omzet × tarif,
  * jurnal Dr Beban PPh Final / Cr Hutang PPh Final, penolakan (ganda, periode depan/tak valid, tanpa omzet),
  * hapus membalik jurnal, catat ulang menghasilkan jumlah yang sama.
  */
@@ -28,14 +29,22 @@ async function main() {
   console.log(`=== 1. Ringkasan pajak ${periode} = dokumen ===`);
   const { dari, sampai } = batasBulan(tahun, bulan);
   const [fj, rj] = await Promise.all([
-    db.fakturPenjualan.aggregate({ where: { tanggal: { gte: dari, lte: sampai } }, _sum: { dpp: true, ppn: true } }),
-    db.returPenjualan.aggregate({ where: { tanggal: { gte: dari, lte: sampai } }, _sum: { dpp: true, ppn: true } }),
+    db.fakturPenjualan.aggregate({ where: { tanggal: { gte: dari, lte: sampai } }, _sum: { dpp: true, diskon: true, ppn: true } }),
+    db.returPenjualan.aggregate({ where: { tanggal: { gte: dari, lte: sampai } }, _sum: { dpp: true, diskon: true, ppn: true } }),
   ]);
-  const omzetHarap = n(fj._sum.dpp ?? 0) - n(rj._sum.dpp ?? 0);
+  const omzetHarap = n(fj._sum.dpp ?? 0) + n(fj._sum.diskon ?? 0) - n(rj._sum.dpp ?? 0) - n(rj._sum.diskon ?? 0);
+  // omzet buku besar: akun pendapatan usaha (di luar kelompok 4-8xxx kontra dan 4-9xxx lain-lain pada bagan standar)
+  const barisOmzet = await db.barisJurnal.findMany({
+    where: { akun: { jenis: "PENDAPATAN", NOT: [{ kode: { startsWith: "4-8" } }, { kode: { startsWith: "4-9" } }] }, jurnal: { tanggal: { gte: dari, lte: sampai }, sumber: { not: "PENUTUP" } } },
+    select: { debit: true, kredit: true },
+  });
+  const omzetBukuBesar = barisOmzet.reduce((s, x) => s + n(x.kredit) - n(x.debit), 0);
   const r = await ringkasanPajak(db, tahun, pengaturan.pphFinalPersen);
   const b = r.bulan[bulan - 1];
-  pastikan(b.periode === periode && Math.abs(n(b.omzet) - omzetHarap) < 0.01, `omzet ${periode} = Σ DPP faktur − retur (${omzetHarap})`);
-  pastikan(Math.abs(n(b.pphFinal) - Math.round(omzetHarap * 0.5) / 100) < 0.01, `PPh Final ${periode} = 0,5% × omzet = ${n(b.pphFinal)}`);
+  pastikan(b.periode === periode && Math.abs(n(b.omzetFaktur) - omzetHarap) < 0.01, `omzet dari faktur ${periode} = Σ bruto faktur − retur (${omzetHarap})`);
+  pastikan(Math.abs(n(b.omzet) - omzetBukuBesar) < 0.01, `omzet ${periode} = akun pendapatan usaha di buku besar (${omzetBukuBesar})`);
+  pastikan(Math.abs(n(b.omzet) - n(b.omzetFaktur) - n(b.omzetLain)) < 0.01, "omzet = faktur + di luar faktur");
+  pastikan(Math.abs(n(b.pphFinal) - Math.round(n(b.omzet) * 0.5) / 100) < 0.01, `PPh Final ${periode} = 0,5% × omzet = ${n(b.pphFinal)}`);
   if (!pengaturan.pkp) pastikan(n(b.ppnKeluaran) === 0 && n(b.ppnMasukan) === 0, "non-PKP: PPN keluaran & masukan nol");
   pastikan(Math.abs(n(r.total.omzet) - r.bulan.reduce((s, x) => s + n(x.omzet), 0)) < 0.01, "total tahunan = Σ bulan");
   pastikan(omzetHarap > 0, "bulan berjalan punya omzet (data seed)");
