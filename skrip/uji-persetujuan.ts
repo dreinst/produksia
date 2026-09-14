@@ -316,7 +316,11 @@ async function main() {
 
   // ---------------------------------------------------------------- Penggajian
   console.log("\n=== 6. Penggajian ===");
-  const periode = `${mulaiUji.getFullYear()}-${String(mulaiUji.getMonth() + 1).padStart(2, "0")}`;
+  // Bulan berikutnya, bukan bulan berjalan: seed.ts juga memproses gaji "bulan berjalan"
+  // (periode saat ini), jadi memakai periode yang sama di sini akan selalu bentrok
+  // ("Penggajian periode ... sudah diproses") setiap kali uji dijalankan setelah seed.
+  const bulanUji = new Date(mulaiUji.getFullYear(), mulaiUji.getMonth() + 1, 1);
+  const periode = `${bulanUji.getFullYear()}-${String(bulanUji.getMonth() + 1).padStart(2, "0")}`;
   await sebagai(PENGAJU, () =>
     jalankan("buat penggajian (draf)", () =>
       buatPenggajian(

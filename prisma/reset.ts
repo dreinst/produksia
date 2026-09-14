@@ -5,6 +5,7 @@ async function main() {
   console.log("=== Menghapus semua data transaksi & master data ===");
   await db.logAktivitas.deleteMany();
   await db.hakAksesPeran.deleteMany();
+  await db.dokumenKas.deleteMany();
   await db.mutasiBank.deleteMany();
   await db.prive.deleteMany();
   await db.pemetaanAkunTambahan.deleteMany();
@@ -43,6 +44,8 @@ async function main() {
   await db.kelompokBarang.deleteMany();
   await db.pelanggan.deleteMany();
   await db.pemasok.deleteMany();
+  await db.barisPenggajian.deleteMany();
+  await db.penggajian.deleteMany();
   await db.karyawan.deleteMany();
   await db.departemen.deleteMany();
   await db.gudang.deleteMany();
@@ -52,6 +55,7 @@ async function main() {
   await db.jurnal.deleteMany();
   await db.pemetaanAkun.deleteMany();
   await db.pengaturanPerusahaan.deleteMany();
+  await db.mataUang.deleteMany();
   await db.akun.deleteMany();
   await db.sesi.deleteMany();
   await db.permintaanAturUlang.deleteMany();
