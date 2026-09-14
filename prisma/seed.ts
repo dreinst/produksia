@@ -15,6 +15,7 @@ import { buatPrive } from "../src/lib/aksi/prive";
 import { buatAsetTetap, jalankanPenyusutanBulanan } from "../src/lib/aksi/asetTetap";
 import { buatPenyesuaianPersediaan, buatPindahBarang } from "../src/lib/aksi/persediaan";
 import { catatPphFinal } from "../src/lib/aksi/pajak";
+import { buatPenggajian } from "../src/lib/aksi/sdm";
 
 /** Aksi server diakhiri redirect()/revalidatePath() yang melempar di luar Next — efek DB-nya sudah tersimpan. */
 async function jalankan(label: string, fn: () => Promise<void>) {
@@ -55,7 +56,16 @@ async function main() {
 
   console.log("=== Data induk (usaha Event/Wedding Organizer) ===");
   const dept = await db.departemen.create({ data: { nama: "Marketing & Event" } });
-  const penjual = await db.karyawan.create({ data: { kode: "SLS-01", nama: "Rudi Hartono", departemenId: dept.id } });
+  const penjual = await db.karyawan.create({
+    data: { kode: "SLS-01", nama: "Rudi Hartono", departemenId: dept.id, jabatan: "Sales Executive", status: "AKTIF", gajiPokok: 4000000, tunjangan: 500000 },
+  });
+  const deptOps = await db.departemen.create({ data: { nama: "Operasional Event" } });
+  const koordinator = await db.karyawan.create({
+    data: { kode: "KRY-001", nama: "Sari Wulandari", departemenId: deptOps.id, jabatan: "Koordinator Lapangan", status: "AKTIF", gajiPokok: 4500000, tunjangan: 500000 },
+  });
+  const kruLepas = await db.karyawan.create({
+    data: { kode: "KRY-002", nama: "Joko Prasetyo", departemenId: deptOps.id, jabatan: "Kru Lepas", status: "AKTIF", gajiPokok: 1200000, tunjangan: 0 },
+  });
   const pelanggan = await db.pelanggan.create({
     data: { kode: "CUST-001", nama: "PT Cahaya Nusantara", alamat: "Jl. Sudirman Kav. 12, Jakarta", telepon: "021-5551234", penjualId: penjual.id },
   });
@@ -262,6 +272,20 @@ async function main() {
   console.log("=== Tahap 19: PPh Final UMKM 0,5% bulan berjalan dari omzet (jurnal JU-PPHF: Dr Beban PPh Final / Cr Hutang PPh Final) ===");
   const periodeIni = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
   await jalankan(`JU-PPHF periode ${periodeIni}: 0,5% × omzet Rp 3.311.000 = Rp 16.555`, () => catatPphFinal(formulir({ periode: periodeIni })));
+
+  console.log("=== Tahap 20: SDM — Proses Gaji bulan berjalan (Dr Beban Gaji Pokok + Tunjangan / Cr Hutang Potongan / Cr Kas) ===");
+  await jalankan(`GJ periode ${periodeIni}: Rudi, Sari, Joko (potongan BPJS Sari Rp 100.000)`, () =>
+    buatPenggajian(formulir({
+      periode: periodeIni,
+      akunKasId: kas.id,
+      keterangan: "Gaji bulan berjalan",
+      baris: [
+        { karyawanId: penjual.id, gajiPokok: 4000000, tunjangan: 500000, potongan: 0 },
+        { karyawanId: koordinator.id, gajiPokok: 4500000, tunjangan: 500000, potongan: 100000, keteranganPotongan: "BPJS Kesehatan" },
+        { karyawanId: kruLepas.id, gajiPokok: 1200000, tunjangan: 0, potongan: 0 },
+      ],
+    })),
+  );
 
   console.log("=== Selesai. Ringkasan & pemeriksaan sinkronisasi ===");
   const daftarStok = await db.stokBarang.findMany({ include: { barang: true } });
