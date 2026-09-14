@@ -7,6 +7,7 @@ import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 
 export default async function HalamanPenyesuaianPersediaan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("penyesuaian.lihat");
@@ -29,7 +30,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
       <KepalaHalaman
         jejak={[{ label: "Persediaan" }, { label: "Stok per Gudang", href: "/persediaan" }]}
         judul="Penyesuaian Stok"
-        subjudul="Saldo awal, hasil opname, dan koreksi stok. Setiap penyesuaian otomatis membuat jurnal JU-PS."
+        subjudul="Saldo awal, hasil opname, dan koreksi stok. Selama alur persetujuan menyala, stok fisik dan jurnal JU-PS baru berubah setelah penyesuaian disetujui pengguna lain."
         aksi={
           punyaHak(pengguna, "penyesuaian.buat") ? (
             <Link href="/persediaan/penyesuaian/baru" className="tombol tombol-utama">
@@ -53,6 +54,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                 <th className="text-right">Baris</th>
                 <th className="text-right">Nilai</th>
                 <th>Jurnal</th>
+                <th>Persetujuan</th>
                 <th />
               </tr>
             </thead>
@@ -69,13 +71,25 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                     <td className="text-right angka">{p.baris.length}</td>
                     <td className={`text-right angka font-semibold ${nilai < 0 ? "text-rose-700" : "text-emerald-700"}`}>{nilai.toLocaleString("id-ID")}</td>
                     <td className="mono text-slate-500">{p.jurnal?.nomor ?? "-"}</td>
+                    <td>
+                      <SelPersetujuan
+                        jenis="penyesuaian"
+                        kode="penyesuaian"
+                        id={p.id}
+                        nomor={p.nomor}
+                        status={p.statusPersetujuan}
+                        diajukanOlehId={p.diajukanOlehId}
+                        pengguna={pengguna}
+                        catatanPenolakan={p.catatanPenolakan}
+                      />
+                    </td>
                     <td className="text-right"><TombolHapusDokumen jenis="penyesuaian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                   </tr>
                 );
               })}
               {daftar.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="kosong">
+                  <td colSpan={10} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada penyesuaian."}
                   </td>
                 </tr>

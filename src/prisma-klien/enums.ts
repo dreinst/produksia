@@ -53,6 +53,7 @@ export type JenisAkun = (typeof JenisAkun)[keyof typeof JenisAkun]
 
 export const SumberJurnal = {
   MANUAL: 'MANUAL',
+  SELISIH_KURS: 'SELISIH_KURS',
   PENUTUP: 'PENUTUP',
   PAJAK: 'PAJAK',
   PRIVE: 'PRIVE',
@@ -76,3 +77,21 @@ export const StatusAset = {
 } as const
 
 export type StatusAset = (typeof StatusAset)[keyof typeof StatusAset]
+
+
+export const StatusPersetujuan = {
+  DRAFT: 'DRAFT',
+  MENUNGGU: 'MENUNGGU',
+  DISETUJUI: 'DISETUJUI',
+  DITOLAK: 'DITOLAK'
+} as const
+
+export type StatusPersetujuan = (typeof StatusPersetujuan)[keyof typeof StatusPersetujuan]
+
+
+export const JenisDokumenKas = {
+  MASUK: 'MASUK',
+  KELUAR: 'KELUAR'
+} as const
+
+export type JenisDokumenKas = (typeof JenisDokumenKas)[keyof typeof JenisDokumenKas]

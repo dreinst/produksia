@@ -8,6 +8,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format } from "@/lib/uang";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { akhirTahun, ringkasanPenutupan } from "@/lib/tutupBuku";
+import { dataLangsungDisetujui } from "@/lib/persetujuan";
 
 const HALAMAN = "/buku-besar/tutup-buku";
 const NOL = D(0);
@@ -60,7 +61,8 @@ export async function tutupTahun(dataFormulir: FormData) {
       });
       jurnalId = jurnal.id;
     }
-    await tx.tutupBuku.create({ data: { tahun, labaBersih: laba, penggunaNama: pengguna.nama, jurnalId } });
+    // Tutup buku belum ikut alur persetujuan; haknya sendiri sudah dibatasi ke Pemilik/Superadmin
+    await tx.tutupBuku.create({ data: { tahun, labaBersih: laba, penggunaNama: pengguna.nama, jurnalId, ...dataLangsungDisetujui(pengguna) } });
 
     // Tahun buku aktif ikut maju bila yang ditutup adalah tahun yang sedang dibuka
     const pengaturan = await tx.pengaturanPerusahaan.findUnique({ where: { id: "default" } });

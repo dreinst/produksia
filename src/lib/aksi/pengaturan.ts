@@ -23,11 +23,12 @@ export async function simpanPemetaanAkun(dataFormulir: FormData) {
   const labaDitahanId = String(dataFormulir.get("labaDitahanId") ?? "") || null;
   const diskonPenjualanId = String(dataFormulir.get("diskonPenjualanId") ?? "") || null;
   const pendapatanLainId = String(dataFormulir.get("pendapatanLainId") ?? "") || null;
+  const selisihKursId = String(dataFormulir.get("selisihKursId") ?? "") || null;
 
   if (!piutangUsahaId || !persediaanId || !hppId || !pendapatanPenjualanId || !utangUsahaId) {
     throw new Error("Semua pemetaan akun wajib diisi");
   }
-  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId, barangTerkirimId, uangMukaPelangganId, labaDitahanId, diskonPenjualanId };
+  const opsional = { bebanJasaId, barangBelumDitagihId, selisihPersediaanId, barangTerkirimId, uangMukaPelangganId, labaDitahanId, diskonPenjualanId, selisihKursId };
   await pastikanAkunRinci(db, [piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...Object.values(opsional).filter((v): v is string => Boolean(v))]);
   // Pendapatan Lain-lain adalah KELOMPOK akun pendapatan (seluruh keturunannya dikecualikan dari omzet)
   if (pendapatanLainId) {
@@ -106,6 +107,8 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
   const tahunBuku = bacaTahunBuku(teks("tahunBuku"));
   const pphFinalPersen = bacaUang(dataFormulir.get("pphFinalPersen") ?? "0.5", "Tarif PPh Final", { allowZero: true });
   if (pphFinalPersen.gt(100)) throw new Error("Tarif PPh Final maksimal 100%");
+  // Alur persetujuan maker-checker: dimatikan berarti dokumen langsung dibukukan tanpa pemeriksa
+  const wajibPersetujuan = dataFormulir.get("wajibPersetujuan") === "on";
   const akun = {
     akunPpnKeluaranId: teks("akunPpnKeluaranId") || null,
     akunPpnMasukanId: teks("akunPpnMasukanId") || null,
@@ -121,10 +124,11 @@ export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
 
   await db.pengaturanPerusahaan.upsert({
     where: { id: "default" },
-    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, ...akun },
-    update: { nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, ...akun },
+    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, wajibPersetujuan, ...akun },
+    update: { nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, wajibPersetujuan, ...akun },
   });
   revalidatePath("/pengaturan/perusahaan");
+  revalidatePath("/persetujuan");
   revalidatePath("/", "layout");
 }
 

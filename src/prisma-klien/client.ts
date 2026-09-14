@@ -58,6 +58,18 @@ export type Sesi = Prisma.SesiModel
  */
 export type PercobaanMasuk = Prisma.PercobaanMasukModel
 /**
+ * Model MataUang
+ * Mata uang transaksi. IDR adalah mata uang fungsional (mata uang pelaporan): seluruh buku besar
+ * tetap dicatat dalam IDR, mata uang asing hanya melekat pada dokumen dan saldo piutang/hutangnya.
+ */
+export type MataUang = Prisma.MataUangModel
+/**
+ * Model KursMataUang
+ * Riwayat kurs terhadap IDR: 1 unit mata uang = `kurs` rupiah pada `tanggal`.
+ * Dokumen menyimpan kurs yang dipakai (snapshot), jadi jurnal lama tidak berubah saat kurs baru dimasukkan.
+ */
+export type KursMataUang = Prisma.KursMataUangModel
+/**
  * Model Departemen
  * 
  */
@@ -232,6 +244,17 @@ export type Jurnal = Prisma.JurnalModel
  * 
  */
 export type BarisJurnal = Prisma.BarisJurnalModel
+/**
+ * Model DokumenKas
+ * Dokumen Kas Masuk / Kas Keluar yang melewati persetujuan.
+ * 
+ * Kenapa model sendiri: di Produksia keberadaan satu baris `Jurnal` BERARTI sudah masuk buku besar
+ * (semua laporan membaca Jurnal tanpa filter). Draf kas karena itu tidak boleh berupa Jurnal, jadi
+ * niat transaksinya disimpan di sini dulu; jurnal KM/KK baru dibuat saat dokumen DISETUJUI dan
+ * ditautkan lewat `jurnalId`. Kas masuk/keluar yang dicatat tanpa alur persetujuan (pengaturan
+ * `wajibPersetujuan` mati) tetap langsung menjadi Jurnal seperti sebelumnya.
+ */
+export type DokumenKas = Prisma.DokumenKasModel
 /**
  * Model AsetTetap
  * 

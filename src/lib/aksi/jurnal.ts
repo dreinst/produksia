@@ -11,6 +11,7 @@ import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import type { SumberJurnal } from "@/prisma-klien/enums";
 import { bacaProyekId } from "@/lib/proyek";
+import { persetujuanWajib } from "@/lib/persetujuan";
 
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan?: string };
 
@@ -58,6 +59,8 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
       keterangan,
       sumber,
       proyekId,
+      // Satu baris Jurnal = sudah masuk buku besar, jadi statusnya selalu DISETUJUI (lihat schema.prisma)
+      statusPersetujuan: "DISETUJUI",
       baris: {
         create: daftarBaris.map((l) => ({
           akunId: l.akunId,
@@ -98,44 +101,59 @@ function bacaFormulirKas(dataFormulir: FormData) {
   return { akunKasId, akunLawanId, keterangan, jumlah };
 }
 
-export async function buatKasMasuk(dataFormulir: FormData) {
-  await wajibHakAksi("kas-masuk.buat");
+/**
+ * Kas Masuk / Kas Keluar.
+ *
+ * Dengan alur persetujuan menyala, dokumennya disimpan lebih dulu di DokumenKas (DRAFT) dan BELUM
+ * menjadi baris Jurnal: di Produksia keberadaan satu baris Jurnal berarti sudah masuk buku besar,
+ * jadi draf kas tidak boleh berupa Jurnal. Jurnal KM/KK dibuat saat dokumen disetujui.
+ * Dengan alur persetujuan mati, perilakunya sama seperti sebelumnya: langsung menjadi jurnal.
+ */
+async function buatDokumenKas(jenis: "MASUK" | "KELUAR", dataFormulir: FormData) {
+  const pengguna = await wajibHakAksi(jenis === "MASUK" ? "kas-masuk.buat" : "kas-keluar.buat");
   const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
+  const proyekId = await bacaProyekId(dataFormulir);
   const zero = D(0);
+  const halaman = jenis === "MASUK" ? "/kas-bank/masuk" : "/kas-bank/keluar";
+  const label = jenis === "MASUK" ? "Kas Masuk" : "Kas Keluar";
 
-  await buatJurnalSeimbang(
-    keterangan || "Kas Masuk",
-    [
-      { akunId: akunKasId, debit: jumlah, kredit: zero, keterangan },
-      { akunId: akunLawanId, debit: zero, kredit: jumlah, keterangan },
-    ],
-    "KAS_MASUK",
-    "KM",
-    await bacaProyekId(dataFormulir),
-  );
+  if (!(await persetujuanWajib(db))) {
+    await buatJurnalSeimbang(
+      keterangan || label,
+      jenis === "MASUK"
+        ? [
+            { akunId: akunKasId, debit: jumlah, kredit: zero, keterangan },
+            { akunId: akunLawanId, debit: zero, kredit: jumlah, keterangan },
+          ]
+        : [
+            { akunId: akunLawanId, debit: jumlah, kredit: zero, keterangan },
+            { akunId: akunKasId, debit: zero, kredit: jumlah, keterangan },
+          ],
+      jenis === "MASUK" ? "KAS_MASUK" : "KAS_KELUAR",
+      jenis === "MASUK" ? "KM" : "KK",
+      proyekId,
+    );
+    revalidatePath(halaman);
+    redirect(halaman);
+  }
 
-  revalidatePath("/kas-bank/masuk");
-  redirect("/kas-bank/masuk");
+  await pastikanAkunRinci(db, [akunKasId, akunLawanId]);
+  const nomor = await nomorDokumenBerikutnya(db.dokumenKas, jenis === "MASUK" ? "KM" : "KK");
+  await db.dokumenKas.create({
+    data: { nomor, jenis, akunKasId, akunLawanId, jumlah, keterangan: keterangan || null, proyekId, dibuatOleh: pengguna.nama, statusPersetujuan: "DRAFT" },
+  });
+
+  revalidatePath(halaman);
+  revalidatePath("/persetujuan");
+  redirect(halaman);
+}
+
+export async function buatKasMasuk(dataFormulir: FormData) {
+  return buatDokumenKas("MASUK", dataFormulir);
 }
 
 export async function buatKasKeluar(dataFormulir: FormData) {
-  await wajibHakAksi("kas-keluar.buat");
-  const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
-  const zero = D(0);
-
-  await buatJurnalSeimbang(
-    keterangan || "Kas Keluar",
-    [
-      { akunId: akunLawanId, debit: jumlah, kredit: zero, keterangan },
-      { akunId: akunKasId, debit: zero, kredit: jumlah, keterangan },
-    ],
-    "KAS_KELUAR",
-    "KK",
-    await bacaProyekId(dataFormulir),
-  );
-
-  revalidatePath("/kas-bank/keluar");
-  redirect("/kas-bank/keluar");
+  return buatDokumenKas("KELUAR", dataFormulir);
 }
 
 // ---------- Varian untuk <FormulirAksi> (mengembalikan pesan error, bukan throw) ----------

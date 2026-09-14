@@ -5,6 +5,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { ambilPengaturanPerusahaan, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 import { buatFakturFormulir } from "@/lib/aksi/penjualan";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
+import { opsiMataUangDokumen } from "@/lib/mataUang";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
 /** Pendapatan diakui setelah acara (PSAK 72): event tanpa tanggal selesai dianggap boleh difaktur. */
@@ -48,6 +49,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
 
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const akunPpn = pengaturan.akunPpnKeluaranId ? await db.akun.findUnique({ where: { id: pengaturan.akunPpnKeluaranId } }) : null;
+  const opsiMataUang = await opsiMataUangDokumen(db);
   const hariIni = new Date();
   const tempo = tanggalJatuhTempo(pengaturan.terminHari, hariIni);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -102,6 +104,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
       }
       pajak={{ pkp: pengaturan.pkp, tarif: Number(pengaturan.tarifPpnPersen) }}
       terminHari={pengaturan.terminHari}
+      mataUang={{ daftar: opsiMataUang, bawaanId: pesanan.pelanggan.mataUangId }}
       uangMukaTersedia={pesanan.uangMuka.reduce((s, u) => s + Number(u.jumlah) - Number(u.jumlahDipakai), 0)}
     />
   );

@@ -9,6 +9,9 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import { gantiTahunBukuFormulir } from "@/lib/aksi/pengaturan";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
+/** Jenis dokumen yang sudah tersambung ke alur persetujuan (lihat BERKAS di src/lib/persetujuan.ts). */
+const DOKUMEN_PERSETUJUAN = ["faktur", "faktur-pembelian", "kas-masuk", "kas-keluar", "penyesuaian", "aset", "penggajian"] as const;
+
 type TautanNavigasi = { href: string; label: string; kode?: string; hak: Hak };
 type Grup = { judul: string; ikon: string; tautan: TautanNavigasi[] };
 
@@ -127,6 +130,7 @@ const dataInduk: Grup = {
 const tautanPengaturan: (TautanNavigasi & { ikon: string })[] = [
   { href: "/pengaturan/perusahaan", label: "Perusahaan & Pajak", ikon: "domain", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pemetaan.tulis" },
+  { href: "/pengaturan/mata-uang", label: "Mata Uang & Kurs", ikon: "payments", hak: "pengaturan.tulis" },
   { href: "/pengaturan/bagan-akun", label: "Bagan Akun Standar", ikon: "account_tree", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
   { href: "/pengaturan/hak-akses", label: "Hak Akses", ikon: "shield", hak: "hak-akses.kelola" },
@@ -228,6 +232,8 @@ function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: Peng
   const grupOperasional = saringGrup(operasional, pengguna);
   const grupDataInduk = saringGrup([persediaan, dataInduk], pengguna);
   const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna, l.hak));
+  // Kotak masuk persetujuan tampil bagi siapa pun yang boleh membuat atau menyetujui dokumen yang ikut alur itu
+  const bolehPersetujuan = DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
   const semuaGrup = [...grupOperasional, ...grupDataInduk];
 
   const judulAktif = semuaGrup.find((g) => g.tautan.some((l) => aktifDi(pathname, l.href)))?.judul ?? null;
@@ -238,6 +244,9 @@ function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: Peng
     <nav className="space-y-5" aria-label="Menu utama">
       <div className="space-y-0.5">
         <TautanTunggal href="/" label="Beranda" ikon="space_dashboard" pathname={pathname} saatNavigasi={saatNavigasi} />
+        {bolehPersetujuan && (
+          <TautanTunggal href="/persetujuan" label="Persetujuan" ikon="verified" pathname={pathname} saatNavigasi={saatNavigasi} />
+        )}
       </div>
 
       {grupOperasional.length > 0 && (

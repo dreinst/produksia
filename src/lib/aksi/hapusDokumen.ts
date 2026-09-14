@@ -33,6 +33,7 @@ export type JenisDokumen =
   | "pembayaran"
   | "returPembelian"
   | "jurnal"
+  | "dokumenKas"
   | "penyesuaian"
   | "pindahBarang"
   | "pphFinal"
@@ -56,6 +57,7 @@ const LABEL: Record<JenisDokumen, string> = {
   pembayaran: "Pembayaran Pembelian",
   returPembelian: "Retur Pembelian",
   jurnal: "Jurnal",
+  dokumenKas: "Kas Masuk / Kas Keluar",
   penyesuaian: "Penyesuaian Stok",
   pindahBarang: "Pindah Barang",
   pphFinal: "PPh Final Bulanan",
@@ -80,6 +82,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   pembayaran: ["/pembelian/pembayaran", "/pembelian/faktur"],
   returPembelian: ["/pembelian/retur", "/pembelian/faktur", "/persediaan"],
   jurnal: ["/buku-besar/jurnal", "/kas-bank/masuk", "/kas-bank/keluar"],
+  dokumenKas: ["/kas-bank/masuk", "/kas-bank/keluar", "/buku-besar/jurnal", "/persetujuan"],
   penyesuaian: ["/persediaan/penyesuaian", "/persediaan"],
   pindahBarang: ["/persediaan/pindah", "/persediaan"],
   pphFinal: ["/buku-besar/pajak", "/buku-besar/jurnal"],
@@ -132,7 +135,7 @@ async function segarkanStatusPesananPembelian(tx: Tx, pesananId: string) {
   await tx.pesananPembelian.update({ where: { id: pesananId }, data: { status: semua ? "DIPROSES" : ada ? "SEBAGIAN" : "DRAF" } });
 }
 /** Hak yang dibutuhkan untuk menghapus tiap jenis dokumen (jurnal diperiksa menurut sumbernya). */
-const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal">, Hak> = {
+const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal" | "dokumenKas">, Hak> = {
   penawaran: "penawaran.hapus",
   pesanan: "pesanan.hapus",
   pengiriman: "pengiriman.hapus",
@@ -158,7 +161,8 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal">, Hak> = {
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
 
 export async function hapusDokumen(jenis: JenisDokumen, id: string) {
-  const pengguna = jenis === "jurnal" ? await wajibMasukAksi() : await wajibHakAksi(HAK_HAPUS[jenis]);
+  // Jurnal & dokumen kas haknya ditentukan setelah datanya dibaca (menurut sumber jurnal / jenis kas)
+  const pengguna = jenis === "jurnal" || jenis === "dokumenKas" ? await wajibMasukAksi() : await wajibHakAksi(HAK_HAPUS[jenis]);
 
   await db.$transaction(async (tx) => {
     switch (jenis) {
@@ -361,8 +365,29 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await catatLog(tx, pengguna, jenis, d.nomor, `Jurnal ${d.sumber.toLowerCase().replace("_", " ")} dihapus${d.keterangan ? ` (${d.keterangan})` : ""}`);
         return;
       }
+      case "dokumenKas": {
+        const d = await tx.dokumenKas.findUniqueOrThrow({ where: { id } });
+        pastikanHak(pengguna, d.jenis === "MASUK" ? "kas-masuk.hapus" : "kas-keluar.hapus");
+        await tx.dokumenKas.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        await catatLog(
+          tx,
+          pengguna,
+          jenis,
+          d.nomor,
+          d.jurnalId ? "Dokumen kas dan jurnalnya dihapus" : `Draf dokumen kas dihapus (status ${d.statusPersetujuan}); belum ada jurnal`,
+        );
+        return;
+      }
       case "penyesuaian": {
         const d = await tx.penyesuaianPersediaan.findUniqueOrThrow({ where: { id }, include: { baris: true } });
+        // Penyesuaian yang belum disetujui belum memindahkan stok maupun membuat jurnal: tidak ada yang perlu dibalik
+        if (d.statusPersetujuan !== "DISETUJUI") {
+          await tx.barisPenyesuaianPersediaan.deleteMany({ where: { penyesuaianId: id } });
+          await tx.penyesuaianPersediaan.delete({ where: { id } });
+          await catatLog(tx, pengguna, jenis, d.nomor, `Draf penyesuaian dihapus (status ${d.statusPersetujuan}); stok dan jurnal tidak tersentuh`);
+          return;
+        }
         const label = await labelBarang(tx, d.baris.map((b) => b.barangId));
         for (const b of d.baris) {
           const selisih = D(b.jumlahSesudah).minus(b.jumlahSebelum);

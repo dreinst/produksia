@@ -29,11 +29,15 @@ export type AggregateBarisJurnal = {
 export type BarisJurnalAvgAggregateOutputType = {
   debit: runtime.Decimal | null
   kredit: runtime.Decimal | null
+  kursAsli: runtime.Decimal | null
+  nilaiAsli: runtime.Decimal | null
 }
 
 export type BarisJurnalSumAggregateOutputType = {
   debit: runtime.Decimal | null
   kredit: runtime.Decimal | null
+  kursAsli: runtime.Decimal | null
+  nilaiAsli: runtime.Decimal | null
 }
 
 export type BarisJurnalMinAggregateOutputType = {
@@ -44,6 +48,9 @@ export type BarisJurnalMinAggregateOutputType = {
   kredit: runtime.Decimal | null
   keterangan: string | null
   rekonsiliasiPada: Date | null
+  mataUangAsliId: string | null
+  kursAsli: runtime.Decimal | null
+  nilaiAsli: runtime.Decimal | null
 }
 
 export type BarisJurnalMaxAggregateOutputType = {
@@ -54,6 +61,9 @@ export type BarisJurnalMaxAggregateOutputType = {
   kredit: runtime.Decimal | null
   keterangan: string | null
   rekonsiliasiPada: Date | null
+  mataUangAsliId: string | null
+  kursAsli: runtime.Decimal | null
+  nilaiAsli: runtime.Decimal | null
 }
 
 export type BarisJurnalCountAggregateOutputType = {
@@ -64,6 +74,9 @@ export type BarisJurnalCountAggregateOutputType = {
   kredit: number
   keterangan: number
   rekonsiliasiPada: number
+  mataUangAsliId: number
+  kursAsli: number
+  nilaiAsli: number
   _all: number
 }
 
@@ -71,11 +84,15 @@ export type BarisJurnalCountAggregateOutputType = {
 export type BarisJurnalAvgAggregateInputType = {
   debit?: true
   kredit?: true
+  kursAsli?: true
+  nilaiAsli?: true
 }
 
 export type BarisJurnalSumAggregateInputType = {
   debit?: true
   kredit?: true
+  kursAsli?: true
+  nilaiAsli?: true
 }
 
 export type BarisJurnalMinAggregateInputType = {
@@ -86,6 +103,9 @@ export type BarisJurnalMinAggregateInputType = {
   kredit?: true
   keterangan?: true
   rekonsiliasiPada?: true
+  mataUangAsliId?: true
+  kursAsli?: true
+  nilaiAsli?: true
 }
 
 export type BarisJurnalMaxAggregateInputType = {
@@ -96,6 +116,9 @@ export type BarisJurnalMaxAggregateInputType = {
   kredit?: true
   keterangan?: true
   rekonsiliasiPada?: true
+  mataUangAsliId?: true
+  kursAsli?: true
+  nilaiAsli?: true
 }
 
 export type BarisJurnalCountAggregateInputType = {
@@ -106,6 +129,9 @@ export type BarisJurnalCountAggregateInputType = {
   kredit?: true
   keterangan?: true
   rekonsiliasiPada?: true
+  mataUangAsliId?: true
+  kursAsli?: true
+  nilaiAsli?: true
   _all?: true
 }
 
@@ -203,6 +229,9 @@ export type BarisJurnalGroupByOutputType = {
   kredit: runtime.Decimal
   keterangan: string | null
   rekonsiliasiPada: Date | null
+  mataUangAsliId: string | null
+  kursAsli: runtime.Decimal | null
+  nilaiAsli: runtime.Decimal | null
   _count: BarisJurnalCountAggregateOutputType | null
   _avg: BarisJurnalAvgAggregateOutputType | null
   _sum: BarisJurnalSumAggregateOutputType | null
@@ -236,9 +265,13 @@ export type BarisJurnalWhereInput = {
   kredit?: Prisma.DecimalFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
   rekonsiliasiPada?: Prisma.DateTimeNullableFilter<"BarisJurnal"> | Date | string | null
+  mataUangAsliId?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
+  kursAsli?: Prisma.DecimalNullableFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.DecimalNullableFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal?: Prisma.XOR<Prisma.JurnalScalarRelationFilter, Prisma.JurnalWhereInput>
   akun?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   mutasiBank?: Prisma.XOR<Prisma.MutasiBankNullableScalarRelationFilter, Prisma.MutasiBankWhereInput> | null
+  mataUangAsli?: Prisma.XOR<Prisma.MataUangNullableScalarRelationFilter, Prisma.MataUangWhereInput> | null
 }
 
 export type BarisJurnalOrderByWithRelationInput = {
@@ -249,9 +282,13 @@ export type BarisJurnalOrderByWithRelationInput = {
   kredit?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   rekonsiliasiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  mataUangAsliId?: Prisma.SortOrderInput | Prisma.SortOrder
+  kursAsli?: Prisma.SortOrderInput | Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrderInput | Prisma.SortOrder
   jurnal?: Prisma.JurnalOrderByWithRelationInput
   akun?: Prisma.AkunOrderByWithRelationInput
   mutasiBank?: Prisma.MutasiBankOrderByWithRelationInput
+  mataUangAsli?: Prisma.MataUangOrderByWithRelationInput
 }
 
 export type BarisJurnalWhereUniqueInput = Prisma.AtLeast<{
@@ -265,9 +302,13 @@ export type BarisJurnalWhereUniqueInput = Prisma.AtLeast<{
   kredit?: Prisma.DecimalFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
   rekonsiliasiPada?: Prisma.DateTimeNullableFilter<"BarisJurnal"> | Date | string | null
+  mataUangAsliId?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
+  kursAsli?: Prisma.DecimalNullableFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.DecimalNullableFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal?: Prisma.XOR<Prisma.JurnalScalarRelationFilter, Prisma.JurnalWhereInput>
   akun?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   mutasiBank?: Prisma.XOR<Prisma.MutasiBankNullableScalarRelationFilter, Prisma.MutasiBankWhereInput> | null
+  mataUangAsli?: Prisma.XOR<Prisma.MataUangNullableScalarRelationFilter, Prisma.MataUangWhereInput> | null
 }, "id">
 
 export type BarisJurnalOrderByWithAggregationInput = {
@@ -278,6 +319,9 @@ export type BarisJurnalOrderByWithAggregationInput = {
   kredit?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   rekonsiliasiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  mataUangAsliId?: Prisma.SortOrderInput | Prisma.SortOrder
+  kursAsli?: Prisma.SortOrderInput | Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BarisJurnalCountOrderByAggregateInput
   _avg?: Prisma.BarisJurnalAvgOrderByAggregateInput
   _max?: Prisma.BarisJurnalMaxOrderByAggregateInput
@@ -296,6 +340,9 @@ export type BarisJurnalScalarWhereWithAggregatesInput = {
   kredit?: Prisma.DecimalWithAggregatesFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"BarisJurnal"> | string | null
   rekonsiliasiPada?: Prisma.DateTimeNullableWithAggregatesFilter<"BarisJurnal"> | Date | string | null
+  mataUangAsliId?: Prisma.StringNullableWithAggregatesFilter<"BarisJurnal"> | string | null
+  kursAsli?: Prisma.DecimalNullableWithAggregatesFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.DecimalNullableWithAggregatesFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalCreateInput = {
@@ -304,9 +351,12 @@ export type BarisJurnalCreateInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal: Prisma.JurnalCreateNestedOneWithoutBarisInput
   akun: Prisma.AkunCreateNestedOneWithoutBarisJurnalInput
   mutasiBank?: Prisma.MutasiBankCreateNestedOneWithoutBarisJurnalInput
+  mataUangAsli?: Prisma.MataUangCreateNestedOneWithoutBarisJurnalAsliInput
 }
 
 export type BarisJurnalUncheckedCreateInput = {
@@ -317,6 +367,9 @@ export type BarisJurnalUncheckedCreateInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedOneWithoutBarisJurnalInput
 }
 
@@ -326,9 +379,12 @@ export type BarisJurnalUpdateInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal?: Prisma.JurnalUpdateOneRequiredWithoutBarisNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutBarisJurnalNestedInput
   mutasiBank?: Prisma.MutasiBankUpdateOneWithoutBarisJurnalNestedInput
+  mataUangAsli?: Prisma.MataUangUpdateOneWithoutBarisJurnalAsliNestedInput
 }
 
 export type BarisJurnalUncheckedUpdateInput = {
@@ -339,6 +395,9 @@ export type BarisJurnalUncheckedUpdateInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateOneWithoutBarisJurnalNestedInput
 }
 
@@ -350,6 +409,9 @@ export type BarisJurnalCreateManyInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalUpdateManyMutationInput = {
@@ -358,6 +420,8 @@ export type BarisJurnalUpdateManyMutationInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalUncheckedUpdateManyInput = {
@@ -368,6 +432,9 @@ export type BarisJurnalUncheckedUpdateManyInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalListRelationFilter = {
@@ -388,11 +455,16 @@ export type BarisJurnalCountOrderByAggregateInput = {
   kredit?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   rekonsiliasiPada?: Prisma.SortOrder
+  mataUangAsliId?: Prisma.SortOrder
+  kursAsli?: Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrder
 }
 
 export type BarisJurnalAvgOrderByAggregateInput = {
   debit?: Prisma.SortOrder
   kredit?: Prisma.SortOrder
+  kursAsli?: Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrder
 }
 
 export type BarisJurnalMaxOrderByAggregateInput = {
@@ -403,6 +475,9 @@ export type BarisJurnalMaxOrderByAggregateInput = {
   kredit?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   rekonsiliasiPada?: Prisma.SortOrder
+  mataUangAsliId?: Prisma.SortOrder
+  kursAsli?: Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrder
 }
 
 export type BarisJurnalMinOrderByAggregateInput = {
@@ -413,16 +488,63 @@ export type BarisJurnalMinOrderByAggregateInput = {
   kredit?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   rekonsiliasiPada?: Prisma.SortOrder
+  mataUangAsliId?: Prisma.SortOrder
+  kursAsli?: Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrder
 }
 
 export type BarisJurnalSumOrderByAggregateInput = {
   debit?: Prisma.SortOrder
   kredit?: Prisma.SortOrder
+  kursAsli?: Prisma.SortOrder
+  nilaiAsli?: Prisma.SortOrder
 }
 
 export type BarisJurnalNullableScalarRelationFilter = {
   is?: Prisma.BarisJurnalWhereInput | null
   isNot?: Prisma.BarisJurnalWhereInput | null
+}
+
+export type BarisJurnalCreateNestedManyWithoutMataUangAsliInput = {
+  create?: Prisma.XOR<Prisma.BarisJurnalCreateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput> | Prisma.BarisJurnalCreateWithoutMataUangAsliInput[] | Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput[]
+  connectOrCreate?: Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput | Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput[]
+  createMany?: Prisma.BarisJurnalCreateManyMataUangAsliInputEnvelope
+  connect?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+}
+
+export type BarisJurnalUncheckedCreateNestedManyWithoutMataUangAsliInput = {
+  create?: Prisma.XOR<Prisma.BarisJurnalCreateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput> | Prisma.BarisJurnalCreateWithoutMataUangAsliInput[] | Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput[]
+  connectOrCreate?: Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput | Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput[]
+  createMany?: Prisma.BarisJurnalCreateManyMataUangAsliInputEnvelope
+  connect?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+}
+
+export type BarisJurnalUpdateManyWithoutMataUangAsliNestedInput = {
+  create?: Prisma.XOR<Prisma.BarisJurnalCreateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput> | Prisma.BarisJurnalCreateWithoutMataUangAsliInput[] | Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput[]
+  connectOrCreate?: Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput | Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput[]
+  upsert?: Prisma.BarisJurnalUpsertWithWhereUniqueWithoutMataUangAsliInput | Prisma.BarisJurnalUpsertWithWhereUniqueWithoutMataUangAsliInput[]
+  createMany?: Prisma.BarisJurnalCreateManyMataUangAsliInputEnvelope
+  set?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  disconnect?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  delete?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  connect?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  update?: Prisma.BarisJurnalUpdateWithWhereUniqueWithoutMataUangAsliInput | Prisma.BarisJurnalUpdateWithWhereUniqueWithoutMataUangAsliInput[]
+  updateMany?: Prisma.BarisJurnalUpdateManyWithWhereWithoutMataUangAsliInput | Prisma.BarisJurnalUpdateManyWithWhereWithoutMataUangAsliInput[]
+  deleteMany?: Prisma.BarisJurnalScalarWhereInput | Prisma.BarisJurnalScalarWhereInput[]
+}
+
+export type BarisJurnalUncheckedUpdateManyWithoutMataUangAsliNestedInput = {
+  create?: Prisma.XOR<Prisma.BarisJurnalCreateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput> | Prisma.BarisJurnalCreateWithoutMataUangAsliInput[] | Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput[]
+  connectOrCreate?: Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput | Prisma.BarisJurnalCreateOrConnectWithoutMataUangAsliInput[]
+  upsert?: Prisma.BarisJurnalUpsertWithWhereUniqueWithoutMataUangAsliInput | Prisma.BarisJurnalUpsertWithWhereUniqueWithoutMataUangAsliInput[]
+  createMany?: Prisma.BarisJurnalCreateManyMataUangAsliInputEnvelope
+  set?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  disconnect?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  delete?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  connect?: Prisma.BarisJurnalWhereUniqueInput | Prisma.BarisJurnalWhereUniqueInput[]
+  update?: Prisma.BarisJurnalUpdateWithWhereUniqueWithoutMataUangAsliInput | Prisma.BarisJurnalUpdateWithWhereUniqueWithoutMataUangAsliInput[]
+  updateMany?: Prisma.BarisJurnalUpdateManyWithWhereWithoutMataUangAsliInput | Prisma.BarisJurnalUpdateManyWithWhereWithoutMataUangAsliInput[]
+  deleteMany?: Prisma.BarisJurnalScalarWhereInput | Prisma.BarisJurnalScalarWhereInput[]
 }
 
 export type BarisJurnalCreateNestedManyWithoutAkunInput = {
@@ -525,14 +647,85 @@ export type BarisJurnalUpdateOneWithoutMutasiBankNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BarisJurnalUpdateToOneWithWhereWithoutMutasiBankInput, Prisma.BarisJurnalUpdateWithoutMutasiBankInput>, Prisma.BarisJurnalUncheckedUpdateWithoutMutasiBankInput>
 }
 
+export type BarisJurnalCreateWithoutMataUangAsliInput = {
+  id?: string
+  debit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  jurnal: Prisma.JurnalCreateNestedOneWithoutBarisInput
+  akun: Prisma.AkunCreateNestedOneWithoutBarisJurnalInput
+  mutasiBank?: Prisma.MutasiBankCreateNestedOneWithoutBarisJurnalInput
+}
+
+export type BarisJurnalUncheckedCreateWithoutMataUangAsliInput = {
+  id?: string
+  jurnalId: string
+  akunId: string
+  debit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedOneWithoutBarisJurnalInput
+}
+
+export type BarisJurnalCreateOrConnectWithoutMataUangAsliInput = {
+  where: Prisma.BarisJurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.BarisJurnalCreateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput>
+}
+
+export type BarisJurnalCreateManyMataUangAsliInputEnvelope = {
+  data: Prisma.BarisJurnalCreateManyMataUangAsliInput | Prisma.BarisJurnalCreateManyMataUangAsliInput[]
+  skipDuplicates?: boolean
+}
+
+export type BarisJurnalUpsertWithWhereUniqueWithoutMataUangAsliInput = {
+  where: Prisma.BarisJurnalWhereUniqueInput
+  update: Prisma.XOR<Prisma.BarisJurnalUpdateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedUpdateWithoutMataUangAsliInput>
+  create: Prisma.XOR<Prisma.BarisJurnalCreateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedCreateWithoutMataUangAsliInput>
+}
+
+export type BarisJurnalUpdateWithWhereUniqueWithoutMataUangAsliInput = {
+  where: Prisma.BarisJurnalWhereUniqueInput
+  data: Prisma.XOR<Prisma.BarisJurnalUpdateWithoutMataUangAsliInput, Prisma.BarisJurnalUncheckedUpdateWithoutMataUangAsliInput>
+}
+
+export type BarisJurnalUpdateManyWithWhereWithoutMataUangAsliInput = {
+  where: Prisma.BarisJurnalScalarWhereInput
+  data: Prisma.XOR<Prisma.BarisJurnalUpdateManyMutationInput, Prisma.BarisJurnalUncheckedUpdateManyWithoutMataUangAsliInput>
+}
+
+export type BarisJurnalScalarWhereInput = {
+  AND?: Prisma.BarisJurnalScalarWhereInput | Prisma.BarisJurnalScalarWhereInput[]
+  OR?: Prisma.BarisJurnalScalarWhereInput[]
+  NOT?: Prisma.BarisJurnalScalarWhereInput | Prisma.BarisJurnalScalarWhereInput[]
+  id?: Prisma.StringFilter<"BarisJurnal"> | string
+  jurnalId?: Prisma.StringFilter<"BarisJurnal"> | string
+  akunId?: Prisma.StringFilter<"BarisJurnal"> | string
+  debit?: Prisma.DecimalFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: Prisma.DecimalFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
+  rekonsiliasiPada?: Prisma.DateTimeNullableFilter<"BarisJurnal"> | Date | string | null
+  mataUangAsliId?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
+  kursAsli?: Prisma.DecimalNullableFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.DecimalNullableFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
 export type BarisJurnalCreateWithoutAkunInput = {
   id?: string
   debit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal: Prisma.JurnalCreateNestedOneWithoutBarisInput
   mutasiBank?: Prisma.MutasiBankCreateNestedOneWithoutBarisJurnalInput
+  mataUangAsli?: Prisma.MataUangCreateNestedOneWithoutBarisJurnalAsliInput
 }
 
 export type BarisJurnalUncheckedCreateWithoutAkunInput = {
@@ -542,6 +735,9 @@ export type BarisJurnalUncheckedCreateWithoutAkunInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedOneWithoutBarisJurnalInput
 }
 
@@ -571,27 +767,17 @@ export type BarisJurnalUpdateManyWithWhereWithoutAkunInput = {
   data: Prisma.XOR<Prisma.BarisJurnalUpdateManyMutationInput, Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunInput>
 }
 
-export type BarisJurnalScalarWhereInput = {
-  AND?: Prisma.BarisJurnalScalarWhereInput | Prisma.BarisJurnalScalarWhereInput[]
-  OR?: Prisma.BarisJurnalScalarWhereInput[]
-  NOT?: Prisma.BarisJurnalScalarWhereInput | Prisma.BarisJurnalScalarWhereInput[]
-  id?: Prisma.StringFilter<"BarisJurnal"> | string
-  jurnalId?: Prisma.StringFilter<"BarisJurnal"> | string
-  akunId?: Prisma.StringFilter<"BarisJurnal"> | string
-  debit?: Prisma.DecimalFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  kredit?: Prisma.DecimalFilter<"BarisJurnal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  keterangan?: Prisma.StringNullableFilter<"BarisJurnal"> | string | null
-  rekonsiliasiPada?: Prisma.DateTimeNullableFilter<"BarisJurnal"> | Date | string | null
-}
-
 export type BarisJurnalCreateWithoutJurnalInput = {
   id?: string
   debit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   akun: Prisma.AkunCreateNestedOneWithoutBarisJurnalInput
   mutasiBank?: Prisma.MutasiBankCreateNestedOneWithoutBarisJurnalInput
+  mataUangAsli?: Prisma.MataUangCreateNestedOneWithoutBarisJurnalAsliInput
 }
 
 export type BarisJurnalUncheckedCreateWithoutJurnalInput = {
@@ -601,6 +787,9 @@ export type BarisJurnalUncheckedCreateWithoutJurnalInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedOneWithoutBarisJurnalInput
 }
 
@@ -636,8 +825,11 @@ export type BarisJurnalCreateWithoutMutasiBankInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal: Prisma.JurnalCreateNestedOneWithoutBarisInput
   akun: Prisma.AkunCreateNestedOneWithoutBarisJurnalInput
+  mataUangAsli?: Prisma.MataUangCreateNestedOneWithoutBarisJurnalAsliInput
 }
 
 export type BarisJurnalUncheckedCreateWithoutMutasiBankInput = {
@@ -648,6 +840,9 @@ export type BarisJurnalUncheckedCreateWithoutMutasiBankInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalCreateOrConnectWithoutMutasiBankInput = {
@@ -672,8 +867,11 @@ export type BarisJurnalUpdateWithoutMutasiBankInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal?: Prisma.JurnalUpdateOneRequiredWithoutBarisNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutBarisJurnalNestedInput
+  mataUangAsli?: Prisma.MataUangUpdateOneWithoutBarisJurnalAsliNestedInput
 }
 
 export type BarisJurnalUncheckedUpdateWithoutMutasiBankInput = {
@@ -684,6 +882,59 @@ export type BarisJurnalUncheckedUpdateWithoutMutasiBankInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
+export type BarisJurnalCreateManyMataUangAsliInput = {
+  id?: string
+  jurnalId: string
+  akunId: string
+  debit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  rekonsiliasiPada?: Date | string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+}
+
+export type BarisJurnalUpdateWithoutMataUangAsliInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  debit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  jurnal?: Prisma.JurnalUpdateOneRequiredWithoutBarisNestedInput
+  akun?: Prisma.AkunUpdateOneRequiredWithoutBarisJurnalNestedInput
+  mutasiBank?: Prisma.MutasiBankUpdateOneWithoutBarisJurnalNestedInput
+}
+
+export type BarisJurnalUncheckedUpdateWithoutMataUangAsliInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  debit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  mutasiBank?: Prisma.MutasiBankUncheckedUpdateOneWithoutBarisJurnalNestedInput
+}
+
+export type BarisJurnalUncheckedUpdateManyWithoutMataUangAsliInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  debit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalCreateManyAkunInput = {
@@ -693,6 +944,9 @@ export type BarisJurnalCreateManyAkunInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalUpdateWithoutAkunInput = {
@@ -701,8 +955,11 @@ export type BarisJurnalUpdateWithoutAkunInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   jurnal?: Prisma.JurnalUpdateOneRequiredWithoutBarisNestedInput
   mutasiBank?: Prisma.MutasiBankUpdateOneWithoutBarisJurnalNestedInput
+  mataUangAsli?: Prisma.MataUangUpdateOneWithoutBarisJurnalAsliNestedInput
 }
 
 export type BarisJurnalUncheckedUpdateWithoutAkunInput = {
@@ -712,6 +969,9 @@ export type BarisJurnalUncheckedUpdateWithoutAkunInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateOneWithoutBarisJurnalNestedInput
 }
 
@@ -722,6 +982,9 @@ export type BarisJurnalUncheckedUpdateManyWithoutAkunInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalCreateManyJurnalInput = {
@@ -731,6 +994,9 @@ export type BarisJurnalCreateManyJurnalInput = {
   kredit?: runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: string | null
   rekonsiliasiPada?: Date | string | null
+  mataUangAsliId?: string | null
+  kursAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 export type BarisJurnalUpdateWithoutJurnalInput = {
@@ -739,8 +1005,11 @@ export type BarisJurnalUpdateWithoutJurnalInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   akun?: Prisma.AkunUpdateOneRequiredWithoutBarisJurnalNestedInput
   mutasiBank?: Prisma.MutasiBankUpdateOneWithoutBarisJurnalNestedInput
+  mataUangAsli?: Prisma.MataUangUpdateOneWithoutBarisJurnalAsliNestedInput
 }
 
 export type BarisJurnalUncheckedUpdateWithoutJurnalInput = {
@@ -750,6 +1019,9 @@ export type BarisJurnalUncheckedUpdateWithoutJurnalInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateOneWithoutBarisJurnalNestedInput
 }
 
@@ -760,6 +1032,9 @@ export type BarisJurnalUncheckedUpdateManyWithoutJurnalInput = {
   kredit?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rekonsiliasiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  mataUangAsliId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kursAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  nilaiAsli?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
 }
 
 
@@ -772,9 +1047,13 @@ export type BarisJurnalSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   kredit?: boolean
   keterangan?: boolean
   rekonsiliasiPada?: boolean
+  mataUangAsliId?: boolean
+  kursAsli?: boolean
+  nilaiAsli?: boolean
   jurnal?: boolean | Prisma.JurnalDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   mutasiBank?: boolean | Prisma.BarisJurnal$mutasiBankArgs<ExtArgs>
+  mataUangAsli?: boolean | Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>
 }, ExtArgs["result"]["barisJurnal"]>
 
 export type BarisJurnalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -785,8 +1064,12 @@ export type BarisJurnalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   kredit?: boolean
   keterangan?: boolean
   rekonsiliasiPada?: boolean
+  mataUangAsliId?: boolean
+  kursAsli?: boolean
+  nilaiAsli?: boolean
   jurnal?: boolean | Prisma.JurnalDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
+  mataUangAsli?: boolean | Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>
 }, ExtArgs["result"]["barisJurnal"]>
 
 export type BarisJurnalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -797,8 +1080,12 @@ export type BarisJurnalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   kredit?: boolean
   keterangan?: boolean
   rekonsiliasiPada?: boolean
+  mataUangAsliId?: boolean
+  kursAsli?: boolean
+  nilaiAsli?: boolean
   jurnal?: boolean | Prisma.JurnalDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
+  mataUangAsli?: boolean | Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>
 }, ExtArgs["result"]["barisJurnal"]>
 
 export type BarisJurnalSelectScalar = {
@@ -809,21 +1096,27 @@ export type BarisJurnalSelectScalar = {
   kredit?: boolean
   keterangan?: boolean
   rekonsiliasiPada?: boolean
+  mataUangAsliId?: boolean
+  kursAsli?: boolean
+  nilaiAsli?: boolean
 }
 
-export type BarisJurnalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jurnalId" | "akunId" | "debit" | "kredit" | "keterangan" | "rekonsiliasiPada", ExtArgs["result"]["barisJurnal"]>
+export type BarisJurnalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "jurnalId" | "akunId" | "debit" | "kredit" | "keterangan" | "rekonsiliasiPada" | "mataUangAsliId" | "kursAsli" | "nilaiAsli", ExtArgs["result"]["barisJurnal"]>
 export type BarisJurnalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.JurnalDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   mutasiBank?: boolean | Prisma.BarisJurnal$mutasiBankArgs<ExtArgs>
+  mataUangAsli?: boolean | Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>
 }
 export type BarisJurnalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.JurnalDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
+  mataUangAsli?: boolean | Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>
 }
 export type BarisJurnalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.JurnalDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
+  mataUangAsli?: boolean | Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>
 }
 
 export type $BarisJurnalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -832,6 +1125,7 @@ export type $BarisJurnalPayload<ExtArgs extends runtime.Types.Extensions.Interna
     jurnal: Prisma.$JurnalPayload<ExtArgs>
     akun: Prisma.$AkunPayload<ExtArgs>
     mutasiBank: Prisma.$MutasiBankPayload<ExtArgs> | null
+    mataUangAsli: Prisma.$MataUangPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -844,6 +1138,13 @@ export type $BarisJurnalPayload<ExtArgs extends runtime.Types.Extensions.Interna
      * Rekonsiliasi kas/bank: kapan baris ini dicocokkan dengan mutasi rekening
      */
     rekonsiliasiPada: Date | null
+    /**
+     * Jejak mata uang asal (informasional). Buku besar SELALU dalam IDR (mata uang fungsional);
+     * tiga kolom ini hanya menyimpan nilai dokumen dalam mata uang transaksinya agar bisa ditelusuri.
+     */
+    mataUangAsliId: string | null
+    kursAsli: runtime.Decimal | null
+    nilaiAsli: runtime.Decimal | null
   }, ExtArgs["result"]["barisJurnal"]>
   composites: {}
 }
@@ -1241,6 +1542,7 @@ export interface Prisma__BarisJurnalClient<T, Null = never, ExtArgs extends runt
   jurnal<T extends Prisma.JurnalDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.JurnalDefaultArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   akun<T extends Prisma.AkunDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AkunDefaultArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   mutasiBank<T extends Prisma.BarisJurnal$mutasiBankArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BarisJurnal$mutasiBankArgs<ExtArgs>>): Prisma.Prisma__MutasiBankClient<runtime.Types.Result.GetResult<Prisma.$MutasiBankPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  mataUangAsli<T extends Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BarisJurnal$mataUangAsliArgs<ExtArgs>>): Prisma.Prisma__MataUangClient<runtime.Types.Result.GetResult<Prisma.$MataUangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1277,6 +1579,9 @@ export interface BarisJurnalFieldRefs {
   readonly kredit: Prisma.FieldRef<"BarisJurnal", 'Decimal'>
   readonly keterangan: Prisma.FieldRef<"BarisJurnal", 'String'>
   readonly rekonsiliasiPada: Prisma.FieldRef<"BarisJurnal", 'DateTime'>
+  readonly mataUangAsliId: Prisma.FieldRef<"BarisJurnal", 'String'>
+  readonly kursAsli: Prisma.FieldRef<"BarisJurnal", 'Decimal'>
+  readonly nilaiAsli: Prisma.FieldRef<"BarisJurnal", 'Decimal'>
 }
     
 
@@ -1694,6 +1999,25 @@ export type BarisJurnal$mutasiBankArgs<ExtArgs extends runtime.Types.Extensions.
    */
   include?: Prisma.MutasiBankInclude<ExtArgs> | null
   where?: Prisma.MutasiBankWhereInput
+}
+
+/**
+ * BarisJurnal.mataUangAsli
+ */
+export type BarisJurnal$mataUangAsliArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MataUang
+   */
+  select?: Prisma.MataUangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MataUang
+   */
+  omit?: Prisma.MataUangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MataUangInclude<ExtArgs> | null
+  where?: Prisma.MataUangWhereInput
 }
 
 /**

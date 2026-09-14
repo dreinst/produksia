@@ -78,6 +78,14 @@ Penawaran, Pesanan Penjualan, Pesanan Pembelian, Kas Masuk/Keluar, dan Jurnal Um
 
 Formulir Penawaran, Pesanan Penjualan, Pesanan Pembelian, Kas Masuk, Kas Keluar, dan Jurnal Umum menampilkan dialog ringkasan isian (pelanggan, event, baris dan total, keterangan) dengan peringatan, lalu tombol "Ya, simpan" atau "Tetap simpan". Komposer Faktur sudah punya pratinjau jurnal dan daftar pengaman sendiri.
 
+## 8b. Persetujuan dokumen, multi mata uang, dan cadangan
+
+Tiga hal berikut diatur di dokumen terpisah, [DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md](DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md):
+
+- Alur persetujuan dokumen (maker-checker). Faktur Penjualan, Faktur Pembelian, Kas Masuk/Keluar, Penyesuaian Stok, Aset Tetap, dan Penggajian dibuat sebagai draf lebih dulu; jurnalnya baru masuk buku besar setelah disetujui pengguna lain, dan pembuat dokumen tidak boleh menyetujui dokumennya sendiri. Saklarnya di Pengaturan → Perusahaan & Pajak, bawaannya menyala.
+- Multi mata uang. Rupiah adalah mata uang fungsional (buku besar selalu rupiah); mata uang asing melekat pada dokumen dan saldo piutang/hutangnya, dengan kurs yang disimpan per dokumen dan penilaian kembali akhir periode ke akun 5-8530 Selisih Kurs.
+- Cadangan basis data lokal beserta uji pulihnya (`skrip/cadangkan-basis-data.sh`, `skrip/pulihkan-basis-data.sh`, `skrip/verifikasi-cadangan.sh`).
+
 ## 9. Yang sengaja belum dibuat
 
 - Diskon di Penawaran/Pesanan (baru di Faktur).
@@ -97,4 +105,5 @@ Formulir Penawaran, Pesanan Penjualan, Pesanan Pembelian, Kas Masuk, Kas Keluar,
 
 ## Riwayat
 
+- 14 Sep 2026: persetujuan dokumen (maker-checker), multi mata uang, dan cadangan basis data terverifikasi; rinciannya di DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md.
 - 14 Sep 2026: kebijakan pertama, bersama fitur Laba Rugi basis kas, Ringkasan Pendapatan basis kas, diskon faktur, omzet bruto dari buku besar, akun dan data induk flagship, dialog verifikasi, tanda event.

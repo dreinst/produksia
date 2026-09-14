@@ -2,7 +2,7 @@ import type { Prisma } from "@/prisma-klien/client";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
-import { D, kali, jumlahkan, type Desimal } from "@/lib/uang";
+import { D, kali, uang, jumlahkan, type Desimal } from "@/lib/uang";
 
 /*
  * Aturan posting jurnal otomatis. Semua fungsi dipanggil DI DALAM transaksi dokumen,
@@ -16,7 +16,27 @@ import { D, kali, jumlahkan, type Desimal } from "@/lib/uang";
 type Tx = Prisma.TransactionClient;
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan: string };
 export type BarisDokumen = { barangId: string; jumlah: Desimal; harga: Desimal };
-export type SumberOtomatis = "PENJUALAN" | "PEMBELIAN" | "PERSEDIAAN" | "ASET_TETAP" | "PENYUSUTAN";
+export type SumberOtomatis =
+  | "PENJUALAN"
+  | "PEMBELIAN"
+  | "PERSEDIAAN"
+  | "ASET_TETAP"
+  | "PENYUSUTAN"
+  | "PENGGAJIAN"
+  | "KAS_MASUK"
+  | "KAS_KELUAR"
+  | "SELISIH_KURS";
+
+/** Nilai dokumen dalam mata uang transaksinya, disalin ke setiap baris jurnal sebagai jejak (buku besar tetap IDR). */
+export type AsliMataUang = { mataUangId: string; kurs: Desimal };
+
+/**
+ * Pilihan saat mencatat jurnal otomatis.
+ * `tanggal`: dipakai alur persetujuan supaya jurnal memakai TANGGAL DOKUMEN, bukan tanggal saat disetujui
+ * (kalau tidak, laporan bisa bergeser periode hanya karena pemeriksa menyetujui terlambat).
+ * `proyekId`: dimensi event. `asli`: mata uang & kurs dokumen (lihat AsliMataUang).
+ */
+export type OpsiJurnal = { tanggal?: Date; proyekId?: string | null; asli?: AsliMataUang | null };
 
 const NOL = D(0);
 
@@ -71,7 +91,14 @@ function pengumpul() {
 }
 
 /** Membuat satu jurnal seimbang; baris bernilai nol dibuang; akun kelompok ditolak. */
-export async function catatJurnal(tx: Tx, prefix: string, keterangan: string, sumber: SumberOtomatis, daftarBaris: InputBarisJurnal[]) {
+export async function catatJurnal(
+  tx: Tx,
+  prefix: string,
+  keterangan: string,
+  sumber: SumberOtomatis,
+  daftarBaris: InputBarisJurnal[],
+  opsi: OpsiJurnal = {},
+) {
   const baris = daftarBaris.filter((b) => !b.debit.isZero() || !b.kredit.isZero());
   if (baris.length === 0) return null;
   const totalDebit = jumlahkan(baris.map((b) => b.debit));
@@ -80,9 +107,31 @@ export async function catatJurnal(tx: Tx, prefix: string, keterangan: string, su
     throw new Error(`Jurnal otomatis ${prefix} tidak seimbang (debit ${totalDebit.toFixed(2)} vs kredit ${totalKredit.toFixed(2)}). Laporkan ke pengembang`);
   }
   await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
-  await pastikanTahunTerbuka(tx, new Date());
+  const tanggal = opsi.tanggal ?? new Date();
+  await pastikanTahunTerbuka(tx, tanggal);
   const nomor = await nomorDokumenBerikutnya(tx.jurnal, prefix);
-  return tx.jurnal.create({ data: { nomor, keterangan, sumber, baris: { create: baris } } });
+  // Jejak mata uang asal: nilai baris (IDR) dibagi kurs = nilai dalam mata uang transaksi
+  const asli = opsi.asli && opsi.asli.kurs.gt(0) ? opsi.asli : null;
+  const jejak = (b: InputBarisJurnal) =>
+    asli
+      ? {
+          mataUangAsliId: asli.mataUangId,
+          kursAsli: asli.kurs,
+          nilaiAsli: uang((b.debit.isZero() ? b.kredit : b.debit).div(asli.kurs)),
+        }
+      : {};
+  return tx.jurnal.create({
+    data: {
+      nomor,
+      tanggal,
+      keterangan,
+      sumber,
+      // Satu baris Jurnal = sudah masuk buku besar; statusnya selalu DISETUJUI (lihat schema.prisma)
+      statusPersetujuan: "DISETUJUI",
+      ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}),
+      baris: { create: baris.map((b) => ({ ...b, ...jejak(b) })) },
+    },
+  });
 }
 
 /** Menandai jurnal dengan proyek/event asal dokumennya (dimensi Laba Rugi per event & LPJ). */
@@ -97,6 +146,14 @@ export function hargaPokokBaris(info: InfoBarang, jumlah: Desimal): Desimal {
 }
 
 // ---------- Penjualan ----------
+
+/**
+ * Porsi "Barang Terkirim Belum Ditagih" yang dikonsumsi sebuah faktur, sudah dalam NILAI (rupiah),
+ * bukan jumlah × harga pokok. Nilainya dihitung saat faktur dibuat (dari baris surat jalan yang
+ * dikonsumsi) lalu disimpan di BarisFakturPenjualan.nilaiTransit, supaya jurnal HPP bisa dicatat
+ * belakangan saat faktur disetujui tanpa perlu menghitung ulang harga pokok yang mungkin sudah berubah.
+ */
+export type KonsumsiTransit = { barangId: string; nilai: Desimal };
 
 /** Baris surat jalan yang dinilai: harga pokok saat kirim dan porsi yang sudah lebih dulu difaktur. */
 export type BarisKirim = { barangId: string; jumlah: Desimal; hargaPokok: Desimal; sudahDifaktur: Desimal };
@@ -143,7 +200,8 @@ export async function catatJurnalFakturPenjualan(
   faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string; uangMuka?: Desimal | number | string; diskon?: Desimal | number | string },
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
-  konsumsiTransit: { barangId: string; jumlah: Desimal; hargaPokok: Desimal }[] = [],
+  konsumsiTransit: KonsumsiTransit[] = [],
+  opsi: OpsiJurnal = {},
 ) {
   const m = await ambilPemetaanAkun(tx);
   const ppn = D(faktur.ppn ?? 0);
@@ -162,9 +220,8 @@ export async function catatJurnalFakturPenjualan(
   let transit = NOL;
   for (const k of konsumsiTransit) {
     const info = ambilInfo(peta, k.barangId);
-    const nilai = kali(k.jumlah, k.hargaPokok);
-    hpp.tambah(info.akunHppId ?? m.hppId, nilai);
-    transit = transit.plus(nilai);
+    hpp.tambah(info.akunHppId ?? m.hppId, k.nilai);
+    transit = transit.plus(k.nilai);
   }
   if (transit.gt(0) && !m.barangTerkirimId) {
     throw new Error("Pemetaan akun 'Barang Terkirim Belum Ditagih' belum diatur (Pengaturan > Pemetaan Akun)");
@@ -178,7 +235,7 @@ export async function catatJurnalFakturPenjualan(
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
     ...(transit.gt(0) && m.barangTerkirimId ? [{ akunId: m.barangTerkirimId, debit: NOL, kredit: transit, keterangan: `Barang terkirim ditagih ${faktur.nomor}` }] : []),
   ];
-  return catatJurnal(tx, "JU-FJ", `Faktur Penjualan ${faktur.nomor}`, "PENJUALAN", baris);
+  return catatJurnal(tx, "JU-FJ", `Faktur Penjualan ${faktur.nomor}`, "PENJUALAN", baris, opsi);
 }
 
 /** Penerimaan Penjualan: Dr Kas/Bank pilihan / Cr Piutang. */
@@ -283,6 +340,7 @@ export async function catatJurnalFakturPembelian(
   daftarBaris: BarisDokumen[],
   hargaPesanan: Map<string, Desimal>,
   akunPpnMasukanId?: string | null,
+  opsi: OpsiJurnal = {},
 ) {
   const m = await ambilPemetaanAkun(tx);
   const ppn = D(faktur.ppn ?? 0);
@@ -317,7 +375,7 @@ export async function catatJurnalFakturPembelian(
     ...(ppn.gt(0) && akunPpnMasukanId ? [{ akunId: akunPpnMasukanId, debit: ppn, kredit: NOL, keterangan: `PPN masukan ${faktur.nomor}` }] : []),
     { akunId: m.utangUsahaId, debit: NOL, kredit: D(faktur.total), keterangan: `Hutang ${faktur.nomor}` },
   ];
-  return catatJurnal(tx, "JU-FB", `Faktur Pembelian ${faktur.nomor}`, "PEMBELIAN", baris);
+  return catatJurnal(tx, "JU-FB", `Faktur Pembelian ${faktur.nomor}`, "PEMBELIAN", baris, opsi);
 }
 
 /** Pembayaran Pembelian: Dr Hutang / Cr Kas/Bank pilihan. */
@@ -387,6 +445,7 @@ export async function catatJurnalPenyesuaianPersediaan(
   tx: Tx,
   penyesuaian: { nomor: string; akunLawanId: string; keterangan?: string | null },
   daftarBaris: { barangId: string; selisih: Desimal; hargaSatuan: Desimal }[],
+  opsi: OpsiJurnal = {},
 ) {
   const m = await ambilPemetaanAkun(tx);
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
@@ -406,13 +465,24 @@ export async function catatJurnalPenyesuaianPersediaan(
     })),
     { akunId: penyesuaian.akunLawanId, debit: total.lt(0) ? total.neg() : NOL, kredit: total.gt(0) ? total : NOL, keterangan: `Lawan penyesuaian ${penyesuaian.nomor}` },
   ];
-  return catatJurnal(tx, "JU-PS", `Penyesuaian Persediaan ${penyesuaian.nomor}${penyesuaian.keterangan ? `: ${penyesuaian.keterangan}` : ""}`, "PERSEDIAAN", baris);
+  return catatJurnal(tx, "JU-PS", `Penyesuaian Persediaan ${penyesuaian.nomor}${penyesuaian.keterangan ? `: ${penyesuaian.keterangan}` : ""}`, "PERSEDIAAN", baris, opsi);
 }
 
 /** Perolehan aset tetap: Dr Akun Aset / Cr Kas-Bank atau Hutang. */
-export async function catatJurnalPerolehanAset(tx: Tx, aset: { kode: string; nama: string; hargaPerolehan: Desimal; akunAsetId: string; akunPembayaranId: string }) {
-  return catatJurnal(tx, "JU-AT", `Perolehan aset ${aset.kode} ${aset.nama}`, "ASET_TETAP", [
-    { akunId: aset.akunAsetId, debit: aset.hargaPerolehan, kredit: NOL, keterangan: `Perolehan ${aset.kode}` },
-    { akunId: aset.akunPembayaranId, debit: NOL, kredit: aset.hargaPerolehan, keterangan: `Pembayaran aset ${aset.kode}` },
-  ]);
+export async function catatJurnalPerolehanAset(
+  tx: Tx,
+  aset: { kode: string; nama: string; hargaPerolehan: Desimal; akunAsetId: string; akunPembayaranId: string },
+  opsi: OpsiJurnal = {},
+) {
+  return catatJurnal(
+    tx,
+    "JU-AT",
+    `Perolehan aset ${aset.kode} ${aset.nama}`,
+    "ASET_TETAP",
+    [
+      { akunId: aset.akunAsetId, debit: aset.hargaPerolehan, kredit: NOL, keterangan: `Perolehan ${aset.kode}` },
+      { akunId: aset.akunPembayaranId, debit: NOL, kredit: aset.hargaPerolehan, keterangan: `Pembayaran aset ${aset.kode}` },
+    ],
+    opsi,
+  );
 }

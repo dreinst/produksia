@@ -2,7 +2,10 @@ import type { PeranPengguna } from "@/prisma-klien/enums";
 
 /**
  * Hak akses per dokumen & per peran, file ini aman diimpor dari komponen klien (tidak menyentuh basis data).
- * Setiap jenis dokumen punya hak `lihat` / `buat` / `hapus`; hak lain (data induk, laporan, pengaturan) per modul.
+ * Setiap jenis dokumen punya hak `lihat` / `buat` / `setujui` / `hapus`; hak lain (data induk, laporan,
+ * pengaturan) per modul. `setujui` adalah hak pemeriksa pada alur maker-checker: yang membuat dokumen
+ * tidak pernah boleh menyetujuinya sendiri (dijaga di src/lib/persetujuan.ts), jadi Kasir & Gudang
+ * bawaannya hanya punya `buat`, sedangkan Admin/Pemilik/Superadmin punya `setujui`.
  * Bawaan per peran ada di HAK_BAWAAN; Superadmin/Pemilik selalu penuh, peran lain bisa diubah di
  * Pengaturan › Hak Akses (tabel HakAksesPeran), hasil akhirnya dihitung `hitungHak` saat sesi dibaca.
  * Pemeriksaan sesungguhnya dilakukan di server: `wajibHak` (halaman) dan `wajibHakAksi` (aksi server).
@@ -11,33 +14,33 @@ import type { PeranPengguna } from "@/prisma-klien/enums";
 export const NAMA_COOKIE_SESI = "sesi_ac";
 
 export type ModulDokumen = "penjualan" | "pembelian" | "kas-bank" | "buku-besar" | "persediaan" | "aset-tetap" | "sdm";
-export type AksiDokumen = "lihat" | "buat" | "hapus";
+export type AksiDokumen = "lihat" | "buat" | "setujui" | "hapus";
 
 export const DOKUMEN_HAK = [
-  { kode: "penawaran", label: "Penawaran Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "pesanan", label: "Pesanan Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "uang-muka", label: "Uang Muka Pelanggan", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "pengiriman", label: "Surat Jalan (Pengiriman)", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "faktur", label: "Faktur Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "penerimaan", label: "Penerimaan Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "retur-penjualan", label: "Retur Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "pesanan-pembelian", label: "Pesanan Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "penerimaan-barang", label: "Terima Barang", modul: "pembelian", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "faktur-pembelian", label: "Faktur Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "pembayaran", label: "Pembayaran Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "retur-pembelian", label: "Retur Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "kas-masuk", label: "Kas Masuk", modul: "kas-bank", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "kas-keluar", label: "Kas Keluar", modul: "kas-bank", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "prive", label: "Prive (pengambilan pemilik)", modul: "kas-bank", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "jurnal", label: "Jurnal Umum (manual)", modul: "buku-besar", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "tutup-buku", label: "Tutup Buku Tahunan", modul: "buku-besar", aksi: ["buat"] },
-  { kode: "pph-final", label: "PPh Final Bulanan", modul: "buku-besar", aksi: ["buat", "hapus"] },
-  { kode: "penyesuaian", label: "Penyesuaian Stok", modul: "persediaan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "pindah-barang", label: "Pindah Barang", modul: "persediaan", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "aset", label: "Aset Tetap", modul: "aset-tetap", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "penyusutan", label: "Penyusutan Aset", modul: "aset-tetap", aksi: ["lihat", "buat", "hapus"] },
-  { kode: "pelepasan-aset", label: "Pelepasan Aset (jual/hapus buku)", modul: "aset-tetap", aksi: ["buat", "hapus"] },
-  { kode: "penggajian", label: "Penggajian (proses gaji karyawan)", modul: "sdm", aksi: ["lihat", "buat", "hapus"] },
+  { kode: "penawaran", label: "Penawaran Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "pesanan", label: "Pesanan Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "uang-muka", label: "Uang Muka Pelanggan", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "pengiriman", label: "Surat Jalan (Pengiriman)", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "faktur", label: "Faktur Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "penerimaan", label: "Penerimaan Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "retur-penjualan", label: "Retur Penjualan", modul: "penjualan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "pesanan-pembelian", label: "Pesanan Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "penerimaan-barang", label: "Terima Barang", modul: "pembelian", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "faktur-pembelian", label: "Faktur Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "pembayaran", label: "Pembayaran Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "retur-pembelian", label: "Retur Pembelian", modul: "pembelian", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "kas-masuk", label: "Kas Masuk", modul: "kas-bank", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "kas-keluar", label: "Kas Keluar", modul: "kas-bank", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "prive", label: "Prive (pengambilan pemilik)", modul: "kas-bank", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "jurnal", label: "Jurnal Umum (manual)", modul: "buku-besar", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "tutup-buku", label: "Tutup Buku Tahunan", modul: "buku-besar", aksi: ["buat", "setujui"] },
+  { kode: "pph-final", label: "PPh Final Bulanan", modul: "buku-besar", aksi: ["buat", "setujui", "hapus"] },
+  { kode: "penyesuaian", label: "Penyesuaian Stok", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "pindah-barang", label: "Pindah Barang", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "aset", label: "Aset Tetap", modul: "aset-tetap", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "penyusutan", label: "Penyusutan Aset", modul: "aset-tetap", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "pelepasan-aset", label: "Pelepasan Aset (jual/hapus buku)", modul: "aset-tetap", aksi: ["buat", "setujui", "hapus"] },
+  { kode: "penggajian", label: "Penggajian (proses gaji karyawan)", modul: "sdm", aksi: ["lihat", "buat", "setujui", "hapus"] },
 ] as const satisfies readonly { kode: string; label: string; modul: ModulDokumen; aksi: readonly AksiDokumen[] }[];
 
 type Dok = (typeof DOKUMEN_HAK)[number];
@@ -187,7 +190,7 @@ export function modulTerlihat(pengguna: PenggunaSesi, modul: ModulDokumen): bool
   return lihatModul(modul).some((h) => punyaHak(pengguna, h));
 }
 
-export const LABEL_AKSI: Record<AksiDokumen, string> = { lihat: "lihat", buat: "buat", hapus: "hapus" };
+export const LABEL_AKSI: Record<AksiDokumen, string> = { lihat: "lihat", buat: "buat", setujui: "setujui", hapus: "hapus" };
 
 export function labelHak(hak: string): string {
   if ((HAK_LAIN as readonly string[]).includes(hak)) return LABEL_HAK_LAIN[hak as (typeof HAK_LAIN)[number]];

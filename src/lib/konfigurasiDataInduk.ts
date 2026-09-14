@@ -79,12 +79,19 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
         jenis: "select",
         opsi: { model: "karyawan", bidangNilai: "id", bidangLabel: "nama" },
       },
+      {
+        nama: "mataUangId",
+        label: "Mata uang bawaan",
+        jenis: "select",
+        opsi: { model: "mataUang", bidangNilai: "id", bidangLabel: "kode", where: { aktif: true } },
+      },
     ],
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
       { key: "telepon", label: "Telepon" },
       { key: "penjual.nama", label: "Sales" },
+      { key: "mataUang.kode", label: "Mata uang" },
     ],
   },
   {
@@ -97,11 +104,18 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
       { nama: "nama", label: "Nama", jenis: "text", wajib: true },
       { nama: "alamat", label: "Alamat", jenis: "text" },
       { nama: "telepon", label: "Telepon", jenis: "text" },
+      {
+        nama: "mataUangId",
+        label: "Mata uang bawaan",
+        jenis: "select",
+        opsi: { model: "mataUang", bidangNilai: "id", bidangLabel: "kode", where: { aktif: true } },
+      },
     ],
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
       { key: "telepon", label: "Telepon" },
+      { key: "mataUang.kode", label: "Mata uang" },
     ],
   },
   {

@@ -5,6 +5,7 @@ import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
 import Link from "next/link";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
+import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import { db } from "@/lib/db";
 
 export default async function HalamanAsetTetap({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -53,6 +54,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
             <th className="text-right angka">Akumulasi Penyusutan</th>
             <th className="text-right angka">Nilai Buku</th>
             <th>Status</th>
+            <th>Persetujuan</th>
             <th>Pelepasan</th>
             <th />
           </tr>
@@ -70,6 +72,18 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
                 <td className="text-right angka">{accumulated.toLocaleString("id-ID")}</td>
                 <td className="text-right angka font-semibold">{bookValue.toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={a.status} /></td>
+                <td>
+                  <SelPersetujuan
+                    jenis="aset"
+                    kode="aset"
+                    id={a.id}
+                    nomor={a.kode}
+                    status={a.statusPersetujuan}
+                    diajukanOlehId={a.diajukanOlehId}
+                    pengguna={pengguna}
+                    catatanPenolakan={a.catatanPenolakan}
+                  />
+                </td>
                 <td className="text-xs text-slate-600 whitespace-nowrap">
                   {a.pelepasan ? (
                     <span>
@@ -82,7 +96,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
                   )}
                 </td>
                 <td className="text-right space-x-3 whitespace-nowrap">
-                  {a.status === "AKTIF" && bolehLepas && <Link href={`/aset-tetap/${a.id}/lepas`} className="tombol-tautan">Lepas</Link>}
+                  {a.status === "AKTIF" && a.statusPersetujuan === "DISETUJUI" && bolehLepas && <Link href={`/aset-tetap/${a.id}/lepas`} className="tombol-tautan">Lepas</Link>}
                   {a.pelepasan ? (
                     <TombolHapusDokumen jenis="pelepasanAset" id={a.pelepasan.id} nomor={`pelepasan ${a.kode}`} boleh={bolehHapusLepas} />
                   ) : (
@@ -94,7 +108,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
           })}
           {daftarAset.length === 0 && (
             <tr>
-              <td colSpan={9} className="kosong">
+              <td colSpan={10} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada aset tetap."}
               </td>
             </tr>

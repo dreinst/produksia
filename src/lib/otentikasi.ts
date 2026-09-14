@@ -70,6 +70,17 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
     // Skrip regresi (skrip/uji-*.ts) memanggil aksi server langsung tanpa HTTP.
     // Pintu ini hanya terbuka di luar produksi DAN bila skrip menyetel UJI_TANPA_SESI=1.
     if (process.env.NODE_ENV !== "production" && process.env.UJI_TANPA_SESI === "1") {
+      // UJI_PENGGUNA=<namaPengguna> memakai pengguna SUNGGUHAN dari basis data. Dibutuhkan alur
+      // persetujuan: pemisahan tugas membandingkan id pengguna, jadi uji butuh dua identitas nyata
+      // (pengaju & pemeriksa) yang id-nya bisa disimpan sebagai kunci asing di dokumen.
+      const namaPengguna = process.env.UJI_PENGGUNA;
+      if (namaPengguna) {
+        const p = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true, nama: true, namaPengguna: true, email: true, peran: true, aktif: true } });
+        if (!p) throw new Error(`UJI_PENGGUNA=${namaPengguna} tidak ada di tabel Pengguna`);
+        if (!p.aktif) throw new Error(`UJI_PENGGUNA=${namaPengguna} nonaktif`);
+        const penyesuaianNyata = await db.hakAksesPeran.findMany({ where: { peran: p.peran }, select: { hak: true, boleh: true } });
+        return { id: p.id, nama: p.nama, namaPengguna: p.namaPengguna, email: p.email, peran: p.peran, hak: hitungHak(p.peran, penyesuaianNyata) };
+      }
       // UJI_PERAN=KASIR dsb. meniru peran lain (hak bawaan ± penyesuaian di tabel HakAksesPeran)
       const peran = (process.env.UJI_PERAN as PeranPengguna | undefined) ?? "PEMILIK";
       const penyesuaian = peran === "PEMILIK" ? [] : await db.hakAksesPeran.findMany({ where: { peran }, select: { hak: true, boleh: true } });

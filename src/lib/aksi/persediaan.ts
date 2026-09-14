@@ -10,6 +10,7 @@ import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { D, uang, type Desimal } from "@/lib/uang";
 import { kurangiStok, perbaruiHargaRata, tambahStok } from "@/lib/stok";
 import { catatJurnalPenyesuaianPersediaan } from "@/lib/akuntansi";
+import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 
 type BarisPenyesuaian = { barangId: string; jumlahSesudah: Desimal; hargaSatuan: Desimal | null };
 
@@ -43,7 +44,7 @@ function bacaBaris(raw: FormDataEntryValue | null): BarisPenyesuaian[] {
  * Persediaan untuk opname). Dengan ini nilai stok dan saldo akun Persediaan tetap sama.
  */
 export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
-  await wajibHakAksi("penyesuaian.buat");
+  const pengguna = await wajibHakAksi("penyesuaian.buat");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   const akunLawanId = String(dataFormulir.get("akunLawanId") ?? "");
   const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();
@@ -52,6 +53,10 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
   const daftarBaris = bacaBaris(dataFormulir.get("baris"));
   await pastikanAkunRinci(db, [akunLawanId]);
 
+  // Alur persetujuan: penyesuaian stok adalah satu-satunya dokumen yang MUTASI FISIKNYA juga ditahan
+  // sampai disetujui, supaya jumlah barang di gudang tidak pernah berbeda dari saldo akun Persediaan
+  // selama dokumen menunggu. Stok & jurnalnya dikerjakan di src/lib/persetujuan.ts saat disetujui.
+  const perluPersetujuan = await persetujuanWajib(db);
   const nomor = await nomorDokumenBerikutnya(db.penyesuaianPersediaan, "PS");
 
   await db.$transaction(async (tx) => {
@@ -76,19 +81,30 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
         throw new Error(`Harga pokok ${barang.kode} - ${barang.nama} belum ada; isi harga satuan pada baris penyesuaian`);
       }
 
-      await tx.stokBarang.upsert({
-        where: { barangId_gudangId: { barangId: b.barangId, gudangId } },
-        create: { barangId: b.barangId, gudangId, jumlah: b.jumlahSesudah },
-        update: { jumlah: b.jumlahSesudah },
-      });
-      if (selisih.gt(0)) await perbaruiHargaRata(tx, b.barangId, selisih, hargaSatuan, true);
+      if (!perluPersetujuan) {
+        await tx.stokBarang.upsert({
+          where: { barangId_gudangId: { barangId: b.barangId, gudangId } },
+          create: { barangId: b.barangId, gudangId, jumlah: b.jumlahSesudah },
+          update: { jumlah: b.jumlahSesudah },
+        });
+        if (selisih.gt(0)) await perbaruiHargaRata(tx, b.barangId, selisih, hargaSatuan, true);
+      }
       barisTersimpan.push({ barangId: b.barangId, jumlahSebelum, jumlahSesudah: b.jumlahSesudah, hargaSatuan });
     }
     if (barisTersimpan.length === 0) throw new Error("Tidak ada perubahan jumlah. Semua baris sama dengan stok saat ini");
 
     const penyesuaian = await tx.penyesuaianPersediaan.create({
-      data: { nomor, gudangId, akunLawanId, keterangan: keterangan || null, baris: { create: barisTersimpan } },
+      data: {
+        nomor,
+        gudangId,
+        akunLawanId,
+        keterangan: keterangan || null,
+        ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
+        baris: { create: barisTersimpan },
+      },
     });
+    if (perluPersetujuan) return; // stok & jurnal dikerjakan saat dokumen disetujui
+
     const jurnal = await catatJurnalPenyesuaianPersediaan(
       tx,
       { nomor, akunLawanId, keterangan: keterangan || null },
@@ -99,6 +115,7 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
 
   revalidatePath("/persediaan");
   revalidatePath("/persediaan/penyesuaian");
+  if (perluPersetujuan) revalidatePath("/persetujuan");
   redirect("/persediaan/penyesuaian");
 }
 
@@ -135,7 +152,7 @@ function bacaBarisPindah(raw: FormDataEntryValue | null): BarisPindah[] {
  * Nilai persediaan tidak berubah (harga pokok rata-rata per barang berlaku di semua gudang), jadi tanpa jurnal.
  */
 export async function buatPindahBarang(dataFormulir: FormData) {
-  await wajibHakAksi("pindah-barang.buat");
+  const pengguna = await wajibHakAksi("pindah-barang.buat");
   const gudangAsalId = String(dataFormulir.get("gudangAsalId") ?? "");
   const gudangTujuanId = String(dataFormulir.get("gudangTujuanId") ?? "");
   const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();
@@ -159,7 +176,7 @@ export async function buatPindahBarang(dataFormulir: FormData) {
       await tambahStok(tx, b.barangId, gudangTujuanId, b.jumlah);
     }
     await tx.pindahBarang.create({
-      data: { nomor, gudangAsalId, gudangTujuanId, keterangan: keterangan || null, baris: { create: daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.jumlah })) } },
+      data: { nomor, gudangAsalId, gudangTujuanId, keterangan: keterangan || null, ...dataLangsungDisetujui(pengguna), baris: { create: daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.jumlah })) } },
     });
   });
 

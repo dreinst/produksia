@@ -266,6 +266,7 @@ export type ProyekWhereInput = {
   pesananPembelian?: Prisma.PesananPembelianListRelationFilter
   jurnal?: Prisma.JurnalListRelationFilter
   penggajian?: Prisma.PenggajianListRelationFilter
+  dokumenKas?: Prisma.DokumenKasListRelationFilter
 }
 
 export type ProyekOrderByWithRelationInput = {
@@ -285,6 +286,7 @@ export type ProyekOrderByWithRelationInput = {
   pesananPembelian?: Prisma.PesananPembelianOrderByRelationAggregateInput
   jurnal?: Prisma.JurnalOrderByRelationAggregateInput
   penggajian?: Prisma.PenggajianOrderByRelationAggregateInput
+  dokumenKas?: Prisma.DokumenKasOrderByRelationAggregateInput
 }
 
 export type ProyekWhereUniqueInput = Prisma.AtLeast<{
@@ -307,6 +309,7 @@ export type ProyekWhereUniqueInput = Prisma.AtLeast<{
   pesananPembelian?: Prisma.PesananPembelianListRelationFilter
   jurnal?: Prisma.JurnalListRelationFilter
   penggajian?: Prisma.PenggajianListRelationFilter
+  dokumenKas?: Prisma.DokumenKasListRelationFilter
 }, "id" | "kode">
 
 export type ProyekOrderByWithAggregationInput = {
@@ -359,6 +362,7 @@ export type ProyekCreateInput = {
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateInput = {
@@ -377,6 +381,7 @@ export type ProyekUncheckedCreateInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUpdateInput = {
@@ -395,6 +400,7 @@ export type ProyekUpdateInput = {
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateInput = {
@@ -413,6 +419,7 @@ export type ProyekUncheckedUpdateInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateManyInput = {
@@ -631,6 +638,22 @@ export type ProyekUpdateOneWithoutJurnalNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutJurnalInput, Prisma.ProyekUpdateWithoutJurnalInput>, Prisma.ProyekUncheckedUpdateWithoutJurnalInput>
 }
 
+export type ProyekCreateNestedOneWithoutDokumenKasInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutDokumenKasInput, Prisma.ProyekUncheckedCreateWithoutDokumenKasInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutDokumenKasInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneWithoutDokumenKasNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutDokumenKasInput, Prisma.ProyekUncheckedCreateWithoutDokumenKasInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutDokumenKasInput
+  upsert?: Prisma.ProyekUpsertWithoutDokumenKasInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutDokumenKasInput, Prisma.ProyekUpdateWithoutDokumenKasInput>, Prisma.ProyekUncheckedUpdateWithoutDokumenKasInput>
+}
+
 export type ProyekCreateNestedOneWithoutPenggajianInput = {
   create?: Prisma.XOR<Prisma.ProyekCreateWithoutPenggajianInput, Prisma.ProyekUncheckedCreateWithoutPenggajianInput>
   connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPenggajianInput
@@ -662,6 +685,7 @@ export type ProyekCreateWithoutPelangganInput = {
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPelangganInput = {
@@ -679,6 +703,7 @@ export type ProyekUncheckedCreateWithoutPelangganInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPelangganInput = {
@@ -738,6 +763,7 @@ export type ProyekCreateWithoutPenawaranInput = {
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPenawaranInput = {
@@ -755,6 +781,7 @@ export type ProyekUncheckedCreateWithoutPenawaranInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPenawaranInput = {
@@ -788,6 +815,7 @@ export type ProyekUpdateWithoutPenawaranInput = {
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPenawaranInput = {
@@ -805,6 +833,7 @@ export type ProyekUncheckedUpdateWithoutPenawaranInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutPesananInput = {
@@ -822,6 +851,7 @@ export type ProyekCreateWithoutPesananInput = {
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPesananInput = {
@@ -839,6 +869,7 @@ export type ProyekUncheckedCreateWithoutPesananInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPesananInput = {
@@ -872,6 +903,7 @@ export type ProyekUpdateWithoutPesananInput = {
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPesananInput = {
@@ -889,6 +921,7 @@ export type ProyekUncheckedUpdateWithoutPesananInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutPesananPembelianInput = {
@@ -906,6 +939,7 @@ export type ProyekCreateWithoutPesananPembelianInput = {
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPesananPembelianInput = {
@@ -923,6 +957,7 @@ export type ProyekUncheckedCreateWithoutPesananPembelianInput = {
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPesananPembelianInput = {
@@ -956,6 +991,7 @@ export type ProyekUpdateWithoutPesananPembelianInput = {
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPesananPembelianInput = {
@@ -973,6 +1009,7 @@ export type ProyekUncheckedUpdateWithoutPesananPembelianInput = {
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutJurnalInput = {
@@ -990,6 +1027,7 @@ export type ProyekCreateWithoutJurnalInput = {
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutJurnalInput = {
@@ -1007,6 +1045,7 @@ export type ProyekUncheckedCreateWithoutJurnalInput = {
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutJurnalInput = {
@@ -1040,6 +1079,7 @@ export type ProyekUpdateWithoutJurnalInput = {
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutJurnalInput = {
@@ -1056,6 +1096,95 @@ export type ProyekUncheckedUpdateWithoutJurnalInput = {
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutDokumenKasInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutDokumenKasInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutDokumenKasInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutDokumenKasInput, Prisma.ProyekUncheckedCreateWithoutDokumenKasInput>
+}
+
+export type ProyekUpsertWithoutDokumenKasInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutDokumenKasInput, Prisma.ProyekUncheckedUpdateWithoutDokumenKasInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutDokumenKasInput, Prisma.ProyekUncheckedCreateWithoutDokumenKasInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutDokumenKasInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutDokumenKasInput, Prisma.ProyekUncheckedUpdateWithoutDokumenKasInput>
+}
+
+export type ProyekUpdateWithoutDokumenKasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutDokumenKasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
 }
 
@@ -1074,6 +1203,7 @@ export type ProyekCreateWithoutPenggajianInput = {
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPenggajianInput = {
@@ -1091,6 +1221,7 @@ export type ProyekUncheckedCreateWithoutPenggajianInput = {
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPenggajianInput = {
@@ -1124,6 +1255,7 @@ export type ProyekUpdateWithoutPenggajianInput = {
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPenggajianInput = {
@@ -1141,6 +1273,7 @@ export type ProyekUncheckedUpdateWithoutPenggajianInput = {
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateManyPelangganInput = {
@@ -1170,6 +1303,7 @@ export type ProyekUpdateWithoutPelangganInput = {
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPelangganInput = {
@@ -1187,6 +1321,7 @@ export type ProyekUncheckedUpdateWithoutPelangganInput = {
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateManyWithoutPelangganInput = {
@@ -1212,6 +1347,7 @@ export type ProyekCountOutputType = {
   pesananPembelian: number
   jurnal: number
   penggajian: number
+  dokumenKas: number
 }
 
 export type ProyekCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1220,6 +1356,7 @@ export type ProyekCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   pesananPembelian?: boolean | ProyekCountOutputTypeCountPesananPembelianArgs
   jurnal?: boolean | ProyekCountOutputTypeCountJurnalArgs
   penggajian?: boolean | ProyekCountOutputTypeCountPenggajianArgs
+  dokumenKas?: boolean | ProyekCountOutputTypeCountDokumenKasArgs
 }
 
 /**
@@ -1267,6 +1404,13 @@ export type ProyekCountOutputTypeCountPenggajianArgs<ExtArgs extends runtime.Typ
   where?: Prisma.PenggajianWhereInput
 }
 
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountDokumenKasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DokumenKasWhereInput
+}
+
 
 export type ProyekSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1285,6 +1429,7 @@ export type ProyekSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   pesananPembelian?: boolean | Prisma.Proyek$pesananPembelianArgs<ExtArgs>
   jurnal?: boolean | Prisma.Proyek$jurnalArgs<ExtArgs>
   penggajian?: boolean | Prisma.Proyek$penggajianArgs<ExtArgs>
+  dokumenKas?: boolean | Prisma.Proyek$dokumenKasArgs<ExtArgs>
   _count?: boolean | Prisma.ProyekCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proyek"]>
 
@@ -1337,6 +1482,7 @@ export type ProyekInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   pesananPembelian?: boolean | Prisma.Proyek$pesananPembelianArgs<ExtArgs>
   jurnal?: boolean | Prisma.Proyek$jurnalArgs<ExtArgs>
   penggajian?: boolean | Prisma.Proyek$penggajianArgs<ExtArgs>
+  dokumenKas?: boolean | Prisma.Proyek$dokumenKasArgs<ExtArgs>
   _count?: boolean | Prisma.ProyekCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProyekIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1355,6 +1501,7 @@ export type $ProyekPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     pesananPembelian: Prisma.$PesananPembelianPayload<ExtArgs>[]
     jurnal: Prisma.$JurnalPayload<ExtArgs>[]
     penggajian: Prisma.$PenggajianPayload<ExtArgs>[]
+    dokumenKas: Prisma.$DokumenKasPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1770,6 +1917,7 @@ export interface Prisma__ProyekClient<T, Null = never, ExtArgs extends runtime.T
   pesananPembelian<T extends Prisma.Proyek$pesananPembelianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$pesananPembelianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PesananPembelianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   jurnal<T extends Prisma.Proyek$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$jurnalArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   penggajian<T extends Prisma.Proyek$penggajianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$penggajianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenggajianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dokumenKas<T extends Prisma.Proyek$dokumenKasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$dokumenKasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DokumenKasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2346,6 +2494,30 @@ export type Proyek$penggajianArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.PenggajianScalarFieldEnum | Prisma.PenggajianScalarFieldEnum[]
+}
+
+/**
+ * Proyek.dokumenKas
+ */
+export type Proyek$dokumenKasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DokumenKas
+   */
+  select?: Prisma.DokumenKasSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DokumenKas
+   */
+  omit?: Prisma.DokumenKasOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DokumenKasInclude<ExtArgs> | null
+  where?: Prisma.DokumenKasWhereInput
+  orderBy?: Prisma.DokumenKasOrderByWithRelationInput | Prisma.DokumenKasOrderByWithRelationInput[]
+  cursor?: Prisma.DokumenKasWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DokumenKasScalarFieldEnum | Prisma.DokumenKasScalarFieldEnum[]
 }
 
 /**

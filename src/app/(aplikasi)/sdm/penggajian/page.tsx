@@ -6,6 +6,7 @@ import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
@@ -32,7 +33,7 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
       <KepalaHalaman
         jejak={[{ label: "SDM" }]}
         judul="Penggajian"
-        subjudul="Proses gaji bulanan: satu dokumen per periode, langsung menjurnal beban gaji dan mengurangi kas/bank."
+        subjudul="Proses gaji bulanan: satu dokumen per periode. Selama alur persetujuan menyala, beban gaji dan kas keluar baru dijurnal setelah dokumen disetujui pengguna lain."
         aksi={bolehBuat && (
           <Link href="/sdm/penggajian/baru" className="tombol tombol-utama">
             + Proses Gaji
@@ -57,6 +58,7 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
                 <th>Dari</th>
                 <th>Event</th>
                 <th>Jurnal</th>
+                <th>Persetujuan</th>
                 <th />
               </tr>
             </thead>
@@ -74,10 +76,22 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
                   <td className="text-slate-500">{p.akunKas.kode} - {p.akunKas.nama}</td>
                   <td className="text-slate-500">{p.proyek?.kode ?? "-"}</td>
                   <td className="mono text-slate-500">{p.jurnal?.nomor ?? "-"}</td>
+                  <td>
+                    <SelPersetujuan
+                      jenis="penggajian"
+                      kode="penggajian"
+                      id={p.id}
+                      nomor={p.nomor}
+                      status={p.statusPersetujuan}
+                      diajukanOlehId={p.diajukanOlehId}
+                      pengguna={pengguna}
+                      catatanPenolakan={p.catatanPenolakan}
+                    />
+                  </td>
                   <td className="text-right"><TombolHapusDokumen jenis="penggajian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                 </tr>
               ))}
-              {daftar.length === 0 && <tr><td colSpan={12} className="kosong">{param.q ? "Tidak ada yang cocok." : "Belum ada penggajian."}</td></tr>}
+              {daftar.length === 0 && <tr><td colSpan={13} className="kosong">{param.q ? "Tidak ada yang cocok." : "Belum ada penggajian."}</td></tr>}
             </tbody>
           </table>
         </div>

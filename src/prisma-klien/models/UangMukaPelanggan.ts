@@ -48,6 +48,14 @@ export type UangMukaPelangganMinAggregateOutputType = {
   metodeBayar: string | null
   keterangan: string | null
   jurnalId: string | null
+  statusPersetujuan: $Enums.StatusPersetujuan | null
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
 }
 
 export type UangMukaPelangganMaxAggregateOutputType = {
@@ -62,6 +70,14 @@ export type UangMukaPelangganMaxAggregateOutputType = {
   metodeBayar: string | null
   keterangan: string | null
   jurnalId: string | null
+  statusPersetujuan: $Enums.StatusPersetujuan | null
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
 }
 
 export type UangMukaPelangganCountAggregateOutputType = {
@@ -76,6 +92,14 @@ export type UangMukaPelangganCountAggregateOutputType = {
   metodeBayar: number
   keterangan: number
   jurnalId: number
+  statusPersetujuan: number
+  diajukanOlehId: number
+  diajukanPada: number
+  disetujuiOlehId: number
+  disetujuiPada: number
+  ditolakOlehId: number
+  ditolakPada: number
+  catatanPenolakan: number
   _all: number
 }
 
@@ -102,6 +126,14 @@ export type UangMukaPelangganMinAggregateInputType = {
   metodeBayar?: true
   keterangan?: true
   jurnalId?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
 }
 
 export type UangMukaPelangganMaxAggregateInputType = {
@@ -116,6 +148,14 @@ export type UangMukaPelangganMaxAggregateInputType = {
   metodeBayar?: true
   keterangan?: true
   jurnalId?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
 }
 
 export type UangMukaPelangganCountAggregateInputType = {
@@ -130,6 +170,14 @@ export type UangMukaPelangganCountAggregateInputType = {
   metodeBayar?: true
   keterangan?: true
   jurnalId?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
   _all?: true
 }
 
@@ -231,6 +279,14 @@ export type UangMukaPelangganGroupByOutputType = {
   metodeBayar: string
   keterangan: string | null
   jurnalId: string | null
+  statusPersetujuan: $Enums.StatusPersetujuan
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
   _count: UangMukaPelangganCountAggregateOutputType | null
   _avg: UangMukaPelangganAvgAggregateOutputType | null
   _sum: UangMukaPelangganSumAggregateOutputType | null
@@ -268,11 +324,22 @@ export type UangMukaPelangganWhereInput = {
   metodeBayar?: Prisma.StringFilter<"UangMukaPelanggan"> | string
   keterangan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
   jurnalId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"UangMukaPelanggan"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
   pelanggan?: Prisma.XOR<Prisma.PelangganScalarRelationFilter, Prisma.PelangganWhereInput>
   pesanan?: Prisma.XOR<Prisma.PesananPenjualanScalarRelationFilter, Prisma.PesananPenjualanWhereInput>
   akun?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   pemakaian?: Prisma.PemakaianUangMukaListRelationFilter
+  diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
 }
 
 export type UangMukaPelangganOrderByWithRelationInput = {
@@ -287,11 +354,22 @@ export type UangMukaPelangganOrderByWithRelationInput = {
   metodeBayar?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   pelanggan?: Prisma.PelangganOrderByWithRelationInput
   pesanan?: Prisma.PesananPenjualanOrderByWithRelationInput
   akun?: Prisma.AkunOrderByWithRelationInput
   jurnal?: Prisma.JurnalOrderByWithRelationInput
   pemakaian?: Prisma.PemakaianUangMukaOrderByRelationAggregateInput
+  diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
+  disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
+  ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
 }
 
 export type UangMukaPelangganWhereUniqueInput = Prisma.AtLeast<{
@@ -309,11 +387,22 @@ export type UangMukaPelangganWhereUniqueInput = Prisma.AtLeast<{
   jumlahDipakai?: Prisma.DecimalFilter<"UangMukaPelanggan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFilter<"UangMukaPelanggan"> | string
   keterangan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"UangMukaPelanggan"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
   pelanggan?: Prisma.XOR<Prisma.PelangganScalarRelationFilter, Prisma.PelangganWhereInput>
   pesanan?: Prisma.XOR<Prisma.PesananPenjualanScalarRelationFilter, Prisma.PesananPenjualanWhereInput>
   akun?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   pemakaian?: Prisma.PemakaianUangMukaListRelationFilter
+  diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
 }, "id" | "nomor" | "jurnalId">
 
 export type UangMukaPelangganOrderByWithAggregationInput = {
@@ -328,6 +417,14 @@ export type UangMukaPelangganOrderByWithAggregationInput = {
   metodeBayar?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UangMukaPelangganCountOrderByAggregateInput
   _avg?: Prisma.UangMukaPelangganAvgOrderByAggregateInput
   _max?: Prisma.UangMukaPelangganMaxOrderByAggregateInput
@@ -350,6 +447,14 @@ export type UangMukaPelangganScalarWhereWithAggregatesInput = {
   metodeBayar?: Prisma.StringWithAggregatesFilter<"UangMukaPelanggan"> | string
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"UangMukaPelanggan"> | string | null
   jurnalId?: Prisma.StringNullableWithAggregatesFilter<"UangMukaPelanggan"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"UangMukaPelanggan"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"UangMukaPelanggan"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"UangMukaPelanggan"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableWithAggregatesFilter<"UangMukaPelanggan"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableWithAggregatesFilter<"UangMukaPelanggan"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableWithAggregatesFilter<"UangMukaPelanggan"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableWithAggregatesFilter<"UangMukaPelanggan"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableWithAggregatesFilter<"UangMukaPelanggan"> | string | null
 }
 
 export type UangMukaPelangganCreateInput = {
@@ -360,11 +465,19 @@ export type UangMukaPelangganCreateInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
   akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
   pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
 }
 
 export type UangMukaPelangganUncheckedCreateInput = {
@@ -379,6 +492,14 @@ export type UangMukaPelangganUncheckedCreateInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
 }
 
@@ -390,11 +511,19 @@ export type UangMukaPelangganUpdateInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
   pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
 }
 
 export type UangMukaPelangganUncheckedUpdateInput = {
@@ -409,6 +538,14 @@ export type UangMukaPelangganUncheckedUpdateInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
 }
 
@@ -424,6 +561,14 @@ export type UangMukaPelangganCreateManyInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type UangMukaPelangganUpdateManyMutationInput = {
@@ -434,6 +579,11 @@ export type UangMukaPelangganUpdateManyMutationInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UangMukaPelangganUncheckedUpdateManyInput = {
@@ -448,6 +598,14 @@ export type UangMukaPelangganUncheckedUpdateManyInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UangMukaPelangganListRelationFilter = {
@@ -472,6 +630,14 @@ export type UangMukaPelangganCountOrderByAggregateInput = {
   metodeBayar?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type UangMukaPelangganAvgOrderByAggregateInput = {
@@ -491,6 +657,14 @@ export type UangMukaPelangganMaxOrderByAggregateInput = {
   metodeBayar?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type UangMukaPelangganMinOrderByAggregateInput = {
@@ -505,6 +679,14 @@ export type UangMukaPelangganMinOrderByAggregateInput = {
   metodeBayar?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type UangMukaPelangganSumOrderByAggregateInput = {
@@ -520,6 +702,132 @@ export type UangMukaPelangganScalarRelationFilter = {
 export type UangMukaPelangganNullableScalarRelationFilter = {
   is?: Prisma.UangMukaPelangganWhereInput | null
   isNot?: Prisma.UangMukaPelangganWhereInput | null
+}
+
+export type UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput> | Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDiajukanOlehInputEnvelope
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+}
+
+export type UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDisetujuiOlehInputEnvelope
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+}
+
+export type UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput> | Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDitolakOlehInputEnvelope
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+}
+
+export type UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput> | Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDiajukanOlehInputEnvelope
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+}
+
+export type UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDisetujuiOlehInputEnvelope
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+}
+
+export type UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput> | Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDitolakOlehInputEnvelope
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+}
+
+export type UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput> | Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput[]
+  upsert?: Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDiajukanOlehInput | Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDiajukanOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDiajukanOlehInputEnvelope
+  set?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  disconnect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  delete?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  update?: Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDiajukanOlehInput | Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDiajukanOlehInput[]
+  updateMany?: Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDiajukanOlehInput | Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDiajukanOlehInput[]
+  deleteMany?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+}
+
+export type UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput[]
+  upsert?: Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDisetujuiOlehInputEnvelope
+  set?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  disconnect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  delete?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  update?: Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDisetujuiOlehInput[]
+  updateMany?: Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDisetujuiOlehInput[]
+  deleteMany?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+}
+
+export type UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput> | Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput[]
+  upsert?: Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDitolakOlehInput | Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDitolakOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDitolakOlehInputEnvelope
+  set?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  disconnect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  delete?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  update?: Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDitolakOlehInput[]
+  updateMany?: Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+}
+
+export type UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput> | Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput[]
+  upsert?: Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDiajukanOlehInput | Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDiajukanOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDiajukanOlehInputEnvelope
+  set?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  disconnect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  delete?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  update?: Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDiajukanOlehInput | Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDiajukanOlehInput[]
+  updateMany?: Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDiajukanOlehInput | Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDiajukanOlehInput[]
+  deleteMany?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+}
+
+export type UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput[]
+  upsert?: Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDisetujuiOlehInputEnvelope
+  set?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  disconnect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  delete?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  update?: Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDisetujuiOlehInput[]
+  updateMany?: Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDisetujuiOlehInput | Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDisetujuiOlehInput[]
+  deleteMany?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+}
+
+export type UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput> | Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput[] | Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput | Prisma.UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput[]
+  upsert?: Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDitolakOlehInput | Prisma.UangMukaPelangganUpsertWithWhereUniqueWithoutDitolakOlehInput[]
+  createMany?: Prisma.UangMukaPelangganCreateManyDitolakOlehInputEnvelope
+  set?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  disconnect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  delete?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  connect?: Prisma.UangMukaPelangganWhereUniqueInput | Prisma.UangMukaPelangganWhereUniqueInput[]
+  update?: Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.UangMukaPelangganUpdateWithWhereUniqueWithoutDitolakOlehInput[]
+  updateMany?: Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.UangMukaPelangganUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
 }
 
 export type UangMukaPelangganCreateNestedManyWithoutPelangganInput = {
@@ -694,6 +1002,241 @@ export type UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UangMukaPelangganUpdateToOneWithWhereWithoutJurnalInput, Prisma.UangMukaPelangganUpdateWithoutJurnalInput>, Prisma.UangMukaPelangganUncheckedUpdateWithoutJurnalInput>
 }
 
+export type UangMukaPelangganCreateWithoutDiajukanOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
+  pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
+  akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
+  pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
+}
+
+export type UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  pesananId: string
+  akunId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
+}
+
+export type UangMukaPelangganCreateOrConnectWithoutDiajukanOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  create: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput>
+}
+
+export type UangMukaPelangganCreateManyDiajukanOlehInputEnvelope = {
+  data: Prisma.UangMukaPelangganCreateManyDiajukanOlehInput | Prisma.UangMukaPelangganCreateManyDiajukanOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type UangMukaPelangganCreateWithoutDisetujuiOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
+  pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
+  akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
+  pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
+}
+
+export type UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  pesananId: string
+  akunId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
+}
+
+export type UangMukaPelangganCreateOrConnectWithoutDisetujuiOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  create: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput>
+}
+
+export type UangMukaPelangganCreateManyDisetujuiOlehInputEnvelope = {
+  data: Prisma.UangMukaPelangganCreateManyDisetujuiOlehInput | Prisma.UangMukaPelangganCreateManyDisetujuiOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type UangMukaPelangganCreateWithoutDitolakOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
+  pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
+  akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
+  pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+}
+
+export type UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  pesananId: string
+  akunId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
+}
+
+export type UangMukaPelangganCreateOrConnectWithoutDitolakOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  create: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput>
+}
+
+export type UangMukaPelangganCreateManyDitolakOlehInputEnvelope = {
+  data: Prisma.UangMukaPelangganCreateManyDitolakOlehInput | Prisma.UangMukaPelangganCreateManyDitolakOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type UangMukaPelangganUpsertWithWhereUniqueWithoutDiajukanOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  update: Prisma.XOR<Prisma.UangMukaPelangganUpdateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedUpdateWithoutDiajukanOlehInput>
+  create: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDiajukanOlehInput>
+}
+
+export type UangMukaPelangganUpdateWithWhereUniqueWithoutDiajukanOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  data: Prisma.XOR<Prisma.UangMukaPelangganUpdateWithoutDiajukanOlehInput, Prisma.UangMukaPelangganUncheckedUpdateWithoutDiajukanOlehInput>
+}
+
+export type UangMukaPelangganUpdateManyWithWhereWithoutDiajukanOlehInput = {
+  where: Prisma.UangMukaPelangganScalarWhereInput
+  data: Prisma.XOR<Prisma.UangMukaPelangganUpdateManyMutationInput, Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehInput>
+}
+
+export type UangMukaPelangganScalarWhereInput = {
+  AND?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+  OR?: Prisma.UangMukaPelangganScalarWhereInput[]
+  NOT?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
+  id?: Prisma.StringFilter<"UangMukaPelanggan"> | string
+  nomor?: Prisma.StringFilter<"UangMukaPelanggan"> | string
+  tanggal?: Prisma.DateTimeFilter<"UangMukaPelanggan"> | Date | string
+  pelangganId?: Prisma.StringFilter<"UangMukaPelanggan"> | string
+  pesananId?: Prisma.StringFilter<"UangMukaPelanggan"> | string
+  akunId?: Prisma.StringFilter<"UangMukaPelanggan"> | string
+  jumlah?: Prisma.DecimalFilter<"UangMukaPelanggan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFilter<"UangMukaPelanggan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFilter<"UangMukaPelanggan"> | string
+  keterangan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  jurnalId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"UangMukaPelanggan"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"UangMukaPelanggan"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
+}
+
+export type UangMukaPelangganUpsertWithWhereUniqueWithoutDisetujuiOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  update: Prisma.XOR<Prisma.UangMukaPelangganUpdateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedUpdateWithoutDisetujuiOlehInput>
+  create: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDisetujuiOlehInput>
+}
+
+export type UangMukaPelangganUpdateWithWhereUniqueWithoutDisetujuiOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  data: Prisma.XOR<Prisma.UangMukaPelangganUpdateWithoutDisetujuiOlehInput, Prisma.UangMukaPelangganUncheckedUpdateWithoutDisetujuiOlehInput>
+}
+
+export type UangMukaPelangganUpdateManyWithWhereWithoutDisetujuiOlehInput = {
+  where: Prisma.UangMukaPelangganScalarWhereInput
+  data: Prisma.XOR<Prisma.UangMukaPelangganUpdateManyMutationInput, Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehInput>
+}
+
+export type UangMukaPelangganUpsertWithWhereUniqueWithoutDitolakOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  update: Prisma.XOR<Prisma.UangMukaPelangganUpdateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedUpdateWithoutDitolakOlehInput>
+  create: Prisma.XOR<Prisma.UangMukaPelangganCreateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedCreateWithoutDitolakOlehInput>
+}
+
+export type UangMukaPelangganUpdateWithWhereUniqueWithoutDitolakOlehInput = {
+  where: Prisma.UangMukaPelangganWhereUniqueInput
+  data: Prisma.XOR<Prisma.UangMukaPelangganUpdateWithoutDitolakOlehInput, Prisma.UangMukaPelangganUncheckedUpdateWithoutDitolakOlehInput>
+}
+
+export type UangMukaPelangganUpdateManyWithWhereWithoutDitolakOlehInput = {
+  where: Prisma.UangMukaPelangganScalarWhereInput
+  data: Prisma.XOR<Prisma.UangMukaPelangganUpdateManyMutationInput, Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehInput>
+}
+
 export type UangMukaPelangganCreateWithoutPelangganInput = {
   id?: string
   nomor: string
@@ -702,10 +1245,18 @@ export type UangMukaPelangganCreateWithoutPelangganInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
   akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
   pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
 }
 
 export type UangMukaPelangganUncheckedCreateWithoutPelangganInput = {
@@ -719,6 +1270,14 @@ export type UangMukaPelangganUncheckedCreateWithoutPelangganInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
 }
 
@@ -748,23 +1307,6 @@ export type UangMukaPelangganUpdateManyWithWhereWithoutPelangganInput = {
   data: Prisma.XOR<Prisma.UangMukaPelangganUpdateManyMutationInput, Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPelangganInput>
 }
 
-export type UangMukaPelangganScalarWhereInput = {
-  AND?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
-  OR?: Prisma.UangMukaPelangganScalarWhereInput[]
-  NOT?: Prisma.UangMukaPelangganScalarWhereInput | Prisma.UangMukaPelangganScalarWhereInput[]
-  id?: Prisma.StringFilter<"UangMukaPelanggan"> | string
-  nomor?: Prisma.StringFilter<"UangMukaPelanggan"> | string
-  tanggal?: Prisma.DateTimeFilter<"UangMukaPelanggan"> | Date | string
-  pelangganId?: Prisma.StringFilter<"UangMukaPelanggan"> | string
-  pesananId?: Prisma.StringFilter<"UangMukaPelanggan"> | string
-  akunId?: Prisma.StringFilter<"UangMukaPelanggan"> | string
-  jumlah?: Prisma.DecimalFilter<"UangMukaPelanggan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  jumlahDipakai?: Prisma.DecimalFilter<"UangMukaPelanggan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  metodeBayar?: Prisma.StringFilter<"UangMukaPelanggan"> | string
-  keterangan?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
-  jurnalId?: Prisma.StringNullableFilter<"UangMukaPelanggan"> | string | null
-}
-
 export type UangMukaPelangganCreateWithoutPesananInput = {
   id?: string
   nomor: string
@@ -773,10 +1315,18 @@ export type UangMukaPelangganCreateWithoutPesananInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
   akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
   pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
 }
 
 export type UangMukaPelangganUncheckedCreateWithoutPesananInput = {
@@ -790,6 +1340,14 @@ export type UangMukaPelangganUncheckedCreateWithoutPesananInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
 }
 
@@ -827,10 +1385,18 @@ export type UangMukaPelangganCreateWithoutPemakaianInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
   akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
 }
 
 export type UangMukaPelangganUncheckedCreateWithoutPemakaianInput = {
@@ -845,6 +1411,14 @@ export type UangMukaPelangganUncheckedCreateWithoutPemakaianInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type UangMukaPelangganCreateOrConnectWithoutPemakaianInput = {
@@ -871,10 +1445,18 @@ export type UangMukaPelangganUpdateWithoutPemakaianInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
 }
 
 export type UangMukaPelangganUncheckedUpdateWithoutPemakaianInput = {
@@ -889,6 +1471,14 @@ export type UangMukaPelangganUncheckedUpdateWithoutPemakaianInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UangMukaPelangganCreateWithoutAkunInput = {
@@ -899,10 +1489,18 @@ export type UangMukaPelangganCreateWithoutAkunInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutUangMukaPelangganInput
   pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
 }
 
 export type UangMukaPelangganUncheckedCreateWithoutAkunInput = {
@@ -916,6 +1514,14 @@ export type UangMukaPelangganUncheckedCreateWithoutAkunInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
 }
 
@@ -953,10 +1559,18 @@ export type UangMukaPelangganCreateWithoutJurnalInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pelanggan: Prisma.PelangganCreateNestedOneWithoutUangMukaInput
   pesanan: Prisma.PesananPenjualanCreateNestedOneWithoutUangMukaInput
   akun: Prisma.AkunCreateNestedOneWithoutUangMukaPelangganInput
   pemakaian?: Prisma.PemakaianUangMukaCreateNestedManyWithoutUangMukaInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanUangMukaPelangganInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiUangMukaPelangganInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakUangMukaPelangganInput
 }
 
 export type UangMukaPelangganUncheckedCreateWithoutJurnalInput = {
@@ -970,6 +1584,14 @@ export type UangMukaPelangganUncheckedCreateWithoutJurnalInput = {
   jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: string
   keterangan?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedCreateNestedManyWithoutUangMukaInput
 }
 
@@ -997,10 +1619,18 @@ export type UangMukaPelangganUpdateWithoutJurnalInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
   pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
 }
 
 export type UangMukaPelangganUncheckedUpdateWithoutJurnalInput = {
@@ -1014,7 +1644,273 @@ export type UangMukaPelangganUncheckedUpdateWithoutJurnalInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
+}
+
+export type UangMukaPelangganCreateManyDiajukanOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  pesananId: string
+  akunId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type UangMukaPelangganCreateManyDisetujuiOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  pesananId: string
+  akunId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type UangMukaPelangganCreateManyDitolakOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pelangganId: string
+  pesananId: string
+  akunId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: string
+  keterangan?: string | null
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type UangMukaPelangganUpdateWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
+  akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
+  pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
+}
+
+export type UangMukaPelangganUncheckedUpdateWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
+}
+
+export type UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type UangMukaPelangganUpdateWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
+  akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
+  pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
+}
+
+export type UangMukaPelangganUncheckedUpdateWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
+}
+
+export type UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type UangMukaPelangganUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
+  akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
+  pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+}
+
+export type UangMukaPelangganUncheckedUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
+}
+
+export type UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelangganId?: Prisma.StringFieldUpdateOperationsInput | string
+  pesananId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UangMukaPelangganCreateManyPelangganInput = {
@@ -1028,6 +1924,14 @@ export type UangMukaPelangganCreateManyPelangganInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type UangMukaPelangganUpdateWithoutPelangganInput = {
@@ -1038,10 +1942,18 @@ export type UangMukaPelangganUpdateWithoutPelangganInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
   pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
 }
 
 export type UangMukaPelangganUncheckedUpdateWithoutPelangganInput = {
@@ -1055,6 +1967,14 @@ export type UangMukaPelangganUncheckedUpdateWithoutPelangganInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
 }
 
@@ -1069,6 +1989,14 @@ export type UangMukaPelangganUncheckedUpdateManyWithoutPelangganInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UangMukaPelangganCreateManyPesananInput = {
@@ -1082,6 +2010,14 @@ export type UangMukaPelangganCreateManyPesananInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type UangMukaPelangganUpdateWithoutPesananInput = {
@@ -1092,10 +2028,18 @@ export type UangMukaPelangganUpdateWithoutPesananInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
   akun?: Prisma.AkunUpdateOneRequiredWithoutUangMukaPelangganNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
   pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
 }
 
 export type UangMukaPelangganUncheckedUpdateWithoutPesananInput = {
@@ -1109,6 +2053,14 @@ export type UangMukaPelangganUncheckedUpdateWithoutPesananInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
 }
 
@@ -1123,6 +2075,14 @@ export type UangMukaPelangganUncheckedUpdateManyWithoutPesananInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UangMukaPelangganCreateManyAkunInput = {
@@ -1136,6 +2096,14 @@ export type UangMukaPelangganCreateManyAkunInput = {
   metodeBayar?: string
   keterangan?: string | null
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type UangMukaPelangganUpdateWithoutAkunInput = {
@@ -1146,10 +2114,18 @@ export type UangMukaPelangganUpdateWithoutAkunInput = {
   jumlahDipakai?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneRequiredWithoutUangMukaNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateOneRequiredWithoutUangMukaNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutUangMukaPelangganNestedInput
   pemakaian?: Prisma.PemakaianUangMukaUpdateManyWithoutUangMukaNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanUangMukaPelangganNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiUangMukaPelangganNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakUangMukaPelangganNestedInput
 }
 
 export type UangMukaPelangganUncheckedUpdateWithoutAkunInput = {
@@ -1163,6 +2139,14 @@ export type UangMukaPelangganUncheckedUpdateWithoutAkunInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pemakaian?: Prisma.PemakaianUangMukaUncheckedUpdateManyWithoutUangMukaNestedInput
 }
 
@@ -1177,6 +2161,14 @@ export type UangMukaPelangganUncheckedUpdateManyWithoutAkunInput = {
   metodeBayar?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1222,11 +2214,22 @@ export type UangMukaPelangganSelect<ExtArgs extends runtime.Types.Extensions.Int
   metodeBayar?: boolean
   keterangan?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   pelanggan?: boolean | Prisma.PelangganDefaultArgs<ExtArgs>
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>
   pemakaian?: boolean | Prisma.UangMukaPelanggan$pemakaianArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>
   _count?: boolean | Prisma.UangMukaPelangganCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["uangMukaPelanggan"]>
 
@@ -1242,10 +2245,21 @@ export type UangMukaPelangganSelectCreateManyAndReturn<ExtArgs extends runtime.T
   metodeBayar?: boolean
   keterangan?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   pelanggan?: boolean | Prisma.PelangganDefaultArgs<ExtArgs>
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["uangMukaPelanggan"]>
 
 export type UangMukaPelangganSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1260,10 +2274,21 @@ export type UangMukaPelangganSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   metodeBayar?: boolean
   keterangan?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   pelanggan?: boolean | Prisma.PelangganDefaultArgs<ExtArgs>
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["uangMukaPelanggan"]>
 
 export type UangMukaPelangganSelectScalar = {
@@ -1278,15 +2303,26 @@ export type UangMukaPelangganSelectScalar = {
   metodeBayar?: boolean
   keterangan?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
 }
 
-export type UangMukaPelangganOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pelangganId" | "pesananId" | "akunId" | "jumlah" | "jumlahDipakai" | "metodeBayar" | "keterangan" | "jurnalId", ExtArgs["result"]["uangMukaPelanggan"]>
+export type UangMukaPelangganOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pelangganId" | "pesananId" | "akunId" | "jumlah" | "jumlahDipakai" | "metodeBayar" | "keterangan" | "jurnalId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["uangMukaPelanggan"]>
 export type UangMukaPelangganInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pelanggan?: boolean | Prisma.PelangganDefaultArgs<ExtArgs>
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>
   pemakaian?: boolean | Prisma.UangMukaPelanggan$pemakaianArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>
   _count?: boolean | Prisma.UangMukaPelangganCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UangMukaPelangganIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1294,12 +2330,18 @@ export type UangMukaPelangganIncludeCreateManyAndReturn<ExtArgs extends runtime.
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>
 }
 export type UangMukaPelangganIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pelanggan?: boolean | Prisma.PelangganDefaultArgs<ExtArgs>
   pesanan?: boolean | Prisma.PesananPenjualanDefaultArgs<ExtArgs>
   akun?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>
 }
 
 export type $UangMukaPelangganPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1310,6 +2352,9 @@ export type $UangMukaPelangganPayload<ExtArgs extends runtime.Types.Extensions.I
     akun: Prisma.$AkunPayload<ExtArgs>
     jurnal: Prisma.$JurnalPayload<ExtArgs> | null
     pemakaian: Prisma.$PemakaianUangMukaPayload<ExtArgs>[]
+    diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1326,6 +2371,17 @@ export type $UangMukaPelangganPayload<ExtArgs extends runtime.Types.Extensions.I
     metodeBayar: string
     keterangan: string | null
     jurnalId: string | null
+    /**
+     * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+     */
+    statusPersetujuan: $Enums.StatusPersetujuan
+    diajukanOlehId: string | null
+    diajukanPada: Date | null
+    disetujuiOlehId: string | null
+    disetujuiPada: Date | null
+    ditolakOlehId: string | null
+    ditolakPada: Date | null
+    catatanPenolakan: string | null
   }, ExtArgs["result"]["uangMukaPelanggan"]>
   composites: {}
 }
@@ -1725,6 +2781,9 @@ export interface Prisma__UangMukaPelangganClient<T, Null = never, ExtArgs extend
   akun<T extends Prisma.AkunDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AkunDefaultArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   jurnal<T extends Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UangMukaPelanggan$jurnalArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pemakaian<T extends Prisma.UangMukaPelanggan$pemakaianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UangMukaPelanggan$pemakaianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PemakaianUangMukaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  diajukanOleh<T extends Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UangMukaPelanggan$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  disetujuiOleh<T extends Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UangMukaPelanggan$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  ditolakOleh<T extends Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UangMukaPelanggan$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1765,6 +2824,14 @@ export interface UangMukaPelangganFieldRefs {
   readonly metodeBayar: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
   readonly keterangan: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
   readonly jurnalId: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
+  readonly statusPersetujuan: Prisma.FieldRef<"UangMukaPelanggan", 'StatusPersetujuan'>
+  readonly diajukanOlehId: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
+  readonly diajukanPada: Prisma.FieldRef<"UangMukaPelanggan", 'DateTime'>
+  readonly disetujuiOlehId: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
+  readonly disetujuiPada: Prisma.FieldRef<"UangMukaPelanggan", 'DateTime'>
+  readonly ditolakOlehId: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
+  readonly ditolakPada: Prisma.FieldRef<"UangMukaPelanggan", 'DateTime'>
+  readonly catatanPenolakan: Prisma.FieldRef<"UangMukaPelanggan", 'String'>
 }
     
 
@@ -2206,6 +3273,63 @@ export type UangMukaPelanggan$pemakaianArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.PemakaianUangMukaScalarFieldEnum | Prisma.PemakaianUangMukaScalarFieldEnum[]
+}
+
+/**
+ * UangMukaPelanggan.diajukanOleh
+ */
+export type UangMukaPelanggan$diajukanOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * UangMukaPelanggan.disetujuiOleh
+ */
+export type UangMukaPelanggan$disetujuiOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * UangMukaPelanggan.ditolakOleh
+ */
+export type UangMukaPelanggan$ditolakOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
 }
 
 /**

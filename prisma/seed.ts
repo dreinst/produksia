@@ -77,8 +77,34 @@ async function main() {
   // Identitas & pajak: usaha kecil non-PKP (faktur tanpa PPN), akun PPh 23 disiapkan agar potongan pajak klien/vendor bisa dicatat
   const [ppnKeluaran, ppnMasukan, pph23Dimuka, pph23Hutang, bebanPphFinal] = await Promise.all(["2-1330", "1-1800", "1-1900", "2-1320", "5-9100"].map(akun));
   await db.pengaturanPerusahaan.create({
-    data: { id: "default", nama: "D'Production Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, pphFinalPersen: 0.5, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id, akunBebanPphFinalId: bebanPphFinal.id, akunHutangPphFinalId: pph23Hutang.id },
+    data: { id: "default", nama: "D'Production Event Organizer", pkp: false, tarifPpnPersen: 11, terminHari: 14, pphFinalPersen: 0.5, wajibPersetujuan: true, akunPpnKeluaranId: ppnKeluaran.id, akunPpnMasukanId: ppnMasukan.id, akunPph23DimukaId: pph23Dimuka.id, akunPph23DipotongId: pph23Hutang.id, akunBebanPphFinalId: bebanPphFinal.id, akunHutangPphFinalId: pph23Hutang.id },
   });
+  // Mata uang: IDR sebagai mata uang fungsional (buku besar selalu rupiah) + mata uang asing yang lazim
+  // dipakai EO (sponsor/artis luar negeri). Kursnya contoh, diperbarui di Pengaturan › Mata Uang & Kurs.
+  console.log("=== Mata uang & kurs (IDR fungsional, USD & SGD aktif) ===");
+  const mataUangStandar = [
+    { kode: "IDR", nama: "Rupiah Indonesia", simbol: "Rp", desimal: 0, fungsional: true },
+    { kode: "USD", nama: "Dolar Amerika Serikat", simbol: "$", desimal: 2, fungsional: false },
+    { kode: "SGD", nama: "Dolar Singapura", simbol: "S$", desimal: 2, fungsional: false },
+  ];
+  for (const mu of mataUangStandar) {
+    await db.mataUang.upsert({ where: { kode: mu.kode }, create: mu, update: mu });
+  }
+  // Tanggal kurs disimpan tengah malam UTC, sama seperti aksi catatKurs, supaya kunci uniknya konsisten
+  const awalBulan = new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), 1));
+  for (const [kode, kurs] of [["USD", 16250], ["SGD", 12100]] as const) {
+    const mu = await db.mataUang.findUniqueOrThrow({ where: { kode } });
+    await db.kursMataUang.upsert({
+      where: { mataUangId_tanggal: { mataUangId: mu.id, tanggal: awalBulan } },
+      create: { mataUangId: mu.id, tanggal: awalBulan, kurs, sumber: "Kurs tengah BI (contoh seed)", dicatatOleh: "Seed" },
+      update: { kurs },
+    });
+    console.log(`  -> 1 ${kode} = Rp ${rp(kurs)} per ${awalBulan.toISOString().slice(0, 10)}`);
+  }
+  // Selisih Kurs: penampung laba/rugi kurs saat piutang/hutang mata uang asing dinilai kembali
+  const akunSelisihKurs = await akun("5-8530");
+  await db.pemetaanAkun.update({ where: { id: "default" }, data: { selisihKursId: akunSelisihKurs.id } });
+
   const [kas, bank, modal, sewa, peralatan, akumPenyusutan, bebanPenyusutan, biayaEvent, pendapatanEvent, pendapatanProduksi] = await Promise.all(
     ["1-1100", "1-1210", "3-1000", "5-4500", "1-2400", "1-2940", "5-9540", "5-1200", "4-1100", "4-2100"].map(akun),
   );

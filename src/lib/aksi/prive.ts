@@ -9,6 +9,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, bacaUang, format } from "@/lib/uang";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
+import { dataLangsungDisetujui } from "@/lib/persetujuan";
 
 /** Prive: pemilik mengambil uang pribadi dari kas/bank. Jurnal PRV: Dr Prive (modal, saldo debit) / Cr Kas/Bank. */
 export async function buatPrive(dataFormulir: FormData) {
@@ -50,7 +51,8 @@ export async function buatPrive(dataFormulir: FormData) {
         },
       },
     });
-    await tx.prive.create({ data: { nomor, tanggal, pemilikNama, akunKasId, akunPriveId, jumlah, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama } });
+    // Prive belum ikut alur persetujuan; jurnalnya langsung dicatat, jadi statusnya langsung DISETUJUI
+    await tx.prive.create({ data: { nomor, tanggal, pemilikNama, akunKasId, akunPriveId, jumlah, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama, ...dataLangsungDisetujui(pengguna) } });
     await tx.logAktivitas.create({
       data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "BUAT", jenis: "Prive", nomor, keterangan: `${pemilikNama} mengambil ${format(jumlah)} dari ${akunKas.kode}` },
     });

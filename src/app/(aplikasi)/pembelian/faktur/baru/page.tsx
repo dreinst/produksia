@@ -5,6 +5,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { ambilPengaturanPerusahaan, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 import { buatFakturPembelianFormulir } from "@/lib/aksi/pembelian";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
+import { opsiMataUangDokumen } from "@/lib/mataUang";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
 export default async function HalamanFakturPembelianBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string }> }) {
@@ -43,6 +44,7 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
     pengaturan.akunPpnMasukanId ? db.akun.findUnique({ where: { id: pengaturan.akunPpnMasukanId } }) : null,
     pemetaan?.barangBelumDitagihId ? db.akun.findUnique({ where: { id: pemetaan.barangBelumDitagihId } }) : null,
   ]);
+  const opsiMataUang = await opsiMataUangDokumen(db);
   const hariIni = new Date();
   const tempo = tanggalJatuhTempo(pengaturan.terminHari, hariIni);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
@@ -82,6 +84,7 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
       }
       pajak={{ pkp: pengaturan.pkp, tarif: Number(pengaturan.tarifPpnPersen) }}
       terminHari={pengaturan.terminHari}
+      mataUang={{ daftar: opsiMataUang, bawaanId: pesanan.pemasok.mataUangId }}
     />
   );
 }

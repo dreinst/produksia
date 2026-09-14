@@ -162,6 +162,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "5-8500", nama: "Beban Administrasi Bank", jenis: B, kelompok: true, asal: "KEPUTUSAN", keterangan: "'Beban Lain-lain (2)', dipisah karena sifatnya biaya keuangan, bukan sosial" },
   { kode: "5-8510", nama: "Administrasi Bank – Rekening Operasional", jenis: B, induk: "5-8500", asal: "ASLI", keterangan: "Satu akun per rekening, sejajar dengan 1-12x0" },
   { kode: "5-8520", nama: "Pajak Bunga Bank", jenis: B, induk: "5-8500", asal: "ASLI" },
+  { kode: "5-8530", nama: "Selisih Kurs", jenis: B, induk: "5-8500", asal: "USUL", keterangan: "Laba/rugi kurs piutang & hutang mata uang asing; laba dikredit ke akun ini, rugi didebit (Pengaturan › Mata Uang & Kurs)" },
 
   { kode: "5-9000", nama: "Beban Pajak", jenis: B, kelompok: true, asal: "ASLI" },
   { kode: "5-9100", nama: "PPh Final UMKM (0,5%)", jenis: B, induk: "5-9000", asal: "USUL", keterangan: "Catatan asli belum punya sub-item" },
@@ -190,6 +191,7 @@ export const PEMETAAN_STANDAR = {
   labaDitahan: "3-2000",
   diskonPenjualan: "4-8100",
   pendapatanLain: "4-9000",
+  selisihKurs: "5-8530",
 } as const;
 
 /** Butir yang semula "pending" di catatan, beserta keputusan kurasinya (ditampilkan di halaman Bagan Akun). */

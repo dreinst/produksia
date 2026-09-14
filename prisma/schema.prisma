@@ -44,6 +44,8 @@ enum JenisAkun {
 
 enum SumberJurnal {
   MANUAL
+  /// Penilaian kembali piutang/hutang mata uang asing ke kurs akhir periode (src/lib/selisihKurs.ts)
+  SELISIH_KURS
   PENUTUP
   PAJAK
   PRIVE
@@ -63,21 +65,103 @@ enum StatusAset {
   DIHAPUS
 }
 
+/// Alur persetujuan dokumen (maker-checker / pemisahan tugas):
+/// DRAFT = baru dibuat, belum masuk buku besar · MENUNGGU = sudah diajukan, menunggu pemeriksa ·
+/// DISETUJUI = jurnalnya sudah dicatat · DITOLAK = dikembalikan ke pembuat dengan catatan.
+enum StatusPersetujuan {
+  DRAFT
+  MENUNGGU
+  DISETUJUI
+  DITOLAK
+}
+
+enum JenisDokumenKas {
+  MASUK
+  KELUAR
+}
+
 // ---------- Pengguna ----------
 
 model Pengguna {
-  id            String        @id @default(cuid())
+  id                           String                  @id @default(cuid())
   /// Identitas masuk (huruf kecil, unik); email hanya kontak opsional
-  namaPengguna  String        @unique
-  email         String?       @unique
-  nama          String
-  kataSandiHash String
-  peran         PeranPengguna @default(KASIR)
-  aktif         Boolean       @default(true)
-  karyawan      Karyawan?
-  sesi          Sesi[]
-  permintaanAturUlang PermintaanAturUlang[]
-  dibuatPada    DateTime      @default(now())
+  namaPengguna                 String                  @unique
+  email                        String?                 @unique
+  nama                         String
+  kataSandiHash                String
+  peran                        PeranPengguna           @default(KASIR)
+  aktif                        Boolean                 @default(true)
+  karyawan                     Karyawan?
+  sesi                         Sesi[]
+  permintaanAturUlang          PermintaanAturUlang[]
+  dibuatPada                   DateTime                @default(now())
+  /// Relasi balik alur persetujuan: siapa mengajukan / menyetujui / menolak tiap jenis dokumen
+  ajukanPenawaranPenjualan     PenawaranPenjualan[]    @relation("AjukanPenawaranPenjualan")
+  setujuiPenawaranPenjualan    PenawaranPenjualan[]    @relation("SetujuiPenawaranPenjualan")
+  tolakPenawaranPenjualan      PenawaranPenjualan[]    @relation("TolakPenawaranPenjualan")
+  ajukanPesananPenjualan       PesananPenjualan[]      @relation("AjukanPesananPenjualan")
+  setujuiPesananPenjualan      PesananPenjualan[]      @relation("SetujuiPesananPenjualan")
+  tolakPesananPenjualan        PesananPenjualan[]      @relation("TolakPesananPenjualan")
+  ajukanUangMukaPelanggan      UangMukaPelanggan[]     @relation("AjukanUangMukaPelanggan")
+  setujuiUangMukaPelanggan     UangMukaPelanggan[]     @relation("SetujuiUangMukaPelanggan")
+  tolakUangMukaPelanggan       UangMukaPelanggan[]     @relation("TolakUangMukaPelanggan")
+  ajukanPengirimanPesanan      PengirimanPesanan[]     @relation("AjukanPengirimanPesanan")
+  setujuiPengirimanPesanan     PengirimanPesanan[]     @relation("SetujuiPengirimanPesanan")
+  tolakPengirimanPesanan       PengirimanPesanan[]     @relation("TolakPengirimanPesanan")
+  ajukanFakturPenjualan        FakturPenjualan[]       @relation("AjukanFakturPenjualan")
+  setujuiFakturPenjualan       FakturPenjualan[]       @relation("SetujuiFakturPenjualan")
+  tolakFakturPenjualan         FakturPenjualan[]       @relation("TolakFakturPenjualan")
+  ajukanPenerimaanPenjualan    PenerimaanPenjualan[]   @relation("AjukanPenerimaanPenjualan")
+  setujuiPenerimaanPenjualan   PenerimaanPenjualan[]   @relation("SetujuiPenerimaanPenjualan")
+  tolakPenerimaanPenjualan     PenerimaanPenjualan[]   @relation("TolakPenerimaanPenjualan")
+  ajukanReturPenjualan         ReturPenjualan[]        @relation("AjukanReturPenjualan")
+  setujuiReturPenjualan        ReturPenjualan[]        @relation("SetujuiReturPenjualan")
+  tolakReturPenjualan          ReturPenjualan[]        @relation("TolakReturPenjualan")
+  ajukanPesananPembelian       PesananPembelian[]      @relation("AjukanPesananPembelian")
+  setujuiPesananPembelian      PesananPembelian[]      @relation("SetujuiPesananPembelian")
+  tolakPesananPembelian        PesananPembelian[]      @relation("TolakPesananPembelian")
+  ajukanPenerimaanBarang       PenerimaanBarang[]      @relation("AjukanPenerimaanBarang")
+  setujuiPenerimaanBarang      PenerimaanBarang[]      @relation("SetujuiPenerimaanBarang")
+  tolakPenerimaanBarang        PenerimaanBarang[]      @relation("TolakPenerimaanBarang")
+  ajukanFakturPembelian        FakturPembelian[]       @relation("AjukanFakturPembelian")
+  setujuiFakturPembelian       FakturPembelian[]       @relation("SetujuiFakturPembelian")
+  tolakFakturPembelian         FakturPembelian[]       @relation("TolakFakturPembelian")
+  ajukanPembayaranPembelian    PembayaranPembelian[]   @relation("AjukanPembayaranPembelian")
+  setujuiPembayaranPembelian   PembayaranPembelian[]   @relation("SetujuiPembayaranPembelian")
+  tolakPembayaranPembelian     PembayaranPembelian[]   @relation("TolakPembayaranPembelian")
+  ajukanReturPembelian         ReturPembelian[]        @relation("AjukanReturPembelian")
+  setujuiReturPembelian        ReturPembelian[]        @relation("SetujuiReturPembelian")
+  tolakReturPembelian          ReturPembelian[]        @relation("TolakReturPembelian")
+  ajukanJurnal                 Jurnal[]                @relation("AjukanJurnal")
+  setujuiJurnal                Jurnal[]                @relation("SetujuiJurnal")
+  tolakJurnal                  Jurnal[]                @relation("TolakJurnal")
+  ajukanPenyesuaianPersediaan  PenyesuaianPersediaan[] @relation("AjukanPenyesuaianPersediaan")
+  setujuiPenyesuaianPersediaan PenyesuaianPersediaan[] @relation("SetujuiPenyesuaianPersediaan")
+  tolakPenyesuaianPersediaan   PenyesuaianPersediaan[] @relation("TolakPenyesuaianPersediaan")
+  ajukanPindahBarang           PindahBarang[]          @relation("AjukanPindahBarang")
+  setujuiPindahBarang          PindahBarang[]          @relation("SetujuiPindahBarang")
+  tolakPindahBarang            PindahBarang[]          @relation("TolakPindahBarang")
+  ajukanAsetTetap              AsetTetap[]             @relation("AjukanAsetTetap")
+  setujuiAsetTetap             AsetTetap[]             @relation("SetujuiAsetTetap")
+  tolakAsetTetap               AsetTetap[]             @relation("TolakAsetTetap")
+  ajukanPelepasanAset          PelepasanAset[]         @relation("AjukanPelepasanAset")
+  setujuiPelepasanAset         PelepasanAset[]         @relation("SetujuiPelepasanAset")
+  tolakPelepasanAset           PelepasanAset[]         @relation("TolakPelepasanAset")
+  ajukanPrive                  Prive[]                 @relation("AjukanPrive")
+  setujuiPrive                 Prive[]                 @relation("SetujuiPrive")
+  tolakPrive                   Prive[]                 @relation("TolakPrive")
+  ajukanPenggajian             Penggajian[]            @relation("AjukanPenggajian")
+  setujuiPenggajian            Penggajian[]            @relation("SetujuiPenggajian")
+  tolakPenggajian              Penggajian[]            @relation("TolakPenggajian")
+  ajukanTutupBuku              TutupBuku[]             @relation("AjukanTutupBuku")
+  setujuiTutupBuku             TutupBuku[]             @relation("SetujuiTutupBuku")
+  tolakTutupBuku               TutupBuku[]             @relation("TolakTutupBuku")
+  ajukanPphFinalBulanan        PphFinalBulanan[]       @relation("AjukanPphFinalBulanan")
+  setujuiPphFinalBulanan       PphFinalBulanan[]       @relation("SetujuiPphFinalBulanan")
+  tolakPphFinalBulanan         PphFinalBulanan[]       @relation("TolakPphFinalBulanan")
+  ajukanDokumenKas             DokumenKas[]            @relation("AjukanDokumenKas")
+  setujuiDokumenKas            DokumenKas[]            @relation("SetujuiDokumenKas")
+  tolakDokumenKas              DokumenKas[]            @relation("TolakDokumenKas")
 }
 
 /// Sesi login berbasis basis data: cookie hanya menyimpan token acak, yang disimpan di sini dalam bentuk hash.
@@ -105,6 +189,49 @@ model PercobaanMasuk {
   @@index([ip, waktu])
 }
 
+// ---------- Mata uang & kurs ----------
+
+/// Mata uang transaksi. IDR adalah mata uang fungsional (mata uang pelaporan): seluruh buku besar
+/// tetap dicatat dalam IDR, mata uang asing hanya melekat pada dokumen dan saldo piutang/hutangnya.
+model MataUang {
+  id         String   @id @default(cuid())
+  /// Kode ISO 4217, mis. IDR, USD, EUR, SGD
+  kode       String   @unique
+  nama       String
+  simbol     String   @default("")
+  /// Jumlah angka desimal yang lazim (IDR 0, USD 2, JPY 0)
+  desimal    Int      @default(2)
+  aktif      Boolean  @default(true)
+  /// Mata uang fungsional/pelaporan (IDR); tepat satu baris bernilai true dan kursnya selalu 1
+  fungsional Boolean  @default(false)
+  dibuatPada DateTime @default(now())
+
+  kurs                KursMataUang[]
+  pelanggan           Pelanggan[]
+  pemasok             Pemasok[]
+  fakturPenjualan     FakturPenjualan[]
+  fakturPembelian     FakturPembelian[]
+  penerimaanPenjualan PenerimaanPenjualan[]
+  pembayaranPembelian PembayaranPembelian[]
+  barisJurnalAsli     BarisJurnal[]         @relation("MataUangAsliBarisJurnal")
+}
+
+/// Riwayat kurs terhadap IDR: 1 unit mata uang = `kurs` rupiah pada `tanggal`.
+/// Dokumen menyimpan kurs yang dipakai (snapshot), jadi jurnal lama tidak berubah saat kurs baru dimasukkan.
+model KursMataUang {
+  id          String   @id @default(cuid())
+  mataUangId  String
+  mataUang    MataUang @relation(fields: [mataUangId], references: [id], onDelete: Cascade)
+  tanggal     DateTime
+  kurs        Decimal  @db.Decimal(18, 6)
+  sumber      String?
+  dicatatOleh String?
+  dibuatPada  DateTime @default(now())
+
+  @@unique([mataUangId, tanggal])
+  @@index([mataUangId, tanggal])
+}
+
 // ---------- Data induk ----------
 
 model Departemen {
@@ -114,38 +241,42 @@ model Departemen {
 }
 
 model Karyawan {
-  id           String      @id @default(cuid())
-  kode         String      @unique
-  nama         String
-  departemenId String?
-  departemen   Departemen? @relation(fields: [departemenId], references: [id])
-  penggunaId   String?     @unique
-  pengguna     Pengguna?   @relation(fields: [penggunaId], references: [id])
-  pelanggan    Pelanggan[]
+  id               String            @id @default(cuid())
+  kode             String            @unique
+  nama             String
+  departemenId     String?
+  departemen       Departemen?       @relation(fields: [departemenId], references: [id])
+  penggunaId       String?           @unique
+  pengguna         Pengguna?         @relation(fields: [penggunaId], references: [id])
+  pelanggan        Pelanggan[]
   /// Siklus SDM: data kepegawaian dan komponen gaji bulanan bawaan (bisa disesuaikan per baris saat Proses Gaji)
   jabatan          String?
   tanggalBergabung DateTime?
-  status           String   @default("AKTIF") // AKTIF | NONAKTIF
-  gajiPokok        Decimal  @default(0) @db.Decimal(18, 2)
-  tunjangan        Decimal  @default(0) @db.Decimal(18, 2)
+  status           String            @default("AKTIF") // AKTIF | NONAKTIF
+  gajiPokok        Decimal           @default(0) @db.Decimal(18, 2)
+  tunjangan        Decimal           @default(0) @db.Decimal(18, 2)
   /// Akun beban khusus karyawan ini (mis. Upah Harian/Honor Volunteer alih-alih Gaji Pokok); kosong = pemetaan tambahan "bebanGaji"
-  akunBebanId String?
-  akunBeban   Akun?   @relation("AkunBebanKaryawan", fields: [akunBebanId], references: [id])
-  barisPenggajian BarisPenggajian[]
-  dibuatPada   DateTime    @default(now())
+  akunBebanId      String?
+  akunBeban        Akun?             @relation("AkunBebanKaryawan", fields: [akunBebanId], references: [id])
+  barisPenggajian  BarisPenggajian[]
+  dibuatPada       DateTime          @default(now())
+
   @@index([departemenId])
   @@index([akunBebanId])
 }
 
 model Pelanggan {
-  id        String    @id @default(cuid())
-  kode      String    @unique
-  nama      String
-  alamat    String?
-  telepon   String?
-  npwp      String?
-  penjualId String?
-  penjual   Karyawan? @relation(fields: [penjualId], references: [id])
+  id         String    @id @default(cuid())
+  kode       String    @unique
+  nama       String
+  alamat     String?
+  telepon    String?
+  npwp       String?
+  penjualId  String?
+  penjual    Karyawan? @relation(fields: [penjualId], references: [id])
+  /// Mata uang transaksi bawaan pelanggan (kosong = IDR / mata uang fungsional)
+  mataUangId String?
+  mataUang   MataUang? @relation(fields: [mataUangId], references: [id])
 
   penawaran  PenawaranPenjualan[]
   pesanan    PesananPenjualan[]
@@ -153,17 +284,21 @@ model Pelanggan {
   penerimaan PenerimaanPenjualan[]
   proyek     Proyek[]
   uangMuka   UangMukaPelanggan[]
-  dibuatPada DateTime @default(now())
+  dibuatPada DateTime              @default(now())
+
   @@index([penjualId])
 }
 
 model Pemasok {
-  id         String   @id @default(cuid())
-  kode       String   @unique
+  id         String    @id @default(cuid())
+  kode       String    @unique
   nama       String
   alamat     String?
   telepon    String?
-  dibuatPada DateTime @default(now())
+  /// Mata uang transaksi bawaan pemasok (kosong = IDR / mata uang fungsional)
+  mataUangId String?
+  mataUang   MataUang? @relation(fields: [mataUangId], references: [id])
+  dibuatPada DateTime  @default(now())
 
   pesanan    PesananPembelian[]
   faktur     FakturPembelian[]
@@ -172,15 +307,15 @@ model Pemasok {
 
 /// Proyek = event/pekerjaan: dimensi transaksi untuk Laba Rugi per event dan Rekonsiliasi Event (LPJ)
 model Proyek {
-  id          String     @id @default(cuid())
-  kode        String     @unique
-  nama        String
-  pelangganId String?
-  pelanggan   Pelanggan? @relation(fields: [pelangganId], references: [id])
-  status      String     @default("BERJALAN")
+  id             String     @id @default(cuid())
+  kode           String     @unique
+  nama           String
+  pelangganId    String?
+  pelanggan      Pelanggan? @relation(fields: [pelangganId], references: [id])
+  status         String     @default("BERJALAN")
   /// Nilai proposal/kontrak yang disetujui klien dan anggaran biaya — pembanding realisasi di LPJ
-  nilaiKontrak  Decimal? @db.Decimal(18, 2)
-  anggaranBiaya Decimal? @db.Decimal(18, 2)
+  nilaiKontrak   Decimal?   @db.Decimal(18, 2)
+  anggaranBiaya  Decimal?   @db.Decimal(18, 2)
   tanggalMulai   DateTime?
   tanggalSelesai DateTime?
   keterangan     String?
@@ -190,6 +325,8 @@ model Proyek {
   pesananPembelian PesananPembelian[]
   jurnal           Jurnal[]
   penggajian       Penggajian[]
+  dokumenKas       DokumenKas[]
+
   @@index([pelangganId])
 }
 
@@ -216,47 +353,49 @@ model KelompokBarang {
   induk   KelompokBarang?  @relation("PohonKelompok", fields: [indukId], references: [id])
   anak    KelompokBarang[] @relation("PohonKelompok")
   barang  Barang[]
+
   @@index([indukId])
 }
 
 model Barang {
-  id          String          @id @default(cuid())
-  kode        String          @unique
-  nama        String
-  jenis       JenisBarang     @default(BARANG)
-  kelompokId  String?
-  kelompok    KelompokBarang? @relation(fields: [kelompokId], references: [id])
-  satuan      String          @default("pcs")
-  hargaBeli   Decimal         @default(0) @db.Decimal(18, 2)
-  hargaJual   Decimal         @default(0) @db.Decimal(18, 2)
+  id           String          @id @default(cuid())
+  kode         String          @unique
+  nama         String
+  jenis        JenisBarang     @default(BARANG)
+  kelompokId   String?
+  kelompok     KelompokBarang? @relation(fields: [kelompokId], references: [id])
+  satuan       String          @default("pcs")
+  hargaBeli    Decimal         @default(0) @db.Decimal(18, 2)
+  hargaJual    Decimal         @default(0) @db.Decimal(18, 2)
   /// Batas bawah harga saat nego dengan klien (0 = tanpa batas)
-  hargaMinimum Decimal        @default(0) @db.Decimal(18, 2)
-  stokMinimum Decimal         @default(0) @db.Decimal(18, 2)
+  hargaMinimum Decimal         @default(0) @db.Decimal(18, 2)
+  stokMinimum  Decimal         @default(0) @db.Decimal(18, 2)
 
-  stok                    StokBarang[]
-  barisPenawaran          BarisPenawaranPenjualan[]
-  barisPesananPenjualan   BarisPesananPenjualan[]
-  barisPengiriman         BarisPengiriman[]
-  barisFakturPenjualan    BarisFakturPenjualan[]
-  barisReturPenjualan     BarisReturPenjualan[]
-  barisPesananPembelian   BarisPesananPembelian[]
-  barisPenerimaanBarang   BarisPenerimaanBarang[]
-  barisFakturPembelian    BarisFakturPembelian[]
-  barisReturPembelian     BarisReturPembelian[]
-  dibuatPada              DateTime @default(now())
+  stok                  StokBarang[]
+  barisPenawaran        BarisPenawaranPenjualan[]
+  barisPesananPenjualan BarisPesananPenjualan[]
+  barisPengiriman       BarisPengiriman[]
+  barisFakturPenjualan  BarisFakturPenjualan[]
+  barisReturPenjualan   BarisReturPenjualan[]
+  barisPesananPembelian BarisPesananPembelian[]
+  barisPenerimaanBarang BarisPenerimaanBarang[]
+  barisFakturPembelian  BarisFakturPembelian[]
+  barisReturPembelian   BarisReturPembelian[]
+  dibuatPada            DateTime                  @default(now())
 
   /// Akun khusus per barang (opsional; kosong = pakai PemetaanAkun)
   akunPendapatanId String?
-  akunPendapatan   Akun? @relation("AkunPendapatanBarang", fields: [akunPendapatanId], references: [id])
+  akunPendapatan   Akun?                        @relation("AkunPendapatanBarang", fields: [akunPendapatanId], references: [id])
   akunHppId        String?
-  akunHpp          Akun? @relation("AkunHppBarang", fields: [akunHppId], references: [id])
+  akunHpp          Akun?                        @relation("AkunHppBarang", fields: [akunHppId], references: [id])
   akunPersediaanId String?
-  akunPersediaan   Akun? @relation("AkunPersediaanBarang", fields: [akunPersediaanId], references: [id])
+  akunPersediaan   Akun?                        @relation("AkunPersediaanBarang", fields: [akunPersediaanId], references: [id])
   /// Untuk JASA yang dibeli: beban yang didebit saat Faktur Pembelian
   akunBebanId      String?
-  akunBeban        Akun? @relation("AkunBebanBarang", fields: [akunBebanId], references: [id])
+  akunBeban        Akun?                        @relation("AkunBebanBarang", fields: [akunBebanId], references: [id])
   barisPenyesuaian BarisPenyesuaianPersediaan[]
   barisPindah      BarisPindahBarang[]
+
   @@index([kelompokId])
   @@index([akunPendapatanId])
   @@index([akunHppId])
@@ -289,12 +428,26 @@ model PenawaranPenjualan {
   proyek      Proyek?       @relation(fields: [proyekId], references: [id])
   total       Decimal       @default(0) @db.Decimal(18, 2)
 
-  baris   BarisPenawaranPenjualan[]
-  pesanan PesananPenjualan?
+  baris             BarisPenawaranPenjualan[]
+  pesanan           PesananPenjualan?
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan         @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?                 @relation("AjukanPenawaranPenjualan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?                 @relation("SetujuiPenawaranPenjualan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?                 @relation("TolakPenawaranPenjualan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pelangganId])
   @@index([proyekId])
   @@index([status])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisPenawaranPenjualan {
@@ -306,6 +459,7 @@ model BarisPenawaranPenjualan {
   jumlah      Decimal            @db.Decimal(18, 2)
   harga       Decimal            @db.Decimal(18, 2)
   subtotal    Decimal            @db.Decimal(18, 2)
+
   @@index([penawaranId])
   @@index([barangId])
 }
@@ -323,14 +477,28 @@ model PesananPenjualan {
   proyek      Proyek?             @relation(fields: [proyekId], references: [id])
   total       Decimal             @default(0) @db.Decimal(18, 2)
 
-  baris      BarisPesananPenjualan[]
-  pengiriman PengirimanPesanan[]
-  faktur     FakturPenjualan[]
-  uangMuka   UangMukaPelanggan[]
+  baris             BarisPesananPenjualan[]
+  pengiriman        PengirimanPesanan[]
+  faktur            FakturPenjualan[]
+  uangMuka          UangMukaPelanggan[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan       @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?               @relation("AjukanPesananPenjualan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?               @relation("SetujuiPesananPenjualan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?               @relation("TolakPesananPenjualan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pelangganId])
   @@index([proyekId])
   @@index([status])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisPesananPenjualan {
@@ -345,6 +513,7 @@ model BarisPesananPenjualan {
   jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
   barisPengiriman BarisPengiriman[]
+
   @@index([pesananId])
   @@index([barangId])
 }
@@ -361,11 +530,25 @@ model PengirimanPesanan {
   jurnalId  String?          @unique
   jurnal    Jurnal?          @relation("JurnalPengiriman", fields: [jurnalId], references: [id])
 
-  baris  BarisPengiriman[]
-  faktur FakturPenjualan[]
+  baris             BarisPengiriman[]
+  faktur            FakturPenjualan[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPengirimanPesanan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPengirimanPesanan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPengirimanPesanan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pesananId])
   @@index([gudangId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisPengiriman {
@@ -381,82 +564,127 @@ model BarisPengiriman {
   hargaPokok     Decimal               @default(0) @db.Decimal(18, 2)
   /// bagian dari baris ini yang sudah dikonsumsi Faktur Penjualan (HPP sudah diakui)
   jumlahDifaktur Decimal               @default(0) @db.Decimal(18, 2)
+
   @@index([pengirimanId])
   @@index([barisPesananId])
   @@index([barangId])
 }
 
 model FakturPenjualan {
-  id           String             @id @default(cuid())
-  nomor        String             @unique
-  tanggal      DateTime           @default(now())
-  jatuhTempo   DateTime?
-  pelangganId  String
-  pelanggan    Pelanggan          @relation(fields: [pelangganId], references: [id])
-  pesananId    String?
-  pesanan      PesananPenjualan?  @relation(fields: [pesananId], references: [id])
-  pengirimanId String?
-  pengiriman   PengirimanPesanan? @relation(fields: [pengirimanId], references: [id])
-  status       StatusDokumen      @default(DRAF)
-  total        Decimal            @default(0) @db.Decimal(18, 2)
+  id                String              @id @default(cuid())
+  nomor             String              @unique
+  tanggal           DateTime            @default(now())
+  jatuhTempo        DateTime?
+  pelangganId       String
+  pelanggan         Pelanggan           @relation(fields: [pelangganId], references: [id])
+  pesananId         String?
+  pesanan           PesananPenjualan?   @relation(fields: [pesananId], references: [id])
+  pengirimanId      String?
+  pengiriman        PengirimanPesanan?  @relation(fields: [pengirimanId], references: [id])
+  status            StatusDokumen       @default(DRAF)
+  total             Decimal             @default(0) @db.Decimal(18, 2)
   /// Diskon faktur (kontra-pendapatan, akun Diskon Penjualan); dpp = Σ baris − diskon
-  diskon     Decimal @default(0) @db.Decimal(18, 2)
+  diskon            Decimal             @default(0) @db.Decimal(18, 2)
   /// Dasar pengenaan pajak (Σ baris − diskon) dan PPN; total = dpp + ppn
-  dpp        Decimal @default(0) @db.Decimal(18, 2)
-  ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
-  ppn        Decimal @default(0) @db.Decimal(18, 2)
+  dpp               Decimal             @default(0) @db.Decimal(18, 2)
+  ppnPersen         Decimal             @default(0) @db.Decimal(5, 2)
+  ppn               Decimal             @default(0) @db.Decimal(18, 2)
   /// Uang muka pelanggan (DP pesanan) yang dipakai mengurangi piutang faktur ini
-  uangMuka   Decimal @default(0) @db.Decimal(18, 2)
-  jurnalId   String? @unique
-  jurnal     Jurnal? @relation("JurnalFakturPenjualan", fields: [jurnalId], references: [id])
+  uangMuka          Decimal             @default(0) @db.Decimal(18, 2)
+  /// Mata uang transaksi (kosong = IDR). `kurs` = kurs ke IDR yang dipakai saat dokumen dibuat (snapshot),
+  /// `nilaiAsli` = nilai total dalam mata uang transaksi. Kolom uang lain (total/dpp/ppn/diskon) selalu IDR.
+  mataUangId        String?             @map("mataUangId")
+  mataUang          MataUang?           @relation(fields: [mataUangId], references: [id])
+  kurs              Decimal             @default(1) @db.Decimal(18, 6)
+  nilaiAsli         Decimal?            @db.Decimal(18, 2)
+  /// Kurs yang saldo terbukanya saat ini dibawa di buku besar. Kosong = masih kurs dokumen (`kurs`).
+  /// Diisi penilaian kembali (src/lib/selisihKurs.ts) supaya penilaian berikutnya hanya mencatat
+  /// selisih sejak penilaian terakhir, bukan menghitung ulang dari kurs asli (idempoten).
+  kursRevaluasi     Decimal?            @db.Decimal(18, 6)
+  revaluasiPada     DateTime?
+  jurnalId          String?             @unique
+  jurnal            Jurnal?             @relation("JurnalFakturPenjualan", fields: [jurnalId], references: [id])
   pemakaianUangMuka PemakaianUangMuka[]
 
-  baris      BarisFakturPenjualan[]
-  penerimaan PenerimaanPenjualan[]
-  retur      ReturPenjualan[]
+  baris             BarisFakturPenjualan[]
+  penerimaan        PenerimaanPenjualan[]
+  retur             ReturPenjualan[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan      @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?              @relation("AjukanFakturPenjualan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?              @relation("SetujuiFakturPenjualan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?              @relation("TolakFakturPenjualan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pelangganId])
   @@index([pesananId])
   @@index([pengirimanId])
   @@index([status])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisFakturPenjualan {
-  id       String          @id @default(cuid())
-  fakturId String
-  faktur   FakturPenjualan @relation(fields: [fakturId], references: [id])
-  barangId String
-  barang   Barang          @relation(fields: [barangId], references: [id])
-  jumlah   Decimal         @db.Decimal(18, 2)
-  harga    Decimal         @db.Decimal(18, 2)
-  subtotal Decimal         @db.Decimal(18, 2)
+  id           String          @id @default(cuid())
+  fakturId     String
+  faktur       FakturPenjualan @relation(fields: [fakturId], references: [id])
+  barangId     String
+  barang       Barang          @relation(fields: [barangId], references: [id])
+  jumlah       Decimal         @db.Decimal(18, 2)
+  harga        Decimal         @db.Decimal(18, 2)
+  subtotal     Decimal         @db.Decimal(18, 2)
+  /// Nilai "Barang Terkirim Belum Ditagih" yang dikonsumsi baris ini saat faktur dibuat (surat jalan
+  /// mendahului faktur). Disimpan karena jurnal HPP baru dicatat saat faktur DISETUJUI, sedangkan
+  /// konsumsi baris surat jalannya sudah terjadi saat draf dibuat.
+  nilaiTransit Decimal         @default(0) @db.Decimal(18, 2)
+
   @@index([fakturId])
   @@index([barangId])
 }
 
 model UangMukaPelanggan {
-  id          String           @id @default(cuid())
-  nomor       String           @unique
-  tanggal     DateTime         @default(now())
-  pelangganId String
-  pelanggan   Pelanggan        @relation(fields: [pelangganId], references: [id])
-  pesananId   String
-  pesanan     PesananPenjualan @relation(fields: [pesananId], references: [id])
-  akunId      String
-  akun        Akun             @relation("AkunUangMuka", fields: [akunId], references: [id])
+  id            String           @id @default(cuid())
+  nomor         String           @unique
+  tanggal       DateTime         @default(now())
+  pelangganId   String
+  pelanggan     Pelanggan        @relation(fields: [pelangganId], references: [id])
+  pesananId     String
+  pesanan       PesananPenjualan @relation(fields: [pesananId], references: [id])
+  akunId        String
+  akun          Akun             @relation("AkunUangMuka", fields: [akunId], references: [id])
   /// DP yang diterima; jumlahDipakai = bagian yang sudah mengurangi faktur
-  jumlah        Decimal @db.Decimal(18, 2)
-  jumlahDipakai Decimal @default(0) @db.Decimal(18, 2)
-  metodeBayar   String  @default("TRANSFER")
+  jumlah        Decimal          @db.Decimal(18, 2)
+  jumlahDipakai Decimal          @default(0) @db.Decimal(18, 2)
+  metodeBayar   String           @default("TRANSFER")
   keterangan    String?
-  jurnalId      String? @unique
-  jurnal        Jurnal? @relation("JurnalUangMuka", fields: [jurnalId], references: [id])
+  jurnalId      String?          @unique
+  jurnal        Jurnal?          @relation("JurnalUangMuka", fields: [jurnalId], references: [id])
 
-  pemakaian PemakaianUangMuka[]
+  pemakaian         PemakaianUangMuka[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan   @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?           @relation("AjukanUangMukaPelanggan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?           @relation("SetujuiUangMukaPelanggan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?           @relation("TolakUangMukaPelanggan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pelangganId])
   @@index([pesananId])
   @@index([akunId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 /// Jejak DP mana yang dipakai faktur mana (dibalik saat faktur dihapus)
@@ -473,25 +701,44 @@ model PemakaianUangMuka {
 }
 
 model PenerimaanPenjualan {
-  id          String          @id @default(cuid())
-  nomor       String          @unique
-  tanggal     DateTime        @default(now())
-  pelangganId String
-  pelanggan   Pelanggan       @relation(fields: [pelangganId], references: [id])
-  fakturId    String
-  faktur      FakturPenjualan @relation(fields: [fakturId], references: [id])
-  akunId      String
-  akun        Akun            @relation("AkunPenerimaanPenjualan", fields: [akunId], references: [id])
-  jumlah      Decimal         @db.Decimal(18, 2)
+  id                String            @id @default(cuid())
+  nomor             String            @unique
+  tanggal           DateTime          @default(now())
+  pelangganId       String
+  pelanggan         Pelanggan         @relation(fields: [pelangganId], references: [id])
+  fakturId          String
+  faktur            FakturPenjualan   @relation(fields: [fakturId], references: [id])
+  akunId            String
+  akun              Akun              @relation("AkunPenerimaanPenjualan", fields: [akunId], references: [id])
+  jumlah            Decimal           @db.Decimal(18, 2)
   /// PPh 23 yang dipotong pelanggan (mengurangi piutang, dicatat sebagai pajak dibayar dimuka)
-  potonganPajak Decimal @default(0) @db.Decimal(18, 2)
-  jurnalId      String? @unique
-  jurnal        Jurnal? @relation("JurnalPenerimaanPenjualan", fields: [jurnalId], references: [id])
-  metodeBayar String          @default("TUNAI")
+  potonganPajak     Decimal           @default(0) @db.Decimal(18, 2)
+  /// Mata uang & kurs saat uang diterima (informasional; `jumlah` tetap IDR)
+  mataUangId        String?
+  mataUang          MataUang?         @relation(fields: [mataUangId], references: [id])
+  kurs              Decimal           @default(1) @db.Decimal(18, 6)
+  nilaiAsli         Decimal?          @db.Decimal(18, 2)
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalPenerimaanPenjualan", fields: [jurnalId], references: [id])
+  metodeBayar       String            @default("TUNAI")
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPenerimaanPenjualan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPenerimaanPenjualan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPenerimaanPenjualan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pelangganId])
   @@index([fakturId])
   @@index([akunId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model ReturPenjualan {
@@ -503,27 +750,42 @@ model ReturPenjualan {
   gudangId String
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
-  total    Decimal @default(0) @db.Decimal(18, 2)
+  total    Decimal         @default(0) @db.Decimal(18, 2)
   /// Bagian diskon faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon
-  diskon   Decimal @default(0) @db.Decimal(18, 2)
-  dpp      Decimal @default(0) @db.Decimal(18, 2)
-  ppn      Decimal @default(0) @db.Decimal(18, 2)
-  jurnalId String? @unique
-  jurnal   Jurnal? @relation("JurnalReturPenjualan", fields: [jurnalId], references: [id])
+  diskon   Decimal         @default(0) @db.Decimal(18, 2)
+  dpp      Decimal         @default(0) @db.Decimal(18, 2)
+  ppn      Decimal         @default(0) @db.Decimal(18, 2)
+  jurnalId String?         @unique
+  jurnal   Jurnal?         @relation("JurnalReturPenjualan", fields: [jurnalId], references: [id])
 
-  baris BarisReturPenjualan[]
+  baris             BarisReturPenjualan[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan     @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?             @relation("AjukanReturPenjualan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?             @relation("SetujuiReturPenjualan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?             @relation("TolakReturPenjualan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([fakturId])
   @@index([gudangId])
+  @@index([statusPersetujuan])
 }
 
 model BarisReturPenjualan {
-  id       String         @id @default(cuid())
-  returId  String
-  retur    ReturPenjualan @relation(fields: [returId], references: [id])
-  barangId String
-  barang   Barang         @relation(fields: [barangId], references: [id])
-  jumlah   Decimal        @db.Decimal(18, 2)
-  hargaPokok Decimal      @default(0) @db.Decimal(18, 2)
+  id         String         @id @default(cuid())
+  returId    String
+  retur      ReturPenjualan @relation(fields: [returId], references: [id])
+  barangId   String
+  barang     Barang         @relation(fields: [barangId], references: [id])
+  jumlah     Decimal        @db.Decimal(18, 2)
+  hargaPokok Decimal        @default(0) @db.Decimal(18, 2)
+
   @@index([returId])
   @@index([barangId])
 }
@@ -541,13 +803,27 @@ model PesananPembelian {
   proyek    Proyek?       @relation(fields: [proyekId], references: [id])
   total     Decimal       @default(0) @db.Decimal(18, 2)
 
-  baris            BarisPesananPembelian[]
-  penerimaanBarang PenerimaanBarang[]
-  faktur           FakturPembelian[]
+  baris             BarisPesananPembelian[]
+  penerimaanBarang  PenerimaanBarang[]
+  faktur            FakturPembelian[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan       @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?               @relation("AjukanPesananPembelian", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?               @relation("SetujuiPesananPembelian", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?               @relation("TolakPesananPembelian", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pemasokId])
   @@index([proyekId])
   @@index([status])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisPesananPembelian {
@@ -562,6 +838,7 @@ model BarisPesananPembelian {
   jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
   barisPenerimaan BarisPenerimaanBarang[]
+
   @@index([pesananId])
   @@index([barangId])
 }
@@ -576,13 +853,27 @@ model PenerimaanBarang {
   gudang    Gudang           @relation(fields: [gudangId], references: [id])
   status    StatusDokumen    @default(DRAF)
 
-  baris  BarisPenerimaanBarang[]
-  faktur FakturPembelian[]
-  jurnalId String? @unique
-  jurnal   Jurnal? @relation(fields: [jurnalId], references: [id])
+  baris             BarisPenerimaanBarang[]
+  faktur            FakturPembelian[]
+  jurnalId          String?                 @unique
+  jurnal            Jurnal?                 @relation(fields: [jurnalId], references: [id])
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan       @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?               @relation("AjukanPenerimaanBarang", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?               @relation("SetujuiPenerimaanBarang", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?               @relation("TolakPenerimaanBarang", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pesananId])
   @@index([gudangId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisPenerimaanBarang {
@@ -596,38 +887,63 @@ model BarisPenerimaanBarang {
   jumlah         Decimal               @db.Decimal(18, 2)
   /// harga satuan (dari pesanan) yang dipakai menilai persediaan masuk
   hargaSatuan    Decimal               @default(0) @db.Decimal(18, 2)
+
   @@index([penerimaanId])
   @@index([barisPesananId])
   @@index([barangId])
 }
 
 model FakturPembelian {
-  id           String            @id @default(cuid())
-  nomor        String            @unique
-  tanggal      DateTime          @default(now())
-  jatuhTempo   DateTime?
-  pemasokId    String
-  pemasok      Pemasok           @relation(fields: [pemasokId], references: [id])
-  pesananId    String?
-  pesanan      PesananPembelian? @relation(fields: [pesananId], references: [id])
-  penerimaanId String?
-  penerimaan   PenerimaanBarang? @relation(fields: [penerimaanId], references: [id])
-  status       StatusDokumen     @default(DRAF)
-  total        Decimal           @default(0) @db.Decimal(18, 2)
-  dpp        Decimal @default(0) @db.Decimal(18, 2)
-  ppnPersen  Decimal @default(0) @db.Decimal(5, 2)
-  ppn        Decimal @default(0) @db.Decimal(18, 2)
-  jurnalId   String? @unique
-  jurnal     Jurnal? @relation("JurnalFakturPembelian", fields: [jurnalId], references: [id])
+  id            String            @id @default(cuid())
+  nomor         String            @unique
+  tanggal       DateTime          @default(now())
+  jatuhTempo    DateTime?
+  pemasokId     String
+  pemasok       Pemasok           @relation(fields: [pemasokId], references: [id])
+  pesananId     String?
+  pesanan       PesananPembelian? @relation(fields: [pesananId], references: [id])
+  penerimaanId  String?
+  penerimaan    PenerimaanBarang? @relation(fields: [penerimaanId], references: [id])
+  status        StatusDokumen     @default(DRAF)
+  total         Decimal           @default(0) @db.Decimal(18, 2)
+  dpp           Decimal           @default(0) @db.Decimal(18, 2)
+  ppnPersen     Decimal           @default(0) @db.Decimal(5, 2)
+  ppn           Decimal           @default(0) @db.Decimal(18, 2)
+  /// Mata uang transaksi (kosong = IDR), kurs snapshot ke IDR, dan nilai total dalam mata uang itu
+  mataUangId    String?
+  mataUang      MataUang?         @relation(fields: [mataUangId], references: [id])
+  kurs          Decimal           @default(1) @db.Decimal(18, 6)
+  nilaiAsli     Decimal?          @db.Decimal(18, 2)
+  /// Kurs yang saldo terbukanya saat ini dibawa di buku besar. Kosong = masih kurs dokumen (`kurs`).
+  /// Diisi penilaian kembali (src/lib/selisihKurs.ts) supaya penilaian berikutnya hanya mencatat
+  /// selisih sejak penilaian terakhir, bukan menghitung ulang dari kurs asli (idempoten).
+  kursRevaluasi Decimal?          @db.Decimal(18, 6)
+  revaluasiPada DateTime?
+  jurnalId      String?           @unique
+  jurnal        Jurnal?           @relation("JurnalFakturPembelian", fields: [jurnalId], references: [id])
 
-  baris      BarisFakturPembelian[]
-  pembayaran PembayaranPembelian[]
-  retur      ReturPembelian[]
+  baris             BarisFakturPembelian[]
+  pembayaran        PembayaranPembelian[]
+  retur             ReturPembelian[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan      @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?              @relation("AjukanFakturPembelian", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?              @relation("SetujuiFakturPembelian", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?              @relation("TolakFakturPembelian", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pemasokId])
   @@index([pesananId])
   @@index([penerimaanId])
   @@index([status])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisFakturPembelian {
@@ -639,30 +955,50 @@ model BarisFakturPembelian {
   jumlah   Decimal         @db.Decimal(18, 2)
   harga    Decimal         @db.Decimal(18, 2)
   subtotal Decimal         @db.Decimal(18, 2)
+
   @@index([fakturId])
   @@index([barangId])
 }
 
 model PembayaranPembelian {
-  id          String          @id @default(cuid())
-  nomor       String          @unique
-  tanggal     DateTime        @default(now())
-  pemasokId   String
-  pemasok     Pemasok         @relation(fields: [pemasokId], references: [id])
-  fakturId    String
-  faktur      FakturPembelian @relation(fields: [fakturId], references: [id])
-  akunId      String
-  akun        Akun            @relation("AkunPembayaranPembelian", fields: [akunId], references: [id])
-  jumlah      Decimal         @db.Decimal(18, 2)
+  id                String            @id @default(cuid())
+  nomor             String            @unique
+  tanggal           DateTime          @default(now())
+  pemasokId         String
+  pemasok           Pemasok           @relation(fields: [pemasokId], references: [id])
+  fakturId          String
+  faktur            FakturPembelian   @relation(fields: [fakturId], references: [id])
+  akunId            String
+  akun              Akun              @relation("AkunPembayaranPembelian", fields: [akunId], references: [id])
+  jumlah            Decimal           @db.Decimal(18, 2)
   /// PPh 23 yang kita potong dari vendor (mengurangi hutang, dicatat sebagai hutang PPh 23)
-  potonganPajak Decimal @default(0) @db.Decimal(18, 2)
-  jurnalId      String? @unique
-  jurnal        Jurnal? @relation("JurnalPembayaranPembelian", fields: [jurnalId], references: [id])
-  metodeBayar String          @default("TRANSFER")
+  potonganPajak     Decimal           @default(0) @db.Decimal(18, 2)
+  /// Mata uang & kurs saat uang dibayarkan (informasional; `jumlah` tetap IDR)
+  mataUangId        String?
+  mataUang          MataUang?         @relation(fields: [mataUangId], references: [id])
+  kurs              Decimal           @default(1) @db.Decimal(18, 6)
+  nilaiAsli         Decimal?          @db.Decimal(18, 2)
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalPembayaranPembelian", fields: [jurnalId], references: [id])
+  metodeBayar       String            @default("TRANSFER")
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPembayaranPembelian", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPembayaranPembelian", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPembayaranPembelian", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([pemasokId])
   @@index([fakturId])
   @@index([akunId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model ReturPembelian {
@@ -674,25 +1010,40 @@ model ReturPembelian {
   gudangId String
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
-  total    Decimal @default(0) @db.Decimal(18, 2)
-  dpp      Decimal @default(0) @db.Decimal(18, 2)
-  ppn      Decimal @default(0) @db.Decimal(18, 2)
-  jurnalId String? @unique
-  jurnal   Jurnal? @relation("JurnalReturPembelian", fields: [jurnalId], references: [id])
+  total    Decimal         @default(0) @db.Decimal(18, 2)
+  dpp      Decimal         @default(0) @db.Decimal(18, 2)
+  ppn      Decimal         @default(0) @db.Decimal(18, 2)
+  jurnalId String?         @unique
+  jurnal   Jurnal?         @relation("JurnalReturPembelian", fields: [jurnalId], references: [id])
 
-  baris BarisReturPembelian[]
+  baris             BarisReturPembelian[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan     @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?             @relation("AjukanReturPembelian", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?             @relation("SetujuiReturPembelian", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?             @relation("TolakReturPembelian", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([fakturId])
   @@index([gudangId])
+  @@index([statusPersetujuan])
 }
 
 model BarisReturPembelian {
-  id       String         @id @default(cuid())
-  returId  String
-  retur    ReturPembelian @relation(fields: [returId], references: [id])
-  barangId String
-  barang   Barang         @relation(fields: [barangId], references: [id])
-  jumlah   Decimal        @db.Decimal(18, 2)
-  hargaPokok Decimal      @default(0) @db.Decimal(18, 2)
+  id         String         @id @default(cuid())
+  returId    String
+  retur      ReturPembelian @relation(fields: [returId], references: [id])
+  barangId   String
+  barang     Barang         @relation(fields: [barangId], references: [id])
+  jumlah     Decimal        @db.Decimal(18, 2)
+  hargaPokok Decimal        @default(0) @db.Decimal(18, 2)
+
   @@index([returId])
   @@index([barangId])
 }
@@ -700,18 +1051,18 @@ model BarisReturPembelian {
 // ---------- Buku Besar & Kas/Bank ----------
 
 model Akun {
-  id      String    @id @default(cuid())
-  kode    String    @unique
-  nama    String
-  jenis   JenisAkun
+  id         String    @id @default(cuid())
+  kode       String    @unique
+  nama       String
+  jenis      JenisAkun
   /// Akun kelompok/induk: hanya wadah untuk anak-anaknya, tidak boleh menerima jurnal
-  kelompok   Boolean @default(false)
+  kelompok   Boolean   @default(false)
   /// Tampil sebagai pilihan akun Kas/Bank (penerimaan, pembayaran, kas masuk/keluar)
-  kasBank    Boolean @default(false)
+  kasBank    Boolean   @default(false)
   keterangan String?
-  indukId String?
-  induk   Akun?     @relation("PohonAkun", fields: [indukId], references: [id])
-  anak    Akun[]    @relation("PohonAkun")
+  indukId    String?
+  induk      Akun?     @relation("PohonAkun", fields: [indukId], references: [id])
+  anak       Akun[]    @relation("PohonAkun")
 
   barisJurnal         BarisJurnal[]
   penerimaanPenjualan PenerimaanPenjualan[] @relation("AkunPenerimaanPenjualan")
@@ -724,38 +1075,42 @@ model Akun {
   pemetaanPendapatan PemetaanAkun? @relation("PetaPendapatan")
   pemetaanUtang      PemetaanAkun? @relation("PetaUtang")
 
-  asetSebagaiAkunAset       AsetTetap[] @relation("AkunAsetTetap")
-  asetSebagaiAkunBeban      AsetTetap[] @relation("AkunBebanPenyusutan")
-  asetSebagaiAkunAkumulasi  AsetTetap[] @relation("AkunAkumulasiPenyusutan")
+  asetSebagaiAkunAset      AsetTetap[] @relation("AkunAsetTetap")
+  asetSebagaiAkunBeban     AsetTetap[] @relation("AkunBebanPenyusutan")
+  asetSebagaiAkunAkumulasi AsetTetap[] @relation("AkunAkumulasiPenyusutan")
 
-  barangPendapatan Barang[] @relation("AkunPendapatanBarang")
-  barangHpp        Barang[] @relation("AkunHppBarang")
-  barangPersediaan Barang[] @relation("AkunPersediaanBarang")
-  barangBeban      Barang[] @relation("AkunBebanBarang")
-  pemetaanBebanJasa          PemetaanAkun? @relation("PetaBebanJasa")
-  pemetaanBarangBelumDitagih PemetaanAkun? @relation("PetaBarangBelumDitagih")
-  pemetaanSelisihPersediaan  PemetaanAkun? @relation("PetaSelisihPersediaan")
-  pemetaanBarangTerkirim     PemetaanAkun? @relation("PetaBarangTerkirim")
-  pemetaanUangMuka           PemetaanAkun? @relation("PetaUangMuka")
-  pemetaanLabaDitahan        PemetaanAkun? @relation("PetaLabaDitahan")
-  pemetaanDiskonPenjualan    PemetaanAkun? @relation("PetaDiskonPenjualan")
-  pemetaanPendapatanLain     PemetaanAkun? @relation("PetaPendapatanLain")
-  asetSebagaiAkunPembayaran  AsetTetap[] @relation("AkunPembayaranAset")
-  pelepasanPenerimaan        PelepasanAset[] @relation("AkunPenerimaanPelepasan")
-  pelepasanLabaRugi          PelepasanAset[] @relation("AkunLabaRugiPelepasan")
-  mutasiBank                 MutasiBank[]    @relation("AkunMutasiBank")
-  priveKas                   Prive[]         @relation("AkunKasPrive")
-  priveModal                 Prive[]         @relation("AkunPrive")
-  karyawanBeban               Karyawan[]      @relation("AkunBebanKaryawan")
-  penggajianKas               Penggajian[]    @relation("AkunKasPenggajian")
-  pemetaanTambahan           PemetaanAkunTambahan[] @relation("AkunPemetaanTambahan")
+  barangPendapatan           Barang[]                @relation("AkunPendapatanBarang")
+  barangHpp                  Barang[]                @relation("AkunHppBarang")
+  barangPersediaan           Barang[]                @relation("AkunPersediaanBarang")
+  barangBeban                Barang[]                @relation("AkunBebanBarang")
+  pemetaanBebanJasa          PemetaanAkun?           @relation("PetaBebanJasa")
+  pemetaanBarangBelumDitagih PemetaanAkun?           @relation("PetaBarangBelumDitagih")
+  pemetaanSelisihPersediaan  PemetaanAkun?           @relation("PetaSelisihPersediaan")
+  pemetaanBarangTerkirim     PemetaanAkun?           @relation("PetaBarangTerkirim")
+  pemetaanUangMuka           PemetaanAkun?           @relation("PetaUangMuka")
+  pemetaanLabaDitahan        PemetaanAkun?           @relation("PetaLabaDitahan")
+  pemetaanDiskonPenjualan    PemetaanAkun?           @relation("PetaDiskonPenjualan")
+  pemetaanPendapatanLain     PemetaanAkun?           @relation("PetaPendapatanLain")
+  pemetaanSelisihKurs        PemetaanAkun?           @relation("PetaSelisihKurs")
+  dokumenKasSebagaiKas       DokumenKas[]            @relation("AkunKasDokumenKas")
+  dokumenKasSebagaiLawan     DokumenKas[]            @relation("AkunLawanDokumenKas")
+  asetSebagaiAkunPembayaran  AsetTetap[]             @relation("AkunPembayaranAset")
+  pelepasanPenerimaan        PelepasanAset[]         @relation("AkunPenerimaanPelepasan")
+  pelepasanLabaRugi          PelepasanAset[]         @relation("AkunLabaRugiPelepasan")
+  mutasiBank                 MutasiBank[]            @relation("AkunMutasiBank")
+  priveKas                   Prive[]                 @relation("AkunKasPrive")
+  priveModal                 Prive[]                 @relation("AkunPrive")
+  karyawanBeban              Karyawan[]              @relation("AkunBebanKaryawan")
+  penggajianKas              Penggajian[]            @relation("AkunKasPenggajian")
+  pemetaanTambahan           PemetaanAkunTambahan[]  @relation("AkunPemetaanTambahan")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
-  pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
-  pengaturanPpnMasukan    PengaturanPerusahaan? @relation("PetaPpnMasukan")
-  pengaturanPph23Dimuka   PengaturanPerusahaan? @relation("PetaPph23Dimuka")
-  pengaturanPph23Dipotong PengaturanPerusahaan? @relation("PetaPph23Dipotong")
-  pengaturanBebanPphFinal  PengaturanPerusahaan? @relation("PetaBebanPphFinal")
-  pengaturanHutangPphFinal PengaturanPerusahaan? @relation("PetaHutangPphFinal")
+  pengaturanPpnKeluaran      PengaturanPerusahaan?   @relation("PetaPpnKeluaran")
+  pengaturanPpnMasukan       PengaturanPerusahaan?   @relation("PetaPpnMasukan")
+  pengaturanPph23Dimuka      PengaturanPerusahaan?   @relation("PetaPph23Dimuka")
+  pengaturanPph23Dipotong    PengaturanPerusahaan?   @relation("PetaPph23Dipotong")
+  pengaturanBebanPphFinal    PengaturanPerusahaan?   @relation("PetaBebanPphFinal")
+  pengaturanHutangPphFinal   PengaturanPerusahaan?   @relation("PetaHutangPphFinal")
+
   @@index([indukId])
 }
 
@@ -778,29 +1133,34 @@ model PemetaanAkun {
   utangUsaha   Akun   @relation("PetaUtang", fields: [utangUsahaId], references: [id])
 
   /// Beban untuk pembelian JASA (kosong = HPP)
-  bebanJasaId String? @unique
-  bebanJasa   Akun?   @relation("PetaBebanJasa", fields: [bebanJasaId], references: [id])
+  bebanJasaId          String? @unique
+  bebanJasa            Akun?   @relation("PetaBebanJasa", fields: [bebanJasaId], references: [id])
   /// Kewajiban sementara: barang sudah diterima (TB) tapi belum ditagih (FB)
   barangBelumDitagihId String? @unique
   barangBelumDitagih   Akun?   @relation("PetaBarangBelumDitagih", fields: [barangBelumDitagihId], references: [id])
   /// Selisih nilai persediaan (retur pembelian beda harga, penyesuaian stok)
-  selisihPersediaanId String? @unique
-  selisihPersediaan   Akun?   @relation("PetaSelisihPersediaan", fields: [selisihPersediaanId], references: [id])
+  selisihPersediaanId  String? @unique
+  selisihPersediaan    Akun?   @relation("PetaSelisihPersediaan", fields: [selisihPersediaanId], references: [id])
   /// Aset sementara: barang sudah dikirim (SJ) tapi belum difaktur (FJ)
-  barangTerkirimId String? @unique
-  barangTerkirim   Akun?   @relation("PetaBarangTerkirim", fields: [barangTerkirimId], references: [id])
+  barangTerkirimId     String? @unique
+  barangTerkirim       Akun?   @relation("PetaBarangTerkirim", fields: [barangTerkirimId], references: [id])
   /// Kewajiban: uang muka/DP pelanggan yang belum dipakai faktur
-  uangMukaPelangganId String? @unique
-  uangMukaPelanggan   Akun?   @relation("PetaUangMuka", fields: [uangMukaPelangganId], references: [id])
+  uangMukaPelangganId  String? @unique
+  uangMukaPelanggan    Akun?   @relation("PetaUangMuka", fields: [uangMukaPelangganId], references: [id])
   /// Ekuitas: tujuan jurnal penutup tahun (laba/rugi bersih dipindahkan ke sini)
-  labaDitahanId String? @unique
-  labaDitahan   Akun?   @relation("PetaLabaDitahan", fields: [labaDitahanId], references: [id])
+  labaDitahanId        String? @unique
+  labaDitahan          Akun?   @relation("PetaLabaDitahan", fields: [labaDitahanId], references: [id])
   /// Kontra-pendapatan: diskon faktur penjualan (saldo normal debit); kelompoknya tidak dihitung sebagai omzet
-  diskonPenjualanId String? @unique
-  diskonPenjualan   Akun?   @relation("PetaDiskonPenjualan", fields: [diskonPenjualanId], references: [id])
+  diskonPenjualanId    String? @unique
+  diskonPenjualan      Akun?   @relation("PetaDiskonPenjualan", fields: [diskonPenjualanId], references: [id])
   /// Kelompok pendapatan non-usaha (bunga bank, laba pelepasan aset, dst.): bukan omzet PPh Final
-  pendapatanLainId String? @unique
-  pendapatanLain   Akun?   @relation("PetaPendapatanLain", fields: [pendapatanLainId], references: [id])
+  pendapatanLainId     String? @unique
+  pendapatanLain       Akun?   @relation("PetaPendapatanLain", fields: [pendapatanLainId], references: [id])
+  /// Selisih Kurs (laba/rugi kurs): tujuan jurnal penilaian kembali piutang/hutang mata uang asing.
+  /// Ditempatkan di PemetaanAkun (bukan PengaturanPerusahaan) karena ini pemetaan akuntansi umum,
+  /// sejenis Selisih Persediaan, bukan akun pajak.
+  selisihKursId        String? @unique
+  selisihKurs          Akun?   @relation("PetaSelisihKurs", fields: [selisihKursId], references: [id])
 }
 
 model Jurnal {
@@ -813,8 +1173,8 @@ model Jurnal {
   proyekId   String?
   proyek     Proyek?      @relation(fields: [proyekId], references: [id])
 
-  baris          BarisJurnal[]
-  penyusutanAset PenyusutanAset[]
+  baris                 BarisJurnal[]
+  penyusutanAset        PenyusutanAset[]
   perolehanAset         AsetTetap?             @relation("JurnalPerolehanAset")
   penyesuaianPersediaan PenyesuaianPersediaan?
   penerimaanBarang      PenerimaanBarang?
@@ -831,24 +1191,96 @@ model Jurnal {
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
   returPembelian        ReturPembelian?        @relation("JurnalReturPembelian")
   penggajian            Penggajian?            @relation("JurnalPenggajian")
+  dokumenKas            DokumenKas?            @relation("JurnalDokumenKas")
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts.
+  /// Untuk Jurnal bawaannya DISETUJUI karena berlaku aturan tetap: ADANYA satu baris Jurnal berarti
+  /// transaksinya SUDAH masuk buku besar (semua laporan membaca Jurnal tanpa menyaring status).
+  /// Draf yang belum dibukukan disimpan di dokumen sumbernya (mis. DokumenKas), bukan sebagai Jurnal.
+  statusPersetujuan     StatusPersetujuan      @default(DISETUJUI)
+  diajukanOlehId        String?
+  diajukanOleh          Pengguna?              @relation("AjukanJurnal", fields: [diajukanOlehId], references: [id])
+  diajukanPada          DateTime?
+  disetujuiOlehId       String?
+  disetujuiOleh         Pengguna?              @relation("SetujuiJurnal", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada         DateTime?
+  ditolakOlehId         String?
+  ditolakOleh           Pengguna?              @relation("TolakJurnal", fields: [ditolakOlehId], references: [id])
+  ditolakPada           DateTime?
+  catatanPenolakan      String?
+
   @@index([proyekId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 model BarisJurnal {
-  id         String  @id @default(cuid())
-  jurnalId   String
-  jurnal     Jurnal  @relation(fields: [jurnalId], references: [id])
-  akunId     String
-  akun       Akun    @relation(fields: [akunId], references: [id])
-  debit      Decimal @default(0) @db.Decimal(18, 2)
-  kredit     Decimal @default(0) @db.Decimal(18, 2)
-  keterangan String?
+  id               String      @id @default(cuid())
+  jurnalId         String
+  jurnal           Jurnal      @relation(fields: [jurnalId], references: [id])
+  akunId           String
+  akun             Akun        @relation(fields: [akunId], references: [id])
+  debit            Decimal     @default(0) @db.Decimal(18, 2)
+  kredit           Decimal     @default(0) @db.Decimal(18, 2)
+  keterangan       String?
   /// Rekonsiliasi kas/bank: kapan baris ini dicocokkan dengan mutasi rekening
   rekonsiliasiPada DateTime?
   mutasiBank       MutasiBank?
+  /// Jejak mata uang asal (informasional). Buku besar SELALU dalam IDR (mata uang fungsional);
+  /// tiga kolom ini hanya menyimpan nilai dokumen dalam mata uang transaksinya agar bisa ditelusuri.
+  mataUangAsliId   String?
+  mataUangAsli     MataUang?   @relation("MataUangAsliBarisJurnal", fields: [mataUangAsliId], references: [id])
+  kursAsli         Decimal?    @db.Decimal(18, 6)
+  nilaiAsli        Decimal?    @db.Decimal(18, 2)
+
   @@index([jurnalId])
   @@index([akunId])
+}
+
+/// Dokumen Kas Masuk / Kas Keluar yang melewati persetujuan.
+///
+/// Kenapa model sendiri: di Produksia keberadaan satu baris `Jurnal` BERARTI sudah masuk buku besar
+/// (semua laporan membaca Jurnal tanpa filter). Draf kas karena itu tidak boleh berupa Jurnal, jadi
+/// niat transaksinya disimpan di sini dulu; jurnal KM/KK baru dibuat saat dokumen DISETUJUI dan
+/// ditautkan lewat `jurnalId`. Kas masuk/keluar yang dicatat tanpa alur persetujuan (pengaturan
+/// `wajibPersetujuan` mati) tetap langsung menjadi Jurnal seperti sebelumnya.
+model DokumenKas {
+  id          String          @id @default(cuid())
+  nomor       String          @unique
+  jenis       JenisDokumenKas
+  tanggal     DateTime        @default(now())
+  akunKasId   String
+  akunKas     Akun            @relation("AkunKasDokumenKas", fields: [akunKasId], references: [id])
+  akunLawanId String
+  akunLawan   Akun            @relation("AkunLawanDokumenKas", fields: [akunLawanId], references: [id])
+  jumlah      Decimal         @db.Decimal(18, 2)
+  keterangan  String?
+  proyekId    String?
+  proyek      Proyek?         @relation(fields: [proyekId], references: [id])
+  /// Terisi setelah disetujui: jurnal KM/KK yang dihasilkan
+  jurnalId    String?         @unique
+  jurnal      Jurnal?         @relation("JurnalDokumenKas", fields: [jurnalId], references: [id])
+  dibuatOleh  String
+  dibuatPada  DateTime        @default(now())
+
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanDokumenKas", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiDokumenKas", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakDokumenKas", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
+  @@index([statusPersetujuan])
+  @@index([jenis])
+  @@index([tanggal])
+  @@index([akunKasId])
+  @@index([akunLawanId])
+  @@index([proyekId])
 }
 
 // ---------- Aset Tetap ----------
@@ -876,38 +1308,67 @@ model AsetTetap {
   jurnalPerolehanId String? @unique
   jurnalPerolehan   Jurnal? @relation("JurnalPerolehanAset", fields: [jurnalPerolehanId], references: [id])
 
-  penyusutan PenyusutanAset[]
-  pelepasan  PelepasanAset?
+  penyusutan        PenyusutanAset[]
+  pelepasan         PelepasanAset?
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanAsetTetap", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiAsetTetap", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakAsetTetap", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([akunAsetId])
   @@index([akunBebanPenyusutanId])
   @@index([akunAkumulasiPenyusutanId])
   @@index([akunPembayaranId])
+  @@index([statusPersetujuan])
 }
 
 /// Pelepasan aset (dijual / dihapusbukukan): akumulasi penyusutan & aset dikeluarkan, selisih harga jual vs nilai buku = laba/rugi
 model PelepasanAset {
-  id      String     @id @default(cuid())
-  asetId  String     @unique
-  aset    AsetTetap  @relation(fields: [asetId], references: [id])
-  tanggal DateTime   @default(now())
-  jenis   StatusAset
-  hargaJual Decimal @default(0) @db.Decimal(18, 2)
+  id                String            @id @default(cuid())
+  asetId            String            @unique
+  aset              AsetTetap         @relation(fields: [asetId], references: [id])
+  tanggal           DateTime          @default(now())
+  jenis             StatusAset
+  hargaJual         Decimal           @default(0) @db.Decimal(18, 2)
   /// Kas/Bank atau Piutang yang menerima hasil penjualan (kosong bila dihapusbukukan tanpa hasil)
-  akunPenerimaanId String?
-  akunPenerimaan   Akun?   @relation("AkunPenerimaanPelepasan", fields: [akunPenerimaanId], references: [id])
+  akunPenerimaanId  String?
+  akunPenerimaan    Akun?             @relation("AkunPenerimaanPelepasan", fields: [akunPenerimaanId], references: [id])
   /// Akun laba/rugi pelepasan (dikredit bila laba, didebit bila rugi)
-  akunLabaRugiId String
-  akunLabaRugi   Akun   @relation("AkunLabaRugiPelepasan", fields: [akunLabaRugiId], references: [id])
-  nilaiBuku  Decimal @db.Decimal(18, 2)
-  labaRugi   Decimal @db.Decimal(18, 2)
-  keterangan String?
-  jurnalId   String? @unique
-  jurnal     Jurnal? @relation("JurnalPelepasanAset", fields: [jurnalId], references: [id])
-  penggunaNama String
-  dibuatPada   DateTime @default(now())
+  akunLabaRugiId    String
+  akunLabaRugi      Akun              @relation("AkunLabaRugiPelepasan", fields: [akunLabaRugiId], references: [id])
+  nilaiBuku         Decimal           @db.Decimal(18, 2)
+  labaRugi          Decimal           @db.Decimal(18, 2)
+  keterangan        String?
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalPelepasanAset", fields: [jurnalId], references: [id])
+  penggunaNama      String
+  dibuatPada        DateTime          @default(now())
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPelepasanAset", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPelepasanAset", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPelepasanAset", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([akunPenerimaanId])
   @@index([akunLabaRugiId])
+  @@index([statusPersetujuan])
 }
+
 model PenyusutanAset {
   id       String    @id @default(cuid())
   asetId   String
@@ -935,10 +1396,25 @@ model PindahBarang {
   keterangan     String?
   dibuatPada     DateTime @default(now())
 
-  baris BarisPindahBarang[]
+  baris             BarisPindahBarang[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan   @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?           @relation("AjukanPindahBarang", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?           @relation("SetujuiPindahBarang", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?           @relation("TolakPindahBarang", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([gudangAsalId])
   @@index([gudangTujuanId])
+  @@index([statusPersetujuan])
 }
+
 model BarisPindahBarang {
   id       String       @id @default(cuid())
   pindahId String
@@ -946,9 +1422,11 @@ model BarisPindahBarang {
   barangId String
   barang   Barang       @relation(fields: [barangId], references: [id])
   jumlah   Decimal      @db.Decimal(18, 2)
+
   @@index([pindahId])
   @@index([barangId])
 }
+
 model PenyesuaianPersediaan {
   id          String   @id @default(cuid())
   nomor       String   @unique
@@ -963,9 +1441,23 @@ model PenyesuaianPersediaan {
   jurnal      Jurnal?  @relation(fields: [jurnalId], references: [id])
   dibuatPada  DateTime @default(now())
 
-  baris BarisPenyesuaianPersediaan[]
+  baris             BarisPenyesuaianPersediaan[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan            @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?                    @relation("AjukanPenyesuaianPersediaan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?                    @relation("SetujuiPenyesuaianPersediaan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?                    @relation("TolakPenyesuaianPersediaan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([gudangId])
   @@index([akunLawanId])
+  @@index([statusPersetujuan])
 }
 
 model BarisPenyesuaianPersediaan {
@@ -978,6 +1470,7 @@ model BarisPenyesuaianPersediaan {
   jumlahSesudah Decimal               @db.Decimal(18, 2)
   /// Harga pokok satuan yang dipakai menilai selisih
   hargaSatuan   Decimal               @db.Decimal(18, 2)
+
   @@index([penyesuaianId])
   @@index([barangId])
 }
@@ -985,26 +1478,30 @@ model BarisPenyesuaianPersediaan {
 // ---------- Pengaturan perusahaan & pajak (singleton id = "default") ----------
 
 model PengaturanPerusahaan {
-  id             String  @id @default("default")
-  nama           String  @default("Produksia")
+  id               String  @id @default("default")
+  nama             String  @default("Produksia")
   /// Pengusaha Kena Pajak: faktur memungut PPN
-  pkp            Boolean @default(false)
-  tarifPpnPersen Decimal @default(11) @db.Decimal(5, 2)
+  pkp              Boolean @default(false)
+  tarifPpnPersen   Decimal @default(11) @db.Decimal(5, 2)
   /// Jatuh tempo bawaan faktur (hari)
-  terminHari     Int     @default(14)
+  terminHari       Int     @default(14)
   /// Tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
-  tahunBuku      Int?
+  tahunBuku        Int?
+  /// Alur persetujuan maker-checker aktif. Menyala (bawaan): dokumen dibuat sebagai DRAFT, harus
+  /// diajukan lalu disetujui orang lain sebelum jurnalnya masuk buku besar. Dimatikan hanya untuk
+  /// usaha yang stafnya terlalu sedikit untuk memisahkan tugas; pengendaliannya hilang.
+  wajibPersetujuan Boolean @default(true)
 
-  akunPpnKeluaranId String? @unique
-  akunPpnKeluaran   Akun?   @relation("PetaPpnKeluaran", fields: [akunPpnKeluaranId], references: [id])
-  akunPpnMasukanId  String? @unique
-  akunPpnMasukan    Akun?   @relation("PetaPpnMasukan", fields: [akunPpnMasukanId], references: [id])
+  akunPpnKeluaranId    String? @unique
+  akunPpnKeluaran      Akun?   @relation("PetaPpnKeluaran", fields: [akunPpnKeluaranId], references: [id])
+  akunPpnMasukanId     String? @unique
+  akunPpnMasukan       Akun?   @relation("PetaPpnMasukan", fields: [akunPpnMasukanId], references: [id])
   /// PPh 23 yang dipotong pelanggan dari pembayaran kita (aset: pajak dibayar dimuka)
-  akunPph23DimukaId String? @unique
-  akunPph23Dimuka   Akun?   @relation("PetaPph23Dimuka", fields: [akunPph23DimukaId], references: [id])
+  akunPph23DimukaId    String? @unique
+  akunPph23Dimuka      Akun?   @relation("PetaPph23Dimuka", fields: [akunPph23DimukaId], references: [id])
   /// PPh 23 yang kita potong dari vendor (kewajiban: hutang PPh 23)
-  akunPph23DipotongId String? @unique
-  akunPph23Dipotong   Akun?   @relation("PetaPph23Dipotong", fields: [akunPph23DipotongId], references: [id])
+  akunPph23DipotongId  String? @unique
+  akunPph23Dipotong    Akun?   @relation("PetaPph23Dipotong", fields: [akunPph23DipotongId], references: [id])
   /// PPh Final UMKM (PP 55/2022): tarif % dari omzet bulanan; beban & hutangnya dijurnal dari Ringkasan Pajak
   pphFinalPersen       Decimal @default(0.5) @db.Decimal(5, 2)
   akunBebanPphFinalId  String? @unique
@@ -1017,26 +1514,54 @@ model PengaturanPerusahaan {
 
 /// Penutupan tahun buku: pendapatan & beban tahun itu dipindahkan ke Laba Ditahan lewat jurnal JU-TUTUP
 model TutupBuku {
-  id           String   @id @default(cuid())
-  tahun        Int      @unique
-  tanggal      DateTime @default(now())
-  labaBersih   Decimal  @default(0) @db.Decimal(18, 2)
-  penggunaNama String
-  jurnalId     String?  @unique
-  jurnal       Jurnal?  @relation("JurnalTutupBuku", fields: [jurnalId], references: [id])
+  id                String            @id @default(cuid())
+  tahun             Int               @unique
+  tanggal           DateTime          @default(now())
+  labaBersih        Decimal           @default(0) @db.Decimal(18, 2)
+  penggunaNama      String
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalTutupBuku", fields: [jurnalId], references: [id])
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanTutupBuku", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiTutupBuku", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakTutupBuku", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
+  @@index([statusPersetujuan])
 }
 
 /// PPh Final UMKM per bulan: omzet (DPP faktur − retur) × tarif, dijurnal Dr Beban PPh Final / Cr Hutang PPh Final
 model PphFinalBulanan {
-  id          String   @id @default(cuid())
+  id                String            @id @default(cuid())
   /// "YYYY-MM"
-  periode     String   @unique
-  omzet       Decimal  @db.Decimal(18, 2)
-  tarifPersen Decimal  @db.Decimal(5, 2)
-  jumlah      Decimal  @db.Decimal(18, 2)
-  jurnalId    String?  @unique
-  jurnal      Jurnal?  @relation("JurnalPphFinal", fields: [jurnalId], references: [id])
-  dibuatPada  DateTime @default(now())
+  periode           String            @unique
+  omzet             Decimal           @db.Decimal(18, 2)
+  tarifPersen       Decimal           @db.Decimal(5, 2)
+  jumlah            Decimal           @db.Decimal(18, 2)
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalPphFinal", fields: [jurnalId], references: [id])
+  dibuatPada        DateTime          @default(now())
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPphFinalBulanan", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPphFinalBulanan", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPphFinalBulanan", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
+  @@index([statusPersetujuan])
 }
 
 /// Penyesuaian hak akses per peran (Pengaturan › Hak Akses); bawaan ada di src/lib/hakAkses.ts
@@ -1050,15 +1575,15 @@ model HakAksesPeran {
 
 /// Permintaan "lupa kata sandi" dari halaman masuk; ditangani Superadmin/Pemilik/Admin dengan tautan sekali pakai
 model PermintaanAturUlang {
-  id          String   @id @default(cuid())
-  penggunaId  String
-  pengguna    Pengguna @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
-  dibuatPada  DateTime @default(now())
+  id            String    @id @default(cuid())
+  penggunaId    String
+  pengguna      Pengguna  @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
+  dibuatPada    DateTime  @default(now())
   /// MENUNGGU → TAUTAN (tautan dibuat) → SELESAI (kata sandi diganti) | DITOLAK
-  status      String   @default("MENUNGGU")
+  status        String    @default("MENUNGGU")
   /// Token tautan sekali pakai (/atur-ulang/<token>), berlaku sampai `kedaluwarsa`
-  token       String?  @unique
-  kedaluwarsa DateTime?
+  token         String?   @unique
+  kedaluwarsa   DateTime?
   ditanganiOleh String?
   ditanganiPada DateTime?
   selesaiPada   DateTime?
@@ -1069,24 +1594,24 @@ model PermintaanAturUlang {
 
 /// Mutasi rekening koran hasil impor (CSV/HTML) per akun kas/bank; dicocokkan ke baris jurnal saat rekonsiliasi
 model MutasiBank {
-  id          String   @id @default(cuid())
-  akunId      String
-  akun        Akun     @relation("AkunMutasiBank", fields: [akunId], references: [id])
-  tanggal     DateTime
-  keterangan  String
-  referensi   String?
-  masuk       Decimal  @default(0) @db.Decimal(18, 2)
-  keluar      Decimal  @default(0) @db.Decimal(18, 2)
-  saldo       Decimal? @db.Decimal(18, 2)
+  id               String       @id @default(cuid())
+  akunId           String
+  akun             Akun         @relation("AkunMutasiBank", fields: [akunId], references: [id])
+  tanggal          DateTime
+  keterangan       String
+  referensi        String?
+  masuk            Decimal      @default(0) @db.Decimal(18, 2)
+  keluar           Decimal      @default(0) @db.Decimal(18, 2)
+  saldo            Decimal?     @db.Decimal(18, 2)
   /// Sidik jari (akun + tanggal + masuk + keluar + keterangan) untuk menolak baris yang diimpor dua kali
-  sidik       String   @unique
-  berkas      String
-  diimporPada DateTime @default(now())
-  penggunaNama String
-  barisJurnalId String?     @unique
-  barisJurnal   BarisJurnal? @relation(fields: [barisJurnalId], references: [id])
+  sidik            String       @unique
+  berkas           String
+  diimporPada      DateTime     @default(now())
+  penggunaNama     String
+  barisJurnalId    String?      @unique
+  barisJurnal      BarisJurnal? @relation(fields: [barisJurnalId], references: [id])
   /// Cocok otomatis tapi tanggal buku ≠ tanggal rekening: perlu dicek orang; dikonfirmasiPada diisi setelah dicek
-  perluPerhatian   Boolean   @default(false)
+  perluPerhatian   Boolean      @default(false)
   dikonfirmasiPada DateTime?
 
   @@index([akunId, tanggal])
@@ -1094,64 +1619,93 @@ model MutasiBank {
 
 /// Prive: pengambilan uang pribadi pemilik dari kas/bank (Dr Prive 3-4000 / Cr Kas)
 model Prive {
-  id          String   @id @default(cuid())
-  nomor       String   @unique
-  tanggal     DateTime @default(now())
-  pemilikNama String
-  akunKasId   String
-  akunKas     Akun     @relation("AkunKasPrive", fields: [akunKasId], references: [id])
-  akunPriveId String
-  akunPrive   Akun     @relation("AkunPrive", fields: [akunPriveId], references: [id])
-  jumlah      Decimal  @db.Decimal(18, 2)
-  keterangan  String?
-  jurnalId    String?  @unique
-  jurnal      Jurnal?  @relation("JurnalPrive", fields: [jurnalId], references: [id])
-  penggunaNama String
-  dibuatPada   DateTime @default(now())
+  id                String            @id @default(cuid())
+  nomor             String            @unique
+  tanggal           DateTime          @default(now())
+  pemilikNama       String
+  akunKasId         String
+  akunKas           Akun              @relation("AkunKasPrive", fields: [akunKasId], references: [id])
+  akunPriveId       String
+  akunPrive         Akun              @relation("AkunPrive", fields: [akunPriveId], references: [id])
+  jumlah            Decimal           @db.Decimal(18, 2)
+  keterangan        String?
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalPrive", fields: [jurnalId], references: [id])
+  penggunaNama      String
+  dibuatPada        DateTime          @default(now())
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPrive", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPrive", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPrive", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([akunKasId])
   @@index([akunPriveId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 /// Siklus SDM: satu proses gaji per periode (bulan), mencakup semua karyawan yang diikutkan.
 /// Jurnal: Dr Beban Gaji Pokok (per akun) + Dr Beban Tunjangan (per akun) / Cr Hutang Potongan Gaji (bila ada potongan) / Cr Kas-Bank (gaji bersih).
 model Penggajian {
-  id        String   @id @default(cuid())
-  nomor     String   @unique
-  periode   String   @unique // YYYY-MM; satu proses per bulan, koreksi = hapus lalu buat ulang
-  tanggal   DateTime @default(now())
-  akunKasId String
-  akunKas   Akun     @relation("AkunKasPenggajian", fields: [akunKasId], references: [id])
-  proyekId  String?
-  proyek    Proyek?  @relation(fields: [proyekId], references: [id])
-  totalGajiPokok Decimal @default(0) @db.Decimal(18, 2)
-  totalTunjangan Decimal @default(0) @db.Decimal(18, 2)
-  totalPotongan  Decimal @default(0) @db.Decimal(18, 2)
-  totalDibayar   Decimal @default(0) @db.Decimal(18, 2)
-  keterangan String?
-  jurnalId   String?  @unique
-  jurnal     Jurnal?  @relation("JurnalPenggajian", fields: [jurnalId], references: [id])
-  penggunaNama String
-  dibuatPada DateTime @default(now())
+  id             String   @id @default(cuid())
+  nomor          String   @unique
+  periode        String   @unique // YYYY-MM; satu proses per bulan, koreksi = hapus lalu buat ulang
+  tanggal        DateTime @default(now())
+  akunKasId      String
+  akunKas        Akun     @relation("AkunKasPenggajian", fields: [akunKasId], references: [id])
+  proyekId       String?
+  proyek         Proyek?  @relation(fields: [proyekId], references: [id])
+  totalGajiPokok Decimal  @default(0) @db.Decimal(18, 2)
+  totalTunjangan Decimal  @default(0) @db.Decimal(18, 2)
+  totalPotongan  Decimal  @default(0) @db.Decimal(18, 2)
+  totalDibayar   Decimal  @default(0) @db.Decimal(18, 2)
+  keterangan     String?
+  jurnalId       String?  @unique
+  jurnal         Jurnal?  @relation("JurnalPenggajian", fields: [jurnalId], references: [id])
+  penggunaNama   String
+  dibuatPada     DateTime @default(now())
 
-  baris BarisPenggajian[]
+  baris             BarisPenggajian[]
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPenggajian", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPenggajian", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPenggajian", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([akunKasId])
   @@index([proyekId])
   @@index([tanggal])
+  @@index([statusPersetujuan])
 }
 
 /// Rincian gaji per karyawan dalam satu proses Penggajian; diterima = gajiPokok + tunjangan − potongan.
 model BarisPenggajian {
-  id           String     @id @default(cuid())
-  penggajianId String
-  penggajian   Penggajian @relation(fields: [penggajianId], references: [id])
-  karyawanId   String
-  karyawan     Karyawan   @relation(fields: [karyawanId], references: [id])
-  gajiPokok Decimal @db.Decimal(18, 2)
-  tunjangan Decimal @db.Decimal(18, 2)
-  potongan  Decimal @default(0) @db.Decimal(18, 2)
+  id                 String     @id @default(cuid())
+  penggajianId       String
+  penggajian         Penggajian @relation(fields: [penggajianId], references: [id])
+  karyawanId         String
+  karyawan           Karyawan   @relation(fields: [karyawanId], references: [id])
+  gajiPokok          Decimal    @db.Decimal(18, 2)
+  tunjangan          Decimal    @db.Decimal(18, 2)
+  potongan           Decimal    @default(0) @db.Decimal(18, 2)
   keteranganPotongan String?
-  diterima  Decimal @db.Decimal(18, 2)
+  diterima           Decimal    @db.Decimal(18, 2)
+
   @@index([penggajianId])
   @@index([karyawanId])
 }
@@ -1166,6 +1720,7 @@ model PemetaanAkunTambahan {
   keterangan String?
   dibuatOleh String
   dibuatPada DateTime @default(now())
+
   @@index([akunId])
 }
 

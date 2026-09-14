@@ -10,6 +10,7 @@ import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { batasBulan, ringkasanPajak } from "@/lib/pajak";
+import { dataLangsungDisetujui } from "@/lib/persetujuan";
 
 const HALAMAN = "/buku-besar/pajak";
 
@@ -52,7 +53,8 @@ export async function catatPphFinal(dataFormulir: FormData) {
         },
       },
     });
-    await tx.pphFinalBulanan.create({ data: { periode, omzet: data.omzet, tarifPersen: pengaturan.pphFinalPersen, jumlah: data.pphFinal, jurnalId: jurnal.id } });
+    // PPh Final bulanan belum ikut alur persetujuan; jurnalnya langsung dicatat
+    await tx.pphFinalBulanan.create({ data: { periode, omzet: data.omzet, tarifPersen: pengaturan.pphFinalPersen, jumlah: data.pphFinal, jurnalId: jurnal.id, ...dataLangsungDisetujui(pengguna) } });
     await tx.logAktivitas.create({
       data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "CATAT", jenis: "PPh Final Bulanan", nomor: jurnal.nomor, keterangan: `Periode ${periode}: omzet ${format(data.omzet)} × ${format(pengaturan.pphFinalPersen)}% = ${format(data.pphFinal)}` },
     });

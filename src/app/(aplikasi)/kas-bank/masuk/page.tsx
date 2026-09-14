@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { daftarProyekAktif } from "@/lib/proyek";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import DaftarDokumenKasDraf from "@/komponen/kas-bank/DaftarDokumenKasDraf";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { PERINGATAN_PENDAPATAN_TANPA_FAKTUR, PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatKasMasukFormulir } from "@/lib/aksi/jurnal";
@@ -84,6 +85,8 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
         </div>
       </FormulirAksi>
       )}
+
+      <DaftarDokumenKasDraf jenis="MASUK" pengguna={pengguna} bolehHapus={bolehHapus} />
 
       <div className="kartu kartu-tabel">
         <KontrolDaftar param={param} total={total} placeholder="Cari nomor KM / keterangan…" />

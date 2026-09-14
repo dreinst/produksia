@@ -6,27 +6,14 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { D, jumlahkan, format, type Desimal } from "@/lib/uang";
+import { D, jumlahkan, type Desimal } from "@/lib/uang";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { bacaProyekId } from "@/lib/proyek";
-import { akunGajiBawaan } from "@/lib/sdm";
+import { akunGajiBawaan, catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
+import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 
 const NOL = D(0);
-
-/** Penjumlahan per akun (urutan sisip dipertahankan agar jurnal mudah dibaca). */
-function pengumpul() {
-  const peta = new Map<string, Desimal>();
-  return {
-    tambah(akunId: string, jumlah: Desimal) {
-      if (jumlah.isZero()) return;
-      peta.set(akunId, (peta.get(akunId) ?? NOL).plus(jumlah));
-    },
-    daftar(): [string, Desimal][] {
-      return [...peta.entries()].filter(([, v]) => !v.isZero());
-    },
-  };
-}
 
 type BarisInput = { karyawanId: string; gajiPokok: Desimal; tunjangan: Desimal; potongan: Desimal; keteranganPotongan: string | null };
 
@@ -93,16 +80,11 @@ export async function buatPenggajian(dataFormulir: FormData) {
   const daftarKaryawan = await db.karyawan.findMany({ where: { id: { in: daftarBaris.map((b) => b.karyawanId) } }, select: { id: true, kode: true, nama: true, akunBebanId: true } });
   const petaKaryawan = new Map(daftarKaryawan.map((k) => [k.id, k]));
 
-  const bebanPokok = pengumpul();
-  const bebanTunjangan = pengumpul();
   let totalGajiPokok = NOL, totalTunjangan = NOL, totalPotongan = NOL, totalDibayar = NOL;
   const barisTersimpan: { karyawanId: string; gajiPokok: Desimal; tunjangan: Desimal; potongan: Desimal; keteranganPotongan: string | null; diterima: Desimal }[] = [];
   for (const b of daftarBaris) {
     const k = petaKaryawan.get(b.karyawanId);
     if (!k) throw new Error("Karyawan tidak ditemukan");
-    const akunBebanKaryawan = k.akunBebanId ?? gaji.bebanGaji.id;
-    bebanPokok.tambah(akunBebanKaryawan, b.gajiPokok);
-    if (b.tunjangan.gt(0)) bebanTunjangan.tambah(gaji.bebanTunjangan?.id ?? akunBebanKaryawan, b.tunjangan);
     const diterima = b.gajiPokok.plus(b.tunjangan).minus(b.potongan);
     if (diterima.isNegative()) throw new Error(`${k.kode} - ${k.nama}: potongan melebihi gaji pokok + tunjangan`);
     totalGajiPokok = totalGajiPokok.plus(b.gajiPokok);
@@ -112,25 +94,14 @@ export async function buatPenggajian(dataFormulir: FormData) {
     barisTersimpan.push({ karyawanId: b.karyawanId, gajiPokok: b.gajiPokok, tunjangan: b.tunjangan, potongan: b.potongan, keteranganPotongan: b.keteranganPotongan, diterima });
   }
 
+  // Alur persetujuan: dokumen gaji dibuat sebagai DRAFT, jurnalnya (beban gaji & kas keluar)
+  // baru dicatat saat disetujui pengguna lain — kontrol paling penting di siklus penggajian.
+  const perluPersetujuan = await persetujuanWajib(db);
   const nomor = await nomorDokumenBerikutnya(db.penggajian, "GJ");
 
   await db.$transaction(async (tx) => {
     await pastikanTahunTerbuka(tx, tanggal);
-    const nomorJurnal = await nomorDokumenBerikutnya(tx.jurnal, "GJ");
-    const barisJurnal = [
-      ...bebanPokok.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Beban gaji pokok ${periode}` })),
-      ...bebanTunjangan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Beban tunjangan ${periode}` })),
-      ...(totalPotongan.gt(0) ? [{ akunId: gaji.hutangPotongan!.id, debit: NOL, kredit: totalPotongan, keterangan: `Potongan gaji ${periode}` }] : []),
-      { akunId: akunKasId, debit: NOL, kredit: totalDibayar, keterangan: `Pembayaran gaji ${periode}` },
-    ];
-    const totalDebit = jumlahkan(barisJurnal.map((b) => b.debit));
-    const totalKredit = jumlahkan(barisJurnal.map((b) => b.kredit));
-    if (!totalDebit.equals(totalKredit)) throw new Error(`Jurnal penggajian tidak seimbang (debit ${format(totalDebit)} vs kredit ${format(totalKredit)}). Laporkan ke pengembang`);
-
-    const jurnal = await tx.jurnal.create({
-      data: { nomor: nomorJurnal, tanggal, keterangan: `Penggajian ${periode}${keterangan ? `: ${keterangan}` : ""}`, sumber: "PENGGAJIAN", proyekId, baris: { create: barisJurnal } },
-    });
-    await tx.penggajian.create({
+    const penggajian = await tx.penggajian.create({
       data: {
         nomor,
         periode,
@@ -142,11 +113,12 @@ export async function buatPenggajian(dataFormulir: FormData) {
         totalPotongan,
         totalDibayar,
         keterangan,
-        jurnalId: jurnal.id,
         penggunaNama: pengguna.nama,
+        ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
         baris: { create: barisTersimpan },
       },
     });
+    if (!perluPersetujuan) await catatJurnalPenggajian(tx, penggajian.id);
     await tx.logAktivitas.create({
       data: {
         penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id,
@@ -154,13 +126,14 @@ export async function buatPenggajian(dataFormulir: FormData) {
         aksi: "BUAT",
         jenis: "Penggajian",
         nomor,
-        keterangan: `Periode ${periode}: ${barisTersimpan.length} karyawan, gaji pokok ${format(totalGajiPokok)}, tunjangan ${format(totalTunjangan)}, potongan ${format(totalPotongan)}, dibayar ${format(totalDibayar)}`,
+        keterangan: `${ringkasanPenggajian({ periode, totalGajiPokok, totalTunjangan, totalPotongan, totalDibayar, baris: barisTersimpan })}${perluPersetujuan ? "; masih draf, jurnal dicatat setelah disetujui" : ""}`,
       },
     });
   });
 
   revalidatePath("/sdm/penggajian");
   revalidatePath("/buku-besar/jurnal");
+  if (perluPersetujuan) revalidatePath("/persetujuan");
   redirect("/sdm/penggajian");
 }
 
