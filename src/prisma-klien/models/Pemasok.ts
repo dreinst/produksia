@@ -30,6 +30,7 @@ export type PemasokMinAggregateOutputType = {
   nama: string | null
   alamat: string | null
   telepon: string | null
+  mataUangId: string | null
   dibuatPada: Date | null
 }
 
@@ -39,6 +40,7 @@ export type PemasokMaxAggregateOutputType = {
   nama: string | null
   alamat: string | null
   telepon: string | null
+  mataUangId: string | null
   dibuatPada: Date | null
 }
 
@@ -48,6 +50,7 @@ export type PemasokCountAggregateOutputType = {
   nama: number
   alamat: number
   telepon: number
+  mataUangId: number
   dibuatPada: number
   _all: number
 }
@@ -59,6 +62,7 @@ export type PemasokMinAggregateInputType = {
   nama?: true
   alamat?: true
   telepon?: true
+  mataUangId?: true
   dibuatPada?: true
 }
 
@@ -68,6 +72,7 @@ export type PemasokMaxAggregateInputType = {
   nama?: true
   alamat?: true
   telepon?: true
+  mataUangId?: true
   dibuatPada?: true
 }
 
@@ -77,6 +82,7 @@ export type PemasokCountAggregateInputType = {
   nama?: true
   alamat?: true
   telepon?: true
+  mataUangId?: true
   dibuatPada?: true
   _all?: true
 }
@@ -159,6 +165,7 @@ export type PemasokGroupByOutputType = {
   nama: string
   alamat: string | null
   telepon: string | null
+  mataUangId: string | null
   dibuatPada: Date
   _count: PemasokCountAggregateOutputType | null
   _min: PemasokMinAggregateOutputType | null
@@ -189,7 +196,9 @@ export type PemasokWhereInput = {
   nama?: Prisma.StringFilter<"Pemasok"> | string
   alamat?: Prisma.StringNullableFilter<"Pemasok"> | string | null
   telepon?: Prisma.StringNullableFilter<"Pemasok"> | string | null
+  mataUangId?: Prisma.StringNullableFilter<"Pemasok"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Pemasok"> | Date | string
+  mataUang?: Prisma.XOR<Prisma.MataUangNullableScalarRelationFilter, Prisma.MataUangWhereInput> | null
   pesanan?: Prisma.PesananPembelianListRelationFilter
   faktur?: Prisma.FakturPembelianListRelationFilter
   pembayaran?: Prisma.PembayaranPembelianListRelationFilter
@@ -201,7 +210,9 @@ export type PemasokOrderByWithRelationInput = {
   nama?: Prisma.SortOrder
   alamat?: Prisma.SortOrderInput | Prisma.SortOrder
   telepon?: Prisma.SortOrderInput | Prisma.SortOrder
+  mataUangId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  mataUang?: Prisma.MataUangOrderByWithRelationInput
   pesanan?: Prisma.PesananPembelianOrderByRelationAggregateInput
   faktur?: Prisma.FakturPembelianOrderByRelationAggregateInput
   pembayaran?: Prisma.PembayaranPembelianOrderByRelationAggregateInput
@@ -216,7 +227,9 @@ export type PemasokWhereUniqueInput = Prisma.AtLeast<{
   nama?: Prisma.StringFilter<"Pemasok"> | string
   alamat?: Prisma.StringNullableFilter<"Pemasok"> | string | null
   telepon?: Prisma.StringNullableFilter<"Pemasok"> | string | null
+  mataUangId?: Prisma.StringNullableFilter<"Pemasok"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Pemasok"> | Date | string
+  mataUang?: Prisma.XOR<Prisma.MataUangNullableScalarRelationFilter, Prisma.MataUangWhereInput> | null
   pesanan?: Prisma.PesananPembelianListRelationFilter
   faktur?: Prisma.FakturPembelianListRelationFilter
   pembayaran?: Prisma.PembayaranPembelianListRelationFilter
@@ -228,6 +241,7 @@ export type PemasokOrderByWithAggregationInput = {
   nama?: Prisma.SortOrder
   alamat?: Prisma.SortOrderInput | Prisma.SortOrder
   telepon?: Prisma.SortOrderInput | Prisma.SortOrder
+  mataUangId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   _count?: Prisma.PemasokCountOrderByAggregateInput
   _max?: Prisma.PemasokMaxOrderByAggregateInput
@@ -243,6 +257,7 @@ export type PemasokScalarWhereWithAggregatesInput = {
   nama?: Prisma.StringWithAggregatesFilter<"Pemasok"> | string
   alamat?: Prisma.StringNullableWithAggregatesFilter<"Pemasok"> | string | null
   telepon?: Prisma.StringNullableWithAggregatesFilter<"Pemasok"> | string | null
+  mataUangId?: Prisma.StringNullableWithAggregatesFilter<"Pemasok"> | string | null
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"Pemasok"> | Date | string
 }
 
@@ -253,6 +268,7 @@ export type PemasokCreateInput = {
   alamat?: string | null
   telepon?: string | null
   dibuatPada?: Date | string
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPemasokInput
   pesanan?: Prisma.PesananPembelianCreateNestedManyWithoutPemasokInput
   faktur?: Prisma.FakturPembelianCreateNestedManyWithoutPemasokInput
   pembayaran?: Prisma.PembayaranPembelianCreateNestedManyWithoutPemasokInput
@@ -264,6 +280,7 @@ export type PemasokUncheckedCreateInput = {
   nama: string
   alamat?: string | null
   telepon?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   pesanan?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutPemasokInput
   faktur?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutPemasokInput
@@ -277,6 +294,7 @@ export type PemasokUpdateInput = {
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mataUang?: Prisma.MataUangUpdateOneWithoutPemasokNestedInput
   pesanan?: Prisma.PesananPembelianUpdateManyWithoutPemasokNestedInput
   faktur?: Prisma.FakturPembelianUpdateManyWithoutPemasokNestedInput
   pembayaran?: Prisma.PembayaranPembelianUpdateManyWithoutPemasokNestedInput
@@ -288,6 +306,7 @@ export type PemasokUncheckedUpdateInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pesanan?: Prisma.PesananPembelianUncheckedUpdateManyWithoutPemasokNestedInput
   faktur?: Prisma.FakturPembelianUncheckedUpdateManyWithoutPemasokNestedInput
@@ -300,6 +319,7 @@ export type PemasokCreateManyInput = {
   nama: string
   alamat?: string | null
   telepon?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
 }
 
@@ -318,7 +338,18 @@ export type PemasokUncheckedUpdateManyInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type PemasokListRelationFilter = {
+  every?: Prisma.PemasokWhereInput
+  some?: Prisma.PemasokWhereInput
+  none?: Prisma.PemasokWhereInput
+}
+
+export type PemasokOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type PemasokCountOrderByAggregateInput = {
@@ -327,6 +358,7 @@ export type PemasokCountOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   alamat?: Prisma.SortOrder
   telepon?: Prisma.SortOrder
+  mataUangId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -336,6 +368,7 @@ export type PemasokMaxOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   alamat?: Prisma.SortOrder
   telepon?: Prisma.SortOrder
+  mataUangId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -345,12 +378,55 @@ export type PemasokMinOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   alamat?: Prisma.SortOrder
   telepon?: Prisma.SortOrder
+  mataUangId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
 export type PemasokScalarRelationFilter = {
   is?: Prisma.PemasokWhereInput
   isNot?: Prisma.PemasokWhereInput
+}
+
+export type PemasokCreateNestedManyWithoutMataUangInput = {
+  create?: Prisma.XOR<Prisma.PemasokCreateWithoutMataUangInput, Prisma.PemasokUncheckedCreateWithoutMataUangInput> | Prisma.PemasokCreateWithoutMataUangInput[] | Prisma.PemasokUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PemasokCreateOrConnectWithoutMataUangInput | Prisma.PemasokCreateOrConnectWithoutMataUangInput[]
+  createMany?: Prisma.PemasokCreateManyMataUangInputEnvelope
+  connect?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+}
+
+export type PemasokUncheckedCreateNestedManyWithoutMataUangInput = {
+  create?: Prisma.XOR<Prisma.PemasokCreateWithoutMataUangInput, Prisma.PemasokUncheckedCreateWithoutMataUangInput> | Prisma.PemasokCreateWithoutMataUangInput[] | Prisma.PemasokUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PemasokCreateOrConnectWithoutMataUangInput | Prisma.PemasokCreateOrConnectWithoutMataUangInput[]
+  createMany?: Prisma.PemasokCreateManyMataUangInputEnvelope
+  connect?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+}
+
+export type PemasokUpdateManyWithoutMataUangNestedInput = {
+  create?: Prisma.XOR<Prisma.PemasokCreateWithoutMataUangInput, Prisma.PemasokUncheckedCreateWithoutMataUangInput> | Prisma.PemasokCreateWithoutMataUangInput[] | Prisma.PemasokUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PemasokCreateOrConnectWithoutMataUangInput | Prisma.PemasokCreateOrConnectWithoutMataUangInput[]
+  upsert?: Prisma.PemasokUpsertWithWhereUniqueWithoutMataUangInput | Prisma.PemasokUpsertWithWhereUniqueWithoutMataUangInput[]
+  createMany?: Prisma.PemasokCreateManyMataUangInputEnvelope
+  set?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  disconnect?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  delete?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  connect?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  update?: Prisma.PemasokUpdateWithWhereUniqueWithoutMataUangInput | Prisma.PemasokUpdateWithWhereUniqueWithoutMataUangInput[]
+  updateMany?: Prisma.PemasokUpdateManyWithWhereWithoutMataUangInput | Prisma.PemasokUpdateManyWithWhereWithoutMataUangInput[]
+  deleteMany?: Prisma.PemasokScalarWhereInput | Prisma.PemasokScalarWhereInput[]
+}
+
+export type PemasokUncheckedUpdateManyWithoutMataUangNestedInput = {
+  create?: Prisma.XOR<Prisma.PemasokCreateWithoutMataUangInput, Prisma.PemasokUncheckedCreateWithoutMataUangInput> | Prisma.PemasokCreateWithoutMataUangInput[] | Prisma.PemasokUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PemasokCreateOrConnectWithoutMataUangInput | Prisma.PemasokCreateOrConnectWithoutMataUangInput[]
+  upsert?: Prisma.PemasokUpsertWithWhereUniqueWithoutMataUangInput | Prisma.PemasokUpsertWithWhereUniqueWithoutMataUangInput[]
+  createMany?: Prisma.PemasokCreateManyMataUangInputEnvelope
+  set?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  disconnect?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  delete?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  connect?: Prisma.PemasokWhereUniqueInput | Prisma.PemasokWhereUniqueInput[]
+  update?: Prisma.PemasokUpdateWithWhereUniqueWithoutMataUangInput | Prisma.PemasokUpdateWithWhereUniqueWithoutMataUangInput[]
+  updateMany?: Prisma.PemasokUpdateManyWithWhereWithoutMataUangInput | Prisma.PemasokUpdateManyWithWhereWithoutMataUangInput[]
+  deleteMany?: Prisma.PemasokScalarWhereInput | Prisma.PemasokScalarWhereInput[]
 }
 
 export type PemasokCreateNestedOneWithoutPesananInput = {
@@ -395,6 +471,69 @@ export type PemasokUpdateOneRequiredWithoutPembayaranNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PemasokUpdateToOneWithWhereWithoutPembayaranInput, Prisma.PemasokUpdateWithoutPembayaranInput>, Prisma.PemasokUncheckedUpdateWithoutPembayaranInput>
 }
 
+export type PemasokCreateWithoutMataUangInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  telepon?: string | null
+  dibuatPada?: Date | string
+  pesanan?: Prisma.PesananPembelianCreateNestedManyWithoutPemasokInput
+  faktur?: Prisma.FakturPembelianCreateNestedManyWithoutPemasokInput
+  pembayaran?: Prisma.PembayaranPembelianCreateNestedManyWithoutPemasokInput
+}
+
+export type PemasokUncheckedCreateWithoutMataUangInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  telepon?: string | null
+  dibuatPada?: Date | string
+  pesanan?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutPemasokInput
+  faktur?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutPemasokInput
+  pembayaran?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutPemasokInput
+}
+
+export type PemasokCreateOrConnectWithoutMataUangInput = {
+  where: Prisma.PemasokWhereUniqueInput
+  create: Prisma.XOR<Prisma.PemasokCreateWithoutMataUangInput, Prisma.PemasokUncheckedCreateWithoutMataUangInput>
+}
+
+export type PemasokCreateManyMataUangInputEnvelope = {
+  data: Prisma.PemasokCreateManyMataUangInput | Prisma.PemasokCreateManyMataUangInput[]
+  skipDuplicates?: boolean
+}
+
+export type PemasokUpsertWithWhereUniqueWithoutMataUangInput = {
+  where: Prisma.PemasokWhereUniqueInput
+  update: Prisma.XOR<Prisma.PemasokUpdateWithoutMataUangInput, Prisma.PemasokUncheckedUpdateWithoutMataUangInput>
+  create: Prisma.XOR<Prisma.PemasokCreateWithoutMataUangInput, Prisma.PemasokUncheckedCreateWithoutMataUangInput>
+}
+
+export type PemasokUpdateWithWhereUniqueWithoutMataUangInput = {
+  where: Prisma.PemasokWhereUniqueInput
+  data: Prisma.XOR<Prisma.PemasokUpdateWithoutMataUangInput, Prisma.PemasokUncheckedUpdateWithoutMataUangInput>
+}
+
+export type PemasokUpdateManyWithWhereWithoutMataUangInput = {
+  where: Prisma.PemasokScalarWhereInput
+  data: Prisma.XOR<Prisma.PemasokUpdateManyMutationInput, Prisma.PemasokUncheckedUpdateManyWithoutMataUangInput>
+}
+
+export type PemasokScalarWhereInput = {
+  AND?: Prisma.PemasokScalarWhereInput | Prisma.PemasokScalarWhereInput[]
+  OR?: Prisma.PemasokScalarWhereInput[]
+  NOT?: Prisma.PemasokScalarWhereInput | Prisma.PemasokScalarWhereInput[]
+  id?: Prisma.StringFilter<"Pemasok"> | string
+  kode?: Prisma.StringFilter<"Pemasok"> | string
+  nama?: Prisma.StringFilter<"Pemasok"> | string
+  alamat?: Prisma.StringNullableFilter<"Pemasok"> | string | null
+  telepon?: Prisma.StringNullableFilter<"Pemasok"> | string | null
+  mataUangId?: Prisma.StringNullableFilter<"Pemasok"> | string | null
+  dibuatPada?: Prisma.DateTimeFilter<"Pemasok"> | Date | string
+}
+
 export type PemasokCreateWithoutPesananInput = {
   id?: string
   kode: string
@@ -402,6 +541,7 @@ export type PemasokCreateWithoutPesananInput = {
   alamat?: string | null
   telepon?: string | null
   dibuatPada?: Date | string
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPemasokInput
   faktur?: Prisma.FakturPembelianCreateNestedManyWithoutPemasokInput
   pembayaran?: Prisma.PembayaranPembelianCreateNestedManyWithoutPemasokInput
 }
@@ -412,6 +552,7 @@ export type PemasokUncheckedCreateWithoutPesananInput = {
   nama: string
   alamat?: string | null
   telepon?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   faktur?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutPemasokInput
   pembayaran?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutPemasokInput
@@ -440,6 +581,7 @@ export type PemasokUpdateWithoutPesananInput = {
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mataUang?: Prisma.MataUangUpdateOneWithoutPemasokNestedInput
   faktur?: Prisma.FakturPembelianUpdateManyWithoutPemasokNestedInput
   pembayaran?: Prisma.PembayaranPembelianUpdateManyWithoutPemasokNestedInput
 }
@@ -450,6 +592,7 @@ export type PemasokUncheckedUpdateWithoutPesananInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   faktur?: Prisma.FakturPembelianUncheckedUpdateManyWithoutPemasokNestedInput
   pembayaran?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutPemasokNestedInput
@@ -462,6 +605,7 @@ export type PemasokCreateWithoutFakturInput = {
   alamat?: string | null
   telepon?: string | null
   dibuatPada?: Date | string
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPemasokInput
   pesanan?: Prisma.PesananPembelianCreateNestedManyWithoutPemasokInput
   pembayaran?: Prisma.PembayaranPembelianCreateNestedManyWithoutPemasokInput
 }
@@ -472,6 +616,7 @@ export type PemasokUncheckedCreateWithoutFakturInput = {
   nama: string
   alamat?: string | null
   telepon?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   pesanan?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutPemasokInput
   pembayaran?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutPemasokInput
@@ -500,6 +645,7 @@ export type PemasokUpdateWithoutFakturInput = {
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mataUang?: Prisma.MataUangUpdateOneWithoutPemasokNestedInput
   pesanan?: Prisma.PesananPembelianUpdateManyWithoutPemasokNestedInput
   pembayaran?: Prisma.PembayaranPembelianUpdateManyWithoutPemasokNestedInput
 }
@@ -510,6 +656,7 @@ export type PemasokUncheckedUpdateWithoutFakturInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pesanan?: Prisma.PesananPembelianUncheckedUpdateManyWithoutPemasokNestedInput
   pembayaran?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutPemasokNestedInput
@@ -522,6 +669,7 @@ export type PemasokCreateWithoutPembayaranInput = {
   alamat?: string | null
   telepon?: string | null
   dibuatPada?: Date | string
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPemasokInput
   pesanan?: Prisma.PesananPembelianCreateNestedManyWithoutPemasokInput
   faktur?: Prisma.FakturPembelianCreateNestedManyWithoutPemasokInput
 }
@@ -532,6 +680,7 @@ export type PemasokUncheckedCreateWithoutPembayaranInput = {
   nama: string
   alamat?: string | null
   telepon?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   pesanan?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutPemasokInput
   faktur?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutPemasokInput
@@ -560,6 +709,7 @@ export type PemasokUpdateWithoutPembayaranInput = {
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mataUang?: Prisma.MataUangUpdateOneWithoutPemasokNestedInput
   pesanan?: Prisma.PesananPembelianUpdateManyWithoutPemasokNestedInput
   faktur?: Prisma.FakturPembelianUpdateManyWithoutPemasokNestedInput
 }
@@ -570,9 +720,52 @@ export type PemasokUncheckedUpdateWithoutPembayaranInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pesanan?: Prisma.PesananPembelianUncheckedUpdateManyWithoutPemasokNestedInput
   faktur?: Prisma.FakturPembelianUncheckedUpdateManyWithoutPemasokNestedInput
+}
+
+export type PemasokCreateManyMataUangInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  telepon?: string | null
+  dibuatPada?: Date | string
+}
+
+export type PemasokUpdateWithoutMataUangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pesanan?: Prisma.PesananPembelianUpdateManyWithoutPemasokNestedInput
+  faktur?: Prisma.FakturPembelianUpdateManyWithoutPemasokNestedInput
+  pembayaran?: Prisma.PembayaranPembelianUpdateManyWithoutPemasokNestedInput
+}
+
+export type PemasokUncheckedUpdateWithoutMataUangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pesanan?: Prisma.PesananPembelianUncheckedUpdateManyWithoutPemasokNestedInput
+  faktur?: Prisma.FakturPembelianUncheckedUpdateManyWithoutPemasokNestedInput
+  pembayaran?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutPemasokNestedInput
+}
+
+export type PemasokUncheckedUpdateManyWithoutMataUangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -630,7 +823,9 @@ export type PemasokSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   nama?: boolean
   alamat?: boolean
   telepon?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
+  mataUang?: boolean | Prisma.Pemasok$mataUangArgs<ExtArgs>
   pesanan?: boolean | Prisma.Pemasok$pesananArgs<ExtArgs>
   faktur?: boolean | Prisma.Pemasok$fakturArgs<ExtArgs>
   pembayaran?: boolean | Prisma.Pemasok$pembayaranArgs<ExtArgs>
@@ -643,7 +838,9 @@ export type PemasokSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   nama?: boolean
   alamat?: boolean
   telepon?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
+  mataUang?: boolean | Prisma.Pemasok$mataUangArgs<ExtArgs>
 }, ExtArgs["result"]["pemasok"]>
 
 export type PemasokSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -652,7 +849,9 @@ export type PemasokSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   nama?: boolean
   alamat?: boolean
   telepon?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
+  mataUang?: boolean | Prisma.Pemasok$mataUangArgs<ExtArgs>
 }, ExtArgs["result"]["pemasok"]>
 
 export type PemasokSelectScalar = {
@@ -661,22 +860,29 @@ export type PemasokSelectScalar = {
   nama?: boolean
   alamat?: boolean
   telepon?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
 }
 
-export type PemasokOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "alamat" | "telepon" | "dibuatPada", ExtArgs["result"]["pemasok"]>
+export type PemasokOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "alamat" | "telepon" | "mataUangId" | "dibuatPada", ExtArgs["result"]["pemasok"]>
 export type PemasokInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  mataUang?: boolean | Prisma.Pemasok$mataUangArgs<ExtArgs>
   pesanan?: boolean | Prisma.Pemasok$pesananArgs<ExtArgs>
   faktur?: boolean | Prisma.Pemasok$fakturArgs<ExtArgs>
   pembayaran?: boolean | Prisma.Pemasok$pembayaranArgs<ExtArgs>
   _count?: boolean | Prisma.PemasokCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type PemasokIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type PemasokIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type PemasokIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  mataUang?: boolean | Prisma.Pemasok$mataUangArgs<ExtArgs>
+}
+export type PemasokIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  mataUang?: boolean | Prisma.Pemasok$mataUangArgs<ExtArgs>
+}
 
 export type $PemasokPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Pemasok"
   objects: {
+    mataUang: Prisma.$MataUangPayload<ExtArgs> | null
     pesanan: Prisma.$PesananPembelianPayload<ExtArgs>[]
     faktur: Prisma.$FakturPembelianPayload<ExtArgs>[]
     pembayaran: Prisma.$PembayaranPembelianPayload<ExtArgs>[]
@@ -687,6 +893,10 @@ export type $PemasokPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     nama: string
     alamat: string | null
     telepon: string | null
+    /**
+     * Mata uang transaksi bawaan pemasok (kosong = IDR / mata uang fungsional)
+     */
+    mataUangId: string | null
     dibuatPada: Date
   }, ExtArgs["result"]["pemasok"]>
   composites: {}
@@ -1082,6 +1292,7 @@ readonly fields: PemasokFieldRefs;
  */
 export interface Prisma__PemasokClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  mataUang<T extends Prisma.Pemasok$mataUangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pemasok$mataUangArgs<ExtArgs>>): Prisma.Prisma__MataUangClient<runtime.Types.Result.GetResult<Prisma.$MataUangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pesanan<T extends Prisma.Pemasok$pesananArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pemasok$pesananArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PesananPembelianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faktur<T extends Prisma.Pemasok$fakturArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pemasok$fakturArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FakturPembelianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pembayaran<T extends Prisma.Pemasok$pembayaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pemasok$pembayaranArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PembayaranPembelianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1119,6 +1330,7 @@ export interface PemasokFieldRefs {
   readonly nama: Prisma.FieldRef<"Pemasok", 'String'>
   readonly alamat: Prisma.FieldRef<"Pemasok", 'String'>
   readonly telepon: Prisma.FieldRef<"Pemasok", 'String'>
+  readonly mataUangId: Prisma.FieldRef<"Pemasok", 'String'>
   readonly dibuatPada: Prisma.FieldRef<"Pemasok", 'DateTime'>
 }
     
@@ -1374,6 +1586,10 @@ export type PemasokCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    */
   data: Prisma.PemasokCreateManyInput | Prisma.PemasokCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PemasokIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1444,6 +1660,10 @@ export type PemasokUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Limit how many Pemasoks to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PemasokIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1510,6 +1730,25 @@ export type PemasokDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Pemasoks to delete.
    */
   limit?: number
+}
+
+/**
+ * Pemasok.mataUang
+ */
+export type Pemasok$mataUangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MataUang
+   */
+  select?: Prisma.MataUangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MataUang
+   */
+  omit?: Prisma.MataUangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MataUangInclude<ExtArgs> | null
+  where?: Prisma.MataUangWhereInput
 }
 
 /**

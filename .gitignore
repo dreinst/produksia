@@ -55,3 +55,6 @@ out*/
 
 # folder aset logo lokal (bukan bagian aplikasi)
 /Produksia-logo/
+
+# hasil cadangan basis data lokal (skrip/cadangkan-basis-data.sh)
+/cadangan/

@@ -107,6 +107,18 @@ export default async function HalamanPengaturanPerusahaan() {
         <PilihAkunPajak nama="akunBebanPphFinalId" label="Akun Beban PPh Final (beban)" nilai={nilai.akunBebanPphFinalId} daftar={beban} petunjuk="Didebit saat PPh Final bulanan dicatat" />
         <PilihAkunPajak nama="akunHutangPphFinalId" label="Akun Hutang PPh Final (kewajiban)" nilai={nilai.akunHutangPphFinalId} daftar={kewajiban} petunjuk="Dikredit saat PPh Final dicatat; dilunasi lewat Kas Keluar saat setor ke DJP" />
 
+        <label className="md:col-span-2 flex items-start gap-3 ubin cursor-pointer">
+          <input type="checkbox" name="wajibPersetujuan" defaultChecked={tersimpan?.wajibPersetujuan ?? true} className="mt-0.5 h-4 w-4 rounded border-slate-300" />
+          <span className="text-sm">
+            <span className="font-semibold text-slate-900">Wajib persetujuan (maker-checker)</span>
+            <span className="block text-xs text-slate-500 mt-0.5">
+              Bila aktif, Faktur Penjualan, Faktur Pembelian, Kas Masuk/Keluar, Penyesuaian Stok, Aset Tetap, dan Penggajian dibuat sebagai
+              draf lebih dulu; jurnalnya baru masuk buku besar setelah diajukan dan disetujui pengguna LAIN (pembuat tidak boleh menyetujui
+              dokumennya sendiri). Mematikannya menghapus pengendalian pemisahan tugas: dokumen langsung dibukukan oleh pembuatnya.
+            </span>
+          </span>
+        </label>
+
         <div className="md:col-span-2">
           <button type="submit" className="tombol tombol-utama">
             Simpan Pengaturan

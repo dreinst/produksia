@@ -48,6 +48,12 @@ export type PropsPenyusun = {
   uangMukaTersedia?: number;
   /** Penjualan: event pesanan; pendapatan sebaiknya diakui (difaktur) setelah acara selesai (PSAK 72) */
   event?: { kode: string; nama: string; tanggalSelesai: string | null; selesai: boolean } | null;
+  /**
+   * Mata uang transaksi yang bisa dipilih (selain rupiah) beserta kurs terakhir yang tercatat.
+   * Nilai baris faktur tetap diisi dalam RUPIAH; mata uang + kurs dipakai untuk mencatat nilai
+   * tagihan dalam mata uang transaksinya (nilaiAsli) dan untuk penilaian kembali piutang/hutang.
+   */
+  mataUang?: { daftar: { id: string; kode: string; nama: string; kursTerakhir: number | null }[]; bawaanId: string | null };
 };
 
 const format = (n: number) => n.toLocaleString("id-ID");
@@ -61,6 +67,10 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
   const uangMukaTersedia = adalahPenjualan ? (p.uangMukaTersedia ?? 0) : 0;
   const [uangMukaInput, setUangMukaInput] = useState(uangMukaTersedia);
   const [diskonInput, setDiskonInput] = useState(0);
+  const daftarMataUang = p.mataUang?.daftar ?? [];
+  const [mataUangId, setMataUangId] = useState(p.mataUang?.bawaanId ?? "");
+  const mataUangDipilih = daftarMataUang.find((m) => m.id === mataUangId) ?? null;
+  const [kursInput, setKursInput] = useState(mataUangDipilih?.kursTerakhir ?? 0);
 
   const hitung = useMemo(() => {
     const subtotal = isian.reduce((s, r) => s + r.jumlah * r.harga, 0);
@@ -136,6 +146,8 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
       <input type="hidden" name="ppnPersen" value={ppnPersen} />
       {adalahPenjualan && <input type="hidden" name="uangMuka" value={hitung.uangMuka} />}
       {adalahPenjualan && <input type="hidden" name="diskon" value={hitung.diskon} />}
+      <input type="hidden" name="mataUangId" value={mataUangId} />
+      {mataUangDipilih && <input type="hidden" name="kurs" value={kursInput} />}
 
       {/* Kepala halaman */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -371,6 +383,51 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                     <span className="angka text-slate-400">non-PKP</span>
                   )}
                 </div>
+                {daftarMataUang.length > 0 && (
+                  <div className="mt-2 p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col gap-2">
+                    <div className="flex justify-between items-center gap-2">
+                      <label htmlFor="pilihMataUang" className="teks-label">Mata uang transaksi</label>
+                      <select
+                        id="pilihMataUang"
+                        value={mataUangId}
+                        onChange={(e) => {
+                          setMataUangId(e.target.value);
+                          setKursInput(daftarMataUang.find((m) => m.id === e.target.value)?.kursTerakhir ?? 0);
+                        }}
+                        className="isian isian-kecil w-auto"
+                      >
+                        <option value="">IDR (rupiah)</option>
+                        {daftarMataUang.map((m) => (
+                          <option key={m.id} value={m.id}>{m.kode}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {mataUangDipilih && (
+                      <>
+                        <div className="flex justify-between items-center gap-2">
+                          <label htmlFor="kursDokumen" className="teks-label">Kurs 1 {mataUangDipilih.kode} = Rp</label>
+                          <input
+                            id="kursDokumen"
+                            type="number"
+                            min={0}
+                            step="0.000001"
+                            value={kursInput}
+                            onChange={(e) => setKursInput(Number(e.target.value))}
+                            className="isian isian-kecil w-32 text-right"
+                            aria-label={`Kurs ${mataUangDipilih.kode}`}
+                          />
+                        </div>
+                        <div className="flex justify-between text-slate-500">
+                          <span>Nilai tagihan dalam {mataUangDipilih.kode}</span>
+                          <span className="angka">{kursInput > 0 ? format(Math.round((hitung.total / kursInput) * 100) / 100) : "-"}</span>
+                        </div>
+                        <span className="petunjuk">
+                          Baris faktur tetap diisi rupiah. Kurs ini disimpan di faktur (snapshot) dan dipakai untuk penilaian kembali piutang/hutang mata uang asing.
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
                 <div className="mt-3 p-3 rounded-lg bg-blue-50/60 border border-blue-100 flex flex-col gap-1">
                   <div className="flex justify-between items-baseline">
                     <span className="teks-label">Total Nilai Tagihan</span>

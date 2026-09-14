@@ -400,6 +400,8 @@ export const ModelName = {
   Pengguna: 'Pengguna',
   Sesi: 'Sesi',
   PercobaanMasuk: 'PercobaanMasuk',
+  MataUang: 'MataUang',
+  KursMataUang: 'KursMataUang',
   Departemen: 'Departemen',
   Karyawan: 'Karyawan',
   Pelanggan: 'Pelanggan',
@@ -435,6 +437,7 @@ export const ModelName = {
   PemetaanAkun: 'PemetaanAkun',
   Jurnal: 'Jurnal',
   BarisJurnal: 'BarisJurnal',
+  DokumenKas: 'DokumenKas',
   AsetTetap: 'AsetTetap',
   PelepasanAset: 'PelepasanAset',
   PenyusutanAset: 'PenyusutanAset',
@@ -468,7 +471,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "penggajian" | "barisPenggajian" | "pemetaanAkunTambahan" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "mataUang" | "kursMataUang" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "dokumenKas" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "penggajian" | "barisPenggajian" | "pemetaanAkunTambahan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -691,6 +694,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PercobaanMasukCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PercobaanMasukCountAggregateOutputType> | number
+        }
+      }
+    }
+    MataUang: {
+      payload: Prisma.$MataUangPayload<ExtArgs>
+      fields: Prisma.MataUangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MataUangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MataUangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>
+        }
+        findFirst: {
+          args: Prisma.MataUangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MataUangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>
+        }
+        findMany: {
+          args: Prisma.MataUangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>[]
+        }
+        create: {
+          args: Prisma.MataUangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>
+        }
+        createMany: {
+          args: Prisma.MataUangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MataUangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>[]
+        }
+        delete: {
+          args: Prisma.MataUangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>
+        }
+        update: {
+          args: Prisma.MataUangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>
+        }
+        deleteMany: {
+          args: Prisma.MataUangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MataUangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MataUangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>[]
+        }
+        upsert: {
+          args: Prisma.MataUangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MataUangPayload>
+        }
+        aggregate: {
+          args: Prisma.MataUangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMataUang>
+        }
+        groupBy: {
+          args: Prisma.MataUangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MataUangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MataUangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MataUangCountAggregateOutputType> | number
+        }
+      }
+    }
+    KursMataUang: {
+      payload: Prisma.$KursMataUangPayload<ExtArgs>
+      fields: Prisma.KursMataUangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.KursMataUangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.KursMataUangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>
+        }
+        findFirst: {
+          args: Prisma.KursMataUangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.KursMataUangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>
+        }
+        findMany: {
+          args: Prisma.KursMataUangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>[]
+        }
+        create: {
+          args: Prisma.KursMataUangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>
+        }
+        createMany: {
+          args: Prisma.KursMataUangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.KursMataUangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>[]
+        }
+        delete: {
+          args: Prisma.KursMataUangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>
+        }
+        update: {
+          args: Prisma.KursMataUangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>
+        }
+        deleteMany: {
+          args: Prisma.KursMataUangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.KursMataUangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.KursMataUangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>[]
+        }
+        upsert: {
+          args: Prisma.KursMataUangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KursMataUangPayload>
+        }
+        aggregate: {
+          args: Prisma.KursMataUangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKursMataUang>
+        }
+        groupBy: {
+          args: Prisma.KursMataUangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KursMataUangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.KursMataUangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KursMataUangCountAggregateOutputType> | number
         }
       }
     }
@@ -3284,6 +3435,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DokumenKas: {
+      payload: Prisma.$DokumenKasPayload<ExtArgs>
+      fields: Prisma.DokumenKasFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DokumenKasFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DokumenKasFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>
+        }
+        findFirst: {
+          args: Prisma.DokumenKasFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DokumenKasFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>
+        }
+        findMany: {
+          args: Prisma.DokumenKasFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>[]
+        }
+        create: {
+          args: Prisma.DokumenKasCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>
+        }
+        createMany: {
+          args: Prisma.DokumenKasCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DokumenKasCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>[]
+        }
+        delete: {
+          args: Prisma.DokumenKasDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>
+        }
+        update: {
+          args: Prisma.DokumenKasUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>
+        }
+        deleteMany: {
+          args: Prisma.DokumenKasDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DokumenKasUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DokumenKasUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>[]
+        }
+        upsert: {
+          args: Prisma.DokumenKasUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DokumenKasPayload>
+        }
+        aggregate: {
+          args: Prisma.DokumenKasAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDokumenKas>
+        }
+        groupBy: {
+          args: Prisma.DokumenKasGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DokumenKasGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DokumenKasCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DokumenKasCountAggregateOutputType> | number
+        }
+      }
+    }
     AsetTetap: {
       payload: Prisma.$AsetTetapPayload<ExtArgs>
       fields: Prisma.AsetTetapFieldRefs
@@ -4690,6 +4915,33 @@ export const PercobaanMasukScalarFieldEnum = {
 export type PercobaanMasukScalarFieldEnum = (typeof PercobaanMasukScalarFieldEnum)[keyof typeof PercobaanMasukScalarFieldEnum]
 
 
+export const MataUangScalarFieldEnum = {
+  id: 'id',
+  kode: 'kode',
+  nama: 'nama',
+  simbol: 'simbol',
+  desimal: 'desimal',
+  aktif: 'aktif',
+  fungsional: 'fungsional',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type MataUangScalarFieldEnum = (typeof MataUangScalarFieldEnum)[keyof typeof MataUangScalarFieldEnum]
+
+
+export const KursMataUangScalarFieldEnum = {
+  id: 'id',
+  mataUangId: 'mataUangId',
+  tanggal: 'tanggal',
+  kurs: 'kurs',
+  sumber: 'sumber',
+  dicatatOleh: 'dicatatOleh',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type KursMataUangScalarFieldEnum = (typeof KursMataUangScalarFieldEnum)[keyof typeof KursMataUangScalarFieldEnum]
+
+
 export const DepartemenScalarFieldEnum = {
   id: 'id',
   nama: 'nama'
@@ -4724,6 +4976,7 @@ export const PelangganScalarFieldEnum = {
   telepon: 'telepon',
   npwp: 'npwp',
   penjualId: 'penjualId',
+  mataUangId: 'mataUangId',
   dibuatPada: 'dibuatPada'
 } as const
 
@@ -4736,6 +4989,7 @@ export const PemasokScalarFieldEnum = {
   nama: 'nama',
   alamat: 'alamat',
   telepon: 'telepon',
+  mataUangId: 'mataUangId',
   dibuatPada: 'dibuatPada'
 } as const
 
@@ -4814,7 +5068,15 @@ export const PenawaranPenjualanScalarFieldEnum = {
   pelangganId: 'pelangganId',
   status: 'status',
   proyekId: 'proyekId',
-  total: 'total'
+  total: 'total',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PenawaranPenjualanScalarFieldEnum = (typeof PenawaranPenjualanScalarFieldEnum)[keyof typeof PenawaranPenjualanScalarFieldEnum]
@@ -4840,7 +5102,15 @@ export const PesananPenjualanScalarFieldEnum = {
   penawaranId: 'penawaranId',
   status: 'status',
   proyekId: 'proyekId',
-  total: 'total'
+  total: 'total',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PesananPenjualanScalarFieldEnum = (typeof PesananPenjualanScalarFieldEnum)[keyof typeof PesananPenjualanScalarFieldEnum]
@@ -4866,7 +5136,15 @@ export const PengirimanPesananScalarFieldEnum = {
   pesananId: 'pesananId',
   gudangId: 'gudangId',
   status: 'status',
-  jurnalId: 'jurnalId'
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PengirimanPesananScalarFieldEnum = (typeof PengirimanPesananScalarFieldEnum)[keyof typeof PengirimanPesananScalarFieldEnum]
@@ -4900,7 +5178,20 @@ export const FakturPenjualanScalarFieldEnum = {
   ppnPersen: 'ppnPersen',
   ppn: 'ppn',
   uangMuka: 'uangMuka',
-  jurnalId: 'jurnalId'
+  mataUangId: 'mataUangId',
+  kurs: 'kurs',
+  nilaiAsli: 'nilaiAsli',
+  kursRevaluasi: 'kursRevaluasi',
+  revaluasiPada: 'revaluasiPada',
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type FakturPenjualanScalarFieldEnum = (typeof FakturPenjualanScalarFieldEnum)[keyof typeof FakturPenjualanScalarFieldEnum]
@@ -4912,7 +5203,8 @@ export const BarisFakturPenjualanScalarFieldEnum = {
   barangId: 'barangId',
   jumlah: 'jumlah',
   harga: 'harga',
-  subtotal: 'subtotal'
+  subtotal: 'subtotal',
+  nilaiTransit: 'nilaiTransit'
 } as const
 
 export type BarisFakturPenjualanScalarFieldEnum = (typeof BarisFakturPenjualanScalarFieldEnum)[keyof typeof BarisFakturPenjualanScalarFieldEnum]
@@ -4929,7 +5221,15 @@ export const UangMukaPelangganScalarFieldEnum = {
   jumlahDipakai: 'jumlahDipakai',
   metodeBayar: 'metodeBayar',
   keterangan: 'keterangan',
-  jurnalId: 'jurnalId'
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type UangMukaPelangganScalarFieldEnum = (typeof UangMukaPelangganScalarFieldEnum)[keyof typeof UangMukaPelangganScalarFieldEnum]
@@ -4954,8 +5254,19 @@ export const PenerimaanPenjualanScalarFieldEnum = {
   akunId: 'akunId',
   jumlah: 'jumlah',
   potonganPajak: 'potonganPajak',
+  mataUangId: 'mataUangId',
+  kurs: 'kurs',
+  nilaiAsli: 'nilaiAsli',
   jurnalId: 'jurnalId',
-  metodeBayar: 'metodeBayar'
+  metodeBayar: 'metodeBayar',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PenerimaanPenjualanScalarFieldEnum = (typeof PenerimaanPenjualanScalarFieldEnum)[keyof typeof PenerimaanPenjualanScalarFieldEnum]
@@ -4972,7 +5283,15 @@ export const ReturPenjualanScalarFieldEnum = {
   diskon: 'diskon',
   dpp: 'dpp',
   ppn: 'ppn',
-  jurnalId: 'jurnalId'
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type ReturPenjualanScalarFieldEnum = (typeof ReturPenjualanScalarFieldEnum)[keyof typeof ReturPenjualanScalarFieldEnum]
@@ -4996,7 +5315,15 @@ export const PesananPembelianScalarFieldEnum = {
   pemasokId: 'pemasokId',
   status: 'status',
   proyekId: 'proyekId',
-  total: 'total'
+  total: 'total',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PesananPembelianScalarFieldEnum = (typeof PesananPembelianScalarFieldEnum)[keyof typeof PesananPembelianScalarFieldEnum]
@@ -5022,7 +5349,15 @@ export const PenerimaanBarangScalarFieldEnum = {
   pesananId: 'pesananId',
   gudangId: 'gudangId',
   status: 'status',
-  jurnalId: 'jurnalId'
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PenerimaanBarangScalarFieldEnum = (typeof PenerimaanBarangScalarFieldEnum)[keyof typeof PenerimaanBarangScalarFieldEnum]
@@ -5053,7 +5388,20 @@ export const FakturPembelianScalarFieldEnum = {
   dpp: 'dpp',
   ppnPersen: 'ppnPersen',
   ppn: 'ppn',
-  jurnalId: 'jurnalId'
+  mataUangId: 'mataUangId',
+  kurs: 'kurs',
+  nilaiAsli: 'nilaiAsli',
+  kursRevaluasi: 'kursRevaluasi',
+  revaluasiPada: 'revaluasiPada',
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type FakturPembelianScalarFieldEnum = (typeof FakturPembelianScalarFieldEnum)[keyof typeof FakturPembelianScalarFieldEnum]
@@ -5080,8 +5428,19 @@ export const PembayaranPembelianScalarFieldEnum = {
   akunId: 'akunId',
   jumlah: 'jumlah',
   potonganPajak: 'potonganPajak',
+  mataUangId: 'mataUangId',
+  kurs: 'kurs',
+  nilaiAsli: 'nilaiAsli',
   jurnalId: 'jurnalId',
-  metodeBayar: 'metodeBayar'
+  metodeBayar: 'metodeBayar',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PembayaranPembelianScalarFieldEnum = (typeof PembayaranPembelianScalarFieldEnum)[keyof typeof PembayaranPembelianScalarFieldEnum]
@@ -5097,7 +5456,15 @@ export const ReturPembelianScalarFieldEnum = {
   total: 'total',
   dpp: 'dpp',
   ppn: 'ppn',
-  jurnalId: 'jurnalId'
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type ReturPembelianScalarFieldEnum = (typeof ReturPembelianScalarFieldEnum)[keyof typeof ReturPembelianScalarFieldEnum]
@@ -5142,7 +5509,8 @@ export const PemetaanAkunScalarFieldEnum = {
   uangMukaPelangganId: 'uangMukaPelangganId',
   labaDitahanId: 'labaDitahanId',
   diskonPenjualanId: 'diskonPenjualanId',
-  pendapatanLainId: 'pendapatanLainId'
+  pendapatanLainId: 'pendapatanLainId',
+  selisihKursId: 'selisihKursId'
 } as const
 
 export type PemetaanAkunScalarFieldEnum = (typeof PemetaanAkunScalarFieldEnum)[keyof typeof PemetaanAkunScalarFieldEnum]
@@ -5154,7 +5522,15 @@ export const JurnalScalarFieldEnum = {
   tanggal: 'tanggal',
   keterangan: 'keterangan',
   sumber: 'sumber',
-  proyekId: 'proyekId'
+  proyekId: 'proyekId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type JurnalScalarFieldEnum = (typeof JurnalScalarFieldEnum)[keyof typeof JurnalScalarFieldEnum]
@@ -5167,10 +5543,39 @@ export const BarisJurnalScalarFieldEnum = {
   debit: 'debit',
   kredit: 'kredit',
   keterangan: 'keterangan',
-  rekonsiliasiPada: 'rekonsiliasiPada'
+  rekonsiliasiPada: 'rekonsiliasiPada',
+  mataUangAsliId: 'mataUangAsliId',
+  kursAsli: 'kursAsli',
+  nilaiAsli: 'nilaiAsli'
 } as const
 
 export type BarisJurnalScalarFieldEnum = (typeof BarisJurnalScalarFieldEnum)[keyof typeof BarisJurnalScalarFieldEnum]
+
+
+export const DokumenKasScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  jenis: 'jenis',
+  tanggal: 'tanggal',
+  akunKasId: 'akunKasId',
+  akunLawanId: 'akunLawanId',
+  jumlah: 'jumlah',
+  keterangan: 'keterangan',
+  proyekId: 'proyekId',
+  jurnalId: 'jurnalId',
+  dibuatOleh: 'dibuatOleh',
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
+} as const
+
+export type DokumenKasScalarFieldEnum = (typeof DokumenKasScalarFieldEnum)[keyof typeof DokumenKasScalarFieldEnum]
 
 
 export const AsetTetapScalarFieldEnum = {
@@ -5186,7 +5591,15 @@ export const AsetTetapScalarFieldEnum = {
   akunBebanPenyusutanId: 'akunBebanPenyusutanId',
   akunAkumulasiPenyusutanId: 'akunAkumulasiPenyusutanId',
   akunPembayaranId: 'akunPembayaranId',
-  jurnalPerolehanId: 'jurnalPerolehanId'
+  jurnalPerolehanId: 'jurnalPerolehanId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type AsetTetapScalarFieldEnum = (typeof AsetTetapScalarFieldEnum)[keyof typeof AsetTetapScalarFieldEnum]
@@ -5205,7 +5618,15 @@ export const PelepasanAsetScalarFieldEnum = {
   keterangan: 'keterangan',
   jurnalId: 'jurnalId',
   penggunaNama: 'penggunaNama',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PelepasanAsetScalarFieldEnum = (typeof PelepasanAsetScalarFieldEnum)[keyof typeof PelepasanAsetScalarFieldEnum]
@@ -5229,7 +5650,15 @@ export const PindahBarangScalarFieldEnum = {
   gudangAsalId: 'gudangAsalId',
   gudangTujuanId: 'gudangTujuanId',
   keterangan: 'keterangan',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PindahBarangScalarFieldEnum = (typeof PindahBarangScalarFieldEnum)[keyof typeof PindahBarangScalarFieldEnum]
@@ -5253,7 +5682,15 @@ export const PenyesuaianPersediaanScalarFieldEnum = {
   keterangan: 'keterangan',
   akunLawanId: 'akunLawanId',
   jurnalId: 'jurnalId',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PenyesuaianPersediaanScalarFieldEnum = (typeof PenyesuaianPersediaanScalarFieldEnum)[keyof typeof PenyesuaianPersediaanScalarFieldEnum]
@@ -5278,6 +5715,7 @@ export const PengaturanPerusahaanScalarFieldEnum = {
   tarifPpnPersen: 'tarifPpnPersen',
   terminHari: 'terminHari',
   tahunBuku: 'tahunBuku',
+  wajibPersetujuan: 'wajibPersetujuan',
   akunPpnKeluaranId: 'akunPpnKeluaranId',
   akunPpnMasukanId: 'akunPpnMasukanId',
   akunPph23DimukaId: 'akunPph23DimukaId',
@@ -5296,7 +5734,15 @@ export const TutupBukuScalarFieldEnum = {
   tanggal: 'tanggal',
   labaBersih: 'labaBersih',
   penggunaNama: 'penggunaNama',
-  jurnalId: 'jurnalId'
+  jurnalId: 'jurnalId',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type TutupBukuScalarFieldEnum = (typeof TutupBukuScalarFieldEnum)[keyof typeof TutupBukuScalarFieldEnum]
@@ -5309,7 +5755,15 @@ export const PphFinalBulananScalarFieldEnum = {
   tarifPersen: 'tarifPersen',
   jumlah: 'jumlah',
   jurnalId: 'jurnalId',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PphFinalBulananScalarFieldEnum = (typeof PphFinalBulananScalarFieldEnum)[keyof typeof PphFinalBulananScalarFieldEnum]
@@ -5371,7 +5825,15 @@ export const PriveScalarFieldEnum = {
   keterangan: 'keterangan',
   jurnalId: 'jurnalId',
   penggunaNama: 'penggunaNama',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PriveScalarFieldEnum = (typeof PriveScalarFieldEnum)[keyof typeof PriveScalarFieldEnum]
@@ -5391,7 +5853,15 @@ export const PenggajianScalarFieldEnum = {
   keterangan: 'keterangan',
   jurnalId: 'jurnalId',
   penggunaNama: 'penggunaNama',
-  dibuatPada: 'dibuatPada'
+  dibuatPada: 'dibuatPada',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PenggajianScalarFieldEnum = (typeof PenggajianScalarFieldEnum)[keyof typeof PenggajianScalarFieldEnum]
@@ -5518,6 +5988,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'Decimal'
  */
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -5560,6 +6044,20 @@ export type ListEnumStatusDokumenFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'StatusPersetujuan'
+ */
+export type EnumStatusPersetujuanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusPersetujuan'>
+    
+
+
+/**
+ * Reference to a field of type 'StatusPersetujuan[]'
+ */
+export type ListEnumStatusPersetujuanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StatusPersetujuan[]'>
+    
+
+
+/**
  * Reference to a field of type 'JenisAkun'
  */
 export type EnumJenisAkunFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisAkun'>
@@ -5588,16 +6086,16 @@ export type ListEnumSumberJurnalFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
- * Reference to a field of type 'Int'
+ * Reference to a field of type 'JenisDokumenKas'
  */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+export type EnumJenisDokumenKasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisDokumenKas'>
     
 
 
 /**
- * Reference to a field of type 'Int[]'
+ * Reference to a field of type 'JenisDokumenKas[]'
  */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+export type ListEnumJenisDokumenKasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisDokumenKas[]'>
     
 
 
@@ -5782,6 +6280,8 @@ export type GlobalOmitConfig = {
   pengguna?: Prisma.PenggunaOmit
   sesi?: Prisma.SesiOmit
   percobaanMasuk?: Prisma.PercobaanMasukOmit
+  mataUang?: Prisma.MataUangOmit
+  kursMataUang?: Prisma.KursMataUangOmit
   departemen?: Prisma.DepartemenOmit
   karyawan?: Prisma.KaryawanOmit
   pelanggan?: Prisma.PelangganOmit
@@ -5817,6 +6317,7 @@ export type GlobalOmitConfig = {
   pemetaanAkun?: Prisma.PemetaanAkunOmit
   jurnal?: Prisma.JurnalOmit
   barisJurnal?: Prisma.BarisJurnalOmit
+  dokumenKas?: Prisma.DokumenKasOmit
   asetTetap?: Prisma.AsetTetapOmit
   pelepasanAset?: Prisma.PelepasanAsetOmit
   penyusutanAset?: Prisma.PenyusutanAsetOmit

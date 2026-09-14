@@ -41,10 +41,12 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
     klien.barang.findMany({ where: { akunPersediaanId: { not: null } }, select: { akunPersediaanId: true }, distinct: ["akunPersediaanId"] }),
     // Σ stok × harga pokok rata-rata (hanya BARANG)
     klien.$queryRaw<Jumlah>`SELECT COALESCE(SUM(s."jumlah" * b."hargaBeli"), 0) AS nilai FROM "StokBarang" s JOIN "Barang" b ON b."id" = s."barangId" WHERE b."jenis" = 'BARANG'`,
-    klien.fakturPenjualan.aggregate({ _sum: { total: true, uangMuka: true } }),
+    // Hanya dokumen yang sudah DISETUJUI (jurnalnya ada di buku besar); draf & yang menunggu persetujuan dikecualikan
+    // supaya angka dokumen selalu sama dengan saldo buku besar. Lihat src/lib/persetujuan.ts.
+    klien.fakturPenjualan.aggregate({ where: { statusPersetujuan: "DISETUJUI" }, _sum: { total: true, uangMuka: true } }),
     klien.penerimaanPenjualan.aggregate({ _sum: { jumlah: true, potonganPajak: true } }),
     klien.returPenjualan.aggregate({ _sum: { total: true } }),
-    klien.fakturPembelian.aggregate({ _sum: { total: true } }),
+    klien.fakturPembelian.aggregate({ where: { statusPersetujuan: "DISETUJUI" }, _sum: { total: true } }),
     klien.pembayaranPembelian.aggregate({ _sum: { jumlah: true, potonganPajak: true } }),
     klien.returPembelian.aggregate({ _sum: { total: true } }),
     // Σ per baris pesanan pembelian: (BARANG diterima − sudah difaktur) × harga pesanan (negatif bila faktur mendahului TB)

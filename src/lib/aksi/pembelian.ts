@@ -16,6 +16,8 @@ import {
 } from "@/lib/akuntansi";
 import { tandaiProyek } from "@/lib/akuntansi";
 import { bacaProyekId } from "@/lib/proyek";
+import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
+import { bacaMataUangDokumen, nilaiDalamMataUang } from "@/lib/mataUang";
 import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
@@ -69,7 +71,7 @@ function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" 
 // ---------- Pesanan Pembelian ----------
 
 export async function buatPesananPembelian(dataFormulir: FormData) {
-  await wajibHakAksi("pesanan-pembelian.buat");
+  const pengguna = await wajibHakAksi("pesanan-pembelian.buat");
   const pemasokId = String(dataFormulir.get("pemasokId") ?? "");
   if (!pemasokId) throw new Error("Pemasok wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
@@ -84,6 +86,8 @@ export async function buatPesananPembelian(dataFormulir: FormData) {
       pemasokId,
       proyekId,
       total,
+      // Pesanan pembelian belum ikut alur persetujuan (tidak menghasilkan jurnal)
+      ...dataLangsungDisetujui(pengguna),
       baris: { create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah, harga: l.harga })) },
     },
   });
@@ -95,7 +99,7 @@ export async function buatPesananPembelian(dataFormulir: FormData) {
 // ---------- Penerimaan Barang ----------
 
 export async function buatPenerimaanBarang(dataFormulir: FormData) {
-  await wajibHakAksi("penerimaan-barang.buat");
+  const pengguna = await wajibHakAksi("penerimaan-barang.buat");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -134,6 +138,7 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
         pesananId,
         gudangId,
         status: "DIPROSES",
+        ...dataLangsungDisetujui(pengguna),
         baris: {
           create: barisNilai.map((l, i) => ({
             barisPesananId: daftarBaris[i].barisPesananId,
@@ -172,7 +177,7 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
 // ---------- Faktur Pembelian ----------
 
 export async function buatFakturPembelian(dataFormulir: FormData) {
-  await wajibHakAksi("faktur-pembelian.buat");
+  const pengguna = await wajibHakAksi("faktur-pembelian.buat");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
   const penerimaanId = String(dataFormulir.get("penerimaanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
@@ -195,6 +200,12 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
   }
   const hargaPesanan = new Map(pesanan.baris.map((ol) => [ol.barangId, D(ol.harga)]));
 
+  // Mata uang transaksi: pilihan formulir, kalau kosong mengikuti mata uang bawaan pemasok
+  const pemasok = await db.pemasok.findUniqueOrThrow({ where: { id: pesanan.pemasokId }, select: { mataUangId: true } });
+  const { mataUangId, kurs } = await bacaMataUangDokumen(db, dataFormulir, pemasok.mataUangId, new Date());
+  const nilaiAsli = mataUangId ? nilaiDalamMataUang(total, kurs) : null;
+
+  const perluPersetujuan = await persetujuanWajib(db);
   const nomor = await nomorDokumenBerikutnya(db.fakturPembelian, "FB");
 
   await db.$transaction(async (tx) => {
@@ -209,7 +220,11 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
         dpp,
         ppnPersen,
         ppn,
+        mataUangId,
+        kurs,
+        nilaiAsli,
         jatuhTempo: tanggalJatuhTempo(pengaturan.terminHari),
+        ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
         baris: {
           create: daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: l.jumlah, harga: l.harga, subtotal: kali(l.jumlah, l.harga) })),
         },
@@ -228,19 +243,24 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       }
     }
 
-    const jurnal = await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan, pengaturan.akunPpnMasukanId);
+    if (perluPersetujuan) return; // jurnal dicatat saat faktur disetujui (src/lib/persetujuan.ts)
+
+    const jurnal = await catatJurnalFakturPembelian(tx, faktur, daftarBaris, hargaPesanan, pengaturan.akunPpnMasukanId, {
+      asli: mataUangId ? { mataUangId, kurs } : null,
+    });
     if (jurnal) await tx.fakturPembelian.update({ where: { id: faktur.id }, data: { jurnalId: jurnal.id } });
     await tandaiProyek(tx, jurnal, pesanan.proyekId);
   });
 
   revalidatePath("/pembelian/faktur");
+  if (perluPersetujuan) revalidatePath("/persetujuan");
   redirect("/pembelian/faktur");
 }
 
 // ---------- Pembayaran Pembelian ----------
 
 export async function buatPembayaranPembelian(dataFormulir: FormData) {
-  await wajibHakAksi("pembayaran.buat");
+  const pengguna = await wajibHakAksi("pembayaran.buat");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const akunId = String(dataFormulir.get("akunId") ?? "");
   const metodeBayar = String(dataFormulir.get("metodeBayar") ?? "TRANSFER");
@@ -268,7 +288,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
 
   await db.$transaction(async (tx) => {
     const pembayaran = await tx.pembayaranPembelian.create({
-      data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, potonganPajak, metodeBayar },
+      data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, potonganPajak, metodeBayar, ...dataLangsungDisetujui(pengguna) },
     });
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
     const jurnal = await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor, pengaturan.akunPph23DipotongId);
@@ -284,7 +304,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
 // ---------- Retur Pembelian ----------
 
 export async function buatReturPembelian(dataFormulir: FormData) {
-  await wajibHakAksi("retur-pembelian.buat");
+  const pengguna = await wajibHakAksi("retur-pembelian.buat");
   const fakturId = String(dataFormulir.get("fakturId") ?? "");
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   const alasan = String(dataFormulir.get("alasan") ?? "").trim();
@@ -340,6 +360,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
         total,
         dpp,
         ppn,
+        ...dataLangsungDisetujui(pengguna),
         baris: {
           create: daftarBaris.map((l) => ({
             barangId: l.barangId,

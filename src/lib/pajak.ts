@@ -48,10 +48,12 @@ export function hitungPphFinal(omzet: Desimal, tarifPersen: Desimal): Desimal {
 export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal: Desimal): Promise<RingkasanPajak> {
   const dari = new Date(tahun, 0, 1), sampai = new Date(tahun, 11, 31, 23, 59, 59, 999);
   const rentang = { tanggal: { gte: dari, lte: sampai } };
+  // Faktur yang belum disetujui belum menjadi penyerahan di buku besar, jadi PPN & DPP-nya belum dihitung
+  const rentangDisetujui = { ...rentang, statusPersetujuan: "DISETUJUI" as const };
   const [fj, rj, fb, rb, trm, byr, tercatat, pemetaan, daftarAkun, agregat] = await Promise.all([
-    klien.fakturPenjualan.findMany({ where: rentang, select: { tanggal: true, dpp: true, diskon: true, ppn: true } }),
+    klien.fakturPenjualan.findMany({ where: rentangDisetujui, select: { tanggal: true, dpp: true, diskon: true, ppn: true } }),
     klien.returPenjualan.findMany({ where: rentang, select: { tanggal: true, dpp: true, diskon: true, ppn: true } }),
-    klien.fakturPembelian.findMany({ where: rentang, select: { tanggal: true, ppn: true } }),
+    klien.fakturPembelian.findMany({ where: rentangDisetujui, select: { tanggal: true, ppn: true } }),
     klien.returPembelian.findMany({ where: rentang, select: { tanggal: true, ppn: true } }),
     klien.penerimaanPenjualan.findMany({ where: rentang, select: { tanggal: true, potonganPajak: true } }),
     klien.pembayaranPembelian.findMany({ where: rentang, select: { tanggal: true, potonganPajak: true } }),

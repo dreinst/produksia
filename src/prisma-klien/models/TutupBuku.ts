@@ -43,6 +43,14 @@ export type TutupBukuMinAggregateOutputType = {
   labaBersih: runtime.Decimal | null
   penggunaNama: string | null
   jurnalId: string | null
+  statusPersetujuan: $Enums.StatusPersetujuan | null
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
 }
 
 export type TutupBukuMaxAggregateOutputType = {
@@ -52,6 +60,14 @@ export type TutupBukuMaxAggregateOutputType = {
   labaBersih: runtime.Decimal | null
   penggunaNama: string | null
   jurnalId: string | null
+  statusPersetujuan: $Enums.StatusPersetujuan | null
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
 }
 
 export type TutupBukuCountAggregateOutputType = {
@@ -61,6 +77,14 @@ export type TutupBukuCountAggregateOutputType = {
   labaBersih: number
   penggunaNama: number
   jurnalId: number
+  statusPersetujuan: number
+  diajukanOlehId: number
+  diajukanPada: number
+  disetujuiOlehId: number
+  disetujuiPada: number
+  ditolakOlehId: number
+  ditolakPada: number
+  catatanPenolakan: number
   _all: number
 }
 
@@ -82,6 +106,14 @@ export type TutupBukuMinAggregateInputType = {
   labaBersih?: true
   penggunaNama?: true
   jurnalId?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
 }
 
 export type TutupBukuMaxAggregateInputType = {
@@ -91,6 +123,14 @@ export type TutupBukuMaxAggregateInputType = {
   labaBersih?: true
   penggunaNama?: true
   jurnalId?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
 }
 
 export type TutupBukuCountAggregateInputType = {
@@ -100,6 +140,14 @@ export type TutupBukuCountAggregateInputType = {
   labaBersih?: true
   penggunaNama?: true
   jurnalId?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
   _all?: true
 }
 
@@ -196,6 +244,14 @@ export type TutupBukuGroupByOutputType = {
   labaBersih: runtime.Decimal
   penggunaNama: string
   jurnalId: string | null
+  statusPersetujuan: $Enums.StatusPersetujuan
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
   _count: TutupBukuCountAggregateOutputType | null
   _avg: TutupBukuAvgAggregateOutputType | null
   _sum: TutupBukuSumAggregateOutputType | null
@@ -228,7 +284,18 @@ export type TutupBukuWhereInput = {
   labaBersih?: Prisma.DecimalFilter<"TutupBuku"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFilter<"TutupBuku"> | string
   jurnalId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"TutupBuku"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
+  diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
 }
 
 export type TutupBukuOrderByWithRelationInput = {
@@ -238,7 +305,18 @@ export type TutupBukuOrderByWithRelationInput = {
   labaBersih?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   jurnal?: Prisma.JurnalOrderByWithRelationInput
+  diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
+  disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
+  ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
 }
 
 export type TutupBukuWhereUniqueInput = Prisma.AtLeast<{
@@ -251,7 +329,18 @@ export type TutupBukuWhereUniqueInput = Prisma.AtLeast<{
   tanggal?: Prisma.DateTimeFilter<"TutupBuku"> | Date | string
   labaBersih?: Prisma.DecimalFilter<"TutupBuku"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFilter<"TutupBuku"> | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"TutupBuku"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
+  diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
 }, "id" | "tahun" | "jurnalId">
 
 export type TutupBukuOrderByWithAggregationInput = {
@@ -261,6 +350,14 @@ export type TutupBukuOrderByWithAggregationInput = {
   labaBersih?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TutupBukuCountOrderByAggregateInput
   _avg?: Prisma.TutupBukuAvgOrderByAggregateInput
   _max?: Prisma.TutupBukuMaxOrderByAggregateInput
@@ -278,6 +375,14 @@ export type TutupBukuScalarWhereWithAggregatesInput = {
   labaBersih?: Prisma.DecimalWithAggregatesFilter<"TutupBuku"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringWithAggregatesFilter<"TutupBuku"> | string
   jurnalId?: Prisma.StringNullableWithAggregatesFilter<"TutupBuku"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"TutupBuku"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"TutupBuku"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"TutupBuku"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableWithAggregatesFilter<"TutupBuku"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableWithAggregatesFilter<"TutupBuku"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableWithAggregatesFilter<"TutupBuku"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableWithAggregatesFilter<"TutupBuku"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableWithAggregatesFilter<"TutupBuku"> | string | null
 }
 
 export type TutupBukuCreateInput = {
@@ -286,7 +391,15 @@ export type TutupBukuCreateInput = {
   tanggal?: Date | string
   labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   jurnal?: Prisma.JurnalCreateNestedOneWithoutTutupBukuInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanTutupBukuInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiTutupBukuInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakTutupBukuInput
 }
 
 export type TutupBukuUncheckedCreateInput = {
@@ -296,6 +409,14 @@ export type TutupBukuUncheckedCreateInput = {
   labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama: string
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type TutupBukuUpdateInput = {
@@ -304,7 +425,15 @@ export type TutupBukuUpdateInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   jurnal?: Prisma.JurnalUpdateOneWithoutTutupBukuNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanTutupBukuNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiTutupBukuNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakTutupBukuNestedInput
 }
 
 export type TutupBukuUncheckedUpdateInput = {
@@ -314,6 +443,14 @@ export type TutupBukuUncheckedUpdateInput = {
   labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TutupBukuCreateManyInput = {
@@ -323,6 +460,14 @@ export type TutupBukuCreateManyInput = {
   labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama: string
   jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type TutupBukuUpdateManyMutationInput = {
@@ -331,6 +476,11 @@ export type TutupBukuUpdateManyMutationInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TutupBukuUncheckedUpdateManyInput = {
@@ -340,6 +490,24 @@ export type TutupBukuUncheckedUpdateManyInput = {
   labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuListRelationFilter = {
+  every?: Prisma.TutupBukuWhereInput
+  some?: Prisma.TutupBukuWhereInput
+  none?: Prisma.TutupBukuWhereInput
+}
+
+export type TutupBukuOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type TutupBukuNullableScalarRelationFilter = {
@@ -354,6 +522,14 @@ export type TutupBukuCountOrderByAggregateInput = {
   labaBersih?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type TutupBukuAvgOrderByAggregateInput = {
@@ -368,6 +544,14 @@ export type TutupBukuMaxOrderByAggregateInput = {
   labaBersih?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type TutupBukuMinOrderByAggregateInput = {
@@ -377,11 +561,145 @@ export type TutupBukuMinOrderByAggregateInput = {
   labaBersih?: Prisma.SortOrder
   penggunaNama?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type TutupBukuSumOrderByAggregateInput = {
   tahun?: Prisma.SortOrder
   labaBersih?: Prisma.SortOrder
+}
+
+export type TutupBukuCreateNestedManyWithoutDiajukanOlehInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput> | Prisma.TutupBukuCreateWithoutDiajukanOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDiajukanOlehInputEnvelope
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+}
+
+export type TutupBukuCreateNestedManyWithoutDisetujuiOlehInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.TutupBukuCreateWithoutDisetujuiOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDisetujuiOlehInputEnvelope
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+}
+
+export type TutupBukuCreateNestedManyWithoutDitolakOlehInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput> | Prisma.TutupBukuCreateWithoutDitolakOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDitolakOlehInputEnvelope
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+}
+
+export type TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput> | Prisma.TutupBukuCreateWithoutDiajukanOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDiajukanOlehInputEnvelope
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+}
+
+export type TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.TutupBukuCreateWithoutDisetujuiOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDisetujuiOlehInputEnvelope
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+}
+
+export type TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput> | Prisma.TutupBukuCreateWithoutDitolakOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDitolakOlehInputEnvelope
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+}
+
+export type TutupBukuUpdateManyWithoutDiajukanOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput> | Prisma.TutupBukuCreateWithoutDiajukanOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput[]
+  upsert?: Prisma.TutupBukuUpsertWithWhereUniqueWithoutDiajukanOlehInput | Prisma.TutupBukuUpsertWithWhereUniqueWithoutDiajukanOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDiajukanOlehInputEnvelope
+  set?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  disconnect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  delete?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  update?: Prisma.TutupBukuUpdateWithWhereUniqueWithoutDiajukanOlehInput | Prisma.TutupBukuUpdateWithWhereUniqueWithoutDiajukanOlehInput[]
+  updateMany?: Prisma.TutupBukuUpdateManyWithWhereWithoutDiajukanOlehInput | Prisma.TutupBukuUpdateManyWithWhereWithoutDiajukanOlehInput[]
+  deleteMany?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+}
+
+export type TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.TutupBukuCreateWithoutDisetujuiOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput[]
+  upsert?: Prisma.TutupBukuUpsertWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.TutupBukuUpsertWithWhereUniqueWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDisetujuiOlehInputEnvelope
+  set?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  disconnect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  delete?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  update?: Prisma.TutupBukuUpdateWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.TutupBukuUpdateWithWhereUniqueWithoutDisetujuiOlehInput[]
+  updateMany?: Prisma.TutupBukuUpdateManyWithWhereWithoutDisetujuiOlehInput | Prisma.TutupBukuUpdateManyWithWhereWithoutDisetujuiOlehInput[]
+  deleteMany?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+}
+
+export type TutupBukuUpdateManyWithoutDitolakOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput> | Prisma.TutupBukuCreateWithoutDitolakOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput[]
+  upsert?: Prisma.TutupBukuUpsertWithWhereUniqueWithoutDitolakOlehInput | Prisma.TutupBukuUpsertWithWhereUniqueWithoutDitolakOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDitolakOlehInputEnvelope
+  set?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  disconnect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  delete?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  update?: Prisma.TutupBukuUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.TutupBukuUpdateWithWhereUniqueWithoutDitolakOlehInput[]
+  updateMany?: Prisma.TutupBukuUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.TutupBukuUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+}
+
+export type TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput> | Prisma.TutupBukuCreateWithoutDiajukanOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDiajukanOlehInput[]
+  upsert?: Prisma.TutupBukuUpsertWithWhereUniqueWithoutDiajukanOlehInput | Prisma.TutupBukuUpsertWithWhereUniqueWithoutDiajukanOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDiajukanOlehInputEnvelope
+  set?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  disconnect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  delete?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  update?: Prisma.TutupBukuUpdateWithWhereUniqueWithoutDiajukanOlehInput | Prisma.TutupBukuUpdateWithWhereUniqueWithoutDiajukanOlehInput[]
+  updateMany?: Prisma.TutupBukuUpdateManyWithWhereWithoutDiajukanOlehInput | Prisma.TutupBukuUpdateManyWithWhereWithoutDiajukanOlehInput[]
+  deleteMany?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+}
+
+export type TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.TutupBukuCreateWithoutDisetujuiOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDisetujuiOlehInput[]
+  upsert?: Prisma.TutupBukuUpsertWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.TutupBukuUpsertWithWhereUniqueWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDisetujuiOlehInputEnvelope
+  set?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  disconnect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  delete?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  update?: Prisma.TutupBukuUpdateWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.TutupBukuUpdateWithWhereUniqueWithoutDisetujuiOlehInput[]
+  updateMany?: Prisma.TutupBukuUpdateManyWithWhereWithoutDisetujuiOlehInput | Prisma.TutupBukuUpdateManyWithWhereWithoutDisetujuiOlehInput[]
+  deleteMany?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+}
+
+export type TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.TutupBukuCreateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput> | Prisma.TutupBukuCreateWithoutDitolakOlehInput[] | Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput | Prisma.TutupBukuCreateOrConnectWithoutDitolakOlehInput[]
+  upsert?: Prisma.TutupBukuUpsertWithWhereUniqueWithoutDitolakOlehInput | Prisma.TutupBukuUpsertWithWhereUniqueWithoutDitolakOlehInput[]
+  createMany?: Prisma.TutupBukuCreateManyDitolakOlehInputEnvelope
+  set?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  disconnect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  delete?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  connect?: Prisma.TutupBukuWhereUniqueInput | Prisma.TutupBukuWhereUniqueInput[]
+  update?: Prisma.TutupBukuUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.TutupBukuUpdateWithWhereUniqueWithoutDitolakOlehInput[]
+  updateMany?: Prisma.TutupBukuUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.TutupBukuUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
 }
 
 export type TutupBukuCreateNestedOneWithoutJurnalInput = {
@@ -416,12 +734,214 @@ export type TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TutupBukuUpdateToOneWithWhereWithoutJurnalInput, Prisma.TutupBukuUpdateWithoutJurnalInput>, Prisma.TutupBukuUncheckedUpdateWithoutJurnalInput>
 }
 
+export type TutupBukuCreateWithoutDiajukanOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutTutupBukuInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiTutupBukuInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakTutupBukuInput
+}
+
+export type TutupBukuUncheckedCreateWithoutDiajukanOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type TutupBukuCreateOrConnectWithoutDiajukanOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutupBukuCreateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput>
+}
+
+export type TutupBukuCreateManyDiajukanOlehInputEnvelope = {
+  data: Prisma.TutupBukuCreateManyDiajukanOlehInput | Prisma.TutupBukuCreateManyDiajukanOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type TutupBukuCreateWithoutDisetujuiOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutTutupBukuInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanTutupBukuInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakTutupBukuInput
+}
+
+export type TutupBukuUncheckedCreateWithoutDisetujuiOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type TutupBukuCreateOrConnectWithoutDisetujuiOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutupBukuCreateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput>
+}
+
+export type TutupBukuCreateManyDisetujuiOlehInputEnvelope = {
+  data: Prisma.TutupBukuCreateManyDisetujuiOlehInput | Prisma.TutupBukuCreateManyDisetujuiOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type TutupBukuCreateWithoutDitolakOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutTutupBukuInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanTutupBukuInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiTutupBukuInput
+}
+
+export type TutupBukuUncheckedCreateWithoutDitolakOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type TutupBukuCreateOrConnectWithoutDitolakOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  create: Prisma.XOR<Prisma.TutupBukuCreateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput>
+}
+
+export type TutupBukuCreateManyDitolakOlehInputEnvelope = {
+  data: Prisma.TutupBukuCreateManyDitolakOlehInput | Prisma.TutupBukuCreateManyDitolakOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type TutupBukuUpsertWithWhereUniqueWithoutDiajukanOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  update: Prisma.XOR<Prisma.TutupBukuUpdateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedUpdateWithoutDiajukanOlehInput>
+  create: Prisma.XOR<Prisma.TutupBukuCreateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDiajukanOlehInput>
+}
+
+export type TutupBukuUpdateWithWhereUniqueWithoutDiajukanOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  data: Prisma.XOR<Prisma.TutupBukuUpdateWithoutDiajukanOlehInput, Prisma.TutupBukuUncheckedUpdateWithoutDiajukanOlehInput>
+}
+
+export type TutupBukuUpdateManyWithWhereWithoutDiajukanOlehInput = {
+  where: Prisma.TutupBukuScalarWhereInput
+  data: Prisma.XOR<Prisma.TutupBukuUpdateManyMutationInput, Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehInput>
+}
+
+export type TutupBukuScalarWhereInput = {
+  AND?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+  OR?: Prisma.TutupBukuScalarWhereInput[]
+  NOT?: Prisma.TutupBukuScalarWhereInput | Prisma.TutupBukuScalarWhereInput[]
+  id?: Prisma.StringFilter<"TutupBuku"> | string
+  tahun?: Prisma.IntFilter<"TutupBuku"> | number
+  tanggal?: Prisma.DateTimeFilter<"TutupBuku"> | Date | string
+  labaBersih?: Prisma.DecimalFilter<"TutupBuku"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFilter<"TutupBuku"> | string
+  jurnalId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"TutupBuku"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"TutupBuku"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"TutupBuku"> | string | null
+}
+
+export type TutupBukuUpsertWithWhereUniqueWithoutDisetujuiOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  update: Prisma.XOR<Prisma.TutupBukuUpdateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedUpdateWithoutDisetujuiOlehInput>
+  create: Prisma.XOR<Prisma.TutupBukuCreateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDisetujuiOlehInput>
+}
+
+export type TutupBukuUpdateWithWhereUniqueWithoutDisetujuiOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  data: Prisma.XOR<Prisma.TutupBukuUpdateWithoutDisetujuiOlehInput, Prisma.TutupBukuUncheckedUpdateWithoutDisetujuiOlehInput>
+}
+
+export type TutupBukuUpdateManyWithWhereWithoutDisetujuiOlehInput = {
+  where: Prisma.TutupBukuScalarWhereInput
+  data: Prisma.XOR<Prisma.TutupBukuUpdateManyMutationInput, Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehInput>
+}
+
+export type TutupBukuUpsertWithWhereUniqueWithoutDitolakOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  update: Prisma.XOR<Prisma.TutupBukuUpdateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedUpdateWithoutDitolakOlehInput>
+  create: Prisma.XOR<Prisma.TutupBukuCreateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedCreateWithoutDitolakOlehInput>
+}
+
+export type TutupBukuUpdateWithWhereUniqueWithoutDitolakOlehInput = {
+  where: Prisma.TutupBukuWhereUniqueInput
+  data: Prisma.XOR<Prisma.TutupBukuUpdateWithoutDitolakOlehInput, Prisma.TutupBukuUncheckedUpdateWithoutDitolakOlehInput>
+}
+
+export type TutupBukuUpdateManyWithWhereWithoutDitolakOlehInput = {
+  where: Prisma.TutupBukuScalarWhereInput
+  data: Prisma.XOR<Prisma.TutupBukuUpdateManyMutationInput, Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehInput>
+}
+
 export type TutupBukuCreateWithoutJurnalInput = {
   id?: string
   tahun: number
   tanggal?: Date | string
   labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanTutupBukuInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiTutupBukuInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakTutupBukuInput
 }
 
 export type TutupBukuUncheckedCreateWithoutJurnalInput = {
@@ -430,6 +950,14 @@ export type TutupBukuUncheckedCreateWithoutJurnalInput = {
   tanggal?: Date | string
   labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type TutupBukuCreateOrConnectWithoutJurnalInput = {
@@ -454,6 +982,14 @@ export type TutupBukuUpdateWithoutJurnalInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanTutupBukuNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiTutupBukuNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakTutupBukuNestedInput
 }
 
 export type TutupBukuUncheckedUpdateWithoutJurnalInput = {
@@ -462,6 +998,206 @@ export type TutupBukuUncheckedUpdateWithoutJurnalInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuCreateManyDiajukanOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type TutupBukuCreateManyDisetujuiOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type TutupBukuCreateManyDitolakOlehInput = {
+  id?: string
+  tahun: number
+  tanggal?: Date | string
+  labaBersih?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama: string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type TutupBukuUpdateWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnal?: Prisma.JurnalUpdateOneWithoutTutupBukuNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiTutupBukuNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakTutupBukuNestedInput
+}
+
+export type TutupBukuUncheckedUpdateWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuUncheckedUpdateManyWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuUpdateWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnal?: Prisma.JurnalUpdateOneWithoutTutupBukuNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanTutupBukuNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakTutupBukuNestedInput
+}
+
+export type TutupBukuUncheckedUpdateWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnal?: Prisma.JurnalUpdateOneWithoutTutupBukuNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanTutupBukuNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiTutupBukuNestedInput
+}
+
+export type TutupBukuUncheckedUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type TutupBukuUncheckedUpdateManyWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahun?: Prisma.IntFieldUpdateOperationsInput | number
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  labaBersih?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -473,7 +1209,18 @@ export type TutupBukuSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   labaBersih?: boolean
   penggunaNama?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   jurnal?: boolean | Prisma.TutupBuku$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["tutupBuku"]>
 
 export type TutupBukuSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -483,7 +1230,18 @@ export type TutupBukuSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   labaBersih?: boolean
   penggunaNama?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   jurnal?: boolean | Prisma.TutupBuku$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["tutupBuku"]>
 
 export type TutupBukuSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -493,7 +1251,18 @@ export type TutupBukuSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   labaBersih?: boolean
   penggunaNama?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   jurnal?: boolean | Prisma.TutupBuku$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["tutupBuku"]>
 
 export type TutupBukuSelectScalar = {
@@ -503,23 +1272,43 @@ export type TutupBukuSelectScalar = {
   labaBersih?: boolean
   penggunaNama?: boolean
   jurnalId?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
 }
 
-export type TutupBukuOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tahun" | "tanggal" | "labaBersih" | "penggunaNama" | "jurnalId", ExtArgs["result"]["tutupBuku"]>
+export type TutupBukuOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tahun" | "tanggal" | "labaBersih" | "penggunaNama" | "jurnalId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["tutupBuku"]>
 export type TutupBukuInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.TutupBuku$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>
 }
 export type TutupBukuIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.TutupBuku$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>
 }
 export type TutupBukuIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.TutupBuku$jurnalArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>
 }
 
 export type $TutupBukuPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TutupBuku"
   objects: {
     jurnal: Prisma.$JurnalPayload<ExtArgs> | null
+    diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -528,6 +1317,17 @@ export type $TutupBukuPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     labaBersih: runtime.Decimal
     penggunaNama: string
     jurnalId: string | null
+    /**
+     * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+     */
+    statusPersetujuan: $Enums.StatusPersetujuan
+    diajukanOlehId: string | null
+    diajukanPada: Date | null
+    disetujuiOlehId: string | null
+    disetujuiPada: Date | null
+    ditolakOlehId: string | null
+    ditolakPada: Date | null
+    catatanPenolakan: string | null
   }, ExtArgs["result"]["tutupBuku"]>
   composites: {}
 }
@@ -923,6 +1723,9 @@ readonly fields: TutupBukuFieldRefs;
 export interface Prisma__TutupBukuClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   jurnal<T extends Prisma.TutupBuku$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutupBuku$jurnalArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  diajukanOleh<T extends Prisma.TutupBuku$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutupBuku$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  disetujuiOleh<T extends Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutupBuku$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  ditolakOleh<T extends Prisma.TutupBuku$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TutupBuku$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -958,6 +1761,14 @@ export interface TutupBukuFieldRefs {
   readonly labaBersih: Prisma.FieldRef<"TutupBuku", 'Decimal'>
   readonly penggunaNama: Prisma.FieldRef<"TutupBuku", 'String'>
   readonly jurnalId: Prisma.FieldRef<"TutupBuku", 'String'>
+  readonly statusPersetujuan: Prisma.FieldRef<"TutupBuku", 'StatusPersetujuan'>
+  readonly diajukanOlehId: Prisma.FieldRef<"TutupBuku", 'String'>
+  readonly diajukanPada: Prisma.FieldRef<"TutupBuku", 'DateTime'>
+  readonly disetujuiOlehId: Prisma.FieldRef<"TutupBuku", 'String'>
+  readonly disetujuiPada: Prisma.FieldRef<"TutupBuku", 'DateTime'>
+  readonly ditolakOlehId: Prisma.FieldRef<"TutupBuku", 'String'>
+  readonly ditolakPada: Prisma.FieldRef<"TutupBuku", 'DateTime'>
+  readonly catatanPenolakan: Prisma.FieldRef<"TutupBuku", 'String'>
 }
     
 
@@ -1375,6 +2186,63 @@ export type TutupBuku$jurnalArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   include?: Prisma.JurnalInclude<ExtArgs> | null
   where?: Prisma.JurnalWhereInput
+}
+
+/**
+ * TutupBuku.diajukanOleh
+ */
+export type TutupBuku$diajukanOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * TutupBuku.disetujuiOleh
+ */
+export type TutupBuku$disetujuiOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * TutupBuku.ditolakOleh
+ */
+export type TutupBuku$ditolakOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
 }
 
 /**

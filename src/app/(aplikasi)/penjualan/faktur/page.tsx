@@ -5,6 +5,7 @@ import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
 import Link from "next/link";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
+import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import { db } from "@/lib/db";
 
 export default async function HalamanFakturPenjualan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -22,7 +23,8 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
     <div className="space-y-6">
       <h1 className="judul-halaman">Faktur Penjualan</h1>
       <p className="redup">
-        Faktur dibuat dari halaman Pesanan Penjualan (tombol &quot;Fakturkan&quot;).
+        Faktur dibuat dari halaman Pesanan Penjualan (tombol &quot;Fakturkan&quot;). Selama alur persetujuan
+        menyala, faktur baru berstatus Draf dan belum masuk buku besar sampai diajukan lalu disetujui pengguna lain.
       </p>
 
       <div className="kartu kartu-tabel">
@@ -37,6 +39,7 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
             <th className="text-right">Total</th>
             <th className="text-right">Terbayar (termasuk DP)</th>
             <th>Status</th>
+            <th>Persetujuan</th>
             <th />
           </tr>
         </thead>
@@ -51,8 +54,20 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
                 <td className="text-right angka">{Number(inv.total).toLocaleString("id-ID")}</td>
                 <td className="text-right angka">{paid.toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={inv.status} /></td>
+                <td>
+                  <SelPersetujuan
+                    jenis="faktur"
+                    kode="faktur"
+                    id={inv.id}
+                    nomor={inv.nomor}
+                    status={inv.statusPersetujuan}
+                    diajukanOlehId={inv.diajukanOlehId}
+                    pengguna={pengguna}
+                    catatanPenolakan={inv.catatanPenolakan}
+                  />
+                </td>
                 <td className="space-x-3 whitespace-nowrap">
-                  {inv.status !== "LUNAS" && boleh("penerimaan.buat") && (
+                  {inv.statusPersetujuan === "DISETUJUI" && inv.status !== "LUNAS" && boleh("penerimaan.buat") && (
                     <Link
                       href={`/penjualan/penerimaan/baru?fakturId=${inv.id}`}
                       className="tombol-tautan"
@@ -60,7 +75,7 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
                       Terima Bayar
                     </Link>
                   )}
-                  {boleh("retur-penjualan.buat") && (
+                  {inv.statusPersetujuan === "DISETUJUI" && boleh("retur-penjualan.buat") && (
                     <Link
                     href={`/penjualan/retur/baru?fakturId=${inv.id}`}
                     className="tombol-tautan"
@@ -75,7 +90,7 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
           })}
           {daftarFaktur.length === 0 && (
             <tr>
-              <td colSpan={7} className="kosong">
+              <td colSpan={8} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada faktur."}
               </td>
             </tr>

@@ -21,6 +21,23 @@ export function LencanaStatus({ status }: { status: string }) {
   return <span className={`lencana ${s.cls}`}>{s.label}</span>;
 }
 
+/** Status alur persetujuan (maker-checker); DISETUJUI = jurnalnya sudah masuk buku besar. */
+const GAYA_PERSETUJUAN: Record<string, { cls: string; label: string; judul: string }> = {
+  DRAFT: { cls: "lencana-slate", label: "Draf", judul: "Belum diajukan; belum ada jurnal di buku besar" },
+  MENUNGGU: { cls: "lencana-amber", label: "Menunggu", judul: "Sudah diajukan, menunggu persetujuan; belum ada jurnal" },
+  DISETUJUI: { cls: "lencana-emerald", label: "Disetujui", judul: "Sudah disetujui; jurnalnya sudah masuk buku besar" },
+  DITOLAK: { cls: "lencana-rose", label: "Ditolak", judul: "Ditolak pemeriksa; tidak ada jurnal yang dicatat" },
+};
+
+export function LencanaPersetujuan({ status }: { status: string }) {
+  const s = GAYA_PERSETUJUAN[status] ?? { cls: "lencana-slate", label: status, judul: status };
+  return (
+    <span className={`lencana ${s.cls}`} title={s.judul}>
+      {s.label}
+    </span>
+  );
+}
+
 const LABEL_BAYAR: Record<string, string> = { TUNAI: "Tunai", TRANSFER: "Transfer", KARTU: "Kartu" };
 export function labelMetodeBayar(v: string) {
   return LABEL_BAYAR[v] ?? v;
@@ -38,6 +55,8 @@ const LABEL_SUMBER: Record<string, string> = {
   PENUTUP: "Penutup tahun",
   PAJAK: "Pajak",
   PRIVE: "Prive",
+  PENGGAJIAN: "Penggajian",
+  SELISIH_KURS: "Selisih kurs",
 };
 export function labelSumberJurnal(v: string) {
   return LABEL_SUMBER[v] ?? v;

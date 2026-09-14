@@ -32,6 +32,14 @@ export type PindahBarangMinAggregateOutputType = {
   gudangTujuanId: string | null
   keterangan: string | null
   dibuatPada: Date | null
+  statusPersetujuan: $Enums.StatusPersetujuan | null
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
 }
 
 export type PindahBarangMaxAggregateOutputType = {
@@ -42,6 +50,14 @@ export type PindahBarangMaxAggregateOutputType = {
   gudangTujuanId: string | null
   keterangan: string | null
   dibuatPada: Date | null
+  statusPersetujuan: $Enums.StatusPersetujuan | null
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
 }
 
 export type PindahBarangCountAggregateOutputType = {
@@ -52,6 +68,14 @@ export type PindahBarangCountAggregateOutputType = {
   gudangTujuanId: number
   keterangan: number
   dibuatPada: number
+  statusPersetujuan: number
+  diajukanOlehId: number
+  diajukanPada: number
+  disetujuiOlehId: number
+  disetujuiPada: number
+  ditolakOlehId: number
+  ditolakPada: number
+  catatanPenolakan: number
   _all: number
 }
 
@@ -64,6 +88,14 @@ export type PindahBarangMinAggregateInputType = {
   gudangTujuanId?: true
   keterangan?: true
   dibuatPada?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
 }
 
 export type PindahBarangMaxAggregateInputType = {
@@ -74,6 +106,14 @@ export type PindahBarangMaxAggregateInputType = {
   gudangTujuanId?: true
   keterangan?: true
   dibuatPada?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
 }
 
 export type PindahBarangCountAggregateInputType = {
@@ -84,6 +124,14 @@ export type PindahBarangCountAggregateInputType = {
   gudangTujuanId?: true
   keterangan?: true
   dibuatPada?: true
+  statusPersetujuan?: true
+  diajukanOlehId?: true
+  diajukanPada?: true
+  disetujuiOlehId?: true
+  disetujuiPada?: true
+  ditolakOlehId?: true
+  ditolakPada?: true
+  catatanPenolakan?: true
   _all?: true
 }
 
@@ -167,6 +215,14 @@ export type PindahBarangGroupByOutputType = {
   gudangTujuanId: string
   keterangan: string | null
   dibuatPada: Date
+  statusPersetujuan: $Enums.StatusPersetujuan
+  diajukanOlehId: string | null
+  diajukanPada: Date | null
+  disetujuiOlehId: string | null
+  disetujuiPada: Date | null
+  ditolakOlehId: string | null
+  ditolakPada: Date | null
+  catatanPenolakan: string | null
   _count: PindahBarangCountAggregateOutputType | null
   _min: PindahBarangMinAggregateOutputType | null
   _max: PindahBarangMaxAggregateOutputType | null
@@ -198,9 +254,20 @@ export type PindahBarangWhereInput = {
   gudangTujuanId?: Prisma.StringFilter<"PindahBarang"> | string
   keterangan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"PindahBarang"> | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"PindahBarang"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
   gudangAsal?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
   gudangTujuan?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
   baris?: Prisma.BarisPindahBarangListRelationFilter
+  diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
 }
 
 export type PindahBarangOrderByWithRelationInput = {
@@ -211,9 +278,20 @@ export type PindahBarangOrderByWithRelationInput = {
   gudangTujuanId?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   gudangAsal?: Prisma.GudangOrderByWithRelationInput
   gudangTujuan?: Prisma.GudangOrderByWithRelationInput
   baris?: Prisma.BarisPindahBarangOrderByRelationAggregateInput
+  diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
+  disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
+  ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
 }
 
 export type PindahBarangWhereUniqueInput = Prisma.AtLeast<{
@@ -227,9 +305,20 @@ export type PindahBarangWhereUniqueInput = Prisma.AtLeast<{
   gudangTujuanId?: Prisma.StringFilter<"PindahBarang"> | string
   keterangan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"PindahBarang"> | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"PindahBarang"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
   gudangAsal?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
   gudangTujuan?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
   baris?: Prisma.BarisPindahBarangListRelationFilter
+  diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
 }, "id" | "nomor">
 
 export type PindahBarangOrderByWithAggregationInput = {
@@ -240,6 +329,14 @@ export type PindahBarangOrderByWithAggregationInput = {
   gudangTujuanId?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PindahBarangCountOrderByAggregateInput
   _max?: Prisma.PindahBarangMaxOrderByAggregateInput
   _min?: Prisma.PindahBarangMinOrderByAggregateInput
@@ -256,6 +353,14 @@ export type PindahBarangScalarWhereWithAggregatesInput = {
   gudangTujuanId?: Prisma.StringWithAggregatesFilter<"PindahBarang"> | string
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"PindahBarang"> | string | null
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"PindahBarang"> | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"PindahBarang"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"PindahBarang"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"PindahBarang"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableWithAggregatesFilter<"PindahBarang"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableWithAggregatesFilter<"PindahBarang"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableWithAggregatesFilter<"PindahBarang"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableWithAggregatesFilter<"PindahBarang"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableWithAggregatesFilter<"PindahBarang"> | string | null
 }
 
 export type PindahBarangCreateInput = {
@@ -264,9 +369,17 @@ export type PindahBarangCreateInput = {
   tanggal?: Date | string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   gudangAsal: Prisma.GudangCreateNestedOneWithoutPindahAsalInput
   gudangTujuan: Prisma.GudangCreateNestedOneWithoutPindahTujuanInput
   baris?: Prisma.BarisPindahBarangCreateNestedManyWithoutPindahInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPindahBarangInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPindahBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPindahBarangInput
 }
 
 export type PindahBarangUncheckedCreateInput = {
@@ -277,6 +390,14 @@ export type PindahBarangUncheckedCreateInput = {
   gudangTujuanId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   baris?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutPindahInput
 }
 
@@ -286,9 +407,17 @@ export type PindahBarangUpdateInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gudangAsal?: Prisma.GudangUpdateOneRequiredWithoutPindahAsalNestedInput
   gudangTujuan?: Prisma.GudangUpdateOneRequiredWithoutPindahTujuanNestedInput
   baris?: Prisma.BarisPindahBarangUpdateManyWithoutPindahNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPindahBarangNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPindahBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPindahBarangNestedInput
 }
 
 export type PindahBarangUncheckedUpdateInput = {
@@ -299,6 +428,14 @@ export type PindahBarangUncheckedUpdateInput = {
   gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutPindahNestedInput
 }
 
@@ -310,6 +447,14 @@ export type PindahBarangCreateManyInput = {
   gudangTujuanId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type PindahBarangUpdateManyMutationInput = {
@@ -318,6 +463,11 @@ export type PindahBarangUpdateManyMutationInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PindahBarangUncheckedUpdateManyInput = {
@@ -328,6 +478,14 @@ export type PindahBarangUncheckedUpdateManyInput = {
   gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PindahBarangListRelationFilter = {
@@ -348,6 +506,14 @@ export type PindahBarangCountOrderByAggregateInput = {
   gudangTujuanId?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type PindahBarangMaxOrderByAggregateInput = {
@@ -358,6 +524,14 @@ export type PindahBarangMaxOrderByAggregateInput = {
   gudangTujuanId?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type PindahBarangMinOrderByAggregateInput = {
@@ -368,11 +542,145 @@ export type PindahBarangMinOrderByAggregateInput = {
   gudangTujuanId?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  statusPersetujuan?: Prisma.SortOrder
+  diajukanOlehId?: Prisma.SortOrder
+  diajukanPada?: Prisma.SortOrder
+  disetujuiOlehId?: Prisma.SortOrder
+  disetujuiPada?: Prisma.SortOrder
+  ditolakOlehId?: Prisma.SortOrder
+  ditolakPada?: Prisma.SortOrder
+  catatanPenolakan?: Prisma.SortOrder
 }
 
 export type PindahBarangScalarRelationFilter = {
   is?: Prisma.PindahBarangWhereInput
   isNot?: Prisma.PindahBarangWhereInput
+}
+
+export type PindahBarangCreateNestedManyWithoutDiajukanOlehInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput> | Prisma.PindahBarangCreateWithoutDiajukanOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDiajukanOlehInputEnvelope
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+}
+
+export type PindahBarangCreateNestedManyWithoutDisetujuiOlehInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.PindahBarangCreateWithoutDisetujuiOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDisetujuiOlehInputEnvelope
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+}
+
+export type PindahBarangCreateNestedManyWithoutDitolakOlehInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput> | Prisma.PindahBarangCreateWithoutDitolakOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDitolakOlehInputEnvelope
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+}
+
+export type PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput> | Prisma.PindahBarangCreateWithoutDiajukanOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDiajukanOlehInputEnvelope
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+}
+
+export type PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.PindahBarangCreateWithoutDisetujuiOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDisetujuiOlehInputEnvelope
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+}
+
+export type PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput> | Prisma.PindahBarangCreateWithoutDitolakOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDitolakOlehInputEnvelope
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+}
+
+export type PindahBarangUpdateManyWithoutDiajukanOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput> | Prisma.PindahBarangCreateWithoutDiajukanOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput[]
+  upsert?: Prisma.PindahBarangUpsertWithWhereUniqueWithoutDiajukanOlehInput | Prisma.PindahBarangUpsertWithWhereUniqueWithoutDiajukanOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDiajukanOlehInputEnvelope
+  set?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  disconnect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  delete?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  update?: Prisma.PindahBarangUpdateWithWhereUniqueWithoutDiajukanOlehInput | Prisma.PindahBarangUpdateWithWhereUniqueWithoutDiajukanOlehInput[]
+  updateMany?: Prisma.PindahBarangUpdateManyWithWhereWithoutDiajukanOlehInput | Prisma.PindahBarangUpdateManyWithWhereWithoutDiajukanOlehInput[]
+  deleteMany?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+}
+
+export type PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.PindahBarangCreateWithoutDisetujuiOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput[]
+  upsert?: Prisma.PindahBarangUpsertWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.PindahBarangUpsertWithWhereUniqueWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDisetujuiOlehInputEnvelope
+  set?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  disconnect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  delete?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  update?: Prisma.PindahBarangUpdateWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.PindahBarangUpdateWithWhereUniqueWithoutDisetujuiOlehInput[]
+  updateMany?: Prisma.PindahBarangUpdateManyWithWhereWithoutDisetujuiOlehInput | Prisma.PindahBarangUpdateManyWithWhereWithoutDisetujuiOlehInput[]
+  deleteMany?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+}
+
+export type PindahBarangUpdateManyWithoutDitolakOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput> | Prisma.PindahBarangCreateWithoutDitolakOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput[]
+  upsert?: Prisma.PindahBarangUpsertWithWhereUniqueWithoutDitolakOlehInput | Prisma.PindahBarangUpsertWithWhereUniqueWithoutDitolakOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDitolakOlehInputEnvelope
+  set?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  disconnect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  delete?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  update?: Prisma.PindahBarangUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.PindahBarangUpdateWithWhereUniqueWithoutDitolakOlehInput[]
+  updateMany?: Prisma.PindahBarangUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.PindahBarangUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+}
+
+export type PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput> | Prisma.PindahBarangCreateWithoutDiajukanOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDiajukanOlehInput[]
+  upsert?: Prisma.PindahBarangUpsertWithWhereUniqueWithoutDiajukanOlehInput | Prisma.PindahBarangUpsertWithWhereUniqueWithoutDiajukanOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDiajukanOlehInputEnvelope
+  set?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  disconnect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  delete?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  update?: Prisma.PindahBarangUpdateWithWhereUniqueWithoutDiajukanOlehInput | Prisma.PindahBarangUpdateWithWhereUniqueWithoutDiajukanOlehInput[]
+  updateMany?: Prisma.PindahBarangUpdateManyWithWhereWithoutDiajukanOlehInput | Prisma.PindahBarangUpdateManyWithWhereWithoutDiajukanOlehInput[]
+  deleteMany?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+}
+
+export type PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput> | Prisma.PindahBarangCreateWithoutDisetujuiOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDisetujuiOlehInput[]
+  upsert?: Prisma.PindahBarangUpsertWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.PindahBarangUpsertWithWhereUniqueWithoutDisetujuiOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDisetujuiOlehInputEnvelope
+  set?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  disconnect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  delete?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  update?: Prisma.PindahBarangUpdateWithWhereUniqueWithoutDisetujuiOlehInput | Prisma.PindahBarangUpdateWithWhereUniqueWithoutDisetujuiOlehInput[]
+  updateMany?: Prisma.PindahBarangUpdateManyWithWhereWithoutDisetujuiOlehInput | Prisma.PindahBarangUpdateManyWithWhereWithoutDisetujuiOlehInput[]
+  deleteMany?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+}
+
+export type PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
+  create?: Prisma.XOR<Prisma.PindahBarangCreateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput> | Prisma.PindahBarangCreateWithoutDitolakOlehInput[] | Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput[]
+  connectOrCreate?: Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput | Prisma.PindahBarangCreateOrConnectWithoutDitolakOlehInput[]
+  upsert?: Prisma.PindahBarangUpsertWithWhereUniqueWithoutDitolakOlehInput | Prisma.PindahBarangUpsertWithWhereUniqueWithoutDitolakOlehInput[]
+  createMany?: Prisma.PindahBarangCreateManyDitolakOlehInputEnvelope
+  set?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  disconnect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  delete?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  connect?: Prisma.PindahBarangWhereUniqueInput | Prisma.PindahBarangWhereUniqueInput[]
+  update?: Prisma.PindahBarangUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.PindahBarangUpdateWithWhereUniqueWithoutDitolakOlehInput[]
+  updateMany?: Prisma.PindahBarangUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.PindahBarangUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
 }
 
 export type PindahBarangCreateNestedManyWithoutGudangAsalInput = {
@@ -473,14 +781,229 @@ export type PindahBarangUpdateOneRequiredWithoutBarisNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PindahBarangUpdateToOneWithWhereWithoutBarisInput, Prisma.PindahBarangUpdateWithoutBarisInput>, Prisma.PindahBarangUncheckedUpdateWithoutBarisInput>
 }
 
+export type PindahBarangCreateWithoutDiajukanOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  gudangAsal: Prisma.GudangCreateNestedOneWithoutPindahAsalInput
+  gudangTujuan: Prisma.GudangCreateNestedOneWithoutPindahTujuanInput
+  baris?: Prisma.BarisPindahBarangCreateNestedManyWithoutPindahInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPindahBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPindahBarangInput
+}
+
+export type PindahBarangUncheckedCreateWithoutDiajukanOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangAsalId: string
+  gudangTujuanId: string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutPindahInput
+}
+
+export type PindahBarangCreateOrConnectWithoutDiajukanOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  create: Prisma.XOR<Prisma.PindahBarangCreateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput>
+}
+
+export type PindahBarangCreateManyDiajukanOlehInputEnvelope = {
+  data: Prisma.PindahBarangCreateManyDiajukanOlehInput | Prisma.PindahBarangCreateManyDiajukanOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type PindahBarangCreateWithoutDisetujuiOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  gudangAsal: Prisma.GudangCreateNestedOneWithoutPindahAsalInput
+  gudangTujuan: Prisma.GudangCreateNestedOneWithoutPindahTujuanInput
+  baris?: Prisma.BarisPindahBarangCreateNestedManyWithoutPindahInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPindahBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPindahBarangInput
+}
+
+export type PindahBarangUncheckedCreateWithoutDisetujuiOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangAsalId: string
+  gudangTujuanId: string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutPindahInput
+}
+
+export type PindahBarangCreateOrConnectWithoutDisetujuiOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  create: Prisma.XOR<Prisma.PindahBarangCreateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput>
+}
+
+export type PindahBarangCreateManyDisetujuiOlehInputEnvelope = {
+  data: Prisma.PindahBarangCreateManyDisetujuiOlehInput | Prisma.PindahBarangCreateManyDisetujuiOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type PindahBarangCreateWithoutDitolakOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  gudangAsal: Prisma.GudangCreateNestedOneWithoutPindahAsalInput
+  gudangTujuan: Prisma.GudangCreateNestedOneWithoutPindahTujuanInput
+  baris?: Prisma.BarisPindahBarangCreateNestedManyWithoutPindahInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPindahBarangInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPindahBarangInput
+}
+
+export type PindahBarangUncheckedCreateWithoutDitolakOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangAsalId: string
+  gudangTujuanId: string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutPindahInput
+}
+
+export type PindahBarangCreateOrConnectWithoutDitolakOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  create: Prisma.XOR<Prisma.PindahBarangCreateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput>
+}
+
+export type PindahBarangCreateManyDitolakOlehInputEnvelope = {
+  data: Prisma.PindahBarangCreateManyDitolakOlehInput | Prisma.PindahBarangCreateManyDitolakOlehInput[]
+  skipDuplicates?: boolean
+}
+
+export type PindahBarangUpsertWithWhereUniqueWithoutDiajukanOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  update: Prisma.XOR<Prisma.PindahBarangUpdateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedUpdateWithoutDiajukanOlehInput>
+  create: Prisma.XOR<Prisma.PindahBarangCreateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDiajukanOlehInput>
+}
+
+export type PindahBarangUpdateWithWhereUniqueWithoutDiajukanOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  data: Prisma.XOR<Prisma.PindahBarangUpdateWithoutDiajukanOlehInput, Prisma.PindahBarangUncheckedUpdateWithoutDiajukanOlehInput>
+}
+
+export type PindahBarangUpdateManyWithWhereWithoutDiajukanOlehInput = {
+  where: Prisma.PindahBarangScalarWhereInput
+  data: Prisma.XOR<Prisma.PindahBarangUpdateManyMutationInput, Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehInput>
+}
+
+export type PindahBarangScalarWhereInput = {
+  AND?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+  OR?: Prisma.PindahBarangScalarWhereInput[]
+  NOT?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
+  id?: Prisma.StringFilter<"PindahBarang"> | string
+  nomor?: Prisma.StringFilter<"PindahBarang"> | string
+  tanggal?: Prisma.DateTimeFilter<"PindahBarang"> | Date | string
+  gudangAsalId?: Prisma.StringFilter<"PindahBarang"> | string
+  gudangTujuanId?: Prisma.StringFilter<"PindahBarang"> | string
+  keterangan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  dibuatPada?: Prisma.DateTimeFilter<"PindahBarang"> | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"PindahBarang"> | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  diajukanPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  disetujuiOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  disetujuiPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  ditolakOlehId?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+  ditolakPada?: Prisma.DateTimeNullableFilter<"PindahBarang"> | Date | string | null
+  catatanPenolakan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
+}
+
+export type PindahBarangUpsertWithWhereUniqueWithoutDisetujuiOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  update: Prisma.XOR<Prisma.PindahBarangUpdateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedUpdateWithoutDisetujuiOlehInput>
+  create: Prisma.XOR<Prisma.PindahBarangCreateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDisetujuiOlehInput>
+}
+
+export type PindahBarangUpdateWithWhereUniqueWithoutDisetujuiOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  data: Prisma.XOR<Prisma.PindahBarangUpdateWithoutDisetujuiOlehInput, Prisma.PindahBarangUncheckedUpdateWithoutDisetujuiOlehInput>
+}
+
+export type PindahBarangUpdateManyWithWhereWithoutDisetujuiOlehInput = {
+  where: Prisma.PindahBarangScalarWhereInput
+  data: Prisma.XOR<Prisma.PindahBarangUpdateManyMutationInput, Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehInput>
+}
+
+export type PindahBarangUpsertWithWhereUniqueWithoutDitolakOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  update: Prisma.XOR<Prisma.PindahBarangUpdateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedUpdateWithoutDitolakOlehInput>
+  create: Prisma.XOR<Prisma.PindahBarangCreateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedCreateWithoutDitolakOlehInput>
+}
+
+export type PindahBarangUpdateWithWhereUniqueWithoutDitolakOlehInput = {
+  where: Prisma.PindahBarangWhereUniqueInput
+  data: Prisma.XOR<Prisma.PindahBarangUpdateWithoutDitolakOlehInput, Prisma.PindahBarangUncheckedUpdateWithoutDitolakOlehInput>
+}
+
+export type PindahBarangUpdateManyWithWhereWithoutDitolakOlehInput = {
+  where: Prisma.PindahBarangScalarWhereInput
+  data: Prisma.XOR<Prisma.PindahBarangUpdateManyMutationInput, Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehInput>
+}
+
 export type PindahBarangCreateWithoutGudangAsalInput = {
   id?: string
   nomor: string
   tanggal?: Date | string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   gudangTujuan: Prisma.GudangCreateNestedOneWithoutPindahTujuanInput
   baris?: Prisma.BarisPindahBarangCreateNestedManyWithoutPindahInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPindahBarangInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPindahBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPindahBarangInput
 }
 
 export type PindahBarangUncheckedCreateWithoutGudangAsalInput = {
@@ -490,6 +1013,14 @@ export type PindahBarangUncheckedCreateWithoutGudangAsalInput = {
   gudangTujuanId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   baris?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutPindahInput
 }
 
@@ -509,8 +1040,16 @@ export type PindahBarangCreateWithoutGudangTujuanInput = {
   tanggal?: Date | string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   gudangAsal: Prisma.GudangCreateNestedOneWithoutPindahAsalInput
   baris?: Prisma.BarisPindahBarangCreateNestedManyWithoutPindahInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPindahBarangInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPindahBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPindahBarangInput
 }
 
 export type PindahBarangUncheckedCreateWithoutGudangTujuanInput = {
@@ -520,6 +1059,14 @@ export type PindahBarangUncheckedCreateWithoutGudangTujuanInput = {
   gudangAsalId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   baris?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutPindahInput
 }
 
@@ -549,19 +1096,6 @@ export type PindahBarangUpdateManyWithWhereWithoutGudangAsalInput = {
   data: Prisma.XOR<Prisma.PindahBarangUpdateManyMutationInput, Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalInput>
 }
 
-export type PindahBarangScalarWhereInput = {
-  AND?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
-  OR?: Prisma.PindahBarangScalarWhereInput[]
-  NOT?: Prisma.PindahBarangScalarWhereInput | Prisma.PindahBarangScalarWhereInput[]
-  id?: Prisma.StringFilter<"PindahBarang"> | string
-  nomor?: Prisma.StringFilter<"PindahBarang"> | string
-  tanggal?: Prisma.DateTimeFilter<"PindahBarang"> | Date | string
-  gudangAsalId?: Prisma.StringFilter<"PindahBarang"> | string
-  gudangTujuanId?: Prisma.StringFilter<"PindahBarang"> | string
-  keterangan?: Prisma.StringNullableFilter<"PindahBarang"> | string | null
-  dibuatPada?: Prisma.DateTimeFilter<"PindahBarang"> | Date | string
-}
-
 export type PindahBarangUpsertWithWhereUniqueWithoutGudangTujuanInput = {
   where: Prisma.PindahBarangWhereUniqueInput
   update: Prisma.XOR<Prisma.PindahBarangUpdateWithoutGudangTujuanInput, Prisma.PindahBarangUncheckedUpdateWithoutGudangTujuanInput>
@@ -584,8 +1118,16 @@ export type PindahBarangCreateWithoutBarisInput = {
   tanggal?: Date | string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
   gudangAsal: Prisma.GudangCreateNestedOneWithoutPindahAsalInput
   gudangTujuan: Prisma.GudangCreateNestedOneWithoutPindahTujuanInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPindahBarangInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPindahBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPindahBarangInput
 }
 
 export type PindahBarangUncheckedCreateWithoutBarisInput = {
@@ -596,6 +1138,14 @@ export type PindahBarangUncheckedCreateWithoutBarisInput = {
   gudangTujuanId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type PindahBarangCreateOrConnectWithoutBarisInput = {
@@ -620,8 +1170,16 @@ export type PindahBarangUpdateWithoutBarisInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gudangAsal?: Prisma.GudangUpdateOneRequiredWithoutPindahAsalNestedInput
   gudangTujuan?: Prisma.GudangUpdateOneRequiredWithoutPindahTujuanNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPindahBarangNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPindahBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPindahBarangNestedInput
 }
 
 export type PindahBarangUncheckedUpdateWithoutBarisInput = {
@@ -632,6 +1190,224 @@ export type PindahBarangUncheckedUpdateWithoutBarisInput = {
   gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PindahBarangCreateManyDiajukanOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangAsalId: string
+  gudangTujuanId: string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PindahBarangCreateManyDisetujuiOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangAsalId: string
+  gudangTujuanId: string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PindahBarangCreateManyDitolakOlehInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangAsalId: string
+  gudangTujuanId: string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PindahBarangUpdateWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gudangAsal?: Prisma.GudangUpdateOneRequiredWithoutPindahAsalNestedInput
+  gudangTujuan?: Prisma.GudangUpdateOneRequiredWithoutPindahTujuanNestedInput
+  baris?: Prisma.BarisPindahBarangUpdateManyWithoutPindahNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPindahBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPindahBarangNestedInput
+}
+
+export type PindahBarangUncheckedUpdateWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutPindahNestedInput
+}
+
+export type PindahBarangUncheckedUpdateManyWithoutDiajukanOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PindahBarangUpdateWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gudangAsal?: Prisma.GudangUpdateOneRequiredWithoutPindahAsalNestedInput
+  gudangTujuan?: Prisma.GudangUpdateOneRequiredWithoutPindahTujuanNestedInput
+  baris?: Prisma.BarisPindahBarangUpdateManyWithoutPindahNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPindahBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPindahBarangNestedInput
+}
+
+export type PindahBarangUncheckedUpdateWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutPindahNestedInput
+}
+
+export type PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PindahBarangUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gudangAsal?: Prisma.GudangUpdateOneRequiredWithoutPindahAsalNestedInput
+  gudangTujuan?: Prisma.GudangUpdateOneRequiredWithoutPindahTujuanNestedInput
+  baris?: Prisma.BarisPindahBarangUpdateManyWithoutPindahNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPindahBarangNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPindahBarangNestedInput
+}
+
+export type PindahBarangUncheckedUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutPindahNestedInput
+}
+
+export type PindahBarangUncheckedUpdateManyWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PindahBarangCreateManyGudangAsalInput = {
@@ -641,6 +1417,14 @@ export type PindahBarangCreateManyGudangAsalInput = {
   gudangTujuanId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type PindahBarangCreateManyGudangTujuanInput = {
@@ -650,6 +1434,14 @@ export type PindahBarangCreateManyGudangTujuanInput = {
   gudangAsalId: string
   keterangan?: string | null
   dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
 }
 
 export type PindahBarangUpdateWithoutGudangAsalInput = {
@@ -658,8 +1450,16 @@ export type PindahBarangUpdateWithoutGudangAsalInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gudangTujuan?: Prisma.GudangUpdateOneRequiredWithoutPindahTujuanNestedInput
   baris?: Prisma.BarisPindahBarangUpdateManyWithoutPindahNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPindahBarangNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPindahBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPindahBarangNestedInput
 }
 
 export type PindahBarangUncheckedUpdateWithoutGudangAsalInput = {
@@ -669,6 +1469,14 @@ export type PindahBarangUncheckedUpdateWithoutGudangAsalInput = {
   gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutPindahNestedInput
 }
 
@@ -679,6 +1487,14 @@ export type PindahBarangUncheckedUpdateManyWithoutGudangAsalInput = {
   gudangTujuanId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PindahBarangUpdateWithoutGudangTujuanInput = {
@@ -687,8 +1503,16 @@ export type PindahBarangUpdateWithoutGudangTujuanInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gudangAsal?: Prisma.GudangUpdateOneRequiredWithoutPindahAsalNestedInput
   baris?: Prisma.BarisPindahBarangUpdateManyWithoutPindahNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPindahBarangNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPindahBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPindahBarangNestedInput
 }
 
 export type PindahBarangUncheckedUpdateWithoutGudangTujuanInput = {
@@ -698,6 +1522,14 @@ export type PindahBarangUncheckedUpdateWithoutGudangTujuanInput = {
   gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutPindahNestedInput
 }
 
@@ -708,6 +1540,14 @@ export type PindahBarangUncheckedUpdateManyWithoutGudangTujuanInput = {
   gudangAsalId?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -749,9 +1589,20 @@ export type PindahBarangSelect<ExtArgs extends runtime.Types.Extensions.Internal
   gudangTujuanId?: boolean
   keterangan?: boolean
   dibuatPada?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   gudangAsal?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   gudangTujuan?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.PindahBarang$barisArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>
   _count?: boolean | Prisma.PindahBarangCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pindahBarang"]>
 
@@ -763,8 +1614,19 @@ export type PindahBarangSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   gudangTujuanId?: boolean
   keterangan?: boolean
   dibuatPada?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   gudangAsal?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   gudangTujuan?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["pindahBarang"]>
 
 export type PindahBarangSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -775,8 +1637,19 @@ export type PindahBarangSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   gudangTujuanId?: boolean
   keterangan?: boolean
   dibuatPada?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
   gudangAsal?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   gudangTujuan?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>
 }, ExtArgs["result"]["pindahBarang"]>
 
 export type PindahBarangSelectScalar = {
@@ -787,22 +1660,39 @@ export type PindahBarangSelectScalar = {
   gudangTujuanId?: boolean
   keterangan?: boolean
   dibuatPada?: boolean
+  statusPersetujuan?: boolean
+  diajukanOlehId?: boolean
+  diajukanPada?: boolean
+  disetujuiOlehId?: boolean
+  disetujuiPada?: boolean
+  ditolakOlehId?: boolean
+  ditolakPada?: boolean
+  catatanPenolakan?: boolean
 }
 
-export type PindahBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "gudangAsalId" | "gudangTujuanId" | "keterangan" | "dibuatPada", ExtArgs["result"]["pindahBarang"]>
+export type PindahBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "gudangAsalId" | "gudangTujuanId" | "keterangan" | "dibuatPada" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["pindahBarang"]>
 export type PindahBarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gudangAsal?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   gudangTujuan?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.PindahBarang$barisArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>
   _count?: boolean | Prisma.PindahBarangCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PindahBarangIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gudangAsal?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   gudangTujuan?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>
 }
 export type PindahBarangIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gudangAsal?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   gudangTujuan?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
+  diajukanOleh?: boolean | Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>
+  disetujuiOleh?: boolean | Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>
+  ditolakOleh?: boolean | Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>
 }
 
 export type $PindahBarangPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -811,6 +1701,9 @@ export type $PindahBarangPayload<ExtArgs extends runtime.Types.Extensions.Intern
     gudangAsal: Prisma.$GudangPayload<ExtArgs>
     gudangTujuan: Prisma.$GudangPayload<ExtArgs>
     baris: Prisma.$BarisPindahBarangPayload<ExtArgs>[]
+    diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -820,6 +1713,17 @@ export type $PindahBarangPayload<ExtArgs extends runtime.Types.Extensions.Intern
     gudangTujuanId: string
     keterangan: string | null
     dibuatPada: Date
+    /**
+     * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+     */
+    statusPersetujuan: $Enums.StatusPersetujuan
+    diajukanOlehId: string | null
+    diajukanPada: Date | null
+    disetujuiOlehId: string | null
+    disetujuiPada: Date | null
+    ditolakOlehId: string | null
+    ditolakPada: Date | null
+    catatanPenolakan: string | null
   }, ExtArgs["result"]["pindahBarang"]>
   composites: {}
 }
@@ -1217,6 +2121,9 @@ export interface Prisma__PindahBarangClient<T, Null = never, ExtArgs extends run
   gudangAsal<T extends Prisma.GudangDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GudangDefaultArgs<ExtArgs>>): Prisma.Prisma__GudangClient<runtime.Types.Result.GetResult<Prisma.$GudangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   gudangTujuan<T extends Prisma.GudangDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GudangDefaultArgs<ExtArgs>>): Prisma.Prisma__GudangClient<runtime.Types.Result.GetResult<Prisma.$GudangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   baris<T extends Prisma.PindahBarang$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PindahBarang$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPindahBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  diajukanOleh<T extends Prisma.PindahBarang$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PindahBarang$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  disetujuiOleh<T extends Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PindahBarang$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  ditolakOleh<T extends Prisma.PindahBarang$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PindahBarang$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1253,6 +2160,14 @@ export interface PindahBarangFieldRefs {
   readonly gudangTujuanId: Prisma.FieldRef<"PindahBarang", 'String'>
   readonly keterangan: Prisma.FieldRef<"PindahBarang", 'String'>
   readonly dibuatPada: Prisma.FieldRef<"PindahBarang", 'DateTime'>
+  readonly statusPersetujuan: Prisma.FieldRef<"PindahBarang", 'StatusPersetujuan'>
+  readonly diajukanOlehId: Prisma.FieldRef<"PindahBarang", 'String'>
+  readonly diajukanPada: Prisma.FieldRef<"PindahBarang", 'DateTime'>
+  readonly disetujuiOlehId: Prisma.FieldRef<"PindahBarang", 'String'>
+  readonly disetujuiPada: Prisma.FieldRef<"PindahBarang", 'DateTime'>
+  readonly ditolakOlehId: Prisma.FieldRef<"PindahBarang", 'String'>
+  readonly ditolakPada: Prisma.FieldRef<"PindahBarang", 'DateTime'>
+  readonly catatanPenolakan: Prisma.FieldRef<"PindahBarang", 'String'>
 }
     
 
@@ -1675,6 +2590,63 @@ export type PindahBarang$barisArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.BarisPindahBarangScalarFieldEnum | Prisma.BarisPindahBarangScalarFieldEnum[]
+}
+
+/**
+ * PindahBarang.diajukanOleh
+ */
+export type PindahBarang$diajukanOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * PindahBarang.disetujuiOleh
+ */
+export type PindahBarang$disetujuiOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * PindahBarang.ditolakOleh
+ */
+export type PindahBarang$ditolakOlehArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Pengguna
+   */
+  select?: Prisma.PenggunaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Pengguna
+   */
+  omit?: Prisma.PenggunaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggunaInclude<ExtArgs> | null
+  where?: Prisma.PenggunaWhereInput
 }
 
 /**

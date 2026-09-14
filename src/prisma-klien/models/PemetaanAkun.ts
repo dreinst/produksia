@@ -39,6 +39,7 @@ export type PemetaanAkunMinAggregateOutputType = {
   labaDitahanId: string | null
   diskonPenjualanId: string | null
   pendapatanLainId: string | null
+  selisihKursId: string | null
 }
 
 export type PemetaanAkunMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type PemetaanAkunMaxAggregateOutputType = {
   labaDitahanId: string | null
   diskonPenjualanId: string | null
   pendapatanLainId: string | null
+  selisihKursId: string | null
 }
 
 export type PemetaanAkunCountAggregateOutputType = {
@@ -73,6 +75,7 @@ export type PemetaanAkunCountAggregateOutputType = {
   labaDitahanId: number
   diskonPenjualanId: number
   pendapatanLainId: number
+  selisihKursId: number
   _all: number
 }
 
@@ -92,6 +95,7 @@ export type PemetaanAkunMinAggregateInputType = {
   labaDitahanId?: true
   diskonPenjualanId?: true
   pendapatanLainId?: true
+  selisihKursId?: true
 }
 
 export type PemetaanAkunMaxAggregateInputType = {
@@ -109,6 +113,7 @@ export type PemetaanAkunMaxAggregateInputType = {
   labaDitahanId?: true
   diskonPenjualanId?: true
   pendapatanLainId?: true
+  selisihKursId?: true
 }
 
 export type PemetaanAkunCountAggregateInputType = {
@@ -126,6 +131,7 @@ export type PemetaanAkunCountAggregateInputType = {
   labaDitahanId?: true
   diskonPenjualanId?: true
   pendapatanLainId?: true
+  selisihKursId?: true
   _all?: true
 }
 
@@ -216,6 +222,7 @@ export type PemetaanAkunGroupByOutputType = {
   labaDitahanId: string | null
   diskonPenjualanId: string | null
   pendapatanLainId: string | null
+  selisihKursId: string | null
   _count: PemetaanAkunCountAggregateOutputType | null
   _min: PemetaanAkunMinAggregateOutputType | null
   _max: PemetaanAkunMaxAggregateOutputType | null
@@ -254,6 +261,7 @@ export type PemetaanAkunWhereInput = {
   labaDitahanId?: Prisma.StringNullableFilter<"PemetaanAkun"> | string | null
   diskonPenjualanId?: Prisma.StringNullableFilter<"PemetaanAkun"> | string | null
   pendapatanLainId?: Prisma.StringNullableFilter<"PemetaanAkun"> | string | null
+  selisihKursId?: Prisma.StringNullableFilter<"PemetaanAkun"> | string | null
   piutangUsaha?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   persediaan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   hpp?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
@@ -267,6 +275,7 @@ export type PemetaanAkunWhereInput = {
   labaDitahan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   diskonPenjualan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   pendapatanLain?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
+  selisihKurs?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
 }
 
 export type PemetaanAkunOrderByWithRelationInput = {
@@ -284,6 +293,7 @@ export type PemetaanAkunOrderByWithRelationInput = {
   labaDitahanId?: Prisma.SortOrderInput | Prisma.SortOrder
   diskonPenjualanId?: Prisma.SortOrderInput | Prisma.SortOrder
   pendapatanLainId?: Prisma.SortOrderInput | Prisma.SortOrder
+  selisihKursId?: Prisma.SortOrderInput | Prisma.SortOrder
   piutangUsaha?: Prisma.AkunOrderByWithRelationInput
   persediaan?: Prisma.AkunOrderByWithRelationInput
   hpp?: Prisma.AkunOrderByWithRelationInput
@@ -297,6 +307,7 @@ export type PemetaanAkunOrderByWithRelationInput = {
   labaDitahan?: Prisma.AkunOrderByWithRelationInput
   diskonPenjualan?: Prisma.AkunOrderByWithRelationInput
   pendapatanLain?: Prisma.AkunOrderByWithRelationInput
+  selisihKurs?: Prisma.AkunOrderByWithRelationInput
 }
 
 export type PemetaanAkunWhereUniqueInput = Prisma.AtLeast<{
@@ -314,6 +325,7 @@ export type PemetaanAkunWhereUniqueInput = Prisma.AtLeast<{
   labaDitahanId?: string
   diskonPenjualanId?: string
   pendapatanLainId?: string
+  selisihKursId?: string
   AND?: Prisma.PemetaanAkunWhereInput | Prisma.PemetaanAkunWhereInput[]
   OR?: Prisma.PemetaanAkunWhereInput[]
   NOT?: Prisma.PemetaanAkunWhereInput | Prisma.PemetaanAkunWhereInput[]
@@ -330,7 +342,8 @@ export type PemetaanAkunWhereUniqueInput = Prisma.AtLeast<{
   labaDitahan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   diskonPenjualan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   pendapatanLain?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
-}, "id" | "piutangUsahaId" | "persediaanId" | "hppId" | "pendapatanPenjualanId" | "utangUsahaId" | "bebanJasaId" | "barangBelumDitagihId" | "selisihPersediaanId" | "barangTerkirimId" | "uangMukaPelangganId" | "labaDitahanId" | "diskonPenjualanId" | "pendapatanLainId">
+  selisihKurs?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
+}, "id" | "piutangUsahaId" | "persediaanId" | "hppId" | "pendapatanPenjualanId" | "utangUsahaId" | "bebanJasaId" | "barangBelumDitagihId" | "selisihPersediaanId" | "barangTerkirimId" | "uangMukaPelangganId" | "labaDitahanId" | "diskonPenjualanId" | "pendapatanLainId" | "selisihKursId">
 
 export type PemetaanAkunOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -347,6 +360,7 @@ export type PemetaanAkunOrderByWithAggregationInput = {
   labaDitahanId?: Prisma.SortOrderInput | Prisma.SortOrder
   diskonPenjualanId?: Prisma.SortOrderInput | Prisma.SortOrder
   pendapatanLainId?: Prisma.SortOrderInput | Prisma.SortOrder
+  selisihKursId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PemetaanAkunCountOrderByAggregateInput
   _max?: Prisma.PemetaanAkunMaxOrderByAggregateInput
   _min?: Prisma.PemetaanAkunMinOrderByAggregateInput
@@ -370,6 +384,7 @@ export type PemetaanAkunScalarWhereWithAggregatesInput = {
   labaDitahanId?: Prisma.StringNullableWithAggregatesFilter<"PemetaanAkun"> | string | null
   diskonPenjualanId?: Prisma.StringNullableWithAggregatesFilter<"PemetaanAkun"> | string | null
   pendapatanLainId?: Prisma.StringNullableWithAggregatesFilter<"PemetaanAkun"> | string | null
+  selisihKursId?: Prisma.StringNullableWithAggregatesFilter<"PemetaanAkun"> | string | null
 }
 
 export type PemetaanAkunCreateInput = {
@@ -387,6 +402,7 @@ export type PemetaanAkunCreateInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateInput = {
@@ -404,6 +420,7 @@ export type PemetaanAkunUncheckedCreateInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunUpdateInput = {
@@ -421,6 +438,7 @@ export type PemetaanAkunUpdateInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateInput = {
@@ -438,6 +456,7 @@ export type PemetaanAkunUncheckedUpdateInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunCreateManyInput = {
@@ -455,6 +474,7 @@ export type PemetaanAkunCreateManyInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunUpdateManyMutationInput = {
@@ -476,6 +496,7 @@ export type PemetaanAkunUncheckedUpdateManyInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunNullableScalarRelationFilter = {
@@ -498,6 +519,7 @@ export type PemetaanAkunCountOrderByAggregateInput = {
   labaDitahanId?: Prisma.SortOrder
   diskonPenjualanId?: Prisma.SortOrder
   pendapatanLainId?: Prisma.SortOrder
+  selisihKursId?: Prisma.SortOrder
 }
 
 export type PemetaanAkunMaxOrderByAggregateInput = {
@@ -515,6 +537,7 @@ export type PemetaanAkunMaxOrderByAggregateInput = {
   labaDitahanId?: Prisma.SortOrder
   diskonPenjualanId?: Prisma.SortOrder
   pendapatanLainId?: Prisma.SortOrder
+  selisihKursId?: Prisma.SortOrder
 }
 
 export type PemetaanAkunMinOrderByAggregateInput = {
@@ -532,6 +555,7 @@ export type PemetaanAkunMinOrderByAggregateInput = {
   labaDitahanId?: Prisma.SortOrder
   diskonPenjualanId?: Prisma.SortOrder
   pendapatanLainId?: Prisma.SortOrder
+  selisihKursId?: Prisma.SortOrder
 }
 
 export type PemetaanAkunCreateNestedOneWithoutPiutangUsahaInput = {
@@ -612,6 +636,12 @@ export type PemetaanAkunCreateNestedOneWithoutPendapatanLainInput = {
   connect?: Prisma.PemetaanAkunWhereUniqueInput
 }
 
+export type PemetaanAkunCreateNestedOneWithoutSelisihKursInput = {
+  create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedCreateWithoutSelisihKursInput>
+  connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutSelisihKursInput
+  connect?: Prisma.PemetaanAkunWhereUniqueInput
+}
+
 export type PemetaanAkunUncheckedCreateNestedOneWithoutPiutangUsahaInput = {
   create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutPiutangUsahaInput, Prisma.PemetaanAkunUncheckedCreateWithoutPiutangUsahaInput>
   connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutPiutangUsahaInput
@@ -687,6 +717,12 @@ export type PemetaanAkunUncheckedCreateNestedOneWithoutDiskonPenjualanInput = {
 export type PemetaanAkunUncheckedCreateNestedOneWithoutPendapatanLainInput = {
   create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutPendapatanLainInput, Prisma.PemetaanAkunUncheckedCreateWithoutPendapatanLainInput>
   connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutPendapatanLainInput
+  connect?: Prisma.PemetaanAkunWhereUniqueInput
+}
+
+export type PemetaanAkunUncheckedCreateNestedOneWithoutSelisihKursInput = {
+  create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedCreateWithoutSelisihKursInput>
+  connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutSelisihKursInput
   connect?: Prisma.PemetaanAkunWhereUniqueInput
 }
 
@@ -820,6 +856,16 @@ export type PemetaanAkunUpdateOneWithoutPendapatanLainNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PemetaanAkunUpdateToOneWithWhereWithoutPendapatanLainInput, Prisma.PemetaanAkunUpdateWithoutPendapatanLainInput>, Prisma.PemetaanAkunUncheckedUpdateWithoutPendapatanLainInput>
 }
 
+export type PemetaanAkunUpdateOneWithoutSelisihKursNestedInput = {
+  create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedCreateWithoutSelisihKursInput>
+  connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutSelisihKursInput
+  upsert?: Prisma.PemetaanAkunUpsertWithoutSelisihKursInput
+  disconnect?: Prisma.PemetaanAkunWhereInput | boolean
+  delete?: Prisma.PemetaanAkunWhereInput | boolean
+  connect?: Prisma.PemetaanAkunWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PemetaanAkunUpdateToOneWithWhereWithoutSelisihKursInput, Prisma.PemetaanAkunUpdateWithoutSelisihKursInput>, Prisma.PemetaanAkunUncheckedUpdateWithoutSelisihKursInput>
+}
+
 export type PemetaanAkunUncheckedUpdateOneWithoutPiutangUsahaNestedInput = {
   create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutPiutangUsahaInput, Prisma.PemetaanAkunUncheckedCreateWithoutPiutangUsahaInput>
   connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutPiutangUsahaInput
@@ -950,6 +996,16 @@ export type PemetaanAkunUncheckedUpdateOneWithoutPendapatanLainNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PemetaanAkunUpdateToOneWithWhereWithoutPendapatanLainInput, Prisma.PemetaanAkunUpdateWithoutPendapatanLainInput>, Prisma.PemetaanAkunUncheckedUpdateWithoutPendapatanLainInput>
 }
 
+export type PemetaanAkunUncheckedUpdateOneWithoutSelisihKursNestedInput = {
+  create?: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedCreateWithoutSelisihKursInput>
+  connectOrCreate?: Prisma.PemetaanAkunCreateOrConnectWithoutSelisihKursInput
+  upsert?: Prisma.PemetaanAkunUpsertWithoutSelisihKursInput
+  disconnect?: Prisma.PemetaanAkunWhereInput | boolean
+  delete?: Prisma.PemetaanAkunWhereInput | boolean
+  connect?: Prisma.PemetaanAkunWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PemetaanAkunUpdateToOneWithWhereWithoutSelisihKursInput, Prisma.PemetaanAkunUpdateWithoutSelisihKursInput>, Prisma.PemetaanAkunUncheckedUpdateWithoutSelisihKursInput>
+}
+
 export type PemetaanAkunCreateWithoutPiutangUsahaInput = {
   id?: string
   persediaan: Prisma.AkunCreateNestedOneWithoutPemetaanPersediaanInput
@@ -964,6 +1020,7 @@ export type PemetaanAkunCreateWithoutPiutangUsahaInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutPiutangUsahaInput = {
@@ -980,6 +1037,7 @@ export type PemetaanAkunUncheckedCreateWithoutPiutangUsahaInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutPiutangUsahaInput = {
@@ -1001,6 +1059,7 @@ export type PemetaanAkunCreateWithoutPersediaanInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutPersediaanInput = {
@@ -1017,6 +1076,7 @@ export type PemetaanAkunUncheckedCreateWithoutPersediaanInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutPersediaanInput = {
@@ -1038,6 +1098,7 @@ export type PemetaanAkunCreateWithoutHppInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutHppInput = {
@@ -1054,6 +1115,7 @@ export type PemetaanAkunUncheckedCreateWithoutHppInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutHppInput = {
@@ -1075,6 +1137,7 @@ export type PemetaanAkunCreateWithoutPendapatanPenjualanInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutPendapatanPenjualanInput = {
@@ -1091,6 +1154,7 @@ export type PemetaanAkunUncheckedCreateWithoutPendapatanPenjualanInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutPendapatanPenjualanInput = {
@@ -1112,6 +1176,7 @@ export type PemetaanAkunCreateWithoutUtangUsahaInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutUtangUsahaInput = {
@@ -1128,6 +1193,7 @@ export type PemetaanAkunUncheckedCreateWithoutUtangUsahaInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutUtangUsahaInput = {
@@ -1149,6 +1215,7 @@ export type PemetaanAkunCreateWithoutBebanJasaInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutBebanJasaInput = {
@@ -1165,6 +1232,7 @@ export type PemetaanAkunUncheckedCreateWithoutBebanJasaInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutBebanJasaInput = {
@@ -1186,6 +1254,7 @@ export type PemetaanAkunCreateWithoutBarangBelumDitagihInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutBarangBelumDitagihInput = {
@@ -1202,6 +1271,7 @@ export type PemetaanAkunUncheckedCreateWithoutBarangBelumDitagihInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutBarangBelumDitagihInput = {
@@ -1223,6 +1293,7 @@ export type PemetaanAkunCreateWithoutSelisihPersediaanInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutSelisihPersediaanInput = {
@@ -1239,6 +1310,7 @@ export type PemetaanAkunUncheckedCreateWithoutSelisihPersediaanInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutSelisihPersediaanInput = {
@@ -1260,6 +1332,7 @@ export type PemetaanAkunCreateWithoutBarangTerkirimInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutBarangTerkirimInput = {
@@ -1276,6 +1349,7 @@ export type PemetaanAkunUncheckedCreateWithoutBarangTerkirimInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutBarangTerkirimInput = {
@@ -1297,6 +1371,7 @@ export type PemetaanAkunCreateWithoutUangMukaPelangganInput = {
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutUangMukaPelangganInput = {
@@ -1313,6 +1388,7 @@ export type PemetaanAkunUncheckedCreateWithoutUangMukaPelangganInput = {
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutUangMukaPelangganInput = {
@@ -1334,6 +1410,7 @@ export type PemetaanAkunCreateWithoutLabaDitahanInput = {
   uangMukaPelanggan?: Prisma.AkunCreateNestedOneWithoutPemetaanUangMukaInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutLabaDitahanInput = {
@@ -1350,6 +1427,7 @@ export type PemetaanAkunUncheckedCreateWithoutLabaDitahanInput = {
   uangMukaPelangganId?: string | null
   diskonPenjualanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutLabaDitahanInput = {
@@ -1371,6 +1449,7 @@ export type PemetaanAkunCreateWithoutDiskonPenjualanInput = {
   uangMukaPelanggan?: Prisma.AkunCreateNestedOneWithoutPemetaanUangMukaInput
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutDiskonPenjualanInput = {
@@ -1387,6 +1466,7 @@ export type PemetaanAkunUncheckedCreateWithoutDiskonPenjualanInput = {
   uangMukaPelangganId?: string | null
   labaDitahanId?: string | null
   pendapatanLainId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutDiskonPenjualanInput = {
@@ -1408,6 +1488,7 @@ export type PemetaanAkunCreateWithoutPendapatanLainInput = {
   uangMukaPelanggan?: Prisma.AkunCreateNestedOneWithoutPemetaanUangMukaInput
   labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
   diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
+  selisihKurs?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihKursInput
 }
 
 export type PemetaanAkunUncheckedCreateWithoutPendapatanLainInput = {
@@ -1424,11 +1505,51 @@ export type PemetaanAkunUncheckedCreateWithoutPendapatanLainInput = {
   uangMukaPelangganId?: string | null
   labaDitahanId?: string | null
   diskonPenjualanId?: string | null
+  selisihKursId?: string | null
 }
 
 export type PemetaanAkunCreateOrConnectWithoutPendapatanLainInput = {
   where: Prisma.PemetaanAkunWhereUniqueInput
   create: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutPendapatanLainInput, Prisma.PemetaanAkunUncheckedCreateWithoutPendapatanLainInput>
+}
+
+export type PemetaanAkunCreateWithoutSelisihKursInput = {
+  id?: string
+  piutangUsaha: Prisma.AkunCreateNestedOneWithoutPemetaanPiutangInput
+  persediaan: Prisma.AkunCreateNestedOneWithoutPemetaanPersediaanInput
+  hpp: Prisma.AkunCreateNestedOneWithoutPemetaanHppInput
+  pendapatanPenjualan: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanInput
+  utangUsaha: Prisma.AkunCreateNestedOneWithoutPemetaanUtangInput
+  bebanJasa?: Prisma.AkunCreateNestedOneWithoutPemetaanBebanJasaInput
+  barangBelumDitagih?: Prisma.AkunCreateNestedOneWithoutPemetaanBarangBelumDitagihInput
+  selisihPersediaan?: Prisma.AkunCreateNestedOneWithoutPemetaanSelisihPersediaanInput
+  barangTerkirim?: Prisma.AkunCreateNestedOneWithoutPemetaanBarangTerkirimInput
+  uangMukaPelanggan?: Prisma.AkunCreateNestedOneWithoutPemetaanUangMukaInput
+  labaDitahan?: Prisma.AkunCreateNestedOneWithoutPemetaanLabaDitahanInput
+  diskonPenjualan?: Prisma.AkunCreateNestedOneWithoutPemetaanDiskonPenjualanInput
+  pendapatanLain?: Prisma.AkunCreateNestedOneWithoutPemetaanPendapatanLainInput
+}
+
+export type PemetaanAkunUncheckedCreateWithoutSelisihKursInput = {
+  id?: string
+  piutangUsahaId: string
+  persediaanId: string
+  hppId: string
+  pendapatanPenjualanId: string
+  utangUsahaId: string
+  bebanJasaId?: string | null
+  barangBelumDitagihId?: string | null
+  selisihPersediaanId?: string | null
+  barangTerkirimId?: string | null
+  uangMukaPelangganId?: string | null
+  labaDitahanId?: string | null
+  diskonPenjualanId?: string | null
+  pendapatanLainId?: string | null
+}
+
+export type PemetaanAkunCreateOrConnectWithoutSelisihKursInput = {
+  where: Prisma.PemetaanAkunWhereUniqueInput
+  create: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedCreateWithoutSelisihKursInput>
 }
 
 export type PemetaanAkunUpsertWithoutPiutangUsahaInput = {
@@ -1456,6 +1577,7 @@ export type PemetaanAkunUpdateWithoutPiutangUsahaInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutPiutangUsahaInput = {
@@ -1472,6 +1594,7 @@ export type PemetaanAkunUncheckedUpdateWithoutPiutangUsahaInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutPersediaanInput = {
@@ -1499,6 +1622,7 @@ export type PemetaanAkunUpdateWithoutPersediaanInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutPersediaanInput = {
@@ -1515,6 +1639,7 @@ export type PemetaanAkunUncheckedUpdateWithoutPersediaanInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutHppInput = {
@@ -1542,6 +1667,7 @@ export type PemetaanAkunUpdateWithoutHppInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutHppInput = {
@@ -1558,6 +1684,7 @@ export type PemetaanAkunUncheckedUpdateWithoutHppInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutPendapatanPenjualanInput = {
@@ -1585,6 +1712,7 @@ export type PemetaanAkunUpdateWithoutPendapatanPenjualanInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutPendapatanPenjualanInput = {
@@ -1601,6 +1729,7 @@ export type PemetaanAkunUncheckedUpdateWithoutPendapatanPenjualanInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutUtangUsahaInput = {
@@ -1628,6 +1757,7 @@ export type PemetaanAkunUpdateWithoutUtangUsahaInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutUtangUsahaInput = {
@@ -1644,6 +1774,7 @@ export type PemetaanAkunUncheckedUpdateWithoutUtangUsahaInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutBebanJasaInput = {
@@ -1671,6 +1802,7 @@ export type PemetaanAkunUpdateWithoutBebanJasaInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutBebanJasaInput = {
@@ -1687,6 +1819,7 @@ export type PemetaanAkunUncheckedUpdateWithoutBebanJasaInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutBarangBelumDitagihInput = {
@@ -1714,6 +1847,7 @@ export type PemetaanAkunUpdateWithoutBarangBelumDitagihInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutBarangBelumDitagihInput = {
@@ -1730,6 +1864,7 @@ export type PemetaanAkunUncheckedUpdateWithoutBarangBelumDitagihInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutSelisihPersediaanInput = {
@@ -1757,6 +1892,7 @@ export type PemetaanAkunUpdateWithoutSelisihPersediaanInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutSelisihPersediaanInput = {
@@ -1773,6 +1909,7 @@ export type PemetaanAkunUncheckedUpdateWithoutSelisihPersediaanInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutBarangTerkirimInput = {
@@ -1800,6 +1937,7 @@ export type PemetaanAkunUpdateWithoutBarangTerkirimInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutBarangTerkirimInput = {
@@ -1816,6 +1954,7 @@ export type PemetaanAkunUncheckedUpdateWithoutBarangTerkirimInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutUangMukaPelangganInput = {
@@ -1843,6 +1982,7 @@ export type PemetaanAkunUpdateWithoutUangMukaPelangganInput = {
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutUangMukaPelangganInput = {
@@ -1859,6 +1999,7 @@ export type PemetaanAkunUncheckedUpdateWithoutUangMukaPelangganInput = {
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutLabaDitahanInput = {
@@ -1886,6 +2027,7 @@ export type PemetaanAkunUpdateWithoutLabaDitahanInput = {
   uangMukaPelanggan?: Prisma.AkunUpdateOneWithoutPemetaanUangMukaNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutLabaDitahanInput = {
@@ -1902,6 +2044,7 @@ export type PemetaanAkunUncheckedUpdateWithoutLabaDitahanInput = {
   uangMukaPelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutDiskonPenjualanInput = {
@@ -1929,6 +2072,7 @@ export type PemetaanAkunUpdateWithoutDiskonPenjualanInput = {
   uangMukaPelanggan?: Prisma.AkunUpdateOneWithoutPemetaanUangMukaNestedInput
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutDiskonPenjualanInput = {
@@ -1945,6 +2089,7 @@ export type PemetaanAkunUncheckedUpdateWithoutDiskonPenjualanInput = {
   uangMukaPelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PemetaanAkunUpsertWithoutPendapatanLainInput = {
@@ -1972,6 +2117,7 @@ export type PemetaanAkunUpdateWithoutPendapatanLainInput = {
   uangMukaPelanggan?: Prisma.AkunUpdateOneWithoutPemetaanUangMukaNestedInput
   labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
   diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
+  selisihKurs?: Prisma.AkunUpdateOneWithoutPemetaanSelisihKursNestedInput
 }
 
 export type PemetaanAkunUncheckedUpdateWithoutPendapatanLainInput = {
@@ -1988,6 +2134,52 @@ export type PemetaanAkunUncheckedUpdateWithoutPendapatanLainInput = {
   uangMukaPelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihKursId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PemetaanAkunUpsertWithoutSelisihKursInput = {
+  update: Prisma.XOR<Prisma.PemetaanAkunUpdateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedUpdateWithoutSelisihKursInput>
+  create: Prisma.XOR<Prisma.PemetaanAkunCreateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedCreateWithoutSelisihKursInput>
+  where?: Prisma.PemetaanAkunWhereInput
+}
+
+export type PemetaanAkunUpdateToOneWithWhereWithoutSelisihKursInput = {
+  where?: Prisma.PemetaanAkunWhereInput
+  data: Prisma.XOR<Prisma.PemetaanAkunUpdateWithoutSelisihKursInput, Prisma.PemetaanAkunUncheckedUpdateWithoutSelisihKursInput>
+}
+
+export type PemetaanAkunUpdateWithoutSelisihKursInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  piutangUsaha?: Prisma.AkunUpdateOneRequiredWithoutPemetaanPiutangNestedInput
+  persediaan?: Prisma.AkunUpdateOneRequiredWithoutPemetaanPersediaanNestedInput
+  hpp?: Prisma.AkunUpdateOneRequiredWithoutPemetaanHppNestedInput
+  pendapatanPenjualan?: Prisma.AkunUpdateOneRequiredWithoutPemetaanPendapatanNestedInput
+  utangUsaha?: Prisma.AkunUpdateOneRequiredWithoutPemetaanUtangNestedInput
+  bebanJasa?: Prisma.AkunUpdateOneWithoutPemetaanBebanJasaNestedInput
+  barangBelumDitagih?: Prisma.AkunUpdateOneWithoutPemetaanBarangBelumDitagihNestedInput
+  selisihPersediaan?: Prisma.AkunUpdateOneWithoutPemetaanSelisihPersediaanNestedInput
+  barangTerkirim?: Prisma.AkunUpdateOneWithoutPemetaanBarangTerkirimNestedInput
+  uangMukaPelanggan?: Prisma.AkunUpdateOneWithoutPemetaanUangMukaNestedInput
+  labaDitahan?: Prisma.AkunUpdateOneWithoutPemetaanLabaDitahanNestedInput
+  diskonPenjualan?: Prisma.AkunUpdateOneWithoutPemetaanDiskonPenjualanNestedInput
+  pendapatanLain?: Prisma.AkunUpdateOneWithoutPemetaanPendapatanLainNestedInput
+}
+
+export type PemetaanAkunUncheckedUpdateWithoutSelisihKursInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  piutangUsahaId?: Prisma.StringFieldUpdateOperationsInput | string
+  persediaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  hppId?: Prisma.StringFieldUpdateOperationsInput | string
+  pendapatanPenjualanId?: Prisma.StringFieldUpdateOperationsInput | string
+  utangUsahaId?: Prisma.StringFieldUpdateOperationsInput | string
+  bebanJasaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barangBelumDitagihId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  selisihPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  barangTerkirimId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  uangMukaPelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  labaDitahanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diskonPenjualanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pendapatanLainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -2007,6 +2199,7 @@ export type PemetaanAkunSelect<ExtArgs extends runtime.Types.Extensions.Internal
   labaDitahanId?: boolean
   diskonPenjualanId?: boolean
   pendapatanLainId?: boolean
+  selisihKursId?: boolean
   piutangUsaha?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   persediaan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   hpp?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2020,6 +2213,7 @@ export type PemetaanAkunSelect<ExtArgs extends runtime.Types.Extensions.Internal
   labaDitahan?: boolean | Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>
   diskonPenjualan?: boolean | Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>
   pendapatanLain?: boolean | Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>
+  selisihKurs?: boolean | Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>
 }, ExtArgs["result"]["pemetaanAkun"]>
 
 export type PemetaanAkunSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2037,6 +2231,7 @@ export type PemetaanAkunSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   labaDitahanId?: boolean
   diskonPenjualanId?: boolean
   pendapatanLainId?: boolean
+  selisihKursId?: boolean
   piutangUsaha?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   persediaan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   hpp?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2050,6 +2245,7 @@ export type PemetaanAkunSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   labaDitahan?: boolean | Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>
   diskonPenjualan?: boolean | Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>
   pendapatanLain?: boolean | Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>
+  selisihKurs?: boolean | Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>
 }, ExtArgs["result"]["pemetaanAkun"]>
 
 export type PemetaanAkunSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2067,6 +2263,7 @@ export type PemetaanAkunSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   labaDitahanId?: boolean
   diskonPenjualanId?: boolean
   pendapatanLainId?: boolean
+  selisihKursId?: boolean
   piutangUsaha?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   persediaan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   hpp?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2080,6 +2277,7 @@ export type PemetaanAkunSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   labaDitahan?: boolean | Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>
   diskonPenjualan?: boolean | Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>
   pendapatanLain?: boolean | Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>
+  selisihKurs?: boolean | Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>
 }, ExtArgs["result"]["pemetaanAkun"]>
 
 export type PemetaanAkunSelectScalar = {
@@ -2097,9 +2295,10 @@ export type PemetaanAkunSelectScalar = {
   labaDitahanId?: boolean
   diskonPenjualanId?: boolean
   pendapatanLainId?: boolean
+  selisihKursId?: boolean
 }
 
-export type PemetaanAkunOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "piutangUsahaId" | "persediaanId" | "hppId" | "pendapatanPenjualanId" | "utangUsahaId" | "bebanJasaId" | "barangBelumDitagihId" | "selisihPersediaanId" | "barangTerkirimId" | "uangMukaPelangganId" | "labaDitahanId" | "diskonPenjualanId" | "pendapatanLainId", ExtArgs["result"]["pemetaanAkun"]>
+export type PemetaanAkunOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "piutangUsahaId" | "persediaanId" | "hppId" | "pendapatanPenjualanId" | "utangUsahaId" | "bebanJasaId" | "barangBelumDitagihId" | "selisihPersediaanId" | "barangTerkirimId" | "uangMukaPelangganId" | "labaDitahanId" | "diskonPenjualanId" | "pendapatanLainId" | "selisihKursId", ExtArgs["result"]["pemetaanAkun"]>
 export type PemetaanAkunInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   piutangUsaha?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   persediaan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2114,6 +2313,7 @@ export type PemetaanAkunInclude<ExtArgs extends runtime.Types.Extensions.Interna
   labaDitahan?: boolean | Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>
   diskonPenjualan?: boolean | Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>
   pendapatanLain?: boolean | Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>
+  selisihKurs?: boolean | Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>
 }
 export type PemetaanAkunIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   piutangUsaha?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2129,6 +2329,7 @@ export type PemetaanAkunIncludeCreateManyAndReturn<ExtArgs extends runtime.Types
   labaDitahan?: boolean | Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>
   diskonPenjualan?: boolean | Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>
   pendapatanLain?: boolean | Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>
+  selisihKurs?: boolean | Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>
 }
 export type PemetaanAkunIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   piutangUsaha?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2144,6 +2345,7 @@ export type PemetaanAkunIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
   labaDitahan?: boolean | Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>
   diskonPenjualan?: boolean | Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>
   pendapatanLain?: boolean | Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>
+  selisihKurs?: boolean | Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>
 }
 
 export type $PemetaanAkunPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2162,6 +2364,7 @@ export type $PemetaanAkunPayload<ExtArgs extends runtime.Types.Extensions.Intern
     labaDitahan: Prisma.$AkunPayload<ExtArgs> | null
     diskonPenjualan: Prisma.$AkunPayload<ExtArgs> | null
     pendapatanLain: Prisma.$AkunPayload<ExtArgs> | null
+    selisihKurs: Prisma.$AkunPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2202,6 +2405,12 @@ export type $PemetaanAkunPayload<ExtArgs extends runtime.Types.Extensions.Intern
      * Kelompok pendapatan non-usaha (bunga bank, laba pelepasan aset, dst.): bukan omzet PPh Final
      */
     pendapatanLainId: string | null
+    /**
+     * Selisih Kurs (laba/rugi kurs): tujuan jurnal penilaian kembali piutang/hutang mata uang asing.
+     * Ditempatkan di PemetaanAkun (bukan PengaturanPerusahaan) karena ini pemetaan akuntansi umum,
+     * sejenis Selisih Persediaan, bukan akun pajak.
+     */
+    selisihKursId: string | null
   }, ExtArgs["result"]["pemetaanAkun"]>
   composites: {}
 }
@@ -2609,6 +2818,7 @@ export interface Prisma__PemetaanAkunClient<T, Null = never, ExtArgs extends run
   labaDitahan<T extends Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PemetaanAkun$labaDitahanArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   diskonPenjualan<T extends Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PemetaanAkun$diskonPenjualanArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pendapatanLain<T extends Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PemetaanAkun$pendapatanLainArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  selisihKurs<T extends Prisma.PemetaanAkun$selisihKursArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PemetaanAkun$selisihKursArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2652,6 +2862,7 @@ export interface PemetaanAkunFieldRefs {
   readonly labaDitahanId: Prisma.FieldRef<"PemetaanAkun", 'String'>
   readonly diskonPenjualanId: Prisma.FieldRef<"PemetaanAkun", 'String'>
   readonly pendapatanLainId: Prisma.FieldRef<"PemetaanAkun", 'String'>
+  readonly selisihKursId: Prisma.FieldRef<"PemetaanAkun", 'String'>
 }
     
 
@@ -3189,6 +3400,25 @@ export type PemetaanAkun$diskonPenjualanArgs<ExtArgs extends runtime.Types.Exten
  * PemetaanAkun.pendapatanLain
  */
 export type PemetaanAkun$pendapatanLainArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Akun
+   */
+  select?: Prisma.AkunSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Akun
+   */
+  omit?: Prisma.AkunOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AkunInclude<ExtArgs> | null
+  where?: Prisma.AkunWhereInput
+}
+
+/**
+ * PemetaanAkun.selisihKurs
+ */
+export type PemetaanAkun$selisihKursArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Akun
    */

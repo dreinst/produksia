@@ -32,6 +32,7 @@ export type PelangganMinAggregateOutputType = {
   telepon: string | null
   npwp: string | null
   penjualId: string | null
+  mataUangId: string | null
   dibuatPada: Date | null
 }
 
@@ -43,6 +44,7 @@ export type PelangganMaxAggregateOutputType = {
   telepon: string | null
   npwp: string | null
   penjualId: string | null
+  mataUangId: string | null
   dibuatPada: Date | null
 }
 
@@ -54,6 +56,7 @@ export type PelangganCountAggregateOutputType = {
   telepon: number
   npwp: number
   penjualId: number
+  mataUangId: number
   dibuatPada: number
   _all: number
 }
@@ -67,6 +70,7 @@ export type PelangganMinAggregateInputType = {
   telepon?: true
   npwp?: true
   penjualId?: true
+  mataUangId?: true
   dibuatPada?: true
 }
 
@@ -78,6 +82,7 @@ export type PelangganMaxAggregateInputType = {
   telepon?: true
   npwp?: true
   penjualId?: true
+  mataUangId?: true
   dibuatPada?: true
 }
 
@@ -89,6 +94,7 @@ export type PelangganCountAggregateInputType = {
   telepon?: true
   npwp?: true
   penjualId?: true
+  mataUangId?: true
   dibuatPada?: true
   _all?: true
 }
@@ -173,6 +179,7 @@ export type PelangganGroupByOutputType = {
   telepon: string | null
   npwp: string | null
   penjualId: string | null
+  mataUangId: string | null
   dibuatPada: Date
   _count: PelangganCountAggregateOutputType | null
   _min: PelangganMinAggregateOutputType | null
@@ -205,8 +212,10 @@ export type PelangganWhereInput = {
   telepon?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
   npwp?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
   penjualId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  mataUangId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Pelanggan"> | Date | string
   penjual?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
+  mataUang?: Prisma.XOR<Prisma.MataUangNullableScalarRelationFilter, Prisma.MataUangWhereInput> | null
   penawaran?: Prisma.PenawaranPenjualanListRelationFilter
   pesanan?: Prisma.PesananPenjualanListRelationFilter
   faktur?: Prisma.FakturPenjualanListRelationFilter
@@ -223,8 +232,10 @@ export type PelangganOrderByWithRelationInput = {
   telepon?: Prisma.SortOrderInput | Prisma.SortOrder
   npwp?: Prisma.SortOrderInput | Prisma.SortOrder
   penjualId?: Prisma.SortOrderInput | Prisma.SortOrder
+  mataUangId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   penjual?: Prisma.KaryawanOrderByWithRelationInput
+  mataUang?: Prisma.MataUangOrderByWithRelationInput
   penawaran?: Prisma.PenawaranPenjualanOrderByRelationAggregateInput
   pesanan?: Prisma.PesananPenjualanOrderByRelationAggregateInput
   faktur?: Prisma.FakturPenjualanOrderByRelationAggregateInput
@@ -244,8 +255,10 @@ export type PelangganWhereUniqueInput = Prisma.AtLeast<{
   telepon?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
   npwp?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
   penjualId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  mataUangId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Pelanggan"> | Date | string
   penjual?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
+  mataUang?: Prisma.XOR<Prisma.MataUangNullableScalarRelationFilter, Prisma.MataUangWhereInput> | null
   penawaran?: Prisma.PenawaranPenjualanListRelationFilter
   pesanan?: Prisma.PesananPenjualanListRelationFilter
   faktur?: Prisma.FakturPenjualanListRelationFilter
@@ -262,6 +275,7 @@ export type PelangganOrderByWithAggregationInput = {
   telepon?: Prisma.SortOrderInput | Prisma.SortOrder
   npwp?: Prisma.SortOrderInput | Prisma.SortOrder
   penjualId?: Prisma.SortOrderInput | Prisma.SortOrder
+  mataUangId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   _count?: Prisma.PelangganCountOrderByAggregateInput
   _max?: Prisma.PelangganMaxOrderByAggregateInput
@@ -279,6 +293,7 @@ export type PelangganScalarWhereWithAggregatesInput = {
   telepon?: Prisma.StringNullableWithAggregatesFilter<"Pelanggan"> | string | null
   npwp?: Prisma.StringNullableWithAggregatesFilter<"Pelanggan"> | string | null
   penjualId?: Prisma.StringNullableWithAggregatesFilter<"Pelanggan"> | string | null
+  mataUangId?: Prisma.StringNullableWithAggregatesFilter<"Pelanggan"> | string | null
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"Pelanggan"> | Date | string
 }
 
@@ -291,6 +306,7 @@ export type PelangganCreateInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
@@ -307,6 +323,7 @@ export type PelangganUncheckedCreateInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -325,6 +342,7 @@ export type PelangganUpdateInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
@@ -341,6 +359,7 @@ export type PelangganUncheckedUpdateInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -358,6 +377,7 @@ export type PelangganCreateManyInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
 }
 
@@ -379,6 +399,7 @@ export type PelangganUncheckedUpdateManyInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -400,6 +421,7 @@ export type PelangganCountOrderByAggregateInput = {
   telepon?: Prisma.SortOrder
   npwp?: Prisma.SortOrder
   penjualId?: Prisma.SortOrder
+  mataUangId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -411,6 +433,7 @@ export type PelangganMaxOrderByAggregateInput = {
   telepon?: Prisma.SortOrder
   npwp?: Prisma.SortOrder
   penjualId?: Prisma.SortOrder
+  mataUangId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -422,6 +445,7 @@ export type PelangganMinOrderByAggregateInput = {
   telepon?: Prisma.SortOrder
   npwp?: Prisma.SortOrder
   penjualId?: Prisma.SortOrder
+  mataUangId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -433,6 +457,48 @@ export type PelangganNullableScalarRelationFilter = {
 export type PelangganScalarRelationFilter = {
   is?: Prisma.PelangganWhereInput
   isNot?: Prisma.PelangganWhereInput
+}
+
+export type PelangganCreateNestedManyWithoutMataUangInput = {
+  create?: Prisma.XOR<Prisma.PelangganCreateWithoutMataUangInput, Prisma.PelangganUncheckedCreateWithoutMataUangInput> | Prisma.PelangganCreateWithoutMataUangInput[] | Prisma.PelangganUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PelangganCreateOrConnectWithoutMataUangInput | Prisma.PelangganCreateOrConnectWithoutMataUangInput[]
+  createMany?: Prisma.PelangganCreateManyMataUangInputEnvelope
+  connect?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+}
+
+export type PelangganUncheckedCreateNestedManyWithoutMataUangInput = {
+  create?: Prisma.XOR<Prisma.PelangganCreateWithoutMataUangInput, Prisma.PelangganUncheckedCreateWithoutMataUangInput> | Prisma.PelangganCreateWithoutMataUangInput[] | Prisma.PelangganUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PelangganCreateOrConnectWithoutMataUangInput | Prisma.PelangganCreateOrConnectWithoutMataUangInput[]
+  createMany?: Prisma.PelangganCreateManyMataUangInputEnvelope
+  connect?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+}
+
+export type PelangganUpdateManyWithoutMataUangNestedInput = {
+  create?: Prisma.XOR<Prisma.PelangganCreateWithoutMataUangInput, Prisma.PelangganUncheckedCreateWithoutMataUangInput> | Prisma.PelangganCreateWithoutMataUangInput[] | Prisma.PelangganUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PelangganCreateOrConnectWithoutMataUangInput | Prisma.PelangganCreateOrConnectWithoutMataUangInput[]
+  upsert?: Prisma.PelangganUpsertWithWhereUniqueWithoutMataUangInput | Prisma.PelangganUpsertWithWhereUniqueWithoutMataUangInput[]
+  createMany?: Prisma.PelangganCreateManyMataUangInputEnvelope
+  set?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  disconnect?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  delete?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  connect?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  update?: Prisma.PelangganUpdateWithWhereUniqueWithoutMataUangInput | Prisma.PelangganUpdateWithWhereUniqueWithoutMataUangInput[]
+  updateMany?: Prisma.PelangganUpdateManyWithWhereWithoutMataUangInput | Prisma.PelangganUpdateManyWithWhereWithoutMataUangInput[]
+  deleteMany?: Prisma.PelangganScalarWhereInput | Prisma.PelangganScalarWhereInput[]
+}
+
+export type PelangganUncheckedUpdateManyWithoutMataUangNestedInput = {
+  create?: Prisma.XOR<Prisma.PelangganCreateWithoutMataUangInput, Prisma.PelangganUncheckedCreateWithoutMataUangInput> | Prisma.PelangganCreateWithoutMataUangInput[] | Prisma.PelangganUncheckedCreateWithoutMataUangInput[]
+  connectOrCreate?: Prisma.PelangganCreateOrConnectWithoutMataUangInput | Prisma.PelangganCreateOrConnectWithoutMataUangInput[]
+  upsert?: Prisma.PelangganUpsertWithWhereUniqueWithoutMataUangInput | Prisma.PelangganUpsertWithWhereUniqueWithoutMataUangInput[]
+  createMany?: Prisma.PelangganCreateManyMataUangInputEnvelope
+  set?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  disconnect?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  delete?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  connect?: Prisma.PelangganWhereUniqueInput | Prisma.PelangganWhereUniqueInput[]
+  update?: Prisma.PelangganUpdateWithWhereUniqueWithoutMataUangInput | Prisma.PelangganUpdateWithWhereUniqueWithoutMataUangInput[]
+  updateMany?: Prisma.PelangganUpdateManyWithWhereWithoutMataUangInput | Prisma.PelangganUpdateManyWithWhereWithoutMataUangInput[]
+  deleteMany?: Prisma.PelangganScalarWhereInput | Prisma.PelangganScalarWhereInput[]
 }
 
 export type PelangganCreateNestedManyWithoutPenjualInput = {
@@ -563,6 +629,81 @@ export type PelangganUpdateOneRequiredWithoutPenerimaanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PelangganUpdateToOneWithWhereWithoutPenerimaanInput, Prisma.PelangganUpdateWithoutPenerimaanInput>, Prisma.PelangganUncheckedUpdateWithoutPenerimaanInput>
 }
 
+export type PelangganCreateWithoutMataUangInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  telepon?: string | null
+  npwp?: string | null
+  dibuatPada?: Date | string
+  penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
+  faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
+  penerimaan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutPelangganInput
+  proyek?: Prisma.ProyekCreateNestedManyWithoutPelangganInput
+  uangMuka?: Prisma.UangMukaPelangganCreateNestedManyWithoutPelangganInput
+}
+
+export type PelangganUncheckedCreateWithoutMataUangInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  telepon?: string | null
+  npwp?: string | null
+  penjualId?: string | null
+  dibuatPada?: Date | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
+  faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPelangganInput
+  penerimaan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutPelangganInput
+  proyek?: Prisma.ProyekUncheckedCreateNestedManyWithoutPelangganInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutPelangganInput
+}
+
+export type PelangganCreateOrConnectWithoutMataUangInput = {
+  where: Prisma.PelangganWhereUniqueInput
+  create: Prisma.XOR<Prisma.PelangganCreateWithoutMataUangInput, Prisma.PelangganUncheckedCreateWithoutMataUangInput>
+}
+
+export type PelangganCreateManyMataUangInputEnvelope = {
+  data: Prisma.PelangganCreateManyMataUangInput | Prisma.PelangganCreateManyMataUangInput[]
+  skipDuplicates?: boolean
+}
+
+export type PelangganUpsertWithWhereUniqueWithoutMataUangInput = {
+  where: Prisma.PelangganWhereUniqueInput
+  update: Prisma.XOR<Prisma.PelangganUpdateWithoutMataUangInput, Prisma.PelangganUncheckedUpdateWithoutMataUangInput>
+  create: Prisma.XOR<Prisma.PelangganCreateWithoutMataUangInput, Prisma.PelangganUncheckedCreateWithoutMataUangInput>
+}
+
+export type PelangganUpdateWithWhereUniqueWithoutMataUangInput = {
+  where: Prisma.PelangganWhereUniqueInput
+  data: Prisma.XOR<Prisma.PelangganUpdateWithoutMataUangInput, Prisma.PelangganUncheckedUpdateWithoutMataUangInput>
+}
+
+export type PelangganUpdateManyWithWhereWithoutMataUangInput = {
+  where: Prisma.PelangganScalarWhereInput
+  data: Prisma.XOR<Prisma.PelangganUpdateManyMutationInput, Prisma.PelangganUncheckedUpdateManyWithoutMataUangInput>
+}
+
+export type PelangganScalarWhereInput = {
+  AND?: Prisma.PelangganScalarWhereInput | Prisma.PelangganScalarWhereInput[]
+  OR?: Prisma.PelangganScalarWhereInput[]
+  NOT?: Prisma.PelangganScalarWhereInput | Prisma.PelangganScalarWhereInput[]
+  id?: Prisma.StringFilter<"Pelanggan"> | string
+  kode?: Prisma.StringFilter<"Pelanggan"> | string
+  nama?: Prisma.StringFilter<"Pelanggan"> | string
+  alamat?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  telepon?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  npwp?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  penjualId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  mataUangId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
+  dibuatPada?: Prisma.DateTimeFilter<"Pelanggan"> | Date | string
+}
+
 export type PelangganCreateWithoutPenjualInput = {
   id?: string
   kode: string
@@ -571,6 +712,7 @@ export type PelangganCreateWithoutPenjualInput = {
   telepon?: string | null
   npwp?: string | null
   dibuatPada?: Date | string
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
@@ -586,6 +728,7 @@ export type PelangganUncheckedCreateWithoutPenjualInput = {
   alamat?: string | null
   telepon?: string | null
   npwp?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -621,20 +764,6 @@ export type PelangganUpdateManyWithWhereWithoutPenjualInput = {
   data: Prisma.XOR<Prisma.PelangganUpdateManyMutationInput, Prisma.PelangganUncheckedUpdateManyWithoutPenjualInput>
 }
 
-export type PelangganScalarWhereInput = {
-  AND?: Prisma.PelangganScalarWhereInput | Prisma.PelangganScalarWhereInput[]
-  OR?: Prisma.PelangganScalarWhereInput[]
-  NOT?: Prisma.PelangganScalarWhereInput | Prisma.PelangganScalarWhereInput[]
-  id?: Prisma.StringFilter<"Pelanggan"> | string
-  kode?: Prisma.StringFilter<"Pelanggan"> | string
-  nama?: Prisma.StringFilter<"Pelanggan"> | string
-  alamat?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
-  telepon?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
-  npwp?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
-  penjualId?: Prisma.StringNullableFilter<"Pelanggan"> | string | null
-  dibuatPada?: Prisma.DateTimeFilter<"Pelanggan"> | Date | string
-}
-
 export type PelangganCreateWithoutProyekInput = {
   id?: string
   kode: string
@@ -644,6 +773,7 @@ export type PelangganCreateWithoutProyekInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
@@ -659,6 +789,7 @@ export type PelangganUncheckedCreateWithoutProyekInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -692,6 +823,7 @@ export type PelangganUpdateWithoutProyekInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
@@ -707,6 +839,7 @@ export type PelangganUncheckedUpdateWithoutProyekInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -724,6 +857,7 @@ export type PelangganCreateWithoutPenawaranInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
   penerimaan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutPelangganInput
@@ -739,6 +873,7 @@ export type PelangganUncheckedCreateWithoutPenawaranInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -772,6 +907,7 @@ export type PelangganUpdateWithoutPenawaranInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
   penerimaan?: Prisma.PenerimaanPenjualanUpdateManyWithoutPelangganNestedInput
@@ -787,6 +923,7 @@ export type PelangganUncheckedUpdateWithoutPenawaranInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -804,6 +941,7 @@ export type PelangganCreateWithoutPesananInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
   penerimaan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutPelangganInput
@@ -819,6 +957,7 @@ export type PelangganUncheckedCreateWithoutPesananInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -852,6 +991,7 @@ export type PelangganUpdateWithoutPesananInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
   penerimaan?: Prisma.PenerimaanPenjualanUpdateManyWithoutPelangganNestedInput
@@ -867,6 +1007,7 @@ export type PelangganUncheckedUpdateWithoutPesananInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -884,6 +1025,7 @@ export type PelangganCreateWithoutFakturInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   penerimaan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutPelangganInput
@@ -899,6 +1041,7 @@ export type PelangganUncheckedCreateWithoutFakturInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -932,6 +1075,7 @@ export type PelangganUpdateWithoutFakturInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   penerimaan?: Prisma.PenerimaanPenjualanUpdateManyWithoutPelangganNestedInput
@@ -947,6 +1091,7 @@ export type PelangganUncheckedUpdateWithoutFakturInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -964,6 +1109,7 @@ export type PelangganCreateWithoutUangMukaInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
@@ -979,6 +1125,7 @@ export type PelangganUncheckedCreateWithoutUangMukaInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -1012,6 +1159,7 @@ export type PelangganUpdateWithoutUangMukaInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
@@ -1027,6 +1175,7 @@ export type PelangganUncheckedUpdateWithoutUangMukaInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -1044,6 +1193,7 @@ export type PelangganCreateWithoutPenerimaanInput = {
   npwp?: string | null
   dibuatPada?: Date | string
   penjual?: Prisma.KaryawanCreateNestedOneWithoutPelangganInput
+  mataUang?: Prisma.MataUangCreateNestedOneWithoutPelangganInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutPelangganInput
   faktur?: Prisma.FakturPenjualanCreateNestedManyWithoutPelangganInput
@@ -1059,6 +1209,7 @@ export type PelangganUncheckedCreateWithoutPenerimaanInput = {
   telepon?: string | null
   npwp?: string | null
   penjualId?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutPelangganInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutPelangganInput
@@ -1092,6 +1243,7 @@ export type PelangganUpdateWithoutPenerimaanInput = {
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
@@ -1107,12 +1259,69 @@ export type PelangganUncheckedUpdateWithoutPenerimaanInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   proyek?: Prisma.ProyekUncheckedUpdateManyWithoutPelangganNestedInput
   uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPelangganNestedInput
+}
+
+export type PelangganCreateManyMataUangInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  telepon?: string | null
+  npwp?: string | null
+  penjualId?: string | null
+  dibuatPada?: Date | string
+}
+
+export type PelangganUpdateWithoutMataUangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  penjual?: Prisma.KaryawanUpdateOneWithoutPelangganNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
+  faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
+  penerimaan?: Prisma.PenerimaanPenjualanUpdateManyWithoutPelangganNestedInput
+  proyek?: Prisma.ProyekUpdateManyWithoutPelangganNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUpdateManyWithoutPelangganNestedInput
+}
+
+export type PelangganUncheckedUpdateWithoutMataUangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
+  faktur?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
+  penerimaan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
+  proyek?: Prisma.ProyekUncheckedUpdateManyWithoutPelangganNestedInput
+  uangMuka?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutPelangganNestedInput
+}
+
+export type PelangganUncheckedUpdateManyWithoutMataUangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penjualId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PelangganCreateManyPenjualInput = {
@@ -1122,6 +1331,7 @@ export type PelangganCreateManyPenjualInput = {
   alamat?: string | null
   telepon?: string | null
   npwp?: string | null
+  mataUangId?: string | null
   dibuatPada?: Date | string
 }
 
@@ -1133,6 +1343,7 @@ export type PelangganUpdateWithoutPenjualInput = {
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  mataUang?: Prisma.MataUangUpdateOneWithoutPelangganNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutPelangganNestedInput
   faktur?: Prisma.FakturPenjualanUpdateManyWithoutPelangganNestedInput
@@ -1148,6 +1359,7 @@ export type PelangganUncheckedUpdateWithoutPenjualInput = {
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutPelangganNestedInput
@@ -1164,6 +1376,7 @@ export type PelangganUncheckedUpdateManyWithoutPenjualInput = {
   alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   npwp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  mataUangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1251,8 +1464,10 @@ export type PelangganSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   telepon?: boolean
   npwp?: boolean
   penjualId?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
   penjual?: boolean | Prisma.Pelanggan$penjualArgs<ExtArgs>
+  mataUang?: boolean | Prisma.Pelanggan$mataUangArgs<ExtArgs>
   penawaran?: boolean | Prisma.Pelanggan$penawaranArgs<ExtArgs>
   pesanan?: boolean | Prisma.Pelanggan$pesananArgs<ExtArgs>
   faktur?: boolean | Prisma.Pelanggan$fakturArgs<ExtArgs>
@@ -1270,8 +1485,10 @@ export type PelangganSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   telepon?: boolean
   npwp?: boolean
   penjualId?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
   penjual?: boolean | Prisma.Pelanggan$penjualArgs<ExtArgs>
+  mataUang?: boolean | Prisma.Pelanggan$mataUangArgs<ExtArgs>
 }, ExtArgs["result"]["pelanggan"]>
 
 export type PelangganSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1282,8 +1499,10 @@ export type PelangganSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   telepon?: boolean
   npwp?: boolean
   penjualId?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
   penjual?: boolean | Prisma.Pelanggan$penjualArgs<ExtArgs>
+  mataUang?: boolean | Prisma.Pelanggan$mataUangArgs<ExtArgs>
 }, ExtArgs["result"]["pelanggan"]>
 
 export type PelangganSelectScalar = {
@@ -1294,12 +1513,14 @@ export type PelangganSelectScalar = {
   telepon?: boolean
   npwp?: boolean
   penjualId?: boolean
+  mataUangId?: boolean
   dibuatPada?: boolean
 }
 
-export type PelangganOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "alamat" | "telepon" | "npwp" | "penjualId" | "dibuatPada", ExtArgs["result"]["pelanggan"]>
+export type PelangganOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "alamat" | "telepon" | "npwp" | "penjualId" | "mataUangId" | "dibuatPada", ExtArgs["result"]["pelanggan"]>
 export type PelangganInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   penjual?: boolean | Prisma.Pelanggan$penjualArgs<ExtArgs>
+  mataUang?: boolean | Prisma.Pelanggan$mataUangArgs<ExtArgs>
   penawaran?: boolean | Prisma.Pelanggan$penawaranArgs<ExtArgs>
   pesanan?: boolean | Prisma.Pelanggan$pesananArgs<ExtArgs>
   faktur?: boolean | Prisma.Pelanggan$fakturArgs<ExtArgs>
@@ -1310,15 +1531,18 @@ export type PelangganInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 export type PelangganIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   penjual?: boolean | Prisma.Pelanggan$penjualArgs<ExtArgs>
+  mataUang?: boolean | Prisma.Pelanggan$mataUangArgs<ExtArgs>
 }
 export type PelangganIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   penjual?: boolean | Prisma.Pelanggan$penjualArgs<ExtArgs>
+  mataUang?: boolean | Prisma.Pelanggan$mataUangArgs<ExtArgs>
 }
 
 export type $PelangganPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Pelanggan"
   objects: {
     penjual: Prisma.$KaryawanPayload<ExtArgs> | null
+    mataUang: Prisma.$MataUangPayload<ExtArgs> | null
     penawaran: Prisma.$PenawaranPenjualanPayload<ExtArgs>[]
     pesanan: Prisma.$PesananPenjualanPayload<ExtArgs>[]
     faktur: Prisma.$FakturPenjualanPayload<ExtArgs>[]
@@ -1334,6 +1558,10 @@ export type $PelangganPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     telepon: string | null
     npwp: string | null
     penjualId: string | null
+    /**
+     * Mata uang transaksi bawaan pelanggan (kosong = IDR / mata uang fungsional)
+     */
+    mataUangId: string | null
     dibuatPada: Date
   }, ExtArgs["result"]["pelanggan"]>
   composites: {}
@@ -1730,6 +1958,7 @@ readonly fields: PelangganFieldRefs;
 export interface Prisma__PelangganClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   penjual<T extends Prisma.Pelanggan$penjualArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pelanggan$penjualArgs<ExtArgs>>): Prisma.Prisma__KaryawanClient<runtime.Types.Result.GetResult<Prisma.$KaryawanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  mataUang<T extends Prisma.Pelanggan$mataUangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pelanggan$mataUangArgs<ExtArgs>>): Prisma.Prisma__MataUangClient<runtime.Types.Result.GetResult<Prisma.$MataUangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   penawaran<T extends Prisma.Pelanggan$penawaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pelanggan$penawaranArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenawaranPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pesanan<T extends Prisma.Pelanggan$pesananArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pelanggan$pesananArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PesananPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faktur<T extends Prisma.Pelanggan$fakturArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pelanggan$fakturArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FakturPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1772,6 +2001,7 @@ export interface PelangganFieldRefs {
   readonly telepon: Prisma.FieldRef<"Pelanggan", 'String'>
   readonly npwp: Prisma.FieldRef<"Pelanggan", 'String'>
   readonly penjualId: Prisma.FieldRef<"Pelanggan", 'String'>
+  readonly mataUangId: Prisma.FieldRef<"Pelanggan", 'String'>
   readonly dibuatPada: Prisma.FieldRef<"Pelanggan", 'DateTime'>
 }
     
@@ -2190,6 +2420,25 @@ export type Pelanggan$penjualArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.KaryawanInclude<ExtArgs> | null
   where?: Prisma.KaryawanWhereInput
+}
+
+/**
+ * Pelanggan.mataUang
+ */
+export type Pelanggan$mataUangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MataUang
+   */
+  select?: Prisma.MataUangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MataUang
+   */
+  omit?: Prisma.MataUangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MataUangInclude<ExtArgs> | null
+  where?: Prisma.MataUangWhereInput
 }
 
 /**

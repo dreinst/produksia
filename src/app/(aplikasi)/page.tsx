@@ -48,13 +48,14 @@ export default async function Beranda() {
     fakturBeliTerbaru,
     pembayaranTerbaru,
   ] = await Promise.all([
-    db.fakturPenjualan.findMany({ where: { status: { not: "LUNAS" } }, include: { penerimaan: true, retur: { select: { total: true } } } }),
-    db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" } }, include: { pembayaran: true, retur: { select: { total: true } } } }),
+    // KPI piutang/hutang & nilai aset hanya dari dokumen yang sudah DISETUJUI, supaya angkanya sama dengan buku besar
+    db.fakturPenjualan.findMany({ where: { status: { not: "LUNAS" }, statusPersetujuan: "DISETUJUI" }, include: { penerimaan: true, retur: { select: { total: true } } } }),
+    db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" }, statusPersetujuan: "DISETUJUI" }, include: { pembayaran: true, retur: { select: { total: true } } } }),
     db.akun.findMany({ orderBy: { kode: "asc" } }),
     db.barisJurnal.groupBy({ by: ["akunId"], _sum: { debit: true, kredit: true } }),
     db.stokBarang.findMany({ include: { barang: true, gudang: true } }),
     db.barang.count({ where: { jenis: "BARANG" } }),
-    db.asetTetap.findMany({ where: { status: "AKTIF" }, include: { penyusutan: true } }),
+    db.asetTetap.findMany({ where: { status: "AKTIF", statusPersetujuan: "DISETUJUI" }, include: { penyusutan: true } }),
     db.penawaranPenjualan.findMany({ where: { status: "DRAF" } }),
     db.pesananPenjualan.findMany({ where: { status: { in: ["DRAF", "SEBAGIAN"] } } }),
     db.pengirimanPesanan.count({ where: { tanggal: { gte: awalBulan } } }),

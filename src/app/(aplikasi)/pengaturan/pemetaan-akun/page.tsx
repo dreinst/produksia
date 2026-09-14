@@ -23,6 +23,7 @@ const FIELDS = [
   { nama: "labaDitahanId", label: "Laba Ditahan (akun Modal)", filterType: "MODAL", wajib: false, petunjuk: "Tujuan jurnal penutup tahun" },
   { nama: "diskonPenjualanId", label: "Diskon Penjualan (akun Pendapatan, kontra)", filterType: "PENDAPATAN", wajib: false, petunjuk: "Potongan harga di Faktur Penjualan; kelompok akun ini tidak dihitung sebagai omzet" },
   { nama: "pendapatanLainId", label: "Pendapatan Lain-lain (kelompok akun Pendapatan)", filterType: "PENDAPATAN", wajib: false, kelompok: true, petunjuk: "Bunga bank, laba pelepasan aset, dsb. Di luar omzet usaha untuk PPh Final" },
+  { nama: "selisihKursId", label: "Selisih Kurs (akun Beban)", filterType: "BEBAN", wajib: false, petunjuk: "Laba/rugi kurs saat piutang & hutang mata uang asing dinilai kembali (Pengaturan › Mata Uang & Kurs)" },
 ] as const;
 
 export default async function HalamanPemetaanAkun() {

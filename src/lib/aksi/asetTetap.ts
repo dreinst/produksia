@@ -10,9 +10,10 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, uang, bacaUang, jumlahkan, format, type Desimal } from "@/lib/uang";
 import { catatJurnalPerolehanAset } from "@/lib/akuntansi";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
+import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 
 export async function buatAsetTetap(dataFormulir: FormData) {
-  await wajibHakAksi("aset.buat");
+  const pengguna = await wajibHakAksi("aset.buat");
   const kode = String(dataFormulir.get("kode") ?? "").trim();
   const nama = String(dataFormulir.get("nama") ?? "").trim();
   const tanggalPerolehan = String(dataFormulir.get("tanggalPerolehan") ?? "");
@@ -40,15 +41,20 @@ export async function buatAsetTetap(dataFormulir: FormData) {
   if (akunPembayaranId && akunPembayaranId === akunAsetId) throw new Error("Akun pembayaran tidak boleh sama dengan akun aset");
   await pastikanAkunRinci(db, [akunAsetId, akunBebanPenyusutanId, akunAkumulasiPenyusutanId, ...(akunPembayaranId ? [akunPembayaranId] : [])]);
 
+  // Alur persetujuan: aset dicatat sebagai DRAFT dulu; jurnal perolehannya baru dibuat saat disetujui,
+  // dan penyusutan bulanan hanya menghitung aset yang sudah DISETUJUI.
+  const perluPersetujuan = await persetujuanWajib(db);
+  const tanggal = tanggalPerolehan ? new Date(tanggalPerolehan) : new Date();
+
   await db.$transaction(async (tx) => {
-    const jurnal = akunPembayaranId
-      ? await catatJurnalPerolehanAset(tx, { kode, nama, hargaPerolehan, akunAsetId, akunPembayaranId })
+    const jurnal = akunPembayaranId && !perluPersetujuan
+      ? await catatJurnalPerolehanAset(tx, { kode, nama, hargaPerolehan, akunAsetId, akunPembayaranId }, { tanggal })
       : null;
     await tx.asetTetap.create({
       data: {
         kode,
         nama,
-        tanggalPerolehan: tanggalPerolehan ? new Date(tanggalPerolehan) : new Date(),
+        tanggalPerolehan: tanggal,
         hargaPerolehan,
         nilaiSisa,
         umurBulan,
@@ -57,11 +63,13 @@ export async function buatAsetTetap(dataFormulir: FormData) {
         akunAkumulasiPenyusutanId,
         akunPembayaranId,
         jurnalPerolehanId: jurnal?.id ?? null,
+        ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
       },
     });
   });
 
   revalidatePath("/aset-tetap");
+  if (perluPersetujuan) revalidatePath("/persetujuan");
   redirect("/aset-tetap");
 }
 
@@ -71,8 +79,9 @@ export async function jalankanPenyusutanBulanan(dataFormulir: FormData) {
   if (!/^\d{4}-\d{2}$/.test(teksPeriode)) throw new Error("Periode wajib dipilih (format YYYY-MM)");
   const periode = new Date(`${teksPeriode}-01T00:00:00.000Z`);
 
+  // Aset yang masih DRAFT/MENUNGGU/DITOLAK belum masuk buku besar, jadi belum boleh disusutkan
   const daftarAset = await db.asetTetap.findMany({
-    where: { status: "AKTIF" },
+    where: { status: "AKTIF", statusPersetujuan: "DISETUJUI" },
     include: { penyusutan: true },
   });
 
@@ -165,6 +174,7 @@ export async function lepasAset(dataFormulir: FormData) {
   await db.$transaction(async (tx) => {
     const aset = await tx.asetTetap.findUniqueOrThrow({ where: { id: asetId }, include: { penyusutan: true, pelepasan: true } });
     if (aset.status !== "AKTIF" || aset.pelepasan) throw new Error(`${aset.kode} sudah dilepas (${aset.status})`);
+    if (aset.statusPersetujuan !== "DISETUJUI") throw new Error(`${aset.kode} belum disetujui, jadi belum masuk buku besar dan belum bisa dilepas`);
     if (tanggal < aset.tanggalPerolehan) throw new Error("Tanggal pelepasan tidak boleh sebelum tanggal perolehan");
     await pastikanTahunTerbuka(tx, tanggal);
     const akumulasi = jumlahkan(aset.penyusutan.map((p) => p.jumlah));
@@ -184,7 +194,7 @@ export async function lepasAset(dataFormulir: FormData) {
       data: { nomor, tanggal, keterangan: `${jenis === "DIJUAL" ? "Penjualan" : "Penghapusbukuan"} aset ${aset.kode} ${aset.nama} (nilai buku ${format(nilaiBuku)}, ${labaRugi.gte(0) ? "laba" : "rugi"} ${format(labaRugi.abs())})`, sumber: "ASET_TETAP", baris: { create: baris } },
     });
     await tx.pelepasanAset.create({
-      data: { asetId, tanggal, jenis, hargaJual, akunPenerimaanId: hargaJual.gt(0) ? akunPenerimaanId : null, akunLabaRugiId, nilaiBuku, labaRugi, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama },
+      data: { asetId, tanggal, jenis, hargaJual, akunPenerimaanId: hargaJual.gt(0) ? akunPenerimaanId : null, akunLabaRugiId, nilaiBuku, labaRugi, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama, ...dataLangsungDisetujui(pengguna) },
     });
     await tx.asetTetap.update({ where: { id: asetId }, data: { status: jenis } });
     await tx.logAktivitas.create({
