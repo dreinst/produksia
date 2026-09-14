@@ -13,6 +13,8 @@ import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import { buatAsetTetap } from "../src/lib/aksi/asetTetap";
 import { buatPenggajian } from "../src/lib/aksi/sdm";
 import { ajukanDokumen, setujuiDokumen, tolakDokumen } from "../src/lib/aksi/persetujuan";
+import { periksaSinkron } from "../src/lib/sinkron";
+import { laporanPiutang } from "../src/lib/laporanRekanan";
 
 /*
  * Uji alur persetujuan maker-checker untuk 6 jenis dokumen yang sudah tersambung:
@@ -149,6 +151,14 @@ async function main() {
   pastikan(s.jurnalId === null, "faktur DRAFT belum punya jurnal (buku besar belum tersentuh)");
   pastikan(faktur.diajukanOlehId === null, "faktur DRAFT belum punya pengaju");
 
+  // Laporan yang membaca tabel dokumen (bukan Jurnal) harus MENGECUALIKAN faktur yang belum disetujui,
+  // kalau tidak piutang dokumen akan berbeda dari saldo buku besar selama dokumen menunggu.
+  const sinkronDraf = await periksaSinkron(db);
+  pastikan(sinkronDraf.piutang.sinkron, `pemeriksaan sinkron tetap cocok walau ada faktur DRAFT (BB ${sinkronDraf.piutang.bukuBesar} vs dokumen ${sinkronDraf.piutang.dokumen})`);
+  const piutangDraf = await laporanPiutang(db, new Date());
+  const nomorDiPiutang = (l: { kelompok: { faktur: { nomor: string }[] }[] }) => l.kelompok.flatMap((k) => k.faktur.map((f) => f.nomor));
+  pastikan(!nomorDiPiutang(piutangDraf).includes(faktur.nomor), "Laporan Piutang belum memuat faktur yang masih DRAFT");
+
   await sebagai(PENGAJU, () => jalankan("ajukan faktur", () => ajukanDokumen("faktur", faktur.id)));
   s = await jumlahJurnalDokumen("fakturPenjualan", faktur.id);
   pastikan(s.statusPersetujuan === "MENUNGGU", `faktur diajukan berstatus MENUNGGU (${s.statusPersetujuan})`);
@@ -179,6 +189,11 @@ async function main() {
   await sebagai(PEMERIKSA, () =>
     harusDitolak("menyetujui faktur dua kali", () => setujuiDokumen("faktur", faktur.id), "sudah disetujui"),
   );
+
+  const sinkronSetelah = await periksaSinkron(db);
+  pastikan(sinkronSetelah.piutang.sinkron, `pemeriksaan sinkron tetap cocok setelah faktur disetujui (BB ${sinkronSetelah.piutang.bukuBesar} vs dokumen ${sinkronSetelah.piutang.dokumen})`);
+  const piutangSetelah = await laporanPiutang(db, new Date());
+  pastikan(piutangSetelah.kelompok.flatMap((k) => k.faktur.map((f) => f.nomor)).includes(faktur.nomor), "Laporan Piutang memuat faktur setelah disetujui");
 
   const logFaktur = await db.logAktivitas.findMany({ where: { nomor: faktur.nomor, waktu: { gte: mulaiUji } }, orderBy: { waktu: "asc" } });
   pastikan(

@@ -54,8 +54,9 @@ function susun(sampai: Date, daftar: { rekanan: { id: string; kode: string; nama
 
 /** Piutang usaha per tanggal: faktur penjualan s.d. tanggal itu dikurangi uang muka, penerimaan, dan retur s.d. tanggal itu. */
 export async function laporanPiutang(klien: PrismaClient = db, sampai: Date): Promise<LaporanUmur> {
+  // Faktur yang belum disetujui belum membentuk piutang di buku besar, jadi belum masuk laporan ini
   const faktur = await klien.fakturPenjualan.findMany({
-    where: { tanggal: { lte: sampai } },
+    where: { tanggal: { lte: sampai }, statusPersetujuan: "DISETUJUI" },
     include: { pelanggan: { select: { id: true, kode: true, nama: true } }, penerimaan: { where: { tanggal: { lte: sampai } }, select: { jumlah: true, potonganPajak: true } }, retur: { where: { tanggal: { lte: sampai } }, select: { total: true } } },
   });
   return susun(
@@ -70,8 +71,9 @@ export async function laporanPiutang(klien: PrismaClient = db, sampai: Date): Pr
 
 /** Hutang usaha per tanggal: faktur pembelian s.d. tanggal itu dikurangi pembayaran dan retur s.d. tanggal itu. */
 export async function laporanHutang(klien: PrismaClient = db, sampai: Date): Promise<LaporanUmur> {
+  // Faktur yang belum disetujui belum membentuk hutang di buku besar, jadi belum masuk laporan ini
   const faktur = await klien.fakturPembelian.findMany({
-    where: { tanggal: { lte: sampai } },
+    where: { tanggal: { lte: sampai }, statusPersetujuan: "DISETUJUI" },
     include: { pemasok: { select: { id: true, kode: true, nama: true } }, pembayaran: { where: { tanggal: { lte: sampai } }, select: { jumlah: true, potonganPajak: true } }, retur: { where: { tanggal: { lte: sampai } }, select: { total: true } } },
   });
   return susun(

@@ -205,7 +205,28 @@ hanya bila `UJI_TANPA_SESI=1`, sama seperti pintu uji yang sudah ada di `src/lib
   memakai `FormulirAksi` dan kelas gaya yang sudah ada. Alasan penolakan diisi di `<details>` berisi
   textarea, jadi tidak ada sistem dialog baru.
 
-### 1.12 Berkas terkait
+### 1.12 Laporan yang membaca tabel dokumen
+
+Sebagian besar laporan membaca `BarisJurnal`, jadi dokumen yang belum disetujui otomatis tidak ikut
+karena jurnalnya belum ada. Tetapi ada beberapa tempat yang membaca tabel dokumen langsung, dan itu
+harus ikut menyaring status, kalau tidak angka dokumen akan berbeda dari saldo buku besar selama
+dokumen menunggu:
+
+| Berkas | Yang disaring |
+|---|---|
+| `src/lib/sinkron.ts` | Σ total faktur penjualan & pembelian pembanding saldo Piutang/Hutang |
+| `src/lib/laporanRekanan.ts` | Laporan Piutang & Laporan Hutang (umur piutang) |
+| `src/lib/pajak.ts` | DPP & PPN keluaran/masukan di Pajak & SPT |
+| `src/app/(aplikasi)/page.tsx` | KPI piutang, KPI hutang, dan nilai buku aset tetap di Beranda |
+
+Daftar dokumen per modul sengaja **tidak** disaring: di situ draf memang harus terlihat, dan ada
+kolom status beserta tombol tindakannya.
+
+Dua pemeriksaan di `skrip/uji-persetujuan.ts` mengunci perilaku ini: saat ada faktur DRAFT,
+`periksaSinkron` tetap cocok dan Laporan Piutang belum memuat fakturnya; setelah disetujui, keduanya
+ikut naik dengan nilai yang sama.
+
+### 1.13 Berkas terkait
 
 | Berkas | Isi |
 |---|---|
