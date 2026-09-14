@@ -5,7 +5,7 @@ import { pulihkanHakBawaanFormulir, simpanHakAksesFormulir } from "@/lib/aksi/ha
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
-const LABEL_MODUL: Record<ModulDokumen, string> = { penjualan: "Penjualan", pembelian: "Pembelian", "kas-bank": "Kas & Bank", "buku-besar": "Buku Besar", persediaan: "Persediaan", "aset-tetap": "Aset Tetap" };
+const LABEL_MODUL: Record<ModulDokumen, string> = { penjualan: "Penjualan", pembelian: "Pembelian", "kas-bank": "Kas & Bank", "buku-besar": "Buku Besar", persediaan: "Persediaan", "aset-tetap": "Aset Tetap", sdm: "SDM" };
 const AKSI: AksiDokumen[] = ["lihat", "buat", "hapus"];
 
 export default async function HalamanHakAkses() {

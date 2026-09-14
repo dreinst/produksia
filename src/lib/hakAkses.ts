@@ -10,7 +10,7 @@ import type { PeranPengguna } from "@/prisma-klien/enums";
 /** Nama cookie sesi, didefinisikan di sini agar proxy.ts bisa memakainya tanpa menyeret modul basis data. */
 export const NAMA_COOKIE_SESI = "sesi_ac";
 
-export type ModulDokumen = "penjualan" | "pembelian" | "kas-bank" | "buku-besar" | "persediaan" | "aset-tetap";
+export type ModulDokumen = "penjualan" | "pembelian" | "kas-bank" | "buku-besar" | "persediaan" | "aset-tetap" | "sdm";
 export type AksiDokumen = "lihat" | "buat" | "hapus";
 
 export const DOKUMEN_HAK = [
@@ -37,6 +37,7 @@ export const DOKUMEN_HAK = [
   { kode: "aset", label: "Aset Tetap", modul: "aset-tetap", aksi: ["lihat", "buat", "hapus"] },
   { kode: "penyusutan", label: "Penyusutan Aset", modul: "aset-tetap", aksi: ["lihat", "buat", "hapus"] },
   { kode: "pelepasan-aset", label: "Pelepasan Aset (jual/hapus buku)", modul: "aset-tetap", aksi: ["buat", "hapus"] },
+  { kode: "penggajian", label: "Penggajian (proses gaji karyawan)", modul: "sdm", aksi: ["lihat", "buat", "hapus"] },
 ] as const satisfies readonly { kode: string; label: string; modul: ModulDokumen; aksi: readonly AksiDokumen[] }[];
 
 type Dok = (typeof DOKUMEN_HAK)[number];

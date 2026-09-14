@@ -88,6 +88,14 @@ const operasional: Grup[] = [
       { href: "/aset-tetap/penyusutan", label: "Hitung Penyusutan", kode: "PNY", hak: "penyusutan.lihat" },
     ],
   },
+  {
+    judul: "SDM",
+    ikon: "group",
+    tautan: [
+      { href: "/data-induk/karyawan", label: "Karyawan", hak: "data-induk.lihat" },
+      { href: "/sdm/penggajian", label: "Penggajian", kode: "GJ", hak: "penggajian.lihat" },
+    ],
+  },
 ];
 
 const persediaan: Grup = {

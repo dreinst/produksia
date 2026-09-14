@@ -54,6 +54,7 @@ enum SumberJurnal {
   PENYUSUTAN
   PERSEDIAAN
   ASET_TETAP
+  PENGGAJIAN
 }
 
 enum StatusAset {
@@ -121,8 +122,19 @@ model Karyawan {
   penggunaId   String?     @unique
   pengguna     Pengguna?   @relation(fields: [penggunaId], references: [id])
   pelanggan    Pelanggan[]
+  /// Siklus SDM: data kepegawaian dan komponen gaji bulanan bawaan (bisa disesuaikan per baris saat Proses Gaji)
+  jabatan          String?
+  tanggalBergabung DateTime?
+  status           String   @default("AKTIF") // AKTIF | NONAKTIF
+  gajiPokok        Decimal  @default(0) @db.Decimal(18, 2)
+  tunjangan        Decimal  @default(0) @db.Decimal(18, 2)
+  /// Akun beban khusus karyawan ini (mis. Upah Harian/Honor Volunteer alih-alih Gaji Pokok); kosong = pemetaan tambahan "bebanGaji"
+  akunBebanId String?
+  akunBeban   Akun?   @relation("AkunBebanKaryawan", fields: [akunBebanId], references: [id])
+  barisPenggajian BarisPenggajian[]
   dibuatPada   DateTime    @default(now())
   @@index([departemenId])
+  @@index([akunBebanId])
 }
 
 model Pelanggan {
@@ -177,6 +189,7 @@ model Proyek {
   pesanan          PesananPenjualan[]
   pesananPembelian PesananPembelian[]
   jurnal           Jurnal[]
+  penggajian       Penggajian[]
   @@index([pelangganId])
 }
 
@@ -733,6 +746,8 @@ model Akun {
   mutasiBank                 MutasiBank[]    @relation("AkunMutasiBank")
   priveKas                   Prive[]         @relation("AkunKasPrive")
   priveModal                 Prive[]         @relation("AkunPrive")
+  karyawanBeban               Karyawan[]      @relation("AkunBebanKaryawan")
+  penggajianKas               Penggajian[]    @relation("AkunKasPenggajian")
   pemetaanTambahan           PemetaanAkunTambahan[] @relation("AkunPemetaanTambahan")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
   pengaturanPpnKeluaran   PengaturanPerusahaan? @relation("PetaPpnKeluaran")
@@ -815,6 +830,7 @@ model Jurnal {
   fakturPembelian       FakturPembelian?       @relation("JurnalFakturPembelian")
   pembayaranPembelian   PembayaranPembelian?   @relation("JurnalPembayaranPembelian")
   returPembelian        ReturPembelian?        @relation("JurnalReturPembelian")
+  penggajian            Penggajian?            @relation("JurnalPenggajian")
   @@index([proyekId])
   @@index([tanggal])
 }
@@ -1095,6 +1111,49 @@ model Prive {
   @@index([akunKasId])
   @@index([akunPriveId])
   @@index([tanggal])
+}
+
+/// Siklus SDM: satu proses gaji per periode (bulan), mencakup semua karyawan yang diikutkan.
+/// Jurnal: Dr Beban Gaji Pokok (per akun) + Dr Beban Tunjangan (per akun) / Cr Hutang Potongan Gaji (bila ada potongan) / Cr Kas-Bank (gaji bersih).
+model Penggajian {
+  id        String   @id @default(cuid())
+  nomor     String   @unique
+  periode   String   @unique // YYYY-MM; satu proses per bulan, koreksi = hapus lalu buat ulang
+  tanggal   DateTime @default(now())
+  akunKasId String
+  akunKas   Akun     @relation("AkunKasPenggajian", fields: [akunKasId], references: [id])
+  proyekId  String?
+  proyek    Proyek?  @relation(fields: [proyekId], references: [id])
+  totalGajiPokok Decimal @default(0) @db.Decimal(18, 2)
+  totalTunjangan Decimal @default(0) @db.Decimal(18, 2)
+  totalPotongan  Decimal @default(0) @db.Decimal(18, 2)
+  totalDibayar   Decimal @default(0) @db.Decimal(18, 2)
+  keterangan String?
+  jurnalId   String?  @unique
+  jurnal     Jurnal?  @relation("JurnalPenggajian", fields: [jurnalId], references: [id])
+  penggunaNama String
+  dibuatPada DateTime @default(now())
+
+  baris BarisPenggajian[]
+  @@index([akunKasId])
+  @@index([proyekId])
+  @@index([tanggal])
+}
+
+/// Rincian gaji per karyawan dalam satu proses Penggajian; diterima = gajiPokok + tunjangan − potongan.
+model BarisPenggajian {
+  id           String     @id @default(cuid())
+  penggajianId String
+  penggajian   Penggajian @relation(fields: [penggajianId], references: [id])
+  karyawanId   String
+  karyawan     Karyawan   @relation(fields: [karyawanId], references: [id])
+  gajiPokok Decimal @db.Decimal(18, 2)
+  tunjangan Decimal @db.Decimal(18, 2)
+  potongan  Decimal @default(0) @db.Decimal(18, 2)
+  keteranganPotongan String?
+  diterima  Decimal @db.Decimal(18, 2)
+  @@index([penggajianId])
+  @@index([karyawanId])
 }
 
 /// Pemetaan akun tambahan buatan pengguna (mis. "prive" → 3-4000) untuk peran yang belum ada di PemetaanAkun

@@ -62,7 +62,8 @@ export const SumberJurnal = {
   PEMBELIAN: 'PEMBELIAN',
   PENYUSUTAN: 'PENYUSUTAN',
   PERSEDIAAN: 'PERSEDIAAN',
-  ASET_TETAP: 'ASET_TETAP'
+  ASET_TETAP: 'ASET_TETAP',
+  PENGGAJIAN: 'PENGGAJIAN'
 } as const
 
 export type SumberJurnal = (typeof SumberJurnal)[keyof typeof SumberJurnal]

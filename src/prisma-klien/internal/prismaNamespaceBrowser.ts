@@ -103,6 +103,8 @@ export const ModelName = {
   PermintaanAturUlang: 'PermintaanAturUlang',
   MutasiBank: 'MutasiBank',
   Prive: 'Prive',
+  Penggajian: 'Penggajian',
+  BarisPenggajian: 'BarisPenggajian',
   PemetaanAkunTambahan: 'PemetaanAkunTambahan',
   LogAktivitas: 'LogAktivitas'
 } as const
@@ -172,6 +174,12 @@ export const KaryawanScalarFieldEnum = {
   nama: 'nama',
   departemenId: 'departemenId',
   penggunaId: 'penggunaId',
+  jabatan: 'jabatan',
+  tanggalBergabung: 'tanggalBergabung',
+  status: 'status',
+  gajiPokok: 'gajiPokok',
+  tunjangan: 'tunjangan',
+  akunBebanId: 'akunBebanId',
   dibuatPada: 'dibuatPada'
 } as const
 
@@ -837,6 +845,40 @@ export const PriveScalarFieldEnum = {
 } as const
 
 export type PriveScalarFieldEnum = (typeof PriveScalarFieldEnum)[keyof typeof PriveScalarFieldEnum]
+
+
+export const PenggajianScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  periode: 'periode',
+  tanggal: 'tanggal',
+  akunKasId: 'akunKasId',
+  proyekId: 'proyekId',
+  totalGajiPokok: 'totalGajiPokok',
+  totalTunjangan: 'totalTunjangan',
+  totalPotongan: 'totalPotongan',
+  totalDibayar: 'totalDibayar',
+  keterangan: 'keterangan',
+  jurnalId: 'jurnalId',
+  penggunaNama: 'penggunaNama',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type PenggajianScalarFieldEnum = (typeof PenggajianScalarFieldEnum)[keyof typeof PenggajianScalarFieldEnum]
+
+
+export const BarisPenggajianScalarFieldEnum = {
+  id: 'id',
+  penggajianId: 'penggajianId',
+  karyawanId: 'karyawanId',
+  gajiPokok: 'gajiPokok',
+  tunjangan: 'tunjangan',
+  potongan: 'potongan',
+  keteranganPotongan: 'keteranganPotongan',
+  diterima: 'diterima'
+} as const
+
+export type BarisPenggajianScalarFieldEnum = (typeof BarisPenggajianScalarFieldEnum)[keyof typeof BarisPenggajianScalarFieldEnum]
 
 
 export const PemetaanAkunTambahanScalarFieldEnum = {

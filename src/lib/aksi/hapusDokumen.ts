@@ -39,7 +39,8 @@ export type JenisDokumen =
   | "prive"
   | "aset"
   | "penyusutan"
-  | "pelepasanAset";
+  | "pelepasanAset"
+  | "penggajian";
 
 const LABEL: Record<JenisDokumen, string> = {
   penawaran: "Penawaran Penjualan",
@@ -62,6 +63,7 @@ const LABEL: Record<JenisDokumen, string> = {
   aset: "Aset Tetap",
   penyusutan: "Penyusutan",
   pelepasanAset: "Pelepasan Aset",
+  penggajian: "Penggajian",
 };
 
 const JALUR: Record<JenisDokumen, string[]> = {
@@ -85,6 +87,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   aset: ["/aset-tetap"],
   penyusutan: ["/aset-tetap/penyusutan", "/aset-tetap"],
   pelepasanAset: ["/aset-tetap", "/buku-besar/jurnal"],
+  penggajian: ["/sdm/penggajian", "/buku-besar/jurnal"],
 };
 
 function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" | "SEBAGIAN" | "LUNAS" {
@@ -149,6 +152,7 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal">, Hak> = {
   aset: "aset.hapus",
   penyusutan: "penyusutan.hapus",
   pelepasanAset: "pelepasan-aset.hapus",
+  penggajian: "penggajian.hapus",
 };
 
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
@@ -397,6 +401,14 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await tx.prive.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalId);
         await catatLog(tx, pengguna, jenis, d.nomor, `Prive ${d.pemilikNama} ${d.jumlah} dibatalkan; kas dan akun prive dibalik`);
+        return;
+      }
+      case "penggajian": {
+        const d = await tx.penggajian.findUniqueOrThrow({ where: { id } });
+        await tx.barisPenggajian.deleteMany({ where: { penggajianId: id } });
+        await tx.penggajian.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        await catatLog(tx, pengguna, jenis, d.nomor, `Penggajian periode ${d.periode} dibatalkan (${d.totalDibayar} dibayar); beban dan kas dibalik`);
         return;
       }
       case "aset": {

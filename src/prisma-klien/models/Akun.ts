@@ -238,6 +238,8 @@ export type AkunWhereInput = {
   mutasiBank?: Prisma.MutasiBankListRelationFilter
   priveKas?: Prisma.PriveListRelationFilter
   priveModal?: Prisma.PriveListRelationFilter
+  karyawanBeban?: Prisma.KaryawanListRelationFilter
+  penggajianKas?: Prisma.PenggajianListRelationFilter
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanListRelationFilter
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanListRelationFilter
   pengaturanPpnKeluaran?: Prisma.XOR<Prisma.PengaturanPerusahaanNullableScalarRelationFilter, Prisma.PengaturanPerusahaanWhereInput> | null
@@ -289,6 +291,8 @@ export type AkunOrderByWithRelationInput = {
   mutasiBank?: Prisma.MutasiBankOrderByRelationAggregateInput
   priveKas?: Prisma.PriveOrderByRelationAggregateInput
   priveModal?: Prisma.PriveOrderByRelationAggregateInput
+  karyawanBeban?: Prisma.KaryawanOrderByRelationAggregateInput
+  penggajianKas?: Prisma.PenggajianOrderByRelationAggregateInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanOrderByRelationAggregateInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanOrderByRelationAggregateInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanOrderByWithRelationInput
@@ -343,6 +347,8 @@ export type AkunWhereUniqueInput = Prisma.AtLeast<{
   mutasiBank?: Prisma.MutasiBankListRelationFilter
   priveKas?: Prisma.PriveListRelationFilter
   priveModal?: Prisma.PriveListRelationFilter
+  karyawanBeban?: Prisma.KaryawanListRelationFilter
+  penggajianKas?: Prisma.PenggajianListRelationFilter
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanListRelationFilter
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanListRelationFilter
   pengaturanPpnKeluaran?: Prisma.XOR<Prisma.PengaturanPerusahaanNullableScalarRelationFilter, Prisma.PengaturanPerusahaanWhereInput> | null
@@ -421,6 +427,8 @@ export type AkunCreateInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -471,6 +479,8 @@ export type AkunUncheckedCreateInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -521,6 +531,8 @@ export type AkunUpdateInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -571,6 +583,8 @@ export type AkunUncheckedUpdateInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -664,6 +678,22 @@ export type AkunMinOrderByAggregateInput = {
   kasBank?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   indukId?: Prisma.SortOrder
+}
+
+export type AkunCreateNestedOneWithoutKaryawanBebanInput = {
+  create?: Prisma.XOR<Prisma.AkunCreateWithoutKaryawanBebanInput, Prisma.AkunUncheckedCreateWithoutKaryawanBebanInput>
+  connectOrCreate?: Prisma.AkunCreateOrConnectWithoutKaryawanBebanInput
+  connect?: Prisma.AkunWhereUniqueInput
+}
+
+export type AkunUpdateOneWithoutKaryawanBebanNestedInput = {
+  create?: Prisma.XOR<Prisma.AkunCreateWithoutKaryawanBebanInput, Prisma.AkunUncheckedCreateWithoutKaryawanBebanInput>
+  connectOrCreate?: Prisma.AkunCreateOrConnectWithoutKaryawanBebanInput
+  upsert?: Prisma.AkunUpsertWithoutKaryawanBebanInput
+  disconnect?: Prisma.AkunWhereInput | boolean
+  delete?: Prisma.AkunWhereInput | boolean
+  connect?: Prisma.AkunWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AkunUpdateToOneWithWhereWithoutKaryawanBebanInput, Prisma.AkunUpdateWithoutKaryawanBebanInput>, Prisma.AkunUncheckedUpdateWithoutKaryawanBebanInput>
 }
 
 export type AkunCreateNestedOneWithoutBarangPendapatanInput = {
@@ -1286,6 +1316,20 @@ export type AkunUpdateOneRequiredWithoutPriveModalNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AkunUpdateToOneWithWhereWithoutPriveModalInput, Prisma.AkunUpdateWithoutPriveModalInput>, Prisma.AkunUncheckedUpdateWithoutPriveModalInput>
 }
 
+export type AkunCreateNestedOneWithoutPenggajianKasInput = {
+  create?: Prisma.XOR<Prisma.AkunCreateWithoutPenggajianKasInput, Prisma.AkunUncheckedCreateWithoutPenggajianKasInput>
+  connectOrCreate?: Prisma.AkunCreateOrConnectWithoutPenggajianKasInput
+  connect?: Prisma.AkunWhereUniqueInput
+}
+
+export type AkunUpdateOneRequiredWithoutPenggajianKasNestedInput = {
+  create?: Prisma.XOR<Prisma.AkunCreateWithoutPenggajianKasInput, Prisma.AkunUncheckedCreateWithoutPenggajianKasInput>
+  connectOrCreate?: Prisma.AkunCreateOrConnectWithoutPenggajianKasInput
+  upsert?: Prisma.AkunUpsertWithoutPenggajianKasInput
+  connect?: Prisma.AkunWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AkunUpdateToOneWithWhereWithoutPenggajianKasInput, Prisma.AkunUpdateWithoutPenggajianKasInput>, Prisma.AkunUncheckedUpdateWithoutPenggajianKasInput>
+}
+
 export type AkunCreateNestedOneWithoutPemetaanTambahanInput = {
   create?: Prisma.XOR<Prisma.AkunCreateWithoutPemetaanTambahanInput, Prisma.AkunUncheckedCreateWithoutPemetaanTambahanInput>
   connectOrCreate?: Prisma.AkunCreateOrConnectWithoutPemetaanTambahanInput
@@ -1298,6 +1342,226 @@ export type AkunUpdateOneRequiredWithoutPemetaanTambahanNestedInput = {
   upsert?: Prisma.AkunUpsertWithoutPemetaanTambahanInput
   connect?: Prisma.AkunWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.AkunUpdateToOneWithWhereWithoutPemetaanTambahanInput, Prisma.AkunUpdateWithoutPemetaanTambahanInput>, Prisma.AkunUncheckedUpdateWithoutPemetaanTambahanInput>
+}
+
+export type AkunCreateWithoutKaryawanBebanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
+  induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
+  anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
+  barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutAkunInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutAkunInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutAkunInput
+  pemetaanPiutang?: Prisma.PemetaanAkunCreateNestedOneWithoutPiutangUsahaInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunCreateNestedOneWithoutPersediaanInput
+  pemetaanHpp?: Prisma.PemetaanAkunCreateNestedOneWithoutHppInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunCreateNestedOneWithoutPendapatanPenjualanInput
+  pemetaanUtang?: Prisma.PemetaanAkunCreateNestedOneWithoutUtangUsahaInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapCreateNestedManyWithoutAkunAsetInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapCreateNestedManyWithoutAkunBebanPenyusutanInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapCreateNestedManyWithoutAkunAkumulasiPenyusutanInput
+  barangPendapatan?: Prisma.BarangCreateNestedManyWithoutAkunPendapatanInput
+  barangHpp?: Prisma.BarangCreateNestedManyWithoutAkunHppInput
+  barangPersediaan?: Prisma.BarangCreateNestedManyWithoutAkunPersediaanInput
+  barangBeban?: Prisma.BarangCreateNestedManyWithoutAkunBebanInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunCreateNestedOneWithoutBebanJasaInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunCreateNestedOneWithoutBarangBelumDitagihInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunCreateNestedOneWithoutSelisihPersediaanInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunCreateNestedOneWithoutBarangTerkirimInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunCreateNestedOneWithoutUangMukaPelangganInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunCreateNestedOneWithoutLabaDitahanInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunCreateNestedOneWithoutDiskonPenjualanInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunCreateNestedOneWithoutPendapatanLainInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapCreateNestedManyWithoutAkunPembayaranInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunPenerimaanInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunLabaRugiInput
+  mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
+  priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
+  priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnMasukanInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPph23DimukaInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPph23DipotongInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunBebanPphFinalInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunHutangPphFinalInput
+}
+
+export type AkunUncheckedCreateWithoutKaryawanBebanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
+  indukId?: string | null
+  anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
+  barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutAkunInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutAkunInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutAkunInput
+  pemetaanPiutang?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPiutangUsahaInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPersediaanInput
+  pemetaanHpp?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutHppInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPendapatanPenjualanInput
+  pemetaanUtang?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutUtangUsahaInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunAsetInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunBebanPenyusutanInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunAkumulasiPenyusutanInput
+  barangPendapatan?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunPendapatanInput
+  barangHpp?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunHppInput
+  barangPersediaan?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunPersediaanInput
+  barangBeban?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunBebanInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutBebanJasaInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutBarangBelumDitagihInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutSelisihPersediaanInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutBarangTerkirimInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutUangMukaPelangganInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutLabaDitahanInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutDiskonPenjualanInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPendapatanLainInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunPembayaranInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunPenerimaanInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunLabaRugiInput
+  mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
+  priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
+  priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnMasukanInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPph23DimukaInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPph23DipotongInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunBebanPphFinalInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunHutangPphFinalInput
+}
+
+export type AkunCreateOrConnectWithoutKaryawanBebanInput = {
+  where: Prisma.AkunWhereUniqueInput
+  create: Prisma.XOR<Prisma.AkunCreateWithoutKaryawanBebanInput, Prisma.AkunUncheckedCreateWithoutKaryawanBebanInput>
+}
+
+export type AkunUpsertWithoutKaryawanBebanInput = {
+  update: Prisma.XOR<Prisma.AkunUpdateWithoutKaryawanBebanInput, Prisma.AkunUncheckedUpdateWithoutKaryawanBebanInput>
+  create: Prisma.XOR<Prisma.AkunCreateWithoutKaryawanBebanInput, Prisma.AkunUncheckedCreateWithoutKaryawanBebanInput>
+  where?: Prisma.AkunWhereInput
+}
+
+export type AkunUpdateToOneWithWhereWithoutKaryawanBebanInput = {
+  where?: Prisma.AkunWhereInput
+  data: Prisma.XOR<Prisma.AkunUpdateWithoutKaryawanBebanInput, Prisma.AkunUncheckedUpdateWithoutKaryawanBebanInput>
+}
+
+export type AkunUpdateWithoutKaryawanBebanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
+  anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
+  barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutAkunNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutAkunNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutAkunNestedInput
+  pemetaanPiutang?: Prisma.PemetaanAkunUpdateOneWithoutPiutangUsahaNestedInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunUpdateOneWithoutPersediaanNestedInput
+  pemetaanHpp?: Prisma.PemetaanAkunUpdateOneWithoutHppNestedInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunUpdateOneWithoutPendapatanPenjualanNestedInput
+  pemetaanUtang?: Prisma.PemetaanAkunUpdateOneWithoutUtangUsahaNestedInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapUpdateManyWithoutAkunAsetNestedInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapUpdateManyWithoutAkunBebanPenyusutanNestedInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapUpdateManyWithoutAkunAkumulasiPenyusutanNestedInput
+  barangPendapatan?: Prisma.BarangUpdateManyWithoutAkunPendapatanNestedInput
+  barangHpp?: Prisma.BarangUpdateManyWithoutAkunHppNestedInput
+  barangPersediaan?: Prisma.BarangUpdateManyWithoutAkunPersediaanNestedInput
+  barangBeban?: Prisma.BarangUpdateManyWithoutAkunBebanNestedInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunUpdateOneWithoutBebanJasaNestedInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunUpdateOneWithoutBarangBelumDitagihNestedInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunUpdateOneWithoutSelisihPersediaanNestedInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunUpdateOneWithoutBarangTerkirimNestedInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunUpdateOneWithoutUangMukaPelangganNestedInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunUpdateOneWithoutLabaDitahanNestedInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunUpdateOneWithoutDiskonPenjualanNestedInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunUpdateOneWithoutPendapatanLainNestedInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapUpdateManyWithoutAkunPembayaranNestedInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetUpdateManyWithoutAkunPenerimaanNestedInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetUpdateManyWithoutAkunLabaRugiNestedInput
+  mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
+  priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
+  priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnMasukanNestedInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPph23DimukaNestedInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPph23DipotongNestedInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunBebanPphFinalNestedInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunHutangPphFinalNestedInput
+}
+
+export type AkunUncheckedUpdateWithoutKaryawanBebanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
+  barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutAkunNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutAkunNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutAkunNestedInput
+  pemetaanPiutang?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPiutangUsahaNestedInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPersediaanNestedInput
+  pemetaanHpp?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutHppNestedInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPendapatanPenjualanNestedInput
+  pemetaanUtang?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutUtangUsahaNestedInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunAsetNestedInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunBebanPenyusutanNestedInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunAkumulasiPenyusutanNestedInput
+  barangPendapatan?: Prisma.BarangUncheckedUpdateManyWithoutAkunPendapatanNestedInput
+  barangHpp?: Prisma.BarangUncheckedUpdateManyWithoutAkunHppNestedInput
+  barangPersediaan?: Prisma.BarangUncheckedUpdateManyWithoutAkunPersediaanNestedInput
+  barangBeban?: Prisma.BarangUncheckedUpdateManyWithoutAkunBebanNestedInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutBebanJasaNestedInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutBarangBelumDitagihNestedInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutSelisihPersediaanNestedInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutBarangTerkirimNestedInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutUangMukaPelangganNestedInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutLabaDitahanNestedInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutDiskonPenjualanNestedInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPendapatanLainNestedInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunPembayaranNestedInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunPenerimaanNestedInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunLabaRugiNestedInput
+  mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
+  priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
+  priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnMasukanNestedInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DimukaNestedInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DipotongNestedInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunBebanPphFinalNestedInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunHutangPphFinalNestedInput
 }
 
 export type AkunCreateWithoutBarangPendapatanInput = {
@@ -1339,6 +1603,8 @@ export type AkunCreateWithoutBarangPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1388,6 +1654,8 @@ export type AkunUncheckedCreateWithoutBarangPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1442,6 +1710,8 @@ export type AkunCreateWithoutBarangHppInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1491,6 +1761,8 @@ export type AkunUncheckedCreateWithoutBarangHppInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1545,6 +1817,8 @@ export type AkunCreateWithoutBarangPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1594,6 +1868,8 @@ export type AkunUncheckedCreateWithoutBarangPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1648,6 +1924,8 @@ export type AkunCreateWithoutBarangBebanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1697,6 +1975,8 @@ export type AkunUncheckedCreateWithoutBarangBebanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -1762,6 +2042,8 @@ export type AkunUpdateWithoutBarangPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -1811,6 +2093,8 @@ export type AkunUncheckedUpdateWithoutBarangPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -1871,6 +2155,8 @@ export type AkunUpdateWithoutBarangHppInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -1920,6 +2206,8 @@ export type AkunUncheckedUpdateWithoutBarangHppInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -1980,6 +2268,8 @@ export type AkunUpdateWithoutBarangPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2029,6 +2319,8 @@ export type AkunUncheckedUpdateWithoutBarangPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2089,6 +2381,8 @@ export type AkunUpdateWithoutBarangBebanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2138,6 +2432,8 @@ export type AkunUncheckedUpdateWithoutBarangBebanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2187,6 +2483,8 @@ export type AkunCreateWithoutUangMukaPelangganInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2236,6 +2534,8 @@ export type AkunUncheckedCreateWithoutUangMukaPelangganInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2301,6 +2601,8 @@ export type AkunUpdateWithoutUangMukaPelangganInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2350,6 +2652,8 @@ export type AkunUncheckedUpdateWithoutUangMukaPelangganInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2399,6 +2703,8 @@ export type AkunCreateWithoutPenerimaanPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2448,6 +2754,8 @@ export type AkunUncheckedCreateWithoutPenerimaanPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2513,6 +2821,8 @@ export type AkunUpdateWithoutPenerimaanPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2562,6 +2872,8 @@ export type AkunUncheckedUpdateWithoutPenerimaanPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2611,6 +2923,8 @@ export type AkunCreateWithoutPembayaranPembelianInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2660,6 +2974,8 @@ export type AkunUncheckedCreateWithoutPembayaranPembelianInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2725,6 +3041,8 @@ export type AkunUpdateWithoutPembayaranPembelianInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2774,6 +3092,8 @@ export type AkunUncheckedUpdateWithoutPembayaranPembelianInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -2823,6 +3143,8 @@ export type AkunCreateWithoutAnakInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2872,6 +3194,8 @@ export type AkunUncheckedCreateWithoutAnakInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2926,6 +3250,8 @@ export type AkunCreateWithoutIndukInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -2975,6 +3301,8 @@ export type AkunUncheckedCreateWithoutIndukInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3045,6 +3373,8 @@ export type AkunUpdateWithoutAnakInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -3094,6 +3424,8 @@ export type AkunUncheckedUpdateWithoutAnakInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -3173,6 +3505,8 @@ export type AkunCreateWithoutPemetaanPiutangInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3222,6 +3556,8 @@ export type AkunUncheckedCreateWithoutPemetaanPiutangInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3276,6 +3612,8 @@ export type AkunCreateWithoutPemetaanPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3325,6 +3663,8 @@ export type AkunUncheckedCreateWithoutPemetaanPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3379,6 +3719,8 @@ export type AkunCreateWithoutPemetaanHppInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3428,6 +3770,8 @@ export type AkunUncheckedCreateWithoutPemetaanHppInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3482,6 +3826,8 @@ export type AkunCreateWithoutPemetaanPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3531,6 +3877,8 @@ export type AkunUncheckedCreateWithoutPemetaanPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3585,6 +3933,8 @@ export type AkunCreateWithoutPemetaanUtangInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3634,6 +3984,8 @@ export type AkunUncheckedCreateWithoutPemetaanUtangInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3688,6 +4040,8 @@ export type AkunCreateWithoutPemetaanBebanJasaInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3737,6 +4091,8 @@ export type AkunUncheckedCreateWithoutPemetaanBebanJasaInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3791,6 +4147,8 @@ export type AkunCreateWithoutPemetaanBarangBelumDitagihInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3840,6 +4198,8 @@ export type AkunUncheckedCreateWithoutPemetaanBarangBelumDitagihInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3894,6 +4254,8 @@ export type AkunCreateWithoutPemetaanSelisihPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3943,6 +4305,8 @@ export type AkunUncheckedCreateWithoutPemetaanSelisihPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -3997,6 +4361,8 @@ export type AkunCreateWithoutPemetaanBarangTerkirimInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4046,6 +4412,8 @@ export type AkunUncheckedCreateWithoutPemetaanBarangTerkirimInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4100,6 +4468,8 @@ export type AkunCreateWithoutPemetaanUangMukaInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4149,6 +4519,8 @@ export type AkunUncheckedCreateWithoutPemetaanUangMukaInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4203,6 +4575,8 @@ export type AkunCreateWithoutPemetaanLabaDitahanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4252,6 +4626,8 @@ export type AkunUncheckedCreateWithoutPemetaanLabaDitahanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4306,6 +4682,8 @@ export type AkunCreateWithoutPemetaanDiskonPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4355,6 +4733,8 @@ export type AkunUncheckedCreateWithoutPemetaanDiskonPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4409,6 +4789,8 @@ export type AkunCreateWithoutPemetaanPendapatanLainInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4458,6 +4840,8 @@ export type AkunUncheckedCreateWithoutPemetaanPendapatanLainInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -4523,6 +4907,8 @@ export type AkunUpdateWithoutPemetaanPiutangInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4572,6 +4958,8 @@ export type AkunUncheckedUpdateWithoutPemetaanPiutangInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4632,6 +5020,8 @@ export type AkunUpdateWithoutPemetaanPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4681,6 +5071,8 @@ export type AkunUncheckedUpdateWithoutPemetaanPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4741,6 +5133,8 @@ export type AkunUpdateWithoutPemetaanHppInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4790,6 +5184,8 @@ export type AkunUncheckedUpdateWithoutPemetaanHppInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4850,6 +5246,8 @@ export type AkunUpdateWithoutPemetaanPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4899,6 +5297,8 @@ export type AkunUncheckedUpdateWithoutPemetaanPendapatanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -4959,6 +5359,8 @@ export type AkunUpdateWithoutPemetaanUtangInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5008,6 +5410,8 @@ export type AkunUncheckedUpdateWithoutPemetaanUtangInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5068,6 +5472,8 @@ export type AkunUpdateWithoutPemetaanBebanJasaInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5117,6 +5523,8 @@ export type AkunUncheckedUpdateWithoutPemetaanBebanJasaInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5177,6 +5585,8 @@ export type AkunUpdateWithoutPemetaanBarangBelumDitagihInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5226,6 +5636,8 @@ export type AkunUncheckedUpdateWithoutPemetaanBarangBelumDitagihInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5286,6 +5698,8 @@ export type AkunUpdateWithoutPemetaanSelisihPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5335,6 +5749,8 @@ export type AkunUncheckedUpdateWithoutPemetaanSelisihPersediaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5395,6 +5811,8 @@ export type AkunUpdateWithoutPemetaanBarangTerkirimInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5444,6 +5862,8 @@ export type AkunUncheckedUpdateWithoutPemetaanBarangTerkirimInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5504,6 +5924,8 @@ export type AkunUpdateWithoutPemetaanUangMukaInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5553,6 +5975,8 @@ export type AkunUncheckedUpdateWithoutPemetaanUangMukaInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5613,6 +6037,8 @@ export type AkunUpdateWithoutPemetaanLabaDitahanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5662,6 +6088,8 @@ export type AkunUncheckedUpdateWithoutPemetaanLabaDitahanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5722,6 +6150,8 @@ export type AkunUpdateWithoutPemetaanDiskonPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5771,6 +6201,8 @@ export type AkunUncheckedUpdateWithoutPemetaanDiskonPenjualanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5831,6 +6263,8 @@ export type AkunUpdateWithoutPemetaanPendapatanLainInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5880,6 +6314,8 @@ export type AkunUncheckedUpdateWithoutPemetaanPendapatanLainInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -5929,6 +6365,8 @@ export type AkunCreateWithoutBarisJurnalInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -5978,6 +6416,8 @@ export type AkunUncheckedCreateWithoutBarisJurnalInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6043,6 +6483,8 @@ export type AkunUpdateWithoutBarisJurnalInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6092,6 +6534,8 @@ export type AkunUncheckedUpdateWithoutBarisJurnalInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6141,6 +6585,8 @@ export type AkunCreateWithoutAsetSebagaiAkunAsetInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6190,6 +6636,8 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunAsetInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6244,6 +6692,8 @@ export type AkunCreateWithoutAsetSebagaiAkunBebanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6293,6 +6743,8 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunBebanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6347,6 +6799,8 @@ export type AkunCreateWithoutAsetSebagaiAkunAkumulasiInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6396,6 +6850,8 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunAkumulasiInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6450,6 +6906,8 @@ export type AkunCreateWithoutAsetSebagaiAkunPembayaranInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6499,6 +6957,8 @@ export type AkunUncheckedCreateWithoutAsetSebagaiAkunPembayaranInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -6564,6 +7024,8 @@ export type AkunUpdateWithoutAsetSebagaiAkunAsetInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6613,6 +7075,8 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunAsetInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6673,6 +7137,8 @@ export type AkunUpdateWithoutAsetSebagaiAkunBebanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6722,6 +7188,8 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunBebanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6782,6 +7250,8 @@ export type AkunUpdateWithoutAsetSebagaiAkunAkumulasiInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6831,6 +7301,8 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunAkumulasiInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6891,6 +7363,8 @@ export type AkunUpdateWithoutAsetSebagaiAkunPembayaranInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6940,6 +7414,8 @@ export type AkunUncheckedUpdateWithoutAsetSebagaiAkunPembayaranInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -6989,6 +7465,8 @@ export type AkunCreateWithoutPelepasanPenerimaanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7038,6 +7516,8 @@ export type AkunUncheckedCreateWithoutPelepasanPenerimaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7092,6 +7572,8 @@ export type AkunCreateWithoutPelepasanLabaRugiInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7141,6 +7623,8 @@ export type AkunUncheckedCreateWithoutPelepasanLabaRugiInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7206,6 +7690,8 @@ export type AkunUpdateWithoutPelepasanPenerimaanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -7255,6 +7741,8 @@ export type AkunUncheckedUpdateWithoutPelepasanPenerimaanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -7315,6 +7803,8 @@ export type AkunUpdateWithoutPelepasanLabaRugiInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -7364,6 +7854,8 @@ export type AkunUncheckedUpdateWithoutPelepasanLabaRugiInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -7414,6 +7906,8 @@ export type AkunCreateWithoutPenyesuaianLawanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnMasukanInput
@@ -7463,6 +7957,8 @@ export type AkunUncheckedCreateWithoutPenyesuaianLawanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnMasukanInput
@@ -7528,6 +8024,8 @@ export type AkunUpdateWithoutPenyesuaianLawanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnMasukanNestedInput
@@ -7577,6 +8075,8 @@ export type AkunUncheckedUpdateWithoutPenyesuaianLawanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnMasukanNestedInput
@@ -7626,6 +8126,8 @@ export type AkunCreateWithoutPengaturanPpnKeluaranInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnMasukanInput
@@ -7675,6 +8177,8 @@ export type AkunUncheckedCreateWithoutPengaturanPpnKeluaranInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnMasukanInput
@@ -7729,6 +8233,8 @@ export type AkunCreateWithoutPengaturanPpnMasukanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7778,6 +8284,8 @@ export type AkunUncheckedCreateWithoutPengaturanPpnMasukanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7832,6 +8340,8 @@ export type AkunCreateWithoutPengaturanPph23DimukaInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7881,6 +8391,8 @@ export type AkunUncheckedCreateWithoutPengaturanPph23DimukaInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7935,6 +8447,8 @@ export type AkunCreateWithoutPengaturanPph23DipotongInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -7984,6 +8498,8 @@ export type AkunUncheckedCreateWithoutPengaturanPph23DipotongInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -8038,6 +8554,8 @@ export type AkunCreateWithoutPengaturanBebanPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -8087,6 +8605,8 @@ export type AkunUncheckedCreateWithoutPengaturanBebanPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -8141,6 +8661,8 @@ export type AkunCreateWithoutPengaturanHutangPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -8190,6 +8712,8 @@ export type AkunUncheckedCreateWithoutPengaturanHutangPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -8255,6 +8779,8 @@ export type AkunUpdateWithoutPengaturanPpnKeluaranInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnMasukanNestedInput
@@ -8304,6 +8830,8 @@ export type AkunUncheckedUpdateWithoutPengaturanPpnKeluaranInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnMasukanNestedInput
@@ -8364,6 +8892,8 @@ export type AkunUpdateWithoutPengaturanPpnMasukanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8413,6 +8943,8 @@ export type AkunUncheckedUpdateWithoutPengaturanPpnMasukanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8473,6 +9005,8 @@ export type AkunUpdateWithoutPengaturanPph23DimukaInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8522,6 +9056,8 @@ export type AkunUncheckedUpdateWithoutPengaturanPph23DimukaInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8582,6 +9118,8 @@ export type AkunUpdateWithoutPengaturanPph23DipotongInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8631,6 +9169,8 @@ export type AkunUncheckedUpdateWithoutPengaturanPph23DipotongInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8691,6 +9231,8 @@ export type AkunUpdateWithoutPengaturanBebanPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8740,6 +9282,8 @@ export type AkunUncheckedUpdateWithoutPengaturanBebanPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8800,6 +9344,8 @@ export type AkunUpdateWithoutPengaturanHutangPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8849,6 +9395,8 @@ export type AkunUncheckedUpdateWithoutPengaturanHutangPphFinalInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -8897,6 +9445,8 @@ export type AkunCreateWithoutMutasiBankInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunLabaRugiInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -8946,6 +9496,8 @@ export type AkunUncheckedCreateWithoutMutasiBankInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunLabaRugiInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -9011,6 +9563,8 @@ export type AkunUpdateWithoutMutasiBankInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUpdateManyWithoutAkunLabaRugiNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9060,6 +9614,8 @@ export type AkunUncheckedUpdateWithoutMutasiBankInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunLabaRugiNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9109,6 +9665,8 @@ export type AkunCreateWithoutPriveKasInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunLabaRugiInput
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -9158,6 +9716,8 @@ export type AkunUncheckedCreateWithoutPriveKasInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunLabaRugiInput
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -9212,6 +9772,8 @@ export type AkunCreateWithoutPriveModalInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunLabaRugiInput
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -9261,6 +9823,8 @@ export type AkunUncheckedCreateWithoutPriveModalInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunLabaRugiInput
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
@@ -9326,6 +9890,8 @@ export type AkunUpdateWithoutPriveKasInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUpdateManyWithoutAkunLabaRugiNestedInput
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9375,6 +9941,8 @@ export type AkunUncheckedUpdateWithoutPriveKasInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunLabaRugiNestedInput
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9435,6 +10003,8 @@ export type AkunUpdateWithoutPriveModalInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUpdateManyWithoutAkunLabaRugiNestedInput
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9484,6 +10054,228 @@ export type AkunUncheckedUpdateWithoutPriveModalInput = {
   pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunLabaRugiNestedInput
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnMasukanNestedInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DimukaNestedInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DipotongNestedInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunBebanPphFinalNestedInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunHutangPphFinalNestedInput
+}
+
+export type AkunCreateWithoutPenggajianKasInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
+  induk?: Prisma.AkunCreateNestedOneWithoutAnakInput
+  anak?: Prisma.AkunCreateNestedManyWithoutIndukInput
+  barisJurnal?: Prisma.BarisJurnalCreateNestedManyWithoutAkunInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutAkunInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutAkunInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutAkunInput
+  pemetaanPiutang?: Prisma.PemetaanAkunCreateNestedOneWithoutPiutangUsahaInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunCreateNestedOneWithoutPersediaanInput
+  pemetaanHpp?: Prisma.PemetaanAkunCreateNestedOneWithoutHppInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunCreateNestedOneWithoutPendapatanPenjualanInput
+  pemetaanUtang?: Prisma.PemetaanAkunCreateNestedOneWithoutUtangUsahaInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapCreateNestedManyWithoutAkunAsetInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapCreateNestedManyWithoutAkunBebanPenyusutanInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapCreateNestedManyWithoutAkunAkumulasiPenyusutanInput
+  barangPendapatan?: Prisma.BarangCreateNestedManyWithoutAkunPendapatanInput
+  barangHpp?: Prisma.BarangCreateNestedManyWithoutAkunHppInput
+  barangPersediaan?: Prisma.BarangCreateNestedManyWithoutAkunPersediaanInput
+  barangBeban?: Prisma.BarangCreateNestedManyWithoutAkunBebanInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunCreateNestedOneWithoutBebanJasaInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunCreateNestedOneWithoutBarangBelumDitagihInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunCreateNestedOneWithoutSelisihPersediaanInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunCreateNestedOneWithoutBarangTerkirimInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunCreateNestedOneWithoutUangMukaPelangganInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunCreateNestedOneWithoutLabaDitahanInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunCreateNestedOneWithoutDiskonPenjualanInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunCreateNestedOneWithoutPendapatanLainInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapCreateNestedManyWithoutAkunPembayaranInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunPenerimaanInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetCreateNestedManyWithoutAkunLabaRugiInput
+  mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
+  priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
+  priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanCreateNestedManyWithoutAkunInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnMasukanInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPph23DimukaInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPph23DipotongInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunBebanPphFinalInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunHutangPphFinalInput
+}
+
+export type AkunUncheckedCreateWithoutPenggajianKasInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis: $Enums.JenisAkun
+  kelompok?: boolean
+  kasBank?: boolean
+  keterangan?: string | null
+  indukId?: string | null
+  anak?: Prisma.AkunUncheckedCreateNestedManyWithoutIndukInput
+  barisJurnal?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutAkunInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutAkunInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutAkunInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutAkunInput
+  pemetaanPiutang?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPiutangUsahaInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPersediaanInput
+  pemetaanHpp?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutHppInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPendapatanPenjualanInput
+  pemetaanUtang?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutUtangUsahaInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunAsetInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunBebanPenyusutanInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunAkumulasiPenyusutanInput
+  barangPendapatan?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunPendapatanInput
+  barangHpp?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunHppInput
+  barangPersediaan?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunPersediaanInput
+  barangBeban?: Prisma.BarangUncheckedCreateNestedManyWithoutAkunBebanInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutBebanJasaInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutBarangBelumDitagihInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutSelisihPersediaanInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutBarangTerkirimInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutUangMukaPelangganInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutLabaDitahanInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutDiskonPenjualanInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunUncheckedCreateNestedOneWithoutPendapatanLainInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutAkunPembayaranInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunPenerimaanInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutAkunLabaRugiInput
+  mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
+  priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
+  priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedCreateNestedManyWithoutAkunInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnMasukanInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPph23DimukaInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPph23DipotongInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunBebanPphFinalInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunHutangPphFinalInput
+}
+
+export type AkunCreateOrConnectWithoutPenggajianKasInput = {
+  where: Prisma.AkunWhereUniqueInput
+  create: Prisma.XOR<Prisma.AkunCreateWithoutPenggajianKasInput, Prisma.AkunUncheckedCreateWithoutPenggajianKasInput>
+}
+
+export type AkunUpsertWithoutPenggajianKasInput = {
+  update: Prisma.XOR<Prisma.AkunUpdateWithoutPenggajianKasInput, Prisma.AkunUncheckedUpdateWithoutPenggajianKasInput>
+  create: Prisma.XOR<Prisma.AkunCreateWithoutPenggajianKasInput, Prisma.AkunUncheckedCreateWithoutPenggajianKasInput>
+  where?: Prisma.AkunWhereInput
+}
+
+export type AkunUpdateToOneWithWhereWithoutPenggajianKasInput = {
+  where?: Prisma.AkunWhereInput
+  data: Prisma.XOR<Prisma.AkunUpdateWithoutPenggajianKasInput, Prisma.AkunUncheckedUpdateWithoutPenggajianKasInput>
+}
+
+export type AkunUpdateWithoutPenggajianKasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  induk?: Prisma.AkunUpdateOneWithoutAnakNestedInput
+  anak?: Prisma.AkunUpdateManyWithoutIndukNestedInput
+  barisJurnal?: Prisma.BarisJurnalUpdateManyWithoutAkunNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutAkunNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutAkunNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutAkunNestedInput
+  pemetaanPiutang?: Prisma.PemetaanAkunUpdateOneWithoutPiutangUsahaNestedInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunUpdateOneWithoutPersediaanNestedInput
+  pemetaanHpp?: Prisma.PemetaanAkunUpdateOneWithoutHppNestedInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunUpdateOneWithoutPendapatanPenjualanNestedInput
+  pemetaanUtang?: Prisma.PemetaanAkunUpdateOneWithoutUtangUsahaNestedInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapUpdateManyWithoutAkunAsetNestedInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapUpdateManyWithoutAkunBebanPenyusutanNestedInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapUpdateManyWithoutAkunAkumulasiPenyusutanNestedInput
+  barangPendapatan?: Prisma.BarangUpdateManyWithoutAkunPendapatanNestedInput
+  barangHpp?: Prisma.BarangUpdateManyWithoutAkunHppNestedInput
+  barangPersediaan?: Prisma.BarangUpdateManyWithoutAkunPersediaanNestedInput
+  barangBeban?: Prisma.BarangUpdateManyWithoutAkunBebanNestedInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunUpdateOneWithoutBebanJasaNestedInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunUpdateOneWithoutBarangBelumDitagihNestedInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunUpdateOneWithoutSelisihPersediaanNestedInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunUpdateOneWithoutBarangTerkirimNestedInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunUpdateOneWithoutUangMukaPelangganNestedInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunUpdateOneWithoutLabaDitahanNestedInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunUpdateOneWithoutDiskonPenjualanNestedInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunUpdateOneWithoutPendapatanLainNestedInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapUpdateManyWithoutAkunPembayaranNestedInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetUpdateManyWithoutAkunPenerimaanNestedInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetUpdateManyWithoutAkunLabaRugiNestedInput
+  mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
+  priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
+  priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
+  penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
+  pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
+  pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnMasukanNestedInput
+  pengaturanPph23Dimuka?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPph23DimukaNestedInput
+  pengaturanPph23Dipotong?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPph23DipotongNestedInput
+  pengaturanBebanPphFinal?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunBebanPphFinalNestedInput
+  pengaturanHutangPphFinal?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunHutangPphFinalNestedInput
+}
+
+export type AkunUncheckedUpdateWithoutPenggajianKasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisAkunFieldUpdateOperationsInput | $Enums.JenisAkun
+  kelompok?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kasBank?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  indukId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anak?: Prisma.AkunUncheckedUpdateManyWithoutIndukNestedInput
+  barisJurnal?: Prisma.BarisJurnalUncheckedUpdateManyWithoutAkunNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutAkunNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutAkunNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutAkunNestedInput
+  pemetaanPiutang?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPiutangUsahaNestedInput
+  pemetaanPersediaan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPersediaanNestedInput
+  pemetaanHpp?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutHppNestedInput
+  pemetaanPendapatan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPendapatanPenjualanNestedInput
+  pemetaanUtang?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutUtangUsahaNestedInput
+  asetSebagaiAkunAset?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunAsetNestedInput
+  asetSebagaiAkunBeban?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunBebanPenyusutanNestedInput
+  asetSebagaiAkunAkumulasi?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunAkumulasiPenyusutanNestedInput
+  barangPendapatan?: Prisma.BarangUncheckedUpdateManyWithoutAkunPendapatanNestedInput
+  barangHpp?: Prisma.BarangUncheckedUpdateManyWithoutAkunHppNestedInput
+  barangPersediaan?: Prisma.BarangUncheckedUpdateManyWithoutAkunPersediaanNestedInput
+  barangBeban?: Prisma.BarangUncheckedUpdateManyWithoutAkunBebanNestedInput
+  pemetaanBebanJasa?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutBebanJasaNestedInput
+  pemetaanBarangBelumDitagih?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutBarangBelumDitagihNestedInput
+  pemetaanSelisihPersediaan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutSelisihPersediaanNestedInput
+  pemetaanBarangTerkirim?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutBarangTerkirimNestedInput
+  pemetaanUangMuka?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutUangMukaPelangganNestedInput
+  pemetaanLabaDitahan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutLabaDitahanNestedInput
+  pemetaanDiskonPenjualan?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutDiskonPenjualanNestedInput
+  pemetaanPendapatanLain?: Prisma.PemetaanAkunUncheckedUpdateOneWithoutPendapatanLainNestedInput
+  asetSebagaiAkunPembayaran?: Prisma.AsetTetapUncheckedUpdateManyWithoutAkunPembayaranNestedInput
+  pelepasanPenerimaan?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunPenerimaanNestedInput
+  pelepasanLabaRugi?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutAkunLabaRugiNestedInput
+  mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
+  priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
+  priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9534,6 +10326,8 @@ export type AkunCreateWithoutPemetaanTambahanInput = {
   mutasiBank?: Prisma.MutasiBankCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianCreateNestedManyWithoutAkunKasInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanCreateNestedOneWithoutAkunPpnMasukanInput
@@ -9583,6 +10377,8 @@ export type AkunUncheckedCreateWithoutPemetaanTambahanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedCreateNestedManyWithoutAkunInput
   priveKas?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunKasInput
   priveModal?: Prisma.PriveUncheckedCreateNestedManyWithoutAkunPriveInput
+  karyawanBeban?: Prisma.KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput
+  penggajianKas?: Prisma.PenggajianUncheckedCreateNestedManyWithoutAkunKasInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutAkunLawanInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnMasukanInput
@@ -9648,6 +10444,8 @@ export type AkunUpdateWithoutPemetaanTambahanInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnMasukanNestedInput
@@ -9697,6 +10495,8 @@ export type AkunUncheckedUpdateWithoutPemetaanTambahanInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
   pengaturanPpnMasukan?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnMasukanNestedInput
@@ -9755,6 +10555,8 @@ export type AkunUpdateWithoutIndukInput = {
   mutasiBank?: Prisma.MutasiBankUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9804,6 +10606,8 @@ export type AkunUncheckedUpdateWithoutIndukInput = {
   mutasiBank?: Prisma.MutasiBankUncheckedUpdateManyWithoutAkunNestedInput
   priveKas?: Prisma.PriveUncheckedUpdateManyWithoutAkunKasNestedInput
   priveModal?: Prisma.PriveUncheckedUpdateManyWithoutAkunPriveNestedInput
+  karyawanBeban?: Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput
+  penggajianKas?: Prisma.PenggajianUncheckedUpdateManyWithoutAkunKasNestedInput
   pemetaanTambahan?: Prisma.PemetaanAkunTambahanUncheckedUpdateManyWithoutAkunNestedInput
   penyesuaianLawan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanNestedInput
   pengaturanPpnKeluaran?: Prisma.PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput
@@ -9848,6 +10652,8 @@ export type AkunCountOutputType = {
   mutasiBank: number
   priveKas: number
   priveModal: number
+  karyawanBeban: number
+  penggajianKas: number
   pemetaanTambahan: number
   penyesuaianLawan: number
 }
@@ -9871,6 +10677,8 @@ export type AkunCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   mutasiBank?: boolean | AkunCountOutputTypeCountMutasiBankArgs
   priveKas?: boolean | AkunCountOutputTypeCountPriveKasArgs
   priveModal?: boolean | AkunCountOutputTypeCountPriveModalArgs
+  karyawanBeban?: boolean | AkunCountOutputTypeCountKaryawanBebanArgs
+  penggajianKas?: boolean | AkunCountOutputTypeCountPenggajianKasArgs
   pemetaanTambahan?: boolean | AkunCountOutputTypeCountPemetaanTambahanArgs
   penyesuaianLawan?: boolean | AkunCountOutputTypeCountPenyesuaianLawanArgs
 }
@@ -10014,6 +10822,20 @@ export type AkunCountOutputTypeCountPriveModalArgs<ExtArgs extends runtime.Types
 /**
  * AkunCountOutputType without action
  */
+export type AkunCountOutputTypeCountKaryawanBebanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.KaryawanWhereInput
+}
+
+/**
+ * AkunCountOutputType without action
+ */
+export type AkunCountOutputTypeCountPenggajianKasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PenggajianWhereInput
+}
+
+/**
+ * AkunCountOutputType without action
+ */
 export type AkunCountOutputTypeCountPemetaanTambahanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PemetaanAkunTambahanWhereInput
 }
@@ -10067,6 +10889,8 @@ export type AkunSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   mutasiBank?: boolean | Prisma.Akun$mutasiBankArgs<ExtArgs>
   priveKas?: boolean | Prisma.Akun$priveKasArgs<ExtArgs>
   priveModal?: boolean | Prisma.Akun$priveModalArgs<ExtArgs>
+  karyawanBeban?: boolean | Prisma.Akun$karyawanBebanArgs<ExtArgs>
+  penggajianKas?: boolean | Prisma.Akun$penggajianKasArgs<ExtArgs>
   pemetaanTambahan?: boolean | Prisma.Akun$pemetaanTambahanArgs<ExtArgs>
   penyesuaianLawan?: boolean | Prisma.Akun$penyesuaianLawanArgs<ExtArgs>
   pengaturanPpnKeluaran?: boolean | Prisma.Akun$pengaturanPpnKeluaranArgs<ExtArgs>
@@ -10147,6 +10971,8 @@ export type AkunInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   mutasiBank?: boolean | Prisma.Akun$mutasiBankArgs<ExtArgs>
   priveKas?: boolean | Prisma.Akun$priveKasArgs<ExtArgs>
   priveModal?: boolean | Prisma.Akun$priveModalArgs<ExtArgs>
+  karyawanBeban?: boolean | Prisma.Akun$karyawanBebanArgs<ExtArgs>
+  penggajianKas?: boolean | Prisma.Akun$penggajianKasArgs<ExtArgs>
   pemetaanTambahan?: boolean | Prisma.Akun$pemetaanTambahanArgs<ExtArgs>
   penyesuaianLawan?: boolean | Prisma.Akun$penyesuaianLawanArgs<ExtArgs>
   pengaturanPpnKeluaran?: boolean | Prisma.Akun$pengaturanPpnKeluaranArgs<ExtArgs>
@@ -10199,6 +11025,8 @@ export type $AkunPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     mutasiBank: Prisma.$MutasiBankPayload<ExtArgs>[]
     priveKas: Prisma.$PrivePayload<ExtArgs>[]
     priveModal: Prisma.$PrivePayload<ExtArgs>[]
+    karyawanBeban: Prisma.$KaryawanPayload<ExtArgs>[]
+    penggajianKas: Prisma.$PenggajianPayload<ExtArgs>[]
     pemetaanTambahan: Prisma.$PemetaanAkunTambahanPayload<ExtArgs>[]
     penyesuaianLawan: Prisma.$PenyesuaianPersediaanPayload<ExtArgs>[]
     pengaturanPpnKeluaran: Prisma.$PengaturanPerusahaanPayload<ExtArgs> | null
@@ -10649,6 +11477,8 @@ export interface Prisma__AkunClient<T, Null = never, ExtArgs extends runtime.Typ
   mutasiBank<T extends Prisma.Akun$mutasiBankArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$mutasiBankArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MutasiBankPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   priveKas<T extends Prisma.Akun$priveKasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$priveKasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   priveModal<T extends Prisma.Akun$priveModalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$priveModalArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PrivePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  karyawanBeban<T extends Prisma.Akun$karyawanBebanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$karyawanBebanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KaryawanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  penggajianKas<T extends Prisma.Akun$penggajianKasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$penggajianKasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenggajianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pemetaanTambahan<T extends Prisma.Akun$pemetaanTambahanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$pemetaanTambahanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PemetaanAkunTambahanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   penyesuaianLawan<T extends Prisma.Akun$penyesuaianLawanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$penyesuaianLawanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenyesuaianPersediaanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pengaturanPpnKeluaran<T extends Prisma.Akun$pengaturanPpnKeluaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Akun$pengaturanPpnKeluaranArgs<ExtArgs>>): Prisma.Prisma__PengaturanPerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PengaturanPerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -11790,6 +12620,54 @@ export type Akun$priveModalArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.PriveScalarFieldEnum | Prisma.PriveScalarFieldEnum[]
+}
+
+/**
+ * Akun.karyawanBeban
+ */
+export type Akun$karyawanBebanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Karyawan
+   */
+  select?: Prisma.KaryawanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Karyawan
+   */
+  omit?: Prisma.KaryawanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KaryawanInclude<ExtArgs> | null
+  where?: Prisma.KaryawanWhereInput
+  orderBy?: Prisma.KaryawanOrderByWithRelationInput | Prisma.KaryawanOrderByWithRelationInput[]
+  cursor?: Prisma.KaryawanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.KaryawanScalarFieldEnum | Prisma.KaryawanScalarFieldEnum[]
+}
+
+/**
+ * Akun.penggajianKas
+ */
+export type Akun$penggajianKasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Penggajian
+   */
+  select?: Prisma.PenggajianSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Penggajian
+   */
+  omit?: Prisma.PenggajianOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PenggajianInclude<ExtArgs> | null
+  where?: Prisma.PenggajianWhereInput
+  orderBy?: Prisma.PenggajianOrderByWithRelationInput | Prisma.PenggajianOrderByWithRelationInput[]
+  cursor?: Prisma.PenggajianWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PenggajianScalarFieldEnum | Prisma.PenggajianScalarFieldEnum[]
 }
 
 /**

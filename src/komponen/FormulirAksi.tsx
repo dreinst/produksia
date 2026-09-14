@@ -30,12 +30,18 @@ function ringkasBaris(form: HTMLFormElement, mentah: string): string {
   }
   if (!Array.isArray(daftar)) return "-";
   const teksOpsi = (id: unknown) => form.querySelector<HTMLOptionElement>(`option[value="${CSS.escape(String(id))}"]`)?.textContent?.trim() ?? String(id);
-  const terisi = daftar.filter((b) => b.barangId || b.akunId);
+  const terisi = daftar.filter((b) => b.barangId || b.akunId || b.karyawanId);
   if (terisi.length === 0) return "-";
   if (terisi[0].barangId !== undefined) {
     const total = terisi.reduce((s, b) => s + Number(b.jumlah ?? 0) * Number(b.harga ?? 0), 0);
     const rinci = terisi.map((b) => `${rupiah(Number(b.jumlah ?? 0))} × ${teksOpsi(b.barangId)}${b.harga !== undefined ? ` @ ${rupiah(Number(b.harga))}` : ""}`);
     return `${rinci.join("\n")}${terisi.some((b) => b.harga !== undefined) ? `\nTotal Rp ${rupiah(total)}` : ""}`;
+  }
+  if (terisi[0].karyawanId !== undefined) {
+    const diterima = (b: Record<string, unknown>) => Number(b.gajiPokok ?? 0) + Number(b.tunjangan ?? 0) - Number(b.potongan ?? 0);
+    const total = terisi.reduce((s, b) => s + diterima(b), 0);
+    const rinci = terisi.map((b) => `${teksOpsi(b.karyawanId)}: Rp ${rupiah(diterima(b))}`);
+    return `${rinci.join("\n")}\nTotal diterima Rp ${rupiah(total)}`;
   }
   const debit = terisi.reduce((s, b) => s + Number(b.debit ?? 0), 0);
   const kredit = terisi.reduce((s, b) => s + Number(b.kredit ?? 0), 0);

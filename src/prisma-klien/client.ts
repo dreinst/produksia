@@ -303,6 +303,17 @@ export type MutasiBank = Prisma.MutasiBankModel
  */
 export type Prive = Prisma.PriveModel
 /**
+ * Model Penggajian
+ * Siklus SDM: satu proses gaji per periode (bulan), mencakup semua karyawan yang diikutkan.
+ * Jurnal: Dr Beban Gaji Pokok (per akun) + Dr Beban Tunjangan (per akun) / Cr Hutang Potongan Gaji (bila ada potongan) / Cr Kas-Bank (gaji bersih).
+ */
+export type Penggajian = Prisma.PenggajianModel
+/**
+ * Model BarisPenggajian
+ * Rincian gaji per karyawan dalam satu proses Penggajian; diterima = gajiPokok + tunjangan − potongan.
+ */
+export type BarisPenggajian = Prisma.BarisPenggajianModel
+/**
  * Model PemetaanAkunTambahan
  * Pemetaan akun tambahan buatan pengguna (mis. "prive" → 3-4000) untuk peran yang belum ada di PemetaanAkun
  */

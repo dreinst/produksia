@@ -20,8 +20,20 @@ export type KaryawanModel = runtime.Types.Result.DefaultSelection<Prisma.$Karyaw
 
 export type AggregateKaryawan = {
   _count: KaryawanCountAggregateOutputType | null
+  _avg: KaryawanAvgAggregateOutputType | null
+  _sum: KaryawanSumAggregateOutputType | null
   _min: KaryawanMinAggregateOutputType | null
   _max: KaryawanMaxAggregateOutputType | null
+}
+
+export type KaryawanAvgAggregateOutputType = {
+  gajiPokok: runtime.Decimal | null
+  tunjangan: runtime.Decimal | null
+}
+
+export type KaryawanSumAggregateOutputType = {
+  gajiPokok: runtime.Decimal | null
+  tunjangan: runtime.Decimal | null
 }
 
 export type KaryawanMinAggregateOutputType = {
@@ -30,6 +42,12 @@ export type KaryawanMinAggregateOutputType = {
   nama: string | null
   departemenId: string | null
   penggunaId: string | null
+  jabatan: string | null
+  tanggalBergabung: Date | null
+  status: string | null
+  gajiPokok: runtime.Decimal | null
+  tunjangan: runtime.Decimal | null
+  akunBebanId: string | null
   dibuatPada: Date | null
 }
 
@@ -39,6 +57,12 @@ export type KaryawanMaxAggregateOutputType = {
   nama: string | null
   departemenId: string | null
   penggunaId: string | null
+  jabatan: string | null
+  tanggalBergabung: Date | null
+  status: string | null
+  gajiPokok: runtime.Decimal | null
+  tunjangan: runtime.Decimal | null
+  akunBebanId: string | null
   dibuatPada: Date | null
 }
 
@@ -48,10 +72,26 @@ export type KaryawanCountAggregateOutputType = {
   nama: number
   departemenId: number
   penggunaId: number
+  jabatan: number
+  tanggalBergabung: number
+  status: number
+  gajiPokok: number
+  tunjangan: number
+  akunBebanId: number
   dibuatPada: number
   _all: number
 }
 
+
+export type KaryawanAvgAggregateInputType = {
+  gajiPokok?: true
+  tunjangan?: true
+}
+
+export type KaryawanSumAggregateInputType = {
+  gajiPokok?: true
+  tunjangan?: true
+}
 
 export type KaryawanMinAggregateInputType = {
   id?: true
@@ -59,6 +99,12 @@ export type KaryawanMinAggregateInputType = {
   nama?: true
   departemenId?: true
   penggunaId?: true
+  jabatan?: true
+  tanggalBergabung?: true
+  status?: true
+  gajiPokok?: true
+  tunjangan?: true
+  akunBebanId?: true
   dibuatPada?: true
 }
 
@@ -68,6 +114,12 @@ export type KaryawanMaxAggregateInputType = {
   nama?: true
   departemenId?: true
   penggunaId?: true
+  jabatan?: true
+  tanggalBergabung?: true
+  status?: true
+  gajiPokok?: true
+  tunjangan?: true
+  akunBebanId?: true
   dibuatPada?: true
 }
 
@@ -77,6 +129,12 @@ export type KaryawanCountAggregateInputType = {
   nama?: true
   departemenId?: true
   penggunaId?: true
+  jabatan?: true
+  tanggalBergabung?: true
+  status?: true
+  gajiPokok?: true
+  tunjangan?: true
+  akunBebanId?: true
   dibuatPada?: true
   _all?: true
 }
@@ -119,6 +177,18 @@ export type KaryawanAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: KaryawanAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: KaryawanSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: KaryawanMinAggregateInputType
@@ -149,6 +219,8 @@ export type KaryawanGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: KaryawanCountAggregateInputType | true
+  _avg?: KaryawanAvgAggregateInputType
+  _sum?: KaryawanSumAggregateInputType
   _min?: KaryawanMinAggregateInputType
   _max?: KaryawanMaxAggregateInputType
 }
@@ -159,8 +231,16 @@ export type KaryawanGroupByOutputType = {
   nama: string
   departemenId: string | null
   penggunaId: string | null
+  jabatan: string | null
+  tanggalBergabung: Date | null
+  status: string
+  gajiPokok: runtime.Decimal
+  tunjangan: runtime.Decimal
+  akunBebanId: string | null
   dibuatPada: Date
   _count: KaryawanCountAggregateOutputType | null
+  _avg: KaryawanAvgAggregateOutputType | null
+  _sum: KaryawanSumAggregateOutputType | null
   _min: KaryawanMinAggregateOutputType | null
   _max: KaryawanMaxAggregateOutputType | null
 }
@@ -189,10 +269,18 @@ export type KaryawanWhereInput = {
   nama?: Prisma.StringFilter<"Karyawan"> | string
   departemenId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
   penggunaId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
+  jabatan?: Prisma.StringNullableFilter<"Karyawan"> | string | null
+  tanggalBergabung?: Prisma.DateTimeNullableFilter<"Karyawan"> | Date | string | null
+  status?: Prisma.StringFilter<"Karyawan"> | string
+  gajiPokok?: Prisma.DecimalFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Karyawan"> | Date | string
   departemen?: Prisma.XOR<Prisma.DepartemenNullableScalarRelationFilter, Prisma.DepartemenWhereInput> | null
   pengguna?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   pelanggan?: Prisma.PelangganListRelationFilter
+  akunBeban?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
+  barisPenggajian?: Prisma.BarisPenggajianListRelationFilter
 }
 
 export type KaryawanOrderByWithRelationInput = {
@@ -201,10 +289,18 @@ export type KaryawanOrderByWithRelationInput = {
   nama?: Prisma.SortOrder
   departemenId?: Prisma.SortOrderInput | Prisma.SortOrder
   penggunaId?: Prisma.SortOrderInput | Prisma.SortOrder
+  jabatan?: Prisma.SortOrderInput | Prisma.SortOrder
+  tanggalBergabung?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
+  akunBebanId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   departemen?: Prisma.DepartemenOrderByWithRelationInput
   pengguna?: Prisma.PenggunaOrderByWithRelationInput
   pelanggan?: Prisma.PelangganOrderByRelationAggregateInput
+  akunBeban?: Prisma.AkunOrderByWithRelationInput
+  barisPenggajian?: Prisma.BarisPenggajianOrderByRelationAggregateInput
 }
 
 export type KaryawanWhereUniqueInput = Prisma.AtLeast<{
@@ -216,10 +312,18 @@ export type KaryawanWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.KaryawanWhereInput | Prisma.KaryawanWhereInput[]
   nama?: Prisma.StringFilter<"Karyawan"> | string
   departemenId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
+  jabatan?: Prisma.StringNullableFilter<"Karyawan"> | string | null
+  tanggalBergabung?: Prisma.DateTimeNullableFilter<"Karyawan"> | Date | string | null
+  status?: Prisma.StringFilter<"Karyawan"> | string
+  gajiPokok?: Prisma.DecimalFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Karyawan"> | Date | string
   departemen?: Prisma.XOR<Prisma.DepartemenNullableScalarRelationFilter, Prisma.DepartemenWhereInput> | null
   pengguna?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   pelanggan?: Prisma.PelangganListRelationFilter
+  akunBeban?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
+  barisPenggajian?: Prisma.BarisPenggajianListRelationFilter
 }, "id" | "kode" | "penggunaId">
 
 export type KaryawanOrderByWithAggregationInput = {
@@ -228,10 +332,18 @@ export type KaryawanOrderByWithAggregationInput = {
   nama?: Prisma.SortOrder
   departemenId?: Prisma.SortOrderInput | Prisma.SortOrder
   penggunaId?: Prisma.SortOrderInput | Prisma.SortOrder
+  jabatan?: Prisma.SortOrderInput | Prisma.SortOrder
+  tanggalBergabung?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
+  akunBebanId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   _count?: Prisma.KaryawanCountOrderByAggregateInput
+  _avg?: Prisma.KaryawanAvgOrderByAggregateInput
   _max?: Prisma.KaryawanMaxOrderByAggregateInput
   _min?: Prisma.KaryawanMinOrderByAggregateInput
+  _sum?: Prisma.KaryawanSumOrderByAggregateInput
 }
 
 export type KaryawanScalarWhereWithAggregatesInput = {
@@ -243,6 +355,12 @@ export type KaryawanScalarWhereWithAggregatesInput = {
   nama?: Prisma.StringWithAggregatesFilter<"Karyawan"> | string
   departemenId?: Prisma.StringNullableWithAggregatesFilter<"Karyawan"> | string | null
   penggunaId?: Prisma.StringNullableWithAggregatesFilter<"Karyawan"> | string | null
+  jabatan?: Prisma.StringNullableWithAggregatesFilter<"Karyawan"> | string | null
+  tanggalBergabung?: Prisma.DateTimeNullableWithAggregatesFilter<"Karyawan"> | Date | string | null
+  status?: Prisma.StringWithAggregatesFilter<"Karyawan"> | string
+  gajiPokok?: Prisma.DecimalWithAggregatesFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalWithAggregatesFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.StringNullableWithAggregatesFilter<"Karyawan"> | string | null
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"Karyawan"> | Date | string
 }
 
@@ -250,10 +368,17 @@ export type KaryawanCreateInput = {
   id?: string
   kode: string
   nama: string
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Date | string
   departemen?: Prisma.DepartemenCreateNestedOneWithoutKaryawanInput
   pengguna?: Prisma.PenggunaCreateNestedOneWithoutKaryawanInput
   pelanggan?: Prisma.PelangganCreateNestedManyWithoutPenjualInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutKaryawanBebanInput
+  barisPenggajian?: Prisma.BarisPenggajianCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanUncheckedCreateInput = {
@@ -262,18 +387,32 @@ export type KaryawanUncheckedCreateInput = {
   nama: string
   departemenId?: string | null
   penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
   dibuatPada?: Date | string
   pelanggan?: Prisma.PelangganUncheckedCreateNestedManyWithoutPenjualInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   departemen?: Prisma.DepartemenUpdateOneWithoutKaryawanNestedInput
   pengguna?: Prisma.PenggunaUpdateOneWithoutKaryawanNestedInput
   pelanggan?: Prisma.PelangganUpdateManyWithoutPenjualNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutKaryawanBebanNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanUncheckedUpdateInput = {
@@ -282,8 +421,15 @@ export type KaryawanUncheckedUpdateInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pelanggan?: Prisma.PelangganUncheckedUpdateManyWithoutPenjualNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanCreateManyInput = {
@@ -292,6 +438,12 @@ export type KaryawanCreateManyInput = {
   nama: string
   departemenId?: string | null
   penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
   dibuatPada?: Date | string
 }
 
@@ -299,6 +451,11 @@ export type KaryawanUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -308,6 +465,12 @@ export type KaryawanUncheckedUpdateManyInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -332,7 +495,18 @@ export type KaryawanCountOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   departemenId?: Prisma.SortOrder
   penggunaId?: Prisma.SortOrder
+  jabatan?: Prisma.SortOrder
+  tanggalBergabung?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
+  akunBebanId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+}
+
+export type KaryawanAvgOrderByAggregateInput = {
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
 }
 
 export type KaryawanMaxOrderByAggregateInput = {
@@ -341,6 +515,12 @@ export type KaryawanMaxOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   departemenId?: Prisma.SortOrder
   penggunaId?: Prisma.SortOrder
+  jabatan?: Prisma.SortOrder
+  tanggalBergabung?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
+  akunBebanId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
 }
 
@@ -350,7 +530,23 @@ export type KaryawanMinOrderByAggregateInput = {
   nama?: Prisma.SortOrder
   departemenId?: Prisma.SortOrder
   penggunaId?: Prisma.SortOrder
+  jabatan?: Prisma.SortOrder
+  tanggalBergabung?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
+  akunBebanId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+}
+
+export type KaryawanSumOrderByAggregateInput = {
+  gajiPokok?: Prisma.SortOrder
+  tunjangan?: Prisma.SortOrder
+}
+
+export type KaryawanScalarRelationFilter = {
+  is?: Prisma.KaryawanWhereInput
+  isNot?: Prisma.KaryawanWhereInput
 }
 
 export type KaryawanCreateNestedOneWithoutPenggunaInput = {
@@ -427,6 +623,18 @@ export type KaryawanUncheckedUpdateManyWithoutDepartemenNestedInput = {
   deleteMany?: Prisma.KaryawanScalarWhereInput | Prisma.KaryawanScalarWhereInput[]
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type DecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 export type KaryawanCreateNestedOneWithoutPelangganInput = {
   create?: Prisma.XOR<Prisma.KaryawanCreateWithoutPelangganInput, Prisma.KaryawanUncheckedCreateWithoutPelangganInput>
   connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutPelangganInput
@@ -443,13 +651,76 @@ export type KaryawanUpdateOneWithoutPelangganNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.KaryawanUpdateToOneWithWhereWithoutPelangganInput, Prisma.KaryawanUpdateWithoutPelangganInput>, Prisma.KaryawanUncheckedUpdateWithoutPelangganInput>
 }
 
+export type KaryawanCreateNestedManyWithoutAkunBebanInput = {
+  create?: Prisma.XOR<Prisma.KaryawanCreateWithoutAkunBebanInput, Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput> | Prisma.KaryawanCreateWithoutAkunBebanInput[] | Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput[]
+  connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput | Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput[]
+  createMany?: Prisma.KaryawanCreateManyAkunBebanInputEnvelope
+  connect?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+}
+
+export type KaryawanUncheckedCreateNestedManyWithoutAkunBebanInput = {
+  create?: Prisma.XOR<Prisma.KaryawanCreateWithoutAkunBebanInput, Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput> | Prisma.KaryawanCreateWithoutAkunBebanInput[] | Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput[]
+  connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput | Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput[]
+  createMany?: Prisma.KaryawanCreateManyAkunBebanInputEnvelope
+  connect?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+}
+
+export type KaryawanUpdateManyWithoutAkunBebanNestedInput = {
+  create?: Prisma.XOR<Prisma.KaryawanCreateWithoutAkunBebanInput, Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput> | Prisma.KaryawanCreateWithoutAkunBebanInput[] | Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput[]
+  connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput | Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput[]
+  upsert?: Prisma.KaryawanUpsertWithWhereUniqueWithoutAkunBebanInput | Prisma.KaryawanUpsertWithWhereUniqueWithoutAkunBebanInput[]
+  createMany?: Prisma.KaryawanCreateManyAkunBebanInputEnvelope
+  set?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  disconnect?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  delete?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  connect?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  update?: Prisma.KaryawanUpdateWithWhereUniqueWithoutAkunBebanInput | Prisma.KaryawanUpdateWithWhereUniqueWithoutAkunBebanInput[]
+  updateMany?: Prisma.KaryawanUpdateManyWithWhereWithoutAkunBebanInput | Prisma.KaryawanUpdateManyWithWhereWithoutAkunBebanInput[]
+  deleteMany?: Prisma.KaryawanScalarWhereInput | Prisma.KaryawanScalarWhereInput[]
+}
+
+export type KaryawanUncheckedUpdateManyWithoutAkunBebanNestedInput = {
+  create?: Prisma.XOR<Prisma.KaryawanCreateWithoutAkunBebanInput, Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput> | Prisma.KaryawanCreateWithoutAkunBebanInput[] | Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput[]
+  connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput | Prisma.KaryawanCreateOrConnectWithoutAkunBebanInput[]
+  upsert?: Prisma.KaryawanUpsertWithWhereUniqueWithoutAkunBebanInput | Prisma.KaryawanUpsertWithWhereUniqueWithoutAkunBebanInput[]
+  createMany?: Prisma.KaryawanCreateManyAkunBebanInputEnvelope
+  set?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  disconnect?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  delete?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  connect?: Prisma.KaryawanWhereUniqueInput | Prisma.KaryawanWhereUniqueInput[]
+  update?: Prisma.KaryawanUpdateWithWhereUniqueWithoutAkunBebanInput | Prisma.KaryawanUpdateWithWhereUniqueWithoutAkunBebanInput[]
+  updateMany?: Prisma.KaryawanUpdateManyWithWhereWithoutAkunBebanInput | Prisma.KaryawanUpdateManyWithWhereWithoutAkunBebanInput[]
+  deleteMany?: Prisma.KaryawanScalarWhereInput | Prisma.KaryawanScalarWhereInput[]
+}
+
+export type KaryawanCreateNestedOneWithoutBarisPenggajianInput = {
+  create?: Prisma.XOR<Prisma.KaryawanCreateWithoutBarisPenggajianInput, Prisma.KaryawanUncheckedCreateWithoutBarisPenggajianInput>
+  connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutBarisPenggajianInput
+  connect?: Prisma.KaryawanWhereUniqueInput
+}
+
+export type KaryawanUpdateOneRequiredWithoutBarisPenggajianNestedInput = {
+  create?: Prisma.XOR<Prisma.KaryawanCreateWithoutBarisPenggajianInput, Prisma.KaryawanUncheckedCreateWithoutBarisPenggajianInput>
+  connectOrCreate?: Prisma.KaryawanCreateOrConnectWithoutBarisPenggajianInput
+  upsert?: Prisma.KaryawanUpsertWithoutBarisPenggajianInput
+  connect?: Prisma.KaryawanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.KaryawanUpdateToOneWithWhereWithoutBarisPenggajianInput, Prisma.KaryawanUpdateWithoutBarisPenggajianInput>, Prisma.KaryawanUncheckedUpdateWithoutBarisPenggajianInput>
+}
+
 export type KaryawanCreateWithoutPenggunaInput = {
   id?: string
   kode: string
   nama: string
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Date | string
   departemen?: Prisma.DepartemenCreateNestedOneWithoutKaryawanInput
   pelanggan?: Prisma.PelangganCreateNestedManyWithoutPenjualInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutKaryawanBebanInput
+  barisPenggajian?: Prisma.BarisPenggajianCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanUncheckedCreateWithoutPenggunaInput = {
@@ -457,8 +728,15 @@ export type KaryawanUncheckedCreateWithoutPenggunaInput = {
   kode: string
   nama: string
   departemenId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
   dibuatPada?: Date | string
   pelanggan?: Prisma.PelangganUncheckedCreateNestedManyWithoutPenjualInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanCreateOrConnectWithoutPenggunaInput = {
@@ -481,9 +759,16 @@ export type KaryawanUpdateWithoutPenggunaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   departemen?: Prisma.DepartemenUpdateOneWithoutKaryawanNestedInput
   pelanggan?: Prisma.PelangganUpdateManyWithoutPenjualNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutKaryawanBebanNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanUncheckedUpdateWithoutPenggunaInput = {
@@ -491,17 +776,31 @@ export type KaryawanUncheckedUpdateWithoutPenggunaInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pelanggan?: Prisma.PelangganUncheckedUpdateManyWithoutPenjualNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanCreateWithoutDepartemenInput = {
   id?: string
   kode: string
   nama: string
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Date | string
   pengguna?: Prisma.PenggunaCreateNestedOneWithoutKaryawanInput
   pelanggan?: Prisma.PelangganCreateNestedManyWithoutPenjualInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutKaryawanBebanInput
+  barisPenggajian?: Prisma.BarisPenggajianCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanUncheckedCreateWithoutDepartemenInput = {
@@ -509,8 +808,15 @@ export type KaryawanUncheckedCreateWithoutDepartemenInput = {
   kode: string
   nama: string
   penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
   dibuatPada?: Date | string
   pelanggan?: Prisma.PelangganUncheckedCreateNestedManyWithoutPenjualInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanCreateOrConnectWithoutDepartemenInput = {
@@ -548,6 +854,12 @@ export type KaryawanScalarWhereInput = {
   nama?: Prisma.StringFilter<"Karyawan"> | string
   departemenId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
   penggunaId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
+  jabatan?: Prisma.StringNullableFilter<"Karyawan"> | string | null
+  tanggalBergabung?: Prisma.DateTimeNullableFilter<"Karyawan"> | Date | string | null
+  status?: Prisma.StringFilter<"Karyawan"> | string
+  gajiPokok?: Prisma.DecimalFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFilter<"Karyawan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.StringNullableFilter<"Karyawan"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Karyawan"> | Date | string
 }
 
@@ -555,9 +867,16 @@ export type KaryawanCreateWithoutPelangganInput = {
   id?: string
   kode: string
   nama: string
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Date | string
   departemen?: Prisma.DepartemenCreateNestedOneWithoutKaryawanInput
   pengguna?: Prisma.PenggunaCreateNestedOneWithoutKaryawanInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutKaryawanBebanInput
+  barisPenggajian?: Prisma.BarisPenggajianCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanUncheckedCreateWithoutPelangganInput = {
@@ -566,7 +885,14 @@ export type KaryawanUncheckedCreateWithoutPelangganInput = {
   nama: string
   departemenId?: string | null
   penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
   dibuatPada?: Date | string
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedCreateNestedManyWithoutKaryawanInput
 }
 
 export type KaryawanCreateOrConnectWithoutPelangganInput = {
@@ -589,9 +915,16 @@ export type KaryawanUpdateWithoutPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   departemen?: Prisma.DepartemenUpdateOneWithoutKaryawanNestedInput
   pengguna?: Prisma.PenggunaUpdateOneWithoutKaryawanNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutKaryawanBebanNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanUncheckedUpdateWithoutPelangganInput = {
@@ -600,7 +933,152 @@ export type KaryawanUncheckedUpdateWithoutPelangganInput = {
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedUpdateManyWithoutKaryawanNestedInput
+}
+
+export type KaryawanCreateWithoutAkunBebanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+  departemen?: Prisma.DepartemenCreateNestedOneWithoutKaryawanInput
+  pengguna?: Prisma.PenggunaCreateNestedOneWithoutKaryawanInput
+  pelanggan?: Prisma.PelangganCreateNestedManyWithoutPenjualInput
+  barisPenggajian?: Prisma.BarisPenggajianCreateNestedManyWithoutKaryawanInput
+}
+
+export type KaryawanUncheckedCreateWithoutAkunBebanInput = {
+  id?: string
+  kode: string
+  nama: string
+  departemenId?: string | null
+  penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+  pelanggan?: Prisma.PelangganUncheckedCreateNestedManyWithoutPenjualInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedCreateNestedManyWithoutKaryawanInput
+}
+
+export type KaryawanCreateOrConnectWithoutAkunBebanInput = {
+  where: Prisma.KaryawanWhereUniqueInput
+  create: Prisma.XOR<Prisma.KaryawanCreateWithoutAkunBebanInput, Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput>
+}
+
+export type KaryawanCreateManyAkunBebanInputEnvelope = {
+  data: Prisma.KaryawanCreateManyAkunBebanInput | Prisma.KaryawanCreateManyAkunBebanInput[]
+  skipDuplicates?: boolean
+}
+
+export type KaryawanUpsertWithWhereUniqueWithoutAkunBebanInput = {
+  where: Prisma.KaryawanWhereUniqueInput
+  update: Prisma.XOR<Prisma.KaryawanUpdateWithoutAkunBebanInput, Prisma.KaryawanUncheckedUpdateWithoutAkunBebanInput>
+  create: Prisma.XOR<Prisma.KaryawanCreateWithoutAkunBebanInput, Prisma.KaryawanUncheckedCreateWithoutAkunBebanInput>
+}
+
+export type KaryawanUpdateWithWhereUniqueWithoutAkunBebanInput = {
+  where: Prisma.KaryawanWhereUniqueInput
+  data: Prisma.XOR<Prisma.KaryawanUpdateWithoutAkunBebanInput, Prisma.KaryawanUncheckedUpdateWithoutAkunBebanInput>
+}
+
+export type KaryawanUpdateManyWithWhereWithoutAkunBebanInput = {
+  where: Prisma.KaryawanScalarWhereInput
+  data: Prisma.XOR<Prisma.KaryawanUpdateManyMutationInput, Prisma.KaryawanUncheckedUpdateManyWithoutAkunBebanInput>
+}
+
+export type KaryawanCreateWithoutBarisPenggajianInput = {
+  id?: string
+  kode: string
+  nama: string
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+  departemen?: Prisma.DepartemenCreateNestedOneWithoutKaryawanInput
+  pengguna?: Prisma.PenggunaCreateNestedOneWithoutKaryawanInput
+  pelanggan?: Prisma.PelangganCreateNestedManyWithoutPenjualInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutKaryawanBebanInput
+}
+
+export type KaryawanUncheckedCreateWithoutBarisPenggajianInput = {
+  id?: string
+  kode: string
+  nama: string
+  departemenId?: string | null
+  penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
+  dibuatPada?: Date | string
+  pelanggan?: Prisma.PelangganUncheckedCreateNestedManyWithoutPenjualInput
+}
+
+export type KaryawanCreateOrConnectWithoutBarisPenggajianInput = {
+  where: Prisma.KaryawanWhereUniqueInput
+  create: Prisma.XOR<Prisma.KaryawanCreateWithoutBarisPenggajianInput, Prisma.KaryawanUncheckedCreateWithoutBarisPenggajianInput>
+}
+
+export type KaryawanUpsertWithoutBarisPenggajianInput = {
+  update: Prisma.XOR<Prisma.KaryawanUpdateWithoutBarisPenggajianInput, Prisma.KaryawanUncheckedUpdateWithoutBarisPenggajianInput>
+  create: Prisma.XOR<Prisma.KaryawanCreateWithoutBarisPenggajianInput, Prisma.KaryawanUncheckedCreateWithoutBarisPenggajianInput>
+  where?: Prisma.KaryawanWhereInput
+}
+
+export type KaryawanUpdateToOneWithWhereWithoutBarisPenggajianInput = {
+  where?: Prisma.KaryawanWhereInput
+  data: Prisma.XOR<Prisma.KaryawanUpdateWithoutBarisPenggajianInput, Prisma.KaryawanUncheckedUpdateWithoutBarisPenggajianInput>
+}
+
+export type KaryawanUpdateWithoutBarisPenggajianInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departemen?: Prisma.DepartemenUpdateOneWithoutKaryawanNestedInput
+  pengguna?: Prisma.PenggunaUpdateOneWithoutKaryawanNestedInput
+  pelanggan?: Prisma.PelangganUpdateManyWithoutPenjualNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutKaryawanBebanNestedInput
+}
+
+export type KaryawanUncheckedUpdateWithoutBarisPenggajianInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelanggan?: Prisma.PelangganUncheckedUpdateManyWithoutPenjualNestedInput
 }
 
 export type KaryawanCreateManyDepartemenInput = {
@@ -608,6 +1086,12 @@ export type KaryawanCreateManyDepartemenInput = {
   kode: string
   nama: string
   penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: string | null
   dibuatPada?: Date | string
 }
 
@@ -615,9 +1099,16 @@ export type KaryawanUpdateWithoutDepartemenInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pengguna?: Prisma.PenggunaUpdateOneWithoutKaryawanNestedInput
   pelanggan?: Prisma.PelangganUpdateManyWithoutPenjualNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutKaryawanBebanNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanUncheckedUpdateWithoutDepartemenInput = {
@@ -625,8 +1116,15 @@ export type KaryawanUncheckedUpdateWithoutDepartemenInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pelanggan?: Prisma.PelangganUncheckedUpdateManyWithoutPenjualNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedUpdateManyWithoutKaryawanNestedInput
 }
 
 export type KaryawanUncheckedUpdateManyWithoutDepartemenInput = {
@@ -634,6 +1132,72 @@ export type KaryawanUncheckedUpdateManyWithoutDepartemenInput = {
   kode?: Prisma.StringFieldUpdateOperationsInput | string
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type KaryawanCreateManyAkunBebanInput = {
+  id?: string
+  kode: string
+  nama: string
+  departemenId?: string | null
+  penggunaId?: string | null
+  jabatan?: string | null
+  tanggalBergabung?: Date | string | null
+  status?: string
+  gajiPokok?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+}
+
+export type KaryawanUpdateWithoutAkunBebanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departemen?: Prisma.DepartemenUpdateOneWithoutKaryawanNestedInput
+  pengguna?: Prisma.PenggunaUpdateOneWithoutKaryawanNestedInput
+  pelanggan?: Prisma.PelangganUpdateManyWithoutPenjualNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUpdateManyWithoutKaryawanNestedInput
+}
+
+export type KaryawanUncheckedUpdateWithoutAkunBebanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pelanggan?: Prisma.PelangganUncheckedUpdateManyWithoutPenjualNestedInput
+  barisPenggajian?: Prisma.BarisPenggajianUncheckedUpdateManyWithoutKaryawanNestedInput
+}
+
+export type KaryawanUncheckedUpdateManyWithoutAkunBebanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  departemenId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penggunaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jabatan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tanggalBergabung?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  gajiPokok?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tunjangan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -644,10 +1208,12 @@ export type KaryawanUncheckedUpdateManyWithoutDepartemenInput = {
 
 export type KaryawanCountOutputType = {
   pelanggan: number
+  barisPenggajian: number
 }
 
 export type KaryawanCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pelanggan?: boolean | KaryawanCountOutputTypeCountPelangganArgs
+  barisPenggajian?: boolean | KaryawanCountOutputTypeCountBarisPenggajianArgs
 }
 
 /**
@@ -667,6 +1233,13 @@ export type KaryawanCountOutputTypeCountPelangganArgs<ExtArgs extends runtime.Ty
   where?: Prisma.PelangganWhereInput
 }
 
+/**
+ * KaryawanCountOutputType without action
+ */
+export type KaryawanCountOutputTypeCountBarisPenggajianArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BarisPenggajianWhereInput
+}
+
 
 export type KaryawanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -674,10 +1247,18 @@ export type KaryawanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   nama?: boolean
   departemenId?: boolean
   penggunaId?: boolean
+  jabatan?: boolean
+  tanggalBergabung?: boolean
+  status?: boolean
+  gajiPokok?: boolean
+  tunjangan?: boolean
+  akunBebanId?: boolean
   dibuatPada?: boolean
   departemen?: boolean | Prisma.Karyawan$departemenArgs<ExtArgs>
   pengguna?: boolean | Prisma.Karyawan$penggunaArgs<ExtArgs>
   pelanggan?: boolean | Prisma.Karyawan$pelangganArgs<ExtArgs>
+  akunBeban?: boolean | Prisma.Karyawan$akunBebanArgs<ExtArgs>
+  barisPenggajian?: boolean | Prisma.Karyawan$barisPenggajianArgs<ExtArgs>
   _count?: boolean | Prisma.KaryawanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["karyawan"]>
 
@@ -687,9 +1268,16 @@ export type KaryawanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   nama?: boolean
   departemenId?: boolean
   penggunaId?: boolean
+  jabatan?: boolean
+  tanggalBergabung?: boolean
+  status?: boolean
+  gajiPokok?: boolean
+  tunjangan?: boolean
+  akunBebanId?: boolean
   dibuatPada?: boolean
   departemen?: boolean | Prisma.Karyawan$departemenArgs<ExtArgs>
   pengguna?: boolean | Prisma.Karyawan$penggunaArgs<ExtArgs>
+  akunBeban?: boolean | Prisma.Karyawan$akunBebanArgs<ExtArgs>
 }, ExtArgs["result"]["karyawan"]>
 
 export type KaryawanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -698,9 +1286,16 @@ export type KaryawanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   nama?: boolean
   departemenId?: boolean
   penggunaId?: boolean
+  jabatan?: boolean
+  tanggalBergabung?: boolean
+  status?: boolean
+  gajiPokok?: boolean
+  tunjangan?: boolean
+  akunBebanId?: boolean
   dibuatPada?: boolean
   departemen?: boolean | Prisma.Karyawan$departemenArgs<ExtArgs>
   pengguna?: boolean | Prisma.Karyawan$penggunaArgs<ExtArgs>
+  akunBeban?: boolean | Prisma.Karyawan$akunBebanArgs<ExtArgs>
 }, ExtArgs["result"]["karyawan"]>
 
 export type KaryawanSelectScalar = {
@@ -709,23 +1304,33 @@ export type KaryawanSelectScalar = {
   nama?: boolean
   departemenId?: boolean
   penggunaId?: boolean
+  jabatan?: boolean
+  tanggalBergabung?: boolean
+  status?: boolean
+  gajiPokok?: boolean
+  tunjangan?: boolean
+  akunBebanId?: boolean
   dibuatPada?: boolean
 }
 
-export type KaryawanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "departemenId" | "penggunaId" | "dibuatPada", ExtArgs["result"]["karyawan"]>
+export type KaryawanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "departemenId" | "penggunaId" | "jabatan" | "tanggalBergabung" | "status" | "gajiPokok" | "tunjangan" | "akunBebanId" | "dibuatPada", ExtArgs["result"]["karyawan"]>
 export type KaryawanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   departemen?: boolean | Prisma.Karyawan$departemenArgs<ExtArgs>
   pengguna?: boolean | Prisma.Karyawan$penggunaArgs<ExtArgs>
   pelanggan?: boolean | Prisma.Karyawan$pelangganArgs<ExtArgs>
+  akunBeban?: boolean | Prisma.Karyawan$akunBebanArgs<ExtArgs>
+  barisPenggajian?: boolean | Prisma.Karyawan$barisPenggajianArgs<ExtArgs>
   _count?: boolean | Prisma.KaryawanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type KaryawanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   departemen?: boolean | Prisma.Karyawan$departemenArgs<ExtArgs>
   pengguna?: boolean | Prisma.Karyawan$penggunaArgs<ExtArgs>
+  akunBeban?: boolean | Prisma.Karyawan$akunBebanArgs<ExtArgs>
 }
 export type KaryawanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   departemen?: boolean | Prisma.Karyawan$departemenArgs<ExtArgs>
   pengguna?: boolean | Prisma.Karyawan$penggunaArgs<ExtArgs>
+  akunBeban?: boolean | Prisma.Karyawan$akunBebanArgs<ExtArgs>
 }
 
 export type $KaryawanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -734,6 +1339,8 @@ export type $KaryawanPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     departemen: Prisma.$DepartemenPayload<ExtArgs> | null
     pengguna: Prisma.$PenggunaPayload<ExtArgs> | null
     pelanggan: Prisma.$PelangganPayload<ExtArgs>[]
+    akunBeban: Prisma.$AkunPayload<ExtArgs> | null
+    barisPenggajian: Prisma.$BarisPenggajianPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -741,6 +1348,18 @@ export type $KaryawanPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     nama: string
     departemenId: string | null
     penggunaId: string | null
+    /**
+     * Siklus SDM: data kepegawaian dan komponen gaji bulanan bawaan (bisa disesuaikan per baris saat Proses Gaji)
+     */
+    jabatan: string | null
+    tanggalBergabung: Date | null
+    status: string
+    gajiPokok: runtime.Decimal
+    tunjangan: runtime.Decimal
+    /**
+     * Akun beban khusus karyawan ini (mis. Upah Harian/Honor Volunteer alih-alih Gaji Pokok); kosong = pemetaan tambahan "bebanGaji"
+     */
+    akunBebanId: string | null
     dibuatPada: Date
   }, ExtArgs["result"]["karyawan"]>
   composites: {}
@@ -1139,6 +1758,8 @@ export interface Prisma__KaryawanClient<T, Null = never, ExtArgs extends runtime
   departemen<T extends Prisma.Karyawan$departemenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Karyawan$departemenArgs<ExtArgs>>): Prisma.Prisma__DepartemenClient<runtime.Types.Result.GetResult<Prisma.$DepartemenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pengguna<T extends Prisma.Karyawan$penggunaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Karyawan$penggunaArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pelanggan<T extends Prisma.Karyawan$pelangganArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Karyawan$pelangganArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PelangganPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  akunBeban<T extends Prisma.Karyawan$akunBebanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Karyawan$akunBebanArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  barisPenggajian<T extends Prisma.Karyawan$barisPenggajianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Karyawan$barisPenggajianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPenggajianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1173,6 +1794,12 @@ export interface KaryawanFieldRefs {
   readonly nama: Prisma.FieldRef<"Karyawan", 'String'>
   readonly departemenId: Prisma.FieldRef<"Karyawan", 'String'>
   readonly penggunaId: Prisma.FieldRef<"Karyawan", 'String'>
+  readonly jabatan: Prisma.FieldRef<"Karyawan", 'String'>
+  readonly tanggalBergabung: Prisma.FieldRef<"Karyawan", 'DateTime'>
+  readonly status: Prisma.FieldRef<"Karyawan", 'String'>
+  readonly gajiPokok: Prisma.FieldRef<"Karyawan", 'Decimal'>
+  readonly tunjangan: Prisma.FieldRef<"Karyawan", 'Decimal'>
+  readonly akunBebanId: Prisma.FieldRef<"Karyawan", 'String'>
   readonly dibuatPada: Prisma.FieldRef<"Karyawan", 'DateTime'>
 }
     
@@ -1634,6 +2261,49 @@ export type Karyawan$pelangganArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.PelangganScalarFieldEnum | Prisma.PelangganScalarFieldEnum[]
+}
+
+/**
+ * Karyawan.akunBeban
+ */
+export type Karyawan$akunBebanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Akun
+   */
+  select?: Prisma.AkunSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Akun
+   */
+  omit?: Prisma.AkunOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AkunInclude<ExtArgs> | null
+  where?: Prisma.AkunWhereInput
+}
+
+/**
+ * Karyawan.barisPenggajian
+ */
+export type Karyawan$barisPenggajianArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BarisPenggajian
+   */
+  select?: Prisma.BarisPenggajianSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BarisPenggajian
+   */
+  omit?: Prisma.BarisPenggajianOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BarisPenggajianInclude<ExtArgs> | null
+  where?: Prisma.BarisPenggajianWhereInput
+  orderBy?: Prisma.BarisPenggajianOrderByWithRelationInput | Prisma.BarisPenggajianOrderByWithRelationInput[]
+  cursor?: Prisma.BarisPenggajianWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BarisPenggajianScalarFieldEnum | Prisma.BarisPenggajianScalarFieldEnum[]
 }
 
 /**
