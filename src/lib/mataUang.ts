@@ -8,7 +8,7 @@ import { D, format, uang, type Desimal } from "@/lib/uang";
  * IDR adalah mata uang fungsional (mata uang pelaporan): SELURUH buku besar dicatat dalam IDR, jadi
  * Neraca, Laba Rugi, Arus Kas, dan pajak tidak pernah mencampur satuan. Mata uang asing hanya melekat
  * pada dokumen (faktur penjualan/pembelian, penerimaan, pembayaran) dan pada saldo piutang/hutang
- * yang dokumen itu bentuk. Ini pola yang sama dengan Accurate, Xero, dan QuickBooks.
+ * yang dokumen itu bentuk. Ini pola yang sama dengan software akuntansi komersial pada umumnya.
  *
  * Kurs yang dipakai sebuah dokumen DISIMPAN di dokumennya (snapshot). Kurs baru yang dimasukkan
  * belakangan karena itu tidak pernah menggeser jurnal yang sudah tercatat; selisihnya diakui lewat

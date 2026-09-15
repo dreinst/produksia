@@ -209,7 +209,7 @@ flowchart LR
 | Penerimaan | `/penjualan/penerimaan/baru?fakturId=` | `buatPenerimaan` | pilih akun kas/bank; ≤ sisa tagihan; belum lunas | status faktur, **jurnal** |
 | Retur | `/penjualan/retur/baru?fakturId=` | `buatRetur` | qty ≤ faktur − retur sebelumnya | stok +, **jurnal** |
 
-Catatan desain: **stok berkurang saat pengiriman, bukan saat pesanan** (pesanan hanya reservasi logis), dan **faktur boleh mendahului pengiriman** (dua jalur, seperti Accurate).
+Catatan desain: **stok berkurang saat pengiriman, bukan saat pesanan** (pesanan hanya reservasi logis), dan **faktur boleh mendahului pengiriman** (dua jalur, praktik umum software akuntansi komersial).
 
 ### 4.2 Pembelian — cermin dari penjualan
 
@@ -406,7 +406,7 @@ Tampilan mengikuti design system **"Precision Ledger"** dari paket Stitch (`DESI
 
 ## 10. Operasional
 
-- **DB lokal:** `~/Cooking/PostgreSQL/pgctl.sh start|stop|status`; database `accurate_copy`; koneksi di `.env` (`DATABASE_URL`, tidak di-commit). Tidak ada rahasia lain.
+- **DB lokal:** `~/Cooking/PostgreSQL/pgctl.sh start|stop|status`; database `produksia`; koneksi di `.env` (`DATABASE_URL`, tidak di-commit). Tidak ada rahasia lain.
 - **Pemasangan awal:** basis data tanpa pengguna → `/masuk` menampilkan formulir pembuatan akun Pemilik pertama. Data contoh (`seed.ts`) membuat 6 akun (`superadmin`, `owner`, `owner2`, `admin`, `kasir`, `gudang`; kata sandi = nama peran + `123`, lihat README).
 - **Menjalankan setelah menarik kode baru atau memindahkan folder:** `npm run dev`, `npm run build`, dan `npm start` otomatis menjalankan `npm run siapkan` (migrasi + generate Prisma Client) lebih dulu, jadi skema basis data selalu sinkron dengan kode. Kalau folder proyek atau PostgreSQL dipindahkan, hentikan dulu `npm run dev` dan `pgctl.sh stop`, pindahkan, lalu `pgctl.sh start` dan `npm run dev` dari lokasi baru — server yang masih berjalan dari lokasi lama akan gagal memuat halaman ("Halaman ini gagal dimuat").
 - **Ubah skema:** edit `prisma/schema.prisma` → `npx prisma migrate dev --name … --config prisma7.config.ts` → **restart `npm run dev`** (Turbopack tidak memuat ulang Prisma Client yang di-generate ulang; gejalanya `Cannot read properties of undefined (reading 'findMany')`). Constraint yang tidak didukung Prisma (mis. `CHECK`) ditulis manual di file migrasi (`--create-only`).

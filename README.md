@@ -17,10 +17,49 @@ Sistem informasi akuntansi untuk usaha event/wedding organizer: penjualan, pembe
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
 - **SDM & Penggajian**: data induk Karyawan diperluas (jabatan, tanggal bergabung, status aktif/nonaktif, gaji pokok & tunjangan bulanan, akun beban khusus per karyawan); **Proses Gaji** (SDM → Penggajian) satu dokumen per bulan untuk semua karyawan yang diikutkan, menjurnal Dr Beban Gaji Pokok + Tunjangan (per akun, karyawan bisa dipetakan ke Upah Harian/Honor Volunteer) / Cr Hutang Potongan Gaji (bila ada potongan BPJS/PPh 21/dll) / Cr Kas-Bank; otomatis masuk Laba Rugi (akrual & basis kas), Arus Kas, dan LPJ bila diberi tanda event; koreksi = hapus lalu proses ulang
 - **Pajak**: status PKP + tarif PPN (Faktur Penjualan/Pembelian & retur), potongan PPh 23 di Penerimaan/Pembayaran, **PPh Final UMKM** bulanan dari omzet bruto usaha (buku besar: sebelum diskon, tanpa kelompok Pendapatan Lain-lain, termasuk pendapatan tanpa faktur), ringkasan **Pajak & SPT** per masa (omzet bruto + kolom di luar faktur, PPN kurang/lebih bayar, PPh 23, PPh Final), termin jatuh tempo, nama perusahaan — semua di Pengaturan → Perusahaan & Pajak
-- **Tahun buku**: kartu perusahaan di sidebar membuka tahun buku (Superadmin/Pemilik/Admin) dan pintasan Laba Rugi/Neraca tahun itu; laporan & pintasan periode mengikutinya; mata uang tunggal Rupiah
+- **Tahun buku**: kartu perusahaan di sidebar membuka tahun buku (Superadmin/Pemilik/Admin) dan pintasan Laba Rugi/Neraca tahun itu; laporan & pintasan periode mengikutinya
 - **Hapus dokumen dengan pembalikan penuh** (Pemilik/Admin): stok, harga pokok, jurnal, dan progres/status dokumen induk dibalik dalam satu transaksi; turunannya harus dihapus dulu; semuanya tercatat di Log Aktivitas
+- **Persetujuan (maker-checker)**: dokumen bisa lahir sebagai draf, diajukan, lalu disetujui atau ditolak oleh orang lain sebelum jurnalnya tercatat; pengaju tidak bisa menyetujui dokumennya sendiri. Lihat bagian *Ini SIA sesungguhnya* di bawah dan `DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md`
+- **Multi mata uang**: buku besar tetap Rupiah (mata uang fungsional), dokumen boleh dalam mata uang lain dengan kurs yang disimpan per dokumen, dan ada revaluasi laba/rugi selisih kurs di akhir periode. Detail di `DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md`
 
 Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (lihat `ARCHITECTURE.md`).
+
+## Ini SIA sesungguhnya, bukan sekadar software pencatatan jurnal
+
+Perbedaan mendasar antara Sistem Informasi Akuntansi (SIA) dan software pembukuan biasa bukan soal tampilan, tapi soal **arah data**. Di software pembukuan biasa, jurnal adalah *input*, manusia menerjemahkan bukti transaksi jadi entri debit-kredit, sistem tinggal memproses ke laporan. Di SIA sesungguhnya, jurnal adalah ***output***, sistem menangkap peristiwa bisnis dari siklus-siklus operasional (penjualan, pembelian, produksi/aset, SDM), lalu jurnal, buku besar, dan laporan keuangan adalah hasil olahan otomatis dari peristiwa itu, bukan sesuatu yang diketik manual.
+
+Produksia dibangun mengikuti arah yang kedua. Alurnya, dari kode sungguhan, bukan diagram konsep:
+
+```
+Dokumen sumber (Faktur, Terima Barang, Kas Keluar, Penyesuaian Stok, ...)
+        │
+        ▼
+Fungsi posting per dokumen (src/lib/akuntansi.ts)
+  (mis. catatJurnalFakturPenjualan, catatJurnalPenerimaanBarang)
+        │  akun ditentukan otomatis dari:
+        │   - PemetaanAkun (13 peran akun baku: piutang, persediaan, HPP, dst.)
+        │   - akun khusus di Barang, bila diisi (override pemetaan)
+        ▼
+catatJurnal(): validasi debit = kredit, tolak akun kelompok,
+               tolak bila tahun buku sudah ditutup
+        │
+        ▼
+Jurnal + BarisJurnal (nomor JU-xxx; keterangan selalu memuat
+                       nomor dokumen asal, bisa ditelusuri dua arah)
+        │  dicatat BERSAMA dengan stok & LogAktivitas dalam satu
+        │  transaksi basis data, semuanya tersimpan atau batal bersama
+        ▼
+Buku Besar → Laporan Keuangan (Laba Rugi, Neraca, Arus Kas, Prive)
+        │
+        ▼
+Tutup Buku Tahunan (pendapatan & beban → Laba Ditahan, tahun terkunci)
+```
+
+Sejak alur persetujuan (maker-checker) ada, langkah "Fungsi posting" di atas baru berjalan **saat dokumen disetujui**, bukan saat dibuat. Dokumen lahir sebagai draf dulu, dan pengaju tidak bisa menyetujui dokumennya sendiri (`src/lib/persetujuan.ts`). Ini pemisahan tugas (segregation of duties) yang sungguhan, bukan sekadar hak akses berbasis peran.
+
+Kenapa ini penting di luar soal teknis: dengan arsitektur ini, Produksia relevan bukan cuma untuk orang akuntansi, tapi juga untuk siapa pun yang merancang alur data dari peristiwa bisnis sampai jadi informasi yang bisa dipercaya untuk pengambilan keputusan, seperti analis bisnis, auditor yang menilai pengendalian internal, dan manajer operasional yang butuh data siklus produksi/SDM secara real-time. Prinsip akuntansi (debit-kredit, akrual, matching) tetap jadi aturan yang menjamin data itu valid, tapi penerapannya lintas disiplin karena sistemnya menangani seluruh siklus operasional, bukan cuma bagian keuangan.
+
+Penilaian sejauh mana Produksia memenuhi kriteria AIS baku (siklus transaksi, audit trail, kontrol internal, pelaporan lengkap, dibandingkan terhadap literatur seperti *Accounting Information Systems* karya Hall) ada di `DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md`, termasuk bagian yang jujur soal apa yang belum selesai (17 dari 24 jenis dokumen masih posting langsung, belum ada persetujuan berjenjang, beberapa pertanyaan desain multi-currency masih terbuka).
 
 ## Menjalankan
 
@@ -29,7 +68,7 @@ Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (li
 3. `npx prisma migrate deploy --config prisma7.config.ts` (sekali, atau setiap ada migrasi baru)
 4. `npm run dev` lalu buka http://localhost:3000
 
-Database: `accurate_copy`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak ada kunci rahasia lain yang perlu diatur.
+Database: `produksia`, koneksi diatur lewat `.env` (`DATABASE_URL`). Tidak ada kunci rahasia lain yang perlu diatur.
 
 ### Menjalankan
 

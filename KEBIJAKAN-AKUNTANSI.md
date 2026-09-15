@@ -1,6 +1,6 @@
 # Kebijakan Akuntansi Produksia
 
-Berlaku sejak 14 September 2026 untuk D'Production Event Organizer. Dokumen ini menetapkan cara sistem mencatat dan melaporkan, hasil riset praktik terbaik (peraturan pajak Indonesia, PSAK 72, Accurate, Jurnal.id, Xero, QuickBooks, praktik EO/WO) yang sudah dibakukan ke dalam aplikasi. Kalau ada penyesuaian, ubah di sini dulu, lalu di kode, lalu catat di bagian Riwayat.
+Berlaku sejak 14 September 2026 untuk D'Production Event Organizer. Dokumen ini menetapkan cara sistem mencatat dan melaporkan, hasil riset praktik terbaik (peraturan pajak Indonesia, PSAK 72, beberapa software akuntansi komersial, Jurnal.id, Xero, QuickBooks, praktik EO/WO) yang sudah dibakukan ke dalam aplikasi. Kalau ada penyesuaian, ubah di sini dulu, lalu di kode, lalu catat di bagian Riwayat.
 
 ## 1. Dua sudut pandang: buku akrual, laporan kas
 
@@ -20,7 +20,7 @@ Definisi basis kas di sistem: hanya jurnal yang menyentuh akun kas/bank yang dib
 
 ## 2. Alur penjualan standar (order-to-cash) untuk EO
 
-Semua software akuntansi yang diteliti (Accurate, Jurnal.id, Xero, QuickBooks) membolehkan faktur langsung; penawaran, pesanan, dan pengiriman opsional. Praktik EO/WO Indonesia: DP 20 sampai 50 persen saat kontrak, termin, pelunasan H-7/H-14 atau setelah acara; DP dicatat sebagai kewajiban dan pendapatan diakui setelah acara terlaksana (PSAK 72).
+Semua software akuntansi yang diteliti (beberapa software akuntansi komersial, Jurnal.id, Xero, QuickBooks) membolehkan faktur langsung; penawaran, pesanan, dan pengiriman opsional. Praktik EO/WO Indonesia: DP 20 sampai 50 persen saat kontrak, termin, pelunasan H-7/H-14 atau setelah acara; DP dicatat sebagai kewajiban dan pendapatan diakui setelah acara terlaksana (PSAK 72).
 
 Alur yang dibakukan di Produksia:
 
@@ -56,7 +56,7 @@ Yang dibakukan:
 - Diskon faktur dicatat ke akun kontra 4-8100 Diskon Penjualan (Dr Diskon / Cr Piutang), sehingga pendapatan bruto tetap terlihat.
 - DPP PPN = subtotal dikurangi diskon yang tercantum di faktur (UU PPN Pasal 1 angka 18).
 - Omzet PPh Final tetap bruto sebelum diskon (PP 55/2022 Pasal 60 ayat (1), PMK 164/2023 Pasal 6 ayat (2)).
-- Retur atas faktur berdiskon membalik diskon secara prorata nilai baris yang diretur (cara alokasi diskon Accurate).
+- Retur atas faktur berdiskon membalik diskon secara prorata nilai baris yang diretur (cara alokasi diskon yang umum dipakai software akuntansi komersial).
 - Nego harga per baris tetap ada untuk harga khusus per barang/jasa; diskon faktur untuk potongan atas keseluruhan tagihan.
 
 ## 5. Pajak
@@ -100,7 +100,7 @@ Tiga hal berikut diatur di dokumen terpisah, [DOKUMENTASI-PERSETUJUAN-KURS-BACKU
 - PP 55/2022 Pasal 60 ayat (1) dan PMK 164/2023 Pasal 6 ayat (2) (peredaran bruto sebelum potongan penjualan).
 - UU PPN Pasal 1 angka 18 (harga jual tidak termasuk potongan harga yang dicantumkan dalam faktur pajak).
 - PSAK 72 / IFRS 15 (kewajiban kontrak, pengakuan pendapatan saat kewajiban pelaksanaan terpenuhi); panduan akuntansi special events (tiket dan sponsorship ditangguhkan sampai acara).
-- Dokumentasi Accurate Online (faktur langsung, uang muka, alokasi diskon), Mekari Jurnal (penagihan langsung, uang muka), QuickBooks Online (retainer/deposit, progress invoicing, daily sales), Xero (deposit/prepayment).
+- Dokumentasi software akuntansi komersial (faktur langsung, uang muka, alokasi diskon), Mekari Jurnal (penagihan langsung, uang muka), QuickBooks Online (retainer/deposit, progress invoicing, daily sales), Xero (deposit/prepayment).
 - Praktik pembayaran EO/WO Indonesia (DP 20 sampai 50 persen, termin, pelunasan H-7/H-14).
 
 ## Riwayat

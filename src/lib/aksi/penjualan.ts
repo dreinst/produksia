@@ -489,7 +489,7 @@ export async function buatRetur(dataFormulir: FormData) {
     harga: D(faktur.baris.find((il) => il.barangId === l.barangId)?.harga ?? 0),
   }));
   const bruto = totalBaris(barisRetur);
-  // diskon faktur ikut dibalik prorata nilai baris yang diretur (cara Accurate: alokasi diskon per barang)
+  // diskon faktur ikut dibalik prorata nilai baris yang diretur (alokasi diskon per barang)
   const brutoFaktur = D(faktur.dpp).plus(faktur.diskon);
   const diskon = brutoFaktur.gt(0) ? uang(D(faktur.diskon).mul(bruto).div(brutoFaktur)) : NOL;
   const dpp = bruto.minus(diskon);

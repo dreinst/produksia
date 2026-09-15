@@ -5,7 +5,7 @@ import type { JenisAkun } from "@/prisma-klien/enums";
  * Hasil kurasi dari catatan tangan pemilik (10 September 2026), lihat BAGAN-AKUN.md untuk
  * keputusan tiap butir yang semula "pending".
  *
- * Penomoran ala Accurate: X-YZWW
+ * Penomoran format standar: X-YZWW
  *   X  = jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapatan, 5 Beban)
  *   Y  = kelompok (akun induk, tidak bisa dijurnal)
  *   Z  = akun rinci di bawah kelompok; WW dipakai untuk anak tingkat ketiga
@@ -204,7 +204,7 @@ export const KEPUTUSAN_KURASI: readonly { butir: string; keputusan: string }[] =
   { butir: "Diskon & Cashback", keputusan: "Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi." },
   { butir: "Pendapatan Flagship: tiket, sponsor, tenant", keputusan: "Dirinci jadi tiga akun rinci di bawah Pendapatan Event: 4-1300 Tiket, 4-1400 Sponsor, 4-1500 Tenant & Booth (14 Sep 2026). Uang tiket/sponsor sebelum acara dicatat sebagai Uang Muka Pelanggan dan diakui saat acara (PSAK 72). Jasa standar (tiket, paket sponsor, booth) dan pelanggan 'Pelanggan Umum' untuk rekap tiket ritel diterapkan bersama bagan akun." },
   { butir: "Beban Lain-lain (1) & (2)", keputusan: "Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500)." },
-  { butir: "Penomoran kode akun", keputusan: "Format Accurate X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan." },
+  { butir: "Penomoran kode akun", keputusan: "Format standar X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan." },
   { butir: "Obligasi & Investasi", keputusan: "Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft." },
 ];
 

@@ -14,7 +14,7 @@ Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber dat
 
 ## Penomoran
 
-Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapatan, 5 Beban), `Y` kelompok, `Z` akun rinci, `WW` anak tingkat ketiga (rekening bank, akumulasi penyusutan per kelas aset, hutang pajak per jenis). Celah nomor sengaja disisakan agar akun baru bisa disisipkan tanpa menomori ulang.
+Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapatan, 5 Beban), `Y` kelompok, `Z` akun rinci, `WW` anak tingkat ketiga (rekening bank, akumulasi penyusutan per kelas aset, hutang pajak per jenis). Celah nomor sengaja disisakan agar akun baru bisa disisipkan tanpa menomori ulang.
 
 ## Pemetaan ke modul sistem
 
@@ -68,7 +68,7 @@ Format Accurate `X-YZWW`: `X` jenis (1 Aset, 2 Kewajiban, 3 Ekuitas, 4 Pendapata
 | Diskon & Cashback | Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi. |
 | Pendapatan Flagship: tiket, sponsor, tenant | Dirinci jadi tiga akun rinci di bawah Pendapatan Event: 4-1300 Tiket, 4-1400 Sponsor, 4-1500 Tenant & Booth (14 Sep 2026). Uang tiket/sponsor sebelum acara dicatat sebagai Uang Muka Pelanggan dan diakui saat acara (PSAK 72). Jasa standar (tiket, paket sponsor, booth) dan pelanggan 'Pelanggan Umum' untuk rekap tiket ritel diterapkan bersama bagan akun. |
 | Beban Lain-lain (1) & (2) | Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500). |
-| Penomoran kode akun | Format Accurate X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan. |
+| Penomoran kode akun | Format standar X-YZWW (umum dipakai software akuntansi komersial): digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan. |
 | Obligasi & Investasi | Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft. |
 
 ## Daftar akun

@@ -184,7 +184,7 @@ membuat keenam jenis dokumen itu kembali ke perilaku lama: dibuat oleh satu oran
 dicatat, statusnya diisi DISETUJUI dengan pembuatnya sebagai penyetuju.
 
 Saklar ini ada karena usaha yang stafnya dua orang memang tidak bisa memisahkan tugas, dan ini pola
-yang dipakai ERP lain (Accurate, Odoo) untuk hal yang sama. Kalimat peringatannya ditulis apa adanya
+yang dipakai ERP lain (mis. Odoo) untuk hal yang sama. Kalimat peringatannya ditulis apa adanya
 di halaman pengaturan: mematikannya menghapus pengendalian pemisahan tugas.
 
 Di dalam skrip regresi (`skrip/uji-*.ts`) alur persetujuan MATI secara bawaan, karena skrip lama
@@ -245,7 +245,7 @@ ikut naik dengan nilai yang sama.
 Rupiah adalah **mata uang fungsional** (mata uang pelaporan): seluruh buku besar dicatat dalam IDR,
 jadi Neraca, Laba Rugi, Arus Kas, dan perhitungan pajak tidak pernah mencampur satuan. Mata uang
 asing hanya melekat pada **dokumen** dan pada **saldo piutang/hutang** yang dokumen itu bentuk. Ini
-pola yang sama dengan Accurate, Xero, dan QuickBooks, dan sejalan dengan PSAK 10 (mata uang
+pola yang sama dengan software akuntansi komersial pada umumnya (Xero, QuickBooks), dan sejalan dengan PSAK 10 (mata uang
 fungsional dipakai untuk pelaporan; transaksi mata uang asing dijabarkan ke mata uang fungsional
 dengan kurs saat transaksi).
 
