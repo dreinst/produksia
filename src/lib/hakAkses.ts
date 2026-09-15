@@ -52,7 +52,7 @@ export const HAK_LAIN = [
   "data-induk.tulis",
   "sdm.lihat", // Data induk Karyawan & Departemen (termasuk gaji pokok/tunjangan) — terpisah dari data-induk, bukan untuk Kasir/Gudang
   "sdm.tulis",
-  "stok-induk.lihat", // Data induk Barang & Jasa, Kelompok Barang, Gudang (lokasi) — dipisah dari data-induk komersial supaya Gudang bisa kelola ini tanpa Pelanggan/Pemasok/Proyek/Bagan Akun
+  "stok-induk.lihat", // Data induk Barang & Jasa, Kategori Barang, Gudang (lokasi) — dipisah dari data-induk komersial supaya Gudang bisa kelola ini tanpa Pelanggan/Pemasok/Proyek/Bagan Akun
   "stok-induk.tulis",
   "persediaan.lihat", // Stok per gudang
   "buku-besar.lihat", // Buku besar mutasi, neraca saldo, laba rugi, neraca, arus kas, pajak, status tutup buku
@@ -72,8 +72,8 @@ export const LABEL_HAK_LAIN: Record<(typeof HAK_LAIN)[number], string> = {
   "data-induk.tulis": "Data induk · ubah",
   "sdm.lihat": "SDM (Karyawan & Departemen) · lihat",
   "sdm.tulis": "SDM (Karyawan & Departemen) · ubah",
-  "stok-induk.lihat": "Data induk stok (Barang, Kelompok Barang, Gudang) · lihat",
-  "stok-induk.tulis": "Data induk stok (Barang, Kelompok Barang, Gudang) · ubah",
+  "stok-induk.lihat": "Data induk stok (Barang, Kategori Barang, Gudang) · lihat",
+  "stok-induk.tulis": "Data induk stok (Barang, Kategori Barang, Gudang) · ubah",
   "persediaan.lihat": "Stok per gudang · lihat",
   "buku-besar.lihat": "Laporan buku besar · lihat",
   "buku-besar.tulis": "Bagan akun · ubah",
@@ -156,7 +156,7 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     ...hakDok("penerimaan-barang", "lihat", "buat"),
     ...hakDok("penyesuaian", "lihat", "buat"),
     ...hakDok("pindah-barang", "lihat", "buat"),
-    // Data induk yang boleh Gudang kelola sendiri (Barang & Jasa, Kelompok Barang, Gudang/lokasi),
+    // Data induk yang boleh Gudang kelola sendiri (Barang & Jasa, Kategori Barang, Gudang/lokasi),
     // TERPISAH dari data induk komersial (Pelanggan, Pemasok, Bagan Akun, Proyek) yang tetap
     // urusan Admin. Lihat & ubah, bukan cuma lihat, karena Gudang perlu menambah barang baru sendiri.
     "stok-induk.lihat",
@@ -188,7 +188,7 @@ export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
   KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, plus kelola Barang/Kelompok Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
+  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, plus kelola Barang/Kategori Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };
