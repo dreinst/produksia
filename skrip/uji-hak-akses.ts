@@ -24,6 +24,9 @@ async function main() {
   pastikan(!punyaHak("ADMIN", "hak-akses.kelola") && !punyaHak("ADMIN", "pengguna.kelola") && !punyaHak("ADMIN", "pengaturan.tulis") && punyaHak("ADMIN", "faktur.hapus") && punyaHak("ADMIN", "buku-besar.lihat") && punyaHak("ADMIN", "rekonsiliasi.tulis"), "Admin: dokumen, laporan, rekonsiliasi; tanpa pengaturan/pengguna/hak akses");
   pastikan(punyaHak("KASIR", "faktur.buat") && punyaHak("KASIR", "kas-masuk.buat") && !punyaHak("KASIR", "faktur.hapus") && !punyaHak("KASIR", "pengiriman.buat") && punyaHak("KASIR", "pengiriman.lihat") && !punyaHak("KASIR", "buku-besar.lihat") && !punyaHak("KASIR", "jurnal.lihat"), "Kasir: buat dokumen keuangan, lihat SJ, tanpa hapus, tanpa laporan/jurnal");
   pastikan(punyaHak("GUDANG", "pengiriman.buat") && punyaHak("GUDANG", "pindah-barang.buat") && !punyaHak("GUDANG", "faktur.buat") && !punyaHak("GUDANG", "kas-masuk.lihat") && !punyaHak("GUDANG", "buku-besar.lihat"), "Gudang: SJ/TB/stok, tanpa keuangan");
+  pastikan(punyaHak("GUDANG", "data-induk.lihat") && !punyaHak("GUDANG", "data-induk.tulis"), "Gudang: data induk hanya lihat (isi formulir), tanpa ubah");
+  pastikan(!punyaHak("GUDANG", "sdm.lihat") && !punyaHak("GUDANG", "sdm.tulis") && !punyaHak("KASIR", "sdm.lihat") && !punyaHak("KASIR", "sdm.tulis"), "Gudang & Kasir: tanpa akses SDM (Karyawan/Departemen, termasuk gaji)");
+  pastikan(punyaHak("ADMIN", "sdm.lihat") && punyaHak("ADMIN", "sdm.tulis"), "Admin: tetap punya akses SDM");
   pastikan(modulTerlihat(sesi("GUDANG", HAK_BAWAAN.GUDANG), "penjualan") && !modulTerlihat(sesi("GUDANG", HAK_BAWAAN.GUDANG), "kas-bank"), "modul tampil hanya bila ada dokumen yang boleh dilihat");
   pastikan(labelHak("faktur.buat") === "Faktur Penjualan · buat" && labelHak("pengguna.kelola") === "Pengguna · kelola", "label hak terbaca manusia");
 

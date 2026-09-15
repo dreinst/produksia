@@ -11,7 +11,7 @@ export default async function HalamanUbahDataInduk({ params }: { params: Promise
   const { entitas, id } = await params;
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
-  await wajibHak(entitas === "akun" ? "buku-besar.tulis" : "data-induk.tulis");
+  await wajibHak(entitas === "akun" ? "buku-besar.tulis" : entitas === "karyawan" || entitas === "departemen" ? "sdm.tulis" : "data-induk.tulis");
 
   const rekaman = await delegasiBaca(config.model).findUnique({ where: { id } });
   if (!rekaman) notFound();

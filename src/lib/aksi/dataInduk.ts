@@ -34,8 +34,10 @@ function delegasiValidasi(model: string): DelegasiValidasi {
 async function konfigurasiDenganHak(slug: string): Promise<{ config: KonfigurasiEntitas; pengguna: PenggunaSesi }> {
   const config = ambilKonfigurasiEntitas(slug);
   if (!config) throw new Error(`Entitas tidak dikenal: ${slug}`);
-  // Bagan akun menentukan struktur laporan keuangan → butuh hak buku besar, bukan sekadar data induk
-  const pengguna = await wajibHakAksi(slug === "akun" ? "buku-besar.tulis" : "data-induk.tulis");
+  // Bagan akun menentukan struktur laporan keuangan → butuh hak buku besar; Karyawan/Departemen
+  // memuat data sensitif (gaji pokok, tunjangan) → butuh hak SDM, bukan data induk komersial
+  const hak = slug === "akun" ? "buku-besar.tulis" : slug === "karyawan" || slug === "departemen" ? "sdm.tulis" : "data-induk.tulis";
+  const pengguna = await wajibHakAksi(hak);
   return { config, pengguna };
 }
 

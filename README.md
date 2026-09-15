@@ -91,8 +91,8 @@ Setiap `npm run dev`/`build`/`start` menjalankan `npm run siapkan` (`prisma migr
 | owner | owner123 | Donny Donatus | Pemilik A | Semua; setara Superadmin |
 | owner2 | owner123 | Nadia Yuliana | Pemilik B | Semua; setara Superadmin |
 | admin | admin123 | Bagus Santoso | Admin | Semua dokumen (lihat/buat/hapus), laporan keuangan, rekonsiliasi, data induk; TANPA pengaturan, pengguna, bagan akun, hak akses — batasnya diatur Pemilik |
-| kasir | kasir123 | Sari Wulandari | Kasir | Membuat & melihat dokumen penjualan, pembelian, kas; data induk; tanpa laporan keuangan dan tanpa hapus |
-| gudang | gudang123 | Joko Prasetyo | Gudang | Surat jalan, terima barang, data induk barang/gudang; tanpa modul keuangan |
+| kasir | kasir123 | Sari Wulandari | Kasir | Membuat & melihat dokumen penjualan, pembelian, kas; data induk (tanpa SDM); tanpa laporan keuangan dan tanpa hapus |
+| gudang | gudang123 | Joko Prasetyo | Gudang | Surat jalan, terima barang, pindah & penyesuaian stok; data induk hanya lihat (isi formulir); tanpa modul keuangan dan tanpa SDM |
 
 Bawaan hak tiap peran ada di `src/lib/hakAkses.ts` (`HAK_BAWAAN`); Superadmin/Pemilik bisa mengubah hak Admin/Kasir/Gudang per dokumen (lihat/buat/hapus) di **Pengaturan → Hak Akses** — perubahan langsung berlaku tanpa masuk ulang. Pengguna baru ditambah lewat **Pengguna** di sidebar (Superadmin/Pemilik/Admin); tiap orang mengganti kata sandinya sendiri di **Profil**. Email hanya kontak opsional.
 

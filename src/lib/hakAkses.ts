@@ -50,6 +50,8 @@ type HakDokumen = { [K in KodeDokumen]: `${K}.${Extract<Dok, { kode: K }>["aksi"
 export const HAK_LAIN = [
   "data-induk.lihat",
   "data-induk.tulis",
+  "sdm.lihat", // Data induk Karyawan & Departemen (termasuk gaji pokok/tunjangan) — terpisah dari data-induk, bukan untuk Kasir/Gudang
+  "sdm.tulis",
   "persediaan.lihat", // Stok per gudang
   "buku-besar.lihat", // Buku besar mutasi, neraca saldo, laba rugi, neraca, arus kas, pajak, status tutup buku
   "buku-besar.tulis", // Mengubah bagan akun
@@ -66,6 +68,8 @@ export const HAK_LAIN = [
 export const LABEL_HAK_LAIN: Record<(typeof HAK_LAIN)[number], string> = {
   "data-induk.lihat": "Data induk · lihat",
   "data-induk.tulis": "Data induk · ubah",
+  "sdm.lihat": "SDM (Karyawan & Departemen) · lihat",
+  "sdm.tulis": "SDM (Karyawan & Departemen) · ubah",
   "persediaan.lihat": "Stok per gudang · lihat",
   "buku-besar.lihat": "Laporan buku besar · lihat",
   "buku-besar.tulis": "Bagan akun · ubah",
@@ -121,8 +125,7 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     ...hakDok("penerimaan-barang", "buat"),
     ...hakDok("penyesuaian", "buat"),
     ...hakDok("pindah-barang", "buat"),
-    "data-induk.lihat",
-    "data-induk.tulis",
+    "data-induk.lihat", // hanya lihat: perlu daftar Barang/Gudang untuk mengisi formulirnya sendiri
     "persediaan.lihat",
   ],
 };
@@ -149,8 +152,8 @@ export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
   SUPERADMIN: "Admin IT. Akses penuh, sama dengan Pemilik.",
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
-  KASIR: "Dokumen penjualan, pembelian, kas, dan data induk. Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Surat jalan, terima barang, stok, dan data induk.",
+  KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
+  GUDANG: "Surat jalan, terima barang, pindah & penyesuaian stok. Data induk hanya lihat (untuk mengisi formulir), tanpa SDM.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };

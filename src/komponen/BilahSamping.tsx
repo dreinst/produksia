@@ -95,8 +95,8 @@ const operasional: Grup[] = [
     judul: "SDM",
     ikon: "group",
     tautan: [
-      { href: "/data-induk/karyawan", label: "Karyawan", hak: "data-induk.lihat" },
-      { href: "/data-induk/departemen", label: "Departemen", hak: "data-induk.lihat" },
+      { href: "/data-induk/karyawan", label: "Karyawan", hak: "sdm.lihat" },
+      { href: "/data-induk/departemen", label: "Departemen", hak: "sdm.lihat" },
       { href: "/sdm/penggajian", label: "Penggajian", kode: "GJ", hak: "penggajian.lihat" },
     ],
   },

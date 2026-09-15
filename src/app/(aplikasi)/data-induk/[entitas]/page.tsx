@@ -17,12 +17,14 @@ export default async function HalamanDataInduk({
   params: Promise<{ entitas: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const pengguna = await wajibHak("data-induk.lihat");
   const { entitas } = await params;
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
-  // Bagan akun ikut aturan buku besar; entitas lain cukup hak data induk
-  const bolehTulis = punyaHak(pengguna, entitas === "akun" ? "buku-besar.tulis" : "data-induk.tulis");
+  // Bagan akun ikut aturan buku besar; Karyawan/Departemen ikut hak SDM (bukan data induk komersial,
+  // memuat data sensitif seperti gaji pokok); entitas lain cukup hak data induk
+  const entitasSdm = entitas === "karyawan" || entitas === "departemen";
+  const pengguna = await wajibHak(entitasSdm ? "sdm.lihat" : "data-induk.lihat");
+  const bolehTulis = punyaHak(pengguna, entitas === "akun" ? "buku-besar.tulis" : entitasSdm ? "sdm.tulis" : "data-induk.tulis");
 
   const param = await bacaParamDaftar(searchParams);
   const where = wherePencarian(config, param.q);
