@@ -46,7 +46,7 @@ export default async function HalamanImporMutasi() {
             <div className="kepala-kartu"><h2 className="judul-kartu">Berkas yang sudah diimpor</h2></div>
             <div className="bungkus-tabel">
               <table className="tabel text-xs">
-                <thead><tr><th>Rekening</th><th>Berkas</th><th className="text-right">Baris</th><th className="text-right">Cocok</th><th>Rentang</th><th /></tr></thead>
+                <thead><tr><th>Rekening</th><th>Berkas</th><th className="text-right">Baris</th><th className="text-right">Cocok</th><th>Rentang</th><th className="th-lekat" /></tr></thead>
                 <tbody>
                   {berkas.map((b) => (
                     <tr key={`${b.akunId}|${b.berkas}`}>
@@ -55,7 +55,7 @@ export default async function HalamanImporMutasi() {
                       <td className="text-right angka">{b._count._all}</td>
                       <td className="text-right angka">{jumlahCocok.get(`${b.akunId}|${b.berkas}`) ?? 0}</td>
                       <td className="whitespace-nowrap text-slate-500">{b._min.tanggal?.toLocaleDateString("id-ID")} s.d. {b._max.tanggal?.toLocaleDateString("id-ID")}</td>
-                      <td className="text-right">
+                      <td className="text-right td-lekat">
                         <FormulirAksi aksi={hapusMutasiFormulir} pesanKonfirmasi={`Hapus ${b._count._all} mutasi dari ${b.berkas}?`} className="inline">
                           <input type="hidden" name="akunId" value={b.akunId} />
                           <input type="hidden" name="berkas" value={b.berkas} />

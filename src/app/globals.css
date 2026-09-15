@@ -29,6 +29,11 @@ html,
 body {
   margin: 0;
   padding: 0;
+  /* Jaring pengaman lebar mobile: kalau ada elemen anak (mis. tabel lebar di dalam grid/flex tanpa
+     min-width:0) mencoba memaksa lebih lebar dari layar, potong di sini alih-alih membuat SELURUH
+     halaman perlu di-zoom-out. Elemen yang memang perlu digeser (tabel di .bungkus-tabel) tetap bisa
+     digeser di dalam kotaknya sendiri karena sudah overflow-x:auto sendiri. */
+  overflow-x: hidden;
 }
 
 body {
@@ -205,6 +210,23 @@ body {
   }
   .tabel .kosong {
     @apply py-8 text-center text-sm text-slate-400;
+  }
+  /* Kolom aksi (Ubah/Hapus) tetap terlihat & bisa ditekan di layar sempit tanpa harus
+     menggeser tabel yang lebar sampai ke ujung kanan dulu. Pasang di <th>/<td> terakhir
+     (kolom aksi) tabel yang punya banyak kolom. */
+  .th-lekat,
+  .td-lekat {
+    @apply sticky right-0 z-10;
+    box-shadow: -6px 0 6px -6px rgb(15 23 42 / 0.15);
+  }
+  .th-lekat {
+    background: var(--color-slate-50, #f8fafc);
+  }
+  .td-lekat {
+    background: #fff;
+  }
+  .tabel tbody tr:hover .td-lekat {
+    background: var(--color-slate-50, #f8fafc);
   }
   .tabel-polos {
     @apply w-full text-left border-collapse text-[13px] text-slate-700;

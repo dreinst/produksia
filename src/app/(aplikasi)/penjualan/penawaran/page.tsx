@@ -42,7 +42,7 @@ export default async function HalamanPenawaran({ searchParams }: { searchParams:
             <th>Pelanggan</th>
             <th className="text-right">Total</th>
             <th>Status</th>
-            <th />
+            <th className="th-lekat" />
           </tr>
         </thead>
         <tbody>
@@ -53,7 +53,7 @@ export default async function HalamanPenawaran({ searchParams }: { searchParams:
               <td>{q.pelanggan.nama}</td>
               <td className="text-right angka">{Number(q.total).toLocaleString("id-ID")}</td>
               <td><LencanaStatus status={q.status} /></td>
-              <td className="space-x-3 whitespace-nowrap">
+              <td className="space-x-3 whitespace-nowrap td-lekat">
                 {q.status === "DRAF" && boleh("pesanan.buat") && (
                   <FormulirAksi
                     aksi={konversiPenawaranKePesananFormulir.bind(null, q.id)}

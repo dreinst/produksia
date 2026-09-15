@@ -58,7 +58,7 @@ export default async function HalamanDataInduk({
                     {kolom.label}
                   </th>
                 ))}
-                <th />
+                <th className="th-lekat" />
               </tr>
             </thead>
             <tbody>
@@ -73,7 +73,7 @@ export default async function HalamanDataInduk({
                       </td>
                     );
                   })}
-                  <td className="whitespace-nowrap text-right">
+                  <td className="whitespace-nowrap text-right td-lekat">
                     {bolehTulis ? (
                       <div className="inline-flex items-center gap-3">
                         <Link href={`/data-induk/${entitas}/${rekaman.id}`} className="tombol-tautan">

@@ -91,7 +91,7 @@ export default async function HalamanPemetaanAkun() {
                 <tr>
                   <th>Nama peran</th>
                   <th>Akun</th>
-                  <th className="w-40" />
+                  <th className="w-40 th-lekat" />
                 </tr>
               </thead>
               <tbody>
@@ -112,7 +112,7 @@ export default async function HalamanPemetaanAkun() {
                         <button type="submit" className="tombol tombol-garis tombol-kecil">Ganti</button>
                       </FormulirAksi>
                     </td>
-                    <td className="text-right">
+                    <td className="text-right td-lekat">
                       <FormulirAksi aksi={hapusPemetaanTambahanFormulir.bind(null, t.id)} pesanKonfirmasi={`Hapus pemetaan "${t.label}"?`}>
                         <button type="submit" className="tombol-tautan-bahaya">Hapus</button>
                       </FormulirAksi>

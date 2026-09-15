@@ -40,7 +40,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
             <th>Pemasok</th>
             <th className="text-right">Total</th>
             <th>Status</th>
-            <th />
+            <th className="th-lekat" />
           </tr>
         </thead>
         <tbody>
@@ -54,7 +54,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
                 <td>{o.pemasok.nama}</td>
                 <td className="text-right angka">{Number(o.total).toLocaleString("id-ID")}</td>
                 <td><LencanaStatus status={o.status} /></td>
-                <td className="space-x-3 whitespace-nowrap">
+                <td className="space-x-3 whitespace-nowrap td-lekat">
                   {!diterimaSemua && boleh("penerimaan-barang.buat") && (
                     <Link
                       href={`/pembelian/penerimaan-barang/baru?pesananId=${o.id}`}

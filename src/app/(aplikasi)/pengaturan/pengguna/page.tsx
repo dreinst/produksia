@@ -123,7 +123,7 @@ export default async function HalamanPengguna() {
                     <th>Peran</th>
                     <th>Status</th>
                     <th className="text-right">Sesi aktif</th>
-                    <th />
+                    <th className="th-lekat" />
                   </tr>
                 </thead>
                 <tbody>
@@ -140,7 +140,7 @@ export default async function HalamanPengguna() {
                         <span className={`lencana ${p.aktif ? "lencana-emerald" : "lencana-slate"}`}>{p.aktif ? "Aktif" : "Nonaktif"}</span>
                       </td>
                       <td className="text-right angka">{p._count.sesi}</td>
-                      <td className="text-right">
+                      <td className="text-right td-lekat">
                         <Link href={`/pengaturan/pengguna/${p.id}`} className="tombol-tautan">
                           Ubah
                         </Link>

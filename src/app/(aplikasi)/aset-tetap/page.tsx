@@ -56,7 +56,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
             <th>Status</th>
             <th>Persetujuan</th>
             <th>Pelepasan</th>
-            <th />
+            <th className="th-lekat" />
           </tr>
         </thead>
         <tbody>
@@ -95,7 +95,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
                     "-"
                   )}
                 </td>
-                <td className="text-right space-x-3 whitespace-nowrap">
+                <td className="text-right space-x-3 whitespace-nowrap td-lekat">
                   {a.status === "AKTIF" && a.statusPersetujuan === "DISETUJUI" && bolehLepas && <Link href={`/aset-tetap/${a.id}/lepas`} className="tombol-tautan">Lepas</Link>}
                   {a.pelepasan ? (
                     <TombolHapusDokumen jenis="pelepasanAset" id={a.pelepasan.id} nomor={`pelepasan ${a.kode}`} boleh={bolehHapusLepas} />

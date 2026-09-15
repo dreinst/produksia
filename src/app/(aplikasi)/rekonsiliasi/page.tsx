@@ -53,7 +53,7 @@ export default async function HalamanRekonsiliasi() {
                 <th className="text-right">Anggaran biaya</th>
                 <th className="text-right">Biaya dikeluarkan</th>
                 <th className="text-right">Laba/Rugi</th>
-                <th />
+                <th className="th-lekat" />
               </tr>
             </thead>
             <tbody>
@@ -68,7 +68,7 @@ export default async function HalamanRekonsiliasi() {
                   <td className="text-right angka">{angka(p.anggaranBiaya)}</td>
                   <td className="text-right angka text-blue-700" title={p.anggaranBiaya && Number(p.beban) > Number(p.anggaranBiaya) ? "Melebihi anggaran biaya" : undefined}>{angka(p.beban)}{p.anggaranBiaya && Number(p.beban) > Number(p.anggaranBiaya) ? " ▲" : ""}</td>
                   <td className={`text-right angka font-semibold ${Number(p.laba) < 0 ? "text-rose-700" : "text-emerald-700"}`}>{angka(p.laba)}</td>
-                  <td className="text-right"><Link href={`/rekonsiliasi/event/${p.id}`} className="tombol-tautan">Buka LPJ</Link></td>
+                  <td className="text-right td-lekat"><Link href={`/rekonsiliasi/event/${p.id}`} className="tombol-tautan">Buka LPJ</Link></td>
                 </tr>
               ))}
               {daftar.length === 0 && <tr><td colSpan={10} className="kosong">Belum ada event/proyek. Tambahkan di Data Induk → Proyek, lalu pilih event saat membuat penawaran/pesanan.</td></tr>}

@@ -40,7 +40,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
             <th className="text-right">Terbayar</th>
             <th>Status</th>
             <th>Persetujuan</th>
-            <th />
+            <th className="th-lekat" />
           </tr>
         </thead>
         <tbody>
@@ -66,7 +66,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
                     catatanPenolakan={inv.catatanPenolakan}
                   />
                 </td>
-                <td className="space-x-3 whitespace-nowrap">
+                <td className="space-x-3 whitespace-nowrap td-lekat">
                   {inv.statusPersetujuan === "DISETUJUI" && inv.status !== "LUNAS" && boleh("pembayaran.buat") && (
                     <Link
                       href={`/pembelian/pembayaran/baru?fakturId=${inv.id}`}

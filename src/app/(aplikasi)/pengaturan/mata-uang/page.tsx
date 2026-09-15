@@ -68,7 +68,7 @@ export default async function HalamanMataUang() {
                 <th className="text-right">Desimal</th>
                 <th className="text-right">Riwayat kurs</th>
                 <th>Aktif</th>
-                <th />
+                <th className="th-lekat" />
               </tr>
             </thead>
             <tbody>
@@ -90,7 +90,7 @@ export default async function HalamanMataUang() {
                       </button>
                     </FormulirAksi>
                   </td>
-                  <td className="text-right">
+                  <td className="text-right td-lekat">
                     {!m.fungsional && (
                       <FormulirAksi aksi={hapusMataUangFormulir.bind(null, m.id)} pesanKonfirmasi={`Hapus mata uang ${m.kode}?`} className="inline">
                         <button type="submit" className="tombol-tautan-bahaya">
@@ -212,7 +212,7 @@ export default async function HalamanMataUang() {
                 <th className="text-right">Kurs (Rp)</th>
                 <th>Sumber</th>
                 <th>Dicatat oleh</th>
-                <th />
+                <th className="th-lekat" />
               </tr>
             </thead>
             <tbody>
@@ -225,7 +225,7 @@ export default async function HalamanMataUang() {
                   </td>
                   <td className="text-slate-500">{k.sumber ?? "-"}</td>
                   <td className="text-slate-500">{k.dicatatOleh ?? "-"}</td>
-                  <td className="text-right">
+                  <td className="text-right td-lekat">
                     <FormulirAksi aksi={hapusKursFormulir.bind(null, k.id)} pesanKonfirmasi="Hapus catatan kurs ini?" className="inline">
                       <button type="submit" className="tombol-tautan-bahaya">
                         Hapus
