@@ -46,6 +46,12 @@ jobs:
           npx prisma migrate deploy --config prisma7.config.ts
           npx prisma generate --config prisma7.config.ts
 
+      - name: Hasilkan tipe rute Next.js
+        # tsc butuh LayoutProps/PageProps dkk. yang di-generate Next.js ke .next/types;
+        # di checkout baru (tanpa .next/ dari dev/build sebelumnya) itu belum ada,
+        # jadi tsc gagal dengan "Cannot find name 'LayoutProps'" tanpa langkah ini.
+        run: npx next typegen
+
       - name: Pemeriksaan tipe
         run: npx tsc --noEmit -p .
 
