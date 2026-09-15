@@ -231,8 +231,10 @@ function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: Peng
   const grupOperasional = saringGrup(operasional, pengguna);
   const grupDataInduk = saringGrup([persediaan, dataInduk], pengguna);
   const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna, l.hak));
-  // Kotak masuk persetujuan tampil bagi siapa pun yang boleh membuat atau menyetujui dokumen yang ikut alur itu
-  const bolehPersetujuan = DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
+  // Kotak masuk persetujuan tampil bagi siapa pun yang boleh membuat atau menyetujui dokumen yang ikut alur itu,
+  // KECUALI Gudang: perannya murni input/output stok, Beranda & Persetujuan di luar fokusnya (permintaan pemilik).
+  const bolehPersetujuan = pengguna.peran !== "GUDANG" && DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
+  const bolehBeranda = pengguna.peran !== "GUDANG";
   const semuaGrup = [...grupOperasional, ...grupDataInduk];
 
   const judulAktif = semuaGrup.find((g) => g.tautan.some((l) => aktifDi(pathname, l.href)))?.judul ?? null;
@@ -242,7 +244,7 @@ function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: Peng
   return (
     <nav className="space-y-5" aria-label="Menu utama">
       <div className="space-y-0.5">
-        <TautanTunggal href="/" label="Beranda" ikon="space_dashboard" pathname={pathname} saatNavigasi={saatNavigasi} />
+        {bolehBeranda && <TautanTunggal href="/" label="Beranda" ikon="space_dashboard" pathname={pathname} saatNavigasi={saatNavigasi} />}
         {bolehPersetujuan && (
           <TautanTunggal href="/persetujuan" label="Persetujuan" ikon="verified" pathname={pathname} saatNavigasi={saatNavigasi} />
         )}

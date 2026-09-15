@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { wajibMasuk } from "@/lib/otentikasi";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
 import { periksaSinkron } from "@/lib/sinkron";
@@ -24,6 +25,8 @@ type Terbaru = {
 
 export default async function Beranda() {
   const pengguna = await wajibMasuk();
+  // Gudang murni input/output stok; Beranda (ringkasan keuangan) di luar fokusnya (permintaan pemilik).
+  if (pengguna.peran === "GUDANG") redirect("/persediaan");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const now = new Date();
   const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);
