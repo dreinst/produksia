@@ -53,7 +53,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
                 <th>Ke</th>
                 <th>Keterangan</th>
                 <th>Barang</th>
-                <th />
+                <th className="th-lekat" />
               </tr>
             </thead>
             <tbody>
@@ -71,7 +71,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
                       </span>
                     ))}
                   </td>
-                  <td className="text-right"><TombolHapusDokumen jenis="pindahBarang" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
+                  <td className="text-right td-lekat"><TombolHapusDokumen jenis="pindahBarang" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                 </tr>
               ))}
               {daftar.length === 0 && (

@@ -55,7 +55,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                 <th className="text-right">Nilai</th>
                 <th>Jurnal</th>
                 <th>Persetujuan</th>
-                <th />
+                <th className="th-lekat" />
               </tr>
             </thead>
             <tbody>
@@ -83,7 +83,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                         catatanPenolakan={p.catatanPenolakan}
                       />
                     </td>
-                    <td className="text-right"><TombolHapusDokumen jenis="penyesuaian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
+                    <td className="text-right td-lekat"><TombolHapusDokumen jenis="penyesuaian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                   </tr>
                 );
               })}

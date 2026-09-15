@@ -25,7 +25,39 @@ export default function PemilihBarisPesanan({ daftarBaris }: { daftarBaris: Bari
   return (
     <div className="md:col-span-2 space-y-2">
       <input type="hidden" name="baris" value={JSON.stringify(isian)} />
-      <div className="kartu kartu-tabel"><div className="bungkus-tabel">
+      {/* Mobile (< md): satu kartu per baris */}
+      <div className="md:hidden space-y-3">
+        {daftarBaris.map((l, i) => {
+          const sisa = Number(l.jumlah) - Number(l.jumlahTerkirim);
+          return (
+            <div key={l.id} className="kartu space-y-2">
+              <div className="text-sm font-medium text-slate-900">{l.labelBarang}</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-slate-500">Sisa Pesanan</div>
+                  <div className="angka text-slate-700">{sisa}</div>
+                </div>
+                <div className="bidang">
+                  <label className="label text-xs" htmlFor={`kirim-${i}`}>Kuantitas Kirim</label>
+                  <input
+                    id={`kirim-${i}`}
+                    type="number"
+                    min={0}
+                    max={sisa}
+                    step="0.01"
+                    className="isian isian-kecil w-full"
+                    value={isian[i].jumlah}
+                    onChange={(e) => ubahJumlah(i, Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop (md+): tabel biasa */}
+      <div className="hidden md:block kartu kartu-tabel"><div className="bungkus-tabel">
         <table className="tabel-polos min-w-[36rem]">
         <thead>
           <tr>

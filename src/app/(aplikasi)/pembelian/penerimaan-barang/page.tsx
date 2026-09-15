@@ -35,7 +35,7 @@ export default async function HalamanPenerimaanBarang({ searchParams }: { search
             <th>Pemasok</th>
             <th>Gudang</th>
             <th>Status</th>
-            <th />
+            <th className="th-lekat" />
           </tr>
         </thead>
         <tbody>
@@ -47,7 +47,7 @@ export default async function HalamanPenerimaanBarang({ searchParams }: { search
               <td>{r.pesanan.pemasok.nama}</td>
               <td>{r.gudang.nama}</td>
               <td><LencanaStatus status={r.status} /></td>
-              <td className="text-right"><TombolHapusDokumen jenis="penerimaanBarang" id={r.id} nomor={r.nomor} boleh={bolehHapus} /></td>
+              <td className="text-right td-lekat"><TombolHapusDokumen jenis="penerimaanBarang" id={r.id} nomor={r.nomor} boleh={bolehHapus} /></td>
             </tr>
           ))}
           {daftarPenerimaan.length === 0 && (

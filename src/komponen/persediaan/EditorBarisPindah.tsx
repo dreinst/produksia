@@ -45,7 +45,64 @@ export default function EditorBarisPindah({ daftarGudang, daftarBarang, petaStok
       </div>
 
       <div className="md:col-span-2 space-y-2">
-        <div className="kartu kartu-tabel">
+        {/* Mobile (< md): satu kartu per baris, tersusun ke bawah */}
+        <div className="md:hidden space-y-3">
+          {isian.map((r, i) => {
+            const barang = daftarBarang.find((b) => b.id === r.barangId);
+            const diAsal = r.barangId ? stokDi(asalId, r.barangId) : 0;
+            const diTujuan = r.barangId && tujuanId ? stokDi(tujuanId, r.barangId) : 0;
+            const lebih = r.barangId && r.jumlah > diAsal;
+            return (
+              <div key={i} className="kartu space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="bidang flex-1">
+                    <label className="label text-xs" htmlFor={`barang-pindah-${i}`}>Barang</label>
+                    <select id={`barang-pindah-${i}`} className="isian isian-kecil w-full" value={r.barangId} onChange={(e) => ubah(i, { barangId: e.target.value, jumlah: 0 })}>
+                      <option value="">-</option>
+                      {daftarBarang.map((b) => (
+                        <option key={b.id} value={b.id}>{b.kode} - {b.nama}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button type="button" onClick={() => setIsian((s) => s.filter((_, idx) => idx !== i))} className="tombol-tautan-bahaya mt-6 shrink-0">Hapus</button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-slate-500">Stok di {namaGudang(asalId) || "asal"}</div>
+                    <div className="angka text-slate-700">{r.barangId ? `${diAsal.toLocaleString("id-ID")} ${barang?.satuan ?? ""}` : "-"}</div>
+                  </div>
+                  <div className="bidang">
+                    <label className="label text-xs" htmlFor={`jumlah-pindah-${i}`}>Jumlah pindah</label>
+                    <input
+                      id={`jumlah-pindah-${i}`}
+                      type="number"
+                      min={0}
+                      max={diAsal}
+                      step="0.01"
+                      className={`isian isian-kecil w-full ${lebih ? "border-rose-400" : ""}`}
+                      value={r.jumlah}
+                      onChange={(e) => ubah(i, { jumlah: Number(e.target.value) })}
+                    />
+                    {lebih && <span className="petunjuk text-rose-600">Melebihi stok gudang asal</span>}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">Stok di {namaGudang(tujuanId) || "tujuan"}</div>
+                  <div className="angka text-slate-700">
+                    {r.barangId ? (
+                      <>
+                        {diTujuan.toLocaleString("id-ID")} <span className="text-emerald-700">→ {(diTujuan + r.jumlah).toLocaleString("id-ID")}</span>
+                      </>
+                    ) : "-"}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop (md+): tabel biasa */}
+        <div className="hidden md:block kartu kartu-tabel">
           <div className="bungkus-tabel">
             <table className="tabel-polos min-w-[40rem]">
               <thead>

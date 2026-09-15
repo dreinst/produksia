@@ -29,7 +29,87 @@ export default function EditorBarisPenyesuaian({ daftarBarang, petaStok, gudangI
   return (
     <div className="md:col-span-2 space-y-2">
       <input type="hidden" name="baris" value={JSON.stringify(isian)} />
-      <div className="kartu kartu-tabel">
+      {/* Mobile (< md): satu kartu per baris, tersusun ke bawah, tanpa perlu geser ke samping */}
+      <div className="md:hidden space-y-3">
+        {isian.map((r, i) => {
+          const barang = daftarBarang.find((b) => b.id === r.barangId);
+          const sebelum = r.barangId ? stokDi(r.barangId) : 0;
+          const selisih = r.barangId ? r.jumlahSesudah - sebelum : 0;
+          return (
+            <div key={i} className="kartu space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="bidang flex-1">
+                  <label className="label text-xs" htmlFor={`barang-${i}`}>Barang</label>
+                  <select
+                    id={`barang-${i}`}
+                    className="isian isian-kecil w-full"
+                    value={r.barangId}
+                    onChange={(e) => {
+                      const b = daftarBarang.find((x) => x.id === e.target.value);
+                      ubah(i, { barangId: e.target.value, jumlahSesudah: b ? stokDi(b.id) : 0, hargaSatuan: b && b.hargaBeli > 0 ? String(b.hargaBeli) : "" });
+                    }}
+                  >
+                    <option value="">-</option>
+                    {daftarBarang.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.kode} - {b.nama}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button type="button" onClick={() => setIsian((s) => s.filter((_, idx) => idx !== i))} className="tombol-tautan-bahaya mt-6 shrink-0">
+                  Hapus
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-slate-500">Stok sekarang</div>
+                  <div className="angka text-slate-700">{r.barangId ? `${sebelum.toLocaleString("id-ID")} ${barang?.satuan ?? ""}` : "-"}</div>
+                </div>
+                <div className="bidang">
+                  <label className="label text-xs" htmlFor={`sesudah-${i}`}>Jumlah sesudah</label>
+                  <input
+                    id={`sesudah-${i}`}
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    className="isian isian-kecil w-full"
+                    value={r.jumlahSesudah}
+                    onChange={(e) => ubah(i, { jumlahSesudah: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-slate-500">Selisih</div>
+                  <div className={`angka font-semibold ${selisih > 0 ? "text-emerald-700" : selisih < 0 ? "text-rose-700" : "text-slate-400"}`}>
+                    {selisih > 0 ? "+" : ""}
+                    {selisih.toLocaleString("id-ID")}
+                  </div>
+                </div>
+                <div className="bidang">
+                  <label className="label text-xs" htmlFor={`harga-${i}`}>Harga pokok satuan</label>
+                  <input
+                    id={`harga-${i}`}
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    className="isian isian-kecil w-full"
+                    placeholder={barang ? String(barang.hargaBeli) : ""}
+                    value={r.hargaSatuan}
+                    disabled={selisih <= 0}
+                    title={selisih <= 0 ? "Pengurangan selalu memakai harga pokok rata-rata saat ini" : "Harga pokok barang yang masuk (untuk saldo awal)"}
+                    onChange={(e) => ubah(i, { hargaSatuan: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop (md+): tabel biasa, lebih ringkas untuk layar lebar */}
+      <div className="hidden md:block kartu kartu-tabel">
         <div className="bungkus-tabel">
           <table className="tabel-polos min-w-[40rem]">
             <thead>
