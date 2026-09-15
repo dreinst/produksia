@@ -52,6 +52,8 @@ export const HAK_LAIN = [
   "data-induk.tulis",
   "sdm.lihat", // Data induk Karyawan & Departemen (termasuk gaji pokok/tunjangan) — terpisah dari data-induk, bukan untuk Kasir/Gudang
   "sdm.tulis",
+  "stok-induk.lihat", // Data induk Barang & Jasa, Kelompok Barang, Gudang (lokasi) — dipisah dari data-induk komersial supaya Gudang bisa kelola ini tanpa Pelanggan/Pemasok/Proyek/Bagan Akun
+  "stok-induk.tulis",
   "persediaan.lihat", // Stok per gudang
   "buku-besar.lihat", // Buku besar mutasi, neraca saldo, laba rugi, neraca, arus kas, pajak, status tutup buku
   "buku-besar.tulis", // Mengubah bagan akun
@@ -70,6 +72,8 @@ export const LABEL_HAK_LAIN: Record<(typeof HAK_LAIN)[number], string> = {
   "data-induk.tulis": "Data induk · ubah",
   "sdm.lihat": "SDM (Karyawan & Departemen) · lihat",
   "sdm.tulis": "SDM (Karyawan & Departemen) · ubah",
+  "stok-induk.lihat": "Data induk stok (Barang, Kelompok Barang, Gudang) · lihat",
+  "stok-induk.tulis": "Data induk stok (Barang, Kelompok Barang, Gudang) · ubah",
   "persediaan.lihat": "Stok per gudang · lihat",
   "buku-besar.lihat": "Laporan buku besar · lihat",
   "buku-besar.tulis": "Bagan akun · ubah",
@@ -86,6 +90,22 @@ export const LABEL_HAK_LAIN: Record<(typeof HAK_LAIN)[number], string> = {
 export type Hak = HakDokumen | (typeof HAK_LAIN)[number];
 
 export const SEMUA_HAK: readonly Hak[] = [...DOKUMEN_HAK.flatMap((d) => d.aksi.map((a) => `${d.kode}.${a}` as Hak)), ...HAK_LAIN];
+
+const ENTITAS_SDM = new Set(["karyawan", "departemen"]);
+const ENTITAS_STOK_INDUK = new Set(["barang", "kelompok-barang", "gudang"]);
+
+/**
+ * Satu sumber kebenaran untuk hak lihat/ubah tiap slug entitas di /data-induk/[entitas]:
+ * Bagan Akun ikut buku besar, Karyawan/Departemen ikut SDM (data gaji), Barang/Kelompok
+ * Barang/Gudang ikut stok induk (supaya Gudang bisa kelola tanpa data induk komersial),
+ * entitas lain (Pelanggan, Pemasok, Proyek) pakai data induk komersial biasa.
+ */
+export function hakDataInduk(slug: string): { lihat: Hak; tulis: Hak } {
+  if (slug === "akun") return { lihat: "data-induk.lihat", tulis: "buku-besar.tulis" };
+  if (ENTITAS_SDM.has(slug)) return { lihat: "sdm.lihat", tulis: "sdm.tulis" };
+  if (ENTITAS_STOK_INDUK.has(slug)) return { lihat: "stok-induk.lihat", tulis: "stok-induk.tulis" };
+  return { lihat: "data-induk.lihat", tulis: "data-induk.tulis" };
+}
 
 const hakDok = (kode: KodeDokumen, ...aksi: AksiDokumen[]): Hak[] => aksi.map((a) => `${kode}.${a}` as Hak);
 const lihatModul = (...modul: ModulDokumen[]): Hak[] =>
@@ -136,7 +156,11 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     ...hakDok("penerimaan-barang", "lihat", "buat"),
     ...hakDok("penyesuaian", "lihat", "buat"),
     ...hakDok("pindah-barang", "lihat", "buat"),
-    "data-induk.lihat", // hanya lihat: perlu daftar Barang/Gudang untuk mengisi formulirnya sendiri
+    // Data induk yang boleh Gudang kelola sendiri (Barang & Jasa, Kelompok Barang, Gudang/lokasi),
+    // TERPISAH dari data induk komersial (Pelanggan, Pemasok, Bagan Akun, Proyek) yang tetap
+    // urusan Admin. Lihat & ubah, bukan cuma lihat, karena Gudang perlu menambah barang baru sendiri.
+    "stok-induk.lihat",
+    "stok-induk.tulis",
     "persediaan.lihat", // Stok per Gudang
   ],
 };
@@ -164,7 +188,7 @@ export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
   KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok. Tanpa dokumen penjualan/pembelian lain, tanpa data induk ubah, tanpa SDM.",
+  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, plus kelola Barang/Kelompok Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };

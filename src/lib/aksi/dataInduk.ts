@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { ambilKonfigurasiEntitas, type KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { wajibHakAksi } from "@/lib/otentikasi";
-import type { PenggunaSesi } from "@/lib/hakAkses";
+import { hakDataInduk, type PenggunaSesi } from "@/lib/hakAkses";
 import { uang } from "@/lib/uang";
 
 // Batas atas kolom uang/kuantitas Decimal(18,2) di skema (16 digit sebelum koma).
@@ -34,10 +34,7 @@ function delegasiValidasi(model: string): DelegasiValidasi {
 async function konfigurasiDenganHak(slug: string): Promise<{ config: KonfigurasiEntitas; pengguna: PenggunaSesi }> {
   const config = ambilKonfigurasiEntitas(slug);
   if (!config) throw new Error(`Entitas tidak dikenal: ${slug}`);
-  // Bagan akun menentukan struktur laporan keuangan → butuh hak buku besar; Karyawan/Departemen
-  // memuat data sensitif (gaji pokok, tunjangan) → butuh hak SDM, bukan data induk komersial
-  const hak = slug === "akun" ? "buku-besar.tulis" : slug === "karyawan" || slug === "departemen" ? "sdm.tulis" : "data-induk.tulis";
-  const pengguna = await wajibHakAksi(hak);
+  const pengguna = await wajibHakAksi(hakDataInduk(slug).tulis);
   return { config, pengguna };
 }
 

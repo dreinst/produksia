@@ -6,12 +6,13 @@ import { ambilKonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { ambilDaftarOpsi, delegasiBaca } from "@/lib/dataInduk";
 import { ubahDataIndukFormulir } from "@/lib/aksi/dataInduk";
 import { wajibHak } from "@/lib/otentikasi";
+import { hakDataInduk } from "@/lib/hakAkses";
 
 export default async function HalamanUbahDataInduk({ params }: { params: Promise<{ entitas: string; id: string }> }) {
   const { entitas, id } = await params;
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
-  await wajibHak(entitas === "akun" ? "buku-besar.tulis" : entitas === "karyawan" || entitas === "departemen" ? "sdm.tulis" : "data-induk.tulis");
+  await wajibHak(hakDataInduk(entitas).tulis);
 
   const rekaman = await delegasiBaca(config.model).findUnique({ where: { id } });
   if (!rekaman) notFound();

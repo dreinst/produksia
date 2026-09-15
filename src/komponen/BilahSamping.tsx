@@ -118,9 +118,9 @@ const dataInduk: Grup = {
   tautan: [
     { href: "/data-induk/pelanggan", label: "Pelanggan", hak: "data-induk.lihat" },
     { href: "/data-induk/pemasok", label: "Pemasok", hak: "data-induk.lihat" },
-    { href: "/data-induk/barang", label: "Barang & Jasa", hak: "data-induk.lihat" },
-    { href: "/data-induk/kelompok-barang", label: "Kelompok Barang", hak: "data-induk.lihat" },
-    { href: "/data-induk/gudang", label: "Gudang", hak: "data-induk.lihat" },
+    { href: "/data-induk/barang", label: "Barang & Jasa", hak: "stok-induk.lihat" },
+    { href: "/data-induk/kelompok-barang", label: "Kelompok Barang", hak: "stok-induk.lihat" },
+    { href: "/data-induk/gudang", label: "Gudang", hak: "stok-induk.lihat" },
     { href: "/data-induk/akun", label: "Bagan Akun", hak: "data-induk.lihat" },
     { href: "/data-induk/proyek", label: "Proyek", hak: "data-induk.lihat" },
   ],

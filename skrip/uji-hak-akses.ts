@@ -24,7 +24,10 @@ async function main() {
   pastikan(!punyaHak("ADMIN", "hak-akses.kelola") && !punyaHak("ADMIN", "pengguna.kelola") && !punyaHak("ADMIN", "pengaturan.tulis") && punyaHak("ADMIN", "faktur.hapus") && punyaHak("ADMIN", "buku-besar.lihat") && punyaHak("ADMIN", "rekonsiliasi.tulis"), "Admin: dokumen, laporan, rekonsiliasi; tanpa pengaturan/pengguna/hak akses");
   pastikan(punyaHak("KASIR", "faktur.buat") && punyaHak("KASIR", "kas-masuk.buat") && !punyaHak("KASIR", "faktur.hapus") && !punyaHak("KASIR", "pengiriman.buat") && punyaHak("KASIR", "pengiriman.lihat") && !punyaHak("KASIR", "buku-besar.lihat") && !punyaHak("KASIR", "jurnal.lihat"), "Kasir: buat dokumen keuangan, lihat SJ, tanpa hapus, tanpa laporan/jurnal");
   pastikan(punyaHak("GUDANG", "pengiriman.buat") && punyaHak("GUDANG", "pindah-barang.buat") && !punyaHak("GUDANG", "faktur.buat") && !punyaHak("GUDANG", "kas-masuk.lihat") && !punyaHak("GUDANG", "buku-besar.lihat"), "Gudang: SJ/TB/stok, tanpa keuangan");
-  pastikan(punyaHak("GUDANG", "data-induk.lihat") && !punyaHak("GUDANG", "data-induk.tulis"), "Gudang: data induk hanya lihat (isi formulir), tanpa ubah");
+  pastikan(
+    punyaHak("GUDANG", "stok-induk.lihat") && punyaHak("GUDANG", "stok-induk.tulis") && !punyaHak("GUDANG", "data-induk.lihat") && !punyaHak("GUDANG", "data-induk.tulis"),
+    "Gudang: kelola Barang/Kelompok Barang/Gudang sendiri (stok-induk), tanpa data induk komersial sama sekali",
+  );
   pastikan(
     !punyaHak("ADMIN", "sdm.lihat") && !punyaHak("ADMIN", "sdm.tulis") && !punyaHak("ADMIN", "penggajian.lihat") &&
       !punyaHak("GUDANG", "sdm.lihat") && !punyaHak("GUDANG", "sdm.tulis") && !punyaHak("KASIR", "sdm.lihat") && !punyaHak("KASIR", "sdm.tulis"),

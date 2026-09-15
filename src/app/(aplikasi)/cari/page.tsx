@@ -32,7 +32,7 @@ export default async function HalamanCari({ searchParams }: { searchParams: Prom
         boleh("jurnal.lihat") ? db.jurnal.findMany({ where: { OR: [{ nomor: ci }, { keterangan: ci }] }, take: 10 }) : [],
         boleh("data-induk.lihat") ? db.pelanggan.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
         boleh("data-induk.lihat") ? db.pemasok.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
-        boleh("data-induk.lihat") ? db.barang.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
+        boleh("stok-induk.lihat") ? db.barang.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
         boleh("data-induk.lihat") ? db.akun.findMany({ where: { OR: [{ kode: ci }, { nama: ci }] }, take: 10 }) : [],
       ])
     : [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];

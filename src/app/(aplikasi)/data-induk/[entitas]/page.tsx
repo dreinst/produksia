@@ -8,7 +8,7 @@ import { ambilDaftarOpsi, delegasiBaca, includeUntukKolom, wherePencarian } from
 import { bacaParamDaftar } from "@/lib/daftar";
 import { buatDataIndukFormulir, hapusDataIndukFormulir } from "@/lib/aksi/dataInduk";
 import { wajibHak } from "@/lib/otentikasi";
-import { punyaHak } from "@/lib/hakAkses";
+import { hakDataInduk, punyaHak } from "@/lib/hakAkses";
 
 export default async function HalamanDataInduk({
   params,
@@ -20,11 +20,9 @@ export default async function HalamanDataInduk({
   const { entitas } = await params;
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
-  // Bagan akun ikut aturan buku besar; Karyawan/Departemen ikut hak SDM (bukan data induk komersial,
-  // memuat data sensitif seperti gaji pokok); entitas lain cukup hak data induk
-  const entitasSdm = entitas === "karyawan" || entitas === "departemen";
-  const pengguna = await wajibHak(entitasSdm ? "sdm.lihat" : "data-induk.lihat");
-  const bolehTulis = punyaHak(pengguna, entitas === "akun" ? "buku-besar.tulis" : entitasSdm ? "sdm.tulis" : "data-induk.tulis");
+  const hak = hakDataInduk(entitas);
+  const pengguna = await wajibHak(hak.lihat);
+  const bolehTulis = punyaHak(pengguna, hak.tulis);
 
   const param = await bacaParamDaftar(searchParams);
   const where = wherePencarian(config, param.q);
