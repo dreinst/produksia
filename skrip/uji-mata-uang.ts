@@ -47,7 +47,12 @@ async function bersihkanSisaUji() {
   await db.akun.deleteMany({ where: { kode: "MU-SELISIHKURS" } });
 }
 
-const iso = (d: Date) => d.toISOString().slice(0, 10);
+// Tanggal lokal, BUKAN toISOString() (UTC): server mengartikan string tanggal formulir
+// di zona waktu lokal (`new Date(\`${nilai}T00:00:00\`)`, lihat src/lib/aksi/dataInduk.ts
+// & sejenisnya). Antara tengah malam UTC dan tengah malam WIB (00:00-07:00 WIB), toISOString()
+// melaporkan tanggal KEMARIN padahal dokumen yang baru dibuat sudah bertanggal HARI INI secara
+// lokal, jadi revaluasi kurs salah menganggap dokumen itu "di masa depan" dan mengabaikannya.
+const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 async function main() {
   const mulaiUji = new Date();
