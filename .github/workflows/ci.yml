@@ -15,18 +15,18 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: accurate
-          POSTGRES_PASSWORD: accurate
-          POSTGRES_DB: accurate_copy
+          POSTGRES_USER: produksia
+          POSTGRES_PASSWORD: produksia
+          POSTGRES_DB: produksia_ci
         ports: ["5432:5432"]
         options: >-
-          --health-cmd "pg_isready -U accurate"
+          --health-cmd "pg_isready -U produksia -d produksia_ci"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
 
     env:
-      DATABASE_URL: postgresql://accurate:accurate@localhost:5432/accurate_copy
+      DATABASE_URL: postgresql://produksia:produksia@localhost:5432/produksia_ci
       # Skrip regresi memanggil aksi server di luar HTTP (lihat penggunaSaatIni di src/lib/otentikasi.ts)
       UJI_TANPA_SESI: "1"
 
@@ -55,12 +55,10 @@ jobs:
       - name: Data contoh
         run: npx tsx prisma/seed.ts
 
-      - name: Regresi (20 suite + pemeriksaan sinkron)
-        run: |
-          for s in skrip/uji-sinkron.ts skrip/uji-laporan.ts skrip/uji-pajak.ts skrip/uji-hapus.ts skrip/uji-uang-muka.ts skrip/uji-pindah-barang.ts skrip/uji-tutup-buku.ts skrip/uji-pph-final.ts skrip/uji-hak-akses.ts skrip/uji-lupa-kata-sandi.ts skrip/uji-pelepasan-aset.ts skrip/uji-proyek.ts skrip/uji-rekonsiliasi.ts skrip/uji-prive.ts skrip/uji-batas-masuk.ts skrip/uji-bagan-akun.ts skrip/uji-persediaan.ts skrip/uji-penjualan.ts skrip/uji-pembelian.ts skrip/uji-buku-besar.ts skrip/uji-aset-tetap.ts skrip/uji-pengaman.ts skrip/uji-sinkron.ts; do
-            echo "##### $s"
-            npx tsx "$s"
-          done
+      - name: Regresi (semua skrip/uji-*.ts + pemeriksaan sinkron)
+        # Daftar skrip TIDAK di-hardcode di sini, supaya skrip uji baru otomatis ikut
+        # dijalankan tanpa perlu mengedit workflow ini (lihat "uji" di package.json).
+        run: npm run uji
 
       - name: Build produksi
         run: npx next build
