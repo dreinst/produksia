@@ -96,6 +96,7 @@ const operasional: Grup[] = [
     ikon: "group",
     tautan: [
       { href: "/data-induk/karyawan", label: "Karyawan", hak: "data-induk.lihat" },
+      { href: "/data-induk/departemen", label: "Departemen", hak: "data-induk.lihat" },
       { href: "/sdm/penggajian", label: "Penggajian", kode: "GJ", hak: "penggajian.lihat" },
     ],
   },
@@ -121,8 +122,6 @@ const dataInduk: Grup = {
     { href: "/data-induk/kelompok-barang", label: "Kelompok Barang", hak: "data-induk.lihat" },
     { href: "/data-induk/gudang", label: "Gudang", hak: "data-induk.lihat" },
     { href: "/data-induk/akun", label: "Bagan Akun", hak: "data-induk.lihat" },
-    { href: "/data-induk/departemen", label: "Departemen", hak: "data-induk.lihat" },
-    { href: "/data-induk/karyawan", label: "Karyawan", hak: "data-induk.lihat" },
     { href: "/data-induk/proyek", label: "Proyek", hak: "data-induk.lihat" },
   ],
 };
