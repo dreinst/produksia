@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { wajibHakAksi } from "@/lib/otentikasi";
-import { HAK_BAWAAN, LABEL_PERAN, PERAN_DAPAT_DIATUR, SEMUA_HAK, type Hak } from "@/lib/hakAkses";
+import { HAK_BAWAAN, HAK_TERTINGGI_SAJA, LABEL_PERAN, PERAN_DAPAT_DIATUR, SEMUA_HAK, type Hak } from "@/lib/hakAkses";
 
 const HALAMAN = "/pengaturan/hak-akses";
 
@@ -17,7 +17,8 @@ async function catat(penggunaId: string, penggunaNama: string, keterangan: strin
 /**
  * Menyimpan matriks hak dari formulir: setiap kotak bernama `<PERAN>|<hak>` yang tercentang = boleh.
  * Hanya selisih terhadap bawaan yang disimpan sebagai penyesuaian; yang sama dengan bawaan dihapus.
- * Superadmin/Pemilik tidak bisa diubah; `hak-akses.kelola` tidak bisa diberikan ke peran lain.
+ * Superadmin/Pemilik tidak bisa diubah; hak di HAK_TERTINGGI_SAJA (hak-akses.kelola, SDM) tidak
+ * bisa diberikan ke peran lain, walau kotaknya tercentang di formulir.
  */
 export async function simpanHakAkses(dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("hak-akses.kelola");
@@ -29,7 +30,7 @@ export async function simpanHakAkses(dataFormulir: FormData) {
     for (const peran of PERAN_DAPAT_DIATUR) {
       const bawaan = new Set<Hak>(HAK_BAWAAN[peran]);
       for (const hak of SEMUA_HAK) {
-        if (hak === "hak-akses.kelola") continue;
+        if ((HAK_TERTINGGI_SAJA as readonly Hak[]).includes(hak)) continue;
         const boleh = tercentang.has(`${peran}|${hak}`);
         const ada = await tx.hakAksesPeran.findUnique({ where: { peran_hak: { peran, hak } } });
         if (boleh === bawaan.has(hak)) {

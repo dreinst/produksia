@@ -2,7 +2,7 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
-import { DOKUMEN_HAK, HAK_BAWAAN, SEMUA_HAK, HAK_LAIN, hitungHak, labelHak, modulTerlihat, punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
+import { DOKUMEN_HAK, HAK_BAWAAN, HAK_TERTINGGI_SAJA, SEMUA_HAK, HAK_LAIN, hitungHak, labelHak, modulTerlihat, punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
 import { simpanHakAkses, pulihkanHakBawaan } from "../src/lib/aksi/hakAkses";
 import { jalankan, formulir, pastikan } from "./bantuan";
 
@@ -25,8 +25,28 @@ async function main() {
   pastikan(punyaHak("KASIR", "faktur.buat") && punyaHak("KASIR", "kas-masuk.buat") && !punyaHak("KASIR", "faktur.hapus") && !punyaHak("KASIR", "pengiriman.buat") && punyaHak("KASIR", "pengiriman.lihat") && !punyaHak("KASIR", "buku-besar.lihat") && !punyaHak("KASIR", "jurnal.lihat"), "Kasir: buat dokumen keuangan, lihat SJ, tanpa hapus, tanpa laporan/jurnal");
   pastikan(punyaHak("GUDANG", "pengiriman.buat") && punyaHak("GUDANG", "pindah-barang.buat") && !punyaHak("GUDANG", "faktur.buat") && !punyaHak("GUDANG", "kas-masuk.lihat") && !punyaHak("GUDANG", "buku-besar.lihat"), "Gudang: SJ/TB/stok, tanpa keuangan");
   pastikan(punyaHak("GUDANG", "data-induk.lihat") && !punyaHak("GUDANG", "data-induk.tulis"), "Gudang: data induk hanya lihat (isi formulir), tanpa ubah");
-  pastikan(!punyaHak("GUDANG", "sdm.lihat") && !punyaHak("GUDANG", "sdm.tulis") && !punyaHak("KASIR", "sdm.lihat") && !punyaHak("KASIR", "sdm.tulis"), "Gudang & Kasir: tanpa akses SDM (Karyawan/Departemen, termasuk gaji)");
-  pastikan(punyaHak("ADMIN", "sdm.lihat") && punyaHak("ADMIN", "sdm.tulis"), "Admin: tetap punya akses SDM");
+  pastikan(
+    !punyaHak("ADMIN", "sdm.lihat") && !punyaHak("ADMIN", "sdm.tulis") && !punyaHak("ADMIN", "penggajian.lihat") &&
+      !punyaHak("GUDANG", "sdm.lihat") && !punyaHak("GUDANG", "sdm.tulis") && !punyaHak("KASIR", "sdm.lihat") && !punyaHak("KASIR", "sdm.tulis"),
+    "SDM (Karyawan/Departemen/Penggajian, termasuk gaji): hanya Superadmin/Pemilik, Admin pun tidak",
+  );
+  pastikan(
+    punyaHak("GUDANG", "pengiriman.buat") && punyaHak("GUDANG", "penerimaan-barang.buat") && punyaHak("GUDANG", "penyesuaian.buat") && punyaHak("GUDANG", "pindah-barang.buat") &&
+      !punyaHak("GUDANG", "faktur.lihat") && !punyaHak("GUDANG", "penawaran.lihat") && !punyaHak("GUDANG", "pesanan.lihat") && !punyaHak("GUDANG", "faktur-pembelian.lihat") && !punyaHak("GUDANG", "pembayaran.lihat"),
+    "Gudang: hanya 4 dokumen penggerak stok, tanpa dokumen penjualan/pembelian lain",
+  );
+  for (const peran of ["ADMIN", "KASIR", "GUDANG"] as const) {
+    for (const h of HAK_TERTINGGI_SAJA) pastikan(!HAK_BAWAAN[peran].includes(h), `${peran} tidak punya ${h} secara bawaan`);
+  }
+  // Simulasikan formulir sungguhan: semua kotak bawaan tetap tercentang, PLUS mencoba menyalakan
+  // sdm.tulis/penggajian.lihat untuk Gudang (harus diabaikan, bukan cuma "tidak disentuh").
+  const isianCobaSdm: Record<string, string> = {};
+  for (const peran of ["ADMIN", "KASIR", "GUDANG"] as const) for (const h of HAK_BAWAAN[peran]) isianCobaSdm[`${peran}|${h}`] = "on";
+  isianCobaSdm["GUDANG|sdm.tulis"] = "on";
+  isianCobaSdm["GUDANG|penggajian.lihat"] = "on";
+  await jalankan("simpan matriks mencoba memberi sdm.tulis ke Gudang (diabaikan)", () => simpanHakAkses(formulir(isianCobaSdm)));
+  pastikan(!punyaHak("GUDANG", "sdm.tulis") && !punyaHak("GUDANG", "penggajian.lihat"), "sdm.tulis/penggajian.lihat tetap tidak bisa diberikan ke Gudang lewat formulir");
+  pastikan((await db.hakAksesPeran.count()) === 0, "mencoba memberi hak terkunci tidak meninggalkan penyesuaian tersimpan");
   pastikan(modulTerlihat(sesi("GUDANG", HAK_BAWAAN.GUDANG), "penjualan") && !modulTerlihat(sesi("GUDANG", HAK_BAWAAN.GUDANG), "kas-bank"), "modul tampil hanya bila ada dokumen yang boleh dilihat");
   pastikan(labelHak("faktur.buat") === "Faktur Penjualan · buat" && labelHak("pengguna.kelola") === "Pengguna · kelola", "label hak terbaca manusia");
 

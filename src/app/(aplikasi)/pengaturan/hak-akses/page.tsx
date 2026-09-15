@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
-import { DOKUMEN_HAK, HAK_BAWAAN, HAK_LAIN, LABEL_HAK_LAIN, LABEL_PERAN, PERAN_DAPAT_DIATUR, PERAN_TERTINGGI, hitungHak, type AksiDokumen, type Hak, type ModulDokumen } from "@/lib/hakAkses";
+import { DOKUMEN_HAK, HAK_BAWAAN, HAK_LAIN, HAK_TERTINGGI_SAJA, LABEL_HAK_LAIN, LABEL_PERAN, PERAN_DAPAT_DIATUR, PERAN_TERTINGGI, hitungHak, type AksiDokumen, type Hak, type ModulDokumen } from "@/lib/hakAkses";
 import { pulihkanHakBawaanFormulir, simpanHakAksesFormulir } from "@/lib/aksi/hakAkses";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -16,6 +16,9 @@ export default async function HalamanHakAkses() {
   const modul = [...new Set(DOKUMEN_HAK.map((d) => d.modul))];
 
   const Kotak = ({ peran, hak }: { peran: string; hak: Hak }) => {
+    if ((HAK_TERTINGGI_SAJA as readonly Hak[]).includes(hak)) {
+      return <span className="text-slate-300 text-xs" title="Hanya Superadmin/Pemilik, tidak bisa diberikan ke peran lain">—</span>;
+    }
     const boleh = efektif[peran].has(hak);
     const beda = boleh !== bawaan[peran].has(hak);
     return (

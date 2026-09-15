@@ -30,6 +30,9 @@ import { laporanPiutang } from "../src/lib/laporanRekanan";
 
 const PENGAJU = "uji-pengaju";
 const PEMERIKSA = "uji-pemeriksa";
+// SDM (Karyawan, Departemen, Penggajian) sekarang dikunci hanya Superadmin/Pemilik (Admin pun tidak
+// punya lagi), jadi Penggajian butuh pengaju berperan SUPERADMIN, beda dari PENGAJU (berperan ADMIN).
+const PENGAJU_SDM = "uji-pengaju-sdm";
 
 async function jumlahJurnalDokumen(tabel: "fakturPenjualan" | "fakturPembelian" | "penyesuaianPersediaan" | "penggajian" | "dokumenKas", id: string) {
   const baris = await (db as unknown as Record<string, { findUniqueOrThrow: (a: unknown) => Promise<{ jurnalId: string | null; statusPersetujuan: string }> }>)[tabel].findUniqueOrThrow({
@@ -126,6 +129,11 @@ async function main() {
     where: { namaPengguna: "uji-kasir" },
     create: { namaPengguna: "uji-kasir", nama: "Kasir Uji", peran: "KASIR", kataSandiHash: await hashKataSandi("uji-kasir-123") },
     update: { peran: "KASIR", aktif: true },
+  });
+  await db.pengguna.upsert({
+    where: { namaPengguna: PENGAJU_SDM },
+    create: { namaPengguna: PENGAJU_SDM, nama: "Pengaju SDM Uji", peran: "SUPERADMIN", kataSandiHash: await hashKataSandi("uji-pengaju-sdm-123") },
+    update: { peran: "SUPERADMIN", aktif: true },
   });
 
   const gudang = await db.gudang.create({ data: { kode: "WH-PST", nama: "Gudang Uji Persetujuan" } });
@@ -321,7 +329,7 @@ async function main() {
   // ("Penggajian periode ... sudah diproses") setiap kali uji dijalankan setelah seed.
   const bulanUji = new Date(mulaiUji.getFullYear(), mulaiUji.getMonth() + 1, 1);
   const periode = `${bulanUji.getFullYear()}-${String(bulanUji.getMonth() + 1).padStart(2, "0")}`;
-  await sebagai(PENGAJU, () =>
+  await sebagai(PENGAJU_SDM, () =>
     jalankan("buat penggajian (draf)", () =>
       buatPenggajian(
         formulir({
@@ -337,9 +345,12 @@ async function main() {
   pastikan(gaji.statusPersetujuan === "DRAFT" && gaji.jurnalId === null, "penggajian baru DRAFT tanpa jurnal");
   pastikan(Number(gaji.totalDibayar) === 3_400_000, `gaji bersih 3.400.000 (${gaji.totalDibayar})`);
 
-  await sebagai(PENGAJU, () => jalankan("ajukan penggajian", () => ajukanDokumen("penggajian", gaji.id)));
-  await sebagai(PENGAJU, () =>
+  await sebagai(PENGAJU_SDM, () => jalankan("ajukan penggajian", () => ajukanDokumen("penggajian", gaji.id)));
+  await sebagai(PENGAJU_SDM, () =>
     harusDitolak("pengaju menyetujui penggajiannya sendiri", () => setujuiDokumen("penggajian", gaji.id), "tidak boleh menyetujui dokumennya sendiri"),
+  );
+  await sebagai(PENGAJU, () =>
+    harusDitolak("Admin tidak punya hak SDM untuk menyetujui penggajian", () => setujuiDokumen("penggajian", gaji.id), "tidak punya hak"),
   );
   await sebagai(PEMERIKSA, () => jalankan("setujui penggajian", () => setujuiDokumen("penggajian", gaji.id)));
   const gajiSetelah = await db.penggajian.findUniqueOrThrow({ where: { id: gaji.id } });

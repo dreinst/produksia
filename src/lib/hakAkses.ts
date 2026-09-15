@@ -92,14 +92,23 @@ const lihatModul = (...modul: ModulDokumen[]): Hak[] =>
   DOKUMEN_HAK.filter((d) => modul.includes(d.modul) && (d.aksi as readonly string[]).includes("lihat")).map((d) => `${d.kode}.lihat` as Hak);
 
 /**
+ * Hak yang cuma boleh dipegang Superadmin/Pemilik: tidak masuk bawaan Admin, dan TIDAK BISA
+ * diberikan ke Admin/Kasir/Gudang lewat Pengaturan › Hak Akses sekalipun dicentang (lihat
+ * simpanHakAkses di src/lib/aksi/hakAkses.ts dan kotak yang dinonaktifkan di halamannya).
+ * SDM (Karyawan, Departemen, Penggajian) memuat data gaji, sengaja dikunci seketat hak-akses.kelola.
+ */
+export const HAK_TERTINGGI_SAJA: readonly Hak[] = ["hak-akses.kelola", "sdm.lihat", "sdm.tulis", ...hakDok("penggajian", "lihat", "buat", "setujui", "hapus")];
+
+/**
  * Bawaan hak per peran. Superadmin (admin IT) & Pemilik selalu penuh dan tidak bisa dikurangi.
  * Admin = pengelola dokumen & laporan; batasnya diatur Pemilik di Pengaturan › Hak Akses, tanpa
- * pengaturan perusahaan, pengguna, dan hak akses. Kasir/Gudang hanya dokumen operasionalnya, tanpa laporan keuangan.
+ * pengaturan perusahaan, pengguna, hak akses, dan SDM (lihat HAK_TERTINGGI_SAJA). Kasir/Gudang
+ * hanya dokumen operasionalnya, tanpa laporan keuangan.
  */
 export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
   SUPERADMIN: SEMUA_HAK,
   PEMILIK: SEMUA_HAK,
-  ADMIN: SEMUA_HAK.filter((h) => !["hak-akses.kelola", "pengaturan.tulis", "pengguna.kelola", "buku-besar.tulis"].includes(h)),
+  ADMIN: SEMUA_HAK.filter((h) => !["pengaturan.tulis", "pengguna.kelola", "buku-besar.tulis", ...HAK_TERTINGGI_SAJA].includes(h)),
   KASIR: [
     ...lihatModul("penjualan", "pembelian", "kas-bank"),
     ...hakDok("penawaran", "buat"),
@@ -119,14 +128,16 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     "persediaan.lihat",
     "harga.nego",
   ],
+  // Gudang murni input/output stok: cuma 4 dokumen yang benar-benar menggerakkan stok fisik,
+  // lihat maupun buat. TIDAK melihat dokumen penjualan/pembelian lain (Faktur, Penawaran,
+  // Pesanan, Retur, Pembayaran, dst.) sama sekali, walau itu di modul yang sama.
   GUDANG: [
-    ...lihatModul("penjualan", "pembelian", "persediaan"),
-    ...hakDok("pengiriman", "buat"),
-    ...hakDok("penerimaan-barang", "buat"),
-    ...hakDok("penyesuaian", "buat"),
-    ...hakDok("pindah-barang", "buat"),
+    ...hakDok("pengiriman", "lihat", "buat"),
+    ...hakDok("penerimaan-barang", "lihat", "buat"),
+    ...hakDok("penyesuaian", "lihat", "buat"),
+    ...hakDok("pindah-barang", "lihat", "buat"),
     "data-induk.lihat", // hanya lihat: perlu daftar Barang/Gudang untuk mengisi formulirnya sendiri
-    "persediaan.lihat",
+    "persediaan.lihat", // Stok per Gudang
   ],
 };
 
@@ -153,7 +164,7 @@ export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
   KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Surat jalan, terima barang, pindah & penyesuaian stok. Data induk hanya lihat (untuk mengisi formulir), tanpa SDM.",
+  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok. Tanpa dokumen penjualan/pembelian lain, tanpa data induk ubah, tanpa SDM.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };
