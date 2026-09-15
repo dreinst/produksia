@@ -35,7 +35,7 @@ const nama = (p: { nama: string } | null | undefined) => p?.nama ?? null;
 export default async function HalamanPersetujuan() {
   const pengguna: PenggunaSesi = await wajibMasuk();
   // Gudang murni input/output stok; kotak masuk Persetujuan di luar fokusnya (permintaan pemilik).
-  if (pengguna.peran === "GUDANG") redirect("/persediaan");
+  if (pengguna.peran === "GUDANG") redirect("/data-induk/barang");
   const bolehLihat = (kode: string) => punyaHak(pengguna, `${kode}.lihat` as Hak) || punyaHak(pengguna, `${kode}.setujui` as Hak);
 
   const [wajib, faktur, fakturBeli, kas, penyesuaian, aset, penggajian] = await Promise.all([
