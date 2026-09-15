@@ -2,12 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import type { Prisma } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { ambilKonfigurasiEntitas, type KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { hakDataInduk, type PenggunaSesi } from "@/lib/hakAkses";
-import { uang } from "@/lib/uang";
+import { D, bacaUang, uang, type Desimal } from "@/lib/uang";
+import { pastikanAkunRinci } from "@/lib/baganAkun";
+import { catatJurnalPenyesuaianPersediaan } from "@/lib/akuntansi";
+import { perbaruiHargaRata } from "@/lib/stok";
+import { nomorDokumenBerikutnya } from "@/lib/penomoran";
+import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 
 // Batas atas kolom uang/kuantitas Decimal(18,2) di skema (16 digit sebelum koma).
 // Semua bidang "number" data induk adalah harga/kuantitas yang tidak boleh negatif.
@@ -54,6 +60,7 @@ async function catatBaganAkun(pengguna: PenggunaSesi, aksi: string, nomor: strin
 async function bacaData(config: KonfigurasiEntitas, dataFormulir: FormData, untukUbah: boolean) {
   const data: Record<string, unknown> = {};
   for (const bidang of config.bidang) {
+    if (bidang.virtual) continue; // ditangani terpisah oleh aksi server, bukan kolom Prisma sungguhan
     const mentah = dataFormulir.get(bidang.nama);
     const nilai = typeof mentah === "string" ? mentah.trim() : "";
     if (bidang.jenis === "boolean") {
@@ -93,10 +100,70 @@ async function bacaData(config: KonfigurasiEntitas, dataFormulir: FormData, untu
   return data;
 }
 
+/**
+ * Jumlah Awal di formulir Barang (bidang virtual, lihat konfigurasiDataInduk.ts): kalau diisi,
+ * barang dibuat SEKALIGUS dengan satu Penyesuaian Stok berjurnal, di transaksi yang sama, jadi
+ * barang baru langsung punya stok tanpa membuka formulir Penyesuaian Stok terpisah — TANPA
+ * memutus jejak audit (tetap berjurnal, tetap ikut alur persetujuan bila alur itu menyala).
+ * Mengembalikan true kalau ditangani di sini (barang sudah dibuat, pemanggil tidak perlu apa-apa lagi).
+ */
+async function buatBarangDenganJumlahAwal(pengguna: PenggunaSesi, data: Record<string, unknown>, dataFormulir: FormData): Promise<boolean> {
+  const jumlahAwalMentah = dataFormulir.get("jumlahAwal");
+  if (typeof jumlahAwalMentah !== "string" || !jumlahAwalMentah.trim()) return false;
+  const jumlahAwal = bacaUang(jumlahAwalMentah, "Jumlah Awal", { allowZero: true });
+  if (jumlahAwal.isZero()) return false;
+  if (data.jenis === "JASA") throw new Error("Jasa tidak punya stok; kosongkan Jumlah Awal");
+
+  const gudangAwalId = String(dataFormulir.get("gudangAwalId") ?? "");
+  const akunLawanAwalId = String(dataFormulir.get("akunLawanAwalId") ?? "");
+  if (!gudangAwalId) throw new Error("Gudang untuk Jumlah Awal wajib dipilih");
+  if (!akunLawanAwalId) throw new Error("Akun Lawan Jumlah Awal wajib dipilih (mis. Modal)");
+  await pastikanAkunRinci(db, [akunLawanAwalId]);
+
+  const hargaSatuan = (data.hargaBeli as Desimal | undefined) ?? D(0);
+  if (hargaSatuan.lte(0)) throw new Error("Isi Harga Beli lebih dulu untuk menghitung nilai Jumlah Awal");
+
+  const perluPersetujuan = await persetujuanWajib(db);
+  const nomor = await nomorDokumenBerikutnya(db.penyesuaianPersediaan, "PS");
+
+  await db.$transaction(async (tx) => {
+    const barang = await tx.barang.create({ data: data as Prisma.BarangCreateInput });
+    if (!perluPersetujuan) {
+      await tx.stokBarang.upsert({
+        where: { barangId_gudangId: { barangId: barang.id, gudangId: gudangAwalId } },
+        create: { barangId: barang.id, gudangId: gudangAwalId, jumlah: jumlahAwal },
+        update: { jumlah: jumlahAwal },
+      });
+      await perbaruiHargaRata(tx, barang.id, jumlahAwal, hargaSatuan, true);
+    }
+    const keterangan = `Jumlah awal saat barang ${barang.kode} dibuat`;
+    const penyesuaian = await tx.penyesuaianPersediaan.create({
+      data: {
+        nomor,
+        gudangId: gudangAwalId,
+        akunLawanId: akunLawanAwalId,
+        keterangan,
+        ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
+        baris: { create: [{ barangId: barang.id, jumlahSebelum: D(0), jumlahSesudah: jumlahAwal, hargaSatuan }] },
+      },
+    });
+    if (perluPersetujuan) return;
+    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId: akunLawanAwalId, keterangan }, [{ barangId: barang.id, selisih: jumlahAwal, hargaSatuan }]);
+    if (jurnal) await tx.penyesuaianPersediaan.update({ where: { id: penyesuaian.id }, data: { jurnalId: jurnal.id } });
+  });
+
+  revalidatePath("/persediaan");
+  revalidatePath("/persediaan/penyesuaian");
+  if (perluPersetujuan) revalidatePath("/persetujuan");
+  return true;
+}
+
 export async function buatDataInduk(slug: string, dataFormulir: FormData) {
   const { config, pengguna } = await konfigurasiDenganHak(slug);
   const data = await bacaData(config, dataFormulir, false);
-  await delegasi(config.model).create({ data });
+  if (slug !== "barang" || !(await buatBarangDenganJumlahAwal(pengguna, data, dataFormulir))) {
+    await delegasi(config.model).create({ data });
+  }
   if (slug === "akun") await catatBaganAkun(pengguna, "BUAT", String(data.kode ?? ""), `Akun ${String(data.kode ?? "")} — ${String(data.nama ?? "")} dibuat`);
   revalidatePath(`/data-induk/${slug}`);
 }

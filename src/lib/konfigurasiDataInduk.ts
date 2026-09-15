@@ -6,6 +6,10 @@ export type KonfigurasiBidang = {
   nilaiBawaan?: string;
   opsi?: { model: string; bidangNilai: string; bidangLabel: string; where?: Record<string, unknown> };
   opsiStatis?: string[];
+  /** Bukan kolom Prisma sungguhan pada model entitas ini; ditangani terpisah oleh aksi server (mis. jumlah awal stok Barang). */
+  virtual?: boolean;
+  /** Hanya tampil saat menambah data baru, disembunyikan saat mengubah data yang sudah ada. */
+  hanyaTambah?: boolean;
 };
 
 export type KonfigurasiEntitas = {
@@ -225,6 +229,27 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
         label: "Akun beban saat dibeli (JASA)",
         jenis: "select",
         opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama", where: { jenis: "BEBAN", kelompok: false } },
+      },
+      // Bukan kolom Barang sungguhan: ditangani khusus di buatDataInduk() (src/lib/aksi/dataInduk.ts),
+      // yang membuat Penyesuaian Stok berjurnal di baliknya, supaya barang baru bisa langsung punya
+      // stok tanpa membuka formulir Penyesuaian Stok terpisah, TANPA memutus jejak audit (tetap
+      // berjurnal, tetap ikut alur persetujuan bila alur itu menyala).
+      { nama: "jumlahAwal", label: "Jumlah Awal (opsional, stok masuk pertama)", jenis: "number", virtual: true, hanyaTambah: true },
+      {
+        nama: "gudangAwalId",
+        label: "Gudang untuk Jumlah Awal",
+        jenis: "select",
+        opsi: { model: "gudang", bidangNilai: "id", bidangLabel: "nama" },
+        virtual: true,
+        hanyaTambah: true,
+      },
+      {
+        nama: "akunLawanAwalId",
+        label: "Akun Lawan Jumlah Awal (mis. Modal)",
+        jenis: "select",
+        opsi: { model: "akun", bidangNilai: "id", bidangLabel: "nama", where: { kelompok: false } },
+        virtual: true,
+        hanyaTambah: true,
       },
     ],
     kolom: [

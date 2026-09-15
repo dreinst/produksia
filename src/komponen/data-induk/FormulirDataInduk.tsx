@@ -39,7 +39,7 @@ export default function FormulirDataInduk({
 
   return (
     <FormulirAksi aksi={aksi} className={className ?? "kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl"}>
-      {config.bidang.map((bidang) => {
+      {config.bidang.filter((bidang) => !(bidang.hanyaTambah && nilai)).map((bidang) => {
         const id = `${awalanId}-${bidang.nama}`;
         return (
           <div key={bidang.nama} className="bidang">

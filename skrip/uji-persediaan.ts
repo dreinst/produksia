@@ -4,6 +4,7 @@ process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
+import { buatDataInduk } from "../src/lib/aksi/dataInduk";
 import { buatPesanan, buatPengiriman, buatFaktur } from "../src/lib/aksi/penjualan";
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
 import { buatAsetTetap } from "../src/lib/aksi/asetTetap";
@@ -47,6 +48,37 @@ async function main() {
   const ps = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { gudangId: gudang.id }, include: { jurnal: true } });
   pastikan(ps.jurnal?.nomor.startsWith("JU-PS"), `penyesuaian terhubung ke jurnal ${ps.jurnal?.nomor}`);
   await pastikanSinkron("penyesuaian");
+
+  console.log("=== 1b. Barang baru langsung dengan Jumlah Awal (via formulir data induk Barang) ===");
+  await jalankan("buat barang baru + jumlah awal 5 @ 12.000", () =>
+    buatDataInduk(
+      "barang",
+      formulir({
+        kode: "BRG-AWAL", nama: "Barang Uji Jumlah Awal", jenis: "BARANG", hargaBeli: 12000, hargaJual: 20000,
+        jumlahAwal: 5, gudangAwalId: gudang.id, akunLawanAwalId: modal.id,
+      }),
+    ),
+  );
+  const barangAwal = await db.barang.findUniqueOrThrow({ where: { kode: "BRG-AWAL" } });
+  const stokAwal = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangAwal.id, gudangId: gudang.id } } });
+  pastikan(Number(stokAwal.jumlah) === 5, `stok barang baru langsung 5 (dapat ${Number(stokAwal.jumlah)})`);
+  const psAwal = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { baris: { some: { barangId: barangAwal.id } } }, include: { jurnal: { include: { baris: true } } } });
+  pastikan(psAwal.nomor.startsWith("PS") && !!psAwal.jurnalId, `barang baru menghasilkan Penyesuaian Stok berjurnal (${psAwal.nomor})`);
+  pastikan(
+    psAwal.jurnal!.baris.reduce((s, b) => s + Number(b.debit), 0) === 60000,
+    `jurnal jumlah awal seimbang 5 x 12.000 = 60.000 (${psAwal.jurnal!.baris.reduce((s, b) => s + Number(b.debit), 0)})`,
+  );
+  await pastikanSinkron("barang baru + jumlah awal");
+  await harusDitolak(
+    "barang baru JASA dengan jumlah awal ditolak",
+    () => buatDataInduk("barang", formulir({ kode: "JSA-AWAL", nama: "Jasa Uji Jumlah Awal", jenis: "JASA", hargaBeli: 1000, jumlahAwal: 5, gudangAwalId: gudang.id, akunLawanAwalId: modal.id })),
+    "tidak punya stok",
+  );
+
+  console.log("=== 1c. Barang baru TANPA Jumlah Awal tetap jalan seperti biasa, tanpa stok ===");
+  await jalankan("buat barang baru tanpa jumlah awal", () => buatDataInduk("barang", formulir({ kode: "BRG-KOSONG", nama: "Barang Uji Tanpa Awal", jenis: "BARANG", hargaBeli: 5000, hargaJual: 9000 })));
+  const barangKosong = await db.barang.findUniqueOrThrow({ where: { kode: "BRG-KOSONG" } });
+  pastikan((await db.stokBarang.count({ where: { barangId: barangKosong.id } })) === 0, "barang baru tanpa jumlah awal tidak punya baris stok");
 
   console.log("=== 2. Penjualan dengan baris JASA: surat jalan tidak menyentuh stok, faktur tanpa HPP untuk jasa ===");
   await jalankan("PSJ 4 barang @15.000 + 1 jasa @100.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: barang.id, jumlah: 4, harga: 15000 }, { barangId: jasa.id, jumlah: 1, harga: 100000 }] })));
@@ -123,7 +155,7 @@ async function main() {
   await db.barisPenyesuaianPersediaan.deleteMany({ where: { penyesuaian: { gudangId: gudang.id } } });
   await db.penyesuaianPersediaan.deleteMany({ where: { gudangId: gudang.id } });
   await db.stokBarang.deleteMany({ where: { gudangId: gudang.id } });
-  await db.barang.deleteMany({ where: { id: { in: [barang.id, jasa.id] } } });
+  await db.barang.deleteMany({ where: { id: { in: [barang.id, jasa.id, barangAwal.id, barangKosong.id] } } });
   await db.pelanggan.delete({ where: { id: pelanggan.id } });
   await db.pemasok.delete({ where: { id: pemasok.id } });
   await db.gudang.delete({ where: { id: gudang.id } });
