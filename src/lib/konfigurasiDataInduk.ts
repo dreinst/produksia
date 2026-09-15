@@ -188,8 +188,8 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     model: "barang",
     bagian: "persediaan",
     bidang: [
-      { nama: "kode", label: "Kode", jenis: "text", wajib: true },
-      { nama: "nama", label: "Nama", jenis: "text", wajib: true },
+      { nama: "kode", label: "Nama Barang", jenis: "text", wajib: true },
+      { nama: "nama", label: "Keterangan", jenis: "text", wajib: true },
       { nama: "jenis", label: "Tipe", jenis: "select", opsiStatis: ["BARANG", "JASA"], nilaiBawaan: "BARANG" },
       {
         nama: "kelompokId",
@@ -228,8 +228,8 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
       },
     ],
     kolom: [
-      { key: "kode", label: "Kode" },
-      { key: "nama", label: "Nama" },
+      { key: "kode", label: "Nama Barang" },
+      { key: "nama", label: "Keterangan" },
       { key: "jenis", label: "Tipe" },
       { key: "satuan", label: "Satuan" },
       { key: "hargaJual", label: "Harga Jual" },
