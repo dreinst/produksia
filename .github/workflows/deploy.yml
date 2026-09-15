@@ -1,6 +1,8 @@
 name: Deploy
 
-# Berjalan otomatis setelah workflow CI di cabang main sukses, atau manual lewat tombol "Run workflow".
+# Terpicu otomatis setelah workflow CI di cabang main sukses, atau manual lewat tombol "Run workflow",
+# TAPI job-nya menunggu persetujuan manual dulu (environment "produksi", lihat di bawah) sebelum
+# benar-benar menyentuh server. Kelola/hapus reviewer di Settings → Environments → produksi.
 # Rahasia yang dibutuhkan (Settings → Secrets and variables → Actions):
 #   VPS_HOST     : alamat IP / nama host server
 #   VPS_SSH_KEY  : kunci privat OpenSSH (ed25519) yang kunci publiknya ada di /srv/produksia/.ssh/authorized_keys
@@ -26,6 +28,10 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Gerbang persetujuan manual: environment "produksi" (Settings → Environments) mewajibkan
+    # reviewer menyetujui run ini sebelum job benar-benar jalan, walau CI sukses otomatis
+    # memicu workflow ini. Kelola daftar reviewer di Settings → Environments → produksi.
+    environment: produksi
     steps:
       - name: Siapkan kunci SSH
         env:
