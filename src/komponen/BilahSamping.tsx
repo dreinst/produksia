@@ -406,7 +406,7 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
         </details>
 
         {/* Menu */}
-        <div className="px-3 py-1 flex-1 overflow-y-auto">
+        <div className="px-3 py-1 flex-1 overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: "touch" }}>
           <AkordeonNavigasi key={pathname} pengguna={pengguna} pathname={pathname} saatNavigasi={saatTutup} />
         </div>
 

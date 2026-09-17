@@ -43,7 +43,10 @@ body {
   font-size: 14px;
   line-height: 20px;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
+  /* "none" di body mematikan scroll elemen overflow-y-auto bersarang (mis. daftar menu sidebar
+     yang fixed) di WebKit/iOS (Safari & Chrome iOS sama-sama pakai WebKit). "contain" tetap
+     mencegah bounce/pull-to-refresh menembus ke halaman tanpa bug itu. */
+  overscroll-behavior-y: contain;
 }
 
 ::-webkit-scrollbar {
