@@ -9,6 +9,7 @@ import { bacaParamDaftar } from "@/lib/daftar";
 import { buatDataIndukFormulir, hapusDataIndukFormulir } from "@/lib/aksi/dataInduk";
 import { wajibHak } from "@/lib/otentikasi";
 import { hakDataInduk, punyaHak } from "@/lib/hakAkses";
+import { db } from "@/lib/db";
 
 export default async function HalamanDataInduk({
   params,
@@ -34,6 +35,18 @@ export default async function HalamanDataInduk({
   ]);
   const daftarOpsi = bolehTulis ? await ambilDaftarOpsi(config) : {};
 
+  // Barang & Jasa: tambahan kolom "Stok" (total lintas gudang) di luar sistem kolom generik,
+  // karena nilainya hasil agregasi StokBarang, bukan bidang Barang langsung.
+  let stokPerBarang: Map<string, number> | null = null;
+  if (entitas === "barang" && daftar.length > 0) {
+    const agregat = await db.stokBarang.groupBy({
+      by: ["barangId"],
+      where: { barangId: { in: daftar.map((b) => String(b.id)) } },
+      _sum: { jumlah: true },
+    });
+    stokPerBarang = new Map(agregat.map((a) => [a.barangId, Number(a._sum.jumlah ?? 0)]));
+  }
+
   return (
     <div className="space-y-8">
       <h1 className="judul-halaman">{config.label}</h1>
@@ -58,6 +71,7 @@ export default async function HalamanDataInduk({
                     {kolom.label}
                   </th>
                 ))}
+                {stokPerBarang && <th className="text-right">Stok</th>}
                 <th className="th-lekat" />
               </tr>
             </thead>
@@ -73,6 +87,11 @@ export default async function HalamanDataInduk({
                       </td>
                     );
                   })}
+                  {stokPerBarang && (
+                    <td className="text-right angka">
+                      {rekaman.jenis === "JASA" ? "–" : (stokPerBarang.get(String(rekaman.id)) ?? 0).toLocaleString("id-ID")}
+                    </td>
+                  )}
                   <td className="whitespace-nowrap text-right td-lekat">
                     {bolehTulis ? (
                       <div className="inline-flex items-center gap-3">
@@ -97,7 +116,7 @@ export default async function HalamanDataInduk({
               ))}
               {daftar.length === 0 && (
                 <tr>
-                  <td colSpan={config.kolom.length + 1} className="kosong">
+                  <td colSpan={config.kolom.length + (stokPerBarang ? 2 : 1)} className="kosong">
                     {param.q ? "Tidak ada data yang cocok." : "Belum ada data."}
                   </td>
                 </tr>
