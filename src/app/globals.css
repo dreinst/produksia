@@ -29,11 +29,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /* Jaring pengaman lebar mobile: kalau ada elemen anak (mis. tabel lebar di dalam grid/flex tanpa
-     min-width:0) mencoba memaksa lebih lebar dari layar, potong di sini alih-alih membuat SELURUH
-     halaman perlu di-zoom-out. Elemen yang memang perlu digeser (tabel di .bungkus-tabel) tetap bisa
-     digeser di dalam kotaknya sendiri karena sudah overflow-x:auto sendiri. */
-  overflow-x: hidden;
 }
 
 body {
@@ -43,6 +38,14 @@ body {
   font-size: 14px;
   line-height: 20px;
   -webkit-font-smoothing: antialiased;
+  /* Jaring pengaman lebar mobile: kalau ada elemen anak (mis. tabel lebar di dalam grid/flex tanpa
+     min-width:0) mencoba memaksa lebih lebar dari layar, potong di sini alih-alih membuat SELURUH
+     halaman perlu di-zoom-out. Elemen yang memang perlu digeser (tabel di .bungkus-tabel) tetap bisa
+     digeser di dalam kotaknya sendiri karena sudah overflow-x:auto sendiri.
+     HANYA di body, bukan html: overflow-x non-visible di html membuat browser otomatis mengubah
+     overflow-y-nya jadi auto juga, sehingga html DAN body sama-sama jadi kotak scroll terpisah
+     (dua scroller bertumpuk) -> scroll trackpad/mouse jadi macet-macet, cuma scrollbar asli yang jalan. */
+  overflow-x: hidden;
   /* "none" di body mematikan scroll elemen overflow-y-auto bersarang (mis. daftar menu sidebar
      yang fixed) di WebKit/iOS (Safari & Chrome iOS sama-sama pakai WebKit). "contain" tetap
      mencegah bounce/pull-to-refresh menembus ke halaman tanpa bug itu. */
