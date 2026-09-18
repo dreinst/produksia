@@ -365,6 +365,40 @@ export type EnumStatusAsetWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumStatusAsetFilter<$PrismaModel>
 }
 
+export type EnumTahapFotoNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapFoto | Prisma.EnumTahapFotoFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTahapFotoNullableFilter<$PrismaModel> | $Enums.TahapFoto | null
+}
+
+export type BytesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
+}
+
+export type EnumTahapFotoNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapFoto | Prisma.EnumTahapFotoFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTahapFotoNullableWithAggregatesFilter<$PrismaModel> | $Enums.TahapFoto | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTahapFotoNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTahapFotoNullableFilter<$PrismaModel>
+}
+
+export type BytesWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesFilter<$PrismaModel>
+}
+
 export type IntNullableFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
@@ -754,6 +788,40 @@ export type NestedEnumStatusAsetWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStatusAsetFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStatusAsetFilter<$PrismaModel>
+}
+
+export type NestedEnumTahapFotoNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapFoto | Prisma.EnumTahapFotoFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTahapFotoNullableFilter<$PrismaModel> | $Enums.TahapFoto | null
+}
+
+export type NestedBytesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
+}
+
+export type NestedEnumTahapFotoNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TahapFoto | Prisma.EnumTahapFotoFieldRefInput<$PrismaModel> | null
+  in?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.TahapFoto[] | Prisma.ListEnumTahapFotoFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumTahapFotoNullableWithAggregatesFilter<$PrismaModel> | $Enums.TahapFoto | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTahapFotoNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTahapFotoNullableFilter<$PrismaModel>
+}
+
+export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesFilter<$PrismaModel>
 }
 
 export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {

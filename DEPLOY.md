@@ -120,14 +120,14 @@ TRUSTED_IPS="IP.mac.anda" bash deploy/docker/firewall.sh   # ufw + ufw-docker: h
 
 Host basis data di URL memakai nama DNS `produksia.<IP>.sslip.io` (ada di SAN sertifikat), bukan IP, karena driver `pg` hanya memverifikasi sertifikat dengan benar untuk host bernama. Punya domain sendiri? Jalankan ulang dengan `DB_HOST_PUBLIK=db.domain.id` (sebelum sertifikat dibuat, atau hapus `/data/produksia/pgbouncer/tls` dulu).
 
-`pasang-pgbouncer.sh` menulis semua nilai lingkungan untuk Vercel ke `/data/produksia/vercel-env.txt` (hanya root): `DATABASE_URL` (pool transaksi, tanpa `sslmode` karena TLS dipasang lewat `DB_SSL_CA`), `DATABASE_URL_MIGRASI` (basis data `produksia_migrasi`, mode session, dipakai `prisma migrate deploy` saat build), `DB_POOL_MAX=3`, `ZONA_WAKTU`, dan `DB_SSL_CA` (sertifikat server PgBouncer; aplikasi memverifikasi TLS secara ketat terhadap sertifikat ini, lihat `src/lib/db.ts`).
+`pasang-pgbouncer.sh` menulis semua nilai lingkungan untuk Vercel ke `/data/produksia/vercel-env.txt` (hanya root): `DATABASE_URL` (pool transaksi, tanpa `sslmode` karena TLS dipasang lewat `DB_SSL_CA`), `DATABASE_URL_MIGRASI` (basis data `produksia_migrasi`, mode session; dulu dipakai `prisma migrate deploy` saat build, sekarang migrasi dijalankan dari VPS, lihat bagian 9), `DB_POOL_MAX=3`, `ZONA_WAKTU`, dan `DB_SSL_CA` (sertifikat server PgBouncer; aplikasi memverifikasi TLS secara ketat terhadap sertifikat ini, lihat `src/lib/db.ts`).
 
 ### Di Vercel (sekali)
 
 1. Vercel → Add New Project → impor repo GitHub `dreinst/produksia`. Framework Next.js terdeteksi; `vercel.json` sudah menetapkan region `sin1`. Node 22 diambil dari `engines` di `package.json`.
 2. Environment Variables (centang hanya **Production**): salin isi `/data/produksia/vercel-env.txt` baris per baris. Untuk `DB_SSL_CA` tempel apa adanya (berisi `\n`; kode mengembalikannya menjadi baris baru).
-3. Deploy. Saat build, `prebuild` menjalankan `prisma migrate deploy` lewat `DATABASE_URL_MIGRASI`, lalu `next build`.
-4. Settings → Git: matikan deploy otomatis untuk cabang selain `main` (Preview) supaya build pratinjau tidak menjalankan migrasi ke basis data produksi, atau beri Preview basis data terpisah.
+3. Deploy. Saat build, `prebuild` hanya menjalankan `prisma generate`, lalu `next build`; migrasi dijalankan terpisah dari VPS (bagian 9).
+4. Settings → Git: matikan deploy otomatis untuk cabang selain `main` (Preview) supaya pratinjau tidak memakai basis data produksi, atau beri Preview basis data terpisah.
 5. Domain: tambahkan domain di Vercel dan arahkan DNS-nya (CNAME ke `cname.vercel-dns.com`).
 
 Setelah Vercel hidup, kontainer `app` di VPS tidak diperlukan lagi: `docker compose --env-file .env.docker stop app` (basis data dan PgBouncer tetap jalan). Menjalankannya kembali kapan saja dengan `up -d app`.
@@ -157,4 +157,24 @@ bash deploy/docker/unban.sh daftar        # daftar semua IP yang diblokir
 
 Alat menampilkan jumlah percobaan gagal, contoh barisnya, dan pemilik IP, supaya Anda membedakan karyawan (sedikit gagal, lokasi wajar) dari peretas (ratusan percobaan, IP asing) sebelum membuka. Sengaja tidak ada tombol unban di web app: memberi aplikasi Vercel kendali firewall VPS justru berbahaya bila app diretas.
 
-> **Penting build Vercel:** build Vercel HANYA menjalankan `prisma generate` (lihat skrip `prebuild`/`siapkan`), TIDAK menjalankan `prisma migrate deploy` — supaya build tak bergantung koneksi DB. Migrasi ke DB produksi dijalankan terpisah: dari VPS `cd /data/produksia/app && docker compose --env-file .env.docker run --rm --build migrasi`, atau dari mesin lain `npm run migrasi` dengan `DATABASE_URL` produksi. Jalankan ini setiap kali ada migrasi baru SEBELUM/也 saat rilis.
+> **Penting build Vercel:** build Vercel HANYA menjalankan `prisma generate` (lihat skrip `prebuild`/`siapkan`), TIDAK menjalankan `prisma migrate deploy`, supaya build tak bergantung koneksi DB. Migrasi ke DB produksi dijalankan terpisah: dari VPS `cd /data/produksia/app && docker compose --env-file .env.docker run --rm --build migrasi`, atau dari mesin lain `npm run migrasi` dengan `DATABASE_URL` produksi. Jalankan ini setiap kali ada migrasi baru SEBELUM rilis (urutan lengkap di bagian 9).
+
+## 9. Urutan rilis (jalur C)
+
+Kode baru sering butuh tabel atau kolom baru. Karena build Vercel tidak memigrasi, urutannya harus: basis data dulu, aplikasi belakangan. Kalau dibalik, aplikasi baru sudah hidup sementara tabelnya belum ada dan halaman terkait gagal.
+
+1. Di VPS, cek migrasi yang belum diterapkan lalu jalankan:
+   ```bash
+   cd /data/produksia/app && git pull
+   docker compose --env-file .env.docker run --rm --build migrasi
+   ```
+   Migrasi Prisma bersifat tambah (tabel/kolom baru), jadi aplikasi versi lama tetap jalan di antara langkah 1 dan 2.
+2. Push ke `main` (atau deploy manual) supaya Vercel membangun aplikasi baru.
+3. Buka halaman yang menyentuh tabel baru dan `/api/sehat`.
+
+Catatan rilis Peminjaman Barang (migrasi `20260918095546_warna_foto_peminjaman`):
+
+- Migrasinya menambah tabel `Foto`, `PeminjamanBarang`, `BarisPeminjamanBarang`, kolom `Barang.warna`, dan constraint `CHECK ("jumlahKembali" <= "jumlah")` yang ditulis manual di berkas migrasi. Pastikan berkas migrasi yang sampai di VPS sama dengan yang di repo (jangan `prisma migrate dev` di server).
+- `next.config.ts` menaikkan `experimental.serverActions.bodySizeLimit` ke `3mb` karena formulir peminjaman mengirim sampai 3 foto HP terkompresi (maks 1 MB per foto). Batas badan permintaan Vercel sekitar 4,5 MB, jadi jangan menaikkannya lebih jauh tanpa mengecilkan batas foto. Di jalur A/B, Caddy dan Traefik bawaan tidak membatasi ukuran badan, jadi tidak ada pengaturan tambahan.
+- Foto disimpan sebagai `Bytes` di PostgreSQL (tidak ada disk di Vercel, tidak ada volume aplikasi di kontainer). Setiap foto terkompresi sekitar 200 KB; perkiraan PRD: sekitar 75 MB sekali untuk foto barang (100 barang × 3 foto) ditambah 10 sampai 15 MB per bulan untuk foto bukti, jadi basis data dan berkas backup akan tumbuh jauh lebih cepat dari sebelumnya. Pantau ukuran dump di log `backup.sh` (baris `backup: ... (ukuran)`) dan ruang di `/data/produksia/app/backup`; bila mulai ratusan MB, kurangi jumlah hari simpan di `backup.sh` atau pindahkan salinan ke `RCLONE_REMOTE`. Ukuran tabel foto bisa dicek dengan `SELECT pg_size_pretty(pg_total_relation_size('"Foto"'));`.
+- Zona waktu: Vercel menjalankan fungsi di UTC dan mengabaikan env `TZ`. Tampilan waktu keluar/kembali memakai `ZONA_WAKTU` (sudah ada di `vercel-env.txt`, bawaan `Asia/Jakarta`), jadi tidak perlu variabel baru. Di jalur A/B `TZ` dan `ZONA_WAKTU` diisi keduanya (`docker-compose.yml`, `.env`), dan nilainya harus sama.

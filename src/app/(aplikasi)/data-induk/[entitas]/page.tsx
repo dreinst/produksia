@@ -38,13 +38,15 @@ export default async function HalamanDataInduk({
   // Barang & Jasa: tambahan kolom "Stok" (total lintas gudang) di luar sistem kolom generik,
   // karena nilainya hasil agregasi StokBarang, bukan bidang Barang langsung.
   let stokPerBarang: Map<string, number> | null = null;
+  let fotoPerBarang: Map<string, number> | null = null;
   if (entitas === "barang" && daftar.length > 0) {
-    const agregat = await db.stokBarang.groupBy({
-      by: ["barangId"],
-      where: { barangId: { in: daftar.map((b) => String(b.id)) } },
-      _sum: { jumlah: true },
-    });
+    const idBarang = daftar.map((b) => String(b.id));
+    const [agregat, agregatFoto] = await Promise.all([
+      db.stokBarang.groupBy({ by: ["barangId"], where: { barangId: { in: idBarang } }, _sum: { jumlah: true } }),
+      db.foto.groupBy({ by: ["barangId"], where: { barangId: { in: idBarang } }, _count: { _all: true } }),
+    ]);
     stokPerBarang = new Map(agregat.map((a) => [a.barangId, Number(a._sum.jumlah ?? 0)]));
+    fotoPerBarang = new Map(agregatFoto.map((a) => [String(a.barangId), a._count._all]));
   }
 
   return (
@@ -72,6 +74,7 @@ export default async function HalamanDataInduk({
                   </th>
                 ))}
                 {stokPerBarang && <th className="text-right">Stok</th>}
+                {stokPerBarang && <th>Foto</th>}
                 <th className="th-lekat" />
               </tr>
             </thead>
@@ -89,7 +92,24 @@ export default async function HalamanDataInduk({
                   })}
                   {stokPerBarang && (
                     <td className="text-right angka">
-                      {rekaman.jenis === "JASA" ? "–" : (stokPerBarang.get(String(rekaman.id)) ?? 0).toLocaleString("id-ID")}
+                      {rekaman.jenis === "JASA" ? "-" : (stokPerBarang.get(String(rekaman.id)) ?? 0).toLocaleString("id-ID")}
+                    </td>
+                  )}
+                  {stokPerBarang && (
+                    <td className="whitespace-nowrap">
+                      {rekaman.jenis === "JASA" ? (
+                        "-"
+                      ) : (fotoPerBarang?.get(String(rekaman.id)) ?? 0) > 0 ? (
+                        <Link href={`/data-induk/barang/${rekaman.id}#foto`} className="tombol-tautan">
+                          {fotoPerBarang?.get(String(rekaman.id))} foto
+                        </Link>
+                      ) : bolehTulis ? (
+                        <Link href={`/data-induk/barang/${rekaman.id}#foto`} className="tombol-tautan">
+                          Unggah
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                   )}
                   <td className="whitespace-nowrap text-right td-lekat">
@@ -116,7 +136,7 @@ export default async function HalamanDataInduk({
               ))}
               {daftar.length === 0 && (
                 <tr>
-                  <td colSpan={config.kolom.length + (stokPerBarang ? 2 : 1)} className="kosong">
+                  <td colSpan={config.kolom.length + (stokPerBarang ? 3 : 1)} className="kosong">
                     {param.q ? "Tidak ada data yang cocok." : "Belum ada data."}
                   </td>
                 </tr>

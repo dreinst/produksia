@@ -37,6 +37,7 @@ export const DOKUMEN_HAK = [
   { kode: "pph-final", label: "PPh Final Bulanan", modul: "buku-besar", aksi: ["buat", "setujui", "hapus"] },
   { kode: "penyesuaian", label: "Penyesuaian Stok", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "pindah-barang", label: "Pindah Barang", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "peminjaman", label: "Peminjaman Barang", modul: "persediaan", aksi: ["lihat", "buat", "hapus"] },
   { kode: "aset", label: "Aset Tetap", modul: "aset-tetap", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "penyusutan", label: "Penyusutan Aset", modul: "aset-tetap", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "pelepasan-aset", label: "Pelepasan Aset (jual/hapus buku)", modul: "aset-tetap", aksi: ["buat", "setujui", "hapus"] },
@@ -156,6 +157,8 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     ...hakDok("penerimaan-barang", "lihat", "buat"),
     ...hakDok("penyesuaian", "lihat", "buat"),
     ...hakDok("pindah-barang", "lihat", "buat"),
+    // Peminjaman barang (loading out/in) tidak menggerakkan stok, jadi tanpa alur persetujuan
+    ...hakDok("peminjaman", "lihat", "buat"),
     // Data induk yang boleh Gudang kelola sendiri (Barang & Jasa, Kategori Barang, Gudang/lokasi),
     // TERPISAH dari data induk komersial (Pelanggan, Pemasok, Bagan Akun, Proyek) yang tetap
     // urusan Admin. Lihat & ubah, bukan cuma lihat, karena Gudang perlu menambah barang baru sendiri.
@@ -188,7 +191,7 @@ export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
   KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, plus kelola Barang/Kategori Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
+  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, peminjaman barang (loading out/in), plus kelola Barang/Kategori Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };

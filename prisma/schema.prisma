@@ -80,6 +80,12 @@ enum JenisDokumenKas {
   KELUAR
 }
 
+/// Tahap foto bukti pada Peminjaman Barang: saat barang keluar (loading out) atau kembali (loading in)
+enum TahapFoto {
+  KELUAR
+  KEMBALI
+}
+
 // ---------- Pengguna ----------
 
 model Pengguna {
@@ -162,6 +168,7 @@ model Pengguna {
   ajukanDokumenKas             DokumenKas[]            @relation("AjukanDokumenKas")
   setujuiDokumenKas            DokumenKas[]            @relation("SetujuiDokumenKas")
   tolakDokumenKas              DokumenKas[]            @relation("TolakDokumenKas")
+  catatPeminjamanBarang        PeminjamanBarang[]      @relation("CatatPeminjamanBarang")
 }
 
 /// Sesi login berbasis basis data: cookie hanya menyimpan token acak, yang disimpan di sini dalam bentuk hash.
@@ -326,6 +333,7 @@ model Proyek {
   jurnal           Jurnal[]
   penggajian       Penggajian[]
   dokumenKas       DokumenKas[]
+  peminjaman       PeminjamanBarang[]
 
   @@index([pelangganId])
 }
@@ -344,6 +352,7 @@ model Gudang {
   penyesuaian      PenyesuaianPersediaan[]
   pindahAsal       PindahBarang[]          @relation("GudangAsalPindah")
   pindahTujuan     PindahBarang[]          @relation("GudangTujuanPindah")
+  peminjaman       PeminjamanBarang[]
 }
 
 model KelompokBarang {
@@ -365,6 +374,7 @@ model Barang {
   kelompokId   String?
   kelompok     KelompokBarang? @relation(fields: [kelompokId], references: [id])
   satuan       String          @default("pcs")
+  warna        String?
   hargaBeli    Decimal         @default(0) @db.Decimal(18, 2)
   hargaJual    Decimal         @default(0) @db.Decimal(18, 2)
   /// Batas bawah harga saat nego dengan klien (0 = tanpa batas)
@@ -395,6 +405,8 @@ model Barang {
   akunBeban        Akun?                        @relation("AkunBebanBarang", fields: [akunBebanId], references: [id])
   barisPenyesuaian BarisPenyesuaianPersediaan[]
   barisPindah      BarisPindahBarang[]
+  barisPeminjaman  BarisPeminjamanBarang[]
+  foto             Foto[]
 
   @@index([kelompokId])
   @@index([akunPendapatanId])
@@ -1454,6 +1466,8 @@ model PenyesuaianPersediaan {
   ditolakOleh       Pengguna?                    @relation("TolakPenyesuaianPersediaan", fields: [ditolakOlehId], references: [id])
   ditolakPada       DateTime?
   catatanPenolakan  String?
+  /// Peminjaman Barang berselisih (hilang/rusak) yang diselesaikan lewat penyesuaian ini
+  peminjaman        PeminjamanBarang[]
 
   @@index([gudangId])
   @@index([akunLawanId])
@@ -1472,6 +1486,74 @@ model BarisPenyesuaianPersediaan {
   hargaSatuan   Decimal               @db.Decimal(18, 2)
 
   @@index([penyesuaianId])
+  @@index([barangId])
+}
+
+// ---------- Peminjaman Barang (loading out / loading in) ----------
+
+/// Foto disimpan di basis data (Bytes) karena Vercel & Docker VPS tidak punya disk tetap.
+/// barangId = foto barang (galeri di data induk); peminjamanId + tahap = foto bukti keluar/kembali.
+model Foto {
+  id           String            @id @default(cuid())
+  barangId     String?
+  barang       Barang?           @relation(fields: [barangId], references: [id], onDelete: Cascade)
+  peminjamanId String?
+  peminjaman   PeminjamanBarang? @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
+  tahap        TahapFoto?
+  urutan       Int               @default(0)
+  tipe         String
+  ukuran       Int
+  isi          Bytes
+  dibuatPada   DateTime          @default(now())
+
+  @@index([barangId])
+  @@index([peminjamanId])
+}
+
+/// Barang keluar gudang untuk event lalu kembali. TIDAK menyentuh StokBarang maupun jurnal;
+/// "sedang di luar" dihitung dari baris (jumlah - jumlahKembali), lihat src/lib/peminjaman.ts.
+/// Status turunan: TERBUKA (ditutupPada null), SELESAI, SELISIH (sisa > 0), DISESUAIKAN (penyesuaianId terisi).
+model PeminjamanBarang {
+  id              String                 @id @default(cuid())
+  nomor           String                 @unique
+  gudangId        String
+  gudang          Gudang                 @relation(fields: [gudangId], references: [id])
+  proyekId        String?
+  proyek          Proyek?                @relation(fields: [proyekId], references: [id])
+  /// Teks bebas: kru lapangan yang mengambil barang belum tentu punya akun
+  namaPengambil   String
+  keterangan      String?
+  waktuKeluar     DateTime               @default(now())
+  rencanaKembali  DateTime?
+  ditutupPada     DateTime?
+  catatanKembali  String?
+  penyesuaianId   String?
+  penyesuaian     PenyesuaianPersediaan? @relation(fields: [penyesuaianId], references: [id])
+  dicatatOlehId   String?
+  dicatatOleh     Pengguna?              @relation("CatatPeminjamanBarang", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
+  dicatatOlehNama String
+
+  baris BarisPeminjamanBarang[]
+  foto  Foto[]
+
+  @@index([gudangId])
+  @@index([proyekId])
+  @@index([penyesuaianId])
+  @@index([ditutupPada])
+  @@index([dicatatOlehId])
+}
+
+model BarisPeminjamanBarang {
+  id            String           @id @default(cuid())
+  peminjamanId  String
+  peminjaman    PeminjamanBarang @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
+  barangId      String
+  barang        Barang           @relation(fields: [barangId], references: [id])
+  jumlah        Decimal          @db.Decimal(18, 2)
+  /// Akumulasi yang sudah kembali (boleh bertahap); CHECK DB: jumlahKembali <= jumlah
+  jumlahKembali Decimal          @default(0) @db.Decimal(18, 2)
+
+  @@unique([peminjamanId, barangId])
   @@index([barangId])
 }
 

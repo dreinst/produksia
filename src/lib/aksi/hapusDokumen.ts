@@ -36,6 +36,7 @@ export type JenisDokumen =
   | "dokumenKas"
   | "penyesuaian"
   | "pindahBarang"
+  | "peminjamanBarang"
   | "pphFinal"
   | "prive"
   | "aset"
@@ -60,6 +61,7 @@ const LABEL: Record<JenisDokumen, string> = {
   dokumenKas: "Kas Masuk / Kas Keluar",
   penyesuaian: "Penyesuaian Stok",
   pindahBarang: "Pindah Barang",
+  peminjamanBarang: "Peminjaman Barang",
   pphFinal: "PPh Final Bulanan",
   prive: "Prive",
   aset: "Aset Tetap",
@@ -85,6 +87,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   dokumenKas: ["/kas-bank/masuk", "/kas-bank/keluar", "/buku-besar/jurnal", "/persetujuan"],
   penyesuaian: ["/persediaan/penyesuaian", "/persediaan"],
   pindahBarang: ["/persediaan/pindah", "/persediaan"],
+  peminjamanBarang: ["/persediaan", "/persediaan/peminjaman"],
   pphFinal: ["/buku-besar/pajak", "/buku-besar/jurnal"],
   prive: ["/kas-bank/prive", "/laporan/prive", "/buku-besar/jurnal"],
   aset: ["/aset-tetap"],
@@ -150,6 +153,7 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal" | "dokumenKas">, Hak> = {
   returPembelian: "retur-pembelian.hapus",
   penyesuaian: "penyesuaian.hapus",
   pindahBarang: "pindah-barang.hapus",
+  peminjamanBarang: "peminjaman.hapus",
   pphFinal: "pph-final.hapus",
   prive: "prive.hapus",
   aset: "aset.hapus",
@@ -412,6 +416,15 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await tx.barisPindahBarang.deleteMany({ where: { pindahId: id } });
         await tx.pindahBarang.delete({ where: { id } });
         await catatLog(tx, pengguna, jenis, d.nomor, "Stok dikembalikan ke gudang asal");
+        return;
+      }
+      case "peminjamanBarang": {
+        // Peminjaman tidak menyentuh stok/jurnal, jadi tidak ada yang dibalik; baris & foto ikut terhapus (cascade)
+        const d = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: { include: { barang: { select: { kode: true } } } }, penyesuaian: { select: { nomor: true } } } });
+        if (d.penyesuaian) throw new Error(`${d.nomor} sudah ditautkan ke ${d.penyesuaian.nomor}; hapus penyesuaian itu dulu bila memang salah`);
+        await tx.peminjamanBarang.delete({ where: { id } });
+        const ringkasBaris = d.baris.map((b) => `${b.barang.kode} ${b.jumlah} (kembali ${b.jumlahKembali})`).join(", ");
+        await catatLog(tx, pengguna, jenis, d.nomor, `Pengambil ${d.namaPengambil}; ${ringkasBaris}`);
         return;
       }
       case "pphFinal": {

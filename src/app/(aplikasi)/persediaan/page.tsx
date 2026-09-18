@@ -4,6 +4,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { periksaSinkron } from "@/lib/sinkron";
+import { petaSedangDiLuar } from "@/lib/peminjaman";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import Ikon from "@/komponen/ui/Ikon";
@@ -14,11 +15,12 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
   const where = param.q
     ? { barang: { OR: [{ kode: cocokTeks(param.q) }, { nama: cocokTeks(param.q) }] } }
     : undefined;
-  const [total, daftarStok, semuaStok, sinkron] = await Promise.all([
+  const [total, daftarStok, semuaStok, sinkron, petaDiLuar] = await Promise.all([
     db.stokBarang.count({ where }),
     db.stokBarang.findMany({ where, include: { barang: true, gudang: true }, orderBy: [{ barang: { kode: "asc" } }, { gudang: { kode: "asc" } }], skip: param.lewati, take: param.ambil }),
     db.stokBarang.findMany({ include: { barang: { select: { hargaBeli: true, jenis: true } } } }),
     periksaSinkron(db),
+    petaSedangDiLuar(db),
   ]);
   const nilaiSeluruh = semuaStok.filter((s) => s.barang.jenis === "BARANG").reduce((t, s) => t + Number(s.jumlah) * Number(s.barang.hargaBeli), 0);
 
@@ -75,6 +77,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
                 <th>Barang</th>
                 <th>Gudang</th>
                 <th className="text-right">Jumlah</th>
+                <th className="text-right">Di lokasi</th>
                 <th>Satuan</th>
                 <th className="text-right">Harga pokok</th>
                 <th className="text-right">Harga jual</th>
@@ -86,6 +89,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
             <tbody>
               {daftarStok.map((s) => {
                 const jumlah = Number(s.jumlah);
+                const diLuar = petaDiLuar.get(`${s.gudangId}:${s.barangId}`) ?? 0;
                 const minimum = Number(s.barang.stokMinimum);
                 const nilai = jumlah * Number(s.barang.hargaBeli);
                 const hargaPokok = Number(s.barang.hargaBeli);
@@ -99,6 +103,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
                     <td className="font-medium text-slate-900">{s.barang.nama}</td>
                     <td className="text-slate-500">{s.gudang.nama}</td>
                     <td className="text-right angka font-semibold">{jumlah.toLocaleString("id-ID")}</td>
+                    <td className={`text-right angka ${diLuar > 0 ? "text-amber-700 font-semibold" : "text-slate-500"}`} title={diLuar > 0 ? `Sedang di luar ${diLuar.toLocaleString("id-ID")}` : undefined}>{(jumlah - diLuar).toLocaleString("id-ID")}</td>
                     <td className="text-slate-500">{s.barang.satuan}</td>
                     <td className="text-right angka">{hargaPokok.toLocaleString("id-ID")}</td>
                     <td className="text-right angka">
@@ -124,7 +129,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
               })}
               {daftarStok.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="kosong">
+                  <td colSpan={11} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada stok. Isi saldo awal lewat Penyesuaian Stok."}
                   </td>
                 </tr>

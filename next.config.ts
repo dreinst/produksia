@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
   // `next build` juga menghasilkan .next/standalone (server.js + dependensi minimum) untuk Docker/VPS;
   // di Vercel tidak diperlukan (Vercel memakai keluaran bawaannya sendiri)
   ...(process.env.VERCEL ? {} : { output: "standalone" as const }),
+  // Formulir Peminjaman Barang mengirim sampai 3 foto HP yang sudah dikompresi di klien (maks 1 MB per foto);
+  // bawaan 1 MB terlalu kecil, sedangkan batas badan permintaan Vercel sekitar 4,5 MB.
+  experimental: { serverActions: { bodySizeLimit: "3mb" } },
   async headers() {
     return [{ source: "/:path*", headers: headerKeamanan }];
   },

@@ -36,6 +36,9 @@ function pesanRamah(galat: unknown): string {
   if (e?.message?.includes("StokBarang_jumlah_tidak_negatif")) {
     return "Stok tidak cukup. Muat ulang halaman lalu coba lagi.";
   }
+  if (e?.message?.includes("BarisPeminjamanBarang_kembali_tidak_melebihi")) {
+    return "Jumlah kembali melebihi yang dibawa keluar. Muat ulang halaman lalu coba lagi.";
+  }
   // Galat internal tak terduga hanya dicatat di server (console.error di jalankanFormulir),
   // klien cukup dapat pesan generik supaya detail internal tidak bocor.
   if (galatInternalTakTerduga(galat)) return "Terjadi kesalahan. Coba lagi.";

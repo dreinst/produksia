@@ -86,6 +86,16 @@ Tiga hal berikut diatur di dokumen terpisah, [DOKUMENTASI-PERSETUJUAN-KURS-BACKU
 - Multi mata uang. Rupiah adalah mata uang fungsional (buku besar selalu rupiah); mata uang asing melekat pada dokumen dan saldo piutang/hutangnya, dengan kurs yang disimpan per dokumen dan penilaian kembali akhir periode ke akun 5-8530 Selisih Kurs.
 - Cadangan basis data lokal beserta uji pulihnya (`skrip/cadangkan-basis-data.sh`, `skrip/pulihkan-basis-data.sh`, `skrip/verifikasi-cadangan.sh`).
 
+## 8c. Peminjaman barang (loading out / loading in)
+
+Barang inventaris yang dibawa kru ke lokasi event dicatat sebagai dokumen Peminjaman Barang (PJ) di Persediaan. Ini pencatatan custody (siapa membawa apa, ke event mana, kapan harus kembali), bukan transaksi akuntansi:
+
+- Tidak ada jurnal dan stok di gudang tidak berkurang. Barang di lapangan tetap milik perusahaan dan tetap dinilai di akun Persediaan; yang berubah hanya tempatnya. Stok per Gudang menampilkan kolom "Di lokasi" dan angka tersedia (stok dikurangi yang sedang di luar) supaya pengambilan berikutnya tidak melebihi barang yang benar-benar ada di gudang.
+- Pengembalian boleh bertahap. Dokumen ditutup otomatis saat semua barang kembali, atau ditutup manual dengan selisih (wajib catatan) bila ada yang hilang atau rusak total.
+- Barang hilang atau rusak total diselesaikan lewat Penyesuaian Stok seperti opname biasa: dokumen PS berjurnal (Cr Persediaan / Dr Selisih Persediaan) dan melewati persetujuan maker-checker. Setelah PS disetujui, Admin menautkannya ke dokumen peminjaman yang berselisih (hak penyesuaian.setujui); status peminjaman menjadi Disesuaikan dan barangnya berhenti dihitung "di luar".
+- Selama selisih belum ditautkan, nilai persediaan di buku sengaja belum turun dan barang itu tetap dihitung di luar. Dokumen peminjaman bukan bukti kerugian; Penyesuaian Stok yang disetujui yang menjadi buktinya. Daftar Riwayat menandai dokumen berstatus Selisih agar tidak terlupa.
+- Peminjaman tidak lewat persetujuan: dokumen langsung sah begitu dicatat, dengan foto bukti saat keluar dan saat kembali. Peran Gudang bisa mencatat dan mengembalikan; menghapus dokumen hanya Admin ke atas, dan dokumen yang sudah ditautkan ke PS tidak bisa dihapus.
+
 ## 9. Yang sengaja belum dibuat
 
 - Diskon di Penawaran/Pesanan (baru di Faktur).
@@ -105,5 +115,6 @@ Tiga hal berikut diatur di dokumen terpisah, [DOKUMENTASI-PERSETUJUAN-KURS-BACKU
 
 ## Riwayat
 
+- 18 Sep 2026: peminjaman barang (loading out / loading in) sebagai custody tanpa jurnal; kehilangan diselesaikan lewat Penyesuaian Stok yang ditautkan (bagian 8c).
 - 14 Sep 2026: persetujuan dokumen (maker-checker), multi mata uang, dan cadangan basis data terverifikasi; rinciannya di DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md.
 - 14 Sep 2026: kebijakan pertama, bersama fitur Laba Rugi basis kas, Ringkasan Pendapatan basis kas, diskon faktur, omzet bruto dari buku besar, akun dan data induk flagship, dialog verifikasi, tanda event.

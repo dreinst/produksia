@@ -99,6 +99,9 @@ export const ModelName = {
   BarisPindahBarang: 'BarisPindahBarang',
   PenyesuaianPersediaan: 'PenyesuaianPersediaan',
   BarisPenyesuaianPersediaan: 'BarisPenyesuaianPersediaan',
+  Foto: 'Foto',
+  PeminjamanBarang: 'PeminjamanBarang',
+  BarisPeminjamanBarang: 'BarisPeminjamanBarang',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
@@ -286,6 +289,7 @@ export const BarangScalarFieldEnum = {
   jenis: 'jenis',
   kelompokId: 'kelompokId',
   satuan: 'satuan',
+  warna: 'warna',
   hargaBeli: 'hargaBeli',
   hargaJual: 'hargaJual',
   hargaMinimum: 'hargaMinimum',
@@ -954,6 +958,51 @@ export const BarisPenyesuaianPersediaanScalarFieldEnum = {
 } as const
 
 export type BarisPenyesuaianPersediaanScalarFieldEnum = (typeof BarisPenyesuaianPersediaanScalarFieldEnum)[keyof typeof BarisPenyesuaianPersediaanScalarFieldEnum]
+
+
+export const FotoScalarFieldEnum = {
+  id: 'id',
+  barangId: 'barangId',
+  peminjamanId: 'peminjamanId',
+  tahap: 'tahap',
+  urutan: 'urutan',
+  tipe: 'tipe',
+  ukuran: 'ukuran',
+  isi: 'isi',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type FotoScalarFieldEnum = (typeof FotoScalarFieldEnum)[keyof typeof FotoScalarFieldEnum]
+
+
+export const PeminjamanBarangScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  gudangId: 'gudangId',
+  proyekId: 'proyekId',
+  namaPengambil: 'namaPengambil',
+  keterangan: 'keterangan',
+  waktuKeluar: 'waktuKeluar',
+  rencanaKembali: 'rencanaKembali',
+  ditutupPada: 'ditutupPada',
+  catatanKembali: 'catatanKembali',
+  penyesuaianId: 'penyesuaianId',
+  dicatatOlehId: 'dicatatOlehId',
+  dicatatOlehNama: 'dicatatOlehNama'
+} as const
+
+export type PeminjamanBarangScalarFieldEnum = (typeof PeminjamanBarangScalarFieldEnum)[keyof typeof PeminjamanBarangScalarFieldEnum]
+
+
+export const BarisPeminjamanBarangScalarFieldEnum = {
+  id: 'id',
+  peminjamanId: 'peminjamanId',
+  barangId: 'barangId',
+  jumlah: 'jumlah',
+  jumlahKembali: 'jumlahKembali'
+} as const
+
+export type BarisPeminjamanBarangScalarFieldEnum = (typeof BarisPeminjamanBarangScalarFieldEnum)[keyof typeof BarisPeminjamanBarangScalarFieldEnum]
 
 
 export const PengaturanPerusahaanScalarFieldEnum = {

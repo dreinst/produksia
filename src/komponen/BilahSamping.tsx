@@ -109,6 +109,7 @@ const persediaan: Grup = {
     { href: "/persediaan", label: "Stok per Gudang", hak: "persediaan.lihat" },
     { href: "/persediaan/penyesuaian", label: "Penyesuaian Stok", kode: "PS", hak: "penyesuaian.lihat" },
     { href: "/persediaan/pindah", label: "Pindah Barang", kode: "PB", hak: "pindah-barang.lihat" },
+    { href: "/persediaan/peminjaman", label: "Peminjaman Barang", kode: "PJ", hak: "peminjaman.lihat" },
   ],
 };
 

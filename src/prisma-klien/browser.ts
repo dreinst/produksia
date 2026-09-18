@@ -267,6 +267,24 @@ export type PenyesuaianPersediaan = Prisma.PenyesuaianPersediaanModel
  */
 export type BarisPenyesuaianPersediaan = Prisma.BarisPenyesuaianPersediaanModel
 /**
+ * Model Foto
+ * Foto disimpan di basis data (Bytes) karena Vercel & Docker VPS tidak punya disk tetap.
+ * barangId = foto barang (galeri di data induk); peminjamanId + tahap = foto bukti keluar/kembali.
+ */
+export type Foto = Prisma.FotoModel
+/**
+ * Model PeminjamanBarang
+ * Barang keluar gudang untuk event lalu kembali. TIDAK menyentuh StokBarang maupun jurnal;
+ * "sedang di luar" dihitung dari baris (jumlah - jumlahKembali), lihat src/lib/peminjaman.ts.
+ * Status turunan: TERBUKA (ditutupPada null), SELESAI, SELISIH (sisa > 0), DISESUAIKAN (penyesuaianId terisi).
+ */
+export type PeminjamanBarang = Prisma.PeminjamanBarangModel
+/**
+ * Model BarisPeminjamanBarang
+ * 
+ */
+export type BarisPeminjamanBarang = Prisma.BarisPeminjamanBarangModel
+/**
  * Model PengaturanPerusahaan
  * 
  */

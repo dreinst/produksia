@@ -89,6 +89,14 @@ function susunRingkasan(form: HTMLFormElement, v: Verifikasi): RingkasanVerifika
 export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses, verifikasi }: Props) {
   const [status, aksiFormulir, sedangProses] = useActionState(aksi, { galat: null });
   const [ringkasan, setRingkasan] = useState<RingkasanVerifikasi | null>(null);
+  // Aksi sukses tanpa redirect: isian dipasang ulang (ganti key) supaya state komponen klien
+  // (mis. pratinjau foto, editor baris) ikut kosong seperti input biasa yang direset React.
+  const [statusTerakhir, setStatusTerakhir] = useState(status);
+  const [kunciIsian, setKunciIsian] = useState(0);
+  if (status !== statusTerakhir) {
+    setStatusTerakhir(status);
+    if (status.ok) setKunciIsian((k) => k + 1);
+  }
   const formRef = useRef<HTMLFormElement>(null);
   const sudahDiverifikasi = useRef(false);
   const pengirim = useRef<HTMLElement | null>(null);
@@ -128,7 +136,7 @@ export default function FormulirAksi({ aksi, children, className, pesanKonfirmas
             {pesanSukses}
           </div>
         )}
-        <fieldset disabled={sedangProses} className="contents">
+        <fieldset key={kunciIsian} disabled={sedangProses} className="contents">
           {children}
         </fieldset>
       </form>

@@ -65,10 +65,11 @@ app/
 │  │  │  ├─ kas-bank/…         # masuk, keluar
 │  │  │  ├─ buku-besar/…       # jurnal (+ /baru), mutasi, neraca-saldo, laba-rugi, neraca
 │  │  │  ├─ aset-tetap/…       # daftar, baru, penyusutan
-│  │  │  ├─ persediaan/…       # stok per gudang, penyesuaian (+ /baru)
+│  │  │  ├─ persediaan/…       # stok per gudang, penyesuaian (+ /baru), pindah, peminjaman (loading out/in, satu halaman)
 │  │  │  ├─ pengaturan/        # perusahaan (pajak), pemetaan-akun, bagan-akun (terapkan standar), pengguna (+ [id]/)
 │  │  │  ├─ profil/ · tanpa-akses/ · cari/
-│  │  └─ api/status/           # cek koneksi DB (butuh sesi)
+│  │  ├─ api/status/           # cek koneksi DB (butuh sesi)
+│  │  └─ api/foto/[id]/        # isi foto barang / bukti peminjaman dari DB (butuh sesi + hak, §3.6)
 │  ├─ komponen/
 │  │  ├─ KerangkaAplikasi.tsx · BilahSamping.tsx · BilahAtas.tsx   # kerangka; menu disaring per peran (client)
 │  │  ├─ FormulirAksi.tsx      # pembungkus form: galat sebagai status, pending, konfirmasi (client)
@@ -92,6 +93,9 @@ app/
 │  │  ├─ uang.ts               # Decimal: D, uang, jumlahkan, kali, bacaUang, format
 │  │  ├─ penomoran.ts          # nomorDokumenBerikutnya(delegasi, prefix)
 │  │  ├─ stok.ts               # kurangiStok, tambahStok, perbaruiHargaRata (rata-rata bergerak), jenisBarang
+│  │  ├─ peminjaman.ts         # status turunan peminjaman barang, petaSedangDiLuar (§6.1a)
+│  │  ├─ foto.ts               # bacaFotoDariFormulir: batas ukuran/jumlah, tipe dari magic bytes
+│  │  ├─ waktu.ts              # formatWaktu/formatTanggal dengan zona waktu eksplisit (ZONA_WAKTU)
 │  │  ├─ akuntansi.ts          # SEMUA aturan posting jurnal otomatis per dokumen (§6.2)
 │  │  ├─ statusFormulir.ts     # jalankanFormulir: galat → status, terjemahkan galat Prisma
 │  │  └─ aksi/                 # "use server": penjualan, pembelian, jurnal, asetTetap, dataInduk, pengaturan, otentikasi, pengguna
@@ -179,6 +183,11 @@ Status (`StatusDokumen`): `DRAF` → `SEBAGIAN` → `DIPROSES` untuk pesanan (be
 ### 3.5 Aset tetap
 `AsetTetap` (harga perolehan, nilai sisa, umur bulan, 3 akun) dan `PenyusutanAset` (unik per `asetId + period`, terhubung ke jurnalnya).
 
+### 3.6 Peminjaman barang & foto
+`PeminjamanBarang` (nomor `PJ-TAHUN-NNNN`, `gudangId`, `proyekId` opsional, `namaPengambil` teks bebas karena kru lapangan belum tentu punya akun, `waktuKeluar` dari server, `rencanaKembali`, `ditutupPada`, `catatanKembali`, `penyesuaianId` ke `PenyesuaianPersediaan`, `dicatatOlehId` FK `SetNull` + `dicatatOlehNama` snapshot) dan `BarisPeminjamanBarang` (`barangId`, `jumlah`, `jumlahKembali` akumulatif; unik per `peminjamanId + barangId`; `CHECK ("jumlahKembali" <= "jumlah")` ditulis manual di migrasi). Tidak ada kolom status; statusnya diturunkan (§6.1a). `Barang` mendapat `warna` (teks bebas) yang ikut daftar, formulir, dan pencarian data induk.
+
+`Foto` adalah satu tabel untuk semua gambar: foto barang (`barangId`) dan foto bukti peminjaman (`peminjamanId` + `tahap` KELUAR/KEMBALI), dengan `tipe`, `ukuran`, dan isi biner di kolom `isi Bytes`. Keduanya `onDelete: Cascade`. Foto disimpan di basis data, bukan di disk, karena Vercel tidak punya disk dan kontainer VPS tidak memasang volume aplikasi. Baris peminjaman merujuk `Barang` tanpa cascade, jadi barang yang pernah dipinjam tidak bisa dihapus (galat P2003 sudah diterjemahkan jadi pesan ramah).
+
 ---
 
 ## 4. Alur tiap modul
@@ -261,6 +270,7 @@ flowchart TB
 |---|---|---|---|---|
 | PNW / PSJ / SJ / FJ / TRM / RJ | siklus penjualan | | JU · KM · KK | jurnal manual, kas masuk, kas keluar |
 | PSB / TB / FB / BYR / RB | siklus pembelian | | JU-FJ · JU-TRM · JU-RJ · JU-FB · JU-BYR · JU-RB · JU-PNY | jurnal otomatis |
+| PS / PB / PJ | penyesuaian stok, pindah barang, peminjaman barang | | | |
 
 ---
 
@@ -269,6 +279,18 @@ flowchart TB
 ### 6.1 Stok (`src/lib/stok.ts`)
 `kurangiStok(tx, barangId, gudangId, qty, label)` membaca stok di dalam transaksi, menolak bila kurang ("Stok X tidak cukup (tersedia…, diminta…)"), lalu `decrement`. Pengaman balapan: `CHECK (qty >= 0)` di DB — bila dua transaksi lolos cek aplikasi bersamaan, yang kedua gagal dan seluruh transaksinya di-rollback; pesannya diterjemahkan oleh `statusFormulir.ts`. `tambahStok` memakai `upsert` (baris stok dibuat saat pertama kali ada barang masuk ke gudang itu). `jenisBarang` dipakai semua dokumen untuk melewati baris JASA. `perbaruiHargaRata(tx, barangId, qtyMasuk, hargaMasuk, stokSudahTermasuk)` menghitung rata-rata bergerak dari seluruh stok barang (lintas gudang); `sesuaikanHargaRata` menyebar selisih nilai (mis. harga faktur ≠ pesanan) ke harga pokok. Karena setiap barang keluar dinilai dengan harga rata-rata yang sama, **Σ stok × hargaBeli = saldo akun Persediaan** (toleransi pembulatan 2 desimal).
 **Pindah Barang** (`PindahBarang`, PB-TAHUN-NNNN, `buatPindahBarang` di `src/lib/aksi/persediaan.ts`): `kurangiStok` di gudang asal + `tambahStok` di gudang tujuan dalam satu transaksi; harga pokok rata-rata berlaku per barang untuk semua gudang, jadi nilai persediaan tidak berubah dan tidak ada jurnal. Menghapusnya membalik perpindahan — ditolak bila stok di gudang tujuan sudah terpakai.
+
+### 6.1a Peminjaman Barang, loading out / loading in (`src/lib/peminjaman.ts`, `src/lib/aksi/peminjaman.ts`)
+Kru mengambil barang inventaris untuk event lalu mengembalikannya. Dokumen `PeminjamanBarang` (§3.6) adalah catatan **custody**, bukan mutasi stok: ia **tidak menyentuh `StokBarang.jumlah`**, tidak memanggil `kurangiStok`/`tambahStok`/`perbaruiHargaRata`, dan tidak membuat jurnal. Kartu Sinkronisasi (§6.2b) karena itu tidak berubah, dan ini satu-satunya pengecualian yang disengaja dari prinsip "dokumen yang mengubah stok wajib menjurnal": barang di lapangan masih milik perusahaan.
+
+- **Sedang di luar & tersedia.** `petaSedangDiLuar(klien, gudangId?)` menjumlahkan `jumlah - jumlahKembali` dari semua baris yang header-nya `penyesuaianId IS NULL`, termasuk dokumen yang sudah ditutup dengan selisih: barang hilang tetap dihitung di luar sampai Admin menautkan Penyesuaian Stok. Kunci peta = `barangId` bila gudang diberikan, selain itu `gudangId:barangId`; barang tanpa sisa tidak masuk peta. Tersedia = `StokBarang.jumlah` − sedang di luar. Saat Catat keluar, validasi dijalankan di dalam `db.$transaction` dengan pesan gaya `kurangiStok` (`<kode> tidak cukup di <gudang> (stok 33, sedang di luar 20, diminta 15)`). Halaman Stok per Gudang menampilkan kolom turunan "Di lokasi" dari peta yang sama; kolom Jumlah dan kartu nilai persediaan tidak berubah.
+- **Loading in bukan dokumen baru.** Aksi Kembalikan menambah `jumlahKembali` per baris (boleh sebagian dan bertahap); `CHECK jumlahKembali <= jumlah` di DB menjadi pengaman balapan seperti `StokBarang_jumlah_tidak_negatif`, pesannya diterjemahkan `statusFormulir.ts`. `ditutupPada` diisi otomatis saat semua sisa 0, atau saat kotak "Tutup dengan selisih" dicentang (catatan wajib bila masih ada sisa).
+- **Status turunan, bukan kolom** (`statusPeminjaman`): TERBUKA (`ditutupPada` null) → SELESAI (ditutup, semua sisa 0) atau SELISIH (ditutup, masih ada sisa, belum ditautkan) → DISESUAIKAN (`penyesuaianId` terisi). `terlambat()` memberi lencana "Terlambat" bila masih TERBUKA dan `rencanaKembali` sudah lewat. Tautkan Penyesuaian Stok hanya menerima PS berstatus DISETUJUI (hak `penyesuaian.setujui`); nilai persediaan baru turun lewat jurnal PS itu, bukan lewat dokumen peminjaman (lihat `KEBIJAKAN-AKUNTANSI.md` §8c).
+- **Tanpa maker-checker.** Dokumen langsung sah. Selama TERBUKA hanya `namaPengambil`, `proyekId`, `keterangan`, dan `rencanaKembali` yang bisa diubah (dicatat ke `LogAktivitas` jenis UBAH); jumlah dan foto tidak. Hapus lewat `hapusDokumen("peminjamanBarang")`: ditolak bila sudah ditautkan ke PS, selain itu header dihapus (baris dan foto ikut cascade) dan dicatat di log. Tidak ada efek stok/jurnal yang perlu dibalik.
+- **Hak** (`DOKUMEN_HAK` kode `peminjaman`, modul `persediaan`): `peminjaman.lihat` / `peminjaman.buat` / `peminjaman.hapus`. Bawaan Gudang: lihat + buat; hapus otomatis milik Admin ke atas; Kasir tidak punya. Halaman memuat daftar proyek aktif lewat `daftarProyekAktif` tanpa memeriksa `data-induk.lihat`, karena Gudang tidak punya hak Proyek tetapi kru perlu menandai event. Unggah/hapus foto barang: `stok-induk.tulis`; tambah/hapus foto bukti setelah dokumen tercatat: `peminjaman.hapus`.
+- **Foto** (`src/lib/foto.ts`, `src/komponen/ui/PemilihFoto.tsx`). Klien mengompresi sebelum kirim: `createImageBitmap` dengan orientasi EXIF, sisi terpanjang 1280 px, JPEG kualitas 0,8; bila dekode gagal, berkas asli yang dikirim. Server (`bacaFotoDariFormulir`) menolak lebih dari 3 foto per kirim (`MAKS_FOTO_PER_KIRIM`), lebih dari 1 MB per foto (`BATAS_UKURAN_FOTO`), dan tipe di luar JPEG/PNG/WebP; tipe dibaca dari magic bytes, bukan `file.type` yang bisa dipalsukan. Karena satu kirim bisa membawa 3 × 1 MB, `next.config.ts` menaikkan `experimental.serverActions.bodySizeLimit` ke `3mb` (bawaan 1 MB; batas badan permintaan Vercel sekitar 4,5 MB). Daftar Barang & Jasa hanya menampilkan jumlah foto ("N foto" atau tombol Unggah), galeri dan unggah ada di halaman ubah barang; foto bukti KELUAR wajib saat catat keluar dan KEMBALI wajib saat kembalikan.
+- **Rute `GET /api/foto/[id]`** (`src/app/api/foto/[id]/route.ts`): wajib sesi (401), foto barang butuh `persediaan.lihat`, foto bukti butuh `peminjaman.lihat` (403), 404 bila tidak ada. Isi biner dikirim dengan `Content-Type` dari kolom `tipe`, `Cache-Control: private, max-age=31536000, immutable`, dan `ETag` = id (304 bila `If-None-Match` cocok); foto tidak pernah berubah, hanya dihapus, jadi cache selamanya aman.
+- **Zona waktu tampilan.** `waktuKeluar` diisi `@default(now())` oleh server (UTC). Semua tampilan waktu di modul ini memakai `formatWaktu`/`formatTanggal` (`src/lib/waktu.ts`) dengan `timeZone` eksplisit `process.env.ZONA_WAKTU ?? "Asia/Jakarta"`, karena Vercel menjalankan fungsi di UTC dan tidak menerima env `TZ`.
 
 ### 6.2 Posting jurnal otomatis (`src/lib/akuntansi.ts`)
 

@@ -95,3 +95,11 @@ export const JenisDokumenKas = {
 } as const
 
 export type JenisDokumenKas = (typeof JenisDokumenKas)[keyof typeof JenisDokumenKas]
+
+
+export const TahapFoto = {
+  KELUAR: 'KELUAR',
+  KEMBALI: 'KEMBALI'
+} as const
+
+export type TahapFoto = (typeof TahapFoto)[keyof typeof TahapFoto]

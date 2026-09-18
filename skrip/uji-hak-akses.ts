@@ -38,6 +38,10 @@ async function main() {
       !punyaHak("GUDANG", "faktur.lihat") && !punyaHak("GUDANG", "penawaran.lihat") && !punyaHak("GUDANG", "pesanan.lihat") && !punyaHak("GUDANG", "faktur-pembelian.lihat") && !punyaHak("GUDANG", "pembayaran.lihat"),
     "Gudang: hanya 4 dokumen penggerak stok, tanpa dokumen penjualan/pembelian lain",
   );
+  pastikan(
+    punyaHak("GUDANG", "peminjaman.lihat") && punyaHak("GUDANG", "peminjaman.buat") && !punyaHak("GUDANG", "peminjaman.hapus") && !punyaHak("KASIR", "peminjaman.lihat") && punyaHak("ADMIN", "peminjaman.hapus"),
+    "Peminjaman Barang: Gudang lihat & buat tanpa hapus, Kasir tidak melihat, Admin boleh hapus",
+  );
   for (const peran of ["ADMIN", "KASIR", "GUDANG"] as const) {
     for (const h of HAK_TERTINGGI_SAJA) pastikan(!HAK_BAWAAN[peran].includes(h), `${peran} tidak punya ${h} secara bawaan`);
   }

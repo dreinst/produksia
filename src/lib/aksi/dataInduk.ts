@@ -14,6 +14,7 @@ import { catatJurnalPenyesuaianPersediaan } from "@/lib/akuntansi";
 import { perbaruiHargaRata } from "@/lib/stok";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
+import { bacaFotoDariFormulir } from "@/lib/foto";
 
 // Batas atas kolom uang/kuantitas Decimal(18,2) di skema (16 digit sebelum koma).
 // Semua bidang "number" data induk adalah harga/kuantitas yang tidak boleh negatif.
@@ -198,4 +199,35 @@ export async function ubahDataIndukFormulir(slug: string, id: string, _sebelumny
 // Dipakai lewat .bind(null, slug, id); argumen (prevState, dataFormulir) dari useActionState sengaja diabaikan
 export async function hapusDataIndukFormulir(slug: string, id: string) {
   return jalankanFormulir(() => hapusDataInduk(slug, id));
+}
+
+// ---------- Foto barang (galeri di halaman ubah Barang & Jasa) ----------
+
+function revalidasiFotoBarang(barangId: string) {
+  revalidatePath("/data-induk/barang");
+  revalidatePath(`/data-induk/barang/${barangId}`);
+}
+
+export async function unggahFotoBarangFormulir(barangId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(async () => {
+    await wajibHakAksi("stok-induk.tulis");
+    const daftarFoto = await bacaFotoDariFormulir(dataFormulir, "foto", { maksimal: 3, wajib: true });
+    const barang = await db.barang.findUnique({ where: { id: barangId }, select: { _count: { select: { foto: true } } } });
+    if (!barang) throw new Error("Barang tidak ditemukan");
+    const mulai = barang._count.foto;
+    await db.foto.createMany({ data: daftarFoto.map((f, i) => ({ barangId, urutan: mulai + i, tipe: f.tipe, ukuran: f.ukuran, isi: f.isi })) });
+    revalidasiFotoBarang(barangId);
+  });
+}
+
+// Dipakai lewat .bind(null, fotoId); argumen useActionState diabaikan seperti hapusDataIndukFormulir
+export async function hapusFotoBarangFormulir(fotoId: string) {
+  return jalankanFormulir(async () => {
+    await wajibHakAksi("stok-induk.tulis");
+    const foto = await db.foto.findUnique({ where: { id: fotoId }, select: { barangId: true } });
+    // Foto bukti peminjaman (barangId null) punya aksi hapus sendiri dengan hak berbeda
+    if (!foto?.barangId) throw new Error("Foto barang tidak ditemukan");
+    await db.foto.delete({ where: { id: fotoId } });
+    revalidasiFotoBarang(foto.barangId);
+  });
 }

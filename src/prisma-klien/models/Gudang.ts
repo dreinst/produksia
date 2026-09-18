@@ -182,6 +182,7 @@ export type GudangWhereInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanListRelationFilter
   pindahAsal?: Prisma.PindahBarangListRelationFilter
   pindahTujuan?: Prisma.PindahBarangListRelationFilter
+  peminjaman?: Prisma.PeminjamanBarangListRelationFilter
 }
 
 export type GudangOrderByWithRelationInput = {
@@ -197,6 +198,7 @@ export type GudangOrderByWithRelationInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanOrderByRelationAggregateInput
   pindahAsal?: Prisma.PindahBarangOrderByRelationAggregateInput
   pindahTujuan?: Prisma.PindahBarangOrderByRelationAggregateInput
+  peminjaman?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
 }
 
 export type GudangWhereUniqueInput = Prisma.AtLeast<{
@@ -215,6 +217,7 @@ export type GudangWhereUniqueInput = Prisma.AtLeast<{
   penyesuaian?: Prisma.PenyesuaianPersediaanListRelationFilter
   pindahAsal?: Prisma.PindahBarangListRelationFilter
   pindahTujuan?: Prisma.PindahBarangListRelationFilter
+  peminjaman?: Prisma.PeminjamanBarangListRelationFilter
 }, "id" | "kode">
 
 export type GudangOrderByWithAggregationInput = {
@@ -250,6 +253,7 @@ export type GudangCreateInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateInput = {
@@ -265,6 +269,7 @@ export type GudangUncheckedCreateInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUpdateInput = {
@@ -280,6 +285,7 @@ export type GudangUpdateInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateInput = {
@@ -295,6 +301,7 @@ export type GudangUncheckedUpdateInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateManyInput = {
@@ -456,6 +463,20 @@ export type GudangUpdateOneRequiredWithoutPenyesuaianNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.GudangUpdateToOneWithWhereWithoutPenyesuaianInput, Prisma.GudangUpdateWithoutPenyesuaianInput>, Prisma.GudangUncheckedUpdateWithoutPenyesuaianInput>
 }
 
+export type GudangCreateNestedOneWithoutPeminjamanInput = {
+  create?: Prisma.XOR<Prisma.GudangCreateWithoutPeminjamanInput, Prisma.GudangUncheckedCreateWithoutPeminjamanInput>
+  connectOrCreate?: Prisma.GudangCreateOrConnectWithoutPeminjamanInput
+  connect?: Prisma.GudangWhereUniqueInput
+}
+
+export type GudangUpdateOneRequiredWithoutPeminjamanNestedInput = {
+  create?: Prisma.XOR<Prisma.GudangCreateWithoutPeminjamanInput, Prisma.GudangUncheckedCreateWithoutPeminjamanInput>
+  connectOrCreate?: Prisma.GudangCreateOrConnectWithoutPeminjamanInput
+  upsert?: Prisma.GudangUpsertWithoutPeminjamanInput
+  connect?: Prisma.GudangWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.GudangUpdateToOneWithWhereWithoutPeminjamanInput, Prisma.GudangUpdateWithoutPeminjamanInput>, Prisma.GudangUncheckedUpdateWithoutPeminjamanInput>
+}
+
 export type GudangCreateWithoutStokInput = {
   id?: string
   kode: string
@@ -468,6 +489,7 @@ export type GudangCreateWithoutStokInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutStokInput = {
@@ -482,6 +504,7 @@ export type GudangUncheckedCreateWithoutStokInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutStokInput = {
@@ -512,6 +535,7 @@ export type GudangUpdateWithoutStokInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutStokInput = {
@@ -526,6 +550,7 @@ export type GudangUncheckedUpdateWithoutStokInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateWithoutPengirimanInput = {
@@ -540,6 +565,7 @@ export type GudangCreateWithoutPengirimanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutPengirimanInput = {
@@ -554,6 +580,7 @@ export type GudangUncheckedCreateWithoutPengirimanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutPengirimanInput = {
@@ -584,6 +611,7 @@ export type GudangUpdateWithoutPengirimanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutPengirimanInput = {
@@ -598,6 +626,7 @@ export type GudangUncheckedUpdateWithoutPengirimanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateWithoutReturPenjualanInput = {
@@ -612,6 +641,7 @@ export type GudangCreateWithoutReturPenjualanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutReturPenjualanInput = {
@@ -626,6 +656,7 @@ export type GudangUncheckedCreateWithoutReturPenjualanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutReturPenjualanInput = {
@@ -656,6 +687,7 @@ export type GudangUpdateWithoutReturPenjualanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutReturPenjualanInput = {
@@ -670,6 +702,7 @@ export type GudangUncheckedUpdateWithoutReturPenjualanInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateWithoutPenerimaanBarangInput = {
@@ -684,6 +717,7 @@ export type GudangCreateWithoutPenerimaanBarangInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutPenerimaanBarangInput = {
@@ -698,6 +732,7 @@ export type GudangUncheckedCreateWithoutPenerimaanBarangInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutPenerimaanBarangInput = {
@@ -728,6 +763,7 @@ export type GudangUpdateWithoutPenerimaanBarangInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutPenerimaanBarangInput = {
@@ -742,6 +778,7 @@ export type GudangUncheckedUpdateWithoutPenerimaanBarangInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateWithoutReturPembelianInput = {
@@ -756,6 +793,7 @@ export type GudangCreateWithoutReturPembelianInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutReturPembelianInput = {
@@ -770,6 +808,7 @@ export type GudangUncheckedCreateWithoutReturPembelianInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutReturPembelianInput = {
@@ -800,6 +839,7 @@ export type GudangUpdateWithoutReturPembelianInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutReturPembelianInput = {
@@ -814,6 +854,7 @@ export type GudangUncheckedUpdateWithoutReturPembelianInput = {
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateWithoutPindahAsalInput = {
@@ -828,6 +869,7 @@ export type GudangCreateWithoutPindahAsalInput = {
   returPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutGudangInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutPindahAsalInput = {
@@ -842,6 +884,7 @@ export type GudangUncheckedCreateWithoutPindahAsalInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutGudangInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutPindahAsalInput = {
@@ -861,6 +904,7 @@ export type GudangCreateWithoutPindahTujuanInput = {
   returPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutGudangInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutPindahTujuanInput = {
@@ -875,6 +919,7 @@ export type GudangUncheckedCreateWithoutPindahTujuanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutGudangInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutPindahTujuanInput = {
@@ -905,6 +950,7 @@ export type GudangUpdateWithoutPindahAsalInput = {
   returPembelian?: Prisma.ReturPembelianUpdateManyWithoutGudangNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutPindahAsalInput = {
@@ -919,6 +965,7 @@ export type GudangUncheckedUpdateWithoutPindahAsalInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutGudangNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUpsertWithoutPindahTujuanInput = {
@@ -944,6 +991,7 @@ export type GudangUpdateWithoutPindahTujuanInput = {
   returPembelian?: Prisma.ReturPembelianUpdateManyWithoutGudangNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutPindahTujuanInput = {
@@ -958,6 +1006,7 @@ export type GudangUncheckedUpdateWithoutPindahTujuanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutGudangNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangCreateWithoutPenyesuaianInput = {
@@ -972,6 +1021,7 @@ export type GudangCreateWithoutPenyesuaianInput = {
   returPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutGudangInput
 }
 
 export type GudangUncheckedCreateWithoutPenyesuaianInput = {
@@ -986,6 +1036,7 @@ export type GudangUncheckedCreateWithoutPenyesuaianInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutGudangInput
   pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
   pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutGudangInput
 }
 
 export type GudangCreateOrConnectWithoutPenyesuaianInput = {
@@ -1016,6 +1067,7 @@ export type GudangUpdateWithoutPenyesuaianInput = {
   returPembelian?: Prisma.ReturPembelianUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutGudangNestedInput
 }
 
 export type GudangUncheckedUpdateWithoutPenyesuaianInput = {
@@ -1028,6 +1080,83 @@ export type GudangUncheckedUpdateWithoutPenyesuaianInput = {
   returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutGudangNestedInput
   penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutGudangNestedInput
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutGudangNestedInput
+  pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
+  pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutGudangNestedInput
+}
+
+export type GudangCreateWithoutPeminjamanInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  stok?: Prisma.StokBarangCreateNestedManyWithoutGudangInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedManyWithoutGudangInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutGudangInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutGudangInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutGudangInput
+  penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutGudangInput
+  pindahAsal?: Prisma.PindahBarangCreateNestedManyWithoutGudangAsalInput
+  pindahTujuan?: Prisma.PindahBarangCreateNestedManyWithoutGudangTujuanInput
+}
+
+export type GudangUncheckedCreateWithoutPeminjamanInput = {
+  id?: string
+  kode: string
+  nama: string
+  alamat?: string | null
+  stok?: Prisma.StokBarangUncheckedCreateNestedManyWithoutGudangInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutGudangInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutGudangInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutGudangInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutGudangInput
+  penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutGudangInput
+  pindahAsal?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangAsalInput
+  pindahTujuan?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutGudangTujuanInput
+}
+
+export type GudangCreateOrConnectWithoutPeminjamanInput = {
+  where: Prisma.GudangWhereUniqueInput
+  create: Prisma.XOR<Prisma.GudangCreateWithoutPeminjamanInput, Prisma.GudangUncheckedCreateWithoutPeminjamanInput>
+}
+
+export type GudangUpsertWithoutPeminjamanInput = {
+  update: Prisma.XOR<Prisma.GudangUpdateWithoutPeminjamanInput, Prisma.GudangUncheckedUpdateWithoutPeminjamanInput>
+  create: Prisma.XOR<Prisma.GudangCreateWithoutPeminjamanInput, Prisma.GudangUncheckedCreateWithoutPeminjamanInput>
+  where?: Prisma.GudangWhereInput
+}
+
+export type GudangUpdateToOneWithWhereWithoutPeminjamanInput = {
+  where?: Prisma.GudangWhereInput
+  data: Prisma.XOR<Prisma.GudangUpdateWithoutPeminjamanInput, Prisma.GudangUncheckedUpdateWithoutPeminjamanInput>
+}
+
+export type GudangUpdateWithoutPeminjamanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stok?: Prisma.StokBarangUpdateManyWithoutGudangNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateManyWithoutGudangNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutGudangNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutGudangNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateManyWithoutGudangNestedInput
+  penyesuaian?: Prisma.PenyesuaianPersediaanUpdateManyWithoutGudangNestedInput
+  pindahAsal?: Prisma.PindahBarangUpdateManyWithoutGudangAsalNestedInput
+  pindahTujuan?: Prisma.PindahBarangUpdateManyWithoutGudangTujuanNestedInput
+}
+
+export type GudangUncheckedUpdateWithoutPeminjamanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  alamat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stok?: Prisma.StokBarangUncheckedUpdateManyWithoutGudangNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutGudangNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutGudangNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutGudangNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutGudangNestedInput
+  penyesuaian?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangNestedInput
   pindahAsal?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangAsalNestedInput
   pindahTujuan?: Prisma.PindahBarangUncheckedUpdateManyWithoutGudangTujuanNestedInput
 }
@@ -1046,6 +1175,7 @@ export type GudangCountOutputType = {
   penyesuaian: number
   pindahAsal: number
   pindahTujuan: number
+  peminjaman: number
 }
 
 export type GudangCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1057,6 +1187,7 @@ export type GudangCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   penyesuaian?: boolean | GudangCountOutputTypeCountPenyesuaianArgs
   pindahAsal?: boolean | GudangCountOutputTypeCountPindahAsalArgs
   pindahTujuan?: boolean | GudangCountOutputTypeCountPindahTujuanArgs
+  peminjaman?: boolean | GudangCountOutputTypeCountPeminjamanArgs
 }
 
 /**
@@ -1125,6 +1256,13 @@ export type GudangCountOutputTypeCountPindahTujuanArgs<ExtArgs extends runtime.T
   where?: Prisma.PindahBarangWhereInput
 }
 
+/**
+ * GudangCountOutputType without action
+ */
+export type GudangCountOutputTypeCountPeminjamanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PeminjamanBarangWhereInput
+}
+
 
 export type GudangSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1139,6 +1277,7 @@ export type GudangSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   penyesuaian?: boolean | Prisma.Gudang$penyesuaianArgs<ExtArgs>
   pindahAsal?: boolean | Prisma.Gudang$pindahAsalArgs<ExtArgs>
   pindahTujuan?: boolean | Prisma.Gudang$pindahTujuanArgs<ExtArgs>
+  peminjaman?: boolean | Prisma.Gudang$peminjamanArgs<ExtArgs>
   _count?: boolean | Prisma.GudangCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["gudang"]>
 
@@ -1173,6 +1312,7 @@ export type GudangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   penyesuaian?: boolean | Prisma.Gudang$penyesuaianArgs<ExtArgs>
   pindahAsal?: boolean | Prisma.Gudang$pindahAsalArgs<ExtArgs>
   pindahTujuan?: boolean | Prisma.Gudang$pindahTujuanArgs<ExtArgs>
+  peminjaman?: boolean | Prisma.Gudang$peminjamanArgs<ExtArgs>
   _count?: boolean | Prisma.GudangCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type GudangIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1189,6 +1329,7 @@ export type $GudangPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     penyesuaian: Prisma.$PenyesuaianPersediaanPayload<ExtArgs>[]
     pindahAsal: Prisma.$PindahBarangPayload<ExtArgs>[]
     pindahTujuan: Prisma.$PindahBarangPayload<ExtArgs>[]
+    peminjaman: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1597,6 +1738,7 @@ export interface Prisma__GudangClient<T, Null = never, ExtArgs extends runtime.T
   penyesuaian<T extends Prisma.Gudang$penyesuaianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gudang$penyesuaianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenyesuaianPersediaanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pindahAsal<T extends Prisma.Gudang$pindahAsalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gudang$pindahAsalArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PindahBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pindahTujuan<T extends Prisma.Gudang$pindahTujuanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gudang$pindahTujuanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PindahBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  peminjaman<T extends Prisma.Gudang$peminjamanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Gudang$peminjamanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2212,6 +2354,30 @@ export type Gudang$pindahTujuanArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.PindahBarangScalarFieldEnum | Prisma.PindahBarangScalarFieldEnum[]
+}
+
+/**
+ * Gudang.peminjaman
+ */
+export type Gudang$peminjamanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PeminjamanBarang
+   */
+  select?: Prisma.PeminjamanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PeminjamanBarang
+   */
+  omit?: Prisma.PeminjamanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PeminjamanBarangInclude<ExtArgs> | null
+  where?: Prisma.PeminjamanBarangWhereInput
+  orderBy?: Prisma.PeminjamanBarangOrderByWithRelationInput | Prisma.PeminjamanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.PeminjamanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PeminjamanBarangScalarFieldEnum | Prisma.PeminjamanBarangScalarFieldEnum[]
 }
 
 /**
