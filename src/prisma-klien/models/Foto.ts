@@ -41,6 +41,7 @@ export type FotoMinAggregateOutputType = {
   id: string | null
   barangId: string | null
   peminjamanId: string | null
+  kerusakanId: string | null
   tahap: $Enums.TahapFoto | null
   urutan: number | null
   tipe: string | null
@@ -53,6 +54,7 @@ export type FotoMaxAggregateOutputType = {
   id: string | null
   barangId: string | null
   peminjamanId: string | null
+  kerusakanId: string | null
   tahap: $Enums.TahapFoto | null
   urutan: number | null
   tipe: string | null
@@ -65,6 +67,7 @@ export type FotoCountAggregateOutputType = {
   id: number
   barangId: number
   peminjamanId: number
+  kerusakanId: number
   tahap: number
   urutan: number
   tipe: number
@@ -89,6 +92,7 @@ export type FotoMinAggregateInputType = {
   id?: true
   barangId?: true
   peminjamanId?: true
+  kerusakanId?: true
   tahap?: true
   urutan?: true
   tipe?: true
@@ -101,6 +105,7 @@ export type FotoMaxAggregateInputType = {
   id?: true
   barangId?: true
   peminjamanId?: true
+  kerusakanId?: true
   tahap?: true
   urutan?: true
   tipe?: true
@@ -113,6 +118,7 @@ export type FotoCountAggregateInputType = {
   id?: true
   barangId?: true
   peminjamanId?: true
+  kerusakanId?: true
   tahap?: true
   urutan?: true
   tipe?: true
@@ -212,6 +218,7 @@ export type FotoGroupByOutputType = {
   id: string
   barangId: string | null
   peminjamanId: string | null
+  kerusakanId: string | null
   tahap: $Enums.TahapFoto | null
   urutan: number
   tipe: string
@@ -247,6 +254,7 @@ export type FotoWhereInput = {
   id?: Prisma.StringFilter<"Foto"> | string
   barangId?: Prisma.StringNullableFilter<"Foto"> | string | null
   peminjamanId?: Prisma.StringNullableFilter<"Foto"> | string | null
+  kerusakanId?: Prisma.StringNullableFilter<"Foto"> | string | null
   tahap?: Prisma.EnumTahapFotoNullableFilter<"Foto"> | $Enums.TahapFoto | null
   urutan?: Prisma.IntFilter<"Foto"> | number
   tipe?: Prisma.StringFilter<"Foto"> | string
@@ -255,12 +263,14 @@ export type FotoWhereInput = {
   dibuatPada?: Prisma.DateTimeFilter<"Foto"> | Date | string
   barang?: Prisma.XOR<Prisma.BarangNullableScalarRelationFilter, Prisma.BarangWhereInput> | null
   peminjaman?: Prisma.XOR<Prisma.PeminjamanBarangNullableScalarRelationFilter, Prisma.PeminjamanBarangWhereInput> | null
+  kerusakan?: Prisma.XOR<Prisma.LaporanKerusakanBarangNullableScalarRelationFilter, Prisma.LaporanKerusakanBarangWhereInput> | null
 }
 
 export type FotoOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   barangId?: Prisma.SortOrderInput | Prisma.SortOrder
   peminjamanId?: Prisma.SortOrderInput | Prisma.SortOrder
+  kerusakanId?: Prisma.SortOrderInput | Prisma.SortOrder
   tahap?: Prisma.SortOrderInput | Prisma.SortOrder
   urutan?: Prisma.SortOrder
   tipe?: Prisma.SortOrder
@@ -269,6 +279,7 @@ export type FotoOrderByWithRelationInput = {
   dibuatPada?: Prisma.SortOrder
   barang?: Prisma.BarangOrderByWithRelationInput
   peminjaman?: Prisma.PeminjamanBarangOrderByWithRelationInput
+  kerusakan?: Prisma.LaporanKerusakanBarangOrderByWithRelationInput
 }
 
 export type FotoWhereUniqueInput = Prisma.AtLeast<{
@@ -278,6 +289,7 @@ export type FotoWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.FotoWhereInput | Prisma.FotoWhereInput[]
   barangId?: Prisma.StringNullableFilter<"Foto"> | string | null
   peminjamanId?: Prisma.StringNullableFilter<"Foto"> | string | null
+  kerusakanId?: Prisma.StringNullableFilter<"Foto"> | string | null
   tahap?: Prisma.EnumTahapFotoNullableFilter<"Foto"> | $Enums.TahapFoto | null
   urutan?: Prisma.IntFilter<"Foto"> | number
   tipe?: Prisma.StringFilter<"Foto"> | string
@@ -286,12 +298,14 @@ export type FotoWhereUniqueInput = Prisma.AtLeast<{
   dibuatPada?: Prisma.DateTimeFilter<"Foto"> | Date | string
   barang?: Prisma.XOR<Prisma.BarangNullableScalarRelationFilter, Prisma.BarangWhereInput> | null
   peminjaman?: Prisma.XOR<Prisma.PeminjamanBarangNullableScalarRelationFilter, Prisma.PeminjamanBarangWhereInput> | null
+  kerusakan?: Prisma.XOR<Prisma.LaporanKerusakanBarangNullableScalarRelationFilter, Prisma.LaporanKerusakanBarangWhereInput> | null
 }, "id">
 
 export type FotoOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   barangId?: Prisma.SortOrderInput | Prisma.SortOrder
   peminjamanId?: Prisma.SortOrderInput | Prisma.SortOrder
+  kerusakanId?: Prisma.SortOrderInput | Prisma.SortOrder
   tahap?: Prisma.SortOrderInput | Prisma.SortOrder
   urutan?: Prisma.SortOrder
   tipe?: Prisma.SortOrder
@@ -312,6 +326,7 @@ export type FotoScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Foto"> | string
   barangId?: Prisma.StringNullableWithAggregatesFilter<"Foto"> | string | null
   peminjamanId?: Prisma.StringNullableWithAggregatesFilter<"Foto"> | string | null
+  kerusakanId?: Prisma.StringNullableWithAggregatesFilter<"Foto"> | string | null
   tahap?: Prisma.EnumTahapFotoNullableWithAggregatesFilter<"Foto"> | $Enums.TahapFoto | null
   urutan?: Prisma.IntWithAggregatesFilter<"Foto"> | number
   tipe?: Prisma.StringWithAggregatesFilter<"Foto"> | string
@@ -330,12 +345,14 @@ export type FotoCreateInput = {
   dibuatPada?: Date | string
   barang?: Prisma.BarangCreateNestedOneWithoutFotoInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedOneWithoutFotoInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedOneWithoutFotoInput
 }
 
 export type FotoUncheckedCreateInput = {
   id?: string
   barangId?: string | null
   peminjamanId?: string | null
+  kerusakanId?: string | null
   tahap?: $Enums.TahapFoto | null
   urutan?: number
   tipe: string
@@ -354,12 +371,14 @@ export type FotoUpdateInput = {
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barang?: Prisma.BarangUpdateOneWithoutFotoNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateOneWithoutFotoNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateOneWithoutFotoNestedInput
 }
 
 export type FotoUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   peminjamanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kerusakanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
   urutan?: Prisma.IntFieldUpdateOperationsInput | number
   tipe?: Prisma.StringFieldUpdateOperationsInput | string
@@ -372,6 +391,7 @@ export type FotoCreateManyInput = {
   id?: string
   barangId?: string | null
   peminjamanId?: string | null
+  kerusakanId?: string | null
   tahap?: $Enums.TahapFoto | null
   urutan?: number
   tipe: string
@@ -394,6 +414,7 @@ export type FotoUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   peminjamanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kerusakanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
   urutan?: Prisma.IntFieldUpdateOperationsInput | number
   tipe?: Prisma.StringFieldUpdateOperationsInput | string
@@ -416,6 +437,7 @@ export type FotoCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   peminjamanId?: Prisma.SortOrder
+  kerusakanId?: Prisma.SortOrder
   tahap?: Prisma.SortOrder
   urutan?: Prisma.SortOrder
   tipe?: Prisma.SortOrder
@@ -433,6 +455,7 @@ export type FotoMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   peminjamanId?: Prisma.SortOrder
+  kerusakanId?: Prisma.SortOrder
   tahap?: Prisma.SortOrder
   urutan?: Prisma.SortOrder
   tipe?: Prisma.SortOrder
@@ -445,6 +468,7 @@ export type FotoMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   barangId?: Prisma.SortOrder
   peminjamanId?: Prisma.SortOrder
+  kerusakanId?: Prisma.SortOrder
   tahap?: Prisma.SortOrder
   urutan?: Prisma.SortOrder
   tipe?: Prisma.SortOrder
@@ -550,6 +574,48 @@ export type FotoUncheckedUpdateManyWithoutPeminjamanNestedInput = {
   deleteMany?: Prisma.FotoScalarWhereInput | Prisma.FotoScalarWhereInput[]
 }
 
+export type FotoCreateNestedManyWithoutKerusakanInput = {
+  create?: Prisma.XOR<Prisma.FotoCreateWithoutKerusakanInput, Prisma.FotoUncheckedCreateWithoutKerusakanInput> | Prisma.FotoCreateWithoutKerusakanInput[] | Prisma.FotoUncheckedCreateWithoutKerusakanInput[]
+  connectOrCreate?: Prisma.FotoCreateOrConnectWithoutKerusakanInput | Prisma.FotoCreateOrConnectWithoutKerusakanInput[]
+  createMany?: Prisma.FotoCreateManyKerusakanInputEnvelope
+  connect?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+}
+
+export type FotoUncheckedCreateNestedManyWithoutKerusakanInput = {
+  create?: Prisma.XOR<Prisma.FotoCreateWithoutKerusakanInput, Prisma.FotoUncheckedCreateWithoutKerusakanInput> | Prisma.FotoCreateWithoutKerusakanInput[] | Prisma.FotoUncheckedCreateWithoutKerusakanInput[]
+  connectOrCreate?: Prisma.FotoCreateOrConnectWithoutKerusakanInput | Prisma.FotoCreateOrConnectWithoutKerusakanInput[]
+  createMany?: Prisma.FotoCreateManyKerusakanInputEnvelope
+  connect?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+}
+
+export type FotoUpdateManyWithoutKerusakanNestedInput = {
+  create?: Prisma.XOR<Prisma.FotoCreateWithoutKerusakanInput, Prisma.FotoUncheckedCreateWithoutKerusakanInput> | Prisma.FotoCreateWithoutKerusakanInput[] | Prisma.FotoUncheckedCreateWithoutKerusakanInput[]
+  connectOrCreate?: Prisma.FotoCreateOrConnectWithoutKerusakanInput | Prisma.FotoCreateOrConnectWithoutKerusakanInput[]
+  upsert?: Prisma.FotoUpsertWithWhereUniqueWithoutKerusakanInput | Prisma.FotoUpsertWithWhereUniqueWithoutKerusakanInput[]
+  createMany?: Prisma.FotoCreateManyKerusakanInputEnvelope
+  set?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  disconnect?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  delete?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  connect?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  update?: Prisma.FotoUpdateWithWhereUniqueWithoutKerusakanInput | Prisma.FotoUpdateWithWhereUniqueWithoutKerusakanInput[]
+  updateMany?: Prisma.FotoUpdateManyWithWhereWithoutKerusakanInput | Prisma.FotoUpdateManyWithWhereWithoutKerusakanInput[]
+  deleteMany?: Prisma.FotoScalarWhereInput | Prisma.FotoScalarWhereInput[]
+}
+
+export type FotoUncheckedUpdateManyWithoutKerusakanNestedInput = {
+  create?: Prisma.XOR<Prisma.FotoCreateWithoutKerusakanInput, Prisma.FotoUncheckedCreateWithoutKerusakanInput> | Prisma.FotoCreateWithoutKerusakanInput[] | Prisma.FotoUncheckedCreateWithoutKerusakanInput[]
+  connectOrCreate?: Prisma.FotoCreateOrConnectWithoutKerusakanInput | Prisma.FotoCreateOrConnectWithoutKerusakanInput[]
+  upsert?: Prisma.FotoUpsertWithWhereUniqueWithoutKerusakanInput | Prisma.FotoUpsertWithWhereUniqueWithoutKerusakanInput[]
+  createMany?: Prisma.FotoCreateManyKerusakanInputEnvelope
+  set?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  disconnect?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  delete?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  connect?: Prisma.FotoWhereUniqueInput | Prisma.FotoWhereUniqueInput[]
+  update?: Prisma.FotoUpdateWithWhereUniqueWithoutKerusakanInput | Prisma.FotoUpdateWithWhereUniqueWithoutKerusakanInput[]
+  updateMany?: Prisma.FotoUpdateManyWithWhereWithoutKerusakanInput | Prisma.FotoUpdateManyWithWhereWithoutKerusakanInput[]
+  deleteMany?: Prisma.FotoScalarWhereInput | Prisma.FotoScalarWhereInput[]
+}
+
 export type FotoCreateWithoutBarangInput = {
   id?: string
   tahap?: $Enums.TahapFoto | null
@@ -559,11 +625,13 @@ export type FotoCreateWithoutBarangInput = {
   isi: runtime.Bytes
   dibuatPada?: Date | string
   peminjaman?: Prisma.PeminjamanBarangCreateNestedOneWithoutFotoInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedOneWithoutFotoInput
 }
 
 export type FotoUncheckedCreateWithoutBarangInput = {
   id?: string
   peminjamanId?: string | null
+  kerusakanId?: string | null
   tahap?: $Enums.TahapFoto | null
   urutan?: number
   tipe: string
@@ -605,6 +673,7 @@ export type FotoScalarWhereInput = {
   id?: Prisma.StringFilter<"Foto"> | string
   barangId?: Prisma.StringNullableFilter<"Foto"> | string | null
   peminjamanId?: Prisma.StringNullableFilter<"Foto"> | string | null
+  kerusakanId?: Prisma.StringNullableFilter<"Foto"> | string | null
   tahap?: Prisma.EnumTahapFotoNullableFilter<"Foto"> | $Enums.TahapFoto | null
   urutan?: Prisma.IntFilter<"Foto"> | number
   tipe?: Prisma.StringFilter<"Foto"> | string
@@ -622,11 +691,13 @@ export type FotoCreateWithoutPeminjamanInput = {
   isi: runtime.Bytes
   dibuatPada?: Date | string
   barang?: Prisma.BarangCreateNestedOneWithoutFotoInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedOneWithoutFotoInput
 }
 
 export type FotoUncheckedCreateWithoutPeminjamanInput = {
   id?: string
   barangId?: string | null
+  kerusakanId?: string | null
   tahap?: $Enums.TahapFoto | null
   urutan?: number
   tipe: string
@@ -661,9 +732,60 @@ export type FotoUpdateManyWithWhereWithoutPeminjamanInput = {
   data: Prisma.XOR<Prisma.FotoUpdateManyMutationInput, Prisma.FotoUncheckedUpdateManyWithoutPeminjamanInput>
 }
 
+export type FotoCreateWithoutKerusakanInput = {
+  id?: string
+  tahap?: $Enums.TahapFoto | null
+  urutan?: number
+  tipe: string
+  ukuran: number
+  isi: runtime.Bytes
+  dibuatPada?: Date | string
+  barang?: Prisma.BarangCreateNestedOneWithoutFotoInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedOneWithoutFotoInput
+}
+
+export type FotoUncheckedCreateWithoutKerusakanInput = {
+  id?: string
+  barangId?: string | null
+  peminjamanId?: string | null
+  tahap?: $Enums.TahapFoto | null
+  urutan?: number
+  tipe: string
+  ukuran: number
+  isi: runtime.Bytes
+  dibuatPada?: Date | string
+}
+
+export type FotoCreateOrConnectWithoutKerusakanInput = {
+  where: Prisma.FotoWhereUniqueInput
+  create: Prisma.XOR<Prisma.FotoCreateWithoutKerusakanInput, Prisma.FotoUncheckedCreateWithoutKerusakanInput>
+}
+
+export type FotoCreateManyKerusakanInputEnvelope = {
+  data: Prisma.FotoCreateManyKerusakanInput | Prisma.FotoCreateManyKerusakanInput[]
+  skipDuplicates?: boolean
+}
+
+export type FotoUpsertWithWhereUniqueWithoutKerusakanInput = {
+  where: Prisma.FotoWhereUniqueInput
+  update: Prisma.XOR<Prisma.FotoUpdateWithoutKerusakanInput, Prisma.FotoUncheckedUpdateWithoutKerusakanInput>
+  create: Prisma.XOR<Prisma.FotoCreateWithoutKerusakanInput, Prisma.FotoUncheckedCreateWithoutKerusakanInput>
+}
+
+export type FotoUpdateWithWhereUniqueWithoutKerusakanInput = {
+  where: Prisma.FotoWhereUniqueInput
+  data: Prisma.XOR<Prisma.FotoUpdateWithoutKerusakanInput, Prisma.FotoUncheckedUpdateWithoutKerusakanInput>
+}
+
+export type FotoUpdateManyWithWhereWithoutKerusakanInput = {
+  where: Prisma.FotoScalarWhereInput
+  data: Prisma.XOR<Prisma.FotoUpdateManyMutationInput, Prisma.FotoUncheckedUpdateManyWithoutKerusakanInput>
+}
+
 export type FotoCreateManyBarangInput = {
   id?: string
   peminjamanId?: string | null
+  kerusakanId?: string | null
   tahap?: $Enums.TahapFoto | null
   urutan?: number
   tipe: string
@@ -681,11 +803,13 @@ export type FotoUpdateWithoutBarangInput = {
   isi?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   peminjaman?: Prisma.PeminjamanBarangUpdateOneWithoutFotoNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateOneWithoutFotoNestedInput
 }
 
 export type FotoUncheckedUpdateWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   peminjamanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kerusakanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
   urutan?: Prisma.IntFieldUpdateOperationsInput | number
   tipe?: Prisma.StringFieldUpdateOperationsInput | string
@@ -697,6 +821,7 @@ export type FotoUncheckedUpdateWithoutBarangInput = {
 export type FotoUncheckedUpdateManyWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   peminjamanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kerusakanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
   urutan?: Prisma.IntFieldUpdateOperationsInput | number
   tipe?: Prisma.StringFieldUpdateOperationsInput | string
@@ -708,6 +833,7 @@ export type FotoUncheckedUpdateManyWithoutBarangInput = {
 export type FotoCreateManyPeminjamanInput = {
   id?: string
   barangId?: string | null
+  kerusakanId?: string | null
   tahap?: $Enums.TahapFoto | null
   urutan?: number
   tipe: string
@@ -725,11 +851,13 @@ export type FotoUpdateWithoutPeminjamanInput = {
   isi?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   barang?: Prisma.BarangUpdateOneWithoutFotoNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateOneWithoutFotoNestedInput
 }
 
 export type FotoUncheckedUpdateWithoutPeminjamanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kerusakanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
   urutan?: Prisma.IntFieldUpdateOperationsInput | number
   tipe?: Prisma.StringFieldUpdateOperationsInput | string
@@ -741,6 +869,55 @@ export type FotoUncheckedUpdateWithoutPeminjamanInput = {
 export type FotoUncheckedUpdateManyWithoutPeminjamanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   barangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  kerusakanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
+  urutan?: Prisma.IntFieldUpdateOperationsInput | number
+  tipe?: Prisma.StringFieldUpdateOperationsInput | string
+  ukuran?: Prisma.IntFieldUpdateOperationsInput | number
+  isi?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type FotoCreateManyKerusakanInput = {
+  id?: string
+  barangId?: string | null
+  peminjamanId?: string | null
+  tahap?: $Enums.TahapFoto | null
+  urutan?: number
+  tipe: string
+  ukuran: number
+  isi: runtime.Bytes
+  dibuatPada?: Date | string
+}
+
+export type FotoUpdateWithoutKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
+  urutan?: Prisma.IntFieldUpdateOperationsInput | number
+  tipe?: Prisma.StringFieldUpdateOperationsInput | string
+  ukuran?: Prisma.IntFieldUpdateOperationsInput | number
+  isi?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  barang?: Prisma.BarangUpdateOneWithoutFotoNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateOneWithoutFotoNestedInput
+}
+
+export type FotoUncheckedUpdateWithoutKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  barangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  peminjamanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
+  urutan?: Prisma.IntFieldUpdateOperationsInput | number
+  tipe?: Prisma.StringFieldUpdateOperationsInput | string
+  ukuran?: Prisma.IntFieldUpdateOperationsInput | number
+  isi?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type FotoUncheckedUpdateManyWithoutKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  barangId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  peminjamanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   tahap?: Prisma.NullableEnumTahapFotoFieldUpdateOperationsInput | $Enums.TahapFoto | null
   urutan?: Prisma.IntFieldUpdateOperationsInput | number
   tipe?: Prisma.StringFieldUpdateOperationsInput | string
@@ -755,6 +932,7 @@ export type FotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   barangId?: boolean
   peminjamanId?: boolean
+  kerusakanId?: boolean
   tahap?: boolean
   urutan?: boolean
   tipe?: boolean
@@ -763,12 +941,14 @@ export type FotoSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   dibuatPada?: boolean
   barang?: boolean | Prisma.Foto$barangArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Foto$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.Foto$kerusakanArgs<ExtArgs>
 }, ExtArgs["result"]["foto"]>
 
 export type FotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   barangId?: boolean
   peminjamanId?: boolean
+  kerusakanId?: boolean
   tahap?: boolean
   urutan?: boolean
   tipe?: boolean
@@ -777,12 +957,14 @@ export type FotoSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   dibuatPada?: boolean
   barang?: boolean | Prisma.Foto$barangArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Foto$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.Foto$kerusakanArgs<ExtArgs>
 }, ExtArgs["result"]["foto"]>
 
 export type FotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   barangId?: boolean
   peminjamanId?: boolean
+  kerusakanId?: boolean
   tahap?: boolean
   urutan?: boolean
   tipe?: boolean
@@ -791,12 +973,14 @@ export type FotoSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   dibuatPada?: boolean
   barang?: boolean | Prisma.Foto$barangArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Foto$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.Foto$kerusakanArgs<ExtArgs>
 }, ExtArgs["result"]["foto"]>
 
 export type FotoSelectScalar = {
   id?: boolean
   barangId?: boolean
   peminjamanId?: boolean
+  kerusakanId?: boolean
   tahap?: boolean
   urutan?: boolean
   tipe?: boolean
@@ -805,18 +989,21 @@ export type FotoSelectScalar = {
   dibuatPada?: boolean
 }
 
-export type FotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barangId" | "peminjamanId" | "tahap" | "urutan" | "tipe" | "ukuran" | "isi" | "dibuatPada", ExtArgs["result"]["foto"]>
+export type FotoOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "barangId" | "peminjamanId" | "kerusakanId" | "tahap" | "urutan" | "tipe" | "ukuran" | "isi" | "dibuatPada", ExtArgs["result"]["foto"]>
 export type FotoInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   barang?: boolean | Prisma.Foto$barangArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Foto$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.Foto$kerusakanArgs<ExtArgs>
 }
 export type FotoIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   barang?: boolean | Prisma.Foto$barangArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Foto$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.Foto$kerusakanArgs<ExtArgs>
 }
 export type FotoIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   barang?: boolean | Prisma.Foto$barangArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Foto$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.Foto$kerusakanArgs<ExtArgs>
 }
 
 export type $FotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -824,11 +1011,16 @@ export type $FotoPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     barang: Prisma.$BarangPayload<ExtArgs> | null
     peminjaman: Prisma.$PeminjamanBarangPayload<ExtArgs> | null
+    kerusakan: Prisma.$LaporanKerusakanBarangPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     barangId: string | null
     peminjamanId: string | null
+    /**
+     * Foto bukti kondisi rusak (lihat LaporanKerusakanBarang); tahap tidak dipakai untuk foto ini (selalu null)
+     */
+    kerusakanId: string | null
     tahap: $Enums.TahapFoto | null
     urutan: number
     tipe: string
@@ -1231,6 +1423,7 @@ export interface Prisma__FotoClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   barang<T extends Prisma.Foto$barangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Foto$barangArgs<ExtArgs>>): Prisma.Prisma__BarangClient<runtime.Types.Result.GetResult<Prisma.$BarangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   peminjaman<T extends Prisma.Foto$peminjamanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Foto$peminjamanArgs<ExtArgs>>): Prisma.Prisma__PeminjamanBarangClient<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  kerusakan<T extends Prisma.Foto$kerusakanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Foto$kerusakanArgs<ExtArgs>>): Prisma.Prisma__LaporanKerusakanBarangClient<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1263,6 +1456,7 @@ export interface FotoFieldRefs {
   readonly id: Prisma.FieldRef<"Foto", 'String'>
   readonly barangId: Prisma.FieldRef<"Foto", 'String'>
   readonly peminjamanId: Prisma.FieldRef<"Foto", 'String'>
+  readonly kerusakanId: Prisma.FieldRef<"Foto", 'String'>
   readonly tahap: Prisma.FieldRef<"Foto", 'TahapFoto'>
   readonly urutan: Prisma.FieldRef<"Foto", 'Int'>
   readonly tipe: Prisma.FieldRef<"Foto", 'String'>
@@ -1705,6 +1899,25 @@ export type Foto$peminjamanArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.PeminjamanBarangInclude<ExtArgs> | null
   where?: Prisma.PeminjamanBarangWhereInput
+}
+
+/**
+ * Foto.kerusakan
+ */
+export type Foto$kerusakanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LaporanKerusakanBarang
+   */
+  select?: Prisma.LaporanKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LaporanKerusakanBarang
+   */
+  omit?: Prisma.LaporanKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LaporanKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.LaporanKerusakanBarangWhereInput
 }
 
 /**

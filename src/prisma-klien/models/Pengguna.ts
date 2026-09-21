@@ -276,6 +276,13 @@ export type PenggunaWhereInput = {
   setujuiDokumenKas?: Prisma.DokumenKasListRelationFilter
   tolakDokumenKas?: Prisma.DokumenKasListRelationFilter
   catatPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
 }
 
 export type PenggunaOrderByWithRelationInput = {
@@ -357,6 +364,13 @@ export type PenggunaOrderByWithRelationInput = {
   setujuiDokumenKas?: Prisma.DokumenKasOrderByRelationAggregateInput
   tolakDokumenKas?: Prisma.DokumenKasOrderByRelationAggregateInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangOrderByRelationAggregateInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangOrderByRelationAggregateInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangOrderByRelationAggregateInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangOrderByRelationAggregateInput
 }
 
 export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
@@ -441,6 +455,13 @@ export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
   setujuiDokumenKas?: Prisma.DokumenKasListRelationFilter
   tolakDokumenKas?: Prisma.DokumenKasListRelationFilter
   catatPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangListRelationFilter
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangListRelationFilter
 }, "id" | "namaPengguna" | "email">
 
 export type PenggunaOrderByWithAggregationInput = {
@@ -550,6 +571,13 @@ export type PenggunaCreateInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateInput = {
@@ -631,6 +659,13 @@ export type PenggunaUncheckedCreateInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUpdateInput = {
@@ -712,6 +747,13 @@ export type PenggunaUpdateInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateInput = {
@@ -793,6 +835,13 @@ export type PenggunaUncheckedUpdateInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateManyInput = {
@@ -1791,6 +1840,24 @@ export type PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput = {
   connect?: Prisma.PenggunaWhereUniqueInput
 }
 
+export type PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanPeminjamanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutAjukanPeminjamanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaCreateNestedOneWithoutSetujuiPeminjamanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiPeminjamanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutSetujuiPeminjamanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaCreateNestedOneWithoutTolakPeminjamanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakPeminjamanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutTolakPeminjamanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
 export type PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput = {
   create?: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatPeminjamanBarangInput>
   connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutCatatPeminjamanBarangInput
@@ -1799,6 +1866,100 @@ export type PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput = {
   delete?: Prisma.PenggunaWhereInput | boolean
   connect?: Prisma.PenggunaWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutCatatPeminjamanBarangInput, Prisma.PenggunaUpdateWithoutCatatPeminjamanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutCatatPeminjamanBarangInput>
+}
+
+export type PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanPeminjamanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutAjukanPeminjamanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutAjukanPeminjamanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUpdateWithoutAjukanPeminjamanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutAjukanPeminjamanBarangInput>
+}
+
+export type PenggunaUpdateOneWithoutSetujuiPeminjamanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiPeminjamanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutSetujuiPeminjamanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutSetujuiPeminjamanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUpdateWithoutSetujuiPeminjamanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutSetujuiPeminjamanBarangInput>
+}
+
+export type PenggunaUpdateOneWithoutTolakPeminjamanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakPeminjamanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutTolakPeminjamanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutTolakPeminjamanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUpdateWithoutTolakPeminjamanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutTolakPeminjamanBarangInput>
+}
+
+export type PenggunaCreateNestedOneWithoutCatatKerusakanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutCatatKerusakanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaCreateNestedOneWithoutAjukanKerusakanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutAjukanKerusakanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaCreateNestedOneWithoutSetujuiKerusakanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutSetujuiKerusakanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaCreateNestedOneWithoutTolakKerusakanBarangInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutTolakKerusakanBarangInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaUpdateOneWithoutCatatKerusakanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutCatatKerusakanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutCatatKerusakanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutCatatKerusakanBarangInput, Prisma.PenggunaUpdateWithoutCatatKerusakanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutCatatKerusakanBarangInput>
+}
+
+export type PenggunaUpdateOneWithoutAjukanKerusakanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutAjukanKerusakanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutAjukanKerusakanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUpdateWithoutAjukanKerusakanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutAjukanKerusakanBarangInput>
+}
+
+export type PenggunaUpdateOneWithoutSetujuiKerusakanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutSetujuiKerusakanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutSetujuiKerusakanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUpdateWithoutSetujuiKerusakanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutSetujuiKerusakanBarangInput>
+}
+
+export type PenggunaUpdateOneWithoutTolakKerusakanBarangNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakKerusakanBarangInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutTolakKerusakanBarangInput
+  upsert?: Prisma.PenggunaUpsertWithoutTolakKerusakanBarangInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutTolakKerusakanBarangInput, Prisma.PenggunaUpdateWithoutTolakKerusakanBarangInput>, Prisma.PenggunaUncheckedUpdateWithoutTolakKerusakanBarangInput>
 }
 
 export type PenggunaCreateNestedOneWithoutAjukanTutupBukuInput = {
@@ -2085,6 +2246,13 @@ export type PenggunaCreateWithoutSesiInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSesiInput = {
@@ -2165,6 +2333,13 @@ export type PenggunaUncheckedCreateWithoutSesiInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSesiInput = {
@@ -2261,6 +2436,13 @@ export type PenggunaUpdateWithoutSesiInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSesiInput = {
@@ -2341,6 +2523,13 @@ export type PenggunaUncheckedUpdateWithoutSesiInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutKaryawanInput = {
@@ -2421,6 +2610,13 @@ export type PenggunaCreateWithoutKaryawanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutKaryawanInput = {
@@ -2501,6 +2697,13 @@ export type PenggunaUncheckedCreateWithoutKaryawanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutKaryawanInput = {
@@ -2597,6 +2800,13 @@ export type PenggunaUpdateWithoutKaryawanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
@@ -2677,6 +2887,13 @@ export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPenawaranPenjualanInput = {
@@ -2757,6 +2974,13 @@ export type PenggunaCreateWithoutAjukanPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPenawaranPenjualanInput = {
@@ -2837,6 +3061,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPenawaranPenjualanInput = {
@@ -2922,6 +3153,13 @@ export type PenggunaCreateWithoutSetujuiPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPenawaranPenjualanInput = {
@@ -3002,6 +3240,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPenawaranPenjualanInput = {
@@ -3087,6 +3332,13 @@ export type PenggunaCreateWithoutTolakPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPenawaranPenjualanInput = {
@@ -3167,6 +3419,13 @@ export type PenggunaUncheckedCreateWithoutTolakPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPenawaranPenjualanInput = {
@@ -3263,6 +3522,13 @@ export type PenggunaUpdateWithoutAjukanPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPenawaranPenjualanInput = {
@@ -3343,6 +3609,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPenawaranPenjualanInput = {
@@ -3434,6 +3707,13 @@ export type PenggunaUpdateWithoutSetujuiPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPenawaranPenjualanInput = {
@@ -3514,6 +3794,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPenawaranPenjualanInput = {
@@ -3605,6 +3892,13 @@ export type PenggunaUpdateWithoutTolakPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPenawaranPenjualanInput = {
@@ -3685,6 +3979,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPenawaranPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPesananPenjualanInput = {
@@ -3765,6 +4066,13 @@ export type PenggunaCreateWithoutAjukanPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPesananPenjualanInput = {
@@ -3845,6 +4153,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPesananPenjualanInput = {
@@ -3930,6 +4245,13 @@ export type PenggunaCreateWithoutSetujuiPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPesananPenjualanInput = {
@@ -4010,6 +4332,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPesananPenjualanInput = {
@@ -4095,6 +4424,13 @@ export type PenggunaCreateWithoutTolakPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPesananPenjualanInput = {
@@ -4175,6 +4511,13 @@ export type PenggunaUncheckedCreateWithoutTolakPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPesananPenjualanInput = {
@@ -4271,6 +4614,13 @@ export type PenggunaUpdateWithoutAjukanPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPesananPenjualanInput = {
@@ -4351,6 +4701,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPesananPenjualanInput = {
@@ -4442,6 +4799,13 @@ export type PenggunaUpdateWithoutSetujuiPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPesananPenjualanInput = {
@@ -4522,6 +4886,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPesananPenjualanInput = {
@@ -4613,6 +4984,13 @@ export type PenggunaUpdateWithoutTolakPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPesananPenjualanInput = {
@@ -4693,6 +5071,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPesananPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPengirimanPesananInput = {
@@ -4773,6 +5158,13 @@ export type PenggunaCreateWithoutAjukanPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPengirimanPesananInput = {
@@ -4853,6 +5245,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPengirimanPesananInput = {
@@ -4938,6 +5337,13 @@ export type PenggunaCreateWithoutSetujuiPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPengirimanPesananInput = {
@@ -5018,6 +5424,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPengirimanPesananInput = {
@@ -5103,6 +5516,13 @@ export type PenggunaCreateWithoutTolakPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPengirimanPesananInput = {
@@ -5183,6 +5603,13 @@ export type PenggunaUncheckedCreateWithoutTolakPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPengirimanPesananInput = {
@@ -5279,6 +5706,13 @@ export type PenggunaUpdateWithoutAjukanPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPengirimanPesananInput = {
@@ -5359,6 +5793,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPengirimanPesananInput = {
@@ -5450,6 +5891,13 @@ export type PenggunaUpdateWithoutSetujuiPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPengirimanPesananInput = {
@@ -5530,6 +5978,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPengirimanPesananInput = {
@@ -5621,6 +6076,13 @@ export type PenggunaUpdateWithoutTolakPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPengirimanPesananInput = {
@@ -5701,6 +6163,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPengirimanPesananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanFakturPenjualanInput = {
@@ -5781,6 +6250,13 @@ export type PenggunaCreateWithoutAjukanFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanFakturPenjualanInput = {
@@ -5861,6 +6337,13 @@ export type PenggunaUncheckedCreateWithoutAjukanFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanFakturPenjualanInput = {
@@ -5946,6 +6429,13 @@ export type PenggunaCreateWithoutSetujuiFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiFakturPenjualanInput = {
@@ -6026,6 +6516,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiFakturPenjualanInput = {
@@ -6111,6 +6608,13 @@ export type PenggunaCreateWithoutTolakFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakFakturPenjualanInput = {
@@ -6191,6 +6695,13 @@ export type PenggunaUncheckedCreateWithoutTolakFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakFakturPenjualanInput = {
@@ -6287,6 +6798,13 @@ export type PenggunaUpdateWithoutAjukanFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanFakturPenjualanInput = {
@@ -6367,6 +6885,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiFakturPenjualanInput = {
@@ -6458,6 +6983,13 @@ export type PenggunaUpdateWithoutSetujuiFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiFakturPenjualanInput = {
@@ -6538,6 +7070,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakFakturPenjualanInput = {
@@ -6629,6 +7168,13 @@ export type PenggunaUpdateWithoutTolakFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakFakturPenjualanInput = {
@@ -6709,6 +7255,13 @@ export type PenggunaUncheckedUpdateWithoutTolakFakturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanUangMukaPelangganInput = {
@@ -6789,6 +7342,13 @@ export type PenggunaCreateWithoutAjukanUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanUangMukaPelangganInput = {
@@ -6869,6 +7429,13 @@ export type PenggunaUncheckedCreateWithoutAjukanUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanUangMukaPelangganInput = {
@@ -6954,6 +7521,13 @@ export type PenggunaCreateWithoutSetujuiUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiUangMukaPelangganInput = {
@@ -7034,6 +7608,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiUangMukaPelangganInput = {
@@ -7119,6 +7700,13 @@ export type PenggunaCreateWithoutTolakUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakUangMukaPelangganInput = {
@@ -7199,6 +7787,13 @@ export type PenggunaUncheckedCreateWithoutTolakUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakUangMukaPelangganInput = {
@@ -7295,6 +7890,13 @@ export type PenggunaUpdateWithoutAjukanUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanUangMukaPelangganInput = {
@@ -7375,6 +7977,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiUangMukaPelangganInput = {
@@ -7466,6 +8075,13 @@ export type PenggunaUpdateWithoutSetujuiUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiUangMukaPelangganInput = {
@@ -7546,6 +8162,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakUangMukaPelangganInput = {
@@ -7637,6 +8260,13 @@ export type PenggunaUpdateWithoutTolakUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakUangMukaPelangganInput = {
@@ -7717,6 +8347,13 @@ export type PenggunaUncheckedUpdateWithoutTolakUangMukaPelangganInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPenerimaanPenjualanInput = {
@@ -7797,6 +8434,13 @@ export type PenggunaCreateWithoutAjukanPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPenerimaanPenjualanInput = {
@@ -7877,6 +8521,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPenerimaanPenjualanInput = {
@@ -7962,6 +8613,13 @@ export type PenggunaCreateWithoutSetujuiPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPenerimaanPenjualanInput = {
@@ -8042,6 +8700,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPenerimaanPenjualanInput = {
@@ -8127,6 +8792,13 @@ export type PenggunaCreateWithoutTolakPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPenerimaanPenjualanInput = {
@@ -8207,6 +8879,13 @@ export type PenggunaUncheckedCreateWithoutTolakPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPenerimaanPenjualanInput = {
@@ -8303,6 +8982,13 @@ export type PenggunaUpdateWithoutAjukanPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPenerimaanPenjualanInput = {
@@ -8383,6 +9069,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPenerimaanPenjualanInput = {
@@ -8474,6 +9167,13 @@ export type PenggunaUpdateWithoutSetujuiPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPenerimaanPenjualanInput = {
@@ -8554,6 +9254,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPenerimaanPenjualanInput = {
@@ -8645,6 +9352,13 @@ export type PenggunaUpdateWithoutTolakPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPenerimaanPenjualanInput = {
@@ -8725,6 +9439,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPenerimaanPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanReturPenjualanInput = {
@@ -8805,6 +9526,13 @@ export type PenggunaCreateWithoutAjukanReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanReturPenjualanInput = {
@@ -8885,6 +9613,13 @@ export type PenggunaUncheckedCreateWithoutAjukanReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanReturPenjualanInput = {
@@ -8970,6 +9705,13 @@ export type PenggunaCreateWithoutSetujuiReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiReturPenjualanInput = {
@@ -9050,6 +9792,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiReturPenjualanInput = {
@@ -9135,6 +9884,13 @@ export type PenggunaCreateWithoutTolakReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakReturPenjualanInput = {
@@ -9215,6 +9971,13 @@ export type PenggunaUncheckedCreateWithoutTolakReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakReturPenjualanInput = {
@@ -9311,6 +10074,13 @@ export type PenggunaUpdateWithoutAjukanReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanReturPenjualanInput = {
@@ -9391,6 +10161,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiReturPenjualanInput = {
@@ -9482,6 +10259,13 @@ export type PenggunaUpdateWithoutSetujuiReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiReturPenjualanInput = {
@@ -9562,6 +10346,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakReturPenjualanInput = {
@@ -9653,6 +10444,13 @@ export type PenggunaUpdateWithoutTolakReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakReturPenjualanInput = {
@@ -9733,6 +10531,13 @@ export type PenggunaUncheckedUpdateWithoutTolakReturPenjualanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPesananPembelianInput = {
@@ -9813,6 +10618,13 @@ export type PenggunaCreateWithoutAjukanPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPesananPembelianInput = {
@@ -9893,6 +10705,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPesananPembelianInput = {
@@ -9978,6 +10797,13 @@ export type PenggunaCreateWithoutSetujuiPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPesananPembelianInput = {
@@ -10058,6 +10884,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPesananPembelianInput = {
@@ -10143,6 +10976,13 @@ export type PenggunaCreateWithoutTolakPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPesananPembelianInput = {
@@ -10223,6 +11063,13 @@ export type PenggunaUncheckedCreateWithoutTolakPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPesananPembelianInput = {
@@ -10319,6 +11166,13 @@ export type PenggunaUpdateWithoutAjukanPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPesananPembelianInput = {
@@ -10399,6 +11253,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPesananPembelianInput = {
@@ -10490,6 +11351,13 @@ export type PenggunaUpdateWithoutSetujuiPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPesananPembelianInput = {
@@ -10570,6 +11438,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPesananPembelianInput = {
@@ -10661,6 +11536,13 @@ export type PenggunaUpdateWithoutTolakPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPesananPembelianInput = {
@@ -10741,6 +11623,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPesananPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPenerimaanBarangInput = {
@@ -10821,6 +11710,13 @@ export type PenggunaCreateWithoutAjukanPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPenerimaanBarangInput = {
@@ -10901,6 +11797,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPenerimaanBarangInput = {
@@ -10986,6 +11889,13 @@ export type PenggunaCreateWithoutSetujuiPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPenerimaanBarangInput = {
@@ -11066,6 +11976,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPenerimaanBarangInput = {
@@ -11151,6 +12068,13 @@ export type PenggunaCreateWithoutTolakPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPenerimaanBarangInput = {
@@ -11231,6 +12155,13 @@ export type PenggunaUncheckedCreateWithoutTolakPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPenerimaanBarangInput = {
@@ -11327,6 +12258,13 @@ export type PenggunaUpdateWithoutAjukanPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPenerimaanBarangInput = {
@@ -11407,6 +12345,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPenerimaanBarangInput = {
@@ -11498,6 +12443,13 @@ export type PenggunaUpdateWithoutSetujuiPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPenerimaanBarangInput = {
@@ -11578,6 +12530,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPenerimaanBarangInput = {
@@ -11669,6 +12628,13 @@ export type PenggunaUpdateWithoutTolakPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPenerimaanBarangInput = {
@@ -11749,6 +12715,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPenerimaanBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanFakturPembelianInput = {
@@ -11829,6 +12802,13 @@ export type PenggunaCreateWithoutAjukanFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanFakturPembelianInput = {
@@ -11909,6 +12889,13 @@ export type PenggunaUncheckedCreateWithoutAjukanFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanFakturPembelianInput = {
@@ -11994,6 +12981,13 @@ export type PenggunaCreateWithoutSetujuiFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiFakturPembelianInput = {
@@ -12074,6 +13068,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiFakturPembelianInput = {
@@ -12159,6 +13160,13 @@ export type PenggunaCreateWithoutTolakFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakFakturPembelianInput = {
@@ -12239,6 +13247,13 @@ export type PenggunaUncheckedCreateWithoutTolakFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakFakturPembelianInput = {
@@ -12335,6 +13350,13 @@ export type PenggunaUpdateWithoutAjukanFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanFakturPembelianInput = {
@@ -12415,6 +13437,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiFakturPembelianInput = {
@@ -12506,6 +13535,13 @@ export type PenggunaUpdateWithoutSetujuiFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiFakturPembelianInput = {
@@ -12586,6 +13622,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakFakturPembelianInput = {
@@ -12677,6 +13720,13 @@ export type PenggunaUpdateWithoutTolakFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakFakturPembelianInput = {
@@ -12757,6 +13807,13 @@ export type PenggunaUncheckedUpdateWithoutTolakFakturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPembayaranPembelianInput = {
@@ -12837,6 +13894,13 @@ export type PenggunaCreateWithoutAjukanPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPembayaranPembelianInput = {
@@ -12917,6 +13981,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPembayaranPembelianInput = {
@@ -13002,6 +14073,13 @@ export type PenggunaCreateWithoutSetujuiPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPembayaranPembelianInput = {
@@ -13082,6 +14160,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPembayaranPembelianInput = {
@@ -13167,6 +14252,13 @@ export type PenggunaCreateWithoutTolakPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPembayaranPembelianInput = {
@@ -13247,6 +14339,13 @@ export type PenggunaUncheckedCreateWithoutTolakPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPembayaranPembelianInput = {
@@ -13343,6 +14442,13 @@ export type PenggunaUpdateWithoutAjukanPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPembayaranPembelianInput = {
@@ -13423,6 +14529,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPembayaranPembelianInput = {
@@ -13514,6 +14627,13 @@ export type PenggunaUpdateWithoutSetujuiPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPembayaranPembelianInput = {
@@ -13594,6 +14714,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPembayaranPembelianInput = {
@@ -13685,6 +14812,13 @@ export type PenggunaUpdateWithoutTolakPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPembayaranPembelianInput = {
@@ -13765,6 +14899,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPembayaranPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanReturPembelianInput = {
@@ -13845,6 +14986,13 @@ export type PenggunaCreateWithoutAjukanReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanReturPembelianInput = {
@@ -13925,6 +15073,13 @@ export type PenggunaUncheckedCreateWithoutAjukanReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanReturPembelianInput = {
@@ -14010,6 +15165,13 @@ export type PenggunaCreateWithoutSetujuiReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiReturPembelianInput = {
@@ -14090,6 +15252,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiReturPembelianInput = {
@@ -14175,6 +15344,13 @@ export type PenggunaCreateWithoutTolakReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakReturPembelianInput = {
@@ -14255,6 +15431,13 @@ export type PenggunaUncheckedCreateWithoutTolakReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakReturPembelianInput = {
@@ -14351,6 +15534,13 @@ export type PenggunaUpdateWithoutAjukanReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanReturPembelianInput = {
@@ -14431,6 +15621,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiReturPembelianInput = {
@@ -14522,6 +15719,13 @@ export type PenggunaUpdateWithoutSetujuiReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiReturPembelianInput = {
@@ -14602,6 +15806,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakReturPembelianInput = {
@@ -14693,6 +15904,13 @@ export type PenggunaUpdateWithoutTolakReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakReturPembelianInput = {
@@ -14773,6 +15991,13 @@ export type PenggunaUncheckedUpdateWithoutTolakReturPembelianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanJurnalInput = {
@@ -14853,6 +16078,13 @@ export type PenggunaCreateWithoutAjukanJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanJurnalInput = {
@@ -14933,6 +16165,13 @@ export type PenggunaUncheckedCreateWithoutAjukanJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanJurnalInput = {
@@ -15018,6 +16257,13 @@ export type PenggunaCreateWithoutSetujuiJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiJurnalInput = {
@@ -15098,6 +16344,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiJurnalInput = {
@@ -15183,6 +16436,13 @@ export type PenggunaCreateWithoutTolakJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakJurnalInput = {
@@ -15263,6 +16523,13 @@ export type PenggunaUncheckedCreateWithoutTolakJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakJurnalInput = {
@@ -15359,6 +16626,13 @@ export type PenggunaUpdateWithoutAjukanJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanJurnalInput = {
@@ -15439,6 +16713,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiJurnalInput = {
@@ -15530,6 +16811,13 @@ export type PenggunaUpdateWithoutSetujuiJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiJurnalInput = {
@@ -15610,6 +16898,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakJurnalInput = {
@@ -15701,6 +16996,13 @@ export type PenggunaUpdateWithoutTolakJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakJurnalInput = {
@@ -15781,6 +17083,13 @@ export type PenggunaUncheckedUpdateWithoutTolakJurnalInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanDokumenKasInput = {
@@ -15861,6 +17170,13 @@ export type PenggunaCreateWithoutAjukanDokumenKasInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanDokumenKasInput = {
@@ -15941,6 +17257,13 @@ export type PenggunaUncheckedCreateWithoutAjukanDokumenKasInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanDokumenKasInput = {
@@ -16026,6 +17349,13 @@ export type PenggunaCreateWithoutSetujuiDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiDokumenKasInput = {
@@ -16106,6 +17436,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiDokumenKasInput = {
@@ -16191,6 +17528,13 @@ export type PenggunaCreateWithoutTolakDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakDokumenKasInput = {
@@ -16271,6 +17615,13 @@ export type PenggunaUncheckedCreateWithoutTolakDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakDokumenKasInput = {
@@ -16367,6 +17718,13 @@ export type PenggunaUpdateWithoutAjukanDokumenKasInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanDokumenKasInput = {
@@ -16447,6 +17805,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanDokumenKasInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiDokumenKasInput = {
@@ -16538,6 +17903,13 @@ export type PenggunaUpdateWithoutSetujuiDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiDokumenKasInput = {
@@ -16618,6 +17990,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakDokumenKasInput = {
@@ -16709,6 +18088,13 @@ export type PenggunaUpdateWithoutTolakDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakDokumenKasInput = {
@@ -16789,6 +18175,13 @@ export type PenggunaUncheckedUpdateWithoutTolakDokumenKasInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanAsetTetapInput = {
@@ -16869,6 +18262,13 @@ export type PenggunaCreateWithoutAjukanAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanAsetTetapInput = {
@@ -16949,6 +18349,13 @@ export type PenggunaUncheckedCreateWithoutAjukanAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanAsetTetapInput = {
@@ -17034,6 +18441,13 @@ export type PenggunaCreateWithoutSetujuiAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiAsetTetapInput = {
@@ -17114,6 +18528,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiAsetTetapInput = {
@@ -17199,6 +18620,13 @@ export type PenggunaCreateWithoutTolakAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakAsetTetapInput = {
@@ -17279,6 +18707,13 @@ export type PenggunaUncheckedCreateWithoutTolakAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakAsetTetapInput = {
@@ -17375,6 +18810,13 @@ export type PenggunaUpdateWithoutAjukanAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanAsetTetapInput = {
@@ -17455,6 +18897,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiAsetTetapInput = {
@@ -17546,6 +18995,13 @@ export type PenggunaUpdateWithoutSetujuiAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiAsetTetapInput = {
@@ -17626,6 +19082,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakAsetTetapInput = {
@@ -17717,6 +19180,13 @@ export type PenggunaUpdateWithoutTolakAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakAsetTetapInput = {
@@ -17797,6 +19267,13 @@ export type PenggunaUncheckedUpdateWithoutTolakAsetTetapInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPelepasanAsetInput = {
@@ -17877,6 +19354,13 @@ export type PenggunaCreateWithoutAjukanPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPelepasanAsetInput = {
@@ -17957,6 +19441,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPelepasanAsetInput = {
@@ -18042,6 +19533,13 @@ export type PenggunaCreateWithoutSetujuiPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPelepasanAsetInput = {
@@ -18122,6 +19620,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPelepasanAsetInput = {
@@ -18207,6 +19712,13 @@ export type PenggunaCreateWithoutTolakPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPelepasanAsetInput = {
@@ -18287,6 +19799,13 @@ export type PenggunaUncheckedCreateWithoutTolakPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPelepasanAsetInput = {
@@ -18383,6 +19902,13 @@ export type PenggunaUpdateWithoutAjukanPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPelepasanAsetInput = {
@@ -18463,6 +19989,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPelepasanAsetInput = {
@@ -18554,6 +20087,13 @@ export type PenggunaUpdateWithoutSetujuiPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPelepasanAsetInput = {
@@ -18634,6 +20174,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPelepasanAsetInput = {
@@ -18725,6 +20272,13 @@ export type PenggunaUpdateWithoutTolakPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPelepasanAsetInput = {
@@ -18805,6 +20359,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPelepasanAsetInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPindahBarangInput = {
@@ -18885,6 +20446,13 @@ export type PenggunaCreateWithoutAjukanPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPindahBarangInput = {
@@ -18965,6 +20533,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPindahBarangInput = {
@@ -19050,6 +20625,13 @@ export type PenggunaCreateWithoutSetujuiPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPindahBarangInput = {
@@ -19130,6 +20712,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPindahBarangInput = {
@@ -19215,6 +20804,13 @@ export type PenggunaCreateWithoutTolakPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPindahBarangInput = {
@@ -19295,6 +20891,13 @@ export type PenggunaUncheckedCreateWithoutTolakPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPindahBarangInput = {
@@ -19391,6 +20994,13 @@ export type PenggunaUpdateWithoutAjukanPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPindahBarangInput = {
@@ -19471,6 +21081,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPindahBarangInput = {
@@ -19562,6 +21179,13 @@ export type PenggunaUpdateWithoutSetujuiPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPindahBarangInput = {
@@ -19642,6 +21266,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPindahBarangInput = {
@@ -19733,6 +21364,13 @@ export type PenggunaUpdateWithoutTolakPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPindahBarangInput = {
@@ -19813,6 +21451,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPindahBarangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPenyesuaianPersediaanInput = {
@@ -19893,6 +21538,13 @@ export type PenggunaCreateWithoutAjukanPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPenyesuaianPersediaanInput = {
@@ -19973,6 +21625,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPenyesuaianPersediaanInput = {
@@ -20058,6 +21717,13 @@ export type PenggunaCreateWithoutSetujuiPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPenyesuaianPersediaanInput = {
@@ -20138,6 +21804,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPenyesuaianPersediaanInput = {
@@ -20223,6 +21896,13 @@ export type PenggunaCreateWithoutTolakPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPenyesuaianPersediaanInput = {
@@ -20303,6 +21983,13 @@ export type PenggunaUncheckedCreateWithoutTolakPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPenyesuaianPersediaanInput = {
@@ -20399,6 +22086,13 @@ export type PenggunaUpdateWithoutAjukanPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPenyesuaianPersediaanInput = {
@@ -20479,6 +22173,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPenyesuaianPersediaanInput = {
@@ -20570,6 +22271,13 @@ export type PenggunaUpdateWithoutSetujuiPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPenyesuaianPersediaanInput = {
@@ -20650,6 +22358,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPenyesuaianPersediaanInput = {
@@ -20741,6 +22456,13 @@ export type PenggunaUpdateWithoutTolakPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPenyesuaianPersediaanInput = {
@@ -20821,6 +22543,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPenyesuaianPersediaanInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutCatatPeminjamanBarangInput = {
@@ -20901,6 +22630,13 @@ export type PenggunaCreateWithoutCatatPeminjamanBarangInput = {
   ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutCatatPeminjamanBarangInput = {
@@ -20981,11 +22717,555 @@ export type PenggunaUncheckedCreateWithoutCatatPeminjamanBarangInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutCatatPeminjamanBarangInput = {
   where: Prisma.PenggunaWhereUniqueInput
   create: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatPeminjamanBarangInput>
+}
+
+export type PenggunaCreateWithoutAjukanPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutAjukanPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutAjukanPeminjamanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanPeminjamanBarangInput>
+}
+
+export type PenggunaCreateWithoutSetujuiPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutSetujuiPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutSetujuiPeminjamanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiPeminjamanBarangInput>
+}
+
+export type PenggunaCreateWithoutTolakPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutTolakPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutTolakPeminjamanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakPeminjamanBarangInput>
 }
 
 export type PenggunaUpsertWithoutCatatPeminjamanBarangInput = {
@@ -21077,6 +23357,13 @@ export type PenggunaUpdateWithoutCatatPeminjamanBarangInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutCatatPeminjamanBarangInput = {
@@ -21157,6 +23444,2024 @@ export type PenggunaUncheckedUpdateWithoutCatatPeminjamanBarangInput = {
   ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUpsertWithoutAjukanPeminjamanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutAjukanPeminjamanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanPeminjamanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutAjukanPeminjamanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutAjukanPeminjamanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutAjukanPeminjamanBarangInput>
+}
+
+export type PenggunaUpdateWithoutAjukanPeminjamanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutAjukanPeminjamanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUpsertWithoutSetujuiPeminjamanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutSetujuiPeminjamanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiPeminjamanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutSetujuiPeminjamanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutSetujuiPeminjamanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutSetujuiPeminjamanBarangInput>
+}
+
+export type PenggunaUpdateWithoutSetujuiPeminjamanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutSetujuiPeminjamanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUpsertWithoutTolakPeminjamanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutTolakPeminjamanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakPeminjamanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutTolakPeminjamanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutTolakPeminjamanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutTolakPeminjamanBarangInput>
+}
+
+export type PenggunaUpdateWithoutTolakPeminjamanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutTolakPeminjamanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaCreateWithoutCatatKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutCatatKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutCatatKerusakanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatKerusakanBarangInput>
+}
+
+export type PenggunaCreateWithoutAjukanKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutAjukanKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutAjukanKerusakanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanKerusakanBarangInput>
+}
+
+export type PenggunaCreateWithoutSetujuiKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutSetujuiKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutSetujuiKerusakanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiKerusakanBarangInput>
+}
+
+export type PenggunaCreateWithoutTolakKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutTolakKerusakanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutTolakKerusakanBarangInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakKerusakanBarangInput>
+}
+
+export type PenggunaUpsertWithoutCatatKerusakanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutCatatKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutCatatKerusakanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatKerusakanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutCatatKerusakanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutCatatKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutCatatKerusakanBarangInput>
+}
+
+export type PenggunaUpdateWithoutCatatKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutCatatKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUpsertWithoutAjukanKerusakanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutAjukanKerusakanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutAjukanKerusakanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutAjukanKerusakanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutAjukanKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutAjukanKerusakanBarangInput>
+}
+
+export type PenggunaUpdateWithoutAjukanKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutAjukanKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUpsertWithoutSetujuiKerusakanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutSetujuiKerusakanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutSetujuiKerusakanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutSetujuiKerusakanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutSetujuiKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutSetujuiKerusakanBarangInput>
+}
+
+export type PenggunaUpdateWithoutSetujuiKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutSetujuiKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUpsertWithoutTolakKerusakanBarangInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutTolakKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutTolakKerusakanBarangInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutTolakKerusakanBarangInput, Prisma.PenggunaUncheckedCreateWithoutTolakKerusakanBarangInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutTolakKerusakanBarangInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutTolakKerusakanBarangInput, Prisma.PenggunaUncheckedUpdateWithoutTolakKerusakanBarangInput>
+}
+
+export type PenggunaUpdateWithoutTolakKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutTolakKerusakanBarangInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanTutupBukuInput = {
@@ -21237,6 +25542,13 @@ export type PenggunaCreateWithoutAjukanTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanTutupBukuInput = {
@@ -21317,6 +25629,13 @@ export type PenggunaUncheckedCreateWithoutAjukanTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanTutupBukuInput = {
@@ -21402,6 +25721,13 @@ export type PenggunaCreateWithoutSetujuiTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiTutupBukuInput = {
@@ -21482,6 +25808,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiTutupBukuInput = {
@@ -21567,6 +25900,13 @@ export type PenggunaCreateWithoutTolakTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakTutupBukuInput = {
@@ -21647,6 +25987,13 @@ export type PenggunaUncheckedCreateWithoutTolakTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakTutupBukuInput = {
@@ -21743,6 +26090,13 @@ export type PenggunaUpdateWithoutAjukanTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanTutupBukuInput = {
@@ -21823,6 +26177,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiTutupBukuInput = {
@@ -21914,6 +26275,13 @@ export type PenggunaUpdateWithoutSetujuiTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiTutupBukuInput = {
@@ -21994,6 +26362,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakTutupBukuInput = {
@@ -22085,6 +26460,13 @@ export type PenggunaUpdateWithoutTolakTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakTutupBukuInput = {
@@ -22165,6 +26547,13 @@ export type PenggunaUncheckedUpdateWithoutTolakTutupBukuInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPphFinalBulananInput = {
@@ -22245,6 +26634,13 @@ export type PenggunaCreateWithoutAjukanPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPphFinalBulananInput = {
@@ -22325,6 +26721,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPphFinalBulananInput = {
@@ -22410,6 +26813,13 @@ export type PenggunaCreateWithoutSetujuiPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPphFinalBulananInput = {
@@ -22490,6 +26900,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPphFinalBulananInput = {
@@ -22575,6 +26992,13 @@ export type PenggunaCreateWithoutTolakPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPphFinalBulananInput = {
@@ -22655,6 +27079,13 @@ export type PenggunaUncheckedCreateWithoutTolakPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPphFinalBulananInput = {
@@ -22751,6 +27182,13 @@ export type PenggunaUpdateWithoutAjukanPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPphFinalBulananInput = {
@@ -22831,6 +27269,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPphFinalBulananInput = {
@@ -22922,6 +27367,13 @@ export type PenggunaUpdateWithoutSetujuiPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPphFinalBulananInput = {
@@ -23002,6 +27454,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPphFinalBulananInput = {
@@ -23093,6 +27552,13 @@ export type PenggunaUpdateWithoutTolakPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPphFinalBulananInput = {
@@ -23173,6 +27639,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPphFinalBulananInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutPermintaanAturUlangInput = {
@@ -23253,6 +27726,13 @@ export type PenggunaCreateWithoutPermintaanAturUlangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutPermintaanAturUlangInput = {
@@ -23333,6 +27813,13 @@ export type PenggunaUncheckedCreateWithoutPermintaanAturUlangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutPermintaanAturUlangInput = {
@@ -23429,6 +27916,13 @@ export type PenggunaUpdateWithoutPermintaanAturUlangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput = {
@@ -23509,6 +28003,13 @@ export type PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPriveInput = {
@@ -23589,6 +28090,13 @@ export type PenggunaCreateWithoutAjukanPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPriveInput = {
@@ -23669,6 +28177,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPriveInput = {
@@ -23754,6 +28269,13 @@ export type PenggunaCreateWithoutSetujuiPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPriveInput = {
@@ -23834,6 +28356,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPriveInput = {
@@ -23919,6 +28448,13 @@ export type PenggunaCreateWithoutTolakPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPriveInput = {
@@ -23999,6 +28535,13 @@ export type PenggunaUncheckedCreateWithoutTolakPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPriveInput = {
@@ -24095,6 +28638,13 @@ export type PenggunaUpdateWithoutAjukanPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPriveInput = {
@@ -24175,6 +28725,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPriveInput = {
@@ -24266,6 +28823,13 @@ export type PenggunaUpdateWithoutSetujuiPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPriveInput = {
@@ -24346,6 +28910,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPriveInput = {
@@ -24437,6 +29008,13 @@ export type PenggunaUpdateWithoutTolakPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPriveInput = {
@@ -24517,6 +29095,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPriveInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaCreateWithoutAjukanPenggajianInput = {
@@ -24597,6 +29182,13 @@ export type PenggunaCreateWithoutAjukanPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutAjukanPenggajianInput = {
@@ -24677,6 +29269,13 @@ export type PenggunaUncheckedCreateWithoutAjukanPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutAjukanPenggajianInput = {
@@ -24762,6 +29361,13 @@ export type PenggunaCreateWithoutSetujuiPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutSetujuiPenggajianInput = {
@@ -24842,6 +29448,13 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutSetujuiPenggajianInput = {
@@ -24927,6 +29540,13 @@ export type PenggunaCreateWithoutTolakPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaUncheckedCreateWithoutTolakPenggajianInput = {
@@ -25007,6 +29627,13 @@ export type PenggunaUncheckedCreateWithoutTolakPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
 }
 
 export type PenggunaCreateOrConnectWithoutTolakPenggajianInput = {
@@ -25103,6 +29730,13 @@ export type PenggunaUpdateWithoutAjukanPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutAjukanPenggajianInput = {
@@ -25183,6 +29817,13 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutSetujuiPenggajianInput = {
@@ -25274,6 +29915,13 @@ export type PenggunaUpdateWithoutSetujuiPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutSetujuiPenggajianInput = {
@@ -25354,6 +30002,13 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUpsertWithoutTolakPenggajianInput = {
@@ -25445,6 +30100,13 @@ export type PenggunaUpdateWithoutTolakPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
 }
 
 export type PenggunaUncheckedUpdateWithoutTolakPenggajianInput = {
@@ -25525,6 +30187,13 @@ export type PenggunaUncheckedUpdateWithoutTolakPenggajianInput = {
   setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
   tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
   catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
 
@@ -25602,6 +30271,13 @@ export type PenggunaCountOutputType = {
   setujuiDokumenKas: number
   tolakDokumenKas: number
   catatPeminjamanBarang: number
+  ajukanPeminjamanBarang: number
+  setujuiPeminjamanBarang: number
+  tolakPeminjamanBarang: number
+  catatKerusakanBarang: number
+  ajukanKerusakanBarang: number
+  setujuiKerusakanBarang: number
+  tolakKerusakanBarang: number
 }
 
 export type PenggunaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -25674,6 +30350,13 @@ export type PenggunaCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   setujuiDokumenKas?: boolean | PenggunaCountOutputTypeCountSetujuiDokumenKasArgs
   tolakDokumenKas?: boolean | PenggunaCountOutputTypeCountTolakDokumenKasArgs
   catatPeminjamanBarang?: boolean | PenggunaCountOutputTypeCountCatatPeminjamanBarangArgs
+  ajukanPeminjamanBarang?: boolean | PenggunaCountOutputTypeCountAjukanPeminjamanBarangArgs
+  setujuiPeminjamanBarang?: boolean | PenggunaCountOutputTypeCountSetujuiPeminjamanBarangArgs
+  tolakPeminjamanBarang?: boolean | PenggunaCountOutputTypeCountTolakPeminjamanBarangArgs
+  catatKerusakanBarang?: boolean | PenggunaCountOutputTypeCountCatatKerusakanBarangArgs
+  ajukanKerusakanBarang?: boolean | PenggunaCountOutputTypeCountAjukanKerusakanBarangArgs
+  setujuiKerusakanBarang?: boolean | PenggunaCountOutputTypeCountSetujuiKerusakanBarangArgs
+  tolakKerusakanBarang?: boolean | PenggunaCountOutputTypeCountTolakKerusakanBarangArgs
 }
 
 /**
@@ -26169,6 +30852,55 @@ export type PenggunaCountOutputTypeCountCatatPeminjamanBarangArgs<ExtArgs extend
   where?: Prisma.PeminjamanBarangWhereInput
 }
 
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountAjukanPeminjamanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PeminjamanBarangWhereInput
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountSetujuiPeminjamanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PeminjamanBarangWhereInput
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountTolakPeminjamanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PeminjamanBarangWhereInput
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountCatatKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountAjukanKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountSetujuiKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+}
+
+/**
+ * PenggunaCountOutputType without action
+ */
+export type PenggunaCountOutputTypeCountTolakKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+}
+
 
 export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -26249,6 +30981,13 @@ export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   setujuiDokumenKas?: boolean | Prisma.Pengguna$setujuiDokumenKasArgs<ExtArgs>
   tolakDokumenKas?: boolean | Prisma.Pengguna$tolakDokumenKasArgs<ExtArgs>
   catatPeminjamanBarang?: boolean | Prisma.Pengguna$catatPeminjamanBarangArgs<ExtArgs>
+  ajukanPeminjamanBarang?: boolean | Prisma.Pengguna$ajukanPeminjamanBarangArgs<ExtArgs>
+  setujuiPeminjamanBarang?: boolean | Prisma.Pengguna$setujuiPeminjamanBarangArgs<ExtArgs>
+  tolakPeminjamanBarang?: boolean | Prisma.Pengguna$tolakPeminjamanBarangArgs<ExtArgs>
+  catatKerusakanBarang?: boolean | Prisma.Pengguna$catatKerusakanBarangArgs<ExtArgs>
+  ajukanKerusakanBarang?: boolean | Prisma.Pengguna$ajukanKerusakanBarangArgs<ExtArgs>
+  setujuiKerusakanBarang?: boolean | Prisma.Pengguna$setujuiKerusakanBarangArgs<ExtArgs>
+  tolakKerusakanBarang?: boolean | Prisma.Pengguna$tolakKerusakanBarangArgs<ExtArgs>
   _count?: boolean | Prisma.PenggunaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pengguna"]>
 
@@ -26357,6 +31096,13 @@ export type PenggunaInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   setujuiDokumenKas?: boolean | Prisma.Pengguna$setujuiDokumenKasArgs<ExtArgs>
   tolakDokumenKas?: boolean | Prisma.Pengguna$tolakDokumenKasArgs<ExtArgs>
   catatPeminjamanBarang?: boolean | Prisma.Pengguna$catatPeminjamanBarangArgs<ExtArgs>
+  ajukanPeminjamanBarang?: boolean | Prisma.Pengguna$ajukanPeminjamanBarangArgs<ExtArgs>
+  setujuiPeminjamanBarang?: boolean | Prisma.Pengguna$setujuiPeminjamanBarangArgs<ExtArgs>
+  tolakPeminjamanBarang?: boolean | Prisma.Pengguna$tolakPeminjamanBarangArgs<ExtArgs>
+  catatKerusakanBarang?: boolean | Prisma.Pengguna$catatKerusakanBarangArgs<ExtArgs>
+  ajukanKerusakanBarang?: boolean | Prisma.Pengguna$ajukanKerusakanBarangArgs<ExtArgs>
+  setujuiKerusakanBarang?: boolean | Prisma.Pengguna$setujuiKerusakanBarangArgs<ExtArgs>
+  tolakKerusakanBarang?: boolean | Prisma.Pengguna$tolakKerusakanBarangArgs<ExtArgs>
   _count?: boolean | Prisma.PenggunaCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PenggunaIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -26438,6 +31184,13 @@ export type $PenggunaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     setujuiDokumenKas: Prisma.$DokumenKasPayload<ExtArgs>[]
     tolakDokumenKas: Prisma.$DokumenKasPayload<ExtArgs>[]
     catatPeminjamanBarang: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
+    ajukanPeminjamanBarang: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
+    setujuiPeminjamanBarang: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
+    tolakPeminjamanBarang: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
+    catatKerusakanBarang: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>[]
+    ajukanKerusakanBarang: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>[]
+    setujuiKerusakanBarang: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>[]
+    tolakKerusakanBarang: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -26915,6 +31668,13 @@ export interface Prisma__PenggunaClient<T, Null = never, ExtArgs extends runtime
   setujuiDokumenKas<T extends Prisma.Pengguna$setujuiDokumenKasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$setujuiDokumenKasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DokumenKasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tolakDokumenKas<T extends Prisma.Pengguna$tolakDokumenKasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$tolakDokumenKasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DokumenKasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   catatPeminjamanBarang<T extends Prisma.Pengguna$catatPeminjamanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$catatPeminjamanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ajukanPeminjamanBarang<T extends Prisma.Pengguna$ajukanPeminjamanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$ajukanPeminjamanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  setujuiPeminjamanBarang<T extends Prisma.Pengguna$setujuiPeminjamanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$setujuiPeminjamanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tolakPeminjamanBarang<T extends Prisma.Pengguna$tolakPeminjamanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$tolakPeminjamanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  catatKerusakanBarang<T extends Prisma.Pengguna$catatKerusakanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$catatKerusakanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ajukanKerusakanBarang<T extends Prisma.Pengguna$ajukanKerusakanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$ajukanKerusakanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  setujuiKerusakanBarang<T extends Prisma.Pengguna$setujuiKerusakanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$setujuiKerusakanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tolakKerusakanBarang<T extends Prisma.Pengguna$tolakKerusakanBarangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$tolakKerusakanBarangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -29017,6 +33777,174 @@ export type Pengguna$catatPeminjamanBarangArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.PeminjamanBarangScalarFieldEnum | Prisma.PeminjamanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.ajukanPeminjamanBarang
+ */
+export type Pengguna$ajukanPeminjamanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PeminjamanBarang
+   */
+  select?: Prisma.PeminjamanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PeminjamanBarang
+   */
+  omit?: Prisma.PeminjamanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PeminjamanBarangInclude<ExtArgs> | null
+  where?: Prisma.PeminjamanBarangWhereInput
+  orderBy?: Prisma.PeminjamanBarangOrderByWithRelationInput | Prisma.PeminjamanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.PeminjamanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PeminjamanBarangScalarFieldEnum | Prisma.PeminjamanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.setujuiPeminjamanBarang
+ */
+export type Pengguna$setujuiPeminjamanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PeminjamanBarang
+   */
+  select?: Prisma.PeminjamanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PeminjamanBarang
+   */
+  omit?: Prisma.PeminjamanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PeminjamanBarangInclude<ExtArgs> | null
+  where?: Prisma.PeminjamanBarangWhereInput
+  orderBy?: Prisma.PeminjamanBarangOrderByWithRelationInput | Prisma.PeminjamanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.PeminjamanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PeminjamanBarangScalarFieldEnum | Prisma.PeminjamanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.tolakPeminjamanBarang
+ */
+export type Pengguna$tolakPeminjamanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PeminjamanBarang
+   */
+  select?: Prisma.PeminjamanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PeminjamanBarang
+   */
+  omit?: Prisma.PeminjamanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PeminjamanBarangInclude<ExtArgs> | null
+  where?: Prisma.PeminjamanBarangWhereInput
+  orderBy?: Prisma.PeminjamanBarangOrderByWithRelationInput | Prisma.PeminjamanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.PeminjamanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PeminjamanBarangScalarFieldEnum | Prisma.PeminjamanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.catatKerusakanBarang
+ */
+export type Pengguna$catatKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LaporanKerusakanBarang
+   */
+  select?: Prisma.LaporanKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LaporanKerusakanBarang
+   */
+  omit?: Prisma.LaporanKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LaporanKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+  orderBy?: Prisma.LaporanKerusakanBarangOrderByWithRelationInput | Prisma.LaporanKerusakanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.LaporanKerusakanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LaporanKerusakanBarangScalarFieldEnum | Prisma.LaporanKerusakanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.ajukanKerusakanBarang
+ */
+export type Pengguna$ajukanKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LaporanKerusakanBarang
+   */
+  select?: Prisma.LaporanKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LaporanKerusakanBarang
+   */
+  omit?: Prisma.LaporanKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LaporanKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+  orderBy?: Prisma.LaporanKerusakanBarangOrderByWithRelationInput | Prisma.LaporanKerusakanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.LaporanKerusakanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LaporanKerusakanBarangScalarFieldEnum | Prisma.LaporanKerusakanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.setujuiKerusakanBarang
+ */
+export type Pengguna$setujuiKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LaporanKerusakanBarang
+   */
+  select?: Prisma.LaporanKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LaporanKerusakanBarang
+   */
+  omit?: Prisma.LaporanKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LaporanKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+  orderBy?: Prisma.LaporanKerusakanBarangOrderByWithRelationInput | Prisma.LaporanKerusakanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.LaporanKerusakanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LaporanKerusakanBarangScalarFieldEnum | Prisma.LaporanKerusakanBarangScalarFieldEnum[]
+}
+
+/**
+ * Pengguna.tolakKerusakanBarang
+ */
+export type Pengguna$tolakKerusakanBarangArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LaporanKerusakanBarang
+   */
+  select?: Prisma.LaporanKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LaporanKerusakanBarang
+   */
+  omit?: Prisma.LaporanKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LaporanKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+  orderBy?: Prisma.LaporanKerusakanBarangOrderByWithRelationInput | Prisma.LaporanKerusakanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.LaporanKerusakanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LaporanKerusakanBarangScalarFieldEnum | Prisma.LaporanKerusakanBarangScalarFieldEnum[]
 }
 
 /**

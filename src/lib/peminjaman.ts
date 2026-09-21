@@ -1,14 +1,13 @@
-import type { Prisma, PrismaClient } from "@/prisma-klien/client";
-import { D, type Desimal } from "@/lib/uang";
+import { D } from "@/lib/uang";
 import { tanggalIso } from "@/lib/waktu";
 
 /*
- * Peminjaman Barang (loading out / loading in) tidak menyentuh StokBarang maupun jurnal.
- * "Sedang di luar" dihitung dari baris dokumen yang belum ditautkan ke Penyesuaian Stok,
- * termasuk dokumen yang sudah ditutup dengan selisih: barang hilang tetap dihitung di luar
- * sampai Admin menautkan penyesuaiannya. Tersedia = StokBarang.jumlah - sedang di luar.
+ * Peminjaman Barang (loading out / loading in) untuk kru event. Sejak disetujui Gudang, StokBarang
+ * sungguhan dikurangi (lihat src/lib/persetujuan.ts, berkas "peminjaman") lewat kurangiStok/tambahStok
+ * (src/lib/stok.ts) di dalam transaksi, jadi StokBarang.jumlah SUDAH mencerminkan barang yang masih
+ * di luar - tidak ada lagi perhitungan "tersedia = stok - sedang di luar" yang terpisah. Dokumen yang
+ * masih DRAFT/MENUNGGU belum menyentuh stok sama sekali (lihat src/lib/hakAkses.ts).
  */
-type KlienDb = PrismaClient | Prisma.TransactionClient;
 
 export type StatusPeminjaman = "TERBUKA" | "SELESAI" | "SELISIH" | "DISESUAIKAN";
 
@@ -35,22 +34,7 @@ export function terlambat(p: { rencanaKembali: Date | null; ditutupPada: Date | 
   return !p.ditutupPada && !!p.rencanaKembali && tanggalIso(p.rencanaKembali) < tanggalIso(sekarang);
 }
 
-/**
- * Peta jumlah yang sedang di luar. Kunci = barangId bila gudangId diberikan,
- * selain itu `${gudangId}:${barangId}`. Barang tanpa sisa tidak masuk peta.
- */
-export async function petaSedangDiLuar(klien: KlienDb, gudangId?: string): Promise<Map<string, number>> {
-  const baris = await klien.barisPeminjamanBarang.findMany({
-    where: { peminjaman: { penyesuaianId: null, ...(gudangId ? { gudangId } : {}) } },
-    select: { barangId: true, jumlah: true, jumlahKembali: true, peminjaman: { select: { gudangId: true } } },
-  });
-  // Dijumlahkan sebagai Decimal supaya 0,1 + 0,2 tetap 0,3 (satuan bisa bukan pcs), baru diubah ke number.
-  const jumlah = new Map<string, Desimal>();
-  for (const b of baris) {
-    const sisa = D(b.jumlah).minus(D(b.jumlahKembali));
-    if (sisa.lte(0)) continue;
-    const kunci = gudangId ? b.barangId : `${b.peminjaman.gudangId}:${b.barangId}`;
-    jumlah.set(kunci, (jumlah.get(kunci) ?? D(0)).plus(sisa));
-  }
-  return new Map([...jumlah].map(([k, v]) => [k, v.toNumber()]));
+/** Bagian yang sudah diajukan kembali oleh Kru tapi belum dikonfirmasi (stok belum ditambah balik) oleh Gudang. */
+export function menungguKonfirmasiBaris(b: { jumlahDiajukanKembali: unknown; jumlahKembali: unknown }): number {
+  return D(b.jumlahDiajukanKembali as string).minus(D(b.jumlahKembali as string)).toNumber();
 }

@@ -6,8 +6,12 @@ import { useState } from "react";
 type OpsiBarang = { id: string; kode: string; nama: string; satuan: string; warna: string | null; tersedia: number };
 type Baris = { barangId: string; jumlah: number };
 
-/** Baris barang yang dibawa keluar; hidden "baris" = JSON [{ barangId, jumlah }]. Tersedia = stok gudang dikurangi yang sedang di luar. */
-export default function EditorBarisPeminjaman({ daftarBarang }: { daftarBarang: OpsiBarang[] }) {
+/**
+ * Baris barang yang dikurangi dari stok gudang terpilih; hidden "baris" = JSON [{ barangId, jumlah }].
+ * Tersedia = StokBarang.jumlah gudang terpilih. `labelJumlah` disesuaikan pemanggil (peminjaman:
+ * "Jumlah keluar", kerusakan: "Jumlah rusak"), keduanya sama-sama mengurangi StokBarang.
+ */
+export default function EditorBarisPeminjaman({ daftarBarang, labelJumlah = "Jumlah keluar" }: { daftarBarang: OpsiBarang[]; labelJumlah?: string }) {
   const [isian, setIsian] = useState<Baris[]>([{ barangId: "", jumlah: 0 }]);
   const ubah = (i: number, patch: Partial<Baris>) => setIsian((s) => s.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   const hapus = (i: number) => setIsian((s) => s.filter((_, idx) => idx !== i));
@@ -53,7 +57,7 @@ export default function EditorBarisPeminjaman({ daftarBarang }: { daftarBarang: 
                 <div className="angka text-slate-700">{infoBarang(r)}</div>
               </div>
               <div className="bidang">
-                <label className="label text-xs" htmlFor={`jumlah-pinjam-${i}`}>Jumlah keluar</label>
+                <label className="label text-xs" htmlFor={`jumlah-pinjam-${i}`}>{labelJumlah}</label>
                 <input
                   id={`jumlah-pinjam-${i}`}
                   type="number"
@@ -79,7 +83,7 @@ export default function EditorBarisPeminjaman({ daftarBarang }: { daftarBarang: 
               <tr>
                 <th>Barang</th>
                 <th className="w-40 text-right">Tersedia</th>
-                <th className="w-32">Jumlah keluar</th>
+                <th className="w-32">{labelJumlah}</th>
                 <th />
               </tr>
             </thead>
@@ -94,7 +98,7 @@ export default function EditorBarisPeminjaman({ daftarBarang }: { daftarBarang: 
                   </td>
                   <td className="text-right angka text-slate-500 text-xs">{infoBarang(r)}</td>
                   <td>
-                    <input type="number" min={0} step="0.01" className={`isian isian-kecil ${lebih(r) ? "border-rose-400" : ""}`} value={r.jumlah} onChange={(e) => ubah(i, { jumlah: Number(e.target.value) })} aria-label={`Jumlah keluar baris ${i + 1}`} />
+                    <input type="number" min={0} step="0.01" className={`isian isian-kecil ${lebih(r) ? "border-rose-400" : ""}`} value={r.jumlah} onChange={(e) => ubah(i, { jumlah: Number(e.target.value) })} aria-label={`${labelJumlah} baris ${i + 1}`} />
                     {peringatan(r, i)}
                   </td>
                   <td>
@@ -140,7 +144,11 @@ export function PemilihGudang({ daftarGudang, gudangId }: { daftarGudang: { id: 
 
 type BarisKembali = { barangId: string; kode: string; nama: string; satuan: string; sisa: number };
 
-/** Isian jumlah yang kembali sekarang per baris (bawaan = sisa); hidden "baris" = JSON [{ barangId, jumlahKembali }]. */
+/**
+ * Isian jumlah per baris (bawaan = batas atas `sisa`); hidden "baris" = JSON [{ barangId, jumlahKembali }].
+ * Dipakai untuk dua form berbeda: Kru "ajukan kembali" (sisa = belum diklaim) dan Gudang
+ * "konfirmasi kembali" (sisa = menunggu konfirmasi) — makna `sisa` disesuaikan pemanggil.
+ */
 export function EditorKembali({ baris }: { baris: BarisKembali[] }) {
   const [isian, setIsian] = useState(baris.map((b) => ({ barangId: b.barangId, jumlahKembali: b.sisa })));
   return (

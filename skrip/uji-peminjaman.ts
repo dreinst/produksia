@@ -6,21 +6,26 @@ import { periksaSinkron } from "../src/lib/sinkron";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import {
+  ajukanKembaliPeminjamanBarang,
   buatPeminjamanBarang,
   hapusFotoPeminjaman,
-  kembalikanPeminjamanBarang,
+  konfirmasiKembaliPeminjamanBarang,
   tautkanPenyesuaianPeminjaman,
   ubahPeminjamanBarang,
   unggahFotoPeminjaman,
 } from "../src/lib/aksi/peminjaman";
-import { petaSedangDiLuar, statusPeminjaman, terlambat } from "../src/lib/peminjaman";
+import { statusPeminjaman, terlambat } from "../src/lib/peminjaman";
 import { tanggalIso } from "../src/lib/waktu";
-import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
+import { formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
 
 /*
- * Peminjaman barang (loading out / loading in): keluar mengurangi "tersedia" tetapi StokBarang.jumlah tetap,
- * kembali sebagian bertahap lalu tutup otomatis, tutup dengan selisih tetap dihitung di luar sampai ditautkan
- * ke Penyesuaian Stok DISETUJUI, hapus dokumen membersihkan baris & foto, dan buku besar tidak pernah tersentuh.
+ * Peminjaman barang (loading out / loading in). Di skrip uji, alur persetujuan MATI (bawaan), jadi
+ * setiap "Ajukan pinjam" langsung DISETUJUI dan StokBarang.jumlah langsung berkurang saat itu juga
+ * (lihat src/lib/persetujuan.ts, berkas "peminjaman", dan src/lib/aksi/peminjaman.ts). Alur maker-checker
+ * sungguhan (DRAFT -> MENUNGGU -> DISETUJUI/DITOLAK, termasuk pengajuan kedua ditolak karena stok sudah
+ * direbut yang pertama) diuji terpisah di skrip/uji-persetujuan.ts, sama seperti dokumen lain. Barang
+ * kembali tetap dua langkah: Kru "ajukan kembali" (stok belum berubah), Gudang "konfirmasi kembali"
+ * (StokBarang ditambah balik saat itu). Buku besar tidak pernah tersentuh (tidak ada jurnal).
  */
 const JPEG_PALSU = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0xff, 0xd9]);
 const BUKAN_GAMBAR = Buffer.from("halo ini bukan gambar");
@@ -37,7 +42,6 @@ async function pastikanSinkron(label: string) {
   pastikan(s.seimbang && s.persediaan.sinkron, `sinkron setelah ${label} (persediaan ${Number(s.persediaan.bukuBesar)}/${Number(s.persediaan.dokumen)})`);
 }
 const stok = async (barangId: string, gudangId: string) => Number((await db.stokBarang.findUnique({ where: { barangId_gudangId: { barangId, gudangId } } }))?.jumlah ?? 0);
-const diLuar = async (barangId: string, gudangId: string) => (await petaSedangDiLuar(db, gudangId)).get(barangId) ?? 0;
 const dokumen = (id: string) => db.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, foto: { select: { tahap: true, tipe: true, ukuran: true, urutan: true } } } });
 
 async function main() {
@@ -55,7 +59,7 @@ async function main() {
   const jurnalSetelahPs = await db.jurnal.count();
   await pastikanSinkron("saldo awal");
 
-  console.log("=== 1. Penolakan saat catat keluar ===");
+  console.log("=== 1. Penolakan saat ajukan pinjam ===");
   const isianKeluar = { gudangId: gudang.id, namaPengambil: "Andi", baris: [{ barangId: barang.id, jumlah: 20 }] };
   await harusDitolak("tanpa foto", () => buatPeminjamanBarang(formulir(isianKeluar)), "Foto wajib");
   await harusDitolak("4 foto", () => buatPeminjamanBarang(denganFoto(isianKeluar, 4)), "Maksimal 3 foto");
@@ -68,80 +72,92 @@ async function main() {
   await harusDitolak("barang ganda", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 1 }, { barangId: barang.id, jumlah: 1 }] })), "hanya boleh muncul sekali");
   await harusDitolak("proyek tidak ada", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, proyekId: "tidak-ada" })), "Proyek/event tidak ditemukan");
   await harusDitolak("rencana kembali bukan tanggal", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, rencanaKembali: "besok" })), "format tanggal");
-  await harusDitolak("melebihi stok (31 > 30)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 31 }] })), "stok 30, sedang di luar 0, diminta 31");
+  await harusDitolak("melebihi stok (31 > 30)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 31 }] })), "tidak cukup di gudang ini");
   pastikan((await db.peminjamanBarang.count({ where: { gudangId: gudang.id } })) === 0 && (await db.foto.count({ where: { peminjaman: { gudangId: gudang.id } } })) === 0, "penolakan tidak menyimpan dokumen maupun foto");
+  pastikan((await stok(barang.id, gudang.id)) === 30, "penolakan tidak menyentuh stok");
 
-  console.log("=== 2. Keluar 20 (2 foto), stok tetap, tersedia berkurang ===");
+  console.log("=== 2. Ajukan pinjam 20 (2 foto): langsung DISETUJUI, stok berkurang saat itu ===");
   await jalankan("PJ 20 untuk event", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, proyekId: proyek.id, keterangan: "uji pinjam", rencanaKembali: "2030-01-31" }, 2)));
   const dok1 = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id }, include: { baris: true, foto: true } });
   pastikan(dok1.nomor.startsWith("PJ-") && dok1.baris.length === 1 && Number(dok1.baris[0].jumlah) === 20 && Number(dok1.baris[0].jumlahKembali) === 0, `dokumen ${dok1.nomor} tersimpan dengan 1 baris × 20`);
   pastikan(dok1.proyekId === proyek.id && dok1.namaPengambil === "Andi" && dok1.dicatatOlehNama === "Skrip Uji" && dok1.dicatatOlehId === null, "proyek, pengambil, dan pencatat tersimpan");
   pastikan(dok1.foto.length === 2 && dok1.foto.every((f) => f.tahap === "KELUAR" && f.tipe === "image/jpeg" && f.ukuran === JPEG_PALSU.length) && Buffer.from(dok1.foto[0].isi).equals(JPEG_PALSU), "2 foto KELUAR tersimpan, tipe image/jpeg dari magic bytes");
-  pastikan(statusPeminjaman(dok1) === "TERBUKA" && !terlambat(dok1), "status TERBUKA, belum terlambat");
-  pastikan((await stok(barang.id, gudang.id)) === 30 && (await diLuar(barang.id, gudang.id)) === 20, "StokBarang tetap 30, sedang di luar 20");
+  pastikan(dok1.statusPersetujuan === "DISETUJUI" && statusPeminjaman(dok1) === "TERBUKA" && !terlambat(dok1), "langsung DISETUJUI (persetujuan mati di skrip uji), status TERBUKA, belum terlambat");
+  pastikan((await stok(barang.id, gudang.id)) === 10, "StokBarang langsung berkurang jadi 10 (30 - 20)");
   pastikan((await db.jurnal.count()) === jurnalSetelahPs, "peminjaman tidak membuat jurnal");
   await pastikanSinkron("PJ keluar");
-  await harusDitolak("keluar 11 saat tersedia 10", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 11 }] })), "stok 30, sedang di luar 20, diminta 11");
-  await jalankan("PJ 10 (tersedia habis)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, namaPengambil: "Budi", baris: [{ barangId: barang.id, jumlah: 10 }] })));
+  await harusDitolak("pinjam 11 saat stok 10", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 11 }] })), "tidak cukup di gudang ini");
+  await jalankan("PJ 10 (stok habis)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, namaPengambil: "Budi", baris: [{ barangId: barang.id, jumlah: 10 }] })));
   const dok2 = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id, namaPengambil: "Budi" } });
-  pastikan(dok2.nomor > dok1.nomor && (await diLuar(barang.id, gudang.id)) === 30, `nomor berurutan (${dok1.nomor}, ${dok2.nomor}), sedang di luar 30`);
+  pastikan(dok2.nomor > dok1.nomor && (await stok(barang.id, gudang.id)) === 0, `nomor berurutan (${dok1.nomor}, ${dok2.nomor}), stok habis`);
 
-  console.log("=== 2b. Satuan desimal: 0,1 + 0,2 sedang di luar harus persis 0,3 ===");
+  console.log("=== 2b. Satuan desimal: 0,1 + 0,2 pengurangan stok harus persis 0,3 ===");
   const isianKabel = (jumlah: number) => denganFoto({ gudangId: gudang.id, namaPengambil: "Dedi", baris: [{ barangId: kabel.id, jumlah }] });
   await jalankan("kabel keluar 0,1", () => buatPeminjamanBarang(isianKabel(0.1)));
   await jalankan("kabel keluar 0,2", () => buatPeminjamanBarang(isianKabel(0.2)));
-  pastikan((await diLuar(kabel.id, gudang.id)) === 0.3, "sedang di luar persis 0,3 (bukan 0,30000000000000004)");
-  await jalankan("kabel keluar 0,7 (tersedia habis)", () => buatPeminjamanBarang(isianKabel(0.7)));
-  await harusDitolak("kabel keluar 0,01 saat tersedia 0", () => buatPeminjamanBarang(isianKabel(0.01)), "stok 1, sedang di luar 1, diminta 0,01");
+  pastikan((await stok(kabel.id, gudang.id)) === 0.7, "stok kabel persis 0,7 (bukan 0,6999999999999998)");
+  await jalankan("kabel keluar 0,7 (stok habis)", () => buatPeminjamanBarang(isianKabel(0.7)));
+  await harusDitolak("kabel keluar 0,01 saat stok 0", () => buatPeminjamanBarang(isianKabel(0.01)), "tidak cukup di gudang ini");
 
-  console.log("=== 3. Ubah terbatas selama TERBUKA ===");
+  console.log("=== 3. Ubah data (metadata saja, tidak menyentuh stok) ===");
   await harusDitolak("ubah tanpa nama", () => ubahPeminjamanBarang(dok2.id, formulir({ namaPengambil: "" })), "Nama pengambil wajib");
-  await jalankan("ubah pengambil, proyek, rencana kembali", () => ubahPeminjamanBarang(dok2.id, formulir({ namaPengambil: "Budi Santoso", proyekId: proyek.id, keterangan: "diubah", rencanaKembali: "2020-01-01" })));
+  await jalankan("ubah pengambil, proyek, rencana kembali (walau sudah DISETUJUI)", () => ubahPeminjamanBarang(dok2.id, formulir({ namaPengambil: "Budi Santoso", proyekId: proyek.id, keterangan: "diubah", rencanaKembali: "2020-01-01" })));
   const dok2Ubah = await dokumen(dok2.id);
   pastikan(dok2Ubah.namaPengambil === "Budi Santoso" && dok2Ubah.proyekId === proyek.id && dok2Ubah.keterangan === "diubah" && terlambat(dok2Ubah), "perubahan tersimpan dan dokumen terlambat");
   const sekarang = new Date();
   pastikan(!terlambat({ rencanaKembali: new Date(`${tanggalIso(sekarang)}T00:00:00Z`), ditutupPada: null }, sekarang), "rencana kembali hari ini belum terlambat");
   pastikan((await db.logAktivitas.count({ where: { waktu: { gte: mulaiUji }, jenis: "Peminjaman Barang", aksi: "UBAH" } })) === 1, "perubahan tercatat di log aktivitas");
+  pastikan((await stok(barang.id, gudang.id)) === 0, "ubah data tidak menyentuh stok");
 
-  console.log("=== 4. Kembali sebagian bertahap lalu selesai otomatis ===");
-  await harusDitolak("kembali tanpa foto", () => kembalikanPeminjamanBarang(dok1.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 5 }] })), "Foto wajib");
-  await harusDitolak("kembali 0 tanpa tutup", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 0 }] })), "minimal pada satu barang");
-  await harusDitolak("kembali 25 > sisa 20", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 25 }] })), "melebihi sisa di luar (20)");
-  await harusDitolak("kembali barang lain", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: jasa.id, jumlahKembali: 1 }] })), "tidak ada di dokumen ini");
-  await jalankan("kembali 12", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 12 }] })));
+  console.log("=== 4. Ajukan kembali (Kru) lalu konfirmasi (Gudang) sebagian bertahap lalu selesai otomatis ===");
+  await harusDitolak("ajukan kembali tanpa foto", () => ajukanKembaliPeminjamanBarang(dok1.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 5 }] })), "Foto wajib");
+  await harusDitolak("ajukan kembali 0", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 0 }] })), "minimal pada satu barang");
+  await harusDitolak("ajukan kembali 25 > sisa 20", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 25 }] })), "melebihi sisa yang belum diklaim (20)");
+  await harusDitolak("ajukan kembali barang lain", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: jasa.id, jumlahKembali: 1 }] })), "tidak ada di dokumen ini");
+  await jalankan("Kru ajukan kembali 12", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 12 }] })));
   let d = await dokumen(dok1.id);
-  pastikan(!d.ditutupPada && Number(d.baris[0].jumlahKembali) === 12 && (await diLuar(barang.id, gudang.id)) === 18, "masih terbuka, kembali 12, sedang di luar 18");
-  await harusDitolak("kembali 9 > sisa 8", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 9 }] })), "melebihi sisa di luar (8)");
-  await jalankan("kembali 8 (lunas)", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 8 }] })));
+  pastikan(!d.ditutupPada && Number(d.baris[0].jumlahKembali) === 0 && Number(d.baris[0].jumlahDiajukanKembali) === 12, "diklaim 12, TAPI stok/jumlahKembali belum berubah sebelum dikonfirmasi Gudang");
+  pastikan((await stok(barang.id, gudang.id)) === 0, "ajukan kembali belum menyentuh stok");
+  await harusDitolak("konfirmasi 13 > yang diklaim 12", () => konfirmasiKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 13 }] })), "melebihi yang diklaim Kru (12)");
+  await jalankan("Gudang konfirmasi kembali 12", () => konfirmasiKembaliPeminjamanBarang(dok1.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 12 }] })));
   d = await dokumen(dok1.id);
-  pastikan(!!d.ditutupPada && statusPeminjaman(d) === "SELESAI" && (await diLuar(barang.id, gudang.id)) === 10, "tutup otomatis, status SELESAI, sedang di luar tinggal 10");
-  pastikan(d.foto.filter((f) => f.tahap === "KEMBALI").length === 2 && d.foto.filter((f) => f.tahap === "KEMBALI").map((f) => f.urutan).join(",") === "0,1", "2 foto KEMBALI dengan urutan berlanjut");
-  await harusDitolak("kembali ke dokumen yang sudah ditutup", () => kembalikanPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 1 }] })), "sudah ditutup");
-  pastikan((await stok(barang.id, gudang.id)) === 30, "StokBarang tetap 30 sepanjang keluar-kembali");
+  pastikan(!d.ditutupPada && Number(d.baris[0].jumlahKembali) === 12 && (await stok(barang.id, gudang.id)) === 12, "masih terbuka, kembali 12, stok bertambah balik jadi 12");
+  // Dua panggilan terpisah (bukan digabung dalam satu jalankan()): masing-masing aksi memanggil
+  // revalidatePath sendiri di akhir, yang melempar galat "di luar request" di skrip uji (ditoleransi
+  // jalankan()) -- kalau digabung dalam satu lambda, galat dari ajukan akan menghentikan lambda
+  // sebelum sempat memanggil konfirmasi.
+  await jalankan("Kru ajukan kembali sisa 8", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 8 }] })));
+  await jalankan("Gudang konfirmasi kembali 8 (lunas)", () => konfirmasiKembaliPeminjamanBarang(dok1.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 8 }] })));
+  d = await dokumen(dok1.id);
+  pastikan(!!d.ditutupPada && statusPeminjaman(d) === "SELESAI" && (await stok(barang.id, gudang.id)) === 20, "tutup otomatis, status SELESAI, stok kembali 20");
+  pastikan(d.foto.filter((f) => f.tahap === "KEMBALI").length === 2 && d.foto.filter((f) => f.tahap === "KEMBALI").map((f) => f.urutan).join(",") === "0,1", "2 foto KEMBALI (dari 2x ajukan kembali) dengan urutan berlanjut");
+  await harusDitolak("ajukan kembali ke dokumen yang sudah ditutup", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 1 }] })), "sudah ditutup");
   await pastikanSinkron("kembali");
 
-  console.log("=== 5. Tutup dengan selisih tetap dihitung di luar ===");
-  await harusDitolak("tutup selisih tanpa catatan", () => kembalikanPeminjamanBarang(dok2.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 7 }], tutupDenganSelisih: "1" })), "Catatan wajib");
-  await jalankan("kembali 7, tutup dengan selisih 3", () => kembalikanPeminjamanBarang(dok2.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 7 }], tutupDenganSelisih: "1", catatan: "3 hilang di venue" })));
+  console.log("=== 5. Tutup dengan selisih: bagian yang tidak kembali TETAP dianggap dikeluarkan dari stok ===");
+  await harusDitolak("tutup selisih tanpa catatan", () => konfirmasiKembaliPeminjamanBarang(dok2.id, formulir({ baris: [], tutupDenganSelisih: "1" })), "Catatan wajib");
+  await jalankan("tutup dengan selisih 10 (tanpa klaim kembali)", () => konfirmasiKembaliPeminjamanBarang(dok2.id, formulir({ baris: [], tutupDenganSelisih: "1", catatan: "10 hilang di venue" })));
   d = await dokumen(dok2.id);
-  pastikan(!!d.ditutupPada && statusPeminjaman(d) === "SELISIH" && d.catatanKembali === "3 hilang di venue" && !terlambat(d), "status SELISIH dengan catatan, tidak lagi terlambat");
-  pastikan((await diLuar(barang.id, gudang.id)) === 3 && (await stok(barang.id, gudang.id)) === 30, "3 yang hilang tetap dihitung di luar, stok tetap 30");
+  pastikan(!!d.ditutupPada && statusPeminjaman(d) === "SELISIH" && d.catatanKembali === "10 hilang di venue" && !terlambat(d), "status SELISIH dengan catatan, tidak lagi terlambat");
+  pastikan((await stok(barang.id, gudang.id)) === 20, "10 yang hilang TETAP terkurangi dari stok (sudah dikurangi sejak disetujui, tidak dikembalikan)");
   await harusDitolak("ubah dokumen yang sudah ditutup", () => ubahPeminjamanBarang(dok2.id, formulir({ namaPengambil: "Budi" })), "sudah ditutup");
-  await harusDitolak("keluar 28 saat tersedia 27", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 28 }] })), "stok 30, sedang di luar 3, diminta 28");
+  await jalankan("PJ 20 (stok penuh lagi)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 20 }] })));
+  await harusDitolak("pinjam 1 saat stok 0", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 1 }] })), "tidak cukup di gudang ini");
+  const dok3 = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id, namaPengambil: "Andi", baris: { some: { jumlah: 20 } } }, orderBy: { waktuKeluar: "desc" } });
+  await jalankan("dok3 ajukan kembali 20 (penuh)", () => ajukanKembaliPeminjamanBarang(dok3.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 20 }] })));
+  await jalankan("dok3 konfirmasi kembali 20, supaya stok longgar lagi untuk bagian berikut", () => konfirmasiKembaliPeminjamanBarang(dok3.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 20 }] })));
+  pastikan((await stok(barang.id, gudang.id)) === 20, "stok 20 lagi setelah dok3 dikembalikan penuh");
 
-  console.log("=== 6. Tautkan Penyesuaian Stok ===");
-  aturPersetujuan(true);
-  await jalankan("PS draf (belum disetujui)", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudang.id, akunLawanId: modal.id, baris: [{ barangId: barang.id, jumlahSesudah: 27 }] })));
-  aturPersetujuan(false);
-  const psDraf = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { gudangId: gudang.id, statusPersetujuan: "DRAFT" } });
-  await harusDitolak("tautkan PS draf", () => tautkanPenyesuaianPeminjaman(dok2.id, formulir({ penyesuaianId: psDraf.id })), "belum disetujui");
+  console.log("=== 6. Tautkan Penyesuaian Stok (jejak akuntansi tambahan opsional untuk SELISIH) ===");
   await harusDitolak("tautkan tanpa PS", () => tautkanPenyesuaianPeminjaman(dok2.id, formulir({})), "wajib dipilih");
   await harusDitolak("tautkan PS tidak ada", () => tautkanPenyesuaianPeminjaman(dok2.id, formulir({ penyesuaianId: "tidak-ada" })), "tidak ditemukan");
-  await harusDitolak("tautkan ke dokumen SELESAI", () => tautkanPenyesuaianPeminjaman(dok1.id, formulir({ penyesuaianId: psDraf.id })), "tidak punya selisih");
-  await jalankan("hapus PS draf", () => hapusDokumen("penyesuaian", psDraf.id));
-  await jalankan("PS opname 27 (disetujui)", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudang.id, akunLawanId: modal.id, keterangan: "3 hilang", baris: [{ barangId: barang.id, jumlahSesudah: 27 }] })));
-  const psOpname = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { gudangId: gudang.id, keterangan: "3 hilang" } });
-  pastikan(psOpname.statusPersetujuan === "DISETUJUI" && (await stok(barang.id, gudang.id)) === 27, "PS opname disetujui, stok 27");
+  await harusDitolak("tautkan ke dokumen SELESAI", () => tautkanPenyesuaianPeminjaman(dok1.id, formulir({ penyesuaianId: "tidak-ada" })), "tidak punya selisih");
+  // Stok `barang` sudah benar (20) sejak dok2 disetujui/ditutup; PS di sini bukan koreksi barang yang
+  // sama, melainkan opname rutin gudang yang kebetulan mau ditautkan sebagai jejak tambahan (kode
+  // tautkanPenyesuaianPeminjaman hanya mensyaratkan gudang yang sama, bukan barang yang sama).
+  await jalankan("PS opname kabel (disetujui, tidak menyentuh stok barang)", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudang.id, akunLawanId: modal.id, keterangan: "catatan tambahan 10 hilang", baris: [{ barangId: kabel.id, jumlahSesudah: 5 }] })));
+  const psOpname = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { gudangId: gudang.id, keterangan: "catatan tambahan 10 hilang" } });
+  pastikan(psOpname.statusPersetujuan === "DISETUJUI" && (await stok(barang.id, gudang.id)) === 20, "PS opname disetujui, stok barang tetap 20 (PS ini murni jejak tambahan, tidak menyentuh barang)");
   await pastikanSinkron("PS opname");
   const gudangLain = await db.gudang.create({ data: { kode: "WH-PJ2", nama: "Gudang Lain Uji Pinjam" } });
   await jalankan("PS saldo awal di gudang lain (disetujui)", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudangLain.id, akunLawanId: modal.id, baris: [{ barangId: barang.id, jumlahSesudah: 3, hargaSatuan: 5000 }] })));
@@ -150,11 +166,9 @@ async function main() {
   await jalankan("hapus PS gudang lain", () => hapusDokumen("penyesuaian", psGudangLain.id));
   await jalankan("tautkan PS ke dokumen selisih", () => tautkanPenyesuaianPeminjaman(dok2.id, formulir({ penyesuaianId: psOpname.id })));
   d = await dokumen(dok2.id);
-  pastikan(d.penyesuaianId === psOpname.id && statusPeminjaman(d) === "DISESUAIKAN" && (await diLuar(barang.id, gudang.id)) === 0, "status DISESUAIKAN, tidak lagi dihitung di luar");
+  pastikan(d.penyesuaianId === psOpname.id && statusPeminjaman(d) === "DISESUAIKAN", "status DISESUAIKAN (tautan hanya jejak, stok sudah benar sejak awal)");
   pastikan((await db.logAktivitas.count({ where: { waktu: { gte: mulaiUji }, jenis: "Peminjaman Barang", aksi: "TAUTKAN" } })) === 1, "penautan tercatat di log aktivitas");
   await harusDitolak("tautkan dua kali", () => tautkanPenyesuaianPeminjaman(dok2.id, formulir({ penyesuaianId: psOpname.id })), "sudah ditautkan");
-  await jalankan("PJ 27 (tersedia penuh lagi)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, namaPengambil: "Citra", baris: [{ barangId: barang.id, jumlah: 27 }] })));
-  const dok3 = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id, namaPengambil: "Citra" } });
   await pastikanSinkron("tautkan PS");
 
   console.log("=== 7. Foto bukti tambahan ===");
@@ -169,27 +183,47 @@ async function main() {
   const fotoBarang = await db.foto.create({ data: { barangId: barang.id, tipe: "image/jpeg", ukuran: JPEG_PALSU.length, isi: new Uint8Array(JPEG_PALSU) } });
   await harusDitolak("hapus foto barang lewat aksi peminjaman", () => hapusFotoPeminjaman(fotoBarang.id), "tidak ditemukan");
 
-  console.log("=== 8. Hapus dokumen ===");
+  console.log("=== 8. Hapus dokumen: bagian yang masih di luar dikembalikan ke stok ===");
   await harusDitolak("hapus dokumen yang sudah ditautkan", () => hapusDokumen("peminjamanBarang", dok2.id), "sudah ditautkan");
-  await jalankan("hapus PJ selesai", () => hapusDokumen("peminjamanBarang", dok1.id));
-  await jalankan("hapus PJ terbuka", () => hapusDokumen("peminjamanBarang", dok3.id));
-  pastikan((await db.peminjamanBarang.count({ where: { id: { in: [dok1.id, dok3.id] } } })) === 0 && (await db.barisPeminjamanBarang.count({ where: { peminjamanId: { in: [dok1.id, dok3.id] } } })) === 0 && (await db.foto.count({ where: { peminjamanId: { in: [dok1.id, dok3.id] } } })) === 0, "dokumen, baris, dan foto ikut terhapus");
+  const stokSebelumHapus = await stok(barang.id, gudang.id);
+  pastikan((await dokumen(dok3.id)).ditutupPada !== null, "dok3 sudah ditutup (dikembalikan penuh) di bagian 5");
+  await jalankan("hapus PJ selesai (tanpa sisa, stok tidak berubah)", () => hapusDokumen("peminjamanBarang", dok1.id));
+  pastikan((await stok(barang.id, gudang.id)) === stokSebelumHapus, "hapus PJ yang sudah lunas (sisa 0) tidak mengubah stok");
+  await jalankan("PJ 5 lalu hapus tanpa dikembalikan dulu", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, namaPengambil: "Citra", baris: [{ barangId: barang.id, jumlah: 5 }] })));
+  const dok4 = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id, namaPengambil: "Citra" } });
+  const stokSebelumHapusDok4 = await stok(barang.id, gudang.id);
+  await jalankan("hapus PJ yang masih penuh di luar", () => hapusDokumen("peminjamanBarang", dok4.id));
+  pastikan((await stok(barang.id, gudang.id)) === stokSebelumHapusDok4 + 5, "hapus PJ yang masih 5 di luar mengembalikan 5 itu ke stok");
+  pastikan((await db.peminjamanBarang.count({ where: { id: { in: [dok1.id, dok4.id] } } })) === 0 && (await db.barisPeminjamanBarang.count({ where: { peminjamanId: { in: [dok1.id, dok4.id] } } })) === 0 && (await db.foto.count({ where: { peminjamanId: { in: [dok1.id, dok4.id] } } })) === 0, "dokumen, baris, dan foto ikut terhapus");
   pastikan((await db.logAktivitas.count({ where: { waktu: { gte: mulaiUji }, jenis: "Peminjaman Barang", aksi: "HAPUS" } })) === 2, "2 penghapusan tercatat di log aktivitas");
-  pastikan((await stok(barang.id, gudang.id)) === 27 && (await diLuar(barang.id, gudang.id)) === 0, "hapus tidak menyentuh stok");
   await jalankan("hapus PS opname", () => hapusDokumen("penyesuaian", psOpname.id));
   d = await dokumen(dok2.id);
-  pastikan(d.penyesuaianId === null && statusPeminjaman(d) === "SELISIH" && (await diLuar(barang.id, gudang.id)) === 3, "PS dihapus: tautan lepas, dokumen kembali SELISIH dan dihitung di luar");
+  pastikan(d.penyesuaianId === null && statusPeminjaman(d) === "SELISIH", "PS dihapus: tautan lepas, dokumen kembali SELISIH");
+  // dok2 (barang) masih punya baris; harus dihapus/dikosongkan dulu sebelum barang boleh dihapus.
+  // Bisa kena constraint StokBarang atau BarisPeminjamanBarang duluan tergantung urutan pemeriksaan Postgres;
+  // yang penting dua-duanya masih menahan (barang masih punya stok & riwayat peminjaman saat ini).
+  await harusDitolak("hapus barang yang punya riwayat peminjaman", () => db.barang.delete({ where: { id: barang.id } }), "_barangId_fkey");
+
+  // PS saldo awal menginjeksikan 30 barang + 1 kabel ke stok; supaya penghapusannya nanti bisa
+  // membalik dengan bersih (stok cukup untuk dibalik), SEMUA peminjaman yang masih memegang sebagian
+  // dari stok itu -- termasuk yang "hilang" (dok2, SELISIH) dan kabel Dedi yang tidak pernah
+  // dikembalikan -- harus dihapus lebih dulu lewat hapusDokumen supaya efeknya ikut dibalik.
+  const dokKabelDedi = await db.peminjamanBarang.findMany({ where: { gudangId: gudang.id, namaPengambil: "Dedi" } });
+  for (const dk of dokKabelDedi) await jalankan(`hapus PJ kabel ${dk.nomor} (Dedi)`, () => hapusDokumen("peminjamanBarang", dk.id));
+  pastikan((await stok(kabel.id, gudang.id)) === 1, "kabel kembali penuh 1 meter setelah semua PJ kabel dihapus");
+  await jalankan("hapus PJ selisih (mengembalikan 10 yang tadinya dianggap hilang)", () => hapusDokumen("peminjamanBarang", dok2.id));
+  pastikan((await stok(barang.id, gudang.id)) === 30, "barang kembali penuh 30 setelah PJ selisih dihapus");
+  await jalankan("hapus PJ dok3 (sudah lunas, sisa terakhir yang masih terikat ke barang)", () => hapusDokumen("peminjamanBarang", dok3.id));
+
   const psAwal = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { gudangId: gudang.id } });
   await jalankan("hapus PS saldo awal", () => hapusDokumen("penyesuaian", psAwal.id));
   pastikan((await db.jurnal.count()) === jumlahJurnalAwal, "tidak ada jurnal uji yang tersisa");
-  await db.stokBarang.deleteMany({ where: { barangId: { in: [barang.id, kabel.id] } } });
-  await harusDitolak("hapus barang yang punya riwayat peminjaman", () => db.barang.delete({ where: { id: barang.id } }), "BarisPeminjamanBarang_barangId_fkey");
-  await db.peminjamanBarang.deleteMany({ where: { gudangId: gudang.id, namaPengambil: "Dedi" } });
-  await jalankan("hapus PJ selisih", () => hapusDokumen("peminjamanBarang", dok2.id));
+  pastikan((await stok(barang.id, gudang.id)) === 0 && (await stok(kabel.id, gudang.id)) === 0, "stok kembali 0 setelah PS saldo awal dibalik");
   await pastikanSinkron("hapus semua");
 
   console.log("=== Bersih-bersih ===");
   await db.logAktivitas.deleteMany({ where: { waktu: { gte: mulaiUji } } });
+  await db.stokBarang.deleteMany({ where: { barangId: { in: [barang.id, kabel.id] } } });
   await db.barang.deleteMany({ where: { id: { in: [barang.id, jasa.id, kabel.id] } } });
   await db.proyek.delete({ where: { id: proyek.id } });
   await db.gudang.deleteMany({ where: { id: { in: [gudang.id, gudangLain.id] } } });

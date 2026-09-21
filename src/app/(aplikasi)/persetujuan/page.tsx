@@ -35,15 +35,18 @@ const nama = (p: { nama: string } | null | undefined) => p?.nama ?? null;
 export default async function HalamanPersetujuan() {
   const pengguna: PenggunaSesi = await wajibMasuk();
   // Gudang murni input/output stok; kotak masuk Persetujuan di luar fokusnya (permintaan pemilik).
-  if (pengguna.peran === "GUDANG") redirect("/data-induk/barang");
+  // Persetujuan Peminjaman Barang & Laporan Kerusakan Barangnya sendiri ada langsung di halaman masing-masing.
+  if (pengguna.peran === "GUDANG" || pengguna.peran === "KRU") redirect(pengguna.peran === "KRU" ? "/persediaan/peminjaman" : "/data-induk/barang");
   const bolehLihat = (kode: string) => punyaHak(pengguna, `${kode}.lihat` as Hak) || punyaHak(pengguna, `${kode}.setujui` as Hak);
 
-  const [wajib, faktur, fakturBeli, kas, penyesuaian, aset, penggajian] = await Promise.all([
+  const [wajib, faktur, fakturBeli, kas, penyesuaian, peminjaman, kerusakan, aset, penggajian] = await Promise.all([
     persetujuanWajib(db),
     db.fakturPenjualan.findMany({ where: BELUM_SELESAI, include: { pelanggan: true, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
     db.fakturPembelian.findMany({ where: BELUM_SELESAI, include: { pemasok: true, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
     db.dokumenKas.findMany({ where: BELUM_SELESAI, include: { akunKas: true, akunLawan: true, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
     db.penyesuaianPersediaan.findMany({ where: BELUM_SELESAI, include: { gudang: true, baris: true, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
+    db.peminjamanBarang.findMany({ where: BELUM_SELESAI, include: { gudang: true, baris: true, diajukanOleh: true }, orderBy: { waktuKeluar: "desc" } }),
+    db.laporanKerusakanBarang.findMany({ where: BELUM_SELESAI, include: { gudang: true, baris: true, diajukanOleh: true }, orderBy: { waktuLapor: "desc" } }),
     db.asetTetap.findMany({ where: BELUM_SELESAI, include: { diajukanOleh: true }, orderBy: { tanggalPerolehan: "desc" } }),
     db.penggajian.findMany({ where: BELUM_SELESAI, include: { baris: true, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
   ]);
@@ -70,6 +73,16 @@ export default async function HalamanPersetujuan() {
       keterangan: `${p.baris.length} baris di gudang ${p.gudang.nama}`,
       nilai: p.baris.reduce((s, b) => s + (Number(b.jumlahSesudah) - Number(b.jumlahSebelum)) * Number(b.hargaSatuan), 0),
       status: p.statusPersetujuan, diajukanOlehId: p.diajukanOlehId, diajukanOleh: nama(p.diajukanOleh), catatanPenolakan: p.catatanPenolakan,
+    })),
+    ...peminjaman.map((p) => ({
+      jenis: "peminjaman" as const, kode: "peminjaman", label: "Peminjaman Barang", id: p.id, nomor: p.nomor, tanggal: p.waktuKeluar,
+      keterangan: `${p.namaPengambil}, ${p.baris.length} barang di ${p.gudang.nama}`, nilai: 0,
+      status: p.statusPersetujuan, diajukanOlehId: p.diajukanOlehId, diajukanOleh: nama(p.diajukanOleh), catatanPenolakan: p.catatanPenolakan,
+    })),
+    ...kerusakan.map((k) => ({
+      jenis: "kerusakan" as const, kode: "kerusakan", label: "Laporan Kerusakan Barang", id: k.id, nomor: k.nomor, tanggal: k.waktuLapor,
+      keterangan: `${k.namaPelapor}, ${k.baris.length} barang di ${k.gudang.nama}`, nilai: 0,
+      status: k.statusPersetujuan, diajukanOlehId: k.diajukanOlehId, diajukanOleh: nama(k.diajukanOleh), catatanPenolakan: k.catatanPenolakan,
     })),
     ...aset.map((a) => ({
       jenis: "aset" as const, kode: "aset", label: "Aset Tetap", id: a.id, nomor: a.kode, tanggal: a.tanggalPerolehan,

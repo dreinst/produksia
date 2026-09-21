@@ -45,6 +45,7 @@ export const AKUN_CONTOH = [
   { namaPengguna: "admin", kataSandi: "admin123", nama: "Bagus Santoso", peran: "ADMIN" },
   { namaPengguna: "kasir", kataSandi: "kasir123", nama: "Sari Wulandari", peran: "KASIR" },
   { namaPengguna: "gudang", kataSandi: "gudang123", nama: "Joko Prasetyo", peran: "GUDANG" },
+  { namaPengguna: "kru", kataSandi: "kru123", nama: "Rizal Maulana", peran: "KRU" },
 ] as const;
 
 async function main() {

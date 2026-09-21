@@ -278,6 +278,7 @@ export type PenyesuaianPersediaanWhereInput = {
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   peminjaman?: Prisma.PeminjamanBarangListRelationFilter
+  kerusakan?: Prisma.LaporanKerusakanBarangListRelationFilter
 }
 
 export type PenyesuaianPersediaanOrderByWithRelationInput = {
@@ -305,6 +306,7 @@ export type PenyesuaianPersediaanOrderByWithRelationInput = {
   disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
   ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
   peminjaman?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
+  kerusakan?: Prisma.LaporanKerusakanBarangOrderByRelationAggregateInput
 }
 
 export type PenyesuaianPersediaanWhereUniqueInput = Prisma.AtLeast<{
@@ -335,6 +337,7 @@ export type PenyesuaianPersediaanWhereUniqueInput = Prisma.AtLeast<{
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   peminjaman?: Prisma.PeminjamanBarangListRelationFilter
+  kerusakan?: Prisma.LaporanKerusakanBarangListRelationFilter
 }, "id" | "nomor" | "jurnalId">
 
 export type PenyesuaianPersediaanOrderByWithAggregationInput = {
@@ -400,6 +403,7 @@ export type PenyesuaianPersediaanCreateInput = {
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateInput = {
@@ -421,6 +425,7 @@ export type PenyesuaianPersediaanUncheckedCreateInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUpdateInput = {
@@ -442,6 +447,7 @@ export type PenyesuaianPersediaanUpdateInput = {
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateInput = {
@@ -463,6 +469,7 @@ export type PenyesuaianPersediaanUncheckedUpdateInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanCreateManyInput = {
@@ -865,6 +872,22 @@ export type PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PenyesuaianPersediaanUpdateToOneWithWhereWithoutPeminjamanInput, Prisma.PenyesuaianPersediaanUpdateWithoutPeminjamanInput>, Prisma.PenyesuaianPersediaanUncheckedUpdateWithoutPeminjamanInput>
 }
 
+export type PenyesuaianPersediaanCreateNestedOneWithoutKerusakanInput = {
+  create?: Prisma.XOR<Prisma.PenyesuaianPersediaanCreateWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUncheckedCreateWithoutKerusakanInput>
+  connectOrCreate?: Prisma.PenyesuaianPersediaanCreateOrConnectWithoutKerusakanInput
+  connect?: Prisma.PenyesuaianPersediaanWhereUniqueInput
+}
+
+export type PenyesuaianPersediaanUpdateOneWithoutKerusakanNestedInput = {
+  create?: Prisma.XOR<Prisma.PenyesuaianPersediaanCreateWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUncheckedCreateWithoutKerusakanInput>
+  connectOrCreate?: Prisma.PenyesuaianPersediaanCreateOrConnectWithoutKerusakanInput
+  upsert?: Prisma.PenyesuaianPersediaanUpsertWithoutKerusakanInput
+  disconnect?: Prisma.PenyesuaianPersediaanWhereInput | boolean
+  delete?: Prisma.PenyesuaianPersediaanWhereInput | boolean
+  connect?: Prisma.PenyesuaianPersediaanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenyesuaianPersediaanUpdateToOneWithWhereWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUpdateWithoutKerusakanInput>, Prisma.PenyesuaianPersediaanUncheckedUpdateWithoutKerusakanInput>
+}
+
 export type PenyesuaianPersediaanCreateWithoutDiajukanOlehInput = {
   id?: string
   nomor: string
@@ -883,6 +906,7 @@ export type PenyesuaianPersediaanCreateWithoutDiajukanOlehInput = {
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutDiajukanOlehInput = {
@@ -903,6 +927,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutDiajukanOlehInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutDiajukanOlehInput = {
@@ -933,6 +958,7 @@ export type PenyesuaianPersediaanCreateWithoutDisetujuiOlehInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutDisetujuiOlehInput = {
@@ -953,6 +979,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutDisetujuiOlehInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutDisetujuiOlehInput = {
@@ -983,6 +1010,7 @@ export type PenyesuaianPersediaanCreateWithoutDitolakOlehInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPenyesuaianPersediaanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutDitolakOlehInput = {
@@ -1003,6 +1031,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutDitolakOlehInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutDitolakOlehInput = {
@@ -1103,6 +1132,7 @@ export type PenyesuaianPersediaanCreateWithoutGudangInput = {
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutGudangInput = {
@@ -1123,6 +1153,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutGudangInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutGudangInput = {
@@ -1169,6 +1200,7 @@ export type PenyesuaianPersediaanCreateWithoutAkunLawanInput = {
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutAkunLawanInput = {
@@ -1189,6 +1221,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutAkunLawanInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutAkunLawanInput = {
@@ -1235,6 +1268,7 @@ export type PenyesuaianPersediaanCreateWithoutJurnalInput = {
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutJurnalInput = {
@@ -1255,6 +1289,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutJurnalInput = {
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutJurnalInput = {
@@ -1291,6 +1326,7 @@ export type PenyesuaianPersediaanUpdateWithoutJurnalInput = {
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutJurnalInput = {
@@ -1311,6 +1347,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutJurnalInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanCreateWithoutBarisInput = {
@@ -1331,6 +1368,7 @@ export type PenyesuaianPersediaanCreateWithoutBarisInput = {
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutBarisInput = {
@@ -1351,6 +1389,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutBarisInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutBarisInput = {
@@ -1387,6 +1426,7 @@ export type PenyesuaianPersediaanUpdateWithoutBarisInput = {
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutBarisInput = {
@@ -1407,6 +1447,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutBarisInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanCreateWithoutPeminjamanInput = {
@@ -1427,6 +1468,7 @@ export type PenyesuaianPersediaanCreateWithoutPeminjamanInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPenyesuaianPersediaanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanUncheckedCreateWithoutPeminjamanInput = {
@@ -1447,6 +1489,7 @@ export type PenyesuaianPersediaanUncheckedCreateWithoutPeminjamanInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
 }
 
 export type PenyesuaianPersediaanCreateOrConnectWithoutPeminjamanInput = {
@@ -1483,6 +1526,7 @@ export type PenyesuaianPersediaanUpdateWithoutPeminjamanInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPenyesuaianPersediaanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutPeminjamanInput = {
@@ -1503,6 +1547,107 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutPeminjamanInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+}
+
+export type PenyesuaianPersediaanCreateWithoutKerusakanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  gudang: Prisma.GudangCreateNestedOneWithoutPenyesuaianInput
+  akunLawan: Prisma.AkunCreateNestedOneWithoutPenyesuaianLawanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPenyesuaianPersediaanInput
+  baris?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutPenyesuaianInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPenyesuaianPersediaanInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPenyesuaianPersediaanInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPenyesuaianPersediaanInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutPenyesuaianInput
+}
+
+export type PenyesuaianPersediaanUncheckedCreateWithoutKerusakanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  gudangId: string
+  keterangan?: string | null
+  akunLawanId: string
+  jurnalId?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutPenyesuaianInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutPenyesuaianInput
+}
+
+export type PenyesuaianPersediaanCreateOrConnectWithoutKerusakanInput = {
+  where: Prisma.PenyesuaianPersediaanWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenyesuaianPersediaanCreateWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUncheckedCreateWithoutKerusakanInput>
+}
+
+export type PenyesuaianPersediaanUpsertWithoutKerusakanInput = {
+  update: Prisma.XOR<Prisma.PenyesuaianPersediaanUpdateWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUncheckedUpdateWithoutKerusakanInput>
+  create: Prisma.XOR<Prisma.PenyesuaianPersediaanCreateWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUncheckedCreateWithoutKerusakanInput>
+  where?: Prisma.PenyesuaianPersediaanWhereInput
+}
+
+export type PenyesuaianPersediaanUpdateToOneWithWhereWithoutKerusakanInput = {
+  where?: Prisma.PenyesuaianPersediaanWhereInput
+  data: Prisma.XOR<Prisma.PenyesuaianPersediaanUpdateWithoutKerusakanInput, Prisma.PenyesuaianPersediaanUncheckedUpdateWithoutKerusakanInput>
+}
+
+export type PenyesuaianPersediaanUpdateWithoutKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gudang?: Prisma.GudangUpdateOneRequiredWithoutPenyesuaianNestedInput
+  akunLawan?: Prisma.AkunUpdateOneRequiredWithoutPenyesuaianLawanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPenyesuaianPersediaanNestedInput
+  baris?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutPenyesuaianNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPenyesuaianPersediaanNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+}
+
+export type PenyesuaianPersediaanUncheckedUpdateWithoutKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunLawanId?: Prisma.StringFieldUpdateOperationsInput | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanCreateManyDiajukanOlehInput = {
@@ -1577,6 +1722,7 @@ export type PenyesuaianPersediaanUpdateWithoutDiajukanOlehInput = {
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutDiajukanOlehInput = {
@@ -1597,6 +1743,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutDiajukanOlehInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehInput = {
@@ -1635,6 +1782,7 @@ export type PenyesuaianPersediaanUpdateWithoutDisetujuiOlehInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutDisetujuiOlehInput = {
@@ -1655,6 +1803,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutDisetujuiOlehInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehInput = {
@@ -1693,6 +1842,7 @@ export type PenyesuaianPersediaanUpdateWithoutDitolakOlehInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPenyesuaianPersediaanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutDitolakOlehInput = {
@@ -1713,6 +1863,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutDitolakOlehInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehInput = {
@@ -1769,6 +1920,7 @@ export type PenyesuaianPersediaanUpdateWithoutGudangInput = {
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutGudangInput = {
@@ -1789,6 +1941,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutGudangInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateManyWithoutGudangInput = {
@@ -1845,6 +1998,7 @@ export type PenyesuaianPersediaanUpdateWithoutAkunLawanInput = {
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPenyesuaianPersediaanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateWithoutAkunLawanInput = {
@@ -1865,6 +2019,7 @@ export type PenyesuaianPersediaanUncheckedUpdateWithoutAkunLawanInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   baris?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutPenyesuaianNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutPenyesuaianNestedInput
 }
 
 export type PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanInput = {
@@ -1893,11 +2048,13 @@ export type PenyesuaianPersediaanUncheckedUpdateManyWithoutAkunLawanInput = {
 export type PenyesuaianPersediaanCountOutputType = {
   baris: number
   peminjaman: number
+  kerusakan: number
 }
 
 export type PenyesuaianPersediaanCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   baris?: boolean | PenyesuaianPersediaanCountOutputTypeCountBarisArgs
   peminjaman?: boolean | PenyesuaianPersediaanCountOutputTypeCountPeminjamanArgs
+  kerusakan?: boolean | PenyesuaianPersediaanCountOutputTypeCountKerusakanArgs
 }
 
 /**
@@ -1922,6 +2079,13 @@ export type PenyesuaianPersediaanCountOutputTypeCountBarisArgs<ExtArgs extends r
  */
 export type PenyesuaianPersediaanCountOutputTypeCountPeminjamanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PeminjamanBarangWhereInput
+}
+
+/**
+ * PenyesuaianPersediaanCountOutputType without action
+ */
+export type PenyesuaianPersediaanCountOutputTypeCountKerusakanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LaporanKerusakanBarangWhereInput
 }
 
 
@@ -1950,6 +2114,7 @@ export type PenyesuaianPersediaanSelect<ExtArgs extends runtime.Types.Extensions
   disetujuiOleh?: boolean | Prisma.PenyesuaianPersediaan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PenyesuaianPersediaan$ditolakOlehArgs<ExtArgs>
   peminjaman?: boolean | Prisma.PenyesuaianPersediaan$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.PenyesuaianPersediaan$kerusakanArgs<ExtArgs>
   _count?: boolean | Prisma.PenyesuaianPersediaanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["penyesuaianPersediaan"]>
 
@@ -2032,6 +2197,7 @@ export type PenyesuaianPersediaanInclude<ExtArgs extends runtime.Types.Extension
   disetujuiOleh?: boolean | Prisma.PenyesuaianPersediaan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PenyesuaianPersediaan$ditolakOlehArgs<ExtArgs>
   peminjaman?: boolean | Prisma.PenyesuaianPersediaan$peminjamanArgs<ExtArgs>
+  kerusakan?: boolean | Prisma.PenyesuaianPersediaan$kerusakanArgs<ExtArgs>
   _count?: boolean | Prisma.PenyesuaianPersediaanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PenyesuaianPersediaanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2065,6 +2231,10 @@ export type $PenyesuaianPersediaanPayload<ExtArgs extends runtime.Types.Extensio
      * Peminjaman Barang berselisih (hilang/rusak) yang diselesaikan lewat penyesuaian ini
      */
     peminjaman: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
+    /**
+     * Laporan Kerusakan Barang yang ditautkan sebagai jejak akuntansi tambahan
+     */
+    kerusakan: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2491,6 +2661,7 @@ export interface Prisma__PenyesuaianPersediaanClient<T, Null = never, ExtArgs ex
   disetujuiOleh<T extends Prisma.PenyesuaianPersediaan$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PenyesuaianPersediaan$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ditolakOleh<T extends Prisma.PenyesuaianPersediaan$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PenyesuaianPersediaan$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   peminjaman<T extends Prisma.PenyesuaianPersediaan$peminjamanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PenyesuaianPersediaan$peminjamanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  kerusakan<T extends Prisma.PenyesuaianPersediaan$kerusakanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PenyesuaianPersediaan$kerusakanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3058,6 +3229,30 @@ export type PenyesuaianPersediaan$peminjamanArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.PeminjamanBarangScalarFieldEnum | Prisma.PeminjamanBarangScalarFieldEnum[]
+}
+
+/**
+ * PenyesuaianPersediaan.kerusakan
+ */
+export type PenyesuaianPersediaan$kerusakanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LaporanKerusakanBarang
+   */
+  select?: Prisma.LaporanKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LaporanKerusakanBarang
+   */
+  omit?: Prisma.LaporanKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LaporanKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.LaporanKerusakanBarangWhereInput
+  orderBy?: Prisma.LaporanKerusakanBarangOrderByWithRelationInput | Prisma.LaporanKerusakanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.LaporanKerusakanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LaporanKerusakanBarangScalarFieldEnum | Prisma.LaporanKerusakanBarangScalarFieldEnum[]
 }
 
 /**

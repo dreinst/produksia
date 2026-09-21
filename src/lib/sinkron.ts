@@ -35,12 +35,34 @@ type Jumlah = { nilai: Desimal | number | null }[];
 const satu = (r: Jumlah) => D(r[0]?.nilai ?? 0);
 
 export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSinkron> {
-  const [pemetaan, total, akunPersediaanBarang, nilaiStokRaw, fakturJual, terimaJual, returJual, fakturBeli, bayarBeli, returBeli, belumDitagihRaw, terkirimRaw, uangMukaAgg] = await Promise.all([
+  const [pemetaan, total, akunPersediaanBarang, nilaiStokRaw, nilaiDipinjamRaw, nilaiRusakRaw, fakturJual, terimaJual, returJual, fakturBeli, bayarBeli, returBeli, belumDitagihRaw, terkirimRaw, uangMukaAgg] = await Promise.all([
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     klien.barisJurnal.aggregate({ _sum: { debit: true, kredit: true } }),
     klien.barang.findMany({ where: { akunPersediaanId: { not: null } }, select: { akunPersediaanId: true }, distinct: ["akunPersediaanId"] }),
     // Σ stok × harga pokok rata-rata (hanya BARANG)
     klien.$queryRaw<Jumlah>`SELECT COALESCE(SUM(s."jumlah" * b."hargaBeli"), 0) AS nilai FROM "StokBarang" s JOIN "Barang" b ON b."id" = s."barangId" WHERE b."jenis" = 'BARANG'`,
+    // Peminjaman Barang mengurangi StokBarang saat disetujui TANPA jurnal (barang masih milik
+    // perusahaan, cuma sedang di luar, bukan terjual/dipakai) — lihat src/lib/persetujuan.ts.
+    // Supaya nilai stok tetap sama dengan saldo akun Persediaan, bagian yang masih di luar (jumlah -
+    // jumlahKembali, TERMASUK yang ditutup dengan selisih/hilang) ditambahkan balik di sini, tanpa
+    // peduli statusnya sudah ditautkan ke Penyesuaian Stok atau belum: tautkan hanya jejak opsional,
+    // Penyesuaian Stok yang ditautkan tidak harus menyesuaikan barang/nilai yang sama (lihat
+    // tautkanPenyesuaianPeminjaman di src/lib/aksi/peminjaman.ts). Dokumen DRAFT/MENUNGGU/DITOLAK
+    // belum menyentuh stok sama sekali, jadi tidak diikutkan.
+    klien.$queryRaw<Jumlah>`
+      SELECT COALESCE(SUM((bp."jumlah" - bp."jumlahKembali") * b."hargaBeli"), 0) AS nilai
+      FROM "BarisPeminjamanBarang" bp
+      JOIN "PeminjamanBarang" p ON p."id" = bp."peminjamanId"
+      JOIN "Barang" b ON b."id" = bp."barangId"
+      WHERE p."statusPersetujuan" = 'DISETUJUI' AND b."jenis" = 'BARANG'`,
+    // Laporan Kerusakan Barang: sama alasannya dengan Peminjaman Barang di atas, tapi tanpa "jumlahKembali"
+    // (tidak ada alur kembali — begitu disetujui, dianggap rusak permanen selamanya sampai ditautkan).
+    klien.$queryRaw<Jumlah>`
+      SELECT COALESCE(SUM(bk."jumlah" * b."hargaBeli"), 0) AS nilai
+      FROM "BarisKerusakanBarang" bk
+      JOIN "LaporanKerusakanBarang" k ON k."id" = bk."laporanId"
+      JOIN "Barang" b ON b."id" = bk."barangId"
+      WHERE k."statusPersetujuan" = 'DISETUJUI' AND b."jenis" = 'BARANG'`,
     // Hanya dokumen yang sudah DISETUJUI (jurnalnya ada di buku besar); draf & yang menunggu persetujuan dikecualikan
     // supaya angka dokumen selalu sama dengan saldo buku besar. Lihat src/lib/persetujuan.ts.
     klien.fakturPenjualan.aggregate({ where: { statusPersetujuan: "DISETUJUI" }, _sum: { total: true, uangMuka: true } }),
@@ -87,7 +109,7 @@ export async function periksaSinkron(klien: PrismaClient = db): Promise<HasilSin
     return normalDebit ? debit.minus(kredit) : kredit.minus(debit);
   };
 
-  const persediaan = banding(saldo(akunPersediaan, true), satu(nilaiStokRaw));
+  const persediaan = banding(saldo(akunPersediaan, true), satu(nilaiStokRaw).plus(satu(nilaiDipinjamRaw)).plus(satu(nilaiRusakRaw)));
   // Piutang: Σ (total faktur − uang muka dipakai) − Σ (penerimaan + potongan pajak) − Σ retur
   const sisaPiutang = D(fakturJual._sum.total ?? 0).minus(fakturJual._sum.uangMuka ?? 0).minus(terimaJual._sum.jumlah ?? 0).minus(terimaJual._sum.potonganPajak ?? 0).minus(returJual._sum.total ?? 0);
   const piutang = banding(saldo([pemetaan.piutangUsahaId], true), sisaPiutang);

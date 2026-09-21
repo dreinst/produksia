@@ -32,6 +32,8 @@ enum PeranPengguna {
   ADMIN
   KASIR
   GUDANG
+  /// Kru lapangan: hanya bisa ajukan/ajukan-kembali Peminjaman Barang, menunggu persetujuan Gudang
+  KRU
 }
 
 enum JenisAkun {
@@ -169,6 +171,13 @@ model Pengguna {
   setujuiDokumenKas            DokumenKas[]            @relation("SetujuiDokumenKas")
   tolakDokumenKas              DokumenKas[]            @relation("TolakDokumenKas")
   catatPeminjamanBarang        PeminjamanBarang[]      @relation("CatatPeminjamanBarang")
+  ajukanPeminjamanBarang       PeminjamanBarang[]      @relation("AjukanPeminjamanBarang")
+  setujuiPeminjamanBarang      PeminjamanBarang[]      @relation("SetujuiPeminjamanBarang")
+  tolakPeminjamanBarang        PeminjamanBarang[]      @relation("TolakPeminjamanBarang")
+  catatKerusakanBarang         LaporanKerusakanBarang[] @relation("CatatKerusakanBarang")
+  ajukanKerusakanBarang        LaporanKerusakanBarang[] @relation("AjukanKerusakanBarang")
+  setujuiKerusakanBarang       LaporanKerusakanBarang[] @relation("SetujuiKerusakanBarang")
+  tolakKerusakanBarang         LaporanKerusakanBarang[] @relation("TolakKerusakanBarang")
 }
 
 /// Sesi login berbasis basis data: cookie hanya menyimpan token acak, yang disimpan di sini dalam bentuk hash.
@@ -334,6 +343,7 @@ model Proyek {
   penggajian       Penggajian[]
   dokumenKas       DokumenKas[]
   peminjaman       PeminjamanBarang[]
+  kerusakan        LaporanKerusakanBarang[]
 
   @@index([pelangganId])
 }
@@ -353,6 +363,7 @@ model Gudang {
   pindahAsal       PindahBarang[]          @relation("GudangAsalPindah")
   pindahTujuan     PindahBarang[]          @relation("GudangTujuanPindah")
   peminjaman       PeminjamanBarang[]
+  kerusakan        LaporanKerusakanBarang[]
 }
 
 model KelompokBarang {
@@ -406,6 +417,7 @@ model Barang {
   barisPenyesuaian BarisPenyesuaianPersediaan[]
   barisPindah      BarisPindahBarang[]
   barisPeminjaman  BarisPeminjamanBarang[]
+  barisKerusakan   BarisKerusakanBarang[]
   foto             Foto[]
 
   @@index([kelompokId])
@@ -1468,6 +1480,8 @@ model PenyesuaianPersediaan {
   catatanPenolakan  String?
   /// Peminjaman Barang berselisih (hilang/rusak) yang diselesaikan lewat penyesuaian ini
   peminjaman        PeminjamanBarang[]
+  /// Laporan Kerusakan Barang yang ditautkan sebagai jejak akuntansi tambahan
+  kerusakan         LaporanKerusakanBarang[]
 
   @@index([gudangId])
   @@index([akunLawanId])
@@ -1494,24 +1508,31 @@ model BarisPenyesuaianPersediaan {
 /// Foto disimpan di basis data (Bytes) karena Vercel & Docker VPS tidak punya disk tetap.
 /// barangId = foto barang (galeri di data induk); peminjamanId + tahap = foto bukti keluar/kembali.
 model Foto {
-  id           String            @id @default(cuid())
+  id           String                @id @default(cuid())
   barangId     String?
-  barang       Barang?           @relation(fields: [barangId], references: [id], onDelete: Cascade)
+  barang       Barang?               @relation(fields: [barangId], references: [id], onDelete: Cascade)
   peminjamanId String?
-  peminjaman   PeminjamanBarang? @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
+  peminjaman   PeminjamanBarang?     @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
+  /// Foto bukti kondisi rusak (lihat LaporanKerusakanBarang); tahap tidak dipakai untuk foto ini (selalu null)
+  kerusakanId  String?
+  kerusakan    LaporanKerusakanBarang? @relation(fields: [kerusakanId], references: [id], onDelete: Cascade)
   tahap        TahapFoto?
-  urutan       Int               @default(0)
+  urutan       Int                   @default(0)
   tipe         String
   ukuran       Int
   isi          Bytes
-  dibuatPada   DateTime          @default(now())
+  dibuatPada   DateTime              @default(now())
 
   @@index([barangId])
   @@index([peminjamanId])
+  @@index([kerusakanId])
 }
 
-/// Barang keluar gudang untuk event lalu kembali. TIDAK menyentuh StokBarang maupun jurnal;
-/// "sedang di luar" dihitung dari baris (jumlah - jumlahKembali), lihat src/lib/peminjaman.ts.
+/// Barang keluar gudang untuk event lalu kembali. Mengurangi StokBarang saat disetujui (lihat
+/// src/lib/persetujuan.ts, berkas "peminjaman") dan menambah kembali StokBarang saat Gudang
+/// mengonfirmasi barang kembali, lewat kurangiStok/tambahStok (src/lib/stok.ts) — mutasi relatif
+/// yang diserialisasi Postgres per baris + CHECK DB (jumlah >= 0) sebagai penjamin tidak minus saat
+/// dua persetujuan bentrok pada barang yang sama. TIDAK menjurnal (bukan transaksi keuangan).
 /// Status turunan: TERBUKA (ditutupPada null), SELESAI, SELISIH (sisa > 0), DISESUAIKAN (penyesuaianId terisi).
 model PeminjamanBarang {
   id              String                 @id @default(cuid())
@@ -1527,6 +1548,8 @@ model PeminjamanBarang {
   rencanaKembali  DateTime?
   ditutupPada     DateTime?
   catatanKembali  String?
+  /// Opsional: dipakai bila kehilangan/kerusakan barang pinjaman perlu jejak akuntansi (jurnal beban)
+  /// tambahan di luar pengurangan stok yang sudah terjadi otomatis saat peminjaman disetujui.
   penyesuaianId   String?
   penyesuaian     PenyesuaianPersediaan? @relation(fields: [penyesuaianId], references: [id])
   dicatatOlehId   String?
@@ -1536,11 +1559,26 @@ model PeminjamanBarang {
   baris BarisPeminjamanBarang[]
   foto  Foto[]
 
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts. Kru mengajukan (MENUNGGU), Gudang
+  /// menyetujui (stok dikurangi saat itu) atau menolak.
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanPeminjamanBarang", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiPeminjamanBarang", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakPeminjamanBarang", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
   @@index([gudangId])
   @@index([proyekId])
   @@index([penyesuaianId])
   @@index([ditutupPada])
   @@index([dicatatOlehId])
+  @@index([statusPersetujuan])
 }
 
 model BarisPeminjamanBarang {
@@ -1550,10 +1588,76 @@ model BarisPeminjamanBarang {
   barangId      String
   barang        Barang           @relation(fields: [barangId], references: [id])
   jumlah        Decimal          @db.Decimal(18, 2)
-  /// Akumulasi yang sudah kembali (boleh bertahap); CHECK DB: jumlahKembali <= jumlah
+  /// Akumulasi yang sudah kembali dan stoknya sudah ditambah balik (boleh bertahap);
+  /// CHECK DB: jumlahKembali <= jumlah
   jumlahKembali Decimal          @default(0) @db.Decimal(18, 2)
+  /// Diisi Kru lewat "ajukan kembali" (belum menyentuh stok); Gudang mengonfirmasi lalu jumlahKembali
+  /// disamakan ke nilai ini dan StokBarang ditambah selisihnya. CHECK DB: jumlahDiajukanKembali <= jumlah
+  jumlahDiajukanKembali Decimal  @default(0) @db.Decimal(18, 2)
 
   @@unique([peminjamanId, barangId])
+  @@index([barangId])
+}
+
+// ---------- Laporan Kerusakan Barang ----------
+
+/// Barang rusak (tidak bisa dipakai/dijual lagi) dilaporkan Kru/Gudang, disetujui Gudang. Berbeda dari
+/// Peminjaman Barang: TIDAK ADA alur "kembali" — begitu disetujui, StokBarang berkurang PERMANEN saat
+/// itu juga (lihat src/lib/persetujuan.ts, berkas "kerusakan"), sama pola row-mutation/CHECK DB dengan
+/// peminjaman (src/lib/stok.ts). Sama seperti peminjaman, TIDAK menjurnal; bila kerugian perlu diakui
+/// di laporan keuangan, tautkan manual ke Penyesuaian Stok yang sudah disetujui (opsional).
+model LaporanKerusakanBarang {
+  id              String                 @id @default(cuid())
+  nomor           String                 @unique
+  gudangId        String
+  gudang          Gudang                 @relation(fields: [gudangId], references: [id])
+  proyekId        String?
+  proyek          Proyek?                @relation(fields: [proyekId], references: [id])
+  /// Teks bebas: kru lapangan yang melapor belum tentu punya akun
+  namaPelapor     String
+  /// Jenis/penyebab kerusakan (mis. "Basah kehujanan", "Jatuh saat loading")
+  keterangan      String?
+  waktuLapor      DateTime               @default(now())
+  /// Opsional: dipakai bila kerugian ini perlu jejak akuntansi (jurnal beban) lewat Penyesuaian Stok
+  penyesuaianId   String?
+  penyesuaian     PenyesuaianPersediaan? @relation(fields: [penyesuaianId], references: [id])
+  dicatatOlehId   String?
+  dicatatOleh     Pengguna?              @relation("CatatKerusakanBarang", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
+  dicatatOlehNama String
+
+  baris BarisKerusakanBarang[]
+  foto  Foto[]
+
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts. Kru/Gudang melapor (MENUNGGU), Gudang
+  /// menyetujui (stok dikurangi permanen saat itu) atau menolak.
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanKerusakanBarang", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiKerusakanBarang", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakKerusakanBarang", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
+  @@index([gudangId])
+  @@index([proyekId])
+  @@index([penyesuaianId])
+  @@index([dicatatOlehId])
+  @@index([statusPersetujuan])
+}
+
+model BarisKerusakanBarang {
+  id         String                 @id @default(cuid())
+  laporanId  String
+  laporan    LaporanKerusakanBarang @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+  barangId   String
+  barang     Barang                 @relation(fields: [barangId], references: [id])
+  jumlah     Decimal                @db.Decimal(18, 2)
+
+  @@unique([laporanId, barangId])
   @@index([barangId])
 }
 

@@ -102,6 +102,8 @@ export const ModelName = {
   Foto: 'Foto',
   PeminjamanBarang: 'PeminjamanBarang',
   BarisPeminjamanBarang: 'BarisPeminjamanBarang',
+  LaporanKerusakanBarang: 'LaporanKerusakanBarang',
+  BarisKerusakanBarang: 'BarisKerusakanBarang',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
@@ -964,6 +966,7 @@ export const FotoScalarFieldEnum = {
   id: 'id',
   barangId: 'barangId',
   peminjamanId: 'peminjamanId',
+  kerusakanId: 'kerusakanId',
   tahap: 'tahap',
   urutan: 'urutan',
   tipe: 'tipe',
@@ -988,7 +991,15 @@ export const PeminjamanBarangScalarFieldEnum = {
   catatanKembali: 'catatanKembali',
   penyesuaianId: 'penyesuaianId',
   dicatatOlehId: 'dicatatOlehId',
-  dicatatOlehNama: 'dicatatOlehNama'
+  dicatatOlehNama: 'dicatatOlehNama',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PeminjamanBarangScalarFieldEnum = (typeof PeminjamanBarangScalarFieldEnum)[keyof typeof PeminjamanBarangScalarFieldEnum]
@@ -999,10 +1010,45 @@ export const BarisPeminjamanBarangScalarFieldEnum = {
   peminjamanId: 'peminjamanId',
   barangId: 'barangId',
   jumlah: 'jumlah',
-  jumlahKembali: 'jumlahKembali'
+  jumlahKembali: 'jumlahKembali',
+  jumlahDiajukanKembali: 'jumlahDiajukanKembali'
 } as const
 
 export type BarisPeminjamanBarangScalarFieldEnum = (typeof BarisPeminjamanBarangScalarFieldEnum)[keyof typeof BarisPeminjamanBarangScalarFieldEnum]
+
+
+export const LaporanKerusakanBarangScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  gudangId: 'gudangId',
+  proyekId: 'proyekId',
+  namaPelapor: 'namaPelapor',
+  keterangan: 'keterangan',
+  waktuLapor: 'waktuLapor',
+  penyesuaianId: 'penyesuaianId',
+  dicatatOlehId: 'dicatatOlehId',
+  dicatatOlehNama: 'dicatatOlehNama',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
+} as const
+
+export type LaporanKerusakanBarangScalarFieldEnum = (typeof LaporanKerusakanBarangScalarFieldEnum)[keyof typeof LaporanKerusakanBarangScalarFieldEnum]
+
+
+export const BarisKerusakanBarangScalarFieldEnum = {
+  id: 'id',
+  laporanId: 'laporanId',
+  barangId: 'barangId',
+  jumlah: 'jumlah'
+} as const
+
+export type BarisKerusakanBarangScalarFieldEnum = (typeof BarisKerusakanBarangScalarFieldEnum)[keyof typeof BarisKerusakanBarangScalarFieldEnum]
 
 
 export const PengaturanPerusahaanScalarFieldEnum = {

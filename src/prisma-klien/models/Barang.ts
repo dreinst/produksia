@@ -334,6 +334,7 @@ export type BarangWhereInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanListRelationFilter
   barisPindah?: Prisma.BarisPindahBarangListRelationFilter
   barisPeminjaman?: Prisma.BarisPeminjamanBarangListRelationFilter
+  barisKerusakan?: Prisma.BarisKerusakanBarangListRelationFilter
   foto?: Prisma.FotoListRelationFilter
 }
 
@@ -372,6 +373,7 @@ export type BarangOrderByWithRelationInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanOrderByRelationAggregateInput
   barisPindah?: Prisma.BarisPindahBarangOrderByRelationAggregateInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangOrderByRelationAggregateInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangOrderByRelationAggregateInput
   foto?: Prisma.FotoOrderByRelationAggregateInput
 }
 
@@ -413,6 +415,7 @@ export type BarangWhereUniqueInput = Prisma.AtLeast<{
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanListRelationFilter
   barisPindah?: Prisma.BarisPindahBarangListRelationFilter
   barisPeminjaman?: Prisma.BarisPeminjamanBarangListRelationFilter
+  barisKerusakan?: Prisma.BarisKerusakanBarangListRelationFilter
   foto?: Prisma.FotoListRelationFilter
 }, "id" | "kode">
 
@@ -492,6 +495,7 @@ export type BarangCreateInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -525,6 +529,7 @@ export type BarangUncheckedCreateInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -558,6 +563,7 @@ export type BarangUpdateInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -591,6 +597,7 @@ export type BarangUncheckedUpdateInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -1149,6 +1156,20 @@ export type BarangUpdateOneRequiredWithoutBarisPeminjamanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BarangUpdateToOneWithWhereWithoutBarisPeminjamanInput, Prisma.BarangUpdateWithoutBarisPeminjamanInput>, Prisma.BarangUncheckedUpdateWithoutBarisPeminjamanInput>
 }
 
+export type BarangCreateNestedOneWithoutBarisKerusakanInput = {
+  create?: Prisma.XOR<Prisma.BarangCreateWithoutBarisKerusakanInput, Prisma.BarangUncheckedCreateWithoutBarisKerusakanInput>
+  connectOrCreate?: Prisma.BarangCreateOrConnectWithoutBarisKerusakanInput
+  connect?: Prisma.BarangWhereUniqueInput
+}
+
+export type BarangUpdateOneRequiredWithoutBarisKerusakanNestedInput = {
+  create?: Prisma.XOR<Prisma.BarangCreateWithoutBarisKerusakanInput, Prisma.BarangUncheckedCreateWithoutBarisKerusakanInput>
+  connectOrCreate?: Prisma.BarangCreateOrConnectWithoutBarisKerusakanInput
+  upsert?: Prisma.BarangUpsertWithoutBarisKerusakanInput
+  connect?: Prisma.BarangWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BarangUpdateToOneWithWhereWithoutBarisKerusakanInput, Prisma.BarangUpdateWithoutBarisKerusakanInput>, Prisma.BarangUncheckedUpdateWithoutBarisKerusakanInput>
+}
+
 export type BarangCreateWithoutKelompokInput = {
   id?: string
   kode: string
@@ -1178,6 +1199,7 @@ export type BarangCreateWithoutKelompokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -1210,6 +1232,7 @@ export type BarangUncheckedCreateWithoutKelompokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -1290,6 +1313,7 @@ export type BarangCreateWithoutStokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -1322,6 +1346,7 @@ export type BarangUncheckedCreateWithoutStokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -1370,6 +1395,7 @@ export type BarangUpdateWithoutStokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -1402,6 +1428,7 @@ export type BarangUncheckedUpdateWithoutStokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -1434,6 +1461,7 @@ export type BarangCreateWithoutBarisPenawaranInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -1466,6 +1494,7 @@ export type BarangUncheckedCreateWithoutBarisPenawaranInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -1514,6 +1543,7 @@ export type BarangUpdateWithoutBarisPenawaranInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -1546,6 +1576,7 @@ export type BarangUncheckedUpdateWithoutBarisPenawaranInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -1578,6 +1609,7 @@ export type BarangCreateWithoutBarisPesananPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -1610,6 +1642,7 @@ export type BarangUncheckedCreateWithoutBarisPesananPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -1658,6 +1691,7 @@ export type BarangUpdateWithoutBarisPesananPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -1690,6 +1724,7 @@ export type BarangUncheckedUpdateWithoutBarisPesananPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -1722,6 +1757,7 @@ export type BarangCreateWithoutBarisPengirimanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -1754,6 +1790,7 @@ export type BarangUncheckedCreateWithoutBarisPengirimanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -1802,6 +1839,7 @@ export type BarangUpdateWithoutBarisPengirimanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -1834,6 +1872,7 @@ export type BarangUncheckedUpdateWithoutBarisPengirimanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -1866,6 +1905,7 @@ export type BarangCreateWithoutBarisFakturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -1898,6 +1938,7 @@ export type BarangUncheckedCreateWithoutBarisFakturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -1946,6 +1987,7 @@ export type BarangUpdateWithoutBarisFakturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -1978,6 +2020,7 @@ export type BarangUncheckedUpdateWithoutBarisFakturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -2010,6 +2053,7 @@ export type BarangCreateWithoutBarisReturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2042,6 +2086,7 @@ export type BarangUncheckedCreateWithoutBarisReturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2090,6 +2135,7 @@ export type BarangUpdateWithoutBarisReturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -2122,6 +2168,7 @@ export type BarangUncheckedUpdateWithoutBarisReturPenjualanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -2154,6 +2201,7 @@ export type BarangCreateWithoutBarisPesananPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2186,6 +2234,7 @@ export type BarangUncheckedCreateWithoutBarisPesananPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2234,6 +2283,7 @@ export type BarangUpdateWithoutBarisPesananPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -2266,6 +2316,7 @@ export type BarangUncheckedUpdateWithoutBarisPesananPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -2298,6 +2349,7 @@ export type BarangCreateWithoutBarisPenerimaanBarangInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2330,6 +2382,7 @@ export type BarangUncheckedCreateWithoutBarisPenerimaanBarangInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2378,6 +2431,7 @@ export type BarangUpdateWithoutBarisPenerimaanBarangInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -2410,6 +2464,7 @@ export type BarangUncheckedUpdateWithoutBarisPenerimaanBarangInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -2442,6 +2497,7 @@ export type BarangCreateWithoutBarisFakturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2474,6 +2530,7 @@ export type BarangUncheckedCreateWithoutBarisFakturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2522,6 +2579,7 @@ export type BarangUpdateWithoutBarisFakturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -2554,6 +2612,7 @@ export type BarangUncheckedUpdateWithoutBarisFakturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -2586,6 +2645,7 @@ export type BarangCreateWithoutBarisReturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2618,6 +2678,7 @@ export type BarangUncheckedCreateWithoutBarisReturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2666,6 +2727,7 @@ export type BarangUpdateWithoutBarisReturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -2698,6 +2760,7 @@ export type BarangUncheckedUpdateWithoutBarisReturPembelianInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -2730,6 +2793,7 @@ export type BarangCreateWithoutAkunPendapatanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2762,6 +2826,7 @@ export type BarangUncheckedCreateWithoutAkunPendapatanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2804,6 +2869,7 @@ export type BarangCreateWithoutAkunHppInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2836,6 +2902,7 @@ export type BarangUncheckedCreateWithoutAkunHppInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2878,6 +2945,7 @@ export type BarangCreateWithoutAkunPersediaanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2910,6 +2978,7 @@ export type BarangUncheckedCreateWithoutAkunPersediaanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -2952,6 +3021,7 @@ export type BarangCreateWithoutAkunBebanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -2984,6 +3054,7 @@ export type BarangUncheckedCreateWithoutAkunBebanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -3090,6 +3161,7 @@ export type BarangCreateWithoutBarisPindahInput = {
   akunBeban?: Prisma.AkunCreateNestedOneWithoutBarangBebanInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -3122,6 +3194,7 @@ export type BarangUncheckedCreateWithoutBarisPindahInput = {
   barisReturPembelian?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutBarangInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -3170,6 +3243,7 @@ export type BarangUpdateWithoutBarisPindahInput = {
   akunBeban?: Prisma.AkunUpdateOneWithoutBarangBebanNestedInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -3202,6 +3276,7 @@ export type BarangUncheckedUpdateWithoutBarisPindahInput = {
   barisReturPembelian?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutBarangNestedInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -3234,6 +3309,7 @@ export type BarangCreateWithoutBarisPenyesuaianInput = {
   akunBeban?: Prisma.AkunCreateNestedOneWithoutBarangBebanInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -3266,6 +3342,7 @@ export type BarangUncheckedCreateWithoutBarisPenyesuaianInput = {
   barisReturPembelian?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -3314,6 +3391,7 @@ export type BarangUpdateWithoutBarisPenyesuaianInput = {
   akunBeban?: Prisma.AkunUpdateOneWithoutBarangBebanNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -3346,6 +3424,7 @@ export type BarangUncheckedUpdateWithoutBarisPenyesuaianInput = {
   barisReturPembelian?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -3379,6 +3458,7 @@ export type BarangCreateWithoutFotoInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
 }
 
 export type BarangUncheckedCreateWithoutFotoInput = {
@@ -3411,6 +3491,7 @@ export type BarangUncheckedCreateWithoutFotoInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
 }
 
 export type BarangCreateOrConnectWithoutFotoInput = {
@@ -3459,6 +3540,7 @@ export type BarangUpdateWithoutFotoInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
 }
 
 export type BarangUncheckedUpdateWithoutFotoInput = {
@@ -3491,6 +3573,7 @@ export type BarangUncheckedUpdateWithoutFotoInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
 }
 
 export type BarangCreateWithoutBarisPeminjamanInput = {
@@ -3522,6 +3605,7 @@ export type BarangCreateWithoutBarisPeminjamanInput = {
   akunBeban?: Prisma.AkunCreateNestedOneWithoutBarangBebanInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
 }
 
@@ -3554,6 +3638,7 @@ export type BarangUncheckedCreateWithoutBarisPeminjamanInput = {
   barisReturPembelian?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutBarangInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
   foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
 }
 
@@ -3602,6 +3687,7 @@ export type BarangUpdateWithoutBarisPeminjamanInput = {
   akunBeban?: Prisma.AkunUpdateOneWithoutBarangBebanNestedInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -3634,6 +3720,155 @@ export type BarangUncheckedUpdateWithoutBarisPeminjamanInput = {
   barisReturPembelian?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutBarangNestedInput
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
+}
+
+export type BarangCreateWithoutBarisKerusakanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis?: $Enums.JenisBarang
+  satuan?: string
+  warna?: string | null
+  hargaBeli?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+  kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
+  barisPengiriman?: Prisma.BarisPengirimanCreateNestedManyWithoutBarangInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanCreateNestedManyWithoutBarangInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanCreateNestedManyWithoutBarangInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianCreateNestedManyWithoutBarangInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangCreateNestedManyWithoutBarangInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianCreateNestedManyWithoutBarangInput
+  barisReturPembelian?: Prisma.BarisReturPembelianCreateNestedManyWithoutBarangInput
+  akunPendapatan?: Prisma.AkunCreateNestedOneWithoutBarangPendapatanInput
+  akunHpp?: Prisma.AkunCreateNestedOneWithoutBarangHppInput
+  akunPersediaan?: Prisma.AkunCreateNestedOneWithoutBarangPersediaanInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutBarangBebanInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
+  barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
+}
+
+export type BarangUncheckedCreateWithoutBarisKerusakanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis?: $Enums.JenisBarang
+  kelompokId?: string | null
+  satuan?: string
+  warna?: string | null
+  hargaBeli?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+  akunPendapatanId?: string | null
+  akunHppId?: string | null
+  akunPersediaanId?: string | null
+  akunBebanId?: string | null
+  stok?: Prisma.StokBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisPengiriman?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutBarangInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianUncheckedCreateNestedManyWithoutBarangInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianUncheckedCreateNestedManyWithoutBarangInput
+  barisReturPembelian?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutBarangInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
+  barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
+}
+
+export type BarangCreateOrConnectWithoutBarisKerusakanInput = {
+  where: Prisma.BarangWhereUniqueInput
+  create: Prisma.XOR<Prisma.BarangCreateWithoutBarisKerusakanInput, Prisma.BarangUncheckedCreateWithoutBarisKerusakanInput>
+}
+
+export type BarangUpsertWithoutBarisKerusakanInput = {
+  update: Prisma.XOR<Prisma.BarangUpdateWithoutBarisKerusakanInput, Prisma.BarangUncheckedUpdateWithoutBarisKerusakanInput>
+  create: Prisma.XOR<Prisma.BarangCreateWithoutBarisKerusakanInput, Prisma.BarangUncheckedCreateWithoutBarisKerusakanInput>
+  where?: Prisma.BarangWhereInput
+}
+
+export type BarangUpdateToOneWithWhereWithoutBarisKerusakanInput = {
+  where?: Prisma.BarangWhereInput
+  data: Prisma.XOR<Prisma.BarangUpdateWithoutBarisKerusakanInput, Prisma.BarangUncheckedUpdateWithoutBarisKerusakanInput>
+}
+
+export type BarangUpdateWithoutBarisKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisBarangFieldUpdateOperationsInput | $Enums.JenisBarang
+  satuan?: Prisma.StringFieldUpdateOperationsInput | string
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hargaBeli?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
+  barisPengiriman?: Prisma.BarisPengirimanUpdateManyWithoutBarangNestedInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanUpdateManyWithoutBarangNestedInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanUpdateManyWithoutBarangNestedInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianUpdateManyWithoutBarangNestedInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangUpdateManyWithoutBarangNestedInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianUpdateManyWithoutBarangNestedInput
+  barisReturPembelian?: Prisma.BarisReturPembelianUpdateManyWithoutBarangNestedInput
+  akunPendapatan?: Prisma.AkunUpdateOneWithoutBarangPendapatanNestedInput
+  akunHpp?: Prisma.AkunUpdateOneWithoutBarangHppNestedInput
+  akunPersediaan?: Prisma.AkunUpdateOneWithoutBarangPersediaanNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutBarangBebanNestedInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
+  barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
+}
+
+export type BarangUncheckedUpdateWithoutBarisKerusakanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisBarangFieldUpdateOperationsInput | $Enums.JenisBarang
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  satuan?: Prisma.StringFieldUpdateOperationsInput | string
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hargaBeli?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stok?: Prisma.StokBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPengiriman?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutBarangNestedInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianUncheckedUpdateManyWithoutBarangNestedInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianUncheckedUpdateManyWithoutBarangNestedInput
+  barisReturPembelian?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutBarangNestedInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -3684,6 +3919,7 @@ export type BarangUpdateWithoutKelompokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -3716,6 +3952,7 @@ export type BarangUncheckedUpdateWithoutKelompokInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -3838,6 +4075,7 @@ export type BarangUpdateWithoutAkunPendapatanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -3870,6 +4108,7 @@ export type BarangUncheckedUpdateWithoutAkunPendapatanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -3920,6 +4159,7 @@ export type BarangUpdateWithoutAkunHppInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -3952,6 +4192,7 @@ export type BarangUncheckedUpdateWithoutAkunHppInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -4002,6 +4243,7 @@ export type BarangUpdateWithoutAkunPersediaanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -4034,6 +4276,7 @@ export type BarangUncheckedUpdateWithoutAkunPersediaanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -4084,6 +4327,7 @@ export type BarangUpdateWithoutAkunBebanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
 }
 
@@ -4116,6 +4360,7 @@ export type BarangUncheckedUpdateWithoutAkunBebanInput = {
   barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
   barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
   barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
@@ -4156,6 +4401,7 @@ export type BarangCountOutputType = {
   barisPenyesuaian: number
   barisPindah: number
   barisPeminjaman: number
+  barisKerusakan: number
   foto: number
 }
 
@@ -4173,6 +4419,7 @@ export type BarangCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   barisPenyesuaian?: boolean | BarangCountOutputTypeCountBarisPenyesuaianArgs
   barisPindah?: boolean | BarangCountOutputTypeCountBarisPindahArgs
   barisPeminjaman?: boolean | BarangCountOutputTypeCountBarisPeminjamanArgs
+  barisKerusakan?: boolean | BarangCountOutputTypeCountBarisKerusakanArgs
   foto?: boolean | BarangCountOutputTypeCountFotoArgs
 }
 
@@ -4280,6 +4527,13 @@ export type BarangCountOutputTypeCountBarisPeminjamanArgs<ExtArgs extends runtim
 /**
  * BarangCountOutputType without action
  */
+export type BarangCountOutputTypeCountBarisKerusakanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BarisKerusakanBarangWhereInput
+}
+
+/**
+ * BarangCountOutputType without action
+ */
 export type BarangCountOutputTypeCountFotoArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.FotoWhereInput
 }
@@ -4320,6 +4574,7 @@ export type BarangSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   barisPenyesuaian?: boolean | Prisma.Barang$barisPenyesuaianArgs<ExtArgs>
   barisPindah?: boolean | Prisma.Barang$barisPindahArgs<ExtArgs>
   barisPeminjaman?: boolean | Prisma.Barang$barisPeminjamanArgs<ExtArgs>
+  barisKerusakan?: boolean | Prisma.Barang$barisKerusakanArgs<ExtArgs>
   foto?: boolean | Prisma.Barang$fotoArgs<ExtArgs>
   _count?: boolean | Prisma.BarangCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barang"]>
@@ -4411,6 +4666,7 @@ export type BarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   barisPenyesuaian?: boolean | Prisma.Barang$barisPenyesuaianArgs<ExtArgs>
   barisPindah?: boolean | Prisma.Barang$barisPindahArgs<ExtArgs>
   barisPeminjaman?: boolean | Prisma.Barang$barisPeminjamanArgs<ExtArgs>
+  barisKerusakan?: boolean | Prisma.Barang$barisKerusakanArgs<ExtArgs>
   foto?: boolean | Prisma.Barang$fotoArgs<ExtArgs>
   _count?: boolean | Prisma.BarangCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -4450,6 +4706,7 @@ export type $BarangPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     barisPenyesuaian: Prisma.$BarisPenyesuaianPersediaanPayload<ExtArgs>[]
     barisPindah: Prisma.$BarisPindahBarangPayload<ExtArgs>[]
     barisPeminjaman: Prisma.$BarisPeminjamanBarangPayload<ExtArgs>[]
+    barisKerusakan: Prisma.$BarisKerusakanBarangPayload<ExtArgs>[]
     foto: Prisma.$FotoPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -4890,6 +5147,7 @@ export interface Prisma__BarangClient<T, Null = never, ExtArgs extends runtime.T
   barisPenyesuaian<T extends Prisma.Barang$barisPenyesuaianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$barisPenyesuaianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPenyesuaianPersediaanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   barisPindah<T extends Prisma.Barang$barisPindahArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$barisPindahArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPindahBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   barisPeminjaman<T extends Prisma.Barang$barisPeminjamanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$barisPeminjamanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  barisKerusakan<T extends Prisma.Barang$barisKerusakanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$barisKerusakanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   foto<T extends Prisma.Barang$fotoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$fotoArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -5741,6 +5999,30 @@ export type Barang$barisPeminjamanArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.BarisPeminjamanBarangScalarFieldEnum | Prisma.BarisPeminjamanBarangScalarFieldEnum[]
+}
+
+/**
+ * Barang.barisKerusakan
+ */
+export type Barang$barisKerusakanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BarisKerusakanBarang
+   */
+  select?: Prisma.BarisKerusakanBarangSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BarisKerusakanBarang
+   */
+  omit?: Prisma.BarisKerusakanBarangOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BarisKerusakanBarangInclude<ExtArgs> | null
+  where?: Prisma.BarisKerusakanBarangWhereInput
+  orderBy?: Prisma.BarisKerusakanBarangOrderByWithRelationInput | Prisma.BarisKerusakanBarangOrderByWithRelationInput[]
+  cursor?: Prisma.BarisKerusakanBarangWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BarisKerusakanBarangScalarFieldEnum | Prisma.BarisKerusakanBarangScalarFieldEnum[]
 }
 
 /**
