@@ -34,7 +34,8 @@ export const PeranPengguna = {
   PEMILIK: 'PEMILIK',
   ADMIN: 'ADMIN',
   KASIR: 'KASIR',
-  GUDANG: 'GUDANG'
+  GUDANG: 'GUDANG',
+  KRU: 'KRU'
 } as const
 
 export type PeranPengguna = (typeof PeranPengguna)[keyof typeof PeranPengguna]

@@ -274,8 +274,11 @@ export type BarisPenyesuaianPersediaan = Prisma.BarisPenyesuaianPersediaanModel
 export type Foto = Prisma.FotoModel
 /**
  * Model PeminjamanBarang
- * Barang keluar gudang untuk event lalu kembali. TIDAK menyentuh StokBarang maupun jurnal;
- * "sedang di luar" dihitung dari baris (jumlah - jumlahKembali), lihat src/lib/peminjaman.ts.
+ * Barang keluar gudang untuk event lalu kembali. Mengurangi StokBarang saat disetujui (lihat
+ * src/lib/persetujuan.ts, berkas "peminjaman") dan menambah kembali StokBarang saat Gudang
+ * mengonfirmasi barang kembali, lewat kurangiStok/tambahStok (src/lib/stok.ts) — mutasi relatif
+ * yang diserialisasi Postgres per baris + CHECK DB (jumlah >= 0) sebagai penjamin tidak minus saat
+ * dua persetujuan bentrok pada barang yang sama. TIDAK menjurnal (bukan transaksi keuangan).
  * Status turunan: TERBUKA (ditutupPada null), SELESAI, SELISIH (sisa > 0), DISESUAIKAN (penyesuaianId terisi).
  */
 export type PeminjamanBarang = Prisma.PeminjamanBarangModel
@@ -284,6 +287,20 @@ export type PeminjamanBarang = Prisma.PeminjamanBarangModel
  * 
  */
 export type BarisPeminjamanBarang = Prisma.BarisPeminjamanBarangModel
+/**
+ * Model LaporanKerusakanBarang
+ * Barang rusak (tidak bisa dipakai/dijual lagi) dilaporkan Kru/Gudang, disetujui Gudang. Berbeda dari
+ * Peminjaman Barang: TIDAK ADA alur "kembali" — begitu disetujui, StokBarang berkurang PERMANEN saat
+ * itu juga (lihat src/lib/persetujuan.ts, berkas "kerusakan"), sama pola row-mutation/CHECK DB dengan
+ * peminjaman (src/lib/stok.ts). Sama seperti peminjaman, TIDAK menjurnal; bila kerugian perlu diakui
+ * di laporan keuangan, tautkan manual ke Penyesuaian Stok yang sudah disetujui (opsional).
+ */
+export type LaporanKerusakanBarang = Prisma.LaporanKerusakanBarangModel
+/**
+ * Model BarisKerusakanBarang
+ * 
+ */
+export type BarisKerusakanBarang = Prisma.BarisKerusakanBarangModel
 /**
  * Model PengaturanPerusahaan
  * 

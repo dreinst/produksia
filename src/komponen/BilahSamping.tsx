@@ -10,7 +10,7 @@ import { gantiTahunBukuFormulir } from "@/lib/aksi/pengaturan";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
 /** Jenis dokumen yang sudah tersambung ke alur persetujuan (lihat BERKAS di src/lib/persetujuan.ts). */
-const DOKUMEN_PERSETUJUAN = ["faktur", "faktur-pembelian", "kas-masuk", "kas-keluar", "penyesuaian", "aset", "penggajian"] as const;
+const DOKUMEN_PERSETUJUAN = ["faktur", "faktur-pembelian", "kas-masuk", "kas-keluar", "penyesuaian", "peminjaman", "kerusakan", "aset", "penggajian"] as const;
 
 type TautanNavigasi = { href: string; label: string; kode?: string; hak: Hak };
 type Grup = { judul: string; ikon: string; tautan: TautanNavigasi[] };
@@ -110,6 +110,7 @@ const persediaan: Grup = {
     { href: "/persediaan/penyesuaian", label: "Penyesuaian Stok", kode: "PS", hak: "penyesuaian.lihat" },
     { href: "/persediaan/pindah", label: "Pindah Barang", kode: "PB", hak: "pindah-barang.lihat" },
     { href: "/persediaan/peminjaman", label: "Peminjaman Barang", kode: "PJ", hak: "peminjaman.lihat" },
+    { href: "/persediaan/kerusakan", label: "Laporan Kerusakan Barang", kode: "BR", hak: "kerusakan.lihat" },
   ],
 };
 
@@ -233,9 +234,11 @@ function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: Peng
   const grupDataInduk = saringGrup([persediaan, dataInduk], pengguna);
   const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna, l.hak));
   // Kotak masuk persetujuan tampil bagi siapa pun yang boleh membuat atau menyetujui dokumen yang ikut alur itu,
-  // KECUALI Gudang: perannya murni input/output stok, Beranda & Persetujuan di luar fokusnya (permintaan pemilik).
-  const bolehPersetujuan = pengguna.peran !== "GUDANG" && DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
-  const bolehBeranda = pengguna.peran !== "GUDANG";
+  // KECUALI Gudang & Kru: perannya murni operasional (Gudang: input/output stok; Kru: hanya ajukan
+  // peminjaman), Beranda & kotak masuk Persetujuan gabungan di luar fokusnya (persetujuan Kru sendiri
+  // sudah ada langsung di halaman Peminjaman Barang).
+  const bolehPersetujuan = pengguna.peran !== "GUDANG" && pengguna.peran !== "KRU" && DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
+  const bolehBeranda = pengguna.peran !== "GUDANG" && pengguna.peran !== "KRU";
   const semuaGrup = [...grupOperasional, ...grupDataInduk];
 
   const judulAktif = semuaGrup.find((g) => g.tautan.some((l) => aktifDi(pathname, l.href)))?.judul ?? null;

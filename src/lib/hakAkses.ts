@@ -37,7 +37,8 @@ export const DOKUMEN_HAK = [
   { kode: "pph-final", label: "PPh Final Bulanan", modul: "buku-besar", aksi: ["buat", "setujui", "hapus"] },
   { kode: "penyesuaian", label: "Penyesuaian Stok", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "pindah-barang", label: "Pindah Barang", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
-  { kode: "peminjaman", label: "Peminjaman Barang", modul: "persediaan", aksi: ["lihat", "buat", "hapus"] },
+  { kode: "peminjaman", label: "Peminjaman Barang", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
+  { kode: "kerusakan", label: "Laporan Kerusakan Barang", modul: "persediaan", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "aset", label: "Aset Tetap", modul: "aset-tetap", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "penyusutan", label: "Penyusutan Aset", modul: "aset-tetap", aksi: ["lihat", "buat", "setujui", "hapus"] },
   { kode: "pelepasan-aset", label: "Pelepasan Aset (jual/hapus buku)", modul: "aset-tetap", aksi: ["buat", "setujui", "hapus"] },
@@ -157,8 +158,11 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     ...hakDok("penerimaan-barang", "lihat", "buat"),
     ...hakDok("penyesuaian", "lihat", "buat"),
     ...hakDok("pindah-barang", "lihat", "buat"),
-    // Peminjaman barang (loading out/in) tidak menggerakkan stok, jadi tanpa alur persetujuan
-    ...hakDok("peminjaman", "lihat", "buat"),
+    // Peminjaman barang: Gudang yang menyetujui pengajuan Kru (stok baru dikurangi/ditambah balik
+    // saat itu) dan mengonfirmasi barang kembali, jadi juga punya "setujui" di sini.
+    ...hakDok("peminjaman", "lihat", "buat", "setujui"),
+    // Laporan Kerusakan Barang: pola sama seperti peminjaman (Kru/Gudang lapor, Gudang menyetujui).
+    ...hakDok("kerusakan", "lihat", "buat", "setujui"),
     // Data induk yang boleh Gudang kelola sendiri (Barang & Jasa, Kategori Barang, Gudang/lokasi),
     // TERPISAH dari data induk komersial (Pelanggan, Pemasok, Bagan Akun, Proyek) yang tetap
     // urusan Admin. Lihat & ubah, bukan cuma lihat, karena Gudang perlu menambah barang baru sendiri.
@@ -166,9 +170,14 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     "stok-induk.tulis",
     "persediaan.lihat", // Stok per Gudang
   ],
+  // Kru lapangan: SATU-SATUNYA hak yang dimiliki adalah Peminjaman Barang & Laporan Kerusakan Barang
+  // (lihat & buat pengajuan), tanpa "setujui" (pemisahan tugas: yang ajukan bukan yang setujui) dan
+  // tanpa "hapus". Tanpa persediaan.lihat/stok-induk.lihat pun, jadi modul lain otomatis tidak tampil
+  // di menu (lihat modulTerlihat) - ini yang membuat Kru cuma bisa mengakses dua halaman itu.
+  KRU: [...hakDok("peminjaman", "lihat", "buat"), ...hakDok("kerusakan", "lihat", "buat")],
 };
 
-export const DAFTAR_PERAN: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "GUDANG"];
+export const DAFTAR_PERAN: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "GUDANG", "KRU"];
 
 /** Tingkat tertinggi: Superadmin dan Pemilik setara, hanya mereka yang boleh menyentuh akun setingkat ini & hak akses. */
 export const PERAN_TERTINGGI: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK"];
@@ -176,7 +185,7 @@ export function peranTertinggi(peran: PeranPengguna): boolean {
   return PERAN_TERTINGGI.includes(peran);
 }
 /** Peran yang hak aksesnya bisa diubah dari Pengaturan › Hak Akses. */
-export const PERAN_DAPAT_DIATUR: readonly PeranPengguna[] = ["ADMIN", "KASIR", "GUDANG"];
+export const PERAN_DAPAT_DIATUR: readonly PeranPengguna[] = ["ADMIN", "KASIR", "GUDANG", "KRU"];
 
 export const LABEL_PERAN: Record<PeranPengguna, string> = {
   SUPERADMIN: "Superadmin",
@@ -184,6 +193,7 @@ export const LABEL_PERAN: Record<PeranPengguna, string> = {
   ADMIN: "Admin",
   KASIR: "Kasir",
   GUDANG: "Gudang",
+  KRU: "Kru",
 };
 
 export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
@@ -191,7 +201,8 @@ export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
   KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, peminjaman barang (loading out/in), plus kelola Barang/Kategori Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
+  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, peminjaman barang (loading out/in) dan laporan kerusakan barang termasuk menyetujui keduanya, plus kelola Barang/Kategori Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
+  KRU: "Hanya Peminjaman Barang (ajukan pinjam & ajukan kembali) dan Laporan Kerusakan Barang, menunggu persetujuan Gudang. Tidak bisa mengakses halaman lain sama sekali.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };

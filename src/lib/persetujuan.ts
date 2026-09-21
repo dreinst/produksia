@@ -2,7 +2,7 @@ import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import type { StatusPersetujuan } from "@/prisma-klien/enums";
 import type { Hak, KodeDokumen, PenggunaSesi } from "@/lib/hakAkses";
 import { D, format, type Desimal } from "@/lib/uang";
-import { perbaruiHargaRata } from "@/lib/stok";
+import { kurangiStok, labelBarang, perbaruiHargaRata } from "@/lib/stok";
 import { catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import {
@@ -184,6 +184,8 @@ export type JenisPersetujuan =
   | "fakturPembelian"
   | "dokumenKas"
   | "penyesuaian"
+  | "peminjaman"
+  | "kerusakan"
   | "aset"
   | "penggajian";
 
@@ -337,6 +339,69 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     ringkas: async (tx, id) => {
       const p = await tx.penyesuaianPersediaan.findUniqueOrThrow({ where: { id }, include: { baris: true, gudang: { select: { nama: true } } } });
       return `${p.baris.length} baris di gudang ${p.gudang.nama}`;
+    },
+  },
+
+  peminjaman: {
+    label: "Peminjaman Barang",
+    kode: "peminjaman",
+    jalur: ["/persediaan/peminjaman", "/persediaan"],
+    baca: async (tx, id) => {
+      const p = await tx.peminjamanBarang.findUnique({
+        where: { id },
+        select: { id: true, nomor: true, waktuKeluar: true, statusPersetujuan: true, diajukanOlehId: true },
+      });
+      return p ? { id: p.id, nomor: p.nomor, tanggal: p.waktuKeluar, statusPersetujuan: p.statusPersetujuan, diajukanOlehId: p.diajukanOlehId } : null;
+    },
+    simpan: async (tx, id, data) => void (await tx.peminjamanBarang.update({ where: { id }, data })),
+    /**
+     * Seperti Penyesuaian Stok: mutasi fisiknya juga ditahan sampai disetujui. Stok baru dikurangi di
+     * sini, di dalam transaksi yang sama dengan perubahan status; kalau stok sudah tidak cukup (mis.
+     * direbut pengajuan lain yang lebih dulu disetujui), kurangiStok melempar galat dan seluruh
+     * transaksi (termasuk perubahan status) dibatalkan -- dokumen tetap MENUNGGU, harus ditolak atau
+     * dicoba lagi setelah stok tersedia. Tidak ada jurnal; peminjaman bukan transaksi keuangan.
+     */
+    posting: async (tx, id) => {
+      const p = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true } });
+      const label = await labelBarang(tx, p.baris.map((b) => b.barangId));
+      for (const b of p.baris) {
+        await kurangiStok(tx, b.barangId, p.gudangId, D(b.jumlah), label.get(b.barangId) ?? b.barangId);
+      }
+    },
+    ringkas: async (tx, id) => {
+      const p = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, gudang: { select: { nama: true } } } });
+      return `${p.namaPengambil}, ${p.baris.length} barang di ${p.gudang.nama}`;
+    },
+  },
+
+  kerusakan: {
+    label: "Laporan Kerusakan Barang",
+    kode: "kerusakan",
+    jalur: ["/persediaan/kerusakan", "/persediaan"],
+    baca: async (tx, id) => {
+      const k = await tx.laporanKerusakanBarang.findUnique({
+        where: { id },
+        select: { id: true, nomor: true, waktuLapor: true, statusPersetujuan: true, diajukanOlehId: true },
+      });
+      return k ? { id: k.id, nomor: k.nomor, tanggal: k.waktuLapor, statusPersetujuan: k.statusPersetujuan, diajukanOlehId: k.diajukanOlehId } : null;
+    },
+    simpan: async (tx, id, data) => void (await tx.laporanKerusakanBarang.update({ where: { id }, data })),
+    /**
+     * Sama seperti peminjaman: stok baru dikurangi di sini, di dalam transaksi yang sama dengan
+     * perubahan status. TIDAK ADA alur "kembali" — begitu disetujui, barang dianggap rusak permanen.
+     * Kalau stok sudah tidak cukup (mis. sudah dipakai/dipinjamkan duluan), kurangiStok melempar galat
+     * dan seluruh transaksi (termasuk perubahan status) dibatalkan. Tidak ada jurnal.
+     */
+    posting: async (tx, id) => {
+      const k = await tx.laporanKerusakanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true } });
+      const label = await labelBarang(tx, k.baris.map((b) => b.barangId));
+      for (const b of k.baris) {
+        await kurangiStok(tx, b.barangId, k.gudangId, D(b.jumlah), label.get(b.barangId) ?? b.barangId);
+      }
+    },
+    ringkas: async (tx, id) => {
+      const k = await tx.laporanKerusakanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, gudang: { select: { nama: true } } } });
+      return `${k.namaPelapor}, ${k.baris.length} barang di ${k.gudang.nama}`;
     },
   },
 

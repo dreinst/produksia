@@ -37,6 +37,7 @@ export type JenisDokumen =
   | "penyesuaian"
   | "pindahBarang"
   | "peminjamanBarang"
+  | "laporanKerusakan"
   | "pphFinal"
   | "prive"
   | "aset"
@@ -62,6 +63,7 @@ const LABEL: Record<JenisDokumen, string> = {
   penyesuaian: "Penyesuaian Stok",
   pindahBarang: "Pindah Barang",
   peminjamanBarang: "Peminjaman Barang",
+  laporanKerusakan: "Laporan Kerusakan Barang",
   pphFinal: "PPh Final Bulanan",
   prive: "Prive",
   aset: "Aset Tetap",
@@ -88,6 +90,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   penyesuaian: ["/persediaan/penyesuaian", "/persediaan"],
   pindahBarang: ["/persediaan/pindah", "/persediaan"],
   peminjamanBarang: ["/persediaan", "/persediaan/peminjaman"],
+  laporanKerusakan: ["/persediaan", "/persediaan/kerusakan"],
   pphFinal: ["/buku-besar/pajak", "/buku-besar/jurnal"],
   prive: ["/kas-bank/prive", "/laporan/prive", "/buku-besar/jurnal"],
   aset: ["/aset-tetap"],
@@ -154,6 +157,7 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal" | "dokumenKas">, Hak> = {
   penyesuaian: "penyesuaian.hapus",
   pindahBarang: "pindah-barang.hapus",
   peminjamanBarang: "peminjaman.hapus",
+  laporanKerusakan: "kerusakan.hapus",
   pphFinal: "pph-final.hapus",
   prive: "prive.hapus",
   aset: "aset.hapus",
@@ -419,12 +423,33 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         return;
       }
       case "peminjamanBarang": {
-        // Peminjaman tidak menyentuh stok/jurnal, jadi tidak ada yang dibalik; baris & foto ikut terhapus (cascade)
+        // Tidak menjurnal, tapi SUDAH menyentuh stok sejak disetujui (lihat src/lib/persetujuan.ts,
+        // berkas "peminjaman"): bagian yang masih di luar (jumlah - jumlahKembali) harus dikembalikan
+        // ke StokBarang; bagian yang sudah dikonfirmasi kembali sudah ditambah balik saat itu, tidak diulang.
         const d = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: { include: { barang: { select: { kode: true } } } }, penyesuaian: { select: { nomor: true } } } });
         if (d.penyesuaian) throw new Error(`${d.nomor} sudah ditautkan ke ${d.penyesuaian.nomor}; hapus penyesuaian itu dulu bila memang salah`);
+        if (d.statusPersetujuan === "DISETUJUI") {
+          for (const b of d.baris) {
+            const sisa = D(b.jumlah).minus(D(b.jumlahKembali));
+            if (sisa.gt(0)) await tambahStok(tx, b.barangId, d.gudangId, sisa);
+          }
+        }
         await tx.peminjamanBarang.delete({ where: { id } });
         const ringkasBaris = d.baris.map((b) => `${b.barang.kode} ${b.jumlah} (kembali ${b.jumlahKembali})`).join(", ");
-        await catatLog(tx, pengguna, jenis, d.nomor, `Pengambil ${d.namaPengambil}; ${ringkasBaris}`);
+        await catatLog(tx, pengguna, jenis, d.nomor, `Pengambil ${d.namaPengambil}; ${ringkasBaris}${d.statusPersetujuan === "DISETUJUI" ? "; stok yang masih di luar dikembalikan" : ""}`);
+        return;
+      }
+      case "laporanKerusakan": {
+        // Tidak menjurnal, tapi SUDAH menyentuh stok sejak disetujui (lihat src/lib/persetujuan.ts,
+        // berkas "kerusakan"): tidak ada alur "kembali", jadi seluruh jumlah tiap baris dikembalikan.
+        const d = await tx.laporanKerusakanBarang.findUniqueOrThrow({ where: { id }, include: { baris: { include: { barang: { select: { kode: true } } } }, penyesuaian: { select: { nomor: true } } } });
+        if (d.penyesuaian) throw new Error(`${d.nomor} sudah ditautkan ke ${d.penyesuaian.nomor}; hapus penyesuaian itu dulu bila memang salah`);
+        if (d.statusPersetujuan === "DISETUJUI") {
+          for (const b of d.baris) await tambahStok(tx, b.barangId, d.gudangId, D(b.jumlah));
+        }
+        await tx.laporanKerusakanBarang.delete({ where: { id } });
+        const ringkasBaris = d.baris.map((b) => `${b.barang.kode} ${b.jumlah}`).join(", ");
+        await catatLog(tx, pengguna, jenis, d.nomor, `Pelapor ${d.namaPelapor}; ${ringkasBaris}${d.statusPersetujuan === "DISETUJUI" ? "; stok dikembalikan" : ""}`);
         return;
       }
       case "pphFinal": {

@@ -3,12 +3,13 @@ import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { daftarProyekAktif } from "@/lib/proyek";
-import { LABEL_STATUS_PEMINJAMAN, petaSedangDiLuar, sisaBaris, statusPeminjaman, terlambat } from "@/lib/peminjaman";
+import { LABEL_STATUS_PEMINJAMAN, menungguKonfirmasiBaris, sisaBaris, statusPeminjaman, terlambat } from "@/lib/peminjaman";
 import { formatTanggal, formatWaktu, tanggalIso } from "@/lib/waktu";
 import {
+  ajukanKembaliPeminjamanBarangFormulir,
   buatPeminjamanBarangFormulir,
   hapusFotoPeminjamanFormulir,
-  kembalikanPeminjamanBarangFormulir,
+  konfirmasiKembaliPeminjamanBarangFormulir,
   tautkanPenyesuaianPeminjamanFormulir,
   ubahPeminjamanBarangFormulir,
   unggahFotoPeminjamanFormulir,
@@ -19,6 +20,7 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import PemilihFoto from "@/komponen/ui/PemilihFoto";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import EditorBarisPeminjaman, { EditorKembali, PemilihGudang } from "@/komponen/persediaan/EditorBarisPeminjaman";
 
 const SERTAKAN = {
@@ -55,6 +57,33 @@ function TautanFoto({ foto }: { foto: Foto[] }) {
 
 type Proyek = { id: string; kode: string; nama: string };
 
+type DokumenUbah = { id: string; namaPengambil: string; proyekId: string | null; rencanaKembali: Date | null; keterangan: string | null };
+
+/** Ubah metadata (bukan jumlah barang, stok tidak tersentuh): boleh selama tidak MENUNGGU/ditutup. */
+function FormUbahData({ p, daftarProyek }: { p: DokumenUbah; daftarProyek: Proyek[] }) {
+  return (
+    <details className="pt-1">
+      <summary className="cursor-pointer text-xs font-semibold text-slate-600 py-3.5">Ubah data</summary>
+      <FormulirAksi aksi={ubahPeminjamanBarangFormulir.bind(null, p.id)} pesanSukses="Perubahan disimpan." className="space-y-3 mt-2">
+        <div className="bidang">
+          <label className="label" htmlFor={`ubah-nama-${p.id}`}>Nama pengambil *</label>
+          <input id={`ubah-nama-${p.id}`} name="namaPengambil" required list="saran-nama-pengambil" defaultValue={p.namaPengambil} className="isian min-h-11" />
+        </div>
+        <PilihanProyek id={`ubah-proyek-${p.id}`} daftarProyek={daftarProyek} nilai={p.proyekId} />
+        <div className="bidang">
+          <label className="label" htmlFor={`ubah-rencana-${p.id}`}>Rencana kembali</label>
+          <input id={`ubah-rencana-${p.id}`} name="rencanaKembali" type="date" defaultValue={p.rencanaKembali ? tanggalIso(p.rencanaKembali) : ""} className="isian min-h-11" />
+        </div>
+        <div className="bidang">
+          <label className="label" htmlFor={`ubah-ket-${p.id}`}>Keterangan</label>
+          <input id={`ubah-ket-${p.id}`} name="keterangan" defaultValue={p.keterangan ?? ""} className="isian min-h-11" />
+        </div>
+        <button type="submit" className="tombol tombol-garis w-full min-h-11">Simpan perubahan</button>
+      </FormulirAksi>
+    </details>
+  );
+}
+
 /** Pilihan event opsional; disembunyikan bila belum ada proyek aktif. */
 function PilihanProyek({ id, daftarProyek, nilai }: { id: string; daftarProyek: Proyek[]; nilai?: string | null }) {
   if (daftarProyek.length === 0) return null;
@@ -74,6 +103,7 @@ function PilihanProyek({ id, daftarProyek, nilai }: { id: string; daftarProyek: 
 export default async function HalamanPeminjamanBarang({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("peminjaman.lihat");
   const bolehBuat = punyaHak(pengguna, "peminjaman.buat");
+  const bolehSetujui = punyaHak(pengguna, "peminjaman.setujui");
   const bolehHapus = punyaHak(pengguna, "peminjaman.hapus");
   const bolehTautkan = punyaHak(pengguna, "penyesuaian.setujui");
   const param = await bacaParamDaftar(searchParams);
@@ -84,15 +114,15 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
     ditutupPada: { not: null },
     ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { namaPengambil: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}),
   };
-  const [daftarGudang, daftarProyek, daftarBarang, daftarStok, petaDiLuar, saranNama, terbuka, totalRiwayat, riwayat, daftarPs] = await Promise.all([
+  const [daftarGudang, daftarProyek, daftarBarang, daftarStok, saranNama, diajukan, terbuka, totalRiwayat, riwayat, daftarPs] = await Promise.all([
     db.gudang.findMany({ orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true } }),
     // Tanpa cek hak data-induk: GUDANG tidak punya hak Proyek, tetapi kru perlu menandai event yang dilayani.
     daftarProyekAktif(),
     db.barang.findMany({ where: { jenis: "BARANG" }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true } }),
     db.stokBarang.findMany({ select: { gudangId: true, barangId: true, jumlah: true } }),
-    petaSedangDiLuar(db),
     db.peminjamanBarang.findMany({ select: { namaPengambil: true }, orderBy: { waktuKeluar: "desc" }, take: 50 }),
-    db.peminjamanBarang.findMany({ where: { ditutupPada: null }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
+    db.peminjamanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] } }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
+    db.peminjamanBarang.findMany({ where: { statusPersetujuan: "DISETUJUI", ditutupPada: null }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
     db.peminjamanBarang.count({ where: whereRiwayat }),
     db.peminjamanBarang.findMany({ where: whereRiwayat, include: SERTAKAN, orderBy: { waktuKeluar: "desc" }, skip: param.lewati, take: param.ambil }),
     bolehTautkan ? db.penyesuaianPersediaan.findMany({ where: { statusPersetujuan: "DISETUJUI" }, select: { id: true, nomor: true, gudangId: true, keterangan: true }, orderBy: { nomor: "desc" } }) : Promise.resolve([]),
@@ -100,7 +130,8 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
 
   const gudangId = daftarGudang.find((g) => g.id === gudangDipilih)?.id ?? daftarGudang[0]?.id ?? "";
   const stokGudang = new Map(daftarStok.filter((s) => s.gudangId === gudangId).map((s) => [s.barangId, Number(s.jumlah)]));
-  const barangEditor = daftarBarang.map((b) => ({ ...b, tersedia: (stokGudang.get(b.id) ?? 0) - (petaDiLuar.get(`${gudangId}:${b.id}`) ?? 0) }));
+  // Tersedia = StokBarang.jumlah langsung; peminjaman yang sudah disetujui sudah mengurangi angka ini sendiri.
+  const barangEditor = daftarBarang.map((b) => ({ ...b, tersedia: stokGudang.get(b.id) ?? 0 }));
   const namaUnik = [...new Set(saranNama.map((s) => s.namaPengambil))];
 
   return (
@@ -108,18 +139,18 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
       <KepalaHalaman
         jejak={[{ label: "Persediaan" }, { label: "Stok per Gudang", href: "/persediaan" }]}
         judul="Peminjaman Barang"
-        subjudul="Catatan loading in / loading out barang ke event. Stok akuntansi tidak berubah; yang sedang di luar dihitung terpisah."
+        subjudul="Catatan loading in / loading out barang ke event. Stok baru berkurang setelah Gudang menyetujui pengajuan, dan bertambah balik setelah Gudang mengonfirmasi barang kembali."
       />
 
       {bolehBuat && (
         <div className="kartu">
           <div className="kepala-kartu">
-            <h2 className="judul-kartu">Ambil barang</h2>
+            <h2 className="judul-kartu">Ajukan pinjam</h2>
           </div>
           {daftarGudang.length === 0 ? (
             <p className="redup">Belum ada gudang. Tambahkan gudang di Data Induk terlebih dulu.</p>
           ) : (
-            <FormulirAksi aksi={buatPeminjamanBarangFormulir} className="space-y-4">
+            <FormulirAksi aksi={buatPeminjamanBarangFormulir} pesanSukses="Dicatat sebagai draf. Klik “Ajukan” di bawah untuk mengirimnya ke Gudang." className="space-y-4">
               <datalist id="saran-nama-pengambil">
                 {namaUnik.map((n) => (
                   <option key={n} value={n} />
@@ -154,11 +185,57 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                 <PemilihFoto name="foto" maksimal={3} wajib label="Ambil foto barang keluar" />
                 <span className="petunjuk">Maksimal 3 foto, dikompresi otomatis di HP.</span>
               </div>
-              <button type="submit" className="tombol tombol-utama w-full min-h-11">Catat keluar</button>
+              <button type="submit" className="tombol tombol-utama w-full min-h-11">Catat</button>
             </FormulirAksi>
           )}
         </div>
       )}
+
+      <div className="kartu">
+        <div className="kepala-kartu">
+          <h2 className="judul-kartu">Menunggu persetujuan</h2>
+          <span className="text-xs text-slate-500">{diajukan.length} pengajuan</span>
+        </div>
+        {diajukan.length === 0 ? (
+          <p className="redup">Tidak ada pengajuan yang menunggu.</p>
+        ) : (
+          <div className="space-y-4">
+            {diajukan.map((p) => (
+              <div key={p.id} className="rounded-xl border border-slate-200 p-4 space-y-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <NomorDokumen nomor={p.nomor} />
+                    <span className="text-slate-600">
+                      <span className="font-medium text-slate-900">{p.namaPengambil}</span>
+                      {p.proyek && <> · {p.proyek.nama}</>}
+                    </span>
+                  </div>
+                  <SelPersetujuan
+                    jenis="peminjaman"
+                    kode="peminjaman"
+                    id={p.id}
+                    nomor={p.nomor}
+                    status={p.statusPersetujuan}
+                    diajukanOlehId={p.diajukanOlehId}
+                    pengguna={pengguna}
+                    catatanPenolakan={p.catatanPenolakan}
+                  />
+                </div>
+                <ul className="space-y-0.5">
+                  {p.baris.map((b) => (
+                    <li key={b.id}>
+                      <span className="mono">{b.barang.kode}</span> <span className="text-slate-700">({b.barang.nama})</span>{" "}
+                      <span className="angka">{Number(b.jumlah).toLocaleString("id-ID")}</span> {b.barang.satuan}
+                    </li>
+                  ))}
+                </ul>
+                <TautanFoto foto={p.foto} />
+                {bolehBuat && p.statusPersetujuan !== "MENUNGGU" && <FormUbahData p={p} daftarProyek={daftarProyek} />}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="kartu">
         <div className="kepala-kartu">
@@ -170,7 +247,16 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
         ) : (
           <div className="space-y-4">
             {terbuka.map((p) => {
-              const barisSisa = p.baris.map((b) => ({ barangId: b.barangId, kode: b.barang.kode, nama: b.barang.nama, satuan: b.barang.satuan, sisa: sisaBaris(b) })).filter((b) => b.sisa > 0);
+              const barisSisa = p.baris.map((b) => ({
+                barangId: b.barangId,
+                kode: b.barang.kode,
+                nama: b.barang.nama,
+                satuan: b.barang.satuan,
+                sisa: sisaBaris(b),
+                menunggu: menungguKonfirmasiBaris(b),
+              }));
+              const belumDiklaim = barisSisa.filter((b) => b.sisa - b.menunggu > 0).map((b) => ({ ...b, sisa: b.sisa - b.menunggu }));
+              const menungguKonfirmasi = barisSisa.filter((b) => b.menunggu > 0).map((b) => ({ ...b, sisa: b.menunggu }));
               return (
                 <div key={p.id} className="rounded-xl border border-slate-200 p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="space-y-2 text-sm">
@@ -187,58 +273,51 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                       {p.keterangan && <> · {p.keterangan}</>}
                     </div>
                     <ul className="space-y-0.5">
-                      {p.baris.map((b) => (
-                        <li key={b.id}>
-                          <span className="mono">{b.barang.kode}</span> <span className="text-slate-700">({b.barang.nama})</span>{" "}
-                          <span className="angka">{Number(b.jumlah).toLocaleString("id-ID")}</span> {b.barang.satuan}, kembali <span className="angka">{Number(b.jumlahKembali).toLocaleString("id-ID")}</span>, sisa{" "}
-                          <span className="angka font-semibold">{sisaBaris(b).toLocaleString("id-ID")}</span>
+                      {barisSisa.map((b) => (
+                        <li key={b.barangId}>
+                          <span className="mono">{b.kode}</span> <span className="text-slate-700">({b.nama})</span>{" "}
+                          <span className="angka">{b.sisa.toLocaleString("id-ID")}</span> {b.satuan} di luar
+                          {b.menunggu > 0 && <span className="text-amber-700"> · {b.menunggu.toLocaleString("id-ID")} menunggu konfirmasi kembali</span>}
                         </li>
                       ))}
                     </ul>
                     <TautanFoto foto={p.foto} />
-                    {bolehBuat && (
-                      <details className="pt-1">
-                        <summary className="cursor-pointer text-xs font-semibold text-slate-600 py-3.5">Ubah data</summary>
-                        <FormulirAksi aksi={ubahPeminjamanBarangFormulir.bind(null, p.id)} pesanSukses="Perubahan disimpan." className="space-y-3 mt-2">
-                          <div className="bidang">
-                            <label className="label" htmlFor={`ubah-nama-${p.id}`}>Nama pengambil *</label>
-                            <input id={`ubah-nama-${p.id}`} name="namaPengambil" required list="saran-nama-pengambil" defaultValue={p.namaPengambil} className="isian min-h-11" />
-                          </div>
-                          <PilihanProyek id={`ubah-proyek-${p.id}`} daftarProyek={daftarProyek} nilai={p.proyekId} />
-                          <div className="bidang">
-                            <label className="label" htmlFor={`ubah-rencana-${p.id}`}>Rencana kembali</label>
-                            <input id={`ubah-rencana-${p.id}`} name="rencanaKembali" type="date" defaultValue={p.rencanaKembali ? tanggalIso(p.rencanaKembali) : ""} className="isian min-h-11" />
-                          </div>
-                          <div className="bidang">
-                            <label className="label" htmlFor={`ubah-ket-${p.id}`}>Keterangan</label>
-                            <input id={`ubah-ket-${p.id}`} name="keterangan" defaultValue={p.keterangan ?? ""} className="isian min-h-11" />
-                          </div>
-                          <button type="submit" className="tombol tombol-garis w-full min-h-11">Simpan perubahan</button>
-                        </FormulirAksi>
-                      </details>
-                    )}
+                    {bolehBuat && <FormUbahData p={p} daftarProyek={daftarProyek} />}
                   </div>
 
-                  {bolehBuat && (
-                    <FormulirAksi aksi={kembalikanPeminjamanBarangFormulir.bind(null, p.id)} pesanSukses="Pengembalian dicatat." className="space-y-3 lg:border-l lg:border-slate-100 lg:pl-4">
-                      <div className="text-xs font-semibold text-slate-600">Kembalikan</div>
-                      {/* key ikut sisa supaya isian dimulai ulang dari sisa terbaru setelah pengembalian sebagian */}
-                      <EditorKembali key={barisSisa.map((b) => `${b.barangId}:${b.sisa}`).join(",")} baris={barisSisa} />
-                      <div className="bidang">
-                        <span className="label">Foto barang kembali *</span>
-                        <PemilihFoto name="foto" maksimal={3} wajib label="Ambil foto barang kembali" />
-                      </div>
-                      <div className="bidang">
-                        <label className="label" htmlFor={`catatan-${p.id}`}>Catatan</label>
-                        <input id={`catatan-${p.id}`} name="catatan" className="isian min-h-11" placeholder="Wajib bila ditutup dengan selisih" />
-                      </div>
-                      <label className="flex items-center gap-2 text-sm min-h-11">
-                        <input type="checkbox" name="tutupDenganSelisih" value="1" className="h-5 w-5" />
-                        Tutup dengan selisih (barang yang tidak kembali dianggap hilang)
-                      </label>
-                      <button type="submit" className="tombol tombol-utama w-full min-h-11">Catat kembali</button>
-                    </FormulirAksi>
-                  )}
+                  <div className="space-y-4 lg:border-l lg:border-slate-100 lg:pl-4">
+                    {bolehBuat && belumDiklaim.length > 0 && (
+                      <FormulirAksi aksi={ajukanKembaliPeminjamanBarangFormulir.bind(null, p.id)} pesanSukses="Klaim kembali dicatat, menunggu konfirmasi Gudang." className="space-y-3">
+                        <div className="text-xs font-semibold text-slate-600">Ajukan kembali (Kru)</div>
+                        <EditorKembali key={`ajukan-${belumDiklaim.map((b) => `${b.barangId}:${b.sisa}`).join(",")}`} baris={belumDiklaim} />
+                        <div className="bidang">
+                          <span className="label">Foto barang kembali *</span>
+                          <PemilihFoto name="foto" maksimal={3} wajib label="Ambil foto barang kembali" />
+                        </div>
+                        <button type="submit" className="tombol tombol-garis w-full min-h-11">Ajukan kembali</button>
+                      </FormulirAksi>
+                    )}
+
+                    {bolehSetujui && menungguKonfirmasi.length > 0 && (
+                      <FormulirAksi aksi={konfirmasiKembaliPeminjamanBarangFormulir.bind(null, p.id)} pesanSukses="Pengembalian dikonfirmasi, stok ditambah balik." className="space-y-3">
+                        <div className="text-xs font-semibold text-slate-600">Konfirmasi kembali (Gudang)</div>
+                        <EditorKembali key={`konfirmasi-${menungguKonfirmasi.map((b) => `${b.barangId}:${b.sisa}`).join(",")}`} baris={menungguKonfirmasi} />
+                        <div className="bidang">
+                          <label className="label" htmlFor={`catatan-${p.id}`}>Catatan</label>
+                          <input id={`catatan-${p.id}`} name="catatan" className="isian min-h-11" placeholder="Wajib bila ditutup dengan selisih" />
+                        </div>
+                        <label className="flex items-center gap-2 text-sm min-h-11">
+                          <input type="checkbox" name="tutupDenganSelisih" value="1" className="h-5 w-5" />
+                          Tutup dengan selisih (barang yang tidak kembali dianggap hilang)
+                        </label>
+                        <button type="submit" className="tombol tombol-utama w-full min-h-11">Konfirmasi</button>
+                      </FormulirAksi>
+                    )}
+
+                    {bolehSetujui && menungguKonfirmasi.length === 0 && belumDiklaim.length > 0 && (
+                      <p className="petunjuk">Menunggu Kru mengajukan kembali barangnya.</p>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -386,7 +465,7 @@ function AksiRiwayat({
           </div>
         </details>
       )}
-      <TombolHapusDokumen jenis="peminjamanBarang" id={p.id} nomor={p.nomor} boleh={bolehHapus} className="min-h-11 md:min-h-0" pesanKonfirmasi={`Hapus ${p.nomor}? Dokumen, baris, dan foto buktinya ikut terhapus. Stok tidak berubah. Tindakan ini dicatat di log aktivitas.`} />
+      <TombolHapusDokumen jenis="peminjamanBarang" id={p.id} nomor={p.nomor} boleh={bolehHapus} className="min-h-11 md:min-h-0" pesanKonfirmasi={`Hapus ${p.nomor}? Dokumen, baris, dan foto buktinya ikut terhapus. Bagian yang masih di luar dikembalikan ke stok. Tindakan ini dicatat di log aktivitas.`} />
     </div>
   );
 }

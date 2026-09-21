@@ -29,11 +29,13 @@ export type AggregateBarisPeminjamanBarang = {
 export type BarisPeminjamanBarangAvgAggregateOutputType = {
   jumlah: runtime.Decimal | null
   jumlahKembali: runtime.Decimal | null
+  jumlahDiajukanKembali: runtime.Decimal | null
 }
 
 export type BarisPeminjamanBarangSumAggregateOutputType = {
   jumlah: runtime.Decimal | null
   jumlahKembali: runtime.Decimal | null
+  jumlahDiajukanKembali: runtime.Decimal | null
 }
 
 export type BarisPeminjamanBarangMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type BarisPeminjamanBarangMinAggregateOutputType = {
   barangId: string | null
   jumlah: runtime.Decimal | null
   jumlahKembali: runtime.Decimal | null
+  jumlahDiajukanKembali: runtime.Decimal | null
 }
 
 export type BarisPeminjamanBarangMaxAggregateOutputType = {
@@ -50,6 +53,7 @@ export type BarisPeminjamanBarangMaxAggregateOutputType = {
   barangId: string | null
   jumlah: runtime.Decimal | null
   jumlahKembali: runtime.Decimal | null
+  jumlahDiajukanKembali: runtime.Decimal | null
 }
 
 export type BarisPeminjamanBarangCountAggregateOutputType = {
@@ -58,6 +62,7 @@ export type BarisPeminjamanBarangCountAggregateOutputType = {
   barangId: number
   jumlah: number
   jumlahKembali: number
+  jumlahDiajukanKembali: number
   _all: number
 }
 
@@ -65,11 +70,13 @@ export type BarisPeminjamanBarangCountAggregateOutputType = {
 export type BarisPeminjamanBarangAvgAggregateInputType = {
   jumlah?: true
   jumlahKembali?: true
+  jumlahDiajukanKembali?: true
 }
 
 export type BarisPeminjamanBarangSumAggregateInputType = {
   jumlah?: true
   jumlahKembali?: true
+  jumlahDiajukanKembali?: true
 }
 
 export type BarisPeminjamanBarangMinAggregateInputType = {
@@ -78,6 +85,7 @@ export type BarisPeminjamanBarangMinAggregateInputType = {
   barangId?: true
   jumlah?: true
   jumlahKembali?: true
+  jumlahDiajukanKembali?: true
 }
 
 export type BarisPeminjamanBarangMaxAggregateInputType = {
@@ -86,6 +94,7 @@ export type BarisPeminjamanBarangMaxAggregateInputType = {
   barangId?: true
   jumlah?: true
   jumlahKembali?: true
+  jumlahDiajukanKembali?: true
 }
 
 export type BarisPeminjamanBarangCountAggregateInputType = {
@@ -94,6 +103,7 @@ export type BarisPeminjamanBarangCountAggregateInputType = {
   barangId?: true
   jumlah?: true
   jumlahKembali?: true
+  jumlahDiajukanKembali?: true
   _all?: true
 }
 
@@ -189,6 +199,7 @@ export type BarisPeminjamanBarangGroupByOutputType = {
   barangId: string
   jumlah: runtime.Decimal
   jumlahKembali: runtime.Decimal
+  jumlahDiajukanKembali: runtime.Decimal
   _count: BarisPeminjamanBarangCountAggregateOutputType | null
   _avg: BarisPeminjamanBarangAvgAggregateOutputType | null
   _sum: BarisPeminjamanBarangSumAggregateOutputType | null
@@ -220,6 +231,7 @@ export type BarisPeminjamanBarangWhereInput = {
   barangId?: Prisma.StringFilter<"BarisPeminjamanBarang"> | string
   jumlah?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   peminjaman?: Prisma.XOR<Prisma.PeminjamanBarangScalarRelationFilter, Prisma.PeminjamanBarangWhereInput>
   barang?: Prisma.XOR<Prisma.BarangScalarRelationFilter, Prisma.BarangWhereInput>
 }
@@ -230,6 +242,7 @@ export type BarisPeminjamanBarangOrderByWithRelationInput = {
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
   peminjaman?: Prisma.PeminjamanBarangOrderByWithRelationInput
   barang?: Prisma.BarangOrderByWithRelationInput
 }
@@ -244,6 +257,7 @@ export type BarisPeminjamanBarangWhereUniqueInput = Prisma.AtLeast<{
   barangId?: Prisma.StringFilter<"BarisPeminjamanBarang"> | string
   jumlah?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   peminjaman?: Prisma.XOR<Prisma.PeminjamanBarangScalarRelationFilter, Prisma.PeminjamanBarangWhereInput>
   barang?: Prisma.XOR<Prisma.BarangScalarRelationFilter, Prisma.BarangWhereInput>
 }, "id" | "peminjamanId_barangId">
@@ -254,6 +268,7 @@ export type BarisPeminjamanBarangOrderByWithAggregationInput = {
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
   _count?: Prisma.BarisPeminjamanBarangCountOrderByAggregateInput
   _avg?: Prisma.BarisPeminjamanBarangAvgOrderByAggregateInput
   _max?: Prisma.BarisPeminjamanBarangMaxOrderByAggregateInput
@@ -270,12 +285,14 @@ export type BarisPeminjamanBarangScalarWhereWithAggregatesInput = {
   barangId?: Prisma.StringWithAggregatesFilter<"BarisPeminjamanBarang"> | string
   jumlah?: Prisma.DecimalWithAggregatesFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalWithAggregatesFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalWithAggregatesFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangCreateInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
   peminjaman: Prisma.PeminjamanBarangCreateNestedOneWithoutBarisInput
   barang: Prisma.BarangCreateNestedOneWithoutBarisPeminjamanInput
 }
@@ -286,12 +303,14 @@ export type BarisPeminjamanBarangUncheckedCreateInput = {
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   peminjaman?: Prisma.PeminjamanBarangUpdateOneRequiredWithoutBarisNestedInput
   barang?: Prisma.BarangUpdateOneRequiredWithoutBarisPeminjamanNestedInput
 }
@@ -302,6 +321,7 @@ export type BarisPeminjamanBarangUncheckedUpdateInput = {
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangCreateManyInput = {
@@ -310,12 +330,14 @@ export type BarisPeminjamanBarangCreateManyInput = {
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUncheckedUpdateManyInput = {
@@ -324,6 +346,7 @@ export type BarisPeminjamanBarangUncheckedUpdateManyInput = {
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangListRelationFilter = {
@@ -347,11 +370,13 @@ export type BarisPeminjamanBarangCountOrderByAggregateInput = {
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
 }
 
 export type BarisPeminjamanBarangAvgOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
 }
 
 export type BarisPeminjamanBarangMaxOrderByAggregateInput = {
@@ -360,6 +385,7 @@ export type BarisPeminjamanBarangMaxOrderByAggregateInput = {
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
 }
 
 export type BarisPeminjamanBarangMinOrderByAggregateInput = {
@@ -368,11 +394,13 @@ export type BarisPeminjamanBarangMinOrderByAggregateInput = {
   barangId?: Prisma.SortOrder
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
 }
 
 export type BarisPeminjamanBarangSumOrderByAggregateInput = {
   jumlah?: Prisma.SortOrder
   jumlahKembali?: Prisma.SortOrder
+  jumlahDiajukanKembali?: Prisma.SortOrder
 }
 
 export type BarisPeminjamanBarangCreateNestedManyWithoutBarangInput = {
@@ -463,6 +491,7 @@ export type BarisPeminjamanBarangCreateWithoutBarangInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
   peminjaman: Prisma.PeminjamanBarangCreateNestedOneWithoutBarisInput
 }
 
@@ -471,6 +500,7 @@ export type BarisPeminjamanBarangUncheckedCreateWithoutBarangInput = {
   peminjamanId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangCreateOrConnectWithoutBarangInput = {
@@ -508,12 +538,14 @@ export type BarisPeminjamanBarangScalarWhereInput = {
   barangId?: Prisma.StringFilter<"BarisPeminjamanBarang"> | string
   jumlah?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFilter<"BarisPeminjamanBarang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangCreateWithoutPeminjamanInput = {
   id?: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
   barang: Prisma.BarangCreateNestedOneWithoutBarisPeminjamanInput
 }
 
@@ -522,6 +554,7 @@ export type BarisPeminjamanBarangUncheckedCreateWithoutPeminjamanInput = {
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangCreateOrConnectWithoutPeminjamanInput = {
@@ -555,12 +588,14 @@ export type BarisPeminjamanBarangCreateManyBarangInput = {
   peminjamanId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUpdateWithoutBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   peminjaman?: Prisma.PeminjamanBarangUpdateOneRequiredWithoutBarisNestedInput
 }
 
@@ -569,6 +604,7 @@ export type BarisPeminjamanBarangUncheckedUpdateWithoutBarangInput = {
   peminjamanId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangInput = {
@@ -576,6 +612,7 @@ export type BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangInput = {
   peminjamanId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangCreateManyPeminjamanInput = {
@@ -583,12 +620,14 @@ export type BarisPeminjamanBarangCreateManyPeminjamanInput = {
   barangId: string
   jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUpdateWithoutPeminjamanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   barang?: Prisma.BarangUpdateOneRequiredWithoutBarisPeminjamanNestedInput
 }
 
@@ -597,6 +636,7 @@ export type BarisPeminjamanBarangUncheckedUpdateWithoutPeminjamanInput = {
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type BarisPeminjamanBarangUncheckedUpdateManyWithoutPeminjamanInput = {
@@ -604,6 +644,7 @@ export type BarisPeminjamanBarangUncheckedUpdateManyWithoutPeminjamanInput = {
   barangId?: Prisma.StringFieldUpdateOperationsInput | string
   jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlahKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlahDiajukanKembali?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -614,6 +655,7 @@ export type BarisPeminjamanBarangSelect<ExtArgs extends runtime.Types.Extensions
   barangId?: boolean
   jumlah?: boolean
   jumlahKembali?: boolean
+  jumlahDiajukanKembali?: boolean
   peminjaman?: boolean | Prisma.PeminjamanBarangDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisPeminjamanBarang"]>
@@ -624,6 +666,7 @@ export type BarisPeminjamanBarangSelectCreateManyAndReturn<ExtArgs extends runti
   barangId?: boolean
   jumlah?: boolean
   jumlahKembali?: boolean
+  jumlahDiajukanKembali?: boolean
   peminjaman?: boolean | Prisma.PeminjamanBarangDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisPeminjamanBarang"]>
@@ -634,6 +677,7 @@ export type BarisPeminjamanBarangSelectUpdateManyAndReturn<ExtArgs extends runti
   barangId?: boolean
   jumlah?: boolean
   jumlahKembali?: boolean
+  jumlahDiajukanKembali?: boolean
   peminjaman?: boolean | Prisma.PeminjamanBarangDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["barisPeminjamanBarang"]>
@@ -644,9 +688,10 @@ export type BarisPeminjamanBarangSelectScalar = {
   barangId?: boolean
   jumlah?: boolean
   jumlahKembali?: boolean
+  jumlahDiajukanKembali?: boolean
 }
 
-export type BarisPeminjamanBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "peminjamanId" | "barangId" | "jumlah" | "jumlahKembali", ExtArgs["result"]["barisPeminjamanBarang"]>
+export type BarisPeminjamanBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "peminjamanId" | "barangId" | "jumlah" | "jumlahKembali" | "jumlahDiajukanKembali", ExtArgs["result"]["barisPeminjamanBarang"]>
 export type BarisPeminjamanBarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   peminjaman?: boolean | Prisma.PeminjamanBarangDefaultArgs<ExtArgs>
   barang?: boolean | Prisma.BarangDefaultArgs<ExtArgs>
@@ -672,9 +717,15 @@ export type $BarisPeminjamanBarangPayload<ExtArgs extends runtime.Types.Extensio
     barangId: string
     jumlah: runtime.Decimal
     /**
-     * Akumulasi yang sudah kembali (boleh bertahap); CHECK DB: jumlahKembali <= jumlah
+     * Akumulasi yang sudah kembali dan stoknya sudah ditambah balik (boleh bertahap);
+     * CHECK DB: jumlahKembali <= jumlah
      */
     jumlahKembali: runtime.Decimal
+    /**
+     * Diisi Kru lewat "ajukan kembali" (belum menyentuh stok); Gudang mengonfirmasi lalu jumlahKembali
+     * disamakan ke nilai ini dan StokBarang ditambah selisihnya. CHECK DB: jumlahDiajukanKembali <= jumlah
+     */
+    jumlahDiajukanKembali: runtime.Decimal
   }, ExtArgs["result"]["barisPeminjamanBarang"]>
   composites: {}
 }
@@ -1105,6 +1156,7 @@ export interface BarisPeminjamanBarangFieldRefs {
   readonly barangId: Prisma.FieldRef<"BarisPeminjamanBarang", 'String'>
   readonly jumlah: Prisma.FieldRef<"BarisPeminjamanBarang", 'Decimal'>
   readonly jumlahKembali: Prisma.FieldRef<"BarisPeminjamanBarang", 'Decimal'>
+  readonly jumlahDiajukanKembali: Prisma.FieldRef<"BarisPeminjamanBarang", 'Decimal'>
 }
     
 

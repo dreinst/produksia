@@ -448,6 +448,8 @@ export const ModelName = {
   Foto: 'Foto',
   PeminjamanBarang: 'PeminjamanBarang',
   BarisPeminjamanBarang: 'BarisPeminjamanBarang',
+  LaporanKerusakanBarang: 'LaporanKerusakanBarang',
+  BarisKerusakanBarang: 'BarisKerusakanBarang',
   PengaturanPerusahaan: 'PengaturanPerusahaan',
   TutupBuku: 'TutupBuku',
   PphFinalBulanan: 'PphFinalBulanan',
@@ -474,7 +476,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "mataUang" | "kursMataUang" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "dokumenKas" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "foto" | "peminjamanBarang" | "barisPeminjamanBarang" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "penggajian" | "barisPenggajian" | "pemetaanAkunTambahan" | "logAktivitas"
+    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "mataUang" | "kursMataUang" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "dokumenKas" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "foto" | "peminjamanBarang" | "barisPeminjamanBarang" | "laporanKerusakanBarang" | "barisKerusakanBarang" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "penggajian" | "barisPenggajian" | "pemetaanAkunTambahan" | "logAktivitas"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4252,6 +4254,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LaporanKerusakanBarang: {
+      payload: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>
+      fields: Prisma.LaporanKerusakanBarangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LaporanKerusakanBarangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LaporanKerusakanBarangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>
+        }
+        findFirst: {
+          args: Prisma.LaporanKerusakanBarangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LaporanKerusakanBarangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>
+        }
+        findMany: {
+          args: Prisma.LaporanKerusakanBarangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>[]
+        }
+        create: {
+          args: Prisma.LaporanKerusakanBarangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>
+        }
+        createMany: {
+          args: Prisma.LaporanKerusakanBarangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LaporanKerusakanBarangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>[]
+        }
+        delete: {
+          args: Prisma.LaporanKerusakanBarangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>
+        }
+        update: {
+          args: Prisma.LaporanKerusakanBarangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>
+        }
+        deleteMany: {
+          args: Prisma.LaporanKerusakanBarangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LaporanKerusakanBarangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LaporanKerusakanBarangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>[]
+        }
+        upsert: {
+          args: Prisma.LaporanKerusakanBarangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LaporanKerusakanBarangPayload>
+        }
+        aggregate: {
+          args: Prisma.LaporanKerusakanBarangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLaporanKerusakanBarang>
+        }
+        groupBy: {
+          args: Prisma.LaporanKerusakanBarangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LaporanKerusakanBarangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LaporanKerusakanBarangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LaporanKerusakanBarangCountAggregateOutputType> | number
+        }
+      }
+    }
+    BarisKerusakanBarang: {
+      payload: Prisma.$BarisKerusakanBarangPayload<ExtArgs>
+      fields: Prisma.BarisKerusakanBarangFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BarisKerusakanBarangFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BarisKerusakanBarangFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>
+        }
+        findFirst: {
+          args: Prisma.BarisKerusakanBarangFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BarisKerusakanBarangFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>
+        }
+        findMany: {
+          args: Prisma.BarisKerusakanBarangFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>[]
+        }
+        create: {
+          args: Prisma.BarisKerusakanBarangCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>
+        }
+        createMany: {
+          args: Prisma.BarisKerusakanBarangCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BarisKerusakanBarangCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>[]
+        }
+        delete: {
+          args: Prisma.BarisKerusakanBarangDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>
+        }
+        update: {
+          args: Prisma.BarisKerusakanBarangUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>
+        }
+        deleteMany: {
+          args: Prisma.BarisKerusakanBarangDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BarisKerusakanBarangUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BarisKerusakanBarangUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>[]
+        }
+        upsert: {
+          args: Prisma.BarisKerusakanBarangUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BarisKerusakanBarangPayload>
+        }
+        aggregate: {
+          args: Prisma.BarisKerusakanBarangAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBarisKerusakanBarang>
+        }
+        groupBy: {
+          args: Prisma.BarisKerusakanBarangGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BarisKerusakanBarangGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BarisKerusakanBarangCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BarisKerusakanBarangCountAggregateOutputType> | number
+        }
+      }
+    }
     PengaturanPerusahaan: {
       payload: Prisma.$PengaturanPerusahaanPayload<ExtArgs>
       fields: Prisma.PengaturanPerusahaanFieldRefs
@@ -5938,6 +6088,7 @@ export const FotoScalarFieldEnum = {
   id: 'id',
   barangId: 'barangId',
   peminjamanId: 'peminjamanId',
+  kerusakanId: 'kerusakanId',
   tahap: 'tahap',
   urutan: 'urutan',
   tipe: 'tipe',
@@ -5962,7 +6113,15 @@ export const PeminjamanBarangScalarFieldEnum = {
   catatanKembali: 'catatanKembali',
   penyesuaianId: 'penyesuaianId',
   dicatatOlehId: 'dicatatOlehId',
-  dicatatOlehNama: 'dicatatOlehNama'
+  dicatatOlehNama: 'dicatatOlehNama',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
 } as const
 
 export type PeminjamanBarangScalarFieldEnum = (typeof PeminjamanBarangScalarFieldEnum)[keyof typeof PeminjamanBarangScalarFieldEnum]
@@ -5973,10 +6132,45 @@ export const BarisPeminjamanBarangScalarFieldEnum = {
   peminjamanId: 'peminjamanId',
   barangId: 'barangId',
   jumlah: 'jumlah',
-  jumlahKembali: 'jumlahKembali'
+  jumlahKembali: 'jumlahKembali',
+  jumlahDiajukanKembali: 'jumlahDiajukanKembali'
 } as const
 
 export type BarisPeminjamanBarangScalarFieldEnum = (typeof BarisPeminjamanBarangScalarFieldEnum)[keyof typeof BarisPeminjamanBarangScalarFieldEnum]
+
+
+export const LaporanKerusakanBarangScalarFieldEnum = {
+  id: 'id',
+  nomor: 'nomor',
+  gudangId: 'gudangId',
+  proyekId: 'proyekId',
+  namaPelapor: 'namaPelapor',
+  keterangan: 'keterangan',
+  waktuLapor: 'waktuLapor',
+  penyesuaianId: 'penyesuaianId',
+  dicatatOlehId: 'dicatatOlehId',
+  dicatatOlehNama: 'dicatatOlehNama',
+  statusPersetujuan: 'statusPersetujuan',
+  diajukanOlehId: 'diajukanOlehId',
+  diajukanPada: 'diajukanPada',
+  disetujuiOlehId: 'disetujuiOlehId',
+  disetujuiPada: 'disetujuiPada',
+  ditolakOlehId: 'ditolakOlehId',
+  ditolakPada: 'ditolakPada',
+  catatanPenolakan: 'catatanPenolakan'
+} as const
+
+export type LaporanKerusakanBarangScalarFieldEnum = (typeof LaporanKerusakanBarangScalarFieldEnum)[keyof typeof LaporanKerusakanBarangScalarFieldEnum]
+
+
+export const BarisKerusakanBarangScalarFieldEnum = {
+  id: 'id',
+  laporanId: 'laporanId',
+  barangId: 'barangId',
+  jumlah: 'jumlah'
+} as const
+
+export type BarisKerusakanBarangScalarFieldEnum = (typeof BarisKerusakanBarangScalarFieldEnum)[keyof typeof BarisKerusakanBarangScalarFieldEnum]
 
 
 export const PengaturanPerusahaanScalarFieldEnum = {
@@ -6627,6 +6821,8 @@ export type GlobalOmitConfig = {
   foto?: Prisma.FotoOmit
   peminjamanBarang?: Prisma.PeminjamanBarangOmit
   barisPeminjamanBarang?: Prisma.BarisPeminjamanBarangOmit
+  laporanKerusakanBarang?: Prisma.LaporanKerusakanBarangOmit
+  barisKerusakanBarang?: Prisma.BarisKerusakanBarangOmit
   pengaturanPerusahaan?: Prisma.PengaturanPerusahaanOmit
   tutupBuku?: Prisma.TutupBukuOmit
   pphFinalBulanan?: Prisma.PphFinalBulananOmit

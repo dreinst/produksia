@@ -39,16 +39,27 @@ async function main() {
     "Gudang: hanya 4 dokumen penggerak stok, tanpa dokumen penjualan/pembelian lain",
   );
   pastikan(
-    punyaHak("GUDANG", "peminjaman.lihat") && punyaHak("GUDANG", "peminjaman.buat") && !punyaHak("GUDANG", "peminjaman.hapus") && !punyaHak("KASIR", "peminjaman.lihat") && punyaHak("ADMIN", "peminjaman.hapus"),
-    "Peminjaman Barang: Gudang lihat & buat tanpa hapus, Kasir tidak melihat, Admin boleh hapus",
+    punyaHak("GUDANG", "peminjaman.lihat") && punyaHak("GUDANG", "peminjaman.buat") && punyaHak("GUDANG", "peminjaman.setujui") && !punyaHak("GUDANG", "peminjaman.hapus") && !punyaHak("KASIR", "peminjaman.lihat") && punyaHak("ADMIN", "peminjaman.hapus"),
+    "Peminjaman Barang: Gudang lihat, buat & setujui tanpa hapus, Kasir tidak melihat, Admin boleh hapus",
   );
-  for (const peran of ["ADMIN", "KASIR", "GUDANG"] as const) {
+  pastikan(
+    punyaHak("GUDANG", "kerusakan.lihat") && punyaHak("GUDANG", "kerusakan.buat") && punyaHak("GUDANG", "kerusakan.setujui") && !punyaHak("GUDANG", "kerusakan.hapus") && punyaHak("ADMIN", "kerusakan.hapus"),
+    "Laporan Kerusakan Barang: Gudang lihat, buat & setujui tanpa hapus, Admin boleh hapus",
+  );
+  pastikan(
+    punyaHak("KRU", "peminjaman.lihat") && punyaHak("KRU", "peminjaman.buat") && !punyaHak("KRU", "peminjaman.setujui") && !punyaHak("KRU", "peminjaman.hapus") &&
+      punyaHak("KRU", "kerusakan.lihat") && punyaHak("KRU", "kerusakan.buat") && !punyaHak("KRU", "kerusakan.setujui") && !punyaHak("KRU", "kerusakan.hapus") &&
+      HAK_BAWAAN.KRU.length === 4,
+    "Kru: cuma peminjaman & kerusakan (lihat & buat), tanpa setujui/hapus, tanpa hak lain sama sekali",
+  );
+  pastikan(modulTerlihat(sesi("KRU", HAK_BAWAAN.KRU), "persediaan") && !modulTerlihat(sesi("KRU", HAK_BAWAAN.KRU), "penjualan"), "Kru: modul persediaan tampil (karena peminjaman.lihat), modul lain tidak");
+  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU"] as const) {
     for (const h of HAK_TERTINGGI_SAJA) pastikan(!HAK_BAWAAN[peran].includes(h), `${peran} tidak punya ${h} secara bawaan`);
   }
   // Simulasikan formulir sungguhan: semua kotak bawaan tetap tercentang, PLUS mencoba menyalakan
   // sdm.tulis/penggajian.lihat untuk Gudang (harus diabaikan, bukan cuma "tidak disentuh").
   const isianCobaSdm: Record<string, string> = {};
-  for (const peran of ["ADMIN", "KASIR", "GUDANG"] as const) for (const h of HAK_BAWAAN[peran]) isianCobaSdm[`${peran}|${h}`] = "on";
+  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU"] as const) for (const h of HAK_BAWAAN[peran]) isianCobaSdm[`${peran}|${h}`] = "on";
   isianCobaSdm["GUDANG|sdm.tulis"] = "on";
   isianCobaSdm["GUDANG|penggajian.lihat"] = "on";
   await jalankan("simpan matriks mencoba memberi sdm.tulis ke Gudang (diabaikan)", () => simpanHakAkses(formulir(isianCobaSdm)));
@@ -62,7 +73,7 @@ async function main() {
   pastikan(!hitungHak("ADMIN", [{ hak: "hak-akses.kelola", boleh: true }]).includes("hak-akses.kelola") && hitungHak("PEMILIK", [{ hak: "faktur.buat", boleh: false }]).includes("faktur.buat"), "hak-akses.kelola tak bisa diberikan; Pemilik tak bisa dikurangi");
   // formulir: semua kotak bawaan tercentang, kecuali KASIR|faktur.buat dimatikan dan GUDANG|faktur.lihat + GUDANG|kas-masuk.buat dinyalakan
   const isian: Record<string, string> = {};
-  for (const peran of ["ADMIN", "KASIR", "GUDANG"] as const) for (const h of HAK_BAWAAN[peran]) isian[`${peran}|${h}`] = "on";
+  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU"] as const) for (const h of HAK_BAWAAN[peran]) isian[`${peran}|${h}`] = "on";
   delete isian["KASIR|faktur.buat"];
   isian["GUDANG|kas-masuk.buat"] = "on";
   isian["ADMIN|hak-akses.kelola"] = "on"; // harus diabaikan
