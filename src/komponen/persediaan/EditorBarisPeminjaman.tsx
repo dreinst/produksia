@@ -119,8 +119,23 @@ export default function EditorBarisPeminjaman({ daftarBarang, labelJumlah = "Jum
   );
 }
 
-/** Pilihan gudang pada form Ambil: berganti gudang memuat ulang halaman agar angka tersedia mengikuti gudang itu. */
-export function PemilihGudang({ daftarGudang, gudangId }: { daftarGudang: { id: string; kode: string; nama: string }[]; gudangId: string }) {
+/**
+ * Pilihan gudang: berganti gudang memuat ulang halaman (lewat query string `?gudang=`, atau `paramKey`
+ * lain kalau satu halaman butuh lebih dari satu pemilih gudang) supaya angka yang bergantung gudang
+ * (tersedia, stok saat ini, dst.) ikut halaman yang baru dimuat. `name`/`id` disesuaikan pemanggil
+ * kalau formulirnya lebih dari satu bidang gudang (mis. form Ubah Barang: gudangStokId).
+ */
+export function PemilihGudang({
+  daftarGudang,
+  gudangId,
+  name = "gudangId",
+  paramKey = "gudang",
+}: {
+  daftarGudang: { id: string; kode: string; nama: string }[];
+  gudangId: string;
+  name?: string;
+  paramKey?: string;
+}) {
   const router = useRouter();
   const paramCari = useSearchParams();
   // State lokal supaya pilihan tidak membalik ke nilai lama selama halaman dimuat ulang.
@@ -128,11 +143,11 @@ export function PemilihGudang({ daftarGudang, gudangId }: { daftarGudang: { id: 
   const ganti = (id: string) => {
     setNilai(id);
     const p = new URLSearchParams(paramCari);
-    p.set("gudang", id);
+    p.set(paramKey, id);
     router.replace(`?${p}`);
   };
   return (
-    <select id="gudangId" name="gudangId" required className="isian min-h-11" value={nilai} onChange={(e) => ganti(e.target.value)}>
+    <select id={name} name={name} required className="isian min-h-11" value={nilai} onChange={(e) => ganti(e.target.value)}>
       {daftarGudang.map((g) => (
         <option key={g.id} value={g.id}>
           {g.kode} - {g.nama}

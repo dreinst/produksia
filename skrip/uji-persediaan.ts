@@ -4,7 +4,7 @@ process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
-import { buatDataInduk } from "../src/lib/aksi/dataInduk";
+import { buatDataInduk, ubahStokBarang } from "../src/lib/aksi/dataInduk";
 import { buatPesanan, buatPengiriman, buatFaktur } from "../src/lib/aksi/penjualan";
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatReturPembelian } from "../src/lib/aksi/pembelian";
 import { buatAsetTetap } from "../src/lib/aksi/asetTetap";
@@ -74,6 +74,23 @@ async function main() {
     () => buatDataInduk("barang", formulir({ kode: "JSA-AWAL", nama: "Jasa Uji Jumlah Awal", jenis: "JASA", hargaBeli: 1000, jumlahAwal: 5, gudangAwalId: gudang.id, akunLawanAwalId: modal.id })),
     "tidak punya stok",
   );
+
+  console.log("=== 1d. Ubah stok langsung dari kartu \"Stok Barang\" (halaman Ubah Barang), otomatis lewat Penyesuaian Stok ===");
+  await harusDitolak("stok sama dengan sekarang (5)", () => ubahStokBarang(barangAwal.id, formulir({ gudangId: gudang.id, stok: 5, akunLawanId: modal.id })), "tidak ada perubahan");
+  await harusDitolak("barang JASA tidak punya stok", () => ubahStokBarang(jasa.id, formulir({ gudangId: gudang.id, stok: 5, akunLawanId: modal.id })), "Jasa tidak punya stok");
+  await harusDitolak("tanpa akun lawan", () => ubahStokBarang(barangAwal.id, formulir({ gudangId: gudang.id, stok: 8 })), "Akun Lawan Penyesuaian wajib dipilih");
+  await jalankan("naikkan stok 5 -> 8", () => ubahStokBarang(barangAwal.id, formulir({ gudangId: gudang.id, stok: 8, akunLawanId: modal.id })));
+  const stokNaik = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangAwal.id, gudangId: gudang.id } } });
+  pastikan(Number(stokNaik.jumlah) === 8, `stok naik jadi 8 (${Number(stokNaik.jumlah)})`);
+  const psNaik = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { baris: { some: { barangId: barangAwal.id } } }, orderBy: { dibuatPada: "desc" }, include: { jurnal: { include: { baris: true } } } });
+  pastikan(psNaik.keterangan?.includes("Koreksi stok") === true && !!psNaik.jurnalId, `kenaikan stok bikin PS berjurnal otomatis (${psNaik.nomor})`);
+  pastikan(psNaik.jurnal!.baris.reduce((s, b) => s + Number(b.debit), 0) === 36000, `jurnal kenaikan 3 x 12.000 = 36.000 (${psNaik.jurnal!.baris.reduce((s, b) => s + Number(b.debit), 0)})`);
+  await pastikanSinkron("stok dinaikkan lewat kartu Stok Barang");
+  await jalankan("turunkan stok 8 -> 6", () => ubahStokBarang(barangAwal.id, formulir({ gudangId: gudang.id, stok: 6, akunLawanId: modal.id })));
+  const stokTurun = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangAwal.id, gudangId: gudang.id } } });
+  const barangSetelahTurun = await db.barang.findUniqueOrThrow({ where: { id: barangAwal.id } });
+  pastikan(Number(stokTurun.jumlah) === 6 && Number(barangSetelahTurun.hargaBeli) === 12000, `stok turun jadi 6, harga pokok tidak berubah (${Number(stokTurun.jumlah)}, ${Number(barangSetelahTurun.hargaBeli)})`);
+  await pastikanSinkron("stok diturunkan lewat kartu Stok Barang");
 
   console.log("=== 1c. Barang baru TANPA Jumlah Awal tetap jalan seperti biasa, tanpa stok ===");
   await jalankan("buat barang baru tanpa jumlah awal", () => buatDataInduk("barang", formulir({ kode: "BRG-KOSONG", nama: "Barang Uji Tanpa Awal", jenis: "BARANG", hargaBeli: 5000, hargaJual: 9000 })));
