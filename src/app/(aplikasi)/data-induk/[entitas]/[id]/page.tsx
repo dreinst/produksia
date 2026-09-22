@@ -3,17 +3,24 @@ import { notFound } from "next/navigation";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import FormulirDataInduk from "@/komponen/data-induk/FormulirDataInduk";
 import FormLaporKerusakanInline from "@/komponen/persediaan/FormLaporKerusakanInline";
+import { PemilihGudang } from "@/komponen/persediaan/EditorBarisPeminjaman";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import PemilihFoto from "@/komponen/ui/PemilihFoto";
 import { ambilKonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { ambilDaftarOpsi, delegasiBaca } from "@/lib/dataInduk";
-import { hapusFotoBarangFormulir, ubahDataIndukFormulir, unggahFotoBarangFormulir } from "@/lib/aksi/dataInduk";
+import { hapusFotoBarangFormulir, ubahDataIndukFormulir, ubahStokBarangFormulir, unggahFotoBarangFormulir } from "@/lib/aksi/dataInduk";
 import { buatLaporanKerusakanFormulir } from "@/lib/aksi/kerusakan";
 import { wajibHak } from "@/lib/otentikasi";
 import { hakDataInduk, punyaHak } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
 
-export default async function HalamanUbahDataInduk({ params }: { params: Promise<{ entitas: string; id: string }> }) {
+export default async function HalamanUbahDataInduk({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ entitas: string; id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { entitas, id } = await params;
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
@@ -25,13 +32,19 @@ export default async function HalamanUbahDataInduk({ params }: { params: Promise
   const judul = String(rekaman.nama ?? rekaman.kode ?? config.label);
   // Hanya id & ukuran; isi (Bytes) dilayani terpisah lewat /api/foto/[id]
   const daftarFoto = config.slug === "barang" ? await db.foto.findMany({ where: { barangId: id }, select: { id: true, ukuran: true, urutan: true }, orderBy: { urutan: "asc" } }) : null;
-  const bolehLaporKerusakan = config.slug === "barang" && punyaHak(pengguna, "kerusakan.buat");
-  const daftarGudangStok = bolehLaporKerusakan
+  const bolehLaporKerusakan = config.slug === "barang" && rekaman.jenis === "BARANG" && punyaHak(pengguna, "kerusakan.buat");
+  // "Stok" & "Lapor barang rusak" sama-sama butuh stok per gudang barang ini; satu kueri dipakai berdua.
+  const daftarGudangStok = config.slug === "barang" && rekaman.jenis === "BARANG"
     ? await db.gudang.findMany({
         orderBy: { kode: "asc" },
         select: { id: true, kode: true, nama: true, stok: { where: { barangId: id }, select: { jumlah: true } } },
       })
     : [];
+  const paramGudang = (await searchParams).gudang;
+  const gudangDipilih = Array.isArray(paramGudang) ? paramGudang[0] : paramGudang;
+  const gudangId = daftarGudangStok.find((g) => g.id === gudangDipilih)?.id ?? daftarGudangStok[0]?.id ?? "";
+  const stokSaatIni = daftarGudangStok.find((g) => g.id === gudangId)?.stok[0]?.jumlah;
+  const daftarAkun = daftarGudangStok.length > 0 ? await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true } }) : [];
 
   return (
     <div className="space-y-6">
@@ -56,6 +69,42 @@ export default async function HalamanUbahDataInduk({ params }: { params: Promise
       >
         <span className="text-xs text-slate-500">Bidang yang dikosongkan akan dihapus nilainya.</span>
       </FormulirDataInduk>
+
+      {daftarGudangStok.length > 0 && (
+        <div id="stok" className="kartu">
+          <div className="kepala-kartu">
+            <h2 className="judul-kartu">Stok Barang</h2>
+            <p className="subjudul-kartu">Ubah angka di bawah untuk mengoreksi stok; otomatis membuat Penyesuaian Stok berjurnal di belakang layar, jadi jejak akuntansinya tetap ada.</p>
+          </div>
+          <FormulirAksi aksi={ubahStokBarangFormulir.bind(null, id)} pesanSukses="Stok diperbarui lewat Penyesuaian Stok otomatis." className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {daftarGudangStok.length > 1 ? (
+                <div className="bidang">
+                  <label className="label" htmlFor="gudangId">Gudang *</label>
+                  <PemilihGudang daftarGudang={daftarGudangStok} gudangId={gudangId} />
+                </div>
+              ) : (
+                <input type="hidden" name="gudangId" value={gudangId} />
+              )}
+              <div className="bidang">
+                <label className="label" htmlFor="stok">Stok saat ini *</label>
+                <input id="stok" name="stok" type="number" min={0} step="0.01" required defaultValue={stokSaatIni?.toString() ?? "0"} className="isian min-h-11" />
+              </div>
+              <div className="bidang">
+                <label className="label" htmlFor="akunLawanId">Akun Lawan Penyesuaian *</label>
+                <select id="akunLawanId" name="akunLawanId" required defaultValue="" className="isian min-h-11">
+                  <option value="">-</option>
+                  {daftarAkun.map((a) => (
+                    <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+                  ))}
+                </select>
+                <span className="petunjuk">Mis. &ldquo;Modal&rdquo; untuk saldo awal, &ldquo;Selisih Persediaan&rdquo; untuk koreksi opname.</span>
+              </div>
+            </div>
+            <button type="submit" className="tombol tombol-utama w-full sm:w-auto min-h-11">Simpan stok</button>
+          </FormulirAksi>
+        </div>
+      )}
 
       {daftarFoto && (
         <div id="foto" className="kartu">

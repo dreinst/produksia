@@ -208,6 +208,74 @@ function revalidasiFotoBarang(barangId: string) {
   revalidatePath(`/data-induk/barang/${barangId}`);
 }
 
+// ---------- Stok barang (kartu "Stok Barang" di halaman Ubah Barang & Jasa) ----------
+
+/**
+ * Ubah "Stok saat ini" langsung dari halaman Barang & Jasa: di belakang layar ini membuat satu
+ * Penyesuaian Stok berjurnal (jumlahSebelum = stok saat ini di gudang terpilih, jumlahSesudah = nilai
+ * yang diisi), pola yang sama dengan Jumlah Awal saat barang baru dibuat (lihat
+ * buatBarangDenganJumlahAwal di atas) — supaya koreksi stok cepat TANPA memutus jejak audit.
+ */
+export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
+  const pengguna = await wajibHakAksi("stok-induk.tulis");
+  const gudangId = String(dataFormulir.get("gudangId") ?? "");
+  if (!gudangId) throw new Error("Gudang wajib dipilih");
+  const stokBaru = bacaUang(String(dataFormulir.get("stok") ?? ""), "Stok", { allowZero: true });
+
+  const barang = await db.barang.findUnique({ where: { id: barangId }, select: { kode: true, jenis: true, hargaBeli: true } });
+  if (!barang) throw new Error("Barang tidak ditemukan");
+  if (barang.jenis !== "BARANG") throw new Error("Jasa tidak punya stok");
+
+  const existing = await db.stokBarang.findUnique({ where: { barangId_gudangId: { barangId, gudangId } } });
+  const jumlahSebelum = D(existing?.jumlah ?? 0);
+  const selisih = stokBaru.minus(jumlahSebelum);
+  if (selisih.isZero()) throw new Error(`Stok ${barang.kode} di gudang ini sudah ${jumlahSebelum}, tidak ada perubahan`);
+
+  const akunLawanId = String(dataFormulir.get("akunLawanId") ?? "");
+  if (!akunLawanId) throw new Error("Akun Lawan Penyesuaian wajib dipilih (mis. Selisih Persediaan)");
+  await pastikanAkunRinci(db, [akunLawanId]);
+
+  const hargaSatuan = D(barang.hargaBeli);
+  if (selisih.gt(0) && hargaSatuan.lte(0)) throw new Error("Isi Harga Beli barang ini lebih dulu untuk menghitung nilai penyesuaian stok");
+
+  const perluPersetujuan = await persetujuanWajib(db);
+  const nomor = await nomorDokumenBerikutnya(db.penyesuaianPersediaan, "PS");
+  const keterangan = `Koreksi stok ${barang.kode} dari halaman Barang & Jasa`;
+
+  await db.$transaction(async (tx) => {
+    if (!perluPersetujuan) {
+      await tx.stokBarang.upsert({
+        where: { barangId_gudangId: { barangId, gudangId } },
+        create: { barangId, gudangId, jumlah: stokBaru },
+        update: { jumlah: stokBaru },
+      });
+      if (selisih.gt(0)) await perbaruiHargaRata(tx, barangId, selisih, hargaSatuan, true);
+    }
+    const penyesuaian = await tx.penyesuaianPersediaan.create({
+      data: {
+        nomor,
+        gudangId,
+        akunLawanId,
+        keterangan,
+        ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" as const } : dataLangsungDisetujui(pengguna)),
+        baris: { create: [{ barangId, jumlahSebelum, jumlahSesudah: stokBaru, hargaSatuan }] },
+      },
+    });
+    if (perluPersetujuan) return;
+    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId, keterangan }, [{ barangId, selisih, hargaSatuan }]);
+    if (jurnal) await tx.penyesuaianPersediaan.update({ where: { id: penyesuaian.id }, data: { jurnalId: jurnal.id } });
+  });
+
+  revalidatePath("/persediaan");
+  revalidatePath("/persediaan/penyesuaian");
+  revalidatePath(`/data-induk/barang/${barangId}`);
+  if (perluPersetujuan) revalidatePath("/persetujuan");
+}
+
+export async function ubahStokBarangFormulir(barangId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => ubahStokBarang(barangId, dataFormulir));
+}
+
 export async function unggahFotoBarangFormulir(barangId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(async () => {
     await wajibHakAksi("stok-induk.tulis");
