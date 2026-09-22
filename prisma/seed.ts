@@ -37,21 +37,25 @@ function formulir(isian: Record<string, string | number | object>): FormData {
 
 const rp = (n: number | string | { toString(): string }) => Number(n).toLocaleString("id-ID");
 
-/** Akun contoh: Superadmin dan dua Pemilik setara (tingkat tertinggi); peran lain sesuai dummy. Kata sandi = nama peran + 123. */
+/**
+ * Akun contoh: Superadmin dan dua Pemilik setara (tingkat tertinggi); peran lain sesuai dummy.
+ * Kata sandi = nama peran + 123. nomorTelepon wajib untuk semua peran KECUALI Guest.
+ */
 export const AKUN_CONTOH = [
-  { namaPengguna: "superadmin", kataSandi: "superadmin123", nama: "Andrew Steine", peran: "SUPERADMIN" },
-  { namaPengguna: "owner", kataSandi: "owner123", nama: "Donny Donatus", peran: "PEMILIK" },
-  { namaPengguna: "owner2", kataSandi: "owner123", nama: "Nadia Yuliana", peran: "PEMILIK" },
-  { namaPengguna: "admin", kataSandi: "admin123", nama: "Bagus Santoso", peran: "ADMIN" },
-  { namaPengguna: "kasir", kataSandi: "kasir123", nama: "Sari Wulandari", peran: "KASIR" },
-  { namaPengguna: "gudang", kataSandi: "gudang123", nama: "Joko Prasetyo", peran: "GUDANG" },
-  { namaPengguna: "kru", kataSandi: "kru123", nama: "Rizal Maulana", peran: "KRU" },
+  { namaPengguna: "superadmin", kataSandi: "superadmin123", nama: "Andrew Steine", peran: "SUPERADMIN", nomorTelepon: "+6282228555254" },
+  { namaPengguna: "owner", kataSandi: "owner123", nama: "Donny Donatus", peran: "PEMILIK", nomorTelepon: "+628111111111" },
+  { namaPengguna: "owner2", kataSandi: "owner123", nama: "Nadia Yuliana", peran: "PEMILIK", nomorTelepon: "+628222222222" },
+  { namaPengguna: "admin", kataSandi: "admin123", nama: "Bagus Santoso", peran: "ADMIN", nomorTelepon: "+628333333333" },
+  { namaPengguna: "kasir", kataSandi: "kasir123", nama: "Sari Wulandari", peran: "KASIR", nomorTelepon: "+628444444444" },
+  { namaPengguna: "gudang", kataSandi: "gudang123", nama: "Joko Prasetyo", peran: "GUDANG", nomorTelepon: "+6285704874029" },
+  { namaPengguna: "kru", kataSandi: "kru123", nama: "Rizal Maulana", peran: "KRU", nomorTelepon: "+628555555555" },
+  { namaPengguna: "guest", kataSandi: "guest123", nama: "Tamu Contoh", peran: "GUEST", nomorTelepon: null },
 ] as const;
 
 async function main() {
   console.log("=== Pengguna (masuk dengan nama pengguna; kata sandi = nama peran + 123) ===");
   for (const a of AKUN_CONTOH) {
-    await db.pengguna.create({ data: { namaPengguna: a.namaPengguna, nama: a.nama, peran: a.peran, kataSandiHash: await hashKataSandi(a.kataSandi) } });
+    await db.pengguna.create({ data: { namaPengguna: a.namaPengguna, nama: a.nama, peran: a.peran, nomorTelepon: a.nomorTelepon, kataSandiHash: await hashKataSandi(a.kataSandi) } });
     console.log(`  -> ${a.namaPengguna.padEnd(10)} / ${a.kataSandi.padEnd(14)} ${a.nama} (${a.peran})`);
   }
 

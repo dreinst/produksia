@@ -11,6 +11,7 @@ import { bacaFotoDariFormulir } from "@/lib/foto";
 import { kurangiStok, labelBarang, tambahStok } from "@/lib/stok";
 import { menungguKonfirmasiBaris, sisaBaris } from "@/lib/peminjaman";
 import { bacaProyekId } from "@/lib/proyek";
+import { bacaNomorTelepon } from "@/lib/identitasPengguna";
 import { dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
@@ -103,6 +104,7 @@ export async function buatPeminjamanBarang(dataFormulir: FormData) {
   const gudangId = String(dataFormulir.get("gudangId") ?? "");
   if (!gudangId) throw new Error("Gudang wajib dipilih");
   const namaPengambil = bacaNamaPengambil(dataFormulir.get("namaPengambil"));
+  const nomorTelepon = bacaNomorTelepon(String(dataFormulir.get("nomorTelepon") ?? ""), true);
   const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();
   const rencanaKembali = bacaRencanaKembali(dataFormulir.get("rencanaKembali"));
   const daftarBaris = bacaBarisKeluar(dataFormulir.get("baris"));
@@ -132,6 +134,7 @@ export async function buatPeminjamanBarang(dataFormulir: FormData) {
         gudangId,
         proyekId,
         namaPengambil,
+        nomorTelepon,
         keterangan: keterangan || null,
         rencanaKembali,
         dicatatOlehId: idPenggunaTersimpan(pengguna),
@@ -161,6 +164,7 @@ export async function ajukanKembaliPeminjamanBarang(peminjamanId: string, dataFo
   await wajibHakAksi("peminjaman.buat");
   const daftarKlaim = bacaBarisKembali(dataFormulir.get("baris"));
   if (!daftarKlaim.some((b) => b.jumlahKembali.gt(0))) throw new Error("Isi jumlah yang dibawa kembali minimal pada satu barang");
+  const nomorTeleponKembali = bacaNomorTelepon(String(dataFormulir.get("nomorTeleponKembali") ?? ""), true);
   const daftarFoto = await bacaFotoDariFormulir(dataFormulir, "foto", { wajib: true });
 
   await db.$transaction(async (tx) => {
@@ -182,6 +186,7 @@ export async function ajukanKembaliPeminjamanBarang(peminjamanId: string, dataFo
       }
       await tx.barisPeminjamanBarang.update({ where: { id: baris.id }, data: { jumlahDiajukanKembali: { increment: k.jumlahKembali } } });
     }
+    await tx.peminjamanBarang.update({ where: { id: peminjamanId }, data: { nomorTeleponKembali } });
     await simpanFotoBukti(tx, peminjamanId, "KEMBALI", daftarFoto);
   });
 

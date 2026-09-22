@@ -5,7 +5,7 @@ import { randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { DAFTAR_PERAN, PERAN_TERTINGGI, peranTertinggi, type PenggunaSesi } from "@/lib/hakAkses";
-import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
+import { bacaEmailOpsional, bacaNamaPengguna, bacaNomorTelepon } from "@/lib/identitasPengguna";
 import { hapusSemuaSesiPengguna, hashKataSandi, periksaKekuatanKataSandi, wajibHakAksi } from "@/lib/otentikasi";
 import type { PeranPengguna } from "@/prisma-klien/enums";
 
@@ -49,6 +49,8 @@ export async function buatPengguna(dataFormulir: FormData) {
   const email = bacaEmailOpsional(bacaTeks(dataFormulir, "email"));
   const kataSandi = bacaTeks(dataFormulir, "kataSandi");
   const peran = bacaPeran(dataFormulir);
+  // Wajib untuk semua peran KECUALI Guest (tamu/pihak luar, tidak selalu punya WhatsApp terdaftar).
+  const nomorTelepon = bacaNomorTelepon(bacaTeks(dataFormulir, "nomorTelepon"), peran !== "GUEST");
 
   if (!nama) throw new Error("Nama wajib diisi");
   const galatKekuatan = periksaKekuatanKataSandi(kataSandi);
@@ -56,7 +58,7 @@ export async function buatPengguna(dataFormulir: FormData) {
   if (peranTertinggi(peran) && !peranTertinggi(pelaku.peran)) throw new Error("Hanya Superadmin atau Pemilik yang bisa membuat akun Superadmin/Pemilik");
   await pastikanNamaPenggunaBebas(namaPengguna);
 
-  await db.pengguna.create({ data: { nama, namaPengguna, email, kataSandiHash: await hashKataSandi(kataSandi), peran } });
+  await db.pengguna.create({ data: { nama, namaPengguna, email, nomorTelepon, kataSandiHash: await hashKataSandi(kataSandi), peran } });
   revalidatePath(HALAMAN);
 }
 
@@ -67,6 +69,7 @@ export async function ubahPengguna(id: string, dataFormulir: FormData) {
   const namaPengguna = bacaNamaPengguna(bacaTeks(dataFormulir, "namaPengguna"));
   const email = bacaEmailOpsional(bacaTeks(dataFormulir, "email"));
   const peran = bacaPeran(dataFormulir);
+  const nomorTelepon = bacaNomorTelepon(bacaTeks(dataFormulir, "nomorTelepon"), peran !== "GUEST");
   const aktif = dataFormulir.get("aktif") === "on";
   if (!nama) throw new Error("Nama wajib diisi");
   await pastikanNamaPenggunaBebas(namaPengguna, id);
@@ -77,7 +80,7 @@ export async function ubahPengguna(id: string, dataFormulir: FormData) {
   if (peranTertinggi(peran) && !peranTertinggi(pelaku.peran)) throw new Error("Hanya Superadmin atau Pemilik yang bisa memberi peran Superadmin/Pemilik");
   if (peranTertinggi(sasaran.peran) && (!peranTertinggi(peran) || !aktif)) await pastikanMasihAdaPemilikAktif(sasaran.id);
 
-  await db.pengguna.update({ where: { id }, data: { nama, namaPengguna, email, peran, aktif } });
+  await db.pengguna.update({ where: { id }, data: { nama, namaPengguna, email, nomorTelepon, peran, aktif } });
   if (!aktif || peran !== sasaran.peran) await hapusSemuaSesiPengguna(id); // paksa masuk ulang dengan hak baru
   revalidatePath(HALAMAN);
   revalidatePath(`${HALAMAN}/${id}`);

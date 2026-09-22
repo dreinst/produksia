@@ -60,6 +60,7 @@ export async function setujuiDokumen(jenis: JenisPersetujuan, id: string) {
     if (!dok) throw new Error(`${berkas.label} tidak ditemukan (mungkin sudah dihapus)`);
     pastikanTransisi(dok, "DISETUJUI", berkas.label);
     pastikanBukanPengaju(dok, pengguna, berkas.label);
+    if (berkas.pastikanBolehSetujui) await berkas.pastikanBolehSetujui(tx, id, pengguna);
     // Dokumen bertanggal tahun yang sudah ditutup tidak boleh dibukukan; menolaknya tetap boleh (pembersihan)
     await pastikanTahunTerbuka(tx, dok.tanggal);
     await berkas.posting(tx, id);

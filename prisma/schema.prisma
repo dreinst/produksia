@@ -32,8 +32,10 @@ enum PeranPengguna {
   ADMIN
   KASIR
   GUDANG
-  /// Kru lapangan: hanya bisa ajukan/ajukan-kembali Peminjaman Barang, menunggu persetujuan Gudang
+  /// Kru lapangan (internal): hanya bisa ajukan/ajukan-kembali Peminjaman Barang, menunggu persetujuan Gudang
   KRU
+  /// Tamu/pihak luar: sama seperti Kru tapi TANPA Laporan Kerusakan Barang, dan tanpa wajib nomor WhatsApp saat didaftarkan
+  GUEST
 }
 
 enum JenisAkun {
@@ -95,11 +97,16 @@ model Pengguna {
   /// Identitas masuk (huruf kecil, unik); email hanya kontak opsional
   namaPengguna                 String                  @unique
   email                        String?                 @unique
+  /// Wajib untuk semua peran KECUALI GUEST (lihat pastikanNomorTelepon di src/lib/aksi/pengguna.ts).
+  /// Format +62..., dipakai untuk kirim template WhatsApp saat peminjaman/kerusakan menunggu konfirmasi.
+  nomorTelepon                 String?
   nama                         String
   kataSandiHash                String
   peran                        PeranPengguna           @default(KASIR)
   aktif                        Boolean                 @default(true)
   karyawan                     Karyawan?
+  /// Foto profil (opsional); satu-satunya bidang profil yang boleh diubah sendiri oleh peran non-Superadmin/Pemilik
+  fotoProfil                   Foto?
   sesi                         Sesi[]
   permintaanAturUlang          PermintaanAturUlang[]
   dibuatPada                   DateTime                @default(now())
@@ -1516,6 +1523,9 @@ model Foto {
   /// Foto bukti kondisi rusak (lihat LaporanKerusakanBarang); tahap tidak dipakai untuk foto ini (selalu null)
   kerusakanId  String?
   kerusakan    LaporanKerusakanBarang? @relation(fields: [kerusakanId], references: [id], onDelete: Cascade)
+  /// Foto profil pengguna (satu per pengguna); tahap tidak dipakai untuk foto ini (selalu null)
+  penggunaId   String?               @unique
+  pengguna     Pengguna?             @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
   tahap        TahapFoto?
   urutan       Int                   @default(0)
   tipe         String
@@ -1543,6 +1553,10 @@ model PeminjamanBarang {
   proyek          Proyek?                @relation(fields: [proyekId], references: [id])
   /// Teks bebas: kru lapangan yang mengambil barang belum tentu punya akun
   namaPengambil   String
+  /// Nomor WhatsApp pengambil (format +62...), diisi saat ajukan pinjam; dipakai tombol konfirmasi WhatsApp ke Gudang
+  nomorTelepon    String?
+  /// Nomor WhatsApp yang mengembalikan (boleh beda orang dari yang meminjam), diisi saat ajukan kembali
+  nomorTeleponKembali String?
   keterangan      String?
   waktuKeluar     DateTime               @default(now())
   rencanaKembali  DateTime?

@@ -60,12 +60,14 @@ async function main() {
   await pastikanSinkron("saldo awal");
 
   console.log("=== 1. Penolakan saat ajukan pinjam ===");
-  const isianKeluar = { gudangId: gudang.id, namaPengambil: "Andi", baris: [{ barangId: barang.id, jumlah: 20 }] };
+  const isianKeluar = { gudangId: gudang.id, namaPengambil: "Andi", nomorTelepon: "+6281234567890", baris: [{ barangId: barang.id, jumlah: 20 }] };
   await harusDitolak("tanpa foto", () => buatPeminjamanBarang(formulir(isianKeluar)), "Foto wajib");
   await harusDitolak("4 foto", () => buatPeminjamanBarang(denganFoto(isianKeluar, 4)), "Maksimal 3 foto");
   await harusDitolak("berkas bukan gambar", () => buatPeminjamanBarang(denganFoto(isianKeluar, 1, BUKAN_GAMBAR)), "tidak didukung");
   await harusDitolak("tanpa gudang", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, gudangId: "" })), "Gudang wajib");
   await harusDitolak("tanpa nama pengambil", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, namaPengambil: "  " })), "Nama pengambil wajib");
+  await harusDitolak("tanpa nomor telepon", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, nomorTelepon: "" })), "Nomor WhatsApp wajib");
+  await harusDitolak("nomor telepon format salah", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, nomorTelepon: "081234567890" })), "Format nomor WhatsApp tidak valid");
   await harusDitolak("baris kosong", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [] })), "Minimal 1 baris");
   await harusDitolak("jumlah 0", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 0 }] })), "lebih dari 0");
   await harusDitolak("baris JASA", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: jasa.id, jumlah: 1 }] })), "JASA");
@@ -92,7 +94,7 @@ async function main() {
   pastikan(dok2.nomor > dok1.nomor && (await stok(barang.id, gudang.id)) === 0, `nomor berurutan (${dok1.nomor}, ${dok2.nomor}), stok habis`);
 
   console.log("=== 2b. Satuan desimal: 0,1 + 0,2 pengurangan stok harus persis 0,3 ===");
-  const isianKabel = (jumlah: number) => denganFoto({ gudangId: gudang.id, namaPengambil: "Dedi", baris: [{ barangId: kabel.id, jumlah }] });
+  const isianKabel = (jumlah: number) => denganFoto({ gudangId: gudang.id, namaPengambil: "Dedi", nomorTelepon: "+6281234567890", baris: [{ barangId: kabel.id, jumlah }] });
   await jalankan("kabel keluar 0,1", () => buatPeminjamanBarang(isianKabel(0.1)));
   await jalankan("kabel keluar 0,2", () => buatPeminjamanBarang(isianKabel(0.2)));
   pastikan((await stok(kabel.id, gudang.id)) === 0.7, "stok kabel persis 0,7 (bukan 0,6999999999999998)");
@@ -110,11 +112,11 @@ async function main() {
   pastikan((await stok(barang.id, gudang.id)) === 0, "ubah data tidak menyentuh stok");
 
   console.log("=== 4. Ajukan kembali (Kru) lalu konfirmasi (Gudang) sebagian bertahap lalu selesai otomatis ===");
-  await harusDitolak("ajukan kembali tanpa foto", () => ajukanKembaliPeminjamanBarang(dok1.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 5 }] })), "Foto wajib");
+  await harusDitolak("ajukan kembali tanpa foto", () => ajukanKembaliPeminjamanBarang(dok1.id, formulir({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: barang.id, jumlahKembali: 5 }] })), "Foto wajib");
   await harusDitolak("ajukan kembali 0", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 0 }] })), "minimal pada satu barang");
-  await harusDitolak("ajukan kembali 25 > sisa 20", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 25 }] })), "melebihi sisa yang belum diklaim (20)");
-  await harusDitolak("ajukan kembali barang lain", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: jasa.id, jumlahKembali: 1 }] })), "tidak ada di dokumen ini");
-  await jalankan("Kru ajukan kembali 12", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 12 }] })));
+  await harusDitolak("ajukan kembali 25 > sisa 20", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: barang.id, jumlahKembali: 25 }] })), "melebihi sisa yang belum diklaim (20)");
+  await harusDitolak("ajukan kembali barang lain", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: jasa.id, jumlahKembali: 1 }] })), "tidak ada di dokumen ini");
+  await jalankan("Kru ajukan kembali 12", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: barang.id, jumlahKembali: 12 }] })));
   let d = await dokumen(dok1.id);
   pastikan(!d.ditutupPada && Number(d.baris[0].jumlahKembali) === 0 && Number(d.baris[0].jumlahDiajukanKembali) === 12, "diklaim 12, TAPI stok/jumlahKembali belum berubah sebelum dikonfirmasi Gudang");
   pastikan((await stok(barang.id, gudang.id)) === 0, "ajukan kembali belum menyentuh stok");
@@ -126,12 +128,12 @@ async function main() {
   // revalidatePath sendiri di akhir, yang melempar galat "di luar request" di skrip uji (ditoleransi
   // jalankan()) -- kalau digabung dalam satu lambda, galat dari ajukan akan menghentikan lambda
   // sebelum sempat memanggil konfirmasi.
-  await jalankan("Kru ajukan kembali sisa 8", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 8 }] })));
+  await jalankan("Kru ajukan kembali sisa 8", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: barang.id, jumlahKembali: 8 }] })));
   await jalankan("Gudang konfirmasi kembali 8 (lunas)", () => konfirmasiKembaliPeminjamanBarang(dok1.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 8 }] })));
   d = await dokumen(dok1.id);
   pastikan(!!d.ditutupPada && statusPeminjaman(d) === "SELESAI" && (await stok(barang.id, gudang.id)) === 20, "tutup otomatis, status SELESAI, stok kembali 20");
   pastikan(d.foto.filter((f) => f.tahap === "KEMBALI").length === 2 && d.foto.filter((f) => f.tahap === "KEMBALI").map((f) => f.urutan).join(",") === "0,1", "2 foto KEMBALI (dari 2x ajukan kembali) dengan urutan berlanjut");
-  await harusDitolak("ajukan kembali ke dokumen yang sudah ditutup", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 1 }] })), "sudah ditutup");
+  await harusDitolak("ajukan kembali ke dokumen yang sudah ditutup", () => ajukanKembaliPeminjamanBarang(dok1.id, denganFoto({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: barang.id, jumlahKembali: 1 }] })), "sudah ditutup");
   await pastikanSinkron("kembali");
 
   console.log("=== 5. Tutup dengan selisih: bagian yang tidak kembali TETAP dianggap dikeluarkan dari stok ===");
@@ -144,7 +146,7 @@ async function main() {
   await jalankan("PJ 20 (stok penuh lagi)", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 20 }] })));
   await harusDitolak("pinjam 1 saat stok 0", () => buatPeminjamanBarang(denganFoto({ ...isianKeluar, baris: [{ barangId: barang.id, jumlah: 1 }] })), "tidak cukup di gudang ini");
   const dok3 = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id, namaPengambil: "Andi", baris: { some: { jumlah: 20 } } }, orderBy: { waktuKeluar: "desc" } });
-  await jalankan("dok3 ajukan kembali 20 (penuh)", () => ajukanKembaliPeminjamanBarang(dok3.id, denganFoto({ baris: [{ barangId: barang.id, jumlahKembali: 20 }] })));
+  await jalankan("dok3 ajukan kembali 20 (penuh)", () => ajukanKembaliPeminjamanBarang(dok3.id, denganFoto({ nomorTeleponKembali: "+6281234567890", baris: [{ barangId: barang.id, jumlahKembali: 20 }] })));
   await jalankan("dok3 konfirmasi kembali 20, supaya stok longgar lagi untuk bagian berikut", () => konfirmasiKembaliPeminjamanBarang(dok3.id, formulir({ baris: [{ barangId: barang.id, jumlahKembali: 20 }] })));
   pastikan((await stok(barang.id, gudang.id)) === 20, "stok 20 lagi setelah dok3 dikembalikan penuh");
 

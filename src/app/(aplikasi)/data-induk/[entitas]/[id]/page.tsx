@@ -2,20 +2,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import FormulirDataInduk from "@/komponen/data-induk/FormulirDataInduk";
+import FormLaporKerusakanInline from "@/komponen/persediaan/FormLaporKerusakanInline";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import PemilihFoto from "@/komponen/ui/PemilihFoto";
 import { ambilKonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { ambilDaftarOpsi, delegasiBaca } from "@/lib/dataInduk";
 import { hapusFotoBarangFormulir, ubahDataIndukFormulir, unggahFotoBarangFormulir } from "@/lib/aksi/dataInduk";
+import { buatLaporanKerusakanFormulir } from "@/lib/aksi/kerusakan";
 import { wajibHak } from "@/lib/otentikasi";
-import { hakDataInduk } from "@/lib/hakAkses";
+import { hakDataInduk, punyaHak } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
 
 export default async function HalamanUbahDataInduk({ params }: { params: Promise<{ entitas: string; id: string }> }) {
   const { entitas, id } = await params;
   const config = ambilKonfigurasiEntitas(entitas);
   if (!config) notFound();
-  await wajibHak(hakDataInduk(entitas).tulis);
+  const pengguna = await wajibHak(hakDataInduk(entitas).tulis);
 
   const rekaman = await delegasiBaca(config.model).findUnique({ where: { id } });
   if (!rekaman) notFound();
@@ -23,6 +25,13 @@ export default async function HalamanUbahDataInduk({ params }: { params: Promise
   const judul = String(rekaman.nama ?? rekaman.kode ?? config.label);
   // Hanya id & ukuran; isi (Bytes) dilayani terpisah lewat /api/foto/[id]
   const daftarFoto = config.slug === "barang" ? await db.foto.findMany({ where: { barangId: id }, select: { id: true, ukuran: true, urutan: true }, orderBy: { urutan: "asc" } }) : null;
+  const bolehLaporKerusakan = config.slug === "barang" && punyaHak(pengguna, "kerusakan.buat");
+  const daftarGudangStok = bolehLaporKerusakan
+    ? await db.gudang.findMany({
+        orderBy: { kode: "asc" },
+        select: { id: true, kode: true, nama: true, stok: { where: { barangId: id }, select: { jumlah: true } } },
+      })
+    : [];
 
   return (
     <div className="space-y-6">
@@ -77,6 +86,26 @@ export default async function HalamanUbahDataInduk({ params }: { params: Promise
               Unggah foto
             </button>
           </FormulirAksi>
+        </div>
+      )}
+
+      {bolehLaporKerusakan && (
+        <div className="kartu">
+          <div className="kepala-kartu">
+            <h2 className="judul-kartu">Lapor barang rusak</h2>
+            <p className="subjudul-kartu">Ketemu barang ini rusak saat cek stok? Lapor langsung di sini, tanpa pindah halaman. Menunggu persetujuan sebelum stok berkurang.</p>
+          </div>
+          {daftarGudangStok.length === 0 ? (
+            <p className="redup">Belum ada gudang. Tambahkan gudang di Data Induk terlebih dulu.</p>
+          ) : (
+            <FormulirAksi aksi={buatLaporanKerusakanFormulir} pesanSukses="Dicatat sebagai draf. Klik “Ajukan” di halaman Laporan Kerusakan Barang untuk mengirimnya ke persetujuan." className="space-y-4">
+              <input type="hidden" name="namaPelapor" value={pengguna.nama} />
+              <FormLaporKerusakanInline
+                barangId={id}
+                daftarGudang={daftarGudangStok.map((g) => ({ id: g.id, kode: g.kode, nama: g.nama, tersedia: Number(g.stok[0]?.jumlah ?? 0) }))}
+              />
+            </FormulirAksi>
+          )}
         </div>
       )}
     </div>

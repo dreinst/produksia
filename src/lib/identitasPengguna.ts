@@ -16,3 +16,16 @@ export function bacaEmailOpsional(nilai: string): string | null {
   if (!bersih.includes("@")) throw new Error("Format email tidak valid");
   return bersih;
 }
+
+/** Nomor WhatsApp format Indonesia, mis. +6281234567890. Wajib untuk semua peran KECUALI GUEST. */
+export const POLA_NOMOR_TELEPON = /^\+62[1-9][0-9]{7,13}$/;
+
+export function bacaNomorTelepon(nilai: string, wajib: boolean): string | null {
+  const bersih = nilai.trim().replace(/[\s-]/g, "");
+  if (!bersih) {
+    if (wajib) throw new Error("Nomor WhatsApp wajib diisi (format +62...)");
+    return null;
+  }
+  if (!POLA_NOMOR_TELEPON.test(bersih)) throw new Error("Format nomor WhatsApp tidak valid, mis. +6281234567890");
+  return bersih;
+}

@@ -27,8 +27,8 @@ export default async function Beranda() {
   const pengguna = await wajibMasuk();
   // Gudang murni input/output stok; Beranda (ringkasan keuangan) di luar fokusnya (permintaan pemilik).
   if (pengguna.peran === "GUDANG") redirect("/data-induk/barang");
-  // Kru cuma punya hak Peminjaman Barang & Laporan Kerusakan Barang; Beranda tidak berguna baginya dan haknya tidak cukup untuk memuat data di halaman ini.
-  if (pengguna.peran === "KRU") redirect("/persediaan/peminjaman");
+  // Kru/Guest cuma punya hak Peminjaman Barang; Beranda tidak berguna baginya dan haknya tidak cukup untuk memuat data di halaman ini.
+  if (pengguna.peran === "KRU" || pengguna.peran === "GUEST") redirect("/persediaan/peminjaman");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const now = new Date();
   const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);

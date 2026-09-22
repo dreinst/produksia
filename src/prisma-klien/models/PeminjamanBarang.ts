@@ -35,6 +35,8 @@ export type PeminjamanBarangMinAggregateOutputType = {
   gudangId: string | null
   proyekId: string | null
   namaPengambil: string | null
+  nomorTelepon: string | null
+  nomorTeleponKembali: string | null
   keterangan: string | null
   waktuKeluar: Date | null
   rencanaKembali: Date | null
@@ -59,6 +61,8 @@ export type PeminjamanBarangMaxAggregateOutputType = {
   gudangId: string | null
   proyekId: string | null
   namaPengambil: string | null
+  nomorTelepon: string | null
+  nomorTeleponKembali: string | null
   keterangan: string | null
   waktuKeluar: Date | null
   rencanaKembali: Date | null
@@ -83,6 +87,8 @@ export type PeminjamanBarangCountAggregateOutputType = {
   gudangId: number
   proyekId: number
   namaPengambil: number
+  nomorTelepon: number
+  nomorTeleponKembali: number
   keterangan: number
   waktuKeluar: number
   rencanaKembali: number
@@ -109,6 +115,8 @@ export type PeminjamanBarangMinAggregateInputType = {
   gudangId?: true
   proyekId?: true
   namaPengambil?: true
+  nomorTelepon?: true
+  nomorTeleponKembali?: true
   keterangan?: true
   waktuKeluar?: true
   rencanaKembali?: true
@@ -133,6 +141,8 @@ export type PeminjamanBarangMaxAggregateInputType = {
   gudangId?: true
   proyekId?: true
   namaPengambil?: true
+  nomorTelepon?: true
+  nomorTeleponKembali?: true
   keterangan?: true
   waktuKeluar?: true
   rencanaKembali?: true
@@ -157,6 +167,8 @@ export type PeminjamanBarangCountAggregateInputType = {
   gudangId?: true
   proyekId?: true
   namaPengambil?: true
+  nomorTelepon?: true
+  nomorTeleponKembali?: true
   keterangan?: true
   waktuKeluar?: true
   rencanaKembali?: true
@@ -254,6 +266,8 @@ export type PeminjamanBarangGroupByOutputType = {
   gudangId: string
   proyekId: string | null
   namaPengambil: string
+  nomorTelepon: string | null
+  nomorTeleponKembali: string | null
   keterangan: string | null
   waktuKeluar: Date
   rencanaKembali: Date | null
@@ -299,6 +313,8 @@ export type PeminjamanBarangWhereInput = {
   gudangId?: Prisma.StringFilter<"PeminjamanBarang"> | string
   proyekId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   namaPengambil?: Prisma.StringFilter<"PeminjamanBarang"> | string
+  nomorTelepon?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
+  nomorTeleponKembali?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   keterangan?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   waktuKeluar?: Prisma.DateTimeFilter<"PeminjamanBarang"> | Date | string
   rencanaKembali?: Prisma.DateTimeNullableFilter<"PeminjamanBarang"> | Date | string | null
@@ -332,6 +348,8 @@ export type PeminjamanBarangOrderByWithRelationInput = {
   gudangId?: Prisma.SortOrder
   proyekId?: Prisma.SortOrderInput | Prisma.SortOrder
   namaPengambil?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrderInput | Prisma.SortOrder
+  nomorTeleponKembali?: Prisma.SortOrderInput | Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   waktuKeluar?: Prisma.SortOrder
   rencanaKembali?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -368,6 +386,8 @@ export type PeminjamanBarangWhereUniqueInput = Prisma.AtLeast<{
   gudangId?: Prisma.StringFilter<"PeminjamanBarang"> | string
   proyekId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   namaPengambil?: Prisma.StringFilter<"PeminjamanBarang"> | string
+  nomorTelepon?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
+  nomorTeleponKembali?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   keterangan?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   waktuKeluar?: Prisma.DateTimeFilter<"PeminjamanBarang"> | Date | string
   rencanaKembali?: Prisma.DateTimeNullableFilter<"PeminjamanBarang"> | Date | string | null
@@ -401,6 +421,8 @@ export type PeminjamanBarangOrderByWithAggregationInput = {
   gudangId?: Prisma.SortOrder
   proyekId?: Prisma.SortOrderInput | Prisma.SortOrder
   namaPengambil?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrderInput | Prisma.SortOrder
+  nomorTeleponKembali?: Prisma.SortOrderInput | Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   waktuKeluar?: Prisma.SortOrder
   rencanaKembali?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -431,6 +453,8 @@ export type PeminjamanBarangScalarWhereWithAggregatesInput = {
   gudangId?: Prisma.StringWithAggregatesFilter<"PeminjamanBarang"> | string
   proyekId?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
   namaPengambil?: Prisma.StringWithAggregatesFilter<"PeminjamanBarang"> | string
+  nomorTelepon?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
+  nomorTeleponKembali?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
   waktuKeluar?: Prisma.DateTimeWithAggregatesFilter<"PeminjamanBarang"> | Date | string
   rencanaKembali?: Prisma.DateTimeNullableWithAggregatesFilter<"PeminjamanBarang"> | Date | string | null
@@ -453,6 +477,8 @@ export type PeminjamanBarangCreateInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -481,6 +507,8 @@ export type PeminjamanBarangUncheckedCreateInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -505,6 +533,8 @@ export type PeminjamanBarangUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -533,6 +563,8 @@ export type PeminjamanBarangUncheckedUpdateInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -559,6 +591,8 @@ export type PeminjamanBarangCreateManyInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -581,6 +615,8 @@ export type PeminjamanBarangUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -600,6 +636,8 @@ export type PeminjamanBarangUncheckedUpdateManyInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -639,6 +677,8 @@ export type PeminjamanBarangCountOrderByAggregateInput = {
   gudangId?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
   namaPengambil?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrder
+  nomorTeleponKembali?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   waktuKeluar?: Prisma.SortOrder
   rencanaKembali?: Prisma.SortOrder
@@ -663,6 +703,8 @@ export type PeminjamanBarangMaxOrderByAggregateInput = {
   gudangId?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
   namaPengambil?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrder
+  nomorTeleponKembali?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   waktuKeluar?: Prisma.SortOrder
   rencanaKembali?: Prisma.SortOrder
@@ -687,6 +729,8 @@ export type PeminjamanBarangMinOrderByAggregateInput = {
   gudangId?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
   namaPengambil?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrder
+  nomorTeleponKembali?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
   waktuKeluar?: Prisma.SortOrder
   rencanaKembali?: Prisma.SortOrder
@@ -1038,6 +1082,8 @@ export type PeminjamanBarangCreateWithoutDicatatOlehInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1065,6 +1111,8 @@ export type PeminjamanBarangUncheckedCreateWithoutDicatatOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1098,6 +1146,8 @@ export type PeminjamanBarangCreateWithoutDiajukanOlehInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1125,6 +1175,8 @@ export type PeminjamanBarangUncheckedCreateWithoutDiajukanOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1158,6 +1210,8 @@ export type PeminjamanBarangCreateWithoutDisetujuiOlehInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1185,6 +1239,8 @@ export type PeminjamanBarangUncheckedCreateWithoutDisetujuiOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1218,6 +1274,8 @@ export type PeminjamanBarangCreateWithoutDitolakOlehInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1245,6 +1303,8 @@ export type PeminjamanBarangUncheckedCreateWithoutDitolakOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1299,6 +1359,8 @@ export type PeminjamanBarangScalarWhereInput = {
   gudangId?: Prisma.StringFilter<"PeminjamanBarang"> | string
   proyekId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   namaPengambil?: Prisma.StringFilter<"PeminjamanBarang"> | string
+  nomorTelepon?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
+  nomorTeleponKembali?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   keterangan?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   waktuKeluar?: Prisma.DateTimeFilter<"PeminjamanBarang"> | Date | string
   rencanaKembali?: Prisma.DateTimeNullableFilter<"PeminjamanBarang"> | Date | string | null
@@ -1369,6 +1431,8 @@ export type PeminjamanBarangCreateWithoutProyekInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1395,6 +1459,8 @@ export type PeminjamanBarangUncheckedCreateWithoutProyekInput = {
   nomor: string
   gudangId: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1445,6 +1511,8 @@ export type PeminjamanBarangCreateWithoutGudangInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1471,6 +1539,8 @@ export type PeminjamanBarangUncheckedCreateWithoutGudangInput = {
   nomor: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1521,6 +1591,8 @@ export type PeminjamanBarangCreateWithoutPenyesuaianInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1548,6 +1620,8 @@ export type PeminjamanBarangUncheckedCreateWithoutPenyesuaianInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1597,6 +1671,8 @@ export type PeminjamanBarangCreateWithoutFotoInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1624,6 +1700,8 @@ export type PeminjamanBarangUncheckedCreateWithoutFotoInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1663,6 +1741,8 @@ export type PeminjamanBarangUpdateWithoutFotoInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1690,6 +1770,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutFotoInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1713,6 +1795,8 @@ export type PeminjamanBarangCreateWithoutBarisInput = {
   id?: string
   nomor: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1740,6 +1824,8 @@ export type PeminjamanBarangUncheckedCreateWithoutBarisInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1779,6 +1865,8 @@ export type PeminjamanBarangUpdateWithoutBarisInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1806,6 +1894,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutBarisInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1831,6 +1921,8 @@ export type PeminjamanBarangCreateManyDicatatOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1854,6 +1946,8 @@ export type PeminjamanBarangCreateManyDiajukanOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1877,6 +1971,8 @@ export type PeminjamanBarangCreateManyDisetujuiOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1900,6 +1996,8 @@ export type PeminjamanBarangCreateManyDitolakOlehInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -1921,6 +2019,8 @@ export type PeminjamanBarangUpdateWithoutDicatatOlehInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1948,6 +2048,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutDicatatOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1973,6 +2075,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1994,6 +2098,8 @@ export type PeminjamanBarangUpdateWithoutDiajukanOlehInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2021,6 +2127,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutDiajukanOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2046,6 +2154,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2067,6 +2177,8 @@ export type PeminjamanBarangUpdateWithoutDisetujuiOlehInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2094,6 +2206,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutDisetujuiOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2119,6 +2233,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2140,6 +2256,8 @@ export type PeminjamanBarangUpdateWithoutDitolakOlehInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2167,6 +2285,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutDitolakOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2192,6 +2312,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2214,6 +2336,8 @@ export type PeminjamanBarangCreateManyProyekInput = {
   nomor: string
   gudangId: string
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -2236,6 +2360,8 @@ export type PeminjamanBarangUpdateWithoutProyekInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2262,6 +2388,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutProyekInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2287,6 +2415,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutProyekInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2310,6 +2440,8 @@ export type PeminjamanBarangCreateManyGudangInput = {
   nomor: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -2332,6 +2464,8 @@ export type PeminjamanBarangUpdateWithoutGudangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2358,6 +2492,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutGudangInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2383,6 +2519,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutGudangInput = {
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2407,6 +2545,8 @@ export type PeminjamanBarangCreateManyPenyesuaianInput = {
   gudangId: string
   proyekId?: string | null
   namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
   keterangan?: string | null
   waktuKeluar?: Date | string
   rencanaKembali?: Date | string | null
@@ -2428,6 +2568,8 @@ export type PeminjamanBarangUpdateWithoutPenyesuaianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2455,6 +2597,8 @@ export type PeminjamanBarangUncheckedUpdateWithoutPenyesuaianInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2480,6 +2624,8 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianInput = {
   gudangId?: Prisma.StringFieldUpdateOperationsInput | string
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2543,6 +2689,8 @@ export type PeminjamanBarangSelect<ExtArgs extends runtime.Types.Extensions.Inte
   gudangId?: boolean
   proyekId?: boolean
   namaPengambil?: boolean
+  nomorTelepon?: boolean
+  nomorTeleponKembali?: boolean
   keterangan?: boolean
   waktuKeluar?: boolean
   rencanaKembali?: boolean
@@ -2577,6 +2725,8 @@ export type PeminjamanBarangSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   gudangId?: boolean
   proyekId?: boolean
   namaPengambil?: boolean
+  nomorTelepon?: boolean
+  nomorTeleponKembali?: boolean
   keterangan?: boolean
   waktuKeluar?: boolean
   rencanaKembali?: boolean
@@ -2608,6 +2758,8 @@ export type PeminjamanBarangSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   gudangId?: boolean
   proyekId?: boolean
   namaPengambil?: boolean
+  nomorTelepon?: boolean
+  nomorTeleponKembali?: boolean
   keterangan?: boolean
   waktuKeluar?: boolean
   rencanaKembali?: boolean
@@ -2639,6 +2791,8 @@ export type PeminjamanBarangSelectScalar = {
   gudangId?: boolean
   proyekId?: boolean
   namaPengambil?: boolean
+  nomorTelepon?: boolean
+  nomorTeleponKembali?: boolean
   keterangan?: boolean
   waktuKeluar?: boolean
   rencanaKembali?: boolean
@@ -2657,7 +2811,7 @@ export type PeminjamanBarangSelectScalar = {
   catatanPenolakan?: boolean
 }
 
-export type PeminjamanBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "gudangId" | "proyekId" | "namaPengambil" | "keterangan" | "waktuKeluar" | "rencanaKembali" | "ditutupPada" | "catatanKembali" | "penyesuaianId" | "dicatatOlehId" | "dicatatOlehNama" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["peminjamanBarang"]>
+export type PeminjamanBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "gudangId" | "proyekId" | "namaPengambil" | "nomorTelepon" | "nomorTeleponKembali" | "keterangan" | "waktuKeluar" | "rencanaKembali" | "ditutupPada" | "catatanKembali" | "penyesuaianId" | "dicatatOlehId" | "dicatatOlehNama" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["peminjamanBarang"]>
 export type PeminjamanBarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
@@ -2711,6 +2865,14 @@ export type $PeminjamanBarangPayload<ExtArgs extends runtime.Types.Extensions.In
      * Teks bebas: kru lapangan yang mengambil barang belum tentu punya akun
      */
     namaPengambil: string
+    /**
+     * Nomor WhatsApp pengambil (format +62...), diisi saat ajukan pinjam; dipakai tombol konfirmasi WhatsApp ke Gudang
+     */
+    nomorTelepon: string | null
+    /**
+     * Nomor WhatsApp yang mengembalikan (boleh beda orang dari yang meminjam), diisi saat ajukan kembali
+     */
+    nomorTeleponKembali: string | null
     keterangan: string | null
     waktuKeluar: Date
     rencanaKembali: Date | null
@@ -3172,6 +3334,8 @@ export interface PeminjamanBarangFieldRefs {
   readonly gudangId: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly proyekId: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly namaPengambil: Prisma.FieldRef<"PeminjamanBarang", 'String'>
+  readonly nomorTelepon: Prisma.FieldRef<"PeminjamanBarang", 'String'>
+  readonly nomorTeleponKembali: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly keterangan: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly waktuKeluar: Prisma.FieldRef<"PeminjamanBarang", 'DateTime'>
   readonly rencanaKembali: Prisma.FieldRef<"PeminjamanBarang", 'DateTime'>

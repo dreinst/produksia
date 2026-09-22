@@ -1,10 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
+import { bacaFotoDariFormulir } from "@/lib/foto";
 import { bacaIpKlien, pastikanBolehCoba, catatKegagalanMasuk, resetPercobaanMasuk } from "@/lib/batasMasuk";
 import {
   buatSesi,
@@ -125,6 +127,38 @@ export async function gantiKataSandi(dataFormulir: FormData) {
 
 export async function gantiKataSandiFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => gantiKataSandi(dataFormulir));
+}
+
+/**
+ * Foto profil: satu-satunya bidang profil yang boleh diubah SENDIRI oleh peran apa pun (termasuk
+ * Kru/Guest). Nama, email, nomor WhatsApp, dan peran cuma bisa diubah Superadmin/Pemilik lewat
+ * Pengaturan › Pengguna (src/lib/aksi/pengguna.ts) - lihat batasan di src/app/(aplikasi)/profil/page.tsx.
+ */
+export async function ubahFotoProfil(dataFormulir: FormData) {
+  const saya = await penggunaSaatIni();
+  if (!saya) throw new Error("Sesi sudah berakhir. Silakan masuk kembali.");
+  const [foto] = await bacaFotoDariFormulir(dataFormulir, "foto", { maksimal: 1, wajib: true });
+
+  await db.$transaction(async (tx) => {
+    await tx.foto.deleteMany({ where: { penggunaId: saya.id } });
+    await tx.foto.create({ data: { penggunaId: saya.id, urutan: 0, tipe: foto.tipe, ukuran: foto.ukuran, isi: foto.isi } });
+  });
+  revalidatePath("/profil");
+}
+
+export async function ubahFotoProfilFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => ubahFotoProfil(dataFormulir));
+}
+
+export async function hapusFotoProfil() {
+  const saya = await penggunaSaatIni();
+  if (!saya) throw new Error("Sesi sudah berakhir. Silakan masuk kembali.");
+  await db.foto.deleteMany({ where: { penggunaId: saya.id } });
+  revalidatePath("/profil");
+}
+
+export async function hapusFotoProfilFormulir() {
+  return jalankanFormulir(() => hapusFotoProfil());
 }
 
 // ---------- Lupa kata sandi (tanpa email: ditangani Superadmin/Pemilik/Admin lewat tautan sekali pakai) ----------

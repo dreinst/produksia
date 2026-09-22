@@ -13,7 +13,7 @@ import { jalankan, formulir, pastikan } from "./bantuan";
  * menambah/mengurangi hak (kecuali Superadmin/Pemilik dan hak-akses.kelola), tersimpan sebagai selisih
  * terhadap bawaan, dan bisa dipulihkan.
  */
-const sesi = (peran: PenggunaSesi["peran"], hak: readonly Hak[]): PenggunaSesi => ({ id: "x", nama: "Uji", namaPengguna: "uji", email: null, peran, hak });
+const sesi = (peran: PenggunaSesi["peran"], hak: readonly Hak[]): PenggunaSesi => ({ id: "x", nama: "Uji", namaPengguna: "uji", email: null, nomorTelepon: null, peran, hak });
 
 async function main() {
   const mulaiUji = new Date();
@@ -48,18 +48,23 @@ async function main() {
   );
   pastikan(
     punyaHak("KRU", "peminjaman.lihat") && punyaHak("KRU", "peminjaman.buat") && !punyaHak("KRU", "peminjaman.setujui") && !punyaHak("KRU", "peminjaman.hapus") &&
-      punyaHak("KRU", "kerusakan.lihat") && punyaHak("KRU", "kerusakan.buat") && !punyaHak("KRU", "kerusakan.setujui") && !punyaHak("KRU", "kerusakan.hapus") &&
-      HAK_BAWAAN.KRU.length === 4,
-    "Kru: cuma peminjaman & kerusakan (lihat & buat), tanpa setujui/hapus, tanpa hak lain sama sekali",
+      !punyaHak("KRU", "kerusakan.lihat") && !punyaHak("KRU", "kerusakan.buat") && HAK_BAWAAN.KRU.length === 2,
+    "Kru: cuma Peminjaman Barang (lihat & buat), TANPA Laporan Kerusakan Barang (itu urusan Gudang sendiri), tanpa setujui/hapus",
   );
   pastikan(modulTerlihat(sesi("KRU", HAK_BAWAAN.KRU), "persediaan") && !modulTerlihat(sesi("KRU", HAK_BAWAAN.KRU), "penjualan"), "Kru: modul persediaan tampil (karena peminjaman.lihat), modul lain tidak");
-  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU"] as const) {
+  pastikan(
+    punyaHak("GUEST", "peminjaman.lihat") && punyaHak("GUEST", "peminjaman.buat") && !punyaHak("GUEST", "peminjaman.setujui") && !punyaHak("GUEST", "peminjaman.hapus") &&
+      !punyaHak("GUEST", "kerusakan.lihat") && HAK_BAWAAN.GUEST.length === 2,
+    "Guest: persis seperti Kru, cuma Peminjaman Barang, tanpa setujui/hapus/kerusakan",
+  );
+  pastikan(modulTerlihat(sesi("GUEST", HAK_BAWAAN.GUEST), "persediaan") && !modulTerlihat(sesi("GUEST", HAK_BAWAAN.GUEST), "penjualan"), "Guest: modul persediaan tampil, modul lain tidak");
+  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU", "GUEST"] as const) {
     for (const h of HAK_TERTINGGI_SAJA) pastikan(!HAK_BAWAAN[peran].includes(h), `${peran} tidak punya ${h} secara bawaan`);
   }
   // Simulasikan formulir sungguhan: semua kotak bawaan tetap tercentang, PLUS mencoba menyalakan
   // sdm.tulis/penggajian.lihat untuk Gudang (harus diabaikan, bukan cuma "tidak disentuh").
   const isianCobaSdm: Record<string, string> = {};
-  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU"] as const) for (const h of HAK_BAWAAN[peran]) isianCobaSdm[`${peran}|${h}`] = "on";
+  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU", "GUEST"] as const) for (const h of HAK_BAWAAN[peran]) isianCobaSdm[`${peran}|${h}`] = "on";
   isianCobaSdm["GUDANG|sdm.tulis"] = "on";
   isianCobaSdm["GUDANG|penggajian.lihat"] = "on";
   await jalankan("simpan matriks mencoba memberi sdm.tulis ke Gudang (diabaikan)", () => simpanHakAkses(formulir(isianCobaSdm)));
@@ -73,7 +78,7 @@ async function main() {
   pastikan(!hitungHak("ADMIN", [{ hak: "hak-akses.kelola", boleh: true }]).includes("hak-akses.kelola") && hitungHak("PEMILIK", [{ hak: "faktur.buat", boleh: false }]).includes("faktur.buat"), "hak-akses.kelola tak bisa diberikan; Pemilik tak bisa dikurangi");
   // formulir: semua kotak bawaan tercentang, kecuali KASIR|faktur.buat dimatikan dan GUDANG|faktur.lihat + GUDANG|kas-masuk.buat dinyalakan
   const isian: Record<string, string> = {};
-  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU"] as const) for (const h of HAK_BAWAAN[peran]) isian[`${peran}|${h}`] = "on";
+  for (const peran of ["ADMIN", "KASIR", "GUDANG", "KRU", "GUEST"] as const) for (const h of HAK_BAWAAN[peran]) isian[`${peran}|${h}`] = "on";
   delete isian["KASIR|faktur.buat"];
   isian["GUDANG|kas-masuk.buat"] = "on";
   isian["ADMIN|hak-akses.kelola"] = "on"; // harus diabaikan

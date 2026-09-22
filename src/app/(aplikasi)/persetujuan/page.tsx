@@ -36,7 +36,9 @@ export default async function HalamanPersetujuan() {
   const pengguna: PenggunaSesi = await wajibMasuk();
   // Gudang murni input/output stok; kotak masuk Persetujuan di luar fokusnya (permintaan pemilik).
   // Persetujuan Peminjaman Barang & Laporan Kerusakan Barangnya sendiri ada langsung di halaman masing-masing.
-  if (pengguna.peran === "GUDANG" || pengguna.peran === "KRU") redirect(pengguna.peran === "KRU" ? "/persediaan/peminjaman" : "/data-induk/barang");
+  if (pengguna.peran === "GUDANG" || pengguna.peran === "KRU" || pengguna.peran === "GUEST") {
+    redirect(pengguna.peran === "GUDANG" ? "/data-induk/barang" : "/persediaan/peminjaman");
+  }
   const bolehLihat = (kode: string) => punyaHak(pengguna, `${kode}.lihat` as Hak) || punyaHak(pengguna, `${kode}.setujui` as Hak);
 
   const [wajib, faktur, fakturBeli, kas, penyesuaian, peminjaman, kerusakan, aset, penggajian] = await Promise.all([

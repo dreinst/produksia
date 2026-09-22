@@ -19,12 +19,22 @@ import PemilihFoto from "@/komponen/ui/PemilihFoto";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import EditorBarisPeminjaman, { PemilihGudang } from "@/komponen/persediaan/EditorBarisPeminjaman";
+import { nomorTujuanKonfirmasi, pesanKonfirmasiKerusakan, tautanWhatsApp } from "@/lib/whatsapp";
 
 const SERTAKAN = {
   baris: { include: { barang: { select: { kode: true, nama: true, satuan: true } } } },
   foto: { select: { id: true }, orderBy: { dibuatPada: "asc" as const } },
   proyek: { select: { nama: true } },
+  diajukanOleh: { select: { peran: true } },
 };
+
+function TombolWhatsApp({ peranPengaju, pesan }: { peranPengaju: string | null | undefined; pesan: string }) {
+  return (
+    <a href={tautanWhatsApp(nomorTujuanKonfirmasi(peranPengaju), pesan)} target="_blank" rel="noopener" className="tombol tombol-garis w-full min-h-11 flex items-center justify-center gap-2">
+      Konfirmasi via WhatsApp
+    </a>
+  );
+}
 
 type Foto = { id: string };
 
@@ -198,6 +208,12 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
                   ))}
                 </ul>
                 <TautanFoto foto={k.foto} />
+                {k.statusPersetujuan === "MENUNGGU" && (
+                  <TombolWhatsApp
+                    peranPengaju={k.diajukanOleh?.peran}
+                    pesan={pesanKonfirmasiKerusakan(k.nomor, k.namaPelapor, k.baris.map((b) => ({ kode: b.barang.kode, nama: b.barang.nama, jumlah: Number(b.jumlah), satuan: b.barang.satuan })))}
+                  />
+                )}
                 {bolehBuat && k.statusPersetujuan !== "MENUNGGU" && <FormUbahData p={k} daftarProyek={daftarProyek} />}
               </div>
             ))}
