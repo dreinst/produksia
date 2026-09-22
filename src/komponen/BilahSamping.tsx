@@ -234,11 +234,12 @@ function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: Peng
   const grupDataInduk = saringGrup([persediaan, dataInduk], pengguna);
   const pengaturanBoleh = tautanPengaturan.filter((l) => punyaHak(pengguna, l.hak));
   // Kotak masuk persetujuan tampil bagi siapa pun yang boleh membuat atau menyetujui dokumen yang ikut alur itu,
-  // KECUALI Gudang & Kru: perannya murni operasional (Gudang: input/output stok; Kru: hanya ajukan
-  // peminjaman), Beranda & kotak masuk Persetujuan gabungan di luar fokusnya (persetujuan Kru sendiri
-  // sudah ada langsung di halaman Peminjaman Barang).
-  const bolehPersetujuan = pengguna.peran !== "GUDANG" && pengguna.peran !== "KRU" && DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
-  const bolehBeranda = pengguna.peran !== "GUDANG" && pengguna.peran !== "KRU";
+  // KECUALI Gudang, Kru & Guest: perannya murni operasional (Gudang: input/output stok; Kru/Guest:
+  // hanya ajukan peminjaman), Beranda & kotak masuk Persetujuan gabungan di luar fokusnya (persetujuan
+  // Kru/Guest sendiri sudah ada langsung di halaman Peminjaman Barang).
+  const PERAN_TANPA_BERANDA = new Set<typeof pengguna.peran>(["GUDANG", "KRU", "GUEST"]);
+  const bolehPersetujuan = !PERAN_TANPA_BERANDA.has(pengguna.peran) && DOKUMEN_PERSETUJUAN.some((k) => punyaHak(pengguna, `${k}.buat` as Hak) || punyaHak(pengguna, `${k}.setujui` as Hak));
+  const bolehBeranda = !PERAN_TANPA_BERANDA.has(pengguna.peran);
   const semuaGrup = [...grupOperasional, ...grupDataInduk];
 
   const judulAktif = semuaGrup.find((g) => g.tautan.some((l) => aktifDi(pathname, l.href)))?.judul ?? null;

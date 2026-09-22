@@ -28,6 +28,7 @@ export type PenggunaMinAggregateOutputType = {
   id: string | null
   namaPengguna: string | null
   email: string | null
+  nomorTelepon: string | null
   nama: string | null
   kataSandiHash: string | null
   peran: $Enums.PeranPengguna | null
@@ -39,6 +40,7 @@ export type PenggunaMaxAggregateOutputType = {
   id: string | null
   namaPengguna: string | null
   email: string | null
+  nomorTelepon: string | null
   nama: string | null
   kataSandiHash: string | null
   peran: $Enums.PeranPengguna | null
@@ -50,6 +52,7 @@ export type PenggunaCountAggregateOutputType = {
   id: number
   namaPengguna: number
   email: number
+  nomorTelepon: number
   nama: number
   kataSandiHash: number
   peran: number
@@ -63,6 +66,7 @@ export type PenggunaMinAggregateInputType = {
   id?: true
   namaPengguna?: true
   email?: true
+  nomorTelepon?: true
   nama?: true
   kataSandiHash?: true
   peran?: true
@@ -74,6 +78,7 @@ export type PenggunaMaxAggregateInputType = {
   id?: true
   namaPengguna?: true
   email?: true
+  nomorTelepon?: true
   nama?: true
   kataSandiHash?: true
   peran?: true
@@ -85,6 +90,7 @@ export type PenggunaCountAggregateInputType = {
   id?: true
   namaPengguna?: true
   email?: true
+  nomorTelepon?: true
   nama?: true
   kataSandiHash?: true
   peran?: true
@@ -169,6 +175,7 @@ export type PenggunaGroupByOutputType = {
   id: string
   namaPengguna: string
   email: string | null
+  nomorTelepon: string | null
   nama: string
   kataSandiHash: string
   peran: $Enums.PeranPengguna
@@ -201,12 +208,14 @@ export type PenggunaWhereInput = {
   id?: Prisma.StringFilter<"Pengguna"> | string
   namaPengguna?: Prisma.StringFilter<"Pengguna"> | string
   email?: Prisma.StringNullableFilter<"Pengguna"> | string | null
+  nomorTelepon?: Prisma.StringNullableFilter<"Pengguna"> | string | null
   nama?: Prisma.StringFilter<"Pengguna"> | string
   kataSandiHash?: Prisma.StringFilter<"Pengguna"> | string
   peran?: Prisma.EnumPeranPenggunaFilter<"Pengguna"> | $Enums.PeranPengguna
   aktif?: Prisma.BoolFilter<"Pengguna"> | boolean
   dibuatPada?: Prisma.DateTimeFilter<"Pengguna"> | Date | string
   karyawan?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
+  fotoProfil?: Prisma.XOR<Prisma.FotoNullableScalarRelationFilter, Prisma.FotoWhereInput> | null
   sesi?: Prisma.SesiListRelationFilter
   permintaanAturUlang?: Prisma.PermintaanAturUlangListRelationFilter
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanListRelationFilter
@@ -289,12 +298,14 @@ export type PenggunaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   namaPengguna?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrderInput | Prisma.SortOrder
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
   aktif?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   karyawan?: Prisma.KaryawanOrderByWithRelationInput
+  fotoProfil?: Prisma.FotoOrderByWithRelationInput
   sesi?: Prisma.SesiOrderByRelationAggregateInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangOrderByRelationAggregateInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanOrderByRelationAggregateInput
@@ -380,12 +391,14 @@ export type PenggunaWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PenggunaWhereInput | Prisma.PenggunaWhereInput[]
   OR?: Prisma.PenggunaWhereInput[]
   NOT?: Prisma.PenggunaWhereInput | Prisma.PenggunaWhereInput[]
+  nomorTelepon?: Prisma.StringNullableFilter<"Pengguna"> | string | null
   nama?: Prisma.StringFilter<"Pengguna"> | string
   kataSandiHash?: Prisma.StringFilter<"Pengguna"> | string
   peran?: Prisma.EnumPeranPenggunaFilter<"Pengguna"> | $Enums.PeranPengguna
   aktif?: Prisma.BoolFilter<"Pengguna"> | boolean
   dibuatPada?: Prisma.DateTimeFilter<"Pengguna"> | Date | string
   karyawan?: Prisma.XOR<Prisma.KaryawanNullableScalarRelationFilter, Prisma.KaryawanWhereInput> | null
+  fotoProfil?: Prisma.XOR<Prisma.FotoNullableScalarRelationFilter, Prisma.FotoWhereInput> | null
   sesi?: Prisma.SesiListRelationFilter
   permintaanAturUlang?: Prisma.PermintaanAturUlangListRelationFilter
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanListRelationFilter
@@ -468,6 +481,7 @@ export type PenggunaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   namaPengguna?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrderInput | Prisma.SortOrder
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
@@ -485,6 +499,7 @@ export type PenggunaScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Pengguna"> | string
   namaPengguna?: Prisma.StringWithAggregatesFilter<"Pengguna"> | string
   email?: Prisma.StringNullableWithAggregatesFilter<"Pengguna"> | string | null
+  nomorTelepon?: Prisma.StringNullableWithAggregatesFilter<"Pengguna"> | string | null
   nama?: Prisma.StringWithAggregatesFilter<"Pengguna"> | string
   kataSandiHash?: Prisma.StringWithAggregatesFilter<"Pengguna"> | string
   peran?: Prisma.EnumPeranPenggunaWithAggregatesFilter<"Pengguna"> | $Enums.PeranPengguna
@@ -496,12 +511,14 @@ export type PenggunaCreateInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -584,12 +601,14 @@ export type PenggunaUncheckedCreateInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -672,12 +691,14 @@ export type PenggunaUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -760,12 +781,14 @@ export type PenggunaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -848,6 +871,7 @@ export type PenggunaCreateManyInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
@@ -859,6 +883,7 @@ export type PenggunaUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
@@ -870,6 +895,7 @@ export type PenggunaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
@@ -881,6 +907,7 @@ export type PenggunaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   namaPengguna?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
@@ -892,6 +919,7 @@ export type PenggunaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   namaPengguna?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
@@ -903,6 +931,7 @@ export type PenggunaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   namaPengguna?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  nomorTelepon?: Prisma.SortOrder
   nama?: Prisma.SortOrder
   kataSandiHash?: Prisma.SortOrder
   peran?: Prisma.SortOrder
@@ -1834,6 +1863,22 @@ export type PenggunaUpdateOneWithoutTolakPenyesuaianPersediaanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutTolakPenyesuaianPersediaanInput, Prisma.PenggunaUpdateWithoutTolakPenyesuaianPersediaanInput>, Prisma.PenggunaUncheckedUpdateWithoutTolakPenyesuaianPersediaanInput>
 }
 
+export type PenggunaCreateNestedOneWithoutFotoProfilInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutFotoProfilInput, Prisma.PenggunaUncheckedCreateWithoutFotoProfilInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutFotoProfilInput
+  connect?: Prisma.PenggunaWhereUniqueInput
+}
+
+export type PenggunaUpdateOneWithoutFotoProfilNestedInput = {
+  create?: Prisma.XOR<Prisma.PenggunaCreateWithoutFotoProfilInput, Prisma.PenggunaUncheckedCreateWithoutFotoProfilInput>
+  connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutFotoProfilInput
+  upsert?: Prisma.PenggunaUpsertWithoutFotoProfilInput
+  disconnect?: Prisma.PenggunaWhereInput | boolean
+  delete?: Prisma.PenggunaWhereInput | boolean
+  connect?: Prisma.PenggunaWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PenggunaUpdateToOneWithWhereWithoutFotoProfilInput, Prisma.PenggunaUpdateWithoutFotoProfilInput>, Prisma.PenggunaUncheckedUpdateWithoutFotoProfilInput>
+}
+
 export type PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput = {
   create?: Prisma.XOR<Prisma.PenggunaCreateWithoutCatatPeminjamanBarangInput, Prisma.PenggunaUncheckedCreateWithoutCatatPeminjamanBarangInput>
   connectOrCreate?: Prisma.PenggunaCreateOrConnectWithoutCatatPeminjamanBarangInput
@@ -2172,12 +2217,14 @@ export type PenggunaCreateWithoutSesiInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
@@ -2259,12 +2306,14 @@ export type PenggunaUncheckedCreateWithoutSesiInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
@@ -2362,12 +2411,14 @@ export type PenggunaUpdateWithoutSesiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
@@ -2449,12 +2500,14 @@ export type PenggunaUncheckedUpdateWithoutSesiInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
@@ -2536,11 +2589,13 @@ export type PenggunaCreateWithoutKaryawanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -2623,11 +2678,13 @@ export type PenggunaUncheckedCreateWithoutKaryawanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -2726,11 +2783,13 @@ export type PenggunaUpdateWithoutKaryawanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -2813,11 +2872,13 @@ export type PenggunaUncheckedUpdateWithoutKaryawanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -2900,12 +2961,14 @@ export type PenggunaCreateWithoutAjukanPenawaranPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
@@ -2987,12 +3050,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPenawaranPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
@@ -3079,12 +3144,14 @@ export type PenggunaCreateWithoutSetujuiPenawaranPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -3166,12 +3233,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenawaranPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -3258,12 +3327,14 @@ export type PenggunaCreateWithoutTolakPenawaranPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -3345,12 +3416,14 @@ export type PenggunaUncheckedCreateWithoutTolakPenawaranPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -3448,12 +3521,14 @@ export type PenggunaUpdateWithoutAjukanPenawaranPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
@@ -3535,12 +3610,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenawaranPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
@@ -3633,12 +3710,14 @@ export type PenggunaUpdateWithoutSetujuiPenawaranPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -3720,12 +3799,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenawaranPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -3818,12 +3899,14 @@ export type PenggunaUpdateWithoutTolakPenawaranPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -3905,12 +3988,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPenawaranPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -3992,12 +4077,14 @@ export type PenggunaCreateWithoutAjukanPesananPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -4079,12 +4166,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPesananPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -4171,12 +4260,14 @@ export type PenggunaCreateWithoutSetujuiPesananPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -4258,12 +4349,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPesananPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -4350,12 +4443,14 @@ export type PenggunaCreateWithoutTolakPesananPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -4437,12 +4532,14 @@ export type PenggunaUncheckedCreateWithoutTolakPesananPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -4540,12 +4637,14 @@ export type PenggunaUpdateWithoutAjukanPesananPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -4627,12 +4726,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPesananPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -4725,12 +4826,14 @@ export type PenggunaUpdateWithoutSetujuiPesananPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -4812,12 +4915,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPesananPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -4910,12 +5015,14 @@ export type PenggunaUpdateWithoutTolakPesananPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -4997,12 +5104,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPesananPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -5084,12 +5193,14 @@ export type PenggunaCreateWithoutAjukanPengirimanPesananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -5171,12 +5282,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPengirimanPesananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -5263,12 +5376,14 @@ export type PenggunaCreateWithoutSetujuiPengirimanPesananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -5350,12 +5465,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPengirimanPesananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -5442,12 +5559,14 @@ export type PenggunaCreateWithoutTolakPengirimanPesananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -5529,12 +5648,14 @@ export type PenggunaUncheckedCreateWithoutTolakPengirimanPesananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -5632,12 +5753,14 @@ export type PenggunaUpdateWithoutAjukanPengirimanPesananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -5719,12 +5842,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPengirimanPesananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -5817,12 +5942,14 @@ export type PenggunaUpdateWithoutSetujuiPengirimanPesananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -5904,12 +6031,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPengirimanPesananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -6002,12 +6131,14 @@ export type PenggunaUpdateWithoutTolakPengirimanPesananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -6089,12 +6220,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPengirimanPesananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -6176,12 +6309,14 @@ export type PenggunaCreateWithoutAjukanFakturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -6263,12 +6398,14 @@ export type PenggunaUncheckedCreateWithoutAjukanFakturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -6355,12 +6492,14 @@ export type PenggunaCreateWithoutSetujuiFakturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -6442,12 +6581,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiFakturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -6534,12 +6675,14 @@ export type PenggunaCreateWithoutTolakFakturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -6621,12 +6764,14 @@ export type PenggunaUncheckedCreateWithoutTolakFakturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -6724,12 +6869,14 @@ export type PenggunaUpdateWithoutAjukanFakturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -6811,12 +6958,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanFakturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -6909,12 +7058,14 @@ export type PenggunaUpdateWithoutSetujuiFakturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -6996,12 +7147,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiFakturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -7094,12 +7247,14 @@ export type PenggunaUpdateWithoutTolakFakturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -7181,12 +7336,14 @@ export type PenggunaUncheckedUpdateWithoutTolakFakturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -7268,12 +7425,14 @@ export type PenggunaCreateWithoutAjukanUangMukaPelangganInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -7355,12 +7514,14 @@ export type PenggunaUncheckedCreateWithoutAjukanUangMukaPelangganInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -7447,12 +7608,14 @@ export type PenggunaCreateWithoutSetujuiUangMukaPelangganInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -7534,12 +7697,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiUangMukaPelangganInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -7626,12 +7791,14 @@ export type PenggunaCreateWithoutTolakUangMukaPelangganInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -7713,12 +7880,14 @@ export type PenggunaUncheckedCreateWithoutTolakUangMukaPelangganInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -7816,12 +7985,14 @@ export type PenggunaUpdateWithoutAjukanUangMukaPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -7903,12 +8074,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanUangMukaPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -8001,12 +8174,14 @@ export type PenggunaUpdateWithoutSetujuiUangMukaPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -8088,12 +8263,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiUangMukaPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -8186,12 +8363,14 @@ export type PenggunaUpdateWithoutTolakUangMukaPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -8273,12 +8452,14 @@ export type PenggunaUncheckedUpdateWithoutTolakUangMukaPelangganInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -8360,12 +8541,14 @@ export type PenggunaCreateWithoutAjukanPenerimaanPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -8447,12 +8630,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPenerimaanPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -8539,12 +8724,14 @@ export type PenggunaCreateWithoutSetujuiPenerimaanPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -8626,12 +8813,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenerimaanPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -8718,12 +8907,14 @@ export type PenggunaCreateWithoutTolakPenerimaanPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -8805,12 +8996,14 @@ export type PenggunaUncheckedCreateWithoutTolakPenerimaanPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -8908,12 +9101,14 @@ export type PenggunaUpdateWithoutAjukanPenerimaanPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -8995,12 +9190,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenerimaanPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -9093,12 +9290,14 @@ export type PenggunaUpdateWithoutSetujuiPenerimaanPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -9180,12 +9379,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenerimaanPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -9278,12 +9479,14 @@ export type PenggunaUpdateWithoutTolakPenerimaanPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -9365,12 +9568,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPenerimaanPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -9452,12 +9657,14 @@ export type PenggunaCreateWithoutAjukanReturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -9539,12 +9746,14 @@ export type PenggunaUncheckedCreateWithoutAjukanReturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -9631,12 +9840,14 @@ export type PenggunaCreateWithoutSetujuiReturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -9718,12 +9929,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiReturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -9810,12 +10023,14 @@ export type PenggunaCreateWithoutTolakReturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -9897,12 +10112,14 @@ export type PenggunaUncheckedCreateWithoutTolakReturPenjualanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -10000,12 +10217,14 @@ export type PenggunaUpdateWithoutAjukanReturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -10087,12 +10306,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanReturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -10185,12 +10406,14 @@ export type PenggunaUpdateWithoutSetujuiReturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -10272,12 +10495,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiReturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -10370,12 +10595,14 @@ export type PenggunaUpdateWithoutTolakReturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -10457,12 +10684,14 @@ export type PenggunaUncheckedUpdateWithoutTolakReturPenjualanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -10544,12 +10773,14 @@ export type PenggunaCreateWithoutAjukanPesananPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -10631,12 +10862,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPesananPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -10723,12 +10956,14 @@ export type PenggunaCreateWithoutSetujuiPesananPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -10810,12 +11045,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPesananPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -10902,12 +11139,14 @@ export type PenggunaCreateWithoutTolakPesananPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -10989,12 +11228,14 @@ export type PenggunaUncheckedCreateWithoutTolakPesananPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -11092,12 +11333,14 @@ export type PenggunaUpdateWithoutAjukanPesananPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -11179,12 +11422,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPesananPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -11277,12 +11522,14 @@ export type PenggunaUpdateWithoutSetujuiPesananPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -11364,12 +11611,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPesananPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -11462,12 +11711,14 @@ export type PenggunaUpdateWithoutTolakPesananPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -11549,12 +11800,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPesananPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -11636,12 +11889,14 @@ export type PenggunaCreateWithoutAjukanPenerimaanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -11723,12 +11978,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPenerimaanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -11815,12 +12072,14 @@ export type PenggunaCreateWithoutSetujuiPenerimaanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -11902,12 +12161,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenerimaanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -11994,12 +12255,14 @@ export type PenggunaCreateWithoutTolakPenerimaanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -12081,12 +12344,14 @@ export type PenggunaUncheckedCreateWithoutTolakPenerimaanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -12184,12 +12449,14 @@ export type PenggunaUpdateWithoutAjukanPenerimaanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -12271,12 +12538,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenerimaanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -12369,12 +12638,14 @@ export type PenggunaUpdateWithoutSetujuiPenerimaanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -12456,12 +12727,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenerimaanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -12554,12 +12827,14 @@ export type PenggunaUpdateWithoutTolakPenerimaanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -12641,12 +12916,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPenerimaanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -12728,12 +13005,14 @@ export type PenggunaCreateWithoutAjukanFakturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -12815,12 +13094,14 @@ export type PenggunaUncheckedCreateWithoutAjukanFakturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -12907,12 +13188,14 @@ export type PenggunaCreateWithoutSetujuiFakturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -12994,12 +13277,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiFakturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -13086,12 +13371,14 @@ export type PenggunaCreateWithoutTolakFakturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -13173,12 +13460,14 @@ export type PenggunaUncheckedCreateWithoutTolakFakturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -13276,12 +13565,14 @@ export type PenggunaUpdateWithoutAjukanFakturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -13363,12 +13654,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanFakturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -13461,12 +13754,14 @@ export type PenggunaUpdateWithoutSetujuiFakturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -13548,12 +13843,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiFakturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -13646,12 +13943,14 @@ export type PenggunaUpdateWithoutTolakFakturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -13733,12 +14032,14 @@ export type PenggunaUncheckedUpdateWithoutTolakFakturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -13820,12 +14121,14 @@ export type PenggunaCreateWithoutAjukanPembayaranPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -13907,12 +14210,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPembayaranPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -13999,12 +14304,14 @@ export type PenggunaCreateWithoutSetujuiPembayaranPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -14086,12 +14393,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPembayaranPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -14178,12 +14487,14 @@ export type PenggunaCreateWithoutTolakPembayaranPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -14265,12 +14576,14 @@ export type PenggunaUncheckedCreateWithoutTolakPembayaranPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -14368,12 +14681,14 @@ export type PenggunaUpdateWithoutAjukanPembayaranPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -14455,12 +14770,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPembayaranPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -14553,12 +14870,14 @@ export type PenggunaUpdateWithoutSetujuiPembayaranPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -14640,12 +14959,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPembayaranPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -14738,12 +15059,14 @@ export type PenggunaUpdateWithoutTolakPembayaranPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -14825,12 +15148,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPembayaranPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -14912,12 +15237,14 @@ export type PenggunaCreateWithoutAjukanReturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -14999,12 +15326,14 @@ export type PenggunaUncheckedCreateWithoutAjukanReturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -15091,12 +15420,14 @@ export type PenggunaCreateWithoutSetujuiReturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -15178,12 +15509,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiReturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -15270,12 +15603,14 @@ export type PenggunaCreateWithoutTolakReturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -15357,12 +15692,14 @@ export type PenggunaUncheckedCreateWithoutTolakReturPembelianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -15460,12 +15797,14 @@ export type PenggunaUpdateWithoutAjukanReturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -15547,12 +15886,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanReturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -15645,12 +15986,14 @@ export type PenggunaUpdateWithoutSetujuiReturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -15732,12 +16075,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiReturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -15830,12 +16175,14 @@ export type PenggunaUpdateWithoutTolakReturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -15917,12 +16264,14 @@ export type PenggunaUncheckedUpdateWithoutTolakReturPembelianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -16004,12 +16353,14 @@ export type PenggunaCreateWithoutAjukanJurnalInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -16091,12 +16442,14 @@ export type PenggunaUncheckedCreateWithoutAjukanJurnalInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -16183,12 +16536,14 @@ export type PenggunaCreateWithoutSetujuiJurnalInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -16270,12 +16625,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiJurnalInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -16362,12 +16719,14 @@ export type PenggunaCreateWithoutTolakJurnalInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -16449,12 +16808,14 @@ export type PenggunaUncheckedCreateWithoutTolakJurnalInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -16552,12 +16913,14 @@ export type PenggunaUpdateWithoutAjukanJurnalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -16639,12 +17002,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanJurnalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -16737,12 +17102,14 @@ export type PenggunaUpdateWithoutSetujuiJurnalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -16824,12 +17191,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiJurnalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -16922,12 +17291,14 @@ export type PenggunaUpdateWithoutTolakJurnalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -17009,12 +17380,14 @@ export type PenggunaUncheckedUpdateWithoutTolakJurnalInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -17096,12 +17469,14 @@ export type PenggunaCreateWithoutAjukanDokumenKasInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -17183,12 +17558,14 @@ export type PenggunaUncheckedCreateWithoutAjukanDokumenKasInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -17275,12 +17652,14 @@ export type PenggunaCreateWithoutSetujuiDokumenKasInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -17362,12 +17741,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiDokumenKasInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -17454,12 +17835,14 @@ export type PenggunaCreateWithoutTolakDokumenKasInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -17541,12 +17924,14 @@ export type PenggunaUncheckedCreateWithoutTolakDokumenKasInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -17644,12 +18029,14 @@ export type PenggunaUpdateWithoutAjukanDokumenKasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -17731,12 +18118,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanDokumenKasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -17829,12 +18218,14 @@ export type PenggunaUpdateWithoutSetujuiDokumenKasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -17916,12 +18307,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiDokumenKasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -18014,12 +18407,14 @@ export type PenggunaUpdateWithoutTolakDokumenKasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -18101,12 +18496,14 @@ export type PenggunaUncheckedUpdateWithoutTolakDokumenKasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -18188,12 +18585,14 @@ export type PenggunaCreateWithoutAjukanAsetTetapInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -18275,12 +18674,14 @@ export type PenggunaUncheckedCreateWithoutAjukanAsetTetapInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -18367,12 +18768,14 @@ export type PenggunaCreateWithoutSetujuiAsetTetapInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -18454,12 +18857,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiAsetTetapInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -18546,12 +18951,14 @@ export type PenggunaCreateWithoutTolakAsetTetapInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -18633,12 +19040,14 @@ export type PenggunaUncheckedCreateWithoutTolakAsetTetapInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -18736,12 +19145,14 @@ export type PenggunaUpdateWithoutAjukanAsetTetapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -18823,12 +19234,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanAsetTetapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -18921,12 +19334,14 @@ export type PenggunaUpdateWithoutSetujuiAsetTetapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -19008,12 +19423,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiAsetTetapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -19106,12 +19523,14 @@ export type PenggunaUpdateWithoutTolakAsetTetapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -19193,12 +19612,14 @@ export type PenggunaUncheckedUpdateWithoutTolakAsetTetapInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -19280,12 +19701,14 @@ export type PenggunaCreateWithoutAjukanPelepasanAsetInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -19367,12 +19790,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPelepasanAsetInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -19459,12 +19884,14 @@ export type PenggunaCreateWithoutSetujuiPelepasanAsetInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -19546,12 +19973,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPelepasanAsetInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -19638,12 +20067,14 @@ export type PenggunaCreateWithoutTolakPelepasanAsetInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -19725,12 +20156,14 @@ export type PenggunaUncheckedCreateWithoutTolakPelepasanAsetInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -19828,12 +20261,14 @@ export type PenggunaUpdateWithoutAjukanPelepasanAsetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -19915,12 +20350,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPelepasanAsetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -20013,12 +20450,14 @@ export type PenggunaUpdateWithoutSetujuiPelepasanAsetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -20100,12 +20539,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPelepasanAsetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -20198,12 +20639,14 @@ export type PenggunaUpdateWithoutTolakPelepasanAsetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -20285,12 +20728,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPelepasanAsetInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -20372,12 +20817,14 @@ export type PenggunaCreateWithoutAjukanPindahBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -20459,12 +20906,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPindahBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -20551,12 +21000,14 @@ export type PenggunaCreateWithoutSetujuiPindahBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -20638,12 +21089,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPindahBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -20730,12 +21183,14 @@ export type PenggunaCreateWithoutTolakPindahBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -20817,12 +21272,14 @@ export type PenggunaUncheckedCreateWithoutTolakPindahBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -20920,12 +21377,14 @@ export type PenggunaUpdateWithoutAjukanPindahBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -21007,12 +21466,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPindahBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -21105,12 +21566,14 @@ export type PenggunaUpdateWithoutSetujuiPindahBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -21192,12 +21655,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPindahBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -21290,12 +21755,14 @@ export type PenggunaUpdateWithoutTolakPindahBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -21377,12 +21844,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPindahBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -21464,12 +21933,14 @@ export type PenggunaCreateWithoutAjukanPenyesuaianPersediaanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -21551,12 +22022,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPenyesuaianPersediaanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -21643,12 +22116,14 @@ export type PenggunaCreateWithoutSetujuiPenyesuaianPersediaanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -21730,12 +22205,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenyesuaianPersediaanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -21822,12 +22299,14 @@ export type PenggunaCreateWithoutTolakPenyesuaianPersediaanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -21909,12 +22388,14 @@ export type PenggunaUncheckedCreateWithoutTolakPenyesuaianPersediaanInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -22012,12 +22493,14 @@ export type PenggunaUpdateWithoutAjukanPenyesuaianPersediaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -22099,12 +22582,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenyesuaianPersediaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -22197,12 +22682,14 @@ export type PenggunaUpdateWithoutSetujuiPenyesuaianPersediaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -22284,12 +22771,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenyesuaianPersediaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -22382,12 +22871,14 @@ export type PenggunaUpdateWithoutTolakPenyesuaianPersediaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -22469,12 +22960,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPenyesuaianPersediaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -22552,16 +23045,390 @@ export type PenggunaUncheckedUpdateWithoutTolakPenyesuaianPersediaanInput = {
   tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
 }
 
-export type PenggunaCreateWithoutCatatPeminjamanBarangInput = {
+export type PenggunaCreateWithoutFotoProfilInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaUncheckedCreateWithoutFotoProfilInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nomorTelepon?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakJurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPrive?: Prisma.PriveUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedCreateNestedManyWithoutDitolakOlehInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDicatatOlehInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDiajukanOlehInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDisetujuiOlehInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutDitolakOlehInput
+}
+
+export type PenggunaCreateOrConnectWithoutFotoProfilInput = {
+  where: Prisma.PenggunaWhereUniqueInput
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutFotoProfilInput, Prisma.PenggunaUncheckedCreateWithoutFotoProfilInput>
+}
+
+export type PenggunaUpsertWithoutFotoProfilInput = {
+  update: Prisma.XOR<Prisma.PenggunaUpdateWithoutFotoProfilInput, Prisma.PenggunaUncheckedUpdateWithoutFotoProfilInput>
+  create: Prisma.XOR<Prisma.PenggunaCreateWithoutFotoProfilInput, Prisma.PenggunaUncheckedCreateWithoutFotoProfilInput>
+  where?: Prisma.PenggunaWhereInput
+}
+
+export type PenggunaUpdateToOneWithWhereWithoutFotoProfilInput = {
+  where?: Prisma.PenggunaWhereInput
+  data: Prisma.XOR<Prisma.PenggunaUpdateWithoutFotoProfilInput, Prisma.PenggunaUncheckedUpdateWithoutFotoProfilInput>
+}
+
+export type PenggunaUpdateWithoutFotoProfilInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaUncheckedUpdateWithoutFotoProfilInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
+  peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
+  aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
+  permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
+  ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPenjualan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakUangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPengirimanPesanan?: Prisma.PengirimanPesananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPenjualan?: Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakFakturPembelian?: Prisma.FakturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakReturPembelian?: Prisma.ReturPembelianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakJurnal?: Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPindahBarang?: Prisma.PindahBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakAsetTetap?: Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPrive?: Prisma.PriveUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPrive?: Prisma.PriveUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPrive?: Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPenggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakTutupBuku?: Prisma.TutupBukuUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPphFinalBulanan?: Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  ajukanDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakDokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakPeminjamanBarang?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+  catatKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDicatatOlehNestedInput
+  ajukanKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDiajukanOlehNestedInput
+  setujuiKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
+  tolakKerusakanBarang?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput
+}
+
+export type PenggunaCreateWithoutCatatPeminjamanBarangInput = {
+  id?: string
+  namaPengguna: string
+  email?: string | null
+  nomorTelepon?: string | null
+  nama: string
+  kataSandiHash: string
+  peran?: $Enums.PeranPengguna
+  aktif?: boolean
+  dibuatPada?: Date | string
+  karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -22643,12 +23510,14 @@ export type PenggunaUncheckedCreateWithoutCatatPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -22735,12 +23604,14 @@ export type PenggunaCreateWithoutAjukanPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -22822,12 +23693,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -22914,12 +23787,14 @@ export type PenggunaCreateWithoutSetujuiPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -23001,12 +23876,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -23093,12 +23970,14 @@ export type PenggunaCreateWithoutTolakPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -23180,12 +24059,14 @@ export type PenggunaUncheckedCreateWithoutTolakPeminjamanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -23283,12 +24164,14 @@ export type PenggunaUpdateWithoutCatatPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -23370,12 +24253,14 @@ export type PenggunaUncheckedUpdateWithoutCatatPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -23468,12 +24353,14 @@ export type PenggunaUpdateWithoutAjukanPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -23555,12 +24442,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -23653,12 +24542,14 @@ export type PenggunaUpdateWithoutSetujuiPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -23740,12 +24631,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -23838,12 +24731,14 @@ export type PenggunaUpdateWithoutTolakPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -23925,12 +24820,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPeminjamanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -24012,12 +24909,14 @@ export type PenggunaCreateWithoutCatatKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -24099,12 +24998,14 @@ export type PenggunaUncheckedCreateWithoutCatatKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -24191,12 +25092,14 @@ export type PenggunaCreateWithoutAjukanKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -24278,12 +25181,14 @@ export type PenggunaUncheckedCreateWithoutAjukanKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -24370,12 +25275,14 @@ export type PenggunaCreateWithoutSetujuiKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -24457,12 +25364,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -24549,12 +25458,14 @@ export type PenggunaCreateWithoutTolakKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -24636,12 +25547,14 @@ export type PenggunaUncheckedCreateWithoutTolakKerusakanBarangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -24739,12 +25652,14 @@ export type PenggunaUpdateWithoutCatatKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -24826,12 +25741,14 @@ export type PenggunaUncheckedUpdateWithoutCatatKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -24924,12 +25841,14 @@ export type PenggunaUpdateWithoutAjukanKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -25011,12 +25930,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -25109,12 +26030,14 @@ export type PenggunaUpdateWithoutSetujuiKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -25196,12 +26119,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -25294,12 +26219,14 @@ export type PenggunaUpdateWithoutTolakKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -25381,12 +26308,14 @@ export type PenggunaUncheckedUpdateWithoutTolakKerusakanBarangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -25468,12 +26397,14 @@ export type PenggunaCreateWithoutAjukanTutupBukuInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -25555,12 +26486,14 @@ export type PenggunaUncheckedCreateWithoutAjukanTutupBukuInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -25647,12 +26580,14 @@ export type PenggunaCreateWithoutSetujuiTutupBukuInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -25734,12 +26669,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiTutupBukuInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -25826,12 +26763,14 @@ export type PenggunaCreateWithoutTolakTutupBukuInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -25913,12 +26852,14 @@ export type PenggunaUncheckedCreateWithoutTolakTutupBukuInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -26016,12 +26957,14 @@ export type PenggunaUpdateWithoutAjukanTutupBukuInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -26103,12 +27046,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanTutupBukuInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -26201,12 +27146,14 @@ export type PenggunaUpdateWithoutSetujuiTutupBukuInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -26288,12 +27235,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiTutupBukuInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -26386,12 +27335,14 @@ export type PenggunaUpdateWithoutTolakTutupBukuInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -26473,12 +27424,14 @@ export type PenggunaUncheckedUpdateWithoutTolakTutupBukuInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -26560,12 +27513,14 @@ export type PenggunaCreateWithoutAjukanPphFinalBulananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -26647,12 +27602,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPphFinalBulananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -26739,12 +27696,14 @@ export type PenggunaCreateWithoutSetujuiPphFinalBulananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -26826,12 +27785,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPphFinalBulananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -26918,12 +27879,14 @@ export type PenggunaCreateWithoutTolakPphFinalBulananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -27005,12 +27968,14 @@ export type PenggunaUncheckedCreateWithoutTolakPphFinalBulananInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -27108,12 +28073,14 @@ export type PenggunaUpdateWithoutAjukanPphFinalBulananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -27195,12 +28162,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPphFinalBulananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -27293,12 +28262,14 @@ export type PenggunaUpdateWithoutSetujuiPphFinalBulananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -27380,12 +28351,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPphFinalBulananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -27478,12 +28451,14 @@ export type PenggunaUpdateWithoutTolakPphFinalBulananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -27565,12 +28540,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPphFinalBulananInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -27652,12 +28629,14 @@ export type PenggunaCreateWithoutPermintaanAturUlangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDisetujuiOlehInput
@@ -27739,12 +28718,14 @@ export type PenggunaUncheckedCreateWithoutPermintaanAturUlangInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDisetujuiOlehInput
@@ -27842,12 +28823,14 @@ export type PenggunaUpdateWithoutPermintaanAturUlangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDisetujuiOlehNestedInput
@@ -27929,12 +28912,14 @@ export type PenggunaUncheckedUpdateWithoutPermintaanAturUlangInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
   setujuiPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDisetujuiOlehNestedInput
@@ -28016,12 +29001,14 @@ export type PenggunaCreateWithoutAjukanPriveInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -28103,12 +29090,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPriveInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -28195,12 +29184,14 @@ export type PenggunaCreateWithoutSetujuiPriveInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -28282,12 +29273,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPriveInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -28374,12 +29367,14 @@ export type PenggunaCreateWithoutTolakPriveInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -28461,12 +29456,14 @@ export type PenggunaUncheckedCreateWithoutTolakPriveInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -28564,12 +29561,14 @@ export type PenggunaUpdateWithoutAjukanPriveInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -28651,12 +29650,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPriveInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -28749,12 +29750,14 @@ export type PenggunaUpdateWithoutSetujuiPriveInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -28836,12 +29839,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPriveInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -28934,12 +29939,14 @@ export type PenggunaUpdateWithoutTolakPriveInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -29021,12 +30028,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPriveInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -29108,12 +30117,14 @@ export type PenggunaCreateWithoutAjukanPenggajianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -29195,12 +30206,14 @@ export type PenggunaUncheckedCreateWithoutAjukanPenggajianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -29287,12 +30300,14 @@ export type PenggunaCreateWithoutSetujuiPenggajianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -29374,12 +30389,14 @@ export type PenggunaUncheckedCreateWithoutSetujuiPenggajianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -29466,12 +30483,14 @@ export type PenggunaCreateWithoutTolakPenggajianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanCreateNestedManyWithoutDiajukanOlehInput
@@ -29553,12 +30572,14 @@ export type PenggunaUncheckedCreateWithoutTolakPenggajianInput = {
   id?: string
   namaPengguna: string
   email?: string | null
+  nomorTelepon?: string | null
   nama: string
   kataSandiHash: string
   peran?: $Enums.PeranPengguna
   aktif?: boolean
   dibuatPada?: Date | string
   karyawan?: Prisma.KaryawanUncheckedCreateNestedOneWithoutPenggunaInput
+  fotoProfil?: Prisma.FotoUncheckedCreateNestedOneWithoutPenggunaInput
   sesi?: Prisma.SesiUncheckedCreateNestedManyWithoutPenggunaInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedCreateNestedManyWithoutPenggunaInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutDiajukanOlehInput
@@ -29656,12 +30677,14 @@ export type PenggunaUpdateWithoutAjukanPenggajianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -29743,12 +30766,14 @@ export type PenggunaUncheckedUpdateWithoutAjukanPenggajianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -29841,12 +30866,14 @@ export type PenggunaUpdateWithoutSetujuiPenggajianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -29928,12 +30955,14 @@ export type PenggunaUncheckedUpdateWithoutSetujuiPenggajianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -30026,12 +31055,14 @@ export type PenggunaUpdateWithoutTolakPenggajianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUpdateManyWithoutDiajukanOlehNestedInput
@@ -30113,12 +31144,14 @@ export type PenggunaUncheckedUpdateWithoutTolakPenggajianInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   namaPengguna?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nama?: Prisma.StringFieldUpdateOperationsInput | string
   kataSandiHash?: Prisma.StringFieldUpdateOperationsInput | string
   peran?: Prisma.EnumPeranPenggunaFieldUpdateOperationsInput | $Enums.PeranPengguna
   aktif?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   karyawan?: Prisma.KaryawanUncheckedUpdateOneWithoutPenggunaNestedInput
+  fotoProfil?: Prisma.FotoUncheckedUpdateOneWithoutPenggunaNestedInput
   sesi?: Prisma.SesiUncheckedUpdateManyWithoutPenggunaNestedInput
   permintaanAturUlang?: Prisma.PermintaanAturUlangUncheckedUpdateManyWithoutPenggunaNestedInput
   ajukanPenawaranPenjualan?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutDiajukanOlehNestedInput
@@ -30906,12 +31939,14 @@ export type PenggunaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   namaPengguna?: boolean
   email?: boolean
+  nomorTelepon?: boolean
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
   aktif?: boolean
   dibuatPada?: boolean
   karyawan?: boolean | Prisma.Pengguna$karyawanArgs<ExtArgs>
+  fotoProfil?: boolean | Prisma.Pengguna$fotoProfilArgs<ExtArgs>
   sesi?: boolean | Prisma.Pengguna$sesiArgs<ExtArgs>
   permintaanAturUlang?: boolean | Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs>
   ajukanPenawaranPenjualan?: boolean | Prisma.Pengguna$ajukanPenawaranPenjualanArgs<ExtArgs>
@@ -30995,6 +32030,7 @@ export type PenggunaSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   namaPengguna?: boolean
   email?: boolean
+  nomorTelepon?: boolean
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
@@ -31006,6 +32042,7 @@ export type PenggunaSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   namaPengguna?: boolean
   email?: boolean
+  nomorTelepon?: boolean
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
@@ -31017,6 +32054,7 @@ export type PenggunaSelectScalar = {
   id?: boolean
   namaPengguna?: boolean
   email?: boolean
+  nomorTelepon?: boolean
   nama?: boolean
   kataSandiHash?: boolean
   peran?: boolean
@@ -31024,9 +32062,10 @@ export type PenggunaSelectScalar = {
   dibuatPada?: boolean
 }
 
-export type PenggunaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "namaPengguna" | "email" | "nama" | "kataSandiHash" | "peran" | "aktif" | "dibuatPada", ExtArgs["result"]["pengguna"]>
+export type PenggunaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "namaPengguna" | "email" | "nomorTelepon" | "nama" | "kataSandiHash" | "peran" | "aktif" | "dibuatPada", ExtArgs["result"]["pengguna"]>
 export type PenggunaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   karyawan?: boolean | Prisma.Pengguna$karyawanArgs<ExtArgs>
+  fotoProfil?: boolean | Prisma.Pengguna$fotoProfilArgs<ExtArgs>
   sesi?: boolean | Prisma.Pengguna$sesiArgs<ExtArgs>
   permintaanAturUlang?: boolean | Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs>
   ajukanPenawaranPenjualan?: boolean | Prisma.Pengguna$ajukanPenawaranPenjualanArgs<ExtArgs>
@@ -31112,6 +32151,10 @@ export type $PenggunaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "Pengguna"
   objects: {
     karyawan: Prisma.$KaryawanPayload<ExtArgs> | null
+    /**
+     * Foto profil (opsional); satu-satunya bidang profil yang boleh diubah sendiri oleh peran non-Superadmin/Pemilik
+     */
+    fotoProfil: Prisma.$FotoPayload<ExtArgs> | null
     sesi: Prisma.$SesiPayload<ExtArgs>[]
     permintaanAturUlang: Prisma.$PermintaanAturUlangPayload<ExtArgs>[]
     /**
@@ -31199,6 +32242,11 @@ export type $PenggunaPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
      */
     namaPengguna: string
     email: string | null
+    /**
+     * Wajib untuk semua peran KECUALI GUEST (lihat pastikanNomorTelepon di src/lib/aksi/pengguna.ts).
+     * Format +62..., dipakai untuk kirim template WhatsApp saat peminjaman/kerusakan menunggu konfirmasi.
+     */
+    nomorTelepon: string | null
     nama: string
     kataSandiHash: string
     peran: $Enums.PeranPengguna
@@ -31599,6 +32647,7 @@ readonly fields: PenggunaFieldRefs;
 export interface Prisma__PenggunaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   karyawan<T extends Prisma.Pengguna$karyawanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$karyawanArgs<ExtArgs>>): Prisma.Prisma__KaryawanClient<runtime.Types.Result.GetResult<Prisma.$KaryawanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  fotoProfil<T extends Prisma.Pengguna$fotoProfilArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$fotoProfilArgs<ExtArgs>>): Prisma.Prisma__FotoClient<runtime.Types.Result.GetResult<Prisma.$FotoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sesi<T extends Prisma.Pengguna$sesiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$sesiArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SesiPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   permintaanAturUlang<T extends Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$permintaanAturUlangArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermintaanAturUlangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ajukanPenawaranPenjualan<T extends Prisma.Pengguna$ajukanPenawaranPenjualanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Pengguna$ajukanPenawaranPenjualanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenawaranPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -31707,6 +32756,7 @@ export interface PenggunaFieldRefs {
   readonly id: Prisma.FieldRef<"Pengguna", 'String'>
   readonly namaPengguna: Prisma.FieldRef<"Pengguna", 'String'>
   readonly email: Prisma.FieldRef<"Pengguna", 'String'>
+  readonly nomorTelepon: Prisma.FieldRef<"Pengguna", 'String'>
   readonly nama: Prisma.FieldRef<"Pengguna", 'String'>
   readonly kataSandiHash: Prisma.FieldRef<"Pengguna", 'String'>
   readonly peran: Prisma.FieldRef<"Pengguna", 'PeranPengguna'>
@@ -32121,6 +33171,25 @@ export type Pengguna$karyawanArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.KaryawanInclude<ExtArgs> | null
   where?: Prisma.KaryawanWhereInput
+}
+
+/**
+ * Pengguna.fotoProfil
+ */
+export type Pengguna$fotoProfilArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Foto
+   */
+  select?: Prisma.FotoSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Foto
+   */
+  omit?: Prisma.FotoOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FotoInclude<ExtArgs> | null
+  where?: Prisma.FotoWhereInput
 }
 
 /**

@@ -11,6 +11,7 @@ import { buatPesananPembelian, buatFakturPembelian } from "../src/lib/aksi/pembe
 import { buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import { buatLaporanKerusakan } from "../src/lib/aksi/kerusakan";
+import { buatPeminjamanBarang } from "../src/lib/aksi/peminjaman";
 import { buatAsetTetap } from "../src/lib/aksi/asetTetap";
 import { buatPenggajian } from "../src/lib/aksi/sdm";
 import { ajukanDokumen, setujuiDokumen, tolakDokumen } from "../src/lib/aksi/persetujuan";
@@ -34,6 +35,8 @@ const PEMERIKSA = "uji-pemeriksa";
 // SDM (Karyawan, Departemen, Penggajian) sekarang dikunci hanya Superadmin/Pemilik (Admin pun tidak
 // punya lagi), jadi Penggajian butuh pengaju berperan SUPERADMIN, beda dari PENGAJU (berperan ADMIN).
 const PENGAJU_SDM = "uji-pengaju-sdm";
+const GUDANG_A = "uji-gudang-a";
+const GUDANG_B = "uji-gudang-b";
 const JPEG_PALSU = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0xff, 0xd9]);
 
 /** FormData isian + lampiran foto (dipakai Laporan Kerusakan Barang, satu-satunya dokumen di sini yang wajib foto). */
@@ -76,6 +79,9 @@ async function bersihkanSisaUji() {
   await db.foto.deleteMany({ where: { kerusakan: { gudang: { kode: "WH-PST" } } } });
   await db.barisKerusakanBarang.deleteMany({ where: { laporan: { gudang: { kode: "WH-PST" } } } });
   await db.laporanKerusakanBarang.deleteMany({ where: { gudang: { kode: "WH-PST" } } });
+  await db.foto.deleteMany({ where: { peminjaman: { gudang: { kode: "WH-PST" } } } });
+  await db.barisPeminjamanBarang.deleteMany({ where: { peminjaman: { gudang: { kode: "WH-PST" } } } });
+  await db.peminjamanBarang.deleteMany({ where: { gudang: { kode: "WH-PST" } } });
   await db.dokumenKas.deleteMany({ where: { keterangan: "Honor crew uji persetujuan" } });
   await db.barisFakturPembelian.deleteMany({ where: { faktur: { pemasok: { kode: "SUP-PST" } } } });
   await db.fakturPembelian.deleteMany({ where: { pemasok: { kode: "SUP-PST" } } });
@@ -93,7 +99,7 @@ async function bersihkanSisaUji() {
   await db.gudang.deleteMany({ where: { kode: "WH-PST" } });
   await db.barisJurnal.deleteMany({ where: { jurnalId: { in: jurnalUji.map((j) => j.id) } } });
   await db.jurnal.deleteMany({ where: { id: { in: jurnalUji.map((j) => j.id) } } });
-  await db.pengguna.deleteMany({ where: { namaPengguna: { in: [PENGAJU, PEMERIKSA, "uji-kasir"] } } });
+  await db.pengguna.deleteMany({ where: { namaPengguna: { in: [PENGAJU, PEMERIKSA, "uji-kasir", GUDANG_A, GUDANG_B] } } });
   await db.akun.deleteMany({ where: { kode: { in: ["PST-ASET", "PST-AKUM", "PST-SUSUT", "PST-SELISIH"] } } });
 }
 
@@ -146,6 +152,18 @@ async function main() {
     where: { namaPengguna: PENGAJU_SDM },
     create: { namaPengguna: PENGAJU_SDM, nama: "Pengaju SDM Uji", peran: "SUPERADMIN", kataSandiHash: await hashKataSandi("uji-pengaju-sdm-123") },
     update: { peran: "SUPERADMIN", aktif: true },
+  });
+  // Dua akun Gudang: menguji Gudang TIDAK boleh menyetujui peminjaman yang diajukan sesama Gudang
+  // (pastikanBolehSetujui di src/lib/persetujuan.ts) - beda dari pemisahan tugas biasa (beda ORANG saja).
+  await db.pengguna.upsert({
+    where: { namaPengguna: GUDANG_A },
+    create: { namaPengguna: GUDANG_A, nama: "Gudang A Uji", peran: "GUDANG", kataSandiHash: await hashKataSandi("uji-gudang-a-123") },
+    update: { peran: "GUDANG", aktif: true },
+  });
+  await db.pengguna.upsert({
+    where: { namaPengguna: GUDANG_B },
+    create: { namaPengguna: GUDANG_B, nama: "Gudang B Uji", peran: "GUDANG", kataSandiHash: await hashKataSandi("uji-gudang-b-123") },
+    update: { peran: "GUDANG", aktif: true },
   });
 
   const gudang = await db.gudang.create({ data: { kode: "WH-PST", nama: "Gudang Uji Persetujuan" } });
@@ -327,6 +345,31 @@ async function main() {
   const kerusakanSetelah = await db.laporanKerusakanBarang.findUniqueOrThrow({ where: { id: kerusakan.id } });
   pastikan(kerusakanSetelah.statusPersetujuan === "DISETUJUI", "laporan kerusakan disetujui");
 
+  // ---------------------------------------------------------------- Peminjaman Barang: Gudang tidak boleh menyetujui sesama Gudang
+  console.log("\n=== 4c. Peminjaman Barang (Gudang mengajukan -> sesama Gudang DITOLAK, hanya Pemilik/Superadmin boleh) ===");
+  await sebagai(GUDANG_A, () =>
+    jalankan("Gudang A ajukan pinjam (draf)", () =>
+      buatPeminjamanBarang(denganFoto({ gudangId: gudang.id, namaPengambil: "Gudang A Uji", nomorTelepon: "+6281234567890", baris: [{ barangId: barang.id, jumlah: 5 }] })),
+    ),
+  );
+  const peminjaman = await db.peminjamanBarang.findFirstOrThrow({ where: { gudangId: gudang.id }, orderBy: { waktuKeluar: "desc" } });
+  pastikan(peminjaman.statusPersetujuan === "DRAFT", "peminjaman baru DRAFT");
+  await sebagai(GUDANG_A, () => jalankan("Gudang A ajukan peminjamannya", () => ajukanDokumen("peminjaman", peminjaman.id)));
+  await sebagai(GUDANG_B, () =>
+    harusDitolak(
+      "Gudang B (sesama Gudang, BUKAN pengaju) menyetujui ditolak",
+      () => setujuiDokumen("peminjaman", peminjaman.id),
+      "hanya boleh disetujui Pemilik atau Superadmin",
+    ),
+  );
+  const stokSebelumPinjam = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barang.id, gudangId: gudang.id } } });
+  pastikan(Number(stokSebelumPinjam.jumlah) === 20, "stok belum berubah setelah percobaan Gudang B ditolak (masih 20)");
+  await sebagai(PEMERIKSA, () => jalankan("Pemilik menyetujui peminjaman Gudang A", () => setujuiDokumen("peminjaman", peminjaman.id)));
+  const stokSetelahPinjam = await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barang.id, gudangId: gudang.id } } });
+  pastikan(Number(stokSetelahPinjam.jumlah) === 15, `stok berkurang jadi 15 setelah Pemilik menyetujui (${stokSetelahPinjam.jumlah})`);
+  const peminjamanSetelah = await db.peminjamanBarang.findUniqueOrThrow({ where: { id: peminjaman.id } });
+  pastikan(peminjamanSetelah.statusPersetujuan === "DISETUJUI", "peminjaman disetujui Pemilik");
+
   // ---------------------------------------------------------------- Aset Tetap
   console.log("\n=== 5. Aset Tetap (perolehan) ===");
   await sebagai(PENGAJU, () =>
@@ -410,6 +453,9 @@ async function main() {
   await db.foto.deleteMany({ where: { kerusakanId: kerusakan.id } });
   await db.barisKerusakanBarang.deleteMany({ where: { laporanId: kerusakan.id } });
   await db.laporanKerusakanBarang.deleteMany({ where: { id: kerusakan.id } });
+  await db.foto.deleteMany({ where: { peminjamanId: peminjaman.id } });
+  await db.barisPeminjamanBarang.deleteMany({ where: { peminjamanId: peminjaman.id } });
+  await db.peminjamanBarang.deleteMany({ where: { id: peminjaman.id } });
   await db.dokumenKas.deleteMany({ where: { id: dokKas.id } });
   await db.barisFakturPembelian.deleteMany({ where: { fakturId: fakturBeli.id } });
   await db.fakturPembelian.deleteMany({ where: { id: fakturBeli.id } });

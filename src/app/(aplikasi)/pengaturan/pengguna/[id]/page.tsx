@@ -12,7 +12,7 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
   const { id } = await params;
   const pengguna = await db.pengguna.findUnique({
     where: { id },
-    select: { id: true, nama: true, namaPengguna: true, email: true, peran: true, aktif: true, dibuatPada: true, karyawan: { select: { kode: true, nama: true } } },
+    select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, aktif: true, dibuatPada: true, karyawan: { select: { kode: true, nama: true } } },
   });
   if (!pengguna) notFound();
 
@@ -54,6 +54,11 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
           <div className="bidang">
             <label className="label" htmlFor="email">Email (opsional)</label>
             <input id="email" name="email" type="email" defaultValue={pengguna.email ?? ""} disabled={!bolehSentuh} className="isian" />
+          </div>
+          <div className="bidang">
+            <label className="label" htmlFor="nomorTelepon">Nomor WhatsApp</label>
+            <input id="nomorTelepon" name="nomorTelepon" type="tel" placeholder="+6281234567890" defaultValue={pengguna.nomorTelepon ?? ""} disabled={!bolehSentuh} className="isian" />
+            <span className="petunjuk">Wajib untuk semua peran kecuali Guest.</span>
           </div>
           <div className="bidang">
             <label className="label" htmlFor="peran">Peran</label>

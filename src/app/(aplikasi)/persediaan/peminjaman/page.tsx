@@ -22,12 +22,22 @@ import PemilihFoto from "@/komponen/ui/PemilihFoto";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import EditorBarisPeminjaman, { EditorKembali, PemilihGudang } from "@/komponen/persediaan/EditorBarisPeminjaman";
+import { nomorTujuanKonfirmasi, pesanKonfirmasiKembali, pesanKonfirmasiPinjam, tautanWhatsApp } from "@/lib/whatsapp";
 
 const SERTAKAN = {
   baris: { include: { barang: { select: { kode: true, nama: true, satuan: true } } } },
   foto: { select: { id: true, tahap: true }, orderBy: { dibuatPada: "asc" as const } },
   proyek: { select: { nama: true } },
+  diajukanOleh: { select: { peran: true } },
 };
+
+function TombolWhatsApp({ peranPengaju, pesan }: { peranPengaju: string | null | undefined; pesan: string }) {
+  return (
+    <a href={tautanWhatsApp(nomorTujuanKonfirmasi(peranPengaju), pesan)} target="_blank" rel="noopener" className="tombol tombol-garis w-full min-h-11 flex items-center justify-center gap-2">
+      Konfirmasi via WhatsApp
+    </a>
+  );
+}
 
 type Foto = { id: string; tahap: "KELUAR" | "KEMBALI" | null };
 
@@ -106,6 +116,9 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
   const bolehSetujui = punyaHak(pengguna, "peminjaman.setujui");
   const bolehHapus = punyaHak(pengguna, "peminjaman.hapus");
   const bolehTautkan = punyaHak(pengguna, "penyesuaian.setujui");
+  // Kru & Guest fokus HANYA di form ajukan pinjam/kembali dan status pengajuan sendiri; kartu "Sedang
+  // di luar" dan "Riwayat" (yang memuat data semua pengguna) cuma untuk Gudang/Pemilik/Superadmin.
+  const bolehLihatSemua = pengguna.peran !== "KRU" && pengguna.peran !== "GUEST";
   const param = await bacaParamDaftar(searchParams);
   const paramGudang = (await searchParams).gudang;
   const gudangDipilih = Array.isArray(paramGudang) ? paramGudang[0] : paramGudang;
@@ -169,6 +182,10 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                   <label className="label" htmlFor="namaPengambil">Nama pengambil *</label>
                   <input id="namaPengambil" name="namaPengambil" required list="saran-nama-pengambil" className="isian min-h-11" placeholder="Nama kru yang membawa barang" />
                 </div>
+                <div className="bidang">
+                  <label className="label" htmlFor="nomorTelepon">Nomor WhatsApp pengambil *</label>
+                  <input id="nomorTelepon" name="nomorTelepon" type="tel" required placeholder="+6281234567890" className="isian min-h-11" />
+                </div>
                 <PilihanProyek id="proyekId" daftarProyek={daftarProyek} />
                 <div className="bidang">
                   <label className="label" htmlFor="rencanaKembali">Rencana kembali</label>
@@ -230,6 +247,12 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                   ))}
                 </ul>
                 <TautanFoto foto={p.foto} />
+                {p.statusPersetujuan === "MENUNGGU" && (
+                  <TombolWhatsApp
+                    peranPengaju={p.diajukanOleh?.peran}
+                    pesan={pesanKonfirmasiPinjam(p.nomor, p.namaPengambil, p.baris.map((b) => ({ kode: b.barang.kode, nama: b.barang.nama, jumlah: Number(b.jumlah), satuan: b.barang.satuan })))}
+                  />
+                )}
                 {bolehBuat && p.statusPersetujuan !== "MENUNGGU" && <FormUbahData p={p} daftarProyek={daftarProyek} />}
               </div>
             ))}
@@ -237,6 +260,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
         )}
       </div>
 
+      {bolehLihatSemua && (
       <div className="kartu">
         <div className="kepala-kartu">
           <h2 className="judul-kartu">Sedang di luar</h2>
@@ -291,11 +315,21 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                         <div className="text-xs font-semibold text-slate-600">Ajukan kembali (Kru)</div>
                         <EditorKembali key={`ajukan-${belumDiklaim.map((b) => `${b.barangId}:${b.sisa}`).join(",")}`} baris={belumDiklaim} />
                         <div className="bidang">
+                          <label className="label" htmlFor={`telepon-kembali-${p.id}`}>Nomor WhatsApp yang mengembalikan *</label>
+                          <input id={`telepon-kembali-${p.id}`} name="nomorTeleponKembali" type="tel" required placeholder="+6281234567890" className="isian min-h-11" />
+                        </div>
+                        <div className="bidang">
                           <span className="label">Foto barang kembali *</span>
                           <PemilihFoto name="foto" maksimal={3} wajib label="Ambil foto barang kembali" />
                         </div>
                         <button type="submit" className="tombol tombol-garis w-full min-h-11">Ajukan kembali</button>
                       </FormulirAksi>
+                    )}
+                    {bolehBuat && belumDiklaim.length > 0 && (
+                      <TombolWhatsApp
+                        peranPengaju={p.diajukanOleh?.peran}
+                        pesan={pesanKonfirmasiKembali(p.nomor, p.namaPengambil, belumDiklaim.map((b) => ({ kode: b.kode, nama: b.nama, jumlah: b.sisa, satuan: b.satuan })))}
+                      />
                     )}
 
                     {bolehSetujui && menungguKonfirmasi.length > 0 && (
@@ -324,7 +358,9 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
           </div>
         )}
       </div>
+      )}
 
+      {bolehLihatSemua && (
       <div className="kartu kartu-tabel">
         <div className="kepala-kartu">
           <h2 className="judul-kartu">Riwayat</h2>
@@ -414,6 +450,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
           </table>
         </div>
       </div>
+      )}
     </div>
   );
 }

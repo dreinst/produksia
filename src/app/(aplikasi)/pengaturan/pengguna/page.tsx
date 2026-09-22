@@ -10,7 +10,7 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 export default async function HalamanPengguna() {
   const saya = await wajibHak("pengguna.kelola");
   const daftarPengguna = await db.pengguna.findMany({
-    select: { id: true, nama: true, namaPengguna: true, email: true, peran: true, aktif: true, dibuatPada: true, _count: { select: { sesi: true } } },
+    select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, aktif: true, dibuatPada: true, _count: { select: { sesi: true } } },
     orderBy: [{ peran: "asc" }, { nama: "asc" }],
   });
   const peranBolehDibuat = DAFTAR_PERAN.filter((p) => !peranTertinggi(p) || peranTertinggi(saya.peran));
@@ -92,6 +92,11 @@ export default async function HalamanPengguna() {
             <input id="email" name="email" type="email" className="isian" />
           </div>
           <div className="bidang">
+            <label className="label" htmlFor="nomorTelepon">Nomor WhatsApp</label>
+            <input id="nomorTelepon" name="nomorTelepon" type="tel" placeholder="+6281234567890" className="isian" />
+            <span className="petunjuk">Wajib untuk semua peran kecuali Guest. Dipakai tombol konfirmasi WhatsApp di Peminjaman/Kerusakan Barang.</span>
+          </div>
+          <div className="bidang">
             <label className="label" htmlFor="kataSandi">Kata sandi awal</label>
             <input id="kataSandi" name="kataSandi" type="password" required minLength={PANJANG_KATA_SANDI_MINIMUM} autoComplete="new-password" className="isian" />
             <span className="petunjuk">Minimal {PANJANG_KATA_SANDI_MINIMUM} karakter, huruf + angka</span>
@@ -120,6 +125,7 @@ export default async function HalamanPengguna() {
                     <th>Nama</th>
                     <th>Nama pengguna</th>
                     <th>Email</th>
+                    <th>WhatsApp</th>
                     <th>Peran</th>
                     <th>Status</th>
                     <th className="text-right">Sesi aktif</th>
@@ -135,6 +141,7 @@ export default async function HalamanPengguna() {
                       </td>
                       <td className="font-mono text-slate-700">{p.namaPengguna}</td>
                       <td className="text-slate-500">{p.email ?? "-"}</td>
+                      <td className="text-slate-500">{p.nomorTelepon ?? "-"}</td>
                       <td>{LABEL_PERAN[p.peran]}</td>
                       <td>
                         <span className={`lencana ${p.aktif ? "lencana-emerald" : "lencana-slate"}`}>{p.aktif ? "Aktif" : "Nonaktif"}</span>

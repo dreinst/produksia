@@ -170,14 +170,20 @@ export const HAK_BAWAAN: Record<PeranPengguna, readonly Hak[]> = {
     "stok-induk.tulis",
     "persediaan.lihat", // Stok per Gudang
   ],
-  // Kru lapangan: SATU-SATUNYA hak yang dimiliki adalah Peminjaman Barang & Laporan Kerusakan Barang
-  // (lihat & buat pengajuan), tanpa "setujui" (pemisahan tugas: yang ajukan bukan yang setujui) dan
-  // tanpa "hapus". Tanpa persediaan.lihat/stok-induk.lihat pun, jadi modul lain otomatis tidak tampil
-  // di menu (lihat modulTerlihat) - ini yang membuat Kru cuma bisa mengakses dua halaman itu.
-  KRU: [...hakDok("peminjaman", "lihat", "buat"), ...hakDok("kerusakan", "lihat", "buat")],
+  // Kru lapangan: SATU-SATUNYA hak yang dimiliki adalah Peminjaman Barang (ajukan pinjam & ajukan
+  // kembali), tanpa "setujui" (pemisahan tugas: yang ajukan bukan yang setujui) dan tanpa "hapus".
+  // Laporan Kerusakan Barang BUKAN hak Kru - itu murni pemeriksaan fisik Gudang sendiri saat cek stok
+  // (lihat src/app/(aplikasi)/data-induk/[entitas]/[id]/page.tsx). Tanpa persediaan.lihat/stok-induk.lihat
+  // pun, jadi modul lain otomatis tidak tampil di menu (lihat modulTerlihat) - ini yang membuat Kru
+  // cuma bisa mengakses halaman Peminjaman Barang.
+  KRU: [...hakDok("peminjaman", "lihat", "buat")],
+  // Tamu/pihak luar: persis sama seperti Kru. Dipisah jadi peran sendiri (bukan disamakan dengan Kru)
+  // supaya kewajiban nomor WhatsApp saat pendaftaran bisa beda (Guest dikecualikan, lihat
+  // src/lib/aksi/pengguna.ts) dan supaya kedua populasi ini bisa dibedakan di daftar pengguna & log.
+  GUEST: [...hakDok("peminjaman", "lihat", "buat")],
 };
 
-export const DAFTAR_PERAN: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "GUDANG", "KRU"];
+export const DAFTAR_PERAN: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "GUDANG", "KRU", "GUEST"];
 
 /** Tingkat tertinggi: Superadmin dan Pemilik setara, hanya mereka yang boleh menyentuh akun setingkat ini & hak akses. */
 export const PERAN_TERTINGGI: readonly PeranPengguna[] = ["SUPERADMIN", "PEMILIK"];
@@ -185,7 +191,7 @@ export function peranTertinggi(peran: PeranPengguna): boolean {
   return PERAN_TERTINGGI.includes(peran);
 }
 /** Peran yang hak aksesnya bisa diubah dari Pengaturan › Hak Akses. */
-export const PERAN_DAPAT_DIATUR: readonly PeranPengguna[] = ["ADMIN", "KASIR", "GUDANG", "KRU"];
+export const PERAN_DAPAT_DIATUR: readonly PeranPengguna[] = ["ADMIN", "KASIR", "GUDANG", "KRU", "GUEST"];
 
 export const LABEL_PERAN: Record<PeranPengguna, string> = {
   SUPERADMIN: "Superadmin",
@@ -194,15 +200,17 @@ export const LABEL_PERAN: Record<PeranPengguna, string> = {
   KASIR: "Kasir",
   GUDANG: "Gudang",
   KRU: "Kru",
+  GUEST: "Guest",
 };
 
 export const KETERANGAN_PERAN: Record<PeranPengguna, string> = {
-  SUPERADMIN: "Admin IT. Akses penuh, sama dengan Pemilik.",
+  SUPERADMIN: "Admin IT. Akses penuh, sama dengan Pemilik, termasuk membalap (bypass) aturan yang membatasi peran lain.",
   PEMILIK: "Akses penuh.",
   ADMIN: "Semua dokumen, laporan, dan rekonsiliasi. Tanpa pengaturan, pengguna, dan hak akses.",
   KASIR: "Dokumen penjualan, pembelian, kas, dan data induk (tanpa SDM). Tanpa laporan dan tanpa hapus.",
-  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, peminjaman barang (loading out/in) dan laporan kerusakan barang termasuk menyetujui keduanya, plus kelola Barang/Kategori Barang/Gudang sendiri. Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
-  KRU: "Hanya Peminjaman Barang (ajukan pinjam & ajukan kembali) dan Laporan Kerusakan Barang, menunggu persetujuan Gudang. Tidak bisa mengakses halaman lain sama sekali.",
+  GUDANG: "Hanya input/edit stok gudang: surat jalan, terima barang, pindah & penyesuaian stok, peminjaman barang (loading out/in), plus lapor & setujui barang rusak dan kelola Barang/Kategori Barang/Gudang sendiri. Kalau Gudang sendiri yang mau pinjam barang keluar, yang menyetujui hanya Pemilik/Superadmin (lihat pastikanBolehSetujuiPeminjaman di src/lib/persetujuan.ts). Tanpa dokumen penjualan/pembelian lain, tanpa Pelanggan/Pemasok/Bagan Akun/Proyek, tanpa SDM.",
+  KRU: "Hanya Peminjaman Barang (ajukan pinjam & ajukan kembali), menunggu persetujuan Gudang (atau Pemilik/Superadmin). Tidak bisa mengakses halaman lain sama sekali.",
+  GUEST: "Tamu/pihak luar. Sama seperti Kru: hanya Peminjaman Barang, menunggu persetujuan Gudang. Tidak wajib nomor WhatsApp saat didaftarkan.",
 };
 
 export type PenyesuaianHak = { hak: string; boleh: boolean };
@@ -225,6 +233,7 @@ export type PenggunaSesi = {
   nama: string;
   namaPengguna: string;
   email: string | null;
+  nomorTelepon: string | null;
   peran: PeranPengguna;
   hak: readonly Hak[];
 };

@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import type { StatusPersetujuan } from "@/prisma-klien/enums";
-import type { Hak, KodeDokumen, PenggunaSesi } from "@/lib/hakAkses";
+import { peranTertinggi, type Hak, type KodeDokumen, type PenggunaSesi } from "@/lib/hakAkses";
 import { D, format, type Desimal } from "@/lib/uang";
 import { kurangiStok, labelBarang, perbaruiHargaRata } from "@/lib/stok";
 import { catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
@@ -177,6 +177,13 @@ type Berkas = {
   posting: (tx: Tx, id: string) => Promise<void>;
   /** Keterangan tambahan untuk log aktivitas. */
   ringkas?: (tx: Tx, id: string) => Promise<string>;
+  /**
+   * Penjaga tambahan di luar hak `${kode}.setujui` biasa, dijalankan sebelum posting. Dipakai
+   * Peminjaman Barang: kalau pengaju berperan GUDANG, yang boleh menyetujui HANYA Pemilik/Superadmin
+   * (Gudang lain tidak boleh, meski secara hak dokumen dia punya "peminjaman.setujui" untuk
+   * menyetujui pengajuan Kru/Guest). Lempar Error untuk menolak.
+   */
+  pastikanBolehSetujui?: (tx: Tx, id: string, pengguna: PenggunaSesi) => Promise<void>;
 };
 
 export type JenisPersetujuan =
@@ -372,6 +379,15 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       const p = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, gudang: { select: { nama: true } } } });
       return `${p.namaPengambil}, ${p.baris.length} barang di ${p.gudang.nama}`;
     },
+    // Kalau Gudang sendiri yang mengajukan (mau pinjam barang keluar), sesama Gudang tidak boleh
+    // menyetujui -- harus Pemilik/Superadmin. Kru/Guest tetap bisa disetujui Gudang seperti biasa.
+    pastikanBolehSetujui: async (tx, id, pengguna) => {
+      if (peranTertinggi(pengguna.peran)) return;
+      const p = await tx.peminjamanBarang.findUnique({ where: { id }, select: { diajukanOleh: { select: { peran: true } } } });
+      if (p?.diajukanOleh?.peran === "GUDANG") {
+        throw new Error("Peminjaman yang diajukan Gudang hanya boleh disetujui Pemilik atau Superadmin");
+      }
+    },
   },
 
   kerusakan: {
@@ -388,7 +404,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     simpan: async (tx, id, data) => void (await tx.laporanKerusakanBarang.update({ where: { id }, data })),
     /**
      * Sama seperti peminjaman: stok baru dikurangi di sini, di dalam transaksi yang sama dengan
-     * perubahan status. TIDAK ADA alur "kembali" — begitu disetujui, barang dianggap rusak permanen.
+     * perubahan status. TIDAK ADA alur "kembali": begitu disetujui, barang dianggap rusak permanen.
      * Kalau stok sudah tidak cukup (mis. sudah dipakai/dipinjamkan duluan), kurangiStok melempar galat
      * dan seluruh transaksi (termasuk perubahan status) dibatalkan. Tidak ada jurnal.
      */
