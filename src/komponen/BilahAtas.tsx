@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import { keluar } from "@/lib/aksi/otentikasi";
 import { inisialNama, LABEL_PERAN, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import { useKonteksPratinjau } from "@/komponen/KonteksPratinjau";
 
 const tautanTransaksiBaru: { href: string; label: string; kode: string; ikon: string; hak: Hak }[] = [
   { href: "/penjualan/penawaran/baru", label: "Penawaran Penjualan", kode: "PNW", ikon: "request_quote", hak: "penawaran.buat" },
@@ -25,18 +26,22 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
   const refCari = useRef<HTMLInputElement>(null);
   const [menuTransaksi, setMenuTransaksi] = useState(false);
   const tautanBoleh = tautanTransaksiBaru.filter((l) => punyaHak(pengguna, l.hak));
+  const { terbuka: previewTerbuka, toggle: togglePreview } = useKonteksPratinjau();
 
-  // ⌘K / Ctrl+K memfokuskan kotak pencarian
+  // ⌘K / Ctrl+K (Cari) dan ⌘P / Ctrl+P (Live Preview)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         refCari.current?.focus();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        togglePreview();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [togglePreview]);
 
   return (
     <header className="kaca sticky top-0 z-30 h-16 border-b border-slate-200/60 px-4 md:px-8 flex items-center justify-between gap-3 md:gap-6">
@@ -121,6 +126,29 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
             </div>
           </div>
         )}
+
+        {/* Tombol Live Preview (Bilah Samping Kanan) */}
+        <button
+          type="button"
+          onClick={togglePreview}
+          title="Buka Live Preview (⌘P)"
+          aria-label="Toggle Live Preview"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+            previewTerbuka
+              ? "bg-navy text-white border-navy shadow-sm"
+              : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"
+          }`}
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <Ikon nama="preview" className="!text-[18px] text-oranye" />
+          <span className="hidden sm:inline">Live Preview</span>
+          <kbd className="hidden lg:inline text-[10px] font-mono px-1 py-0.2 bg-black/10 rounded text-current opacity-70">
+            ⌘P
+          </kbd>
+        </button>
 
         <div className="hidden md:block h-6 w-px bg-slate-200" />
 
