@@ -3,8 +3,8 @@
 Ada dua jalur, pilih sesuai server:
 
 - **Jalur A, VPS kosong**: systemd + Caddy + PostgreSQL di host (bagian 1 sampai 6 di bawah).
-- **Jalur C, aplikasi di Vercel + basis data di VPS** (PgBouncer TLS di port 6432, bagian 8). Ini yang dipakai sekarang.
-- **Jalur B, server yang sudah memakai Docker/Coolify/Traefik** (port 80/443 sudah dipakai proxy): stack `docker-compose.yml` dengan PostgreSQL sendiri di volume, dirutekan Traefik lewat jaringan `coolify` dengan HTTPS otomatis (bagian 7). Server `187.53.129.205` (host Coolify) memakai jalur ini.
+- **Jalur C, aplikasi di Vercel + basis data di VPS** (PgBouncer TLS di port 6432, bagian 8). Tidak dipakai lagi sejak 9 Oktober 2026.
+- **Jalur B, server yang sudah memakai Docker/Coolify/Traefik** (port 80/443 sudah dipakai proxy): stack `docker-compose.yml` dengan PostgreSQL sendiri di volume, dirutekan Traefik lewat jaringan `coolify` dengan HTTPS otomatis (bagian 7). Server `187.53.129.205` (host Coolify) memakai jalur ini, dan ini yang dipakai sekarang (https://produksia.dpro.events).
 
 ## Jalur A
 
@@ -108,7 +108,7 @@ Traefik Coolify membaca label kontainer `app` di jaringan `coolify` dan meminta 
 
 ## 8. Jalur C: aplikasi di Vercel, basis data di VPS
 
-Pilihan saat ini: aplikasi berjalan di Vercel (akun `dreinst`, region `sin1` Singapura, dekat VPS Kuala Lumpur), basis data PostgreSQL tetap di VPS di balik **PgBouncer** dengan TLS (port 6432). Fungsi serverless membuka koneksi pendek dalam jumlah besar, PgBouncer (mode transaksi) menjaganya tetap di bawah batas PostgreSQL.
+Catatan lama, tidak dipakai lagi sejak aplikasi pindah ke VPS pada 9 Oktober 2026. Waktu itu aplikasi berjalan di Vercel (akun `dreinst`, region `sin1` Singapura, dekat VPS Kuala Lumpur), basis data PostgreSQL tetap di VPS di balik **PgBouncer** dengan TLS (port 6432). Fungsi serverless membuka koneksi pendek dalam jumlah besar, PgBouncer (mode transaksi) menjaganya tetap di bawah batas PostgreSQL.
 
 ### Di VPS (sudah dipasang)
 

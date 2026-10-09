@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// Header keamanan untuk semua respons. Berlaku di Vercel maupun di balik Traefik/Caddy.
+// Header keamanan untuk semua respons.
 // HSTS: paksa HTTPS 1 tahun. nosniff: cegah MIME sniffing. frame DENY & frame-ancestors none: cegah clickjacking.
 // Referrer & Permissions-Policy: batasi kebocoran & akses perangkat. Tanpa script-src CSP ketat agar Next tidak rusak.
 const headerKeamanan = [
@@ -15,11 +15,10 @@ const headerKeamanan = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // `next build` juga menghasilkan .next/standalone (server.js + dependensi minimum) untuk Docker/VPS;
-  // di Vercel tidak diperlukan (Vercel memakai keluaran bawaannya sendiri)
-  ...(process.env.VERCEL ? {} : { output: "standalone" as const }),
+  // `next build` juga menghasilkan .next/standalone (server.js + dependensi minimum) untuk Docker/VPS
+  output: "standalone",
   // Formulir Peminjaman Barang mengirim sampai 3 foto HP yang sudah dikompresi di klien (maks 1 MB per foto);
-  // bawaan 1 MB terlalu kecil, sedangkan batas badan permintaan Vercel sekitar 4,5 MB.
+  // bawaan 1 MB terlalu kecil.
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
   async headers() {
     return [{ source: "/:path*", headers: headerKeamanan }];

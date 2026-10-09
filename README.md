@@ -213,7 +213,7 @@ Peta lengkap, model data, dan alur tiap modul: `ARCHITECTURE.md`.
 
 ## Deploy & kinerja
 
-Panduan lengkap ada di **`DEPLOY.md`** dan folder `deploy/`: VPS kosong (systemd + Caddy), server Docker/Coolify (compose + Traefik), atau aplikasi di Vercel dengan basis data di VPS lewat PgBouncer TLS (yang dipakai sekarang).
+Panduan lengkap ada di **`DEPLOY.md`** dan folder `deploy/`: VPS kosong (systemd + Caddy), atau server Docker/Coolify (compose + Traefik, yang dipakai sekarang di https://produksia.dpro.events).
 
 - **Build**: `npm run build` (menjalankan migrasi + generate lebih dulu) menghasilkan `.next/standalone` (`output: "standalone"`): jalankan `node .next/standalone/server.js` (salin `.next/static` dan `public` ke sebelahnya) atau cukup `npm start`. Untuk beberapa proses/instance, pasang di belakang reverse proxy (nginx/Caddy) dengan HTTPS.
 - **Basis data**: PostgreSQL 14+. Semua kolom relasi (FK) dan kolom yang sering difilter (`tanggal`, `status`, `kedaluwarsa`) sudah berindeks (107 indeks). Pool koneksi per proses bawaan 10, atur lewat `DB_POOL_MAX`; pastikan `max_connections` PostgreSQL ≥ jumlah proses × pool + cadangan.
