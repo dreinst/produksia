@@ -2,7 +2,12 @@
 export default function KakiHalaman({ className = "" }: { className?: string }) {
   return (
     <footer className={`flex items-center justify-center gap-3 text-[11px] text-slate-400 ${className}`}>
-      <span>Made by dreinst</span>
+      <span>
+              Made by{" "}
+              <a href="https://www.instagram.com/dreiinst/" target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">
+                dreinst
+              </a>
+            </span>
       <span aria-hidden="true" className="h-3.5 w-px bg-slate-300" />
       <span className="flex items-center gap-2">
         Organized by
