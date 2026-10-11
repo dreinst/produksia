@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 /*
  * Pembatas laju masuk (anti brute-force/credential-stuffing/password-spraying).
  * Berbasis basis data (tabel PercobaanMasuk) supaya tetap berlaku lintas instance
- * di lingkungan serverless (Vercel) — penghitung in-memory tidak cukup di sana.
+ * (penghitung in-memory tidak cukup kalau app jalan di banyak instance).
  *
  * Dua kunci sekaligus:
  * - per AKUN (namaPengguna): mencegah brute-force satu akun tertentu.
@@ -32,7 +32,7 @@ const BATAS_ATUR_ULANG_IP = 5;
 /** Awalan kunci IP khusus permintaan atur ulang, agar penghitungnya terpisah dari lockout masuk. */
 const PRAKUNCI_ATUR_ULANG = "atur-ulang:";
 
-/** Ambil IP klien dari header proxy (tersedia di Vercel), jatuh ke penanda generik bila tak ada. */
+/** Ambil IP klien dari header proxy jatuh ke penanda generik bila tak ada. */
 export async function bacaIpKlien(): Promise<string> {
   const kepala = await headers();
   const xff = kepala.get("x-forwarded-for");

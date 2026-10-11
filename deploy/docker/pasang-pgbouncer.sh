@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Menyiapkan direktori konfigurasi PgBouncer di server (sekali jalan, aman diulang):
 # sertifikat TLS self-signed 10 tahun (SAN = IP server + nama sslip), userlist dari DB_PASSWORD di .env.docker,
-# salinan pgbouncer.ini, izin berkas untuk uid pengguna di dalam image, lalu menulis nilai lingkungan untuk Vercel
-# ke /data/produksia/vercel-env.txt (hanya root).
+# salinan pgbouncer.ini, izin berkas untuk uid pengguna di dalam image, lalu menulis nilai lingkungan untuk klien luar
+# ke /data/produksia/klien-luar-env.txt (hanya root).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 IP="${IP_SERVER:-$(curl -fsS --max-time 10 https://api.ipify.org || hostname -I | awk '{print $1}')}"
@@ -29,9 +29,9 @@ docker compose --env-file .env.docker up -d pgbouncer
 sleep 3
 docker compose --env-file .env.docker ps pgbouncer --format "{{.Name}} | {{.Status}}"
 CA_SATU_BARIS="$(awk 'NF {printf "%s\\n", $0}' "$DIR/tls/server.crt")"
-KELUARAN=/data/produksia/vercel-env.txt
+KELUARAN=/data/produksia/klien-luar-env.txt
 {
-  echo "# Nilai Environment Variables untuk proyek Vercel (Production). Jangan bagikan berkas ini."
+  echo "# Nilai lingkungan untuk klien di luar server. Jangan bagikan berkas ini."
   echo "DATABASE_URL=postgresql://produksia:${DB_PASSWORD}@${HOST_DB}:6432/produksia?schema=public"
   echo "DATABASE_URL_MIGRASI=postgresql://produksia:${DB_PASSWORD}@${HOST_DB}:6432/produksia_migrasi?schema=public&sslmode=require&sslaccept=accept_invalid_certs"
   echo "DB_POOL_MAX=3"
@@ -39,4 +39,4 @@ KELUARAN=/data/produksia/vercel-env.txt
   echo "DB_SSL_CA=${CA_SATU_BARIS}"
 } > "$KELUARAN"
 chmod 600 "$KELUARAN"
-echo "nilai lingkungan Vercel ditulis ke $KELUARAN"
+echo "nilai lingkungan klien luar ditulis ke $KELUARAN"

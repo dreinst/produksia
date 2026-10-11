@@ -1,4 +1,4 @@
-// Zona waktu eksplisit: Vercel menjalankan server di UTC dan tidak menerima env TZ,
+// Zona waktu eksplisit: server bisa berjalan di UTC,
 // jadi format tanggal tidak boleh mengandalkan zona waktu proses.
 const ZONA_WAKTU = process.env.ZONA_WAKTU ?? "Asia/Jakarta";
 
