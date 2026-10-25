@@ -59,21 +59,23 @@ async function main() {
   const bank = await db.akun.create({ data: { kode: "REK-BANK", nama: "Bank Uji Rekonsiliasi", jenis: "ASET", kasBank: true } });
   const modal = await db.akun.findFirstOrThrow({ where: { jenis: "MODAL", kelompok: false } });
   const bebanAdmin = await db.akun.findFirstOrThrow({ where: { jenis: "BEBAN", kelompok: false } });
-  await harusDitolak("impor ke akun bukan kas/bank", () => imporMutasi(formulir({ akunId: modal.id, namaBerkas: "x.csv", isi: CONTOH_CSV })), "kas/bank");
-  await jalankan("impor contoh", () => imporMutasi(formulir({ akunId: bank.id, namaBerkas: "contoh.csv", isi: CONTOH_CSV })));
+  // tanggal contoh digeser ke 10/8/6 hari lalu supaya selisih dengan buku (hari ini) selalu di dalam toleransi 31 hari
+  const hariLalu = (h: number) => { const t = new Date(Date.now() - h * 86400000); return `${String(t.getDate()).padStart(2, "0")}/${String(t.getMonth() + 1).padStart(2, "0")}/${t.getFullYear()}`; };
+  const contoh = CONTOH_CSV.replace("01/09/2026", hariLalu(10)).replace("03/09/2026", hariLalu(8)).replace("05/09/2026", hariLalu(6));
+  await harusDitolak("impor ke akun bukan kas/bank", () => imporMutasi(formulir({ akunId: modal.id, namaBerkas: "x.csv", isi: contoh })), "kas/bank");
+  await jalankan("impor contoh", () => imporMutasi(formulir({ akunId: bank.id, namaBerkas: "contoh.csv", isi: contoh })));
   pastikan((await db.mutasiBank.count({ where: { akunId: bank.id } })) === 3, "3 mutasi baru tersimpan");
-  await jalankan("impor ulang berkas yang sama", () => imporMutasi(formulir({ akunId: bank.id, namaBerkas: "contoh-ulang.csv", isi: CONTOH_CSV })));
+  await jalankan("impor ulang berkas yang sama", () => imporMutasi(formulir({ akunId: bank.id, namaBerkas: "contoh-ulang.csv", isi: contoh })));
   pastikan((await db.mutasiBank.count({ where: { akunId: bank.id } })) === 3 && (await db.mutasiBank.count({ where: { akunId: bank.id, berkas: "contoh-ulang.csv" } })) === 0, "impor ulang tidak menggandakan (3 ganda dilewati)");
   pastikan((await db.logAktivitas.count({ where: { waktu: { gte: mulaiUji }, jenis: "Rekonsiliasi", aksi: "IMPOR" } })) === 2, "impor tercatat di log aktivitas");
 
   console.log("=== 3. Pencocokan otomatis, manual, lepas ===");
-  // buku: kas masuk 1.000.000 tgl hari ini (mutasi 01/09 → selisih hari bisa > 3) → pakai toleransi 31 lalu cek 0
+  // buku: kas masuk 1.000.000 tgl hari ini (mutasi 10 hari lalu) → toleransi 0 tidak cocok, toleransi 31 cocok
   await jalankan("KM 1.000.000 (DP klien) ke bank uji", () => buatKasMasuk(formulir({ akunKasId: bank.id, akunLawanId: modal.id, jumlah: 1000000, keterangan: "uji rekonsiliasi dp" })));
   await jalankan("KK 6.500 admin bank", () => buatKasKeluar(formulir({ akunKasId: bank.id, akunLawanId: bebanAdmin.id, jumlah: 6500, keterangan: "uji rekonsiliasi admin" })));
   await jalankan("cocokkan otomatis toleransi 0 hari", () => cocokkanOtomatis(formulir({ akunId: bank.id, toleransiHari: 0 })));
-  const hariSelisih = Math.abs((new Date().getTime() - new Date(2026, 8, 1).getTime()) / 86400000);
   const cocok0 = await db.mutasiBank.count({ where: { akunId: bank.id, barisJurnalId: { not: null } } });
-  pastikan(hariSelisih < 1 ? cocok0 >= 1 : cocok0 === 0, `toleransi 0 hari: ${cocok0} cocok (selisih tanggal ${Math.round(hariSelisih)} hari)`);
+  pastikan(cocok0 === 0, `toleransi 0 hari: ${cocok0} cocok (selisih tanggal 6 sampai 10 hari)`);
   await jalankan("cocokkan otomatis toleransi 31 hari", () => cocokkanOtomatis(formulir({ akunId: bank.id, toleransiHari: 31 })));
   const tercocok = await db.mutasiBank.findMany({ where: { akunId: bank.id, barisJurnalId: { not: null } }, include: { barisJurnal: { include: { jurnal: { select: { tanggal: true } } } } } });
   pastikan(tercocok.length === 2 && tercocok.every((m) => m.barisJurnal?.rekonsiliasiPada), "2 mutasi (DP 1.000.000 & admin 6.500) cocok dengan baris buku dan baris ditandai");
