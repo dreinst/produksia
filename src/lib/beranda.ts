@@ -24,10 +24,10 @@ export const TAB_BERANDA: readonly DefinisiTab[] = [
   { kode: "keuangan", label: "Keuangan", salahSatu: ["beranda-keuangan.lihat"], semua: [], tersedia: true },
   { kode: "saya", label: "Tugas Saya", salahSatu: ["lead.ubah", "konten.ubah", "tugas-desain.ubah"], semua: [], tersedia: true },
   { kode: "penjualan", label: "Penjualan & CRM", salahSatu: ["lead.lihat"], semua: [], tersedia: true },
-  // panel pemasaran dan keuangan proyek menyusul (paket DF4). Tab proyek memuat angka keuangan proyek, jadi
-  // dijaga anggaran-proyek.lihat (HAK.md), bukan proyek.lihat yang juga dipegang KASIR, SOSMED, IKLAN, DESAINER.
-  { kode: "pemasaran", label: "Pemasaran", salahSatu: ["konten.lihat", "tugas-desain.lihat", "kampanye.lihat"], semua: [], tersedia: false },
-  { kode: "proyek", label: "Keuangan Proyek", salahSatu: ["anggaran-proyek.lihat"], semua: [], tersedia: false },
+  // Tab proyek memuat angka keuangan proyek, jadi dijaga anggaran-proyek.lihat (HAK.md), bukan proyek.lihat yang
+  // juga dipegang KASIR, SOSMED, IKLAN, dan DESAINER (daftar proyek tanpa angka keuangan).
+  { kode: "pemasaran", label: "Pemasaran", salahSatu: ["konten.lihat", "tugas-desain.lihat", "kampanye.lihat"], semua: [], tersedia: true },
+  { kode: "proyek", label: "Keuangan Proyek", salahSatu: ["anggaran-proyek.lihat"], semua: [], tersedia: true },
   { kode: "sistem", label: "Sistem", salahSatu: [], semua: ["pengguna.kelola", "log-aktivitas.lihat"], tersedia: true },
 ];
 

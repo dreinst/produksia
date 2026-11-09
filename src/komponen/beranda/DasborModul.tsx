@@ -9,6 +9,8 @@ import PanelSaya from "@/komponen/beranda/PanelSaya";
 import PanelCrmBeranda from "@/komponen/beranda/PanelCrmBeranda";
 import PanelPenjualanDokumen from "@/komponen/beranda/PanelPenjualanDokumen";
 import PanelSistem from "@/komponen/beranda/PanelSistem";
+import PanelPemasaran from "@/komponen/beranda/PanelPemasaran";
+import PanelProyek from "@/komponen/beranda/PanelProyek";
 
 /**
  * Beranda untuk tab selain keuangan (D7 §7.4). Kepala sapaan, lingkup perusahaan, dan tanggal; baris tab bila
@@ -36,7 +38,7 @@ export default async function DasborModul({ tab, daftarTab, pengguna }: { tab: K
   );
 }
 
-/** Panel per tab; tiap panel async punya Suspense sendiri (D7 §3.5 no. 6). Tab pemasaran dan proyek dipasang bersama panelnya (belum aktif di beranda.ts). */
+/** Panel per tab; tiap panel async punya Suspense sendiri (D7 §3.5 no. 6). */
 function IsiTab({ tab, pengguna, perusahaanId }: { tab: KodeTab; pengguna: PenggunaSesi; perusahaanId: string | null }) {
   switch (tab) {
     case "saya":
@@ -52,6 +54,10 @@ function IsiTab({ tab, pengguna, perusahaanId }: { tab: KodeTab; pengguna: Pengg
           </Suspense>
         </div>
       );
+    case "pemasaran":
+      return <PanelPemasaran pengguna={pengguna} perusahaanId={perusahaanId} />;
+    case "proyek":
+      return <PanelProyek pengguna={pengguna} perusahaanId={perusahaanId} />;
     case "sistem":
       return <PanelSistem pengguna={pengguna} perusahaanId={perusahaanId} />;
     default:
