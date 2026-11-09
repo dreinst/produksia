@@ -10,6 +10,9 @@ import AngkaBergerak from "@/komponen/ui/AngkaBergerak";
 import { Suspense } from "react";
 import PanelTren, { KerangkaTren } from "@/komponen/beranda/PanelTren";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
+import { adaDataPerusahaanLain, akunDalamLingkup, muatDataBerandaKeuangan } from "@/lib/berandaKeuangan";
 
 const rp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
@@ -20,6 +23,7 @@ type Terbaru = {
   siapa: string;
   jumlah: number | null;
   status: string;
+  perusahaan: { kode: string; nama: string; warna: string | null };
   aksi?: { label: string; href: string; ikon: string };
 };
 
@@ -34,10 +38,18 @@ export default async function Beranda() {
   // Peran pemasaran tidak memegangnya; penjaga sementara sampai beranda bertab dari paket dashboard terpasang.
   if (!boleh("beranda-keuangan.lihat")) redirect("/tanpa-akses?hak=beranda-keuangan.lihat");
   const now = new Date();
-  const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);
   const labelPeriode = now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 
-  const [
+  // Lingkup perusahaan (D1 §3.2): gabungan = angka persis seperti sebelum multi perusahaan;
+  // satu perusahaan = dokumen, jurnal, stok, dan akun kas disaring perusahaanId.
+  const lingkup = await lingkupPerusahaan();
+  const lingkupId = lingkup.perusahaanId;
+  const gabungan = lingkupId === null;
+  // Tren kas dan pemeriksaan integritas memakai fungsi laporan lama yang menghitung semua perusahaan.
+  // Angkanya hanya ditampilkan bila sama dengan angka lingkup (gabungan, atau belum ada data perusahaan lain).
+  const panelGlobalSesuai = gabungan || !(await adaDataPerusahaanLain(lingkupId));
+
+  const {
     fakturJualBelumLunas,
     fakturBeliBelumLunas,
     daftarAkun,
@@ -55,29 +67,10 @@ export default async function Beranda() {
     pengirimanTerbaru,
     fakturBeliTerbaru,
     pembayaranTerbaru,
-  ] = await Promise.all([
-    // KPI piutang/hutang & nilai aset hanya dari dokumen yang sudah DISETUJUI, supaya angkanya sama dengan buku besar
-    db.fakturPenjualan.findMany({ where: { status: { not: "LUNAS" }, statusPersetujuan: "DISETUJUI" }, include: { penerimaan: true, retur: { select: { total: true } } } }),
-    db.fakturPembelian.findMany({ where: { status: { not: "LUNAS" }, statusPersetujuan: "DISETUJUI" }, include: { pembayaran: true, retur: { select: { total: true } } } }),
-    db.akun.findMany({ orderBy: { kode: "asc" } }),
-    db.barisJurnal.groupBy({ by: ["akunId"], _sum: { debit: true, kredit: true } }),
-    db.stokBarang.findMany({ include: { barang: true, gudang: true } }),
-    db.barang.count({ where: { jenis: "BARANG" } }),
-    db.asetTetap.findMany({ where: { status: "AKTIF", statusPersetujuan: "DISETUJUI" }, include: { penyusutan: true } }),
-    db.penawaranPenjualan.findMany({ where: { status: "DRAF" } }),
-    db.pesananPenjualan.findMany({ where: { status: { in: ["DRAF", "SEBAGIAN"] } } }),
-    db.pengirimanPesanan.count({ where: { tanggal: { gte: awalBulan } } }),
-    db.penerimaanPenjualan.findMany({ where: { tanggal: { gte: awalBulan } } }),
-    db.fakturPenjualan.findMany({ include: { pelanggan: true }, orderBy: { tanggal: "desc" }, take: 4 }),
-    db.pesananPenjualan.findMany({ include: { pelanggan: true, baris: true }, orderBy: { tanggal: "desc" }, take: 4 }),
-    db.penerimaanPenjualan.findMany({ include: { pelanggan: true }, orderBy: { tanggal: "desc" }, take: 3 }),
-    db.pengirimanPesanan.findMany({ include: { pesanan: { include: { pelanggan: true } } }, orderBy: { tanggal: "desc" }, take: 3 }),
-    db.fakturPembelian.findMany({ include: { pemasok: true }, orderBy: { tanggal: "desc" }, take: 3 }),
-    db.pembayaranPembelian.findMany({ include: { pemasok: true }, orderBy: { tanggal: "desc" }, take: 2 }),
-  ]);
+  } = await muatDataBerandaKeuangan(lingkupId, now);
 
   const [sinkron, pengaturan, permintaanLupa] = await Promise.all([
-    periksaSinkron(db),
+    panelGlobalSesuai ? periksaSinkron(db) : Promise.resolve(null),
     ambilPengaturanPerusahaan(db),
     boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
   ]);
@@ -105,8 +98,9 @@ export default async function Beranda() {
     return { ...a, debit, kredit, balance: NORMAL_DEBIT.has(a.jenis) ? debit - kredit : kredit - debit };
   });
   // akun bertanda kas/bank; kalau belum ada yang ditandai, tebak dari nama
-  const bertanda = saldoAkun.filter((a) => a.kasBank && !a.kelompok);
-  const akunKas = bertanda.length > 0 ? bertanda : saldoAkun.filter((a) => a.jenis === "ASET" && !a.kelompok && /\b(kas|bank)\b/i.test(a.nama));
+  // dalam lingkup satu perusahaan hanya akun kas milik perusahaan itu atau bersama
+  const bertanda = saldoAkun.filter((a) => a.kasBank && !a.kelompok && akunDalamLingkup(a, lingkupId));
+  const akunKas = bertanda.length > 0 ? bertanda : saldoAkun.filter((a) => a.jenis === "ASET" && !a.kelompok && akunDalamLingkup(a, lingkupId) && /\b(kas|bank)\b/i.test(a.nama));
   const kas = akunKas.reduce((s, a) => s + a.balance, 0);
 
   // ---- KPI 4: Persediaan ----
@@ -151,23 +145,23 @@ export default async function Beranda() {
   // ---- Transaksi terbaru (gabungan) ----
   const terbaru: Terbaru[] = [
     ...fakturTerbaru.map((d) => ({
-      nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.total), status: d.status,
+      nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.total), status: d.status, perusahaan: d.perusahaan,
       aksi: d.status !== "LUNAS" && boleh("penerimaan.buat") ? { label: "Terima bayar", href: `/penjualan/penerimaan/baru?fakturId=${d.id}`, ikon: "payments" } : undefined,
     })),
     ...pesananTerbaru.map((d) => {
       const terkirimSemua = d.baris.every((l) => Number(l.jumlahTerkirim) >= Number(l.jumlah));
       return {
-        nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.total), status: d.status,
+        nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.total), status: d.status, perusahaan: d.perusahaan,
         aksi: !terkirimSemua && boleh("pengiriman.buat") ? { label: "Buat SJ", href: `/penjualan/pengiriman/baru?pesananId=${d.id}`, ikon: "local_shipping" } : undefined,
       };
     }),
-    ...penerimaanTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.jumlah), status: "TERCATAT" })),
-    ...pengirimanTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pesanan.pelanggan.nama, jumlah: null, status: d.status })),
+    ...penerimaanTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pelanggan.nama, jumlah: Number(d.jumlah), status: "TERCATAT", perusahaan: d.perusahaan })),
+    ...pengirimanTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pesanan.pelanggan.nama, jumlah: null, status: d.status, perusahaan: d.perusahaan })),
     ...fakturBeliTerbaru.map((d) => ({
-      nomor: d.nomor, tanggal: d.tanggal, siapa: d.pemasok.nama, jumlah: Number(d.total), status: d.status,
+      nomor: d.nomor, tanggal: d.tanggal, siapa: d.pemasok.nama, jumlah: Number(d.total), status: d.status, perusahaan: d.perusahaan,
       aksi: d.status !== "LUNAS" && boleh("pembayaran.buat") ? { label: "Bayar", href: `/pembelian/pembayaran/baru?fakturId=${d.id}`, ikon: "payments" } : undefined,
     })),
-    ...pembayaranTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pemasok.nama, jumlah: Number(d.jumlah), status: "TERCATAT" })),
+    ...pembayaranTerbaru.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal, siapa: d.pemasok.nama, jumlah: Number(d.jumlah), status: "TERCATAT", perusahaan: d.perusahaan })),
   ]
     .sort((a, b) => b.tanggal.getTime() - a.tanggal.getTime())
     .slice(0, 8);
@@ -317,11 +311,17 @@ export default async function Beranda() {
         </div>
       </div>
 
-      {boleh("buku-besar.lihat") && (
-        <Suspense fallback={<KerangkaTren />}>
-          <PanelTren tahun={pengaturan.tahunBuku} />
-        </Suspense>
-      )}
+      {boleh("buku-besar.lihat") &&
+        (panelGlobalSesuai ? (
+          <Suspense fallback={<KerangkaTren />}>
+            <PanelTren tahun={pengaturan.tahunBuku} />
+          </Suspense>
+        ) : (
+          <div className="kartu text-sm text-slate-500 flex items-start gap-2.5">
+            <Ikon nama="hub" className="!text-[18px] text-slate-400 mt-0.5" />
+            <span>Tren kas masuk &amp; keluar per perusahaan belum tersedia.{lingkup.bolehGabungan && " Pilih \"Semua perusahaan\" di bilah samping untuk melihat tren gabungan."}</span>
+          </div>
+        ))}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 daftarBarang-awal">
         {/* Kiri */}
@@ -341,6 +341,7 @@ export default async function Beranda() {
                 <thead>
                   <tr>
                     <th>No Dokumen</th>
+                    {gabungan && <th>Perusahaan</th>}
                     <th>Tanggal</th>
                     <th>Rekanan</th>
                     <th className="text-right">Nilai</th>
@@ -352,6 +353,7 @@ export default async function Beranda() {
                   {terbaru.map((r) => (
                     <tr key={r.nomor}>
                       <td><NomorDokumen nomor={r.nomor} /></td>
+                      {gabungan && <td><LencanaPerusahaan kode={r.perusahaan.kode} warna={r.perusahaan.warna} nama={r.perusahaan.nama} /></td>}
                       <td className="text-slate-500 whitespace-nowrap">{r.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                       <td className="font-medium text-slate-900">{r.siapa}</td>
                       <td className="text-right angka font-semibold text-slate-900">{r.jumlah === null ? "-" : r.jumlah.toLocaleString("id-ID")}</td>
@@ -370,7 +372,7 @@ export default async function Beranda() {
                   ))}
                   {terbaru.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="kosong">Belum ada transaksi.</td>
+                      <td colSpan={gabungan ? 7 : 6} className="kosong">Belum ada transaksi.</td>
                     </tr>
                   )}
                 </tbody>
@@ -512,27 +514,33 @@ export default async function Beranda() {
               <Ikon nama="verified_user" className="!text-[22px] text-blue-400" />
               <h3 className="text-sm font-bold">Integritas &amp; Sinkronisasi</h3>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:</p>
-            <div className="space-y-3 text-xs">
-              {[
-                { t: "Jurnal seimbang", ok: sinkron.seimbang, d: `Σ debit ${rp(Number(sinkron.totalDebit))} · Σ kredit ${rp(Number(sinkron.totalKredit))}` },
-                { t: "Persediaan = stok fisik × harga pokok", ok: sinkron.persediaan.sinkron, d: `Buku besar ${rp(Number(sinkron.persediaan.bukuBesar))} · stok ${rp(Number(sinkron.persediaan.dokumen))}` },
-                { t: "Piutang = sisa faktur penjualan", ok: sinkron.piutang.sinkron, d: `Buku besar ${rp(Number(sinkron.piutang.bukuBesar))} · dokumen ${rp(Number(sinkron.piutang.dokumen))}` },
-                { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
-                { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
-                { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
-                { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
-                { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
-              ].map(({ t, ok, d }) => (
-                <div key={t} className="flex items-start gap-2.5">
-                  <Ikon nama={ok ? "check_circle" : "error"} className={`!text-[18px] mt-0.5 ${ok ? "text-emerald-400" : "text-rose-400"}`} />
-                  <div>
-                    <span className={`font-semibold ${ok ? "text-white" : "text-rose-300"}`}>{t}</span>
-                    <p className="text-slate-400 text-[11px] mt-0.5">{d}</p>
-                  </div>
+            {sinkron ? (
+              <>
+                <p className="text-xs text-slate-400 leading-relaxed">Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:</p>
+                <div className="space-y-3 text-xs">
+                  {[
+                    { t: "Jurnal seimbang", ok: sinkron.seimbang, d: `Σ debit ${rp(Number(sinkron.totalDebit))} · Σ kredit ${rp(Number(sinkron.totalKredit))}` },
+                    { t: "Persediaan = stok fisik × harga pokok", ok: sinkron.persediaan.sinkron, d: `Buku besar ${rp(Number(sinkron.persediaan.bukuBesar))} · stok ${rp(Number(sinkron.persediaan.dokumen))}` },
+                    { t: "Piutang = sisa faktur penjualan", ok: sinkron.piutang.sinkron, d: `Buku besar ${rp(Number(sinkron.piutang.bukuBesar))} · dokumen ${rp(Number(sinkron.piutang.dokumen))}` },
+                    { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
+                    { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
+                    { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
+                    { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
+                    { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
+                  ].map(({ t, ok, d }) => (
+                    <div key={t} className="flex items-start gap-2.5">
+                      <Ikon nama={ok ? "check_circle" : "error"} className={`!text-[18px] mt-0.5 ${ok ? "text-emerald-400" : "text-rose-400"}`} />
+                      <div>
+                        <span className={`font-semibold ${ok ? "text-white" : "text-rose-300"}`}>{t}</span>
+                        <p className="text-slate-400 text-[11px] mt-0.5">{d}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              <p className="text-xs text-slate-400 leading-relaxed">Pencocokan buku besar dengan dokumen dan stok per perusahaan belum tersedia.{lingkup.bolehGabungan && " Pilih \"Semua perusahaan\" di bilah samping untuk melihat pemeriksaan gabungan."}</p>
+            )}
             <div className="pt-3 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-400 font-mono">
               <span>PostgreSQL 18 • Prisma 7</span>
               <span className={seimbang ? "text-emerald-400 font-semibold" : "text-rose-400 font-semibold"}>{seimbang ? "Buku besar seimbang" : "Buku besar tidak seimbang"}</span>

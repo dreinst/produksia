@@ -6,8 +6,11 @@ import { useEffect, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import Logo from "@/komponen/ui/Logo";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import PemilihLingkup from "@/komponen/PemilihLingkup";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { gantiTahunBukuFormulir } from "@/lib/aksi/pengaturan";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import type { RingkasPerusahaan } from "@/lib/perusahaan";
 
 /** Jenis dokumen yang sudah tersambung ke alur persetujuan (lihat BERKAS di src/lib/persetujuan.ts). */
 const DOKUMEN_PERSETUJUAN = ["faktur", "faktur-pembelian", "kas-masuk", "kas-keluar", "penyesuaian", "peminjaman", "kerusakan", "aset", "penggajian"] as const;
@@ -318,12 +321,35 @@ function StatusBasisData() {
   );
 }
 
-export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daftarTahun, open, saatTutup }: { pengguna: PenggunaSesi; namaPerusahaan: string; tahunBuku: number; daftarTahun: number[]; open: boolean; saatTutup: () => void }) {
+export default function BilahSamping({
+  pengguna,
+  namaPerusahaan,
+  tahunBuku,
+  daftarTahun,
+  perusahaanAktif,
+  daftarPerusahaan,
+  bolehGabungan,
+  open,
+  saatTutup,
+}: {
+  pengguna: PenggunaSesi;
+  namaPerusahaan: string;
+  tahunBuku: number;
+  daftarTahun: number[];
+  /** lingkup perusahaan aktif; null = gabungan semua perusahaan */
+  perusahaanAktif: RingkasPerusahaan | null;
+  daftarPerusahaan: RingkasPerusahaan[];
+  bolehGabungan: boolean;
+  open: boolean;
+  saatTutup: () => void;
+}) {
   const pathname = usePathname();
   const hariIni = new Date();
   const tahunBerjalan = tahunBuku === hariIni.getFullYear();
   const akhirTahunBuku = tahunBerjalan ? `${tahunBuku}-${String(hariIni.getMonth() + 1).padStart(2, "0")}-${String(hariIni.getDate()).padStart(2, "0")}` : `${tahunBuku}-12-31`;
   const bolehGantiTahun = punyaHak(pengguna, "pengaturan.tulis");
+  const gabungan = perusahaanAktif === null;
+  const jumlahPerusahaanAktif = daftarPerusahaan.filter((p) => p.aktif).length;
 
   return (
     <>
@@ -361,13 +387,25 @@ export default function BilahSamping({ pengguna, namaPerusahaan, tahunBuku, daft
             className="bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2.5 flex items-center justify-between list-none cursor-pointer select-none hover:bg-slate-100 [&::-webkit-details-marker]:hidden"
             aria-label="Perusahaan & tahun buku"
           >
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold text-slate-900 truncate">{namaPerusahaan}</span>
-              <span className="text-[11px] text-slate-500 font-medium">Tahun Buku {tahunBuku} • Rupiah</span>
+            <div className="flex flex-col min-w-0 gap-0.5">
+              <span className="flex items-center gap-1.5 min-w-0">
+                {gabungan ? (
+                  <Ikon nama="hub" className="!text-[16px] text-slate-400 shrink-0" />
+                ) : (
+                  <LencanaPerusahaan kode={perusahaanAktif.kode} warna={perusahaanAktif.warna} nama={perusahaanAktif.nama} />
+                )}
+                <span className="text-xs font-semibold text-slate-900 truncate">{namaPerusahaan}</span>
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                Tahun Buku {tahunBuku} • Rupiah{gabungan ? ` · ${jumlahPerusahaanAktif} perusahaan` : ""}
+              </span>
             </div>
             <Ikon nama="unfold_more" className="!text-[18px] text-slate-400 group-open:rotate-180 transition-transform" />
           </summary>
-          <div className="absolute left-3 right-3 z-40 mt-1 rounded-xl border border-slate-200 bg-white p-2 space-y-1" style={{ boxShadow: "var(--shadow-pop)" }}>
+          <div className="absolute left-3 right-3 z-40 mt-1 rounded-xl border border-slate-200 bg-white p-2 space-y-1 max-h-[75vh] overflow-y-auto" style={{ boxShadow: "var(--shadow-pop)" }}>
+            <div className="border-b border-slate-100 pb-1">
+              <PemilihLingkup daftar={daftarPerusahaan} aktifId={perusahaanAktif?.id ?? null} bolehGabungan={bolehGabungan} />
+            </div>
             <div className="px-2 py-1.5 text-[11px] text-slate-500 space-y-0.5 border-b border-slate-100">
               <div className="text-xs font-semibold text-slate-900 truncate">{namaPerusahaan}</div>
               <div>Mata uang: <span className="font-medium text-slate-700">Rupiah (IDR)</span> · satu mata uang</div>

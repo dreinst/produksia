@@ -5,19 +5,49 @@ import type { ReactNode } from "react";
 import BilahSamping from "@/komponen/BilahSamping";
 import BilahAtas from "@/komponen/BilahAtas";
 import type { PenggunaSesi } from "@/lib/hakAkses";
+import type { RingkasPerusahaan } from "@/lib/perusahaan";
 import KakiHalaman from "@/komponen/ui/KakiHalaman";
 
 /**
  * Kerangka aplikasi: sidebar tetap 16rem di desktop / drawer di mobile, topbar lengket,
  * kanvas konten maks 80rem. State drawer dipegang di sini agar BilahAtas bisa membukanya.
  */
-export default function KerangkaAplikasi({ pengguna, namaPerusahaan, tahunBuku, daftarTahun, children }: { pengguna: PenggunaSesi; namaPerusahaan: string; tahunBuku: number; daftarTahun: number[]; children: ReactNode }) {
+export default function KerangkaAplikasi({
+  pengguna,
+  namaPerusahaan,
+  tahunBuku,
+  daftarTahun,
+  perusahaanAktif,
+  daftarPerusahaan,
+  bolehGabungan,
+  children,
+}: {
+  pengguna: PenggunaSesi;
+  namaPerusahaan: string;
+  tahunBuku: number;
+  daftarTahun: number[];
+  /** lingkup perusahaan aktif; null = gabungan semua perusahaan */
+  perusahaanAktif: RingkasPerusahaan | null;
+  daftarPerusahaan: RingkasPerusahaan[];
+  bolehGabungan: boolean;
+  children: ReactNode;
+}) {
   const [lacaTerbuka, setLacaTerbuka] = useState(false);
 
   return (
     <div className="min-h-screen bg-canvas">
       <div className="aurora" aria-hidden="true" />
-      <BilahSamping pengguna={pengguna} namaPerusahaan={namaPerusahaan} tahunBuku={tahunBuku} daftarTahun={daftarTahun} open={lacaTerbuka} saatTutup={() => setLacaTerbuka(false)} />
+      <BilahSamping
+        pengguna={pengguna}
+        namaPerusahaan={namaPerusahaan}
+        tahunBuku={tahunBuku}
+        daftarTahun={daftarTahun}
+        perusahaanAktif={perusahaanAktif}
+        daftarPerusahaan={daftarPerusahaan}
+        bolehGabungan={bolehGabungan}
+        open={lacaTerbuka}
+        saatTutup={() => setLacaTerbuka(false)}
+      />
       <div className="md:pl-64 min-h-screen flex flex-col">
         <BilahAtas pengguna={pengguna} saatMenu={() => setLacaTerbuka(true)} />
         <main className="animasi-masuk w-full max-w-7xl mx-auto flex-1 px-4 md:px-8 py-5 md:py-7 space-y-6 min-w-0">{children}</main>
