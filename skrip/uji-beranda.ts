@@ -361,7 +361,7 @@ async function main() {
         const hasil = await render(DasborModul({ tab, daftarTab, pengguna }));
         semuaHref.push(...hasil.href);
         const lingkupTeks = perusahaan === "semua" ? "Semua perusahaan" : perusahaan ? p1.nama : "PT D'Pro";
-        pastikan(hasil.teks.includes("Halo, Skrip") && (perusahaan === undefined || hasil.teks.includes(lingkupTeks)), `${peran}/${perusahaan ?? "bawaan"} tab ${tab}: kepala sapaan dan lingkup`);
+        pastikan(hasil.teks.includes("Halo, Skrip") && (perusahaan === undefined || hasil.teks.includes(lingkupTeks)), `${peran}/${perusahaan === p1.id ? "UJB1" : (perusahaan ?? "bawaan")} tab ${tab}: kepala sapaan dan lingkup`);
         pastikan(hasil.href.filter((h) => h.startsWith("/?tab=")).length === daftarTab.length, `${peran} tab ${tab}: baris tab memuat ${daftarTab.length} tab`);
       }
     });
