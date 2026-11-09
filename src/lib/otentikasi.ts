@@ -60,6 +60,20 @@ async function bacaTokenCookie(): Promise<string | null | typeof DI_LUAR_PERMINT
   }
 }
 
+/** Baris sesi permintaan ini (id + lingkup perusahaan). null di luar permintaan HTTP, tanpa cookie, atau sesi kedaluwarsa. */
+export const sesiSaatIni = cache(async (): Promise<{ id: string; perusahaanAktifId: string | null } | null> => {
+  const token = await bacaTokenCookie();
+  if (token === DI_LUAR_PERMINTAAN || !token) return null;
+  const sesi = await db.sesi.findUnique({ where: { tokenHash: hashToken(token) }, select: { id: true, perusahaanAktifId: true, kedaluwarsa: true } });
+  if (!sesi || sesi.kedaluwarsa < new Date()) return null;
+  return { id: sesi.id, perusahaanAktifId: sesi.perusahaanAktifId };
+});
+
+/** true bila dipanggil di luar siklus permintaan HTTP (skrip uji, seed, skrip produksi). */
+export async function diLuarPermintaan(): Promise<boolean> {
+  return (await bacaTokenCookie()) === DI_LUAR_PERMINTAAN;
+}
+
 /**
  * Pengguna yang sedang masuk, atau null. Di-cache per render (React cache) supaya
  * layout, halaman, dan komponen yang sama-sama memanggilnya cukup satu kueri.

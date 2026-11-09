@@ -4,6 +4,7 @@ import KerangkaAplikasi from "@/komponen/KerangkaAplikasi";
 import { db } from "@/lib/db";
 import { penggunaSaatIni } from "@/lib/otentikasi";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan } from "@/lib/perusahaan";
 
 /**
  * Semua halaman aplikasi berada di bawah grup rute ini: butuh sesi yang sah.
@@ -13,18 +14,31 @@ import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 export default async function TataLetakAplikasi({ children }: { children: ReactNode }) {
   const pengguna = await penggunaSaatIni();
   if (!pengguna) redirect("/masuk");
-  const [perusahaan, rentang] = await Promise.all([
+  const [perusahaan, rentang, lingkup, semuaPerusahaan] = await Promise.all([
     ambilPengaturanPerusahaan(),
     // MIN/MAX memakai indeks Jurnal(tanggal): konstan, tidak memindai seluruh jurnal tiap permintaan
     db.jurnal.aggregate({ _min: { tanggal: true }, _max: { tanggal: true } }),
+    lingkupPerusahaan(),
+    daftarPerusahaan(true),
   ]);
   const tahunIni = new Date().getFullYear();
   const tahunAwal = rentang._min.tanggal?.getFullYear() ?? tahunIni;
   const tahunAkhir = rentang._max.tanggal?.getFullYear() ?? tahunIni;
   const tahunJurnal = Array.from({ length: Math.max(0, tahunAkhir - tahunAwal + 1) }, (_, i) => tahunAwal + i);
   const daftarTahun = [...new Set([...tahunJurnal, perusahaan.tahunBuku, tahunIni - 1, tahunIni, tahunIni + 1])].sort((a, b) => b - a);
+  // Perusahaan utama tetap memakai nama dari Pengaturan › Perusahaan (halaman itu belum menulis ke tabel Perusahaan),
+  // supaya tampilan lama tidak berubah; perusahaan lain memakai namanya sendiri, gabungan "Semua perusahaan".
+  const namaPerusahaan = lingkup.perusahaanId === null ? "Semua perusahaan" : lingkup.perusahaanId === PERUSAHAAN_UTAMA ? perusahaan.nama : (lingkup.perusahaan?.nama ?? perusahaan.nama);
   return (
-    <KerangkaAplikasi pengguna={pengguna} namaPerusahaan={perusahaan.nama} tahunBuku={perusahaan.tahunBuku} daftarTahun={daftarTahun}>
+    <KerangkaAplikasi
+      pengguna={pengguna}
+      namaPerusahaan={namaPerusahaan}
+      tahunBuku={perusahaan.tahunBuku}
+      daftarTahun={daftarTahun}
+      perusahaanAktif={lingkup.perusahaan}
+      daftarPerusahaan={semuaPerusahaan}
+      bolehGabungan={lingkup.bolehGabungan}
+    >
       {children}
     </KerangkaAplikasi>
   );
