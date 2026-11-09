@@ -54,6 +54,7 @@ export type PphFinalBulananMinAggregateOutputType = {
   ditolakOlehId: string | null
   ditolakPada: Date | null
   catatanPenolakan: string | null
+  perusahaanId: string | null
 }
 
 export type PphFinalBulananMaxAggregateOutputType = {
@@ -72,6 +73,7 @@ export type PphFinalBulananMaxAggregateOutputType = {
   ditolakOlehId: string | null
   ditolakPada: Date | null
   catatanPenolakan: string | null
+  perusahaanId: string | null
 }
 
 export type PphFinalBulananCountAggregateOutputType = {
@@ -90,6 +92,7 @@ export type PphFinalBulananCountAggregateOutputType = {
   ditolakOlehId: number
   ditolakPada: number
   catatanPenolakan: number
+  perusahaanId: number
   _all: number
 }
 
@@ -122,6 +125,7 @@ export type PphFinalBulananMinAggregateInputType = {
   ditolakOlehId?: true
   ditolakPada?: true
   catatanPenolakan?: true
+  perusahaanId?: true
 }
 
 export type PphFinalBulananMaxAggregateInputType = {
@@ -140,6 +144,7 @@ export type PphFinalBulananMaxAggregateInputType = {
   ditolakOlehId?: true
   ditolakPada?: true
   catatanPenolakan?: true
+  perusahaanId?: true
 }
 
 export type PphFinalBulananCountAggregateInputType = {
@@ -158,6 +163,7 @@ export type PphFinalBulananCountAggregateInputType = {
   ditolakOlehId?: true
   ditolakPada?: true
   catatanPenolakan?: true
+  perusahaanId?: true
   _all?: true
 }
 
@@ -263,6 +269,7 @@ export type PphFinalBulananGroupByOutputType = {
   ditolakOlehId: string | null
   ditolakPada: Date | null
   catatanPenolakan: string | null
+  perusahaanId: string
   _count: PphFinalBulananCountAggregateOutputType | null
   _avg: PphFinalBulananAvgAggregateOutputType | null
   _sum: PphFinalBulananSumAggregateOutputType | null
@@ -304,10 +311,12 @@ export type PphFinalBulananWhereInput = {
   ditolakOlehId?: Prisma.StringNullableFilter<"PphFinalBulanan"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"PphFinalBulanan"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"PphFinalBulanan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"PphFinalBulanan"> | string
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
 }
 
 export type PphFinalBulananOrderByWithRelationInput = {
@@ -326,19 +335,22 @@ export type PphFinalBulananOrderByWithRelationInput = {
   ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   jurnal?: Prisma.JurnalOrderByWithRelationInput
   diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
   disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
   ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
 }
 
 export type PphFinalBulananWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  periode?: string
   jurnalId?: string
+  perusahaanId_periode?: Prisma.PphFinalBulananPerusahaanIdPeriodeCompoundUniqueInput
   AND?: Prisma.PphFinalBulananWhereInput | Prisma.PphFinalBulananWhereInput[]
   OR?: Prisma.PphFinalBulananWhereInput[]
   NOT?: Prisma.PphFinalBulananWhereInput | Prisma.PphFinalBulananWhereInput[]
+  periode?: Prisma.StringFilter<"PphFinalBulanan"> | string
   omzet?: Prisma.DecimalFilter<"PphFinalBulanan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   tarifPersen?: Prisma.DecimalFilter<"PphFinalBulanan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jumlah?: Prisma.DecimalFilter<"PphFinalBulanan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -351,11 +363,13 @@ export type PphFinalBulananWhereUniqueInput = Prisma.AtLeast<{
   ditolakOlehId?: Prisma.StringNullableFilter<"PphFinalBulanan"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"PphFinalBulanan"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"PphFinalBulanan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"PphFinalBulanan"> | string
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
-}, "id" | "periode" | "jurnalId">
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
+}, "id" | "jurnalId" | "perusahaanId_periode">
 
 export type PphFinalBulananOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -373,6 +387,7 @@ export type PphFinalBulananOrderByWithAggregationInput = {
   ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   _count?: Prisma.PphFinalBulananCountOrderByAggregateInput
   _avg?: Prisma.PphFinalBulananAvgOrderByAggregateInput
   _max?: Prisma.PphFinalBulananMaxOrderByAggregateInput
@@ -399,6 +414,7 @@ export type PphFinalBulananScalarWhereWithAggregatesInput = {
   ditolakOlehId?: Prisma.StringNullableWithAggregatesFilter<"PphFinalBulanan"> | string | null
   ditolakPada?: Prisma.DateTimeNullableWithAggregatesFilter<"PphFinalBulanan"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableWithAggregatesFilter<"PphFinalBulanan"> | string | null
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"PphFinalBulanan"> | string
 }
 
 export type PphFinalBulananCreateInput = {
@@ -417,6 +433,7 @@ export type PphFinalBulananCreateInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPphFinalBulananInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPphFinalBulananInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPphFinalBulananInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPphFinalBulananInput
 }
 
 export type PphFinalBulananUncheckedCreateInput = {
@@ -435,6 +452,7 @@ export type PphFinalBulananUncheckedCreateInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananUpdateInput = {
@@ -453,6 +471,7 @@ export type PphFinalBulananUpdateInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPphFinalBulananNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPphFinalBulananNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPphFinalBulananNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPphFinalBulananNestedInput
 }
 
 export type PphFinalBulananUncheckedUpdateInput = {
@@ -471,6 +490,7 @@ export type PphFinalBulananUncheckedUpdateInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananCreateManyInput = {
@@ -489,6 +509,7 @@ export type PphFinalBulananCreateManyInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananUpdateManyMutationInput = {
@@ -521,6 +542,7 @@ export type PphFinalBulananUncheckedUpdateManyInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananListRelationFilter = {
@@ -536,6 +558,11 @@ export type PphFinalBulananOrderByRelationAggregateInput = {
 export type PphFinalBulananNullableScalarRelationFilter = {
   is?: Prisma.PphFinalBulananWhereInput | null
   isNot?: Prisma.PphFinalBulananWhereInput | null
+}
+
+export type PphFinalBulananPerusahaanIdPeriodeCompoundUniqueInput = {
+  perusahaanId: string
+  periode: string
 }
 
 export type PphFinalBulananCountOrderByAggregateInput = {
@@ -554,6 +581,7 @@ export type PphFinalBulananCountOrderByAggregateInput = {
   ditolakOlehId?: Prisma.SortOrder
   ditolakPada?: Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PphFinalBulananAvgOrderByAggregateInput = {
@@ -578,6 +606,7 @@ export type PphFinalBulananMaxOrderByAggregateInput = {
   ditolakOlehId?: Prisma.SortOrder
   ditolakPada?: Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PphFinalBulananMinOrderByAggregateInput = {
@@ -596,6 +625,7 @@ export type PphFinalBulananMinOrderByAggregateInput = {
   ditolakOlehId?: Prisma.SortOrder
   ditolakPada?: Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PphFinalBulananSumOrderByAggregateInput = {
@@ -730,6 +760,48 @@ export type PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   deleteMany?: Prisma.PphFinalBulananScalarWhereInput | Prisma.PphFinalBulananScalarWhereInput[]
 }
 
+export type PphFinalBulananCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput> | Prisma.PphFinalBulananCreateWithoutPerusahaanInput[] | Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput | Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.PphFinalBulananCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+}
+
+export type PphFinalBulananUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput> | Prisma.PphFinalBulananCreateWithoutPerusahaanInput[] | Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput | Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.PphFinalBulananCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+}
+
+export type PphFinalBulananUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput> | Prisma.PphFinalBulananCreateWithoutPerusahaanInput[] | Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput | Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.PphFinalBulananUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.PphFinalBulananUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.PphFinalBulananCreateManyPerusahaanInputEnvelope
+  set?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  disconnect?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  delete?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  connect?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  update?: Prisma.PphFinalBulananUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.PphFinalBulananUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.PphFinalBulananUpdateManyWithWhereWithoutPerusahaanInput | Prisma.PphFinalBulananUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.PphFinalBulananScalarWhereInput | Prisma.PphFinalBulananScalarWhereInput[]
+}
+
+export type PphFinalBulananUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput> | Prisma.PphFinalBulananCreateWithoutPerusahaanInput[] | Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput | Prisma.PphFinalBulananCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.PphFinalBulananUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.PphFinalBulananUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.PphFinalBulananCreateManyPerusahaanInputEnvelope
+  set?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  disconnect?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  delete?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  connect?: Prisma.PphFinalBulananWhereUniqueInput | Prisma.PphFinalBulananWhereUniqueInput[]
+  update?: Prisma.PphFinalBulananUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.PphFinalBulananUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.PphFinalBulananUpdateManyWithWhereWithoutPerusahaanInput | Prisma.PphFinalBulananUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.PphFinalBulananScalarWhereInput | Prisma.PphFinalBulananScalarWhereInput[]
+}
+
 export type PphFinalBulananCreateNestedOneWithoutJurnalInput = {
   create?: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutJurnalInput, Prisma.PphFinalBulananUncheckedCreateWithoutJurnalInput>
   connectOrCreate?: Prisma.PphFinalBulananCreateOrConnectWithoutJurnalInput
@@ -777,6 +849,7 @@ export type PphFinalBulananCreateWithoutDiajukanOlehInput = {
   jurnal?: Prisma.JurnalCreateNestedOneWithoutPphFinalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPphFinalBulananInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPphFinalBulananInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPphFinalBulananInput
 }
 
 export type PphFinalBulananUncheckedCreateWithoutDiajukanOlehInput = {
@@ -794,6 +867,7 @@ export type PphFinalBulananUncheckedCreateWithoutDiajukanOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananCreateOrConnectWithoutDiajukanOlehInput = {
@@ -821,6 +895,7 @@ export type PphFinalBulananCreateWithoutDisetujuiOlehInput = {
   jurnal?: Prisma.JurnalCreateNestedOneWithoutPphFinalInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPphFinalBulananInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPphFinalBulananInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPphFinalBulananInput
 }
 
 export type PphFinalBulananUncheckedCreateWithoutDisetujuiOlehInput = {
@@ -838,6 +913,7 @@ export type PphFinalBulananUncheckedCreateWithoutDisetujuiOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananCreateOrConnectWithoutDisetujuiOlehInput = {
@@ -865,6 +941,7 @@ export type PphFinalBulananCreateWithoutDitolakOlehInput = {
   jurnal?: Prisma.JurnalCreateNestedOneWithoutPphFinalInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPphFinalBulananInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPphFinalBulananInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPphFinalBulananInput
 }
 
 export type PphFinalBulananUncheckedCreateWithoutDitolakOlehInput = {
@@ -882,6 +959,7 @@ export type PphFinalBulananUncheckedCreateWithoutDitolakOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananCreateOrConnectWithoutDitolakOlehInput = {
@@ -929,6 +1007,7 @@ export type PphFinalBulananScalarWhereInput = {
   ditolakOlehId?: Prisma.StringNullableFilter<"PphFinalBulanan"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"PphFinalBulanan"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"PphFinalBulanan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"PphFinalBulanan"> | string
 }
 
 export type PphFinalBulananUpsertWithWhereUniqueWithoutDisetujuiOlehInput = {
@@ -963,6 +1042,68 @@ export type PphFinalBulananUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.PphFinalBulananUpdateManyMutationInput, Prisma.PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
+export type PphFinalBulananCreateWithoutPerusahaanInput = {
+  id?: string
+  periode: string
+  omzet: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tarifPersen: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPphFinalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPphFinalBulananInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPphFinalBulananInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPphFinalBulananInput
+}
+
+export type PphFinalBulananUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  periode: string
+  omzet: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tarifPersen: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PphFinalBulananCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.PphFinalBulananWhereUniqueInput
+  create: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PphFinalBulananCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.PphFinalBulananCreateManyPerusahaanInput | Prisma.PphFinalBulananCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type PphFinalBulananUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.PphFinalBulananWhereUniqueInput
+  update: Prisma.XOR<Prisma.PphFinalBulananUpdateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.PphFinalBulananCreateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PphFinalBulananUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.PphFinalBulananWhereUniqueInput
+  data: Prisma.XOR<Prisma.PphFinalBulananUpdateWithoutPerusahaanInput, Prisma.PphFinalBulananUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type PphFinalBulananUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.PphFinalBulananScalarWhereInput
+  data: Prisma.XOR<Prisma.PphFinalBulananUpdateManyMutationInput, Prisma.PphFinalBulananUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
 export type PphFinalBulananCreateWithoutJurnalInput = {
   id?: string
   periode: string
@@ -978,6 +1119,7 @@ export type PphFinalBulananCreateWithoutJurnalInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPphFinalBulananInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPphFinalBulananInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPphFinalBulananInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPphFinalBulananInput
 }
 
 export type PphFinalBulananUncheckedCreateWithoutJurnalInput = {
@@ -995,6 +1137,7 @@ export type PphFinalBulananUncheckedCreateWithoutJurnalInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananCreateOrConnectWithoutJurnalInput = {
@@ -1028,6 +1171,7 @@ export type PphFinalBulananUpdateWithoutJurnalInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPphFinalBulananNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPphFinalBulananNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPphFinalBulananNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPphFinalBulananNestedInput
 }
 
 export type PphFinalBulananUncheckedUpdateWithoutJurnalInput = {
@@ -1045,6 +1189,7 @@ export type PphFinalBulananUncheckedUpdateWithoutJurnalInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananCreateManyDiajukanOlehInput = {
@@ -1062,6 +1207,7 @@ export type PphFinalBulananCreateManyDiajukanOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananCreateManyDisetujuiOlehInput = {
@@ -1079,6 +1225,7 @@ export type PphFinalBulananCreateManyDisetujuiOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananCreateManyDitolakOlehInput = {
@@ -1096,6 +1243,7 @@ export type PphFinalBulananCreateManyDitolakOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PphFinalBulananUpdateWithoutDiajukanOlehInput = {
@@ -1113,6 +1261,7 @@ export type PphFinalBulananUpdateWithoutDiajukanOlehInput = {
   jurnal?: Prisma.JurnalUpdateOneWithoutPphFinalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPphFinalBulananNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPphFinalBulananNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPphFinalBulananNestedInput
 }
 
 export type PphFinalBulananUncheckedUpdateWithoutDiajukanOlehInput = {
@@ -1130,6 +1279,7 @@ export type PphFinalBulananUncheckedUpdateWithoutDiajukanOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehInput = {
@@ -1147,6 +1297,7 @@ export type PphFinalBulananUncheckedUpdateManyWithoutDiajukanOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananUpdateWithoutDisetujuiOlehInput = {
@@ -1164,6 +1315,7 @@ export type PphFinalBulananUpdateWithoutDisetujuiOlehInput = {
   jurnal?: Prisma.JurnalUpdateOneWithoutPphFinalNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPphFinalBulananNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPphFinalBulananNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPphFinalBulananNestedInput
 }
 
 export type PphFinalBulananUncheckedUpdateWithoutDisetujuiOlehInput = {
@@ -1181,6 +1333,7 @@ export type PphFinalBulananUncheckedUpdateWithoutDisetujuiOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehInput = {
@@ -1198,6 +1351,7 @@ export type PphFinalBulananUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananUpdateWithoutDitolakOlehInput = {
@@ -1215,6 +1369,7 @@ export type PphFinalBulananUpdateWithoutDitolakOlehInput = {
   jurnal?: Prisma.JurnalUpdateOneWithoutPphFinalNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPphFinalBulananNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPphFinalBulananNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPphFinalBulananNestedInput
 }
 
 export type PphFinalBulananUncheckedUpdateWithoutDitolakOlehInput = {
@@ -1232,6 +1387,7 @@ export type PphFinalBulananUncheckedUpdateWithoutDitolakOlehInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehInput = {
@@ -1247,6 +1403,79 @@ export type PphFinalBulananUncheckedUpdateManyWithoutDitolakOlehInput = {
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type PphFinalBulananCreateManyPerusahaanInput = {
+  id?: string
+  periode: string
+  omzet: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tarifPersen: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PphFinalBulananUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  periode?: Prisma.StringFieldUpdateOperationsInput | string
+  omzet?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tarifPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnal?: Prisma.JurnalUpdateOneWithoutPphFinalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPphFinalBulananNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPphFinalBulananNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPphFinalBulananNestedInput
+}
+
+export type PphFinalBulananUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  periode?: Prisma.StringFieldUpdateOperationsInput | string
+  omzet?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tarifPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PphFinalBulananUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  periode?: Prisma.StringFieldUpdateOperationsInput | string
+  omzet?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tarifPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1269,10 +1498,12 @@ export type PphFinalBulananSelect<ExtArgs extends runtime.Types.Extensions.Inter
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
   jurnal?: boolean | Prisma.PphFinalBulanan$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pphFinalBulanan"]>
 
 export type PphFinalBulananSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1291,10 +1522,12 @@ export type PphFinalBulananSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
   jurnal?: boolean | Prisma.PphFinalBulanan$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pphFinalBulanan"]>
 
 export type PphFinalBulananSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1313,10 +1546,12 @@ export type PphFinalBulananSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
   jurnal?: boolean | Prisma.PphFinalBulanan$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pphFinalBulanan"]>
 
 export type PphFinalBulananSelectScalar = {
@@ -1335,26 +1570,30 @@ export type PphFinalBulananSelectScalar = {
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
 }
 
-export type PphFinalBulananOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "periode" | "omzet" | "tarifPersen" | "jumlah" | "jurnalId" | "dibuatPada" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["pphFinalBulanan"]>
+export type PphFinalBulananOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "periode" | "omzet" | "tarifPersen" | "jumlah" | "jurnalId" | "dibuatPada" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan" | "perusahaanId", ExtArgs["result"]["pphFinalBulanan"]>
 export type PphFinalBulananInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.PphFinalBulanan$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type PphFinalBulananIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.PphFinalBulanan$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type PphFinalBulananIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   jurnal?: boolean | Prisma.PphFinalBulanan$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 
 export type $PphFinalBulananPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1364,11 +1603,12 @@ export type $PphFinalBulananPayload<ExtArgs extends runtime.Types.Extensions.Int
     diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     /**
-     * "YYYY-MM"
+     * "YYYY-MM"; unik per perusahaan (PPh Final dihitung per wajib pajak), lihat @@unique di bawah
      */
     periode: string
     omzet: runtime.Decimal
@@ -1387,6 +1627,10 @@ export type $PphFinalBulananPayload<ExtArgs extends runtime.Types.Extensions.Int
     ditolakOlehId: string | null
     ditolakPada: Date | null
     catatanPenolakan: string | null
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
   }, ExtArgs["result"]["pphFinalBulanan"]>
   composites: {}
 }
@@ -1785,6 +2029,7 @@ export interface Prisma__PphFinalBulananClient<T, Null = never, ExtArgs extends 
   diajukanOleh<T extends Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PphFinalBulanan$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   disetujuiOleh<T extends Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PphFinalBulanan$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ditolakOleh<T extends Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PphFinalBulanan$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1829,6 +2074,7 @@ export interface PphFinalBulananFieldRefs {
   readonly ditolakOlehId: Prisma.FieldRef<"PphFinalBulanan", 'String'>
   readonly ditolakPada: Prisma.FieldRef<"PphFinalBulanan", 'DateTime'>
   readonly catatanPenolakan: Prisma.FieldRef<"PphFinalBulanan", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"PphFinalBulanan", 'String'>
 }
     
 

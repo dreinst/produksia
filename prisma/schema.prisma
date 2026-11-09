@@ -36,6 +36,12 @@ enum PeranPengguna {
   KRU
   /// Tamu/pihak luar: sama seperti Kru tapi TANPA Laporan Kerusakan Barang, dan tanpa wajib nomor WhatsApp saat didaftarkan
   GUEST
+  /// Pengelola media sosial (HKA social_media_manager): konten, permintaan dan persetujuan tugas desain
+  SOSMED
+  /// Pengelola iklan (HKA ads_manager): kampanye iklan Meta, permintaan tugas desain
+  IKLAN
+  /// Desainer (HKA designer): mengerjakan tugas desain, tanpa membuat atau menyetujui tugas
+  DESAINER
 }
 
 enum JenisAkun {
@@ -61,6 +67,10 @@ enum SumberJurnal {
   PERSEDIAAN
   ASET_TETAP
   PENGGAJIAN
+  /// Jurnal berpasangan transaksi antar perusahaan (model TransaksiAntarPerusahaan); dihapus lewat dokumennya
+  ANTAR_PERUSAHAAN
+  /// Jurnal dokumen mitra proyek: Talangan Mitra (JU-TLM) dan Pembayaran ke Mitra (JU-BYM), lihat src/lib/keuanganProyek.ts
+  MITRA_PROYEK
 }
 
 enum StatusAset {
@@ -90,101 +100,175 @@ enum TahapFoto {
   KEMBALI
 }
 
+/// Jenis entitas (paritas HKA companies.type: agency | brand | client). Hanya informasi tampilan.
+enum JenisPerusahaan {
+  AGENSI
+  MEREK
+  KLIEN
+}
+
+/// Arah transaksi antar perusahaan (lihat model TransaksiAntarPerusahaan).
+/// TAGIH = pemberi menanggung/membayarkan sesuatu untuk penerima, timbul piutang (pemberi) dan hutang (penerima) antar perusahaan.
+/// LUNAS = penerima melunasi hutang antar perusahaannya ke pemberi.
+enum JenisAntarPerusahaan {
+  TAGIH
+  LUNAS
+}
+
+/// Penanda lampiran (HKA tag reference/output/document). null dibaca REFERENSI.
+/// DOKUMEN = PDF buatan sistem yang disimpan dari halaman cetak (D3).
+enum TagBerkas {
+  REFERENSI
+  HASIL
+  DOKUMEN
+}
+
+/// Jenis notifikasi dalam aplikasi. Padanan HKA: assignment, status, approval, approval_result,
+/// revision, follow_up, invoice_due. Nilai INFO HKA tidak dipakai pemanggil mana pun, jadi tidak dibawa.
+enum JenisNotifikasi {
+  PENUGASAN
+  STATUS
+  PERSETUJUAN
+  HASIL_PERSETUJUAN
+  REVISI
+  TINDAK_LANJUT
+  JATUH_TEMPO
+}
+
 // ---------- Pengguna ----------
 
 model Pengguna {
-  id                           String                  @id @default(cuid())
+  id                           String                   @id @default(cuid())
   /// Identitas masuk (huruf kecil, unik); email hanya kontak opsional
-  namaPengguna                 String                  @unique
-  email                        String?                 @unique
+  namaPengguna                 String                   @unique
+  email                        String?                  @unique
   /// Wajib untuk semua peran KECUALI GUEST (lihat pastikanNomorTelepon di src/lib/aksi/pengguna.ts).
   /// Format +62..., dipakai untuk kirim template WhatsApp saat peminjaman/kerusakan menunggu konfirmasi.
   nomorTelepon                 String?
   nama                         String
   kataSandiHash                String
-  peran                        PeranPengguna           @default(KASIR)
-  aktif                        Boolean                 @default(true)
+  peran                        PeranPengguna            @default(KASIR)
+  aktif                        Boolean                  @default(true)
+  /// Peran tambahan (HKA: banyak peran per pengguna). Hanya SOSMED, IKLAN, DESAINER (dijaga src/lib/aksi/pengguna.ts).
+  /// Hak efektif = gabungan peran utama dan tambahan. Logika lama yang membaca `peran` tetap memakai peran utama.
+  peranTambahan                PeranPengguna[]          @default([])
   karyawan                     Karyawan?
   /// Foto profil (opsional); satu-satunya bidang profil yang boleh diubah sendiri oleh peran non-Superadmin/Pemilik
   fotoProfil                   Foto?
   sesi                         Sesi[]
   permintaanAturUlang          PermintaanAturUlang[]
-  dibuatPada                   DateTime                @default(now())
+  dibuatPada                   DateTime                 @default(now())
   /// Relasi balik alur persetujuan: siapa mengajukan / menyetujui / menolak tiap jenis dokumen
-  ajukanPenawaranPenjualan     PenawaranPenjualan[]    @relation("AjukanPenawaranPenjualan")
-  setujuiPenawaranPenjualan    PenawaranPenjualan[]    @relation("SetujuiPenawaranPenjualan")
-  tolakPenawaranPenjualan      PenawaranPenjualan[]    @relation("TolakPenawaranPenjualan")
-  ajukanPesananPenjualan       PesananPenjualan[]      @relation("AjukanPesananPenjualan")
-  setujuiPesananPenjualan      PesananPenjualan[]      @relation("SetujuiPesananPenjualan")
-  tolakPesananPenjualan        PesananPenjualan[]      @relation("TolakPesananPenjualan")
-  ajukanUangMukaPelanggan      UangMukaPelanggan[]     @relation("AjukanUangMukaPelanggan")
-  setujuiUangMukaPelanggan     UangMukaPelanggan[]     @relation("SetujuiUangMukaPelanggan")
-  tolakUangMukaPelanggan       UangMukaPelanggan[]     @relation("TolakUangMukaPelanggan")
-  ajukanPengirimanPesanan      PengirimanPesanan[]     @relation("AjukanPengirimanPesanan")
-  setujuiPengirimanPesanan     PengirimanPesanan[]     @relation("SetujuiPengirimanPesanan")
-  tolakPengirimanPesanan       PengirimanPesanan[]     @relation("TolakPengirimanPesanan")
-  ajukanFakturPenjualan        FakturPenjualan[]       @relation("AjukanFakturPenjualan")
-  setujuiFakturPenjualan       FakturPenjualan[]       @relation("SetujuiFakturPenjualan")
-  tolakFakturPenjualan         FakturPenjualan[]       @relation("TolakFakturPenjualan")
-  ajukanPenerimaanPenjualan    PenerimaanPenjualan[]   @relation("AjukanPenerimaanPenjualan")
-  setujuiPenerimaanPenjualan   PenerimaanPenjualan[]   @relation("SetujuiPenerimaanPenjualan")
-  tolakPenerimaanPenjualan     PenerimaanPenjualan[]   @relation("TolakPenerimaanPenjualan")
-  ajukanReturPenjualan         ReturPenjualan[]        @relation("AjukanReturPenjualan")
-  setujuiReturPenjualan        ReturPenjualan[]        @relation("SetujuiReturPenjualan")
-  tolakReturPenjualan          ReturPenjualan[]        @relation("TolakReturPenjualan")
-  ajukanPesananPembelian       PesananPembelian[]      @relation("AjukanPesananPembelian")
-  setujuiPesananPembelian      PesananPembelian[]      @relation("SetujuiPesananPembelian")
-  tolakPesananPembelian        PesananPembelian[]      @relation("TolakPesananPembelian")
-  ajukanPenerimaanBarang       PenerimaanBarang[]      @relation("AjukanPenerimaanBarang")
-  setujuiPenerimaanBarang      PenerimaanBarang[]      @relation("SetujuiPenerimaanBarang")
-  tolakPenerimaanBarang        PenerimaanBarang[]      @relation("TolakPenerimaanBarang")
-  ajukanFakturPembelian        FakturPembelian[]       @relation("AjukanFakturPembelian")
-  setujuiFakturPembelian       FakturPembelian[]       @relation("SetujuiFakturPembelian")
-  tolakFakturPembelian         FakturPembelian[]       @relation("TolakFakturPembelian")
-  ajukanPembayaranPembelian    PembayaranPembelian[]   @relation("AjukanPembayaranPembelian")
-  setujuiPembayaranPembelian   PembayaranPembelian[]   @relation("SetujuiPembayaranPembelian")
-  tolakPembayaranPembelian     PembayaranPembelian[]   @relation("TolakPembayaranPembelian")
-  ajukanReturPembelian         ReturPembelian[]        @relation("AjukanReturPembelian")
-  setujuiReturPembelian        ReturPembelian[]        @relation("SetujuiReturPembelian")
-  tolakReturPembelian          ReturPembelian[]        @relation("TolakReturPembelian")
-  ajukanJurnal                 Jurnal[]                @relation("AjukanJurnal")
-  setujuiJurnal                Jurnal[]                @relation("SetujuiJurnal")
-  tolakJurnal                  Jurnal[]                @relation("TolakJurnal")
-  ajukanPenyesuaianPersediaan  PenyesuaianPersediaan[] @relation("AjukanPenyesuaianPersediaan")
-  setujuiPenyesuaianPersediaan PenyesuaianPersediaan[] @relation("SetujuiPenyesuaianPersediaan")
-  tolakPenyesuaianPersediaan   PenyesuaianPersediaan[] @relation("TolakPenyesuaianPersediaan")
-  ajukanPindahBarang           PindahBarang[]          @relation("AjukanPindahBarang")
-  setujuiPindahBarang          PindahBarang[]          @relation("SetujuiPindahBarang")
-  tolakPindahBarang            PindahBarang[]          @relation("TolakPindahBarang")
-  ajukanAsetTetap              AsetTetap[]             @relation("AjukanAsetTetap")
-  setujuiAsetTetap             AsetTetap[]             @relation("SetujuiAsetTetap")
-  tolakAsetTetap               AsetTetap[]             @relation("TolakAsetTetap")
-  ajukanPelepasanAset          PelepasanAset[]         @relation("AjukanPelepasanAset")
-  setujuiPelepasanAset         PelepasanAset[]         @relation("SetujuiPelepasanAset")
-  tolakPelepasanAset           PelepasanAset[]         @relation("TolakPelepasanAset")
-  ajukanPrive                  Prive[]                 @relation("AjukanPrive")
-  setujuiPrive                 Prive[]                 @relation("SetujuiPrive")
-  tolakPrive                   Prive[]                 @relation("TolakPrive")
-  ajukanPenggajian             Penggajian[]            @relation("AjukanPenggajian")
-  setujuiPenggajian            Penggajian[]            @relation("SetujuiPenggajian")
-  tolakPenggajian              Penggajian[]            @relation("TolakPenggajian")
-  ajukanTutupBuku              TutupBuku[]             @relation("AjukanTutupBuku")
-  setujuiTutupBuku             TutupBuku[]             @relation("SetujuiTutupBuku")
-  tolakTutupBuku               TutupBuku[]             @relation("TolakTutupBuku")
-  ajukanPphFinalBulanan        PphFinalBulanan[]       @relation("AjukanPphFinalBulanan")
-  setujuiPphFinalBulanan       PphFinalBulanan[]       @relation("SetujuiPphFinalBulanan")
-  tolakPphFinalBulanan         PphFinalBulanan[]       @relation("TolakPphFinalBulanan")
-  ajukanDokumenKas             DokumenKas[]            @relation("AjukanDokumenKas")
-  setujuiDokumenKas            DokumenKas[]            @relation("SetujuiDokumenKas")
-  tolakDokumenKas              DokumenKas[]            @relation("TolakDokumenKas")
-  catatPeminjamanBarang        PeminjamanBarang[]      @relation("CatatPeminjamanBarang")
-  ajukanPeminjamanBarang       PeminjamanBarang[]      @relation("AjukanPeminjamanBarang")
-  setujuiPeminjamanBarang      PeminjamanBarang[]      @relation("SetujuiPeminjamanBarang")
-  tolakPeminjamanBarang        PeminjamanBarang[]      @relation("TolakPeminjamanBarang")
+  ajukanPenawaranPenjualan     PenawaranPenjualan[]     @relation("AjukanPenawaranPenjualan")
+  setujuiPenawaranPenjualan    PenawaranPenjualan[]     @relation("SetujuiPenawaranPenjualan")
+  tolakPenawaranPenjualan      PenawaranPenjualan[]     @relation("TolakPenawaranPenjualan")
+  ajukanPesananPenjualan       PesananPenjualan[]       @relation("AjukanPesananPenjualan")
+  setujuiPesananPenjualan      PesananPenjualan[]       @relation("SetujuiPesananPenjualan")
+  tolakPesananPenjualan        PesananPenjualan[]       @relation("TolakPesananPenjualan")
+  ajukanUangMukaPelanggan      UangMukaPelanggan[]      @relation("AjukanUangMukaPelanggan")
+  setujuiUangMukaPelanggan     UangMukaPelanggan[]      @relation("SetujuiUangMukaPelanggan")
+  tolakUangMukaPelanggan       UangMukaPelanggan[]      @relation("TolakUangMukaPelanggan")
+  ajukanPengirimanPesanan      PengirimanPesanan[]      @relation("AjukanPengirimanPesanan")
+  setujuiPengirimanPesanan     PengirimanPesanan[]      @relation("SetujuiPengirimanPesanan")
+  tolakPengirimanPesanan       PengirimanPesanan[]      @relation("TolakPengirimanPesanan")
+  ajukanFakturPenjualan        FakturPenjualan[]        @relation("AjukanFakturPenjualan")
+  setujuiFakturPenjualan       FakturPenjualan[]        @relation("SetujuiFakturPenjualan")
+  tolakFakturPenjualan         FakturPenjualan[]        @relation("TolakFakturPenjualan")
+  ajukanPenerimaanPenjualan    PenerimaanPenjualan[]    @relation("AjukanPenerimaanPenjualan")
+  setujuiPenerimaanPenjualan   PenerimaanPenjualan[]    @relation("SetujuiPenerimaanPenjualan")
+  tolakPenerimaanPenjualan     PenerimaanPenjualan[]    @relation("TolakPenerimaanPenjualan")
+  ajukanReturPenjualan         ReturPenjualan[]         @relation("AjukanReturPenjualan")
+  setujuiReturPenjualan        ReturPenjualan[]         @relation("SetujuiReturPenjualan")
+  tolakReturPenjualan          ReturPenjualan[]         @relation("TolakReturPenjualan")
+  ajukanPesananPembelian       PesananPembelian[]       @relation("AjukanPesananPembelian")
+  setujuiPesananPembelian      PesananPembelian[]       @relation("SetujuiPesananPembelian")
+  tolakPesananPembelian        PesananPembelian[]       @relation("TolakPesananPembelian")
+  ajukanPenerimaanBarang       PenerimaanBarang[]       @relation("AjukanPenerimaanBarang")
+  setujuiPenerimaanBarang      PenerimaanBarang[]       @relation("SetujuiPenerimaanBarang")
+  tolakPenerimaanBarang        PenerimaanBarang[]       @relation("TolakPenerimaanBarang")
+  ajukanFakturPembelian        FakturPembelian[]        @relation("AjukanFakturPembelian")
+  setujuiFakturPembelian       FakturPembelian[]        @relation("SetujuiFakturPembelian")
+  tolakFakturPembelian         FakturPembelian[]        @relation("TolakFakturPembelian")
+  ajukanPembayaranPembelian    PembayaranPembelian[]    @relation("AjukanPembayaranPembelian")
+  setujuiPembayaranPembelian   PembayaranPembelian[]    @relation("SetujuiPembayaranPembelian")
+  tolakPembayaranPembelian     PembayaranPembelian[]    @relation("TolakPembayaranPembelian")
+  ajukanReturPembelian         ReturPembelian[]         @relation("AjukanReturPembelian")
+  setujuiReturPembelian        ReturPembelian[]         @relation("SetujuiReturPembelian")
+  tolakReturPembelian          ReturPembelian[]         @relation("TolakReturPembelian")
+  ajukanJurnal                 Jurnal[]                 @relation("AjukanJurnal")
+  setujuiJurnal                Jurnal[]                 @relation("SetujuiJurnal")
+  tolakJurnal                  Jurnal[]                 @relation("TolakJurnal")
+  ajukanPenyesuaianPersediaan  PenyesuaianPersediaan[]  @relation("AjukanPenyesuaianPersediaan")
+  setujuiPenyesuaianPersediaan PenyesuaianPersediaan[]  @relation("SetujuiPenyesuaianPersediaan")
+  tolakPenyesuaianPersediaan   PenyesuaianPersediaan[]  @relation("TolakPenyesuaianPersediaan")
+  ajukanPindahBarang           PindahBarang[]           @relation("AjukanPindahBarang")
+  setujuiPindahBarang          PindahBarang[]           @relation("SetujuiPindahBarang")
+  tolakPindahBarang            PindahBarang[]           @relation("TolakPindahBarang")
+  ajukanAsetTetap              AsetTetap[]              @relation("AjukanAsetTetap")
+  setujuiAsetTetap             AsetTetap[]              @relation("SetujuiAsetTetap")
+  tolakAsetTetap               AsetTetap[]              @relation("TolakAsetTetap")
+  ajukanPelepasanAset          PelepasanAset[]          @relation("AjukanPelepasanAset")
+  setujuiPelepasanAset         PelepasanAset[]          @relation("SetujuiPelepasanAset")
+  tolakPelepasanAset           PelepasanAset[]          @relation("TolakPelepasanAset")
+  ajukanPrive                  Prive[]                  @relation("AjukanPrive")
+  setujuiPrive                 Prive[]                  @relation("SetujuiPrive")
+  tolakPrive                   Prive[]                  @relation("TolakPrive")
+  ajukanPenggajian             Penggajian[]             @relation("AjukanPenggajian")
+  setujuiPenggajian            Penggajian[]             @relation("SetujuiPenggajian")
+  tolakPenggajian              Penggajian[]             @relation("TolakPenggajian")
+  ajukanTutupBuku              TutupBuku[]              @relation("AjukanTutupBuku")
+  setujuiTutupBuku             TutupBuku[]              @relation("SetujuiTutupBuku")
+  tolakTutupBuku               TutupBuku[]              @relation("TolakTutupBuku")
+  ajukanPphFinalBulanan        PphFinalBulanan[]        @relation("AjukanPphFinalBulanan")
+  setujuiPphFinalBulanan       PphFinalBulanan[]        @relation("SetujuiPphFinalBulanan")
+  tolakPphFinalBulanan         PphFinalBulanan[]        @relation("TolakPphFinalBulanan")
+  ajukanDokumenKas             DokumenKas[]             @relation("AjukanDokumenKas")
+  setujuiDokumenKas            DokumenKas[]             @relation("SetujuiDokumenKas")
+  tolakDokumenKas              DokumenKas[]             @relation("TolakDokumenKas")
+  catatPeminjamanBarang        PeminjamanBarang[]       @relation("CatatPeminjamanBarang")
+  ajukanPeminjamanBarang       PeminjamanBarang[]       @relation("AjukanPeminjamanBarang")
+  setujuiPeminjamanBarang      PeminjamanBarang[]       @relation("SetujuiPeminjamanBarang")
+  tolakPeminjamanBarang        PeminjamanBarang[]       @relation("TolakPeminjamanBarang")
   catatKerusakanBarang         LaporanKerusakanBarang[] @relation("CatatKerusakanBarang")
   ajukanKerusakanBarang        LaporanKerusakanBarang[] @relation("AjukanKerusakanBarang")
   setujuiKerusakanBarang       LaporanKerusakanBarang[] @relation("SetujuiKerusakanBarang")
   tolakKerusakanBarang         LaporanKerusakanBarang[] @relation("TolakKerusakanBarang")
+
+  // ---- multi perusahaan (D1) ----
+  catatAntarPerusahaan TransaksiAntarPerusahaan[] @relation("CatatAntarPerusahaan")
+
+  // ---- platform (D7): berkas, tautan bagi, akses proyek, notifikasi ----
+  unggahBerkas          Berkas[]                    @relation("UnggahBerkas")
+  buangBerkas           Berkas[]                    @relation("BuangBerkas")
+  buatTautanBagi        TautanBagiBerkas[]          @relation("BuatTautanBagi")
+  cabutTautanBagi       TautanBagiBerkas[]          @relation("CabutTautanBagi")
+  ubahAksesBerkasProyek AksesBerkasProyek[]         @relation("UbahAksesBerkasProyek")
+  aksesBerkasProyek     AksesBerkasProyekPengguna[] @relation("AksesBerkasProyekPengguna")
+  notifikasi            Notifikasi[]                @relation("NotifikasiPengguna")
+
+  // ---- modul CRM (D4) ----
+  picLead                Lead[]          @relation("PicLead")
+  buatLead               Lead[]          @relation("BuatLead")
+  arsipkanLead           Lead[]          @relation("ArsipkanLead")
+  aktivitasLead          AktivitasLead[] @relation("PelakuAktivitasLead")
+  tindakLanjutDitugaskan TindakLanjut[]  @relation("TindakLanjutDitugaskan")
+  buatTindakLanjut       TindakLanjut[]  @relation("BuatTindakLanjut")
+
+  // ---- keuangan proyek (D5) ----
+  catatTalanganMitra     TalanganMitra[]   @relation("CatatTalanganMitra")
+  ajukanTalanganMitra    TalanganMitra[]   @relation("AjukanTalanganMitra")
+  setujuiTalanganMitra   TalanganMitra[]   @relation("SetujuiTalanganMitra")
+  tolakTalanganMitra     TalanganMitra[]   @relation("TolakTalanganMitra")
+  catatPembayaranMitra   PembayaranMitra[] @relation("CatatPembayaranMitra")
+  ajukanPembayaranMitra  PembayaranMitra[] @relation("AjukanPembayaranMitra")
+  setujuiPembayaranMitra PembayaranMitra[] @relation("SetujuiPembayaranMitra")
+  tolakPembayaranMitra   PembayaranMitra[] @relation("TolakPembayaranMitra")
+
+  // ---- modul Pemasaran (D6) ----
+  kontenSmm       Konten[]      @relation("SmmKonten")
+  kontenDesainer  Konten[]      @relation("DesainerKonten")
+  kontenDibuat    Konten[]      @relation("BuatKonten")
+  tugasDesainSaya TugasDesain[] @relation("DesainerTugas")
 }
 
 /// Sesi login berbasis basis data: cookie hanya menyimpan token acak, yang disimpan di sini dalam bentuk hash.
@@ -196,8 +280,13 @@ model Sesi {
   kedaluwarsa DateTime
   dibuatPada  DateTime @default(now())
 
+  /// Lingkup perusahaan pilihan pengguna di sesi ini; null = belum memilih (gabungan bila berhak, selain itu utama)
+  perusahaanAktifId String?
+  perusahaanAktif   Perusahaan? @relation(fields: [perusahaanAktifId], references: [id], onDelete: SetNull)
+
   @@index([penggunaId])
   @@index([kedaluwarsa])
+  @@index([perusahaanAktifId])
 }
 
 /// Catatan percobaan masuk yang GAGAL, untuk membatasi laju (anti brute-force/credential-stuffing).
@@ -210,6 +299,179 @@ model PercobaanMasuk {
 
   @@index([namaPengguna, waktu])
   @@index([ip, waktu])
+}
+
+// ---------- Perusahaan (multi entitas) ----------
+
+/// Satu entitas/badan usaha dengan pembukuan sendiri. id "utama" = D'Production (DPRO): pemilik semua data
+/// sebelum multi perusahaan dan nilai bawaan setiap kolom perusahaanId. Perusahaan utama tidak boleh dinonaktifkan.
+/// id perusahaan standar D'Pro berupa slug tetap (utama, tapussa, smara, bonanova, sahara, nawasena); perusahaan
+/// yang dibuat lewat UI memakai cuid. Tidak ada hapus fisik: arsip = aktif false (relasi Restrict menolak hapus).
+model Perusahaan {
+  id                   String          @id @default(cuid())
+  /// Kode tampilan (lencana, kolom laporan, pemilih): ^[A-Z0-9]{2,12}$, unik. BUKAN bagian nomor cetak.
+  kode                 String          @unique
+  /// Nama tampilan, 1-120 karakter
+  nama                 String
+  /// Nama badan hukum (mis. "CV Tapussa Bhallika"); kosong = sama dengan nama
+  namaLegal            String?
+  jenis                JenisPerusahaan @default(AGENSI)
+  industri             String?
+  alamat               String?
+  kota                 String?
+  telepon              String?
+  email                String?
+  website              String?
+  instagram            String?
+  /// NPWP 15 atau 16 digit (tanda baca boleh); dipakai cetak & SPT
+  npwp                 String?
+  /// Keterangan pajak bebas (paritas HKA tax_info)
+  infoPajak            String?
+  /// Rekening bawaan untuk teks cetak (paritas HKA bank_name/bank_account/bank_holder). Bukan akun buku besar.
+  namaBank             String?
+  cabangBank           String?
+  nomorRekening        String?
+  atasNamaRekening     String?
+  /// Penanda tangan bawaan dokumen cetak
+  penandaTangan        String?
+  jabatanPenandaTangan String?
+  /// Warna merek #RRGGBB untuk lencana perusahaan di UI
+  warna                String?
+  catatan              String?
+  /// false = diarsipkan: tidak bisa dipakai dokumen baru, pembukuannya tetap tampil di laporan
+  aktif                Boolean         @default(true)
+  /// Urutan tampil di pemilih dan tabel
+  urutan               Int             @default(0)
+  dibuatPada           DateTime        @default(now())
+  diubahPada           DateTime        @updatedAt
+
+  // ---- multi perusahaan (D1) ----
+  pengaturan             PengaturanPerusahaan?
+  sesiAktif              Sesi[]
+  akun                   Akun[]
+  gudang                 Gudang[]
+  barang                 Barang[]
+  proyek                 Proyek[]
+  karyawan               Karyawan[]
+  jurnal                 Jurnal[]
+  penawaranPenjualan     PenawaranPenjualan[]
+  pesananPenjualan       PesananPenjualan[]
+  pengirimanPesanan      PengirimanPesanan[]
+  fakturPenjualan        FakturPenjualan[]
+  uangMukaPelanggan      UangMukaPelanggan[]
+  penerimaanPenjualan    PenerimaanPenjualan[]
+  returPenjualan         ReturPenjualan[]
+  pesananPembelian       PesananPembelian[]
+  penerimaanBarang       PenerimaanBarang[]
+  fakturPembelian        FakturPembelian[]
+  pembayaranPembelian    PembayaranPembelian[]
+  returPembelian         ReturPembelian[]
+  dokumenKas             DokumenKas[]
+  asetTetap              AsetTetap[]
+  pindahBarang           PindahBarang[]
+  penyesuaianPersediaan  PenyesuaianPersediaan[]
+  peminjamanBarang       PeminjamanBarang[]
+  laporanKerusakanBarang LaporanKerusakanBarang[]
+  prive                  Prive[]
+  penggajian             Penggajian[]
+  pphFinalBulanan        PphFinalBulanan[]
+  tutupBuku              TutupBukuPerusahaan[]
+  antarSebagaiPemberi    TransaksiAntarPerusahaan[] @relation("PemberiAntarPerusahaan")
+  antarSebagaiPenerima   TransaksiAntarPerusahaan[] @relation("PenerimaAntarPerusahaan")
+
+  // ---- platform (D7) ----
+  berkas     Berkas[]
+  notifikasi Notifikasi[]
+
+  // ---- dokumen penjualan (D2) ----
+  rencanaTermin              RencanaTermin[]
+  formatNomor                FormatNomor[]
+  penghitungNomor            PenghitungNomor[]
+  pengaturanDokumenPenjualan PengaturanDokumenPenjualan?
+
+  // ---- cetak & kop surat (D3) ----
+  kopSurat KopSurat[]
+
+  // ---- modul CRM (D4) ----
+  lead         Lead[]
+  tahapLead    TahapLead[]
+  sumberLead   SumberLead[]
+  tindakLanjut TindakLanjut[]
+
+  // ---- keuangan proyek (D5) ----
+  talanganMitra   TalanganMitra[]
+  pembayaranMitra PembayaranMitra[]
+
+  // ---- modul Pemasaran (D6) ----
+  konten              Konten[]
+  tugasDesain         TugasDesain[]
+  kampanye            Kampanye[]
+  pengaturanPemasaran PengaturanPemasaran?
+
+  @@index([aktif, urutan])
+}
+
+/// Rincian tutup buku serentak (K4): satu baris per perusahaan yang punya saldo pendapatan/beban di tahun itu,
+/// dengan JU-TUTUP milik perusahaan itu. TutupBuku.tahun tetap unik global (satu kunci tahun untuk semua perusahaan).
+model TutupBukuPerusahaan {
+  id           String     @id @default(cuid())
+  tutupBukuId  String
+  tutupBuku    TutupBuku  @relation(fields: [tutupBukuId], references: [id], onDelete: Cascade)
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+  labaBersih   Decimal    @db.Decimal(18, 2)
+  jurnalId     String?    @unique
+  jurnal       Jurnal?    @relation("JurnalTutupBukuPerusahaan", fields: [jurnalId], references: [id])
+
+  @@unique([tutupBukuId, perusahaanId])
+  @@index([perusahaanId])
+}
+
+/// Transaksi antar perusahaan grup (K5): DUA jurnal dalam satu transaksi basis data, satu di buku tiap perusahaan,
+/// masing-masing seimbang. Pengecualian kontrak "satu perusahaanId per dokumen": dokumen ini milik dua perusahaan.
+/// TAGIH: pemberi  Dr Piutang Antar Perusahaan / Cr akunPemberi;  penerima Dr akunPenerima / Cr Hutang Antar Perusahaan.
+/// LUNAS: penerima Dr Hutang Antar Perusahaan / Cr akunPenerima;  pemberi  Dr akunPemberi / Cr Piutang Antar Perusahaan.
+model TransaksiAntarPerusahaan {
+  id               String               @id @default(cuid())
+  /// "AP-YYYY-NNNN" (nomorDokumenBerikutnya)
+  nomor            String               @unique
+  tanggal          DateTime
+  jenis            JenisAntarPerusahaan
+  /// Perusahaan yang memegang piutang antar perusahaan
+  pemberiId        String
+  pemberi          Perusahaan           @relation("PemberiAntarPerusahaan", fields: [pemberiId], references: [id])
+  /// Perusahaan yang memegang hutang antar perusahaan
+  penerimaId       String
+  penerima         Perusahaan           @relation("PenerimaAntarPerusahaan", fields: [penerimaId], references: [id])
+  jumlah           Decimal              @db.Decimal(18, 2)
+  keterangan       String
+  /// Akun lawan di buku pemberi (TAGIH: dikredit, mis. Kas pemberi; LUNAS: didebit, mis. Kas pemberi)
+  akunPemberiId    String
+  akunPemberi      Akun                 @relation("AkunPemberiAntarPerusahaan", fields: [akunPemberiId], references: [id])
+  /// Akun lawan di buku penerima (TAGIH: didebit, mis. Beban/Aset/Hutang Usaha; LUNAS: dikredit, mis. Kas penerima)
+  akunPenerimaId   String
+  akunPenerima     Akun                 @relation("AkunPenerimaAntarPerusahaan", fields: [akunPenerimaId], references: [id])
+  proyekPemberiId  String?
+  proyekPemberi    Proyek?              @relation("ProyekPemberiAntarPerusahaan", fields: [proyekPemberiId], references: [id])
+  proyekPenerimaId String?
+  proyekPenerima   Proyek?              @relation("ProyekPenerimaAntarPerusahaan", fields: [proyekPenerimaId], references: [id])
+  jurnalPemberiId  String?              @unique
+  jurnalPemberi    Jurnal?              @relation("JurnalPemberiAntarPerusahaan", fields: [jurnalPemberiId], references: [id])
+  jurnalPenerimaId String?              @unique
+  jurnalPenerima   Jurnal?              @relation("JurnalPenerimaAntarPerusahaan", fields: [jurnalPenerimaId], references: [id])
+  dicatatOlehId    String?
+  dicatatOleh      Pengguna?            @relation("CatatAntarPerusahaan", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
+  dicatatOlehNama  String
+  dibuatPada       DateTime             @default(now())
+
+  @@index([pemberiId])
+  @@index([penerimaId])
+  @@index([tanggal])
+  @@index([akunPemberiId])
+  @@index([akunPenerimaId])
+  @@index([proyekPemberiId])
+  @@index([proyekPenerimaId])
+  @@index([dicatatOlehId])
 }
 
 // ---------- Mata uang & kurs ----------
@@ -284,8 +546,13 @@ model Karyawan {
   barisPenggajian  BarisPenggajian[]
   dibuatPada       DateTime          @default(now())
 
+  /// Pemilik data (lihat model Perusahaan); dipilih wajib di formulir data induk
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   @@index([departemenId])
   @@index([akunBebanId])
+  @@index([perusahaanId])
 }
 
 model Pelanggan {
@@ -294,6 +561,10 @@ model Pelanggan {
   nama       String
   alamat     String?
   telepon    String?
+  /// Nama orang yang dihubungi (konversi lead, cetak dokumen). Kolom bersama CRM (D4) dan dokumen penjualan (D2).
+  namaKontak String?
+  /// Email kontak pelanggan. Kolom bersama CRM (D4) dan dokumen penjualan (D2).
+  email      String?
   npwp       String?
   penjualId  String?
   penjual    Karyawan? @relation(fields: [penjualId], references: [id])
@@ -308,6 +579,9 @@ model Pelanggan {
   proyek     Proyek[]
   uangMuka   UangMukaPelanggan[]
   dibuatPada DateTime              @default(now())
+
+  // ---- modul CRM (D4) ----
+  lead Lead[]
 
   @@index([penjualId])
 }
@@ -342,6 +616,14 @@ model Proyek {
   tanggalMulai   DateTime?
   tanggalSelesai DateTime?
   keterangan     String?
+  /// Warna lencana proyek, format #rrggbb huruf kecil (HKA color). Kosong = abu-abu bawaan (#71717a)
+  warna          String?
+  /// Nama klien teks bebas (HKA client_name, ≤160). Dipakai bila pelangganId kosong
+  namaKlien      String?
+
+  /// Pemilik data (lihat model Perusahaan); dipilih wajib di formulir data induk
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   penawaran        PenawaranPenjualan[]
   pesanan          PesananPenjualan[]
@@ -352,7 +634,28 @@ model Proyek {
   peminjaman       PeminjamanBarang[]
   kerusakan        LaporanKerusakanBarang[]
 
+  // ---- multi perusahaan (D1) ----
+  antarSebagaiProyekPemberi  TransaksiAntarPerusahaan[] @relation("ProyekPemberiAntarPerusahaan")
+  antarSebagaiProyekPenerima TransaksiAntarPerusahaan[] @relation("ProyekPenerimaAntarPerusahaan")
+
+  // ---- platform (D7) ----
+  berkas      Berkas[]
+  aksesBerkas AksesBerkasProyek?
+
+  // ---- keuangan proyek (D5) ----
+  barisAnggaran   BarisAnggaranProyek[]
+  mitra           MitraProyek[]
+  talanganMitra   TalanganMitra[]
+  pembayaranMitra PembayaranMitra[]
+
+  // ---- modul Pemasaran (D6) ----
+  konten      Konten[]
+  tugasDesain TugasDesain[]
+  kampanye    Kampanye[]
+
   @@index([pelangganId])
+  @@index([perusahaanId])
+  @@index([status])
 }
 
 model Gudang {
@@ -361,16 +664,23 @@ model Gudang {
   nama   String
   alamat String?
 
+  /// Pemilik gudang (opsional). null = gudang fisik bersama, boleh menyimpan barang milik beberapa perusahaan.
+  /// Terisi = hanya dokumen perusahaan itu. Kepemilikan stok ditentukan Barang.perusahaanId, bukan gudang.
+  perusahaanId String?
+  perusahaan   Perusahaan? @relation(fields: [perusahaanId], references: [id], onDelete: Restrict)
+
   stok             StokBarang[]
   pengiriman       PengirimanPesanan[]
   returPenjualan   ReturPenjualan[]
   penerimaanBarang PenerimaanBarang[]
   returPembelian   ReturPembelian[]
   penyesuaian      PenyesuaianPersediaan[]
-  pindahAsal       PindahBarang[]          @relation("GudangAsalPindah")
-  pindahTujuan     PindahBarang[]          @relation("GudangTujuanPindah")
+  pindahAsal       PindahBarang[]           @relation("GudangAsalPindah")
+  pindahTujuan     PindahBarang[]           @relation("GudangTujuanPindah")
   peminjaman       PeminjamanBarang[]
   kerusakan        LaporanKerusakanBarang[]
+
+  @@index([perusahaanId])
 }
 
 model KelompokBarang {
@@ -398,6 +708,14 @@ model Barang {
   /// Batas bawah harga saat nego dengan klien (0 = tanpa batas)
   hargaMinimum Decimal         @default(0) @db.Decimal(18, 2)
   stokMinimum  Decimal         @default(0) @db.Decimal(18, 2)
+  /// deskripsi katalog; hanya isian awal deskripsi baris dokumen penjualan (≤ 3000)
+  deskripsi    String?
+
+  /// Pemilik barang. BARANG (stok) WAJIB terisi (CHECK DB Barang_barang_wajib_milik_perusahaan) sehingga harga pokok
+  /// rata-rata satu barang hanya memuat stok satu perusahaan dan src/lib/stok.ts tidak berubah (K3).
+  /// JASA boleh null = jasa bersama. Bawaan "utama" supaya create lama tanpa isian tetap sah.
+  perusahaanId String?     @default("utama")
+  perusahaan   Perusahaan? @relation(fields: [perusahaanId], references: [id], onDelete: Restrict)
 
   stok                  StokBarang[]
   barisPenawaran        BarisPenawaranPenjualan[]
@@ -432,6 +750,7 @@ model Barang {
   @@index([akunHppId])
   @@index([akunPersediaanId])
   @@index([akunBebanId])
+  @@index([perusahaanId])
 }
 
 model StokBarang {
@@ -459,6 +778,10 @@ model PenawaranPenjualan {
   proyek      Proyek?       @relation(fields: [proyekId], references: [id])
   total       Decimal       @default(0) @db.Decimal(18, 2)
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisPenawaranPenjualan[]
   pesanan           PesananPenjualan?
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
@@ -474,11 +797,68 @@ model PenawaranPenjualan {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  // --- D2: mode event, diskon, fee, PPN tampilan ---
+  mode                ModeDokumen     @default(STANDAR)
+  tampilanEvent       TampilanEvent   @default(RINCI)
+  namaEvent           String?
+  venue               String?
+  /// teks tampilan bebas, mis. "27-30 Agustus 2026"; kosong = rentang tanggal proyek saat dicetak
+  tanggalEvent        String?
+  jenisDiskon         JenisNilai      @default(NOMINAL)
+  /// isian pengguna: rupiah (NOMINAL) atau persen (PERSEN)
+  nilaiDiskon         Decimal         @default(0) @db.Decimal(18, 2)
+  /// hasil hitung (rupiah)
+  diskon              Decimal         @default(0) @db.Decimal(18, 2)
+  jenisFee            JenisNilai      @default(PERSEN)
+  nilaiFee            Decimal         @default(0) @db.Decimal(18, 2)
+  /// management fee hasil hitung (rupiah); total = Σ nilai baris − diskon + fee (tanpa PPN, sama seperti sebelumnya)
+  fee                 Decimal         @default(0) @db.Decimal(18, 2)
+  /// tarif PPN untuk tampilan dan nilai termin termasuk PPN (0 bila non-PKP); tidak masuk total
+  ppnPersen           Decimal         @default(0) @db.Decimal(5, 2)
+  /// ADD ON proposal D'Pro: informatif, TIDAK masuk total, termin, DP, maupun jurnal
+  nilaiAddOn          Decimal?        @db.Decimal(18, 2)
+  keteranganAddOn     String?
+  // --- D2: teks surat & cetak (tidak pernah dibaca jurnal) ---
+  judulCetak          String?
+  nomorCetak          String?
+  perihal             String?
+  lampiran            String?
+  referensi           String?
+  teksPembuka         String?
+  teksPenutup         String?
+  catatan             String?
+  catatanKanan        String?
+  syaratPembayaran    String?
+  infoBank            String?
+  /// nama/kontak/alamat tujuan di cetakan; kosong = data induk pelanggan saat dicetak
+  kepada              String?
+  kepadaUp            String?
+  kepadaAlamat        String?
+  kepadaTelepon       String?
+  kepadaEmail         String?
+  kopSuratId          String?
+  kopSurat            KopSurat?       @relation(fields: [kopSuratId], references: [id], onDelete: SetNull)
+  /// Lead CRM asal penawaran (opsional). Lead hanya diarsipkan, jadi SetNull hanya terjadi saat reset/uji.
+  leadId              String?
+  lead                Lead?           @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  statusKomersial     StatusKomersial @default(DRAF)
+  statusKomersialPada DateTime?
+  berlakuSampai       DateTime?
+  rencanaTermin       RencanaTermin[]
+
+  // ---- keuangan proyek (D5) ----
+  barisAnggaranProyek BarisAnggaranProyek[] @relation("SumberPenawaranAnggaran")
+
+  @@unique([perusahaanId, nomorCetak])
   @@index([pelangganId])
   @@index([proyekId])
   @@index([status])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
+  @@index([kopSuratId])
+  @@index([leadId])
+  @@index([statusKomersial])
 }
 
 model BarisPenawaranPenjualan {
@@ -490,6 +870,21 @@ model BarisPenawaranPenjualan {
   jumlah      Decimal            @db.Decimal(18, 2)
   harga       Decimal            @db.Decimal(18, 2)
   subtotal    Decimal            @db.Decimal(18, 2)
+
+  /// frekuensi mode event (malam/hari/kali). Hanya mengalikan nilai uang; TIDAK PERNAH kuantitas stok, SJ, atau HPP
+  frekuensi       Decimal @default(1) @db.Decimal(18, 2)
+  satuanFrekuensi String?
+  /// seksi baris (mode event); baris berurutan dengan seksi sama dicetak di bawah satu judul
+  bagian          String?
+  urutan          Int     @default(0)
+  /// nama tampil; kosong = Barang.nama. Baris bebas memakai Barang sistem JASA-LAIN dengan nama di sini
+  nama            String?
+  /// satu poin per baris: "- " butir, "-- " sub-butir, **tebal** (src/lib/teksBerbutir.ts)
+  deskripsi       String?
+  /// satuan tampil; kosong = Barang.satuan
+  satuan          String?
+  /// kolom "Keterangan" proposal D'Pro
+  keterangan      String?
 
   @@index([penawaranId])
   @@index([barangId])
@@ -508,6 +903,10 @@ model PesananPenjualan {
   proyek      Proyek?             @relation(fields: [proyekId], references: [id])
   total       Decimal             @default(0) @db.Decimal(18, 2)
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisPesananPenjualan[]
   pengiriman        PengirimanPesanan[]
   faktur            FakturPenjualan[]
@@ -525,11 +924,52 @@ model PesananPenjualan {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  // --- D2: mode event, diskon, fee, teks surat ---
+  mode             ModeDokumen     @default(STANDAR)
+  tampilanEvent    TampilanEvent   @default(RINCI)
+  namaEvent        String?
+  venue            String?
+  tanggalEvent     String?
+  jenisDiskon      JenisNilai      @default(NOMINAL)
+  nilaiDiskon      Decimal         @default(0) @db.Decimal(18, 2)
+  diskon           Decimal         @default(0) @db.Decimal(18, 2)
+  jenisFee         JenisNilai      @default(PERSEN)
+  nilaiFee         Decimal         @default(0) @db.Decimal(18, 2)
+  fee              Decimal         @default(0) @db.Decimal(18, 2)
+  ppnPersen        Decimal         @default(0) @db.Decimal(5, 2)
+  perihal          String?
+  lampiran         String?
+  referensi        String?
+  teksPembuka      String?
+  teksPenutup      String?
+  catatan          String?
+  catatanKanan     String?
+  syaratPembayaran String?
+  infoBank         String?
+  /// nama/kontak/alamat tujuan di cetakan; kosong = data induk pelanggan saat dicetak
+  kepada           String?
+  kepadaUp         String?
+  kepadaAlamat     String?
+  kepadaTelepon    String?
+  kepadaEmail      String?
+  kopSuratId       String?
+  kopSurat         KopSurat?       @relation(fields: [kopSuratId], references: [id], onDelete: SetNull)
+  /// Lead CRM asal (disalin dari penawaran saat konversi)
+  leadId           String?
+  lead             Lead?           @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  rencanaTermin    RencanaTermin[]
+
+  // ---- keuangan proyek (D5) ----
+  barisAnggaranProyek BarisAnggaranProyek[] @relation("SumberPesananAnggaran")
+
   @@index([pelangganId])
   @@index([proyekId])
   @@index([status])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
+  @@index([kopSuratId])
+  @@index([leadId])
 }
 
 model BarisPesananPenjualan {
@@ -543,7 +983,23 @@ model BarisPesananPenjualan {
   jumlahTerkirim Decimal          @default(0) @db.Decimal(18, 2)
   jumlahDifaktur Decimal          @default(0) @db.Decimal(18, 2)
 
+  /// frekuensi mode event (malam/hari/kali). Hanya mengalikan nilai uang; TIDAK PERNAH kuantitas stok, SJ, atau HPP
+  frekuensi       Decimal @default(1) @db.Decimal(18, 2)
+  satuanFrekuensi String?
+  /// seksi baris (mode event); baris berurutan dengan seksi sama dicetak di bawah satu judul
+  bagian          String?
+  urutan          Int     @default(0)
+  /// nama tampil; kosong = Barang.nama. Baris bebas memakai Barang sistem JASA-LAIN dengan nama di sini
+  nama            String?
+  /// satu poin per baris: "- " butir, "-- " sub-butir, **tebal** (src/lib/teksBerbutir.ts)
+  deskripsi       String?
+  /// satuan tampil; kosong = Barang.satuan
+  satuan          String?
+  /// kolom "Keterangan" proposal D'Pro
+  keterangan      String?
+
   barisPengiriman BarisPengiriman[]
+  barisFaktur     BarisFakturPenjualan[]
 
   @@index([pesananId])
   @@index([barangId])
@@ -560,6 +1016,10 @@ model PengirimanPesanan {
   status    StatusDokumen    @default(DRAF)
   jurnalId  String?          @unique
   jurnal    Jurnal?          @relation("JurnalPengiriman", fields: [jurnalId], references: [id])
+
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   baris             BarisPengiriman[]
   faktur            FakturPenjualan[]
@@ -580,6 +1040,7 @@ model PengirimanPesanan {
   @@index([gudangId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisPengiriman {
@@ -614,9 +1075,9 @@ model FakturPenjualan {
   pengiriman        PengirimanPesanan?  @relation(fields: [pengirimanId], references: [id])
   status            StatusDokumen       @default(DRAF)
   total             Decimal             @default(0) @db.Decimal(18, 2)
-  /// Diskon faktur (kontra-pendapatan, akun Diskon Penjualan); dpp = Σ baris − diskon
+  /// Diskon faktur dalam rupiah (kontra-pendapatan, akun Diskon Penjualan); dpp = Σ baris − diskon + fee
   diskon            Decimal             @default(0) @db.Decimal(18, 2)
-  /// Dasar pengenaan pajak (Σ baris − diskon) dan PPN; total = dpp + ppn
+  /// Dasar pengenaan pajak (Σ baris − diskon + fee) dan PPN; total = dpp + ppn
   dpp               Decimal             @default(0) @db.Decimal(18, 2)
   ppnPersen         Decimal             @default(0) @db.Decimal(5, 2)
   ppn               Decimal             @default(0) @db.Decimal(18, 2)
@@ -637,6 +1098,10 @@ model FakturPenjualan {
   jurnal            Jurnal?             @relation("JurnalFakturPenjualan", fields: [jurnalId], references: [id])
   pemakaianUangMuka PemakaianUangMuka[]
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisFakturPenjualan[]
   penerimaan        PenerimaanPenjualan[]
   retur             ReturPenjualan[]
@@ -653,12 +1118,49 @@ model FakturPenjualan {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  // --- D2: mode event, diskon, fee, teks surat & cetak ---
+  mode             ModeDokumen   @default(STANDAR)
+  tampilanEvent    TampilanEvent @default(RINCI)
+  namaEvent        String?
+  venue            String?
+  tanggalEvent     String?
+  /// informasi cetak cara hitung diskon; nilai rupiahnya tetap di kolom `diskon` lama
+  jenisDiskon      JenisNilai    @default(NOMINAL)
+  nilaiDiskon      Decimal       @default(0) @db.Decimal(18, 2)
+  /// diwarisi dari pesanan (server), tidak dari formulir
+  jenisFee         JenisNilai    @default(PERSEN)
+  nilaiFee         Decimal       @default(0) @db.Decimal(18, 2)
+  /// management fee faktur ini (rupiah); masuk dpp; dijurnal Cr akun fee
+  fee              Decimal       @default(0) @db.Decimal(18, 2)
+  judulCetak       String?
+  nomorCetak       String?
+  perihal          String?
+  lampiran         String?
+  referensi        String?
+  teksPembuka      String?
+  teksPenutup      String?
+  catatan          String?
+  catatanKanan     String?
+  syaratPembayaran String?
+  infoBank         String?
+  /// nama/kontak/alamat tujuan di cetakan; kosong = data induk pelanggan saat dicetak
+  kepada           String?
+  kepadaUp         String?
+  kepadaAlamat     String?
+  kepadaTelepon    String?
+  kepadaEmail      String?
+  kopSuratId       String?
+  kopSurat         KopSurat?     @relation(fields: [kopSuratId], references: [id], onDelete: SetNull)
+
+  @@unique([perusahaanId, nomorCetak])
   @@index([pelangganId])
   @@index([pesananId])
   @@index([pengirimanId])
   @@index([status])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
+  @@index([kopSuratId])
 }
 
 model BarisFakturPenjualan {
@@ -675,8 +1177,28 @@ model BarisFakturPenjualan {
   /// konsumsi baris surat jalannya sudah terjadi saat draf dibuat.
   nilaiTransit Decimal         @default(0) @db.Decimal(18, 2)
 
+  /// frekuensi mode event (malam/hari/kali). Hanya mengalikan nilai uang; TIDAK PERNAH kuantitas stok, SJ, atau HPP
+  frekuensi       Decimal                @default(1) @db.Decimal(18, 2)
+  satuanFrekuensi String?
+  /// seksi baris (mode event); baris berurutan dengan seksi sama dicetak di bawah satu judul
+  bagian          String?
+  urutan          Int                    @default(0)
+  /// nama tampil; kosong = Barang.nama. Baris bebas memakai Barang sistem JASA-LAIN dengan nama di sini
+  nama            String?
+  /// satu poin per baris: "- " butir, "-- " sub-butir, **tebal** (src/lib/teksBerbutir.ts)
+  deskripsi       String?
+  /// satuan tampil; kosong = Barang.satuan
+  satuan          String?
+  /// kolom "Keterangan" proposal D'Pro
+  keterangan      String?
+  /// baris pesanan yang ditagih baris ini. Null untuk baris lama yang barangnya ganda di pesanan (cadangan per barangId)
+  barisPesananId  String?
+  barisPesanan    BarisPesananPenjualan? @relation(fields: [barisPesananId], references: [id], onDelete: SetNull)
+  barisRetur      BarisReturPenjualan[]
+
   @@index([fakturId])
   @@index([barangId])
+  @@index([barisPesananId])
 }
 
 model UangMukaPelanggan {
@@ -697,6 +1219,10 @@ model UangMukaPelanggan {
   jurnalId      String?          @unique
   jurnal        Jurnal?          @relation("JurnalUangMuka", fields: [jurnalId], references: [id])
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   pemakaian         PemakaianUangMuka[]
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
   statusPersetujuan StatusPersetujuan   @default(DRAFT)
@@ -711,11 +1237,26 @@ model UangMukaPelanggan {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  // --- D2: termin dan kuitansi DP ---
+  /// butir rencana termin yang dibayar (opsional); hanya tautan, jurnal UM tidak berubah
+  rencanaTerminId String?
+  rencanaTermin   RencanaTermin? @relation(fields: [rencanaTerminId], references: [id], onDelete: Restrict)
+  nomorCetak      String?
+  judulCetak      String?
+  terimaDari      String?
+  keperluan       String?
+  kopSuratId      String?
+  kopSurat        KopSurat?      @relation(fields: [kopSuratId], references: [id], onDelete: SetNull)
+
+  @@unique([perusahaanId, nomorCetak])
   @@index([pelangganId])
   @@index([pesananId])
   @@index([akunId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
+  @@index([rencanaTerminId])
+  @@index([kopSuratId])
 }
 
 /// Jejak DP mana yang dipakai faktur mana (dibalik saat faktur dihapus)
@@ -765,11 +1306,29 @@ model PenerimaanPenjualan {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
+  // --- D2: kuitansi ---
+  nomorCetak String?
+  judulCetak String?
+  /// "Telah terima dari"; kosong = nama pelanggan
+  terimaDari String?
+  /// "Digunakan untuk" (≤ 300, maks 2 baris cetak); kosong = teks otomatis
+  keperluan  String?
+  catatan    String?
+  kopSuratId String?
+  kopSurat   KopSurat? @relation(fields: [kopSuratId], references: [id], onDelete: SetNull)
+
+  @@unique([perusahaanId, nomorCetak])
   @@index([pelangganId])
   @@index([fakturId])
   @@index([akunId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
+  @@index([kopSuratId])
 }
 
 model ReturPenjualan {
@@ -782,12 +1341,18 @@ model ReturPenjualan {
   gudang   Gudang          @relation(fields: [gudangId], references: [id])
   alasan   String?
   total    Decimal         @default(0) @db.Decimal(18, 2)
-  /// Bagian diskon faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon
+  /// Bagian diskon faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon + fee
   diskon   Decimal         @default(0) @db.Decimal(18, 2)
+  /// bagian management fee faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon + fee
+  fee      Decimal         @default(0) @db.Decimal(18, 2)
   dpp      Decimal         @default(0) @db.Decimal(18, 2)
   ppn      Decimal         @default(0) @db.Decimal(18, 2)
   jurnalId String?         @unique
   jurnal   Jurnal?         @relation("JurnalReturPenjualan", fields: [jurnalId], references: [id])
+
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   baris             BarisReturPenjualan[]
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
@@ -806,6 +1371,7 @@ model ReturPenjualan {
   @@index([fakturId])
   @@index([gudangId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisReturPenjualan {
@@ -817,8 +1383,13 @@ model BarisReturPenjualan {
   jumlah     Decimal        @db.Decimal(18, 2)
   hargaPokok Decimal        @default(0) @db.Decimal(18, 2)
 
+  /// baris faktur yang diretur. Null untuk retur lama yang barangnya ganda di faktur (cadangan per barangId)
+  barisFakturId String?
+  barisFaktur   BarisFakturPenjualan? @relation(fields: [barisFakturId], references: [id], onDelete: SetNull)
+
   @@index([returId])
   @@index([barangId])
+  @@index([barisFakturId])
 }
 
 // ---------- Siklus Pembelian ----------
@@ -833,6 +1404,10 @@ model PesananPembelian {
   proyekId  String?
   proyek    Proyek?       @relation(fields: [proyekId], references: [id])
   total     Decimal       @default(0) @db.Decimal(18, 2)
+
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   baris             BarisPesananPembelian[]
   penerimaanBarang  PenerimaanBarang[]
@@ -855,6 +1430,7 @@ model PesananPembelian {
   @@index([status])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisPesananPembelian {
@@ -884,6 +1460,10 @@ model PenerimaanBarang {
   gudang    Gudang           @relation(fields: [gudangId], references: [id])
   status    StatusDokumen    @default(DRAF)
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisPenerimaanBarang[]
   faktur            FakturPembelian[]
   jurnalId          String?                 @unique
@@ -905,6 +1485,7 @@ model PenerimaanBarang {
   @@index([gudangId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisPenerimaanBarang {
@@ -953,6 +1534,10 @@ model FakturPembelian {
   jurnalId      String?           @unique
   jurnal        Jurnal?           @relation("JurnalFakturPembelian", fields: [jurnalId], references: [id])
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisFakturPembelian[]
   pembayaran        PembayaranPembelian[]
   retur             ReturPembelian[]
@@ -975,6 +1560,7 @@ model FakturPembelian {
   @@index([status])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisFakturPembelian {
@@ -1025,11 +1611,16 @@ model PembayaranPembelian {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   @@index([pemasokId])
   @@index([fakturId])
   @@index([akunId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model ReturPembelian {
@@ -1046,6 +1637,10 @@ model ReturPembelian {
   ppn      Decimal         @default(0) @db.Decimal(18, 2)
   jurnalId String?         @unique
   jurnal   Jurnal?         @relation("JurnalReturPembelian", fields: [jurnalId], references: [id])
+
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   baris             BarisReturPembelian[]
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
@@ -1064,6 +1659,7 @@ model ReturPembelian {
   @@index([fakturId])
   @@index([gudangId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisReturPembelian {
@@ -1094,6 +1690,11 @@ model Akun {
   indukId    String?
   induk      Akun?     @relation("PohonAkun", fields: [indukId], references: [id])
   anak       Akun[]    @relation("PohonAkun")
+
+  /// Pemilik akun (opsional). null = akun bagan bersama, boleh dijurnal semua perusahaan. Terisi = hanya jurnal
+  /// perusahaan itu (dijaga pastikanAkunMilik). Dipakai terutama untuk akun kas/bank per entitas (K2).
+  perusahaanId String?
+  perusahaan   Perusahaan? @relation(fields: [perusahaanId], references: [id], onDelete: Restrict)
 
   barisJurnal         BarisJurnal[]
   penerimaanPenjualan PenerimaanPenjualan[] @relation("AkunPenerimaanPenjualan")
@@ -1135,14 +1736,24 @@ model Akun {
   penggajianKas              Penggajian[]            @relation("AkunKasPenggajian")
   pemetaanTambahan           PemetaanAkunTambahan[]  @relation("AkunPemetaanTambahan")
   penyesuaianLawan           PenyesuaianPersediaan[] @relation("AkunLawanPenyesuaian")
-  pengaturanPpnKeluaran      PengaturanPerusahaan?   @relation("PetaPpnKeluaran")
-  pengaturanPpnMasukan       PengaturanPerusahaan?   @relation("PetaPpnMasukan")
-  pengaturanPph23Dimuka      PengaturanPerusahaan?   @relation("PetaPph23Dimuka")
-  pengaturanPph23Dipotong    PengaturanPerusahaan?   @relation("PetaPph23Dipotong")
-  pengaturanBebanPphFinal    PengaturanPerusahaan?   @relation("PetaBebanPphFinal")
-  pengaturanHutangPphFinal   PengaturanPerusahaan?   @relation("PetaHutangPphFinal")
+  pengaturanPpnKeluaran      PengaturanPerusahaan[]  @relation("PetaPpnKeluaran")
+  pengaturanPpnMasukan       PengaturanPerusahaan[]  @relation("PetaPpnMasukan")
+  pengaturanPph23Dimuka      PengaturanPerusahaan[]  @relation("PetaPph23Dimuka")
+  pengaturanPph23Dipotong    PengaturanPerusahaan[]  @relation("PetaPph23Dipotong")
+  pengaturanBebanPphFinal    PengaturanPerusahaan[]  @relation("PetaBebanPphFinal")
+  pengaturanHutangPphFinal   PengaturanPerusahaan[]  @relation("PetaHutangPphFinal")
+
+  // ---- multi perusahaan (D1) ----
+  antarSebagaiAkunPemberi  TransaksiAntarPerusahaan[] @relation("AkunPemberiAntarPerusahaan")
+  antarSebagaiAkunPenerima TransaksiAntarPerusahaan[] @relation("AkunPenerimaAntarPerusahaan")
+
+  // ---- keuangan proyek (D5) ----
+  talanganMitraBeban TalanganMitra[]       @relation("AkunBebanTalanganMitra")
+  pembayaranMitraKas PembayaranMitra[]     @relation("AkunKasPembayaranMitra")
+  kategoriAnggaran   AkunKategoriAnggaran?
 
   @@index([indukId])
+  @@index([perusahaanId])
 }
 
 model PemetaanAkun {
@@ -1204,6 +1815,10 @@ model Jurnal {
   proyekId   String?
   proyek     Proyek?      @relation(fields: [proyekId], references: [id])
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris                 BarisJurnal[]
   penyusutanAset        PenyusutanAset[]
   perolehanAset         AsetTetap?             @relation("JurnalPerolehanAset")
@@ -1239,9 +1854,19 @@ model Jurnal {
   ditolakPada           DateTime?
   catatanPenolakan      String?
 
+  // ---- multi perusahaan (D1) ----
+  tutupBukuPerusahaan  TutupBukuPerusahaan?      @relation("JurnalTutupBukuPerusahaan")
+  antarSebagaiPemberi  TransaksiAntarPerusahaan? @relation("JurnalPemberiAntarPerusahaan")
+  antarSebagaiPenerima TransaksiAntarPerusahaan? @relation("JurnalPenerimaAntarPerusahaan")
+
+  // ---- keuangan proyek (D5) ----
+  talanganMitra   TalanganMitra?   @relation("JurnalTalanganMitra")
+  pembayaranMitra PembayaranMitra? @relation("JurnalPembayaranMitra")
+
   @@index([proyekId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId, tanggal])
 }
 
 model BarisJurnal {
@@ -1293,6 +1918,10 @@ model DokumenKas {
   dibuatOleh  String
   dibuatPada  DateTime        @default(now())
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
   statusPersetujuan StatusPersetujuan @default(DRAFT)
   diajukanOlehId    String?
@@ -1312,6 +1941,7 @@ model DokumenKas {
   @@index([akunKasId])
   @@index([akunLawanId])
   @@index([proyekId])
+  @@index([perusahaanId])
 }
 
 // ---------- Aset Tetap ----------
@@ -1325,6 +1955,10 @@ model AsetTetap {
   nilaiSisa        Decimal    @default(0) @db.Decimal(18, 2)
   umurBulan        Int
   status           StatusAset @default(AKTIF)
+
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   akunAsetId                String
   akunAset                  Akun   @relation("AkunAsetTetap", fields: [akunAsetId], references: [id])
@@ -1359,6 +1993,7 @@ model AsetTetap {
   @@index([akunAkumulasiPenyusutanId])
   @@index([akunPembayaranId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 /// Pelepasan aset (dijual / dihapusbukukan): akumulasi penyusutan & aset dikeluarkan, selisih harga jual vs nilai buku = laba/rugi
@@ -1427,6 +2062,10 @@ model PindahBarang {
   keterangan     String?
   dibuatPada     DateTime @default(now())
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisPindahBarang[]
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
   statusPersetujuan StatusPersetujuan   @default(DRAFT)
@@ -1444,6 +2083,7 @@ model PindahBarang {
   @@index([gudangAsalId])
   @@index([gudangTujuanId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisPindahBarang {
@@ -1472,6 +2112,10 @@ model PenyesuaianPersediaan {
   jurnal      Jurnal?  @relation(fields: [jurnalId], references: [id])
   dibuatPada  DateTime @default(now())
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisPenyesuaianPersediaan[]
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
   statusPersetujuan StatusPersetujuan            @default(DRAFT)
@@ -1493,6 +2137,7 @@ model PenyesuaianPersediaan {
   @@index([gudangId])
   @@index([akunLawanId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisPenyesuaianPersediaan {
@@ -1515,23 +2160,23 @@ model BarisPenyesuaianPersediaan {
 /// Foto disimpan di basis data (Bytes) karena Vercel & Docker VPS tidak punya disk tetap.
 /// barangId = foto barang (galeri di data induk); peminjamanId + tahap = foto bukti keluar/kembali.
 model Foto {
-  id           String                @id @default(cuid())
+  id           String                  @id @default(cuid())
   barangId     String?
-  barang       Barang?               @relation(fields: [barangId], references: [id], onDelete: Cascade)
+  barang       Barang?                 @relation(fields: [barangId], references: [id], onDelete: Cascade)
   peminjamanId String?
-  peminjaman   PeminjamanBarang?     @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
+  peminjaman   PeminjamanBarang?       @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
   /// Foto bukti kondisi rusak (lihat LaporanKerusakanBarang); tahap tidak dipakai untuk foto ini (selalu null)
   kerusakanId  String?
   kerusakan    LaporanKerusakanBarang? @relation(fields: [kerusakanId], references: [id], onDelete: Cascade)
   /// Foto profil pengguna (satu per pengguna); tahap tidak dipakai untuk foto ini (selalu null)
-  penggunaId   String?               @unique
-  pengguna     Pengguna?             @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
+  penggunaId   String?                 @unique
+  pengguna     Pengguna?               @relation(fields: [penggunaId], references: [id], onDelete: Cascade)
   tahap        TahapFoto?
-  urutan       Int                   @default(0)
+  urutan       Int                     @default(0)
   tipe         String
   ukuran       Int
   isi          Bytes
-  dibuatPada   DateTime              @default(now())
+  dibuatPada   DateTime                @default(now())
 
   @@index([barangId])
   @@index([peminjamanId])
@@ -1545,30 +2190,34 @@ model Foto {
 /// dua persetujuan bentrok pada barang yang sama. TIDAK menjurnal (bukan transaksi keuangan).
 /// Status turunan: TERBUKA (ditutupPada null), SELESAI, SELISIH (sisa > 0), DISESUAIKAN (penyesuaianId terisi).
 model PeminjamanBarang {
-  id              String                 @id @default(cuid())
-  nomor           String                 @unique
-  gudangId        String
-  gudang          Gudang                 @relation(fields: [gudangId], references: [id])
-  proyekId        String?
-  proyek          Proyek?                @relation(fields: [proyekId], references: [id])
+  id                  String                 @id @default(cuid())
+  nomor               String                 @unique
+  gudangId            String
+  gudang              Gudang                 @relation(fields: [gudangId], references: [id])
+  proyekId            String?
+  proyek              Proyek?                @relation(fields: [proyekId], references: [id])
   /// Teks bebas: kru lapangan yang mengambil barang belum tentu punya akun
-  namaPengambil   String
+  namaPengambil       String
   /// Nomor WhatsApp pengambil (format +62...), diisi saat ajukan pinjam; dipakai tombol konfirmasi WhatsApp ke Gudang
-  nomorTelepon    String?
+  nomorTelepon        String?
   /// Nomor WhatsApp yang mengembalikan (boleh beda orang dari yang meminjam), diisi saat ajukan kembali
   nomorTeleponKembali String?
-  keterangan      String?
-  waktuKeluar     DateTime               @default(now())
-  rencanaKembali  DateTime?
-  ditutupPada     DateTime?
-  catatanKembali  String?
+  keterangan          String?
+  waktuKeluar         DateTime               @default(now())
+  rencanaKembali      DateTime?
+  ditutupPada         DateTime?
+  catatanKembali      String?
   /// Opsional: dipakai bila kehilangan/kerusakan barang pinjaman perlu jejak akuntansi (jurnal beban)
   /// tambahan di luar pengurangan stok yang sudah terjadi otomatis saat peminjaman disetujui.
-  penyesuaianId   String?
-  penyesuaian     PenyesuaianPersediaan? @relation(fields: [penyesuaianId], references: [id])
-  dicatatOlehId   String?
-  dicatatOleh     Pengguna?              @relation("CatatPeminjamanBarang", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
-  dicatatOlehNama String
+  penyesuaianId       String?
+  penyesuaian         PenyesuaianPersediaan? @relation(fields: [penyesuaianId], references: [id])
+  dicatatOlehId       String?
+  dicatatOleh         Pengguna?              @relation("CatatPeminjamanBarang", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
+  dicatatOlehNama     String
+
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
 
   baris BarisPeminjamanBarang[]
   foto  Foto[]
@@ -1593,21 +2242,22 @@ model PeminjamanBarang {
   @@index([ditutupPada])
   @@index([dicatatOlehId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisPeminjamanBarang {
-  id            String           @id @default(cuid())
-  peminjamanId  String
-  peminjaman    PeminjamanBarang @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
-  barangId      String
-  barang        Barang           @relation(fields: [barangId], references: [id])
-  jumlah        Decimal          @db.Decimal(18, 2)
+  id                    String           @id @default(cuid())
+  peminjamanId          String
+  peminjaman            PeminjamanBarang @relation(fields: [peminjamanId], references: [id], onDelete: Cascade)
+  barangId              String
+  barang                Barang           @relation(fields: [barangId], references: [id])
+  jumlah                Decimal          @db.Decimal(18, 2)
   /// Akumulasi yang sudah kembali dan stoknya sudah ditambah balik (boleh bertahap);
   /// CHECK DB: jumlahKembali <= jumlah
-  jumlahKembali Decimal          @default(0) @db.Decimal(18, 2)
+  jumlahKembali         Decimal          @default(0) @db.Decimal(18, 2)
   /// Diisi Kru lewat "ajukan kembali" (belum menyentuh stok); Gudang mengonfirmasi lalu jumlahKembali
   /// disamakan ke nilai ini dan StokBarang ditambah selisihnya. CHECK DB: jumlahDiajukanKembali <= jumlah
-  jumlahDiajukanKembali Decimal  @default(0) @db.Decimal(18, 2)
+  jumlahDiajukanKembali Decimal          @default(0) @db.Decimal(18, 2)
 
   @@unique([peminjamanId, barangId])
   @@index([barangId])
@@ -1639,6 +2289,10 @@ model LaporanKerusakanBarang {
   dicatatOleh     Pengguna?              @relation("CatatKerusakanBarang", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
   dicatatOlehNama String
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris BarisKerusakanBarang[]
   foto  Foto[]
 
@@ -1661,53 +2315,70 @@ model LaporanKerusakanBarang {
   @@index([penyesuaianId])
   @@index([dicatatOlehId])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 model BarisKerusakanBarang {
-  id         String                 @id @default(cuid())
-  laporanId  String
-  laporan    LaporanKerusakanBarang @relation(fields: [laporanId], references: [id], onDelete: Cascade)
-  barangId   String
-  barang     Barang                 @relation(fields: [barangId], references: [id])
-  jumlah     Decimal                @db.Decimal(18, 2)
+  id        String                 @id @default(cuid())
+  laporanId String
+  laporan   LaporanKerusakanBarang @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+  barangId  String
+  barang    Barang                 @relation(fields: [barangId], references: [id])
+  jumlah    Decimal                @db.Decimal(18, 2)
 
   @@unique([laporanId, barangId])
   @@index([barangId])
 }
 
-// ---------- Pengaturan perusahaan & pajak (singleton id = "default") ----------
+// ---------- Pengaturan per perusahaan & pajak ----------
 
+/// Satu baris per perusahaan. Baris perusahaan utama SELALU ber-id "default" (kompatibel dengan kode & uji lama
+/// yang memakai where: { id: "default" }); baris perusahaan lain ber-id sama dengan perusahaanId (idPengaturan()).
+/// tahunBuku dan wajibPersetujuan bersifat GLOBAL: hanya nilai di baris "default" yang dibaca dan ditulis.
 model PengaturanPerusahaan {
   id               String  @id @default("default")
+  /// Salinan Perusahaan.nama (ditulis bersamaan); dipertahankan untuk PengaturanPajak.nama lama
   nama             String  @default("Produksia")
   /// Pengusaha Kena Pajak: faktur memungut PPN
   pkp              Boolean @default(false)
   tarifPpnPersen   Decimal @default(11) @db.Decimal(5, 2)
   /// Jatuh tempo bawaan faktur (hari)
   terminHari       Int     @default(14)
-  /// Tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
+  /// GLOBAL (hanya baris "default"): tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
   tahunBuku        Int?
-  /// Alur persetujuan maker-checker aktif. Menyala (bawaan): dokumen dibuat sebagai DRAFT, harus
+  /// GLOBAL (hanya baris "default"): alur persetujuan maker-checker aktif. Menyala (bawaan): dokumen dibuat sebagai DRAFT, harus
   /// diajukan lalu disetujui orang lain sebelum jurnalnya masuk buku besar. Dimatikan hanya untuk
   /// usaha yang stafnya terlalu sedikit untuk memisahkan tugas; pengendaliannya hilang.
   wajibPersetujuan Boolean @default(true)
 
-  akunPpnKeluaranId    String? @unique
+  // @unique akun pajak dibuang (D1 §2.4.5): beberapa perusahaan boleh menunjuk akun pajak bersama yang sama
+  akunPpnKeluaranId    String?
   akunPpnKeluaran      Akun?   @relation("PetaPpnKeluaran", fields: [akunPpnKeluaranId], references: [id])
-  akunPpnMasukanId     String? @unique
+  akunPpnMasukanId     String?
   akunPpnMasukan       Akun?   @relation("PetaPpnMasukan", fields: [akunPpnMasukanId], references: [id])
   /// PPh 23 yang dipotong pelanggan dari pembayaran kita (aset: pajak dibayar dimuka)
-  akunPph23DimukaId    String? @unique
+  akunPph23DimukaId    String?
   akunPph23Dimuka      Akun?   @relation("PetaPph23Dimuka", fields: [akunPph23DimukaId], references: [id])
   /// PPh 23 yang kita potong dari vendor (kewajiban: hutang PPh 23)
-  akunPph23DipotongId  String? @unique
+  akunPph23DipotongId  String?
   akunPph23Dipotong    Akun?   @relation("PetaPph23Dipotong", fields: [akunPph23DipotongId], references: [id])
   /// PPh Final UMKM (PP 55/2022): tarif % dari omzet bulanan; beban & hutangnya dijurnal dari Ringkasan Pajak
   pphFinalPersen       Decimal @default(0.5) @db.Decimal(5, 2)
-  akunBebanPphFinalId  String? @unique
+  akunBebanPphFinalId  String?
   akunBebanPphFinal    Akun?   @relation("PetaBebanPphFinal", fields: [akunBebanPphFinalId], references: [id])
-  akunHutangPphFinalId String? @unique
+  akunHutangPphFinalId String?
   akunHutangPphFinal   Akun?   @relation("PetaHutangPphFinal", fields: [akunHutangPphFinalId], references: [id])
+
+  /// Pemilik baris pengaturan ini (satu baris per perusahaan)
+  perusahaanId String     @unique @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
+  @@index([akunPpnKeluaranId])
+  @@index([akunPpnMasukanId])
+  @@index([akunPph23DimukaId])
+  @@index([akunPph23DipotongId])
+  @@index([akunBebanPphFinalId])
+  @@index([akunHutangPphFinalId])
 }
 
 // ---------- Jejak audit ----------
@@ -1734,14 +2405,17 @@ model TutupBuku {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  /// Rincian per perusahaan; jurnalId di atas tetap menunjuk JU-TUTUP perusahaan utama (kompatibel dengan data lama)
+  rincianPerusahaan TutupBukuPerusahaan[]
+
   @@index([statusPersetujuan])
 }
 
 /// PPh Final UMKM per bulan: omzet (DPP faktur − retur) × tarif, dijurnal Dr Beban PPh Final / Cr Hutang PPh Final
 model PphFinalBulanan {
   id                String            @id @default(cuid())
-  /// "YYYY-MM"
-  periode           String            @unique
+  /// "YYYY-MM"; unik per perusahaan (PPh Final dihitung per wajib pajak), lihat @@unique di bawah
+  periode           String
   omzet             Decimal           @db.Decimal(18, 2)
   tarifPersen       Decimal           @db.Decimal(5, 2)
   jumlah            Decimal           @db.Decimal(18, 2)
@@ -1761,7 +2435,13 @@ model PphFinalBulanan {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
+  @@unique([perusahaanId, periode])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 /// Penyesuaian hak akses per peran (Pengaturan › Hak Akses); bawaan ada di src/lib/hakAkses.ts
@@ -1846,10 +2526,15 @@ model Prive {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   @@index([akunKasId])
   @@index([akunPriveId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 /// Siklus SDM: satu proses gaji per periode (bulan), mencakup semua karyawan yang diikutkan.
@@ -1857,7 +2542,13 @@ model Prive {
 model Penggajian {
   id             String   @id @default(cuid())
   nomor          String   @unique
-  periode        String   @unique // YYYY-MM; satu proses per bulan, koreksi = hapus lalu buat ulang
+  /// KUNCI unik periode (dipertahankan @unique demi kueri lama findUnique({ where: { periode } })):
+  /// perusahaan utama = "YYYY-MM" (sama persis dengan `bulan`, perilaku lama); perusahaan lain = "YYYY-MM@<perusahaanId>".
+  /// Dibentuk HANYA oleh kunciPeriodeGaji() di src/lib/sdm.ts. Kode baru membaca `bulan`, bukan kolom ini.
+  periode        String   @unique
+  /// Bulan gaji "YYYY-MM" untuk semua perusahaan: tampilan, pencarian, keterangan jurnal.
+  /// Satu proses per bulan per perusahaan; koreksi = hapus lalu buat ulang
+  bulan          String
   tanggal        DateTime @default(now())
   akunKasId      String
   akunKas        Akun     @relation("AkunKasPenggajian", fields: [akunKasId], references: [id])
@@ -1873,6 +2564,10 @@ model Penggajian {
   penggunaNama   String
   dibuatPada     DateTime @default(now())
 
+  /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+
   baris             BarisPenggajian[]
   /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
   statusPersetujuan StatusPersetujuan @default(DRAFT)
@@ -1887,10 +2582,12 @@ model Penggajian {
   ditolakPada       DateTime?
   catatanPenolakan  String?
 
+  @@unique([perusahaanId, bulan])
   @@index([akunKasId])
   @@index([proyekId])
   @@index([tanggal])
   @@index([statusPersetujuan])
+  @@index([perusahaanId])
 }
 
 /// Rincian gaji per karyawan dalam satu proses Penggajian; diterima = gajiPokok + tunjangan − potongan.
@@ -1935,6 +2632,1201 @@ model LogAktivitas {
   jenis        String
   nomor        String
   keterangan   String?
+  /// Modul asal (null = catatan lama/akuntansi umum). Nilai dan hak lihatnya: MODUL_LOG di src/lib/log.ts
+  modul        String?
+  /// id entitas yang disentuh (tanpa FK supaya log tidak pernah tersangkut penghapusan)
+  entitasId    String?
+  /// Rincian terstruktur. Untuk modul "berkas" kunci folder dan proyekId SELALU ditulis (boleh null)
+  meta         Json?
+  /// Perusahaan tempat kejadian (null = tingkat sistem). Tanpa FK, sama alasannya dengan penggunaId
+  perusahaanId String?
 
   @@index([waktu])
+  @@index([modul, waktu])
+  @@index([aksi, waktu])
+  @@index([penggunaId, waktu])
+  @@index([perusahaanId, waktu])
+  @@index([entitasId])
+}
+
+// ---------- Berkas (D7) ----------
+
+/// Folder logis berkas (pengganti subfolder Drive HKA). Global untuk semua perusahaan.
+/// Folder sistem dibuat migrasi dan tidak bisa dihapus/diganti kode; folder buatan boleh ditambah Superadmin/Pemilik.
+/// terbatas = file_restrictions HKA: hanya peran di peranBoleh + pemegang berkas.akses-penuh yang bisa melihat isinya.
+model FolderBerkas {
+  kode       String          @id
+  nama       String
+  urutan     Int             @default(0)
+  sistem     Boolean         @default(false)
+  terbatas   Boolean         @default(false)
+  peranBoleh PeranPengguna[] @default([])
+  diubahPada DateTime        @updatedAt
+  berkas     Berkas[]
+
+  @@index([urutan])
+}
+
+/// Metadata berkas yang disimpan di server. Isi biner di IsiBerkas (tabel terpisah supaya daftar, cek hak,
+/// dan jawaban 304 tidak pernah membaca biner). Lampiran polimorfik lewat jenisEntitas + entitasId
+/// (daftar jenis dan haknya di JENIS_LAMPIRAN, src/lib/berkas.ts). null = unggahan umum dari halaman Berkas.
+model Berkas {
+  id               String             @id @default(cuid())
+  perusahaanId     String             @default("utama")
+  perusahaan       Perusahaan         @relation(fields: [perusahaanId], references: [id])
+  folderKode       String             @default("LAINNYA")
+  folder           FolderBerkas       @relation(fields: [folderKode], references: [kode])
+  /// Nama tampil yang sudah dibersihkan (1-200 karakter, ekstensi dipertahankan). Tidak pernah dipakai sebagai path.
+  namaBerkas       String
+  /// Hasil deteksi magic bytes di server (src/lib/tipeBerkas.ts), bukan dari klien
+  tipeMime         String
+  /// Byte, 1 sampai 26.214.400 (25 MB)
+  ukuran           Int
+  /// SHA-256 heksadesimal: ETag, verifikasi, deteksi ganda (tidak unik)
+  sha256           String
+  jenisEntitas     String?
+  entitasId        String?
+  tag              TagBerkas?
+  /// Diwarisi dari entitas bila lampiran; dipilih bebas untuk unggahan umum (harus satu perusahaan).
+  /// Restrict: proyek yang masih punya berkas (termasuk di sampah) tidak bisa dihapus, supaya pembatasan
+  /// berkas proyek tidak terbuka diam-diam.
+  proyekId         String?
+  proyek           Proyek?            @relation(fields: [proyekId], references: [id], onDelete: Restrict)
+  diunggahOlehId   String?
+  diunggahOleh     Pengguna?          @relation("UnggahBerkas", fields: [diunggahOlehId], references: [id], onDelete: SetNull)
+  diunggahOlehNama String
+  dibuatPada       DateTime           @default(now())
+  diubahPada       DateTime           @updatedAt
+  /// Buang (hapus lunak): tampil di Sampah, bisa dipulihkan
+  dihapusPada      DateTime?
+  dihapusOlehId    String?
+  dihapusOleh      Pengguna?          @relation("BuangBerkas", fields: [dihapusOlehId], references: [id], onDelete: SetNull)
+  dihapusOlehNama  String?
+  /// Hapus permanen: isi dibuang, metadata tetap untuk riwayat (mis. riwayat revisi desain D6)
+  isiDihapusPada   DateTime?
+  isi              IsiBerkas?
+  tautanBagi       TautanBagiBerkas[]
+
+  // ---- relasi balik domain lain ----
+  /// Aset gambar kop surat yang memakai berkas ini (D3)
+  asetKopSurat AsetKopSurat?
+  /// Iklan yang memakai berkas ini sebagai kreatif (D6)
+  iklanKreatif Iklan[]       @relation("KreatifIklan")
+
+  @@index([perusahaanId, folderKode, dihapusPada])
+  @@index([jenisEntitas, entitasId])
+  @@index([proyekId])
+  @@index([diunggahOlehId])
+  @@index([dihapusOlehId])
+  @@index([dibuatPada])
+}
+
+/// Isi biner berkas. Kolom isi memakai STORAGE EXTERNAL (SQL manual di migrasi): media sudah terkompresi,
+/// jadi kompresi pglz hanya membuang CPU, dan substring bytea tetap murah bila kelak dukungan Range ditambah.
+model IsiBerkas {
+  berkasId String @id
+  berkas   Berkas @relation(fields: [berkasId], references: [id], onDelete: Cascade)
+  isi      Bytes
+}
+
+/// Tautan bagi publik bertoken (pengganti tautan publik Drive). Token asli hanya ditampilkan sekali;
+/// yang disimpan SHA-256-nya (pola Sesi.tokenHash). Satu berkas boleh punya beberapa tautan.
+model TautanBagiBerkas {
+  id              String    @id @default(cuid())
+  berkasId        String
+  berkas          Berkas    @relation(fields: [berkasId], references: [id], onDelete: Cascade)
+  tokenHash       String    @unique
+  kedaluwarsa     DateTime
+  dibuatOlehId    String?
+  dibuatOleh      Pengguna? @relation("BuatTautanBagi", fields: [dibuatOlehId], references: [id], onDelete: SetNull)
+  dibuatOlehNama  String
+  dibuatPada      DateTime  @default(now())
+  dicabutPada     DateTime?
+  dicabutOlehId   String?
+  dicabutOleh     Pengguna? @relation("CabutTautanBagi", fields: [dicabutOlehId], references: [id], onDelete: SetNull)
+  jumlahUnduh     Int       @default(0)
+  terakhirDiunduh DateTime?
+
+  @@index([berkasId])
+  @@index([dibuatOlehId])
+  @@index([dicabutOlehId])
+}
+
+/// Pembatasan berkas per proyek (file_access HKA). Baris ada = terbatas. Berkas proyek ini hanya terlihat oleh
+/// peran di peranBoleh, pengguna di daftar pengguna, dan pemegang berkas.akses-penuh. Hapus baris = buka pembatasan.
+model AksesBerkasProyek {
+  proyekId     String                      @id
+  proyek       Proyek                      @relation(fields: [proyekId], references: [id], onDelete: Cascade)
+  peranBoleh   PeranPengguna[]             @default([])
+  diubahOlehId String?
+  diubahOleh   Pengguna?                   @relation("UbahAksesBerkasProyek", fields: [diubahOlehId], references: [id], onDelete: SetNull)
+  diubahPada   DateTime                    @updatedAt
+  pengguna     AksesBerkasProyekPengguna[]
+
+  @@index([diubahOlehId])
+}
+
+model AksesBerkasProyekPengguna {
+  proyekId   String
+  akses      AksesBerkasProyek @relation(fields: [proyekId], references: [proyekId], onDelete: Cascade)
+  penggunaId String
+  pengguna   Pengguna          @relation("AksesBerkasProyekPengguna", fields: [penggunaId], references: [id], onDelete: Cascade)
+
+  @@id([proyekId, penggunaId])
+  @@index([penggunaId])
+}
+
+// ---------- Notifikasi (D7) ----------
+
+/// Notifikasi dalam aplikasi milik satu pengguna (lintas perusahaan, seperti HKA). Teks disimpan jadi (bahasa Indonesia).
+/// perusahaanId = perusahaan data yang dirujuk; dipakai untuk mengganti lingkup aktif saat diklik (null = tidak perlu).
+/// kunci = pencegah ganda untuk pengingat otomatis (mis. "jatuh-tempo:faktur:<id>"); null untuk notifikasi biasa.
+model Notifikasi {
+  id           String          @id @default(cuid())
+  penggunaId   String
+  pengguna     Pengguna        @relation("NotifikasiPengguna", fields: [penggunaId], references: [id], onDelete: Cascade)
+  perusahaanId String?
+  perusahaan   Perusahaan?     @relation(fields: [perusahaanId], references: [id], onDelete: SetNull)
+  jenis        JenisNotifikasi
+  judul        String
+  isi          String?
+  /// Path internal Produksia (diawali "/", bukan "//"); dijaga CHECK di migrasi
+  tautan       String?
+  kunci        String?
+  dibaca       Boolean         @default(false)
+  dibacaPada   DateTime?
+  dibuatPada   DateTime        @default(now())
+
+  @@unique([penggunaId, kunci])
+  @@index([penggunaId, dibaca, dibuatPada])
+  @@index([perusahaanId])
+  @@index([dibuatPada])
+}
+
+// ---------- Dokumen penjualan gaya HKA / D'Pro (D2) ----------
+
+/// Mode dokumen penjualan. EVENT membuka frekuensi dan seksi per baris (kolom Qty × Freq).
+enum ModeDokumen {
+  STANDAR
+  EVENT
+}
+
+/// Tampilan cetak dokumen mode event: RINCI = satu halaman rinci; RINGKAS = ringkasan + lampiran RAB (penawaran: RAB saja)
+enum TampilanEvent {
+  RINCI
+  RINGKAS
+}
+
+/// Cara hitung diskon dokumen, management fee, dan butir rencana termin
+enum JenisNilai {
+  NOMINAL
+  PERSEN
+}
+
+/// Status komersial penawaran, diisi tangan, tidak menyentuh jurnal. Terpisah dari StatusDokumen yang diturunkan dari progres.
+enum StatusKomersial {
+  DRAF
+  TERKIRIM
+  DITERIMA
+  DITOLAK
+  KEDALUWARSA
+}
+
+/// Kapan penghitung nomor cetak kembali ke 1
+enum ResetNomor {
+  TAHUNAN
+  BULANAN
+  TIDAK_PERNAH
+}
+
+/// Jadwal termin pembayaran penawaran/pesanan. TIDAK berjurnal: tagihan termin hanya cetakan;
+/// uang yang masuk dicatat sebagai UangMukaPelanggan dengan rencanaTerminId; pendapatan tetap diakui di faktur (K9, PSAK 72).
+/// Tepat satu dari penawaranId / pesananId terisi (CHECK di migration.sql). Disalin dari penawaran ke pesanan saat konversi.
+model RencanaTermin {
+  id           String              @id @default(cuid())
+  /// selalu sama dengan perusahaan dokumen induknya; disimpan supaya nomorCetak unik per perusahaan
+  perusahaanId String              @default("utama")
+  perusahaan   Perusahaan          @relation(fields: [perusahaanId], references: [id])
+  penawaranId  String?
+  penawaran    PenawaranPenjualan? @relation(fields: [penawaranId], references: [id], onDelete: Cascade)
+  pesananId    String?
+  pesanan      PesananPenjualan?   @relation(fields: [pesananId], references: [id], onDelete: Cascade)
+  /// 1..4, urut tampil; butir terakhir selalu "sisa"
+  no           Int
+  /// ≤ 40 karakter; kosong saat simpan = "Termin {no}"
+  label        String
+  mode         JenisNilai          @default(PERSEN)
+  /// isian pengguna (persen atau rupiah sebelum PPN); diabaikan untuk butir terakhir
+  nilai        Decimal             @default(0) @db.Decimal(18, 2)
+  /// hasil penyelesaian: rupiah DPP termin (sebelum PPN), > 0
+  jumlah       Decimal             @db.Decimal(18, 2)
+  /// jumlah / basis × 100, dua desimal
+  persen       Decimal             @db.Decimal(7, 2)
+  jatuhTempo   DateTime?
+  /// nomor tagihan termin (diisi saat diterbitkan, bila format nomor "tagihan-termin" aktif atau diisi manual)
+  nomorCetak   String?
+  /// kapan tagihan termin diterbitkan; null = belum ditagih
+  ditagihPada  DateTime?
+  dibuatPada   DateTime            @default(now())
+
+  uangMuka UangMukaPelanggan[]
+
+  @@unique([penawaranId, no])
+  @@unique([pesananId, no])
+  @@unique([perusahaanId, nomorCetak])
+  @@index([pesananId])
+}
+
+/// Format nomor cetak per perusahaan per jenis dokumen, mis. "{SEQ3}/{KODE}-INV2/{ROMAN}/{YYYY}".
+/// Tidak ada baris (atau aktif = false) = nomor cetak mati untuk jenis itu; cetakan memakai nomor internal.
+model FormatNomor {
+  id           String     @id @default(cuid())
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+  /// "penawaran" | "faktur" | "kwitansi" | "kwitansi-dp" | "tagihan-termin" (daftar JENIS_NOMOR_CETAK di src/lib/nomorCetak.ts)
+  jenis        String
+  /// 3-60 karakter, wajib memuat {SEQ}, {SEQ2}, atau {SEQ3}
+  pola         String
+  /// nilai {PREFIX}: ^[A-Z0-9]{0,8}$
+  prefiks      String     @default("")
+  /// nilai {KODE}: ^[A-Z0-9-]{0,12}$; kosong = Perusahaan.kode
+  kode         String     @default("")
+  /// lebar {SEQ}: 3-8
+  digit        Int        @default(4)
+  /// deret penghitung: jenis yang memakai kunci sama berbagi urutan (buku agenda surat). Bawaan = jenis
+  kunciDeret   String
+  reset        ResetNomor @default(TAHUNAN)
+  aktif        Boolean    @default(true)
+  dibuatPada   DateTime   @default(now())
+  diubahPada   DateTime   @updatedAt
+
+  @@unique([perusahaanId, jenis])
+}
+
+/// Penghitung atomik nomor cetak. Kunci gabungan (bukan cuid) karena dinaikkan lewat
+/// INSERT ... ON CONFLICT DO UPDATE ... RETURNING di dalam transaksi dokumen (src/lib/nomorCetak.ts).
+model PenghitungNomor {
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id])
+  kunciDeret   String
+  /// "2026" (TAHUNAN), "2026-09" (BULANAN), "-" (TIDAK_PERNAH), dihitung dari tanggal dokumen di ZONA_WAKTU
+  periode      String
+  /// nomor terakhir yang sudah dibagikan
+  nilai        Int        @default(0)
+
+  @@id([perusahaanId, kunciDeret, periode])
+}
+
+/// Bawaan dokumen penjualan per perusahaan (isian awal formulir). Tidak ada baris = konstanta bawaan di src/lib/dokumenPenjualan.ts
+/// (daftar seksi HKA dan teks pembuka/penutup proposal D'Pro).
+model PengaturanDokumenPenjualan {
+  id                   String        @id @default(cuid())
+  perusahaanId         String        @unique @default("utama")
+  perusahaan           Perusahaan    @relation(fields: [perusahaanId], references: [id])
+  /// isian awal syarat pembayaran (≤ 3000)
+  syaratPembayaran     String?
+  tampilanEvent        TampilanEvent @default(RINCI)
+  /// pilihan seksi baris (≤ 60 butir, tiap ≤ 60 karakter, unik tanpa beda huruf besar)
+  daftarSeksi          String[]      @default([])
+  /// isian awal paragraf pembuka/penutup penawaran (≤ 3000)
+  teksPembukaPenawaran String?
+  teksPenutupPenawaran String?
+  diubahPada           DateTime      @updatedAt
+}
+
+// ---------- Cetak & kop surat (D3) ----------
+
+/// Jenis dokumen yang punya template cetak per kop. Laporan proyek tidak memakai template.
+enum JenisDokumenCetak {
+  PENAWARAN
+  TAGIHAN_TERMIN
+  FAKTUR
+  KWITANSI
+  KWITANSI_DP
+}
+
+/// Tata letak PDF. HKA_* = tata letak generik HKA (dokumen mode event otomatis memakai tampilan event HKA
+/// bertema kop ini). DPRO_* = desain Figma D'Pro. KWITANSI_ENTITAS = kwitansi/invoice tulisan per gaya entitas
+/// (butuh KopSurat.gayaEntitas). KWITANSI_POLOS = kwitansi teks tanpa gambar (pola SMARA).
+enum TataLetakCetak {
+  HKA_STANDAR
+  HKA_BERMEREK
+  HKA_SURAT
+  HKA_MINIMAL
+  DPRO_INVOICE
+  DPRO_PROPOSAL
+  KWITANSI_ENTITAS
+  KWITANSI_POLOS
+}
+
+enum UkuranKertas {
+  A4
+  A5
+  A5_LANDSCAPE
+}
+
+/// TITIK = "Rp 1.234.567" (gaya Indonesia, HKA, kwitansi D'Pro). KOMA = "1,234,567" (invoice & proposal Figma D'Pro).
+enum GayaAngka {
+  TITIK
+  KOMA
+}
+
+/// Gaya entitas D'Pro: folder aset bawaan src/aset-cetak/<gaya huruf kecil> dan parameter kwitansi per entitas.
+enum GayaEntitas {
+  DPRO
+  TAPUSSA
+  BONANOVA
+  SAHARA
+  NAWASENA
+}
+
+/// Slot gambar kop. TANDA_TANGAN dan STEMPEL tidak pernah punya aset bawaan (hanya unggahan privat).
+enum JenisAsetKop {
+  KOP
+  KAKI
+  WATERMARK
+  LOGO
+  JUDUL_INVOICE
+  JUDUL_KWITANSI
+  LABEL_PEMBAYARAN
+  LABEL_SALAM
+  TANDA_TANGAN
+  STEMPEL
+}
+
+/// Kop surat milik satu perusahaan: gaya, warna, tata letak, aset gambar, dan penimpa identitas cetak.
+/// Kolom identitas kosong = kolom bernama sama di Perusahaan (D1). Hapus lunak: dokumen lama boleh tetap
+/// menunjuknya, tetapi saat dicetak kop terhapus diganti kop bawaan perusahaan (src/lib/cetak/kop.ts).
+model KopSurat {
+  id            String         @id @default(cuid())
+  perusahaanId  String         @default("utama")
+  perusahaan    Perusahaan     @relation(fields: [perusahaanId], references: [id], onDelete: Restrict)
+  /// 1-80 karakter; unik tanpa beda huruf besar di antara kop belum terhapus milik perusahaan yang sama (dicek aplikasi)
+  nama          String
+  /// Satu kop bawaan per perusahaan, dijaga aksi kop dalam satu transaksi (bukan indeks parsial, lihat D3 §2.4)
+  bawaan        Boolean        @default(false)
+  /// null = kop generik HKA (tanpa aset bawaan repo); selain itu folder aset bawaan + parameter kwitansi entitas
+  gayaEntitas   GayaEntitas?
+  /// Tata letak untuk jenis dokumen yang tidak punya baris TemplateCetak; hanya nilai HKA_*
+  tataLetakUmum TataLetakCetak @default(HKA_STANDAR)
+
+  // Khusus kop (tidak ada di Perusahaan)
+  /// ≤60, judul merek di kepala tengah/minimal (HKA brand_title); kosong = nama perusahaan
+  judulMerek    String?
+  /// ≤120, tagline kepala (HKA header_text)
+  teksKepala    String?
+  /// ≤60
+  facebook      String?
+  /// ≤200, teks putih di pita gelombang bermerek/surat (maks 3 baris × 45 karakter tercetak)
+  alamatKaki    String?
+  /// ≤150, kaki tengah tata letak standar/minimal
+  teksKaki      String?
+  /// ≤20, nama bank singkat untuk kwitansi dan Nb. proposal, mis. "BCA"; kosong = namaBank
+  singkatanBank String?
+  /// ≤120, baris di atas tabel rekening bermerek (HKA bank_note)
+  catatanBank   String?
+  /// ≤120; kosong saat simpan dikembalikan ke "Hormat kami,"
+  teksSalam     String  @default("Hormat kami,")
+  /// ≤80, kontak "Nb." proposal D'Pro; kosong = penandaTangan
+  namaKontak    String?
+  /// ≤40; kosong = telepon
+  teleponKontak String?
+
+  // Penimpa identitas Perusahaan (D1); kosong = nilai Perusahaan. Dipakai untuk varian kop (mis. rekening atau penanda tangan lain)
+  namaLegal            String?
+  alamat               String?
+  kota                 String?
+  telepon              String?
+  email                String?
+  website              String?
+  instagram            String?
+  npwp                 String?
+  namaBank             String?
+  cabangBank           String?
+  nomorRekening        String?
+  atasNamaRekening     String?
+  penandaTangan        String?
+  jabatanPenandaTangan String?
+
+  // Tampilan (semua warna ^#[0-9A-F]{6}$, disimpan huruf besar)
+  /// HKA: kepala tabel, garis, gelombang. D'Pro: merah kepala tabel
+  warnaAksen      String  @default("#111111")
+  /// HKA: judul bermerek. D'Pro: navy label, garis tabel, Grand Total
+  warnaUtama      String  @default("#1F3550")
+  /// D'Pro: biru baris Total / TOTAL BIAYA LANGSUNG
+  warnaSekunder   String  @default("#003E9F")
+  /// D'Pro: latar Management Fee / DISCOUNT / ADD ON
+  warnaLembut     String  @default("#DBE4F0")
+  /// Teks isi
+  warnaTinta      String  @default("#111111")
+  /// Hanya tata letak HKA_STANDAR (sama seperti HKA show_logo)
+  tampilLogo      Boolean @default(true)
+  /// Logo pudar 22% di tengah halaman (tata letak HKA_*)
+  tampilWatermark Boolean @default(false)
+
+  dibuatPada  DateTime  @default(now())
+  diubahPada  DateTime  @updatedAt
+  dihapusPada DateTime?
+
+  aset       AsetKopSurat[]
+  template   TemplateCetak[]
+  // relasi balik kolom kopSuratId milik D2
+  penawaran  PenawaranPenjualan[]
+  pesanan    PesananPenjualan[]
+  faktur     FakturPenjualan[]
+  penerimaan PenerimaanPenjualan[]
+  uangMuka   UangMukaPelanggan[]
+
+  @@index([perusahaanId, dihapusPada])
+}
+
+/// Pilihan tata letak per kop per jenis dokumen. Tidak ada baris = KopSurat.tataLetakUmum, A4, gaya angka bawaan.
+model TemplateCetak {
+  id                String            @id @default(cuid())
+  kopSuratId        String
+  kopSurat          KopSurat          @relation(fields: [kopSuratId], references: [id], onDelete: Cascade)
+  jenis             JenisDokumenCetak
+  tataLetak         TataLetakCetak
+  ukuran            UkuranKertas      @default(A4)
+  /// null = bawaan tata letak (DPRO_INVOICE, DPRO_PROPOSAL: KOMA; lainnya: TITIK)
+  gayaAngka         GayaAngka?
+  /// ≤60; null = judul bawaan jenis. Kalah oleh judulCetak dokumen (D2)
+  judul             String?
+  /// Nilai awal kotak "Bubuhkan tanda tangan & stempel" di panel cetak
+  tandaTanganBawaan Boolean           @default(true)
+  diubahPada        DateTime          @updatedAt
+
+  @@unique([kopSuratId, jenis])
+}
+
+/// Gambar unggahan untuk satu slot kop. Isi biner ada di Berkas/IsiBerkas (D7, jenisEntitas "kop-surat",
+/// folder KOP, hak lihat = pengaturan.tulis). Slot tanpa baris ini memakai aset bawaan repo menurut
+/// KopSurat.gayaEntitas (kecuali TANDA_TANGAN dan STEMPEL).
+model AsetKopSurat {
+  id         String       @id @default(cuid())
+  kopSuratId String
+  kopSurat   KopSurat     @relation(fields: [kopSuratId], references: [id], onDelete: Cascade)
+  jenis      JenisAsetKop
+  berkasId   String       @unique
+  berkas     Berkas       @relation(fields: [berkasId], references: [id], onDelete: Cascade)
+  /// Dimensi asli (dibaca periksaGambar saat unggah), untuk menjaga rasio dan validasi
+  lebarPx    Int
+  tinggiPx   Int
+  dibuatPada DateTime     @default(now())
+
+  @@unique([kopSuratId, jenis])
+}
+
+// ---------- CRM (hasil peleburan HKA Console, D4) ----------
+
+/// Jenis tahap pipeline. Status lead = jenis tahapnya (tidak disimpan terpisah).
+enum JenisTahapLead {
+  BERJALAN
+  MENANG
+  KALAH
+}
+
+/// Status pengingat tindak lanjut. "Terlambat" tidak disimpan: dihitung saat tampil (MENUNGGU dan jatuh tempo sudah lewat).
+enum StatusTindakLanjut {
+  MENUNGGU
+  SELESAI
+  DIBATALKAN
+}
+
+/// Jenis entri linimasa lead. Teks tampilan dirangkai saat tampil dari jenis + meta (src/lib/crm.ts, teksAktivitas).
+enum JenisAktivitasLead {
+  DIBUAT
+  DIUBAH
+  TAHAP_DIUBAH
+  MENANG
+  KALAH
+  CATATAN
+  TINDAK_LANJUT_DIJADWALKAN
+  TINDAK_LANJUT_STATUS
+  DIKONVERSI
+  PENAWARAN_DIBUAT
+  DIARSIPKAN
+  DIPULIHKAN
+}
+
+/// Tahap pipeline per perusahaan. Urutan = urutan kolom kanban dan corong; tahap urutan terkecil = tahap awal lead baru (wajib BERJALAN).
+model TahapLead {
+  id           String         @id @default(cuid())
+  perusahaanId String         @default("utama")
+  perusahaan   Perusahaan     @relation(fields: [perusahaanId], references: [id], onDelete: Cascade)
+  nama         String
+  jenis        JenisTahapLead @default(BERJALAN)
+  /// 1, 2, 3, ... rapat tanpa celah (dirapikan ulang setiap tambah/hapus/geser)
+  urutan       Int
+  dibuatPada   DateTime       @default(now())
+
+  lead Lead[]
+
+  @@unique([perusahaanId, nama])
+  @@index([perusahaanId, urutan])
+}
+
+/// Daftar pilihan sumber lead per perusahaan. Lead menyimpan NAMA sumber (teks), jadi menghapus sumber tidak mengubah lead lama.
+model SumberLead {
+  id           String     @id @default(cuid())
+  perusahaanId String     @default("utama")
+  perusahaan   Perusahaan @relation(fields: [perusahaanId], references: [id], onDelete: Cascade)
+  nama         String
+  urutan       Int        @default(0)
+  dibuatPada   DateTime   @default(now())
+
+  @@unique([perusahaanId, nama])
+  @@index([perusahaanId, urutan])
+}
+
+/// Calon klien (lead) CRM. Milik satu perusahaan; perusahaan tidak bisa diganti setelah dibuat (tahap per perusahaan berbeda).
+model Lead {
+  id                String     @id @default(cuid())
+  perusahaanId      String     @default("utama")
+  perusahaan        Perusahaan @relation(fields: [perusahaanId], references: [id])
+  /// Nama orang yang dihubungi
+  nama              String
+  /// Nama perusahaan/usaha calon klien; disalin ke Pelanggan.nama saat konversi
+  namaUsaha         String
+  telepon           String
+  whatsapp          String
+  email             String?
+  instagram         String?
+  website           String?
+  industri          String?
+  lokasi            String?
+  /// Nama sumber lead saat dicatat (teks dari daftar SumberLead perusahaan lead)
+  sumber            String
+  picId             String?
+  pic               Pengguna?  @relation("PicLead", fields: [picId], references: [id], onDelete: SetNull)
+  nilaiEstimasi     Decimal    @default(0) @db.Decimal(18, 2)
+  /// Catatan tetap pada lead (berbeda dari catatan linimasa di AktivitasLead)
+  catatan           String?
+  /// Tag huruf kecil, tanpa duplikat, maksimal 20
+  tag               String[]   @default([])
+  /// Pasangan nama → nilai teks bebas (custom_fields HKA), maksimal 30 pasangan
+  fieldTambahan     Json       @default("{}")
+  tahapId           String
+  tahap             TahapLead  @relation(fields: [tahapId], references: [id], onDelete: Restrict)
+  /// Alasan menang/kalah; wajib saat masuk tahap KALAH, dikosongkan saat kembali ke BERJALAN
+  alasanMenangKalah String?
+  /// Diisi saat masuk tahap MENANG/KALAH, dikosongkan saat kembali ke BERJALAN
+  ditutupPada       DateTime?
+  pelangganId       String?
+  pelanggan         Pelanggan? @relation(fields: [pelangganId], references: [id], onDelete: SetNull)
+  dikonversiPada    DateTime?
+  dibuatOlehId      String?
+  dibuatOleh        Pengguna?  @relation("BuatLead", fields: [dibuatOlehId], references: [id], onDelete: SetNull)
+  dibuatOlehNama    String
+  dibuatPada        DateTime   @default(now())
+  diubahPada        DateTime   @updatedAt
+  /// Arsip (hapus lunak). Lead terarsip disembunyikan dari daftar, kanban, statistik, pencarian, dan pengingat.
+  dihapusPada       DateTime?
+  dihapusOlehId     String?
+  dihapusOleh       Pengguna?  @relation("ArsipkanLead", fields: [dihapusOlehId], references: [id], onDelete: SetNull)
+  dihapusOlehNama   String?
+
+  aktivitas    AktivitasLead[]
+  tindakLanjut TindakLanjut[]
+  penawaran    PenawaranPenjualan[]
+  /// Pesanan yang leadId-nya disalin dari penawaran saat konversi (kolom milik D2)
+  pesanan      PesananPenjualan[]
+
+  @@index([perusahaanId, dihapusPada, dibuatPada])
+  @@index([tahapId])
+  @@index([picId])
+  @@index([pelangganId])
+  @@index([dibuatOlehId])
+  @@index([dihapusOlehId])
+}
+
+/// Entri linimasa lead. Tidak bisa diubah atau dihapus dari aplikasi.
+model AktivitasLead {
+  id           String             @id @default(cuid())
+  leadId       String
+  lead         Lead               @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  jenis        JenisAktivitasLead
+  /// Isi catatan (jenis CATATAN), 1-5000 karakter
+  isi          String?
+  /// Rincian per jenis (tabel D4 §3.6), dipakai merangkai teks saat tampil
+  meta         Json               @default("{}")
+  penggunaId   String?
+  pengguna     Pengguna?          @relation("PelakuAktivitasLead", fields: [penggunaId], references: [id], onDelete: SetNull)
+  penggunaNama String
+  dibuatPada   DateTime           @default(now())
+
+  @@index([leadId, dibuatPada])
+  @@index([penggunaId])
+}
+
+/// Pengingat tindak lanjut; boleh tanpa lead (pengingat umum). Bila ada lead, perusahaanId = perusahaan lead.
+model TindakLanjut {
+  id             String             @id @default(cuid())
+  perusahaanId   String             @default("utama")
+  perusahaan     Perusahaan         @relation(fields: [perusahaanId], references: [id])
+  leadId         String?
+  lead           Lead?              @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  judul          String
+  jatuhTempo     DateTime
+  catatan        String?
+  status         StatusTindakLanjut @default(MENUNGGU)
+  ditugaskanKeId String?
+  ditugaskanKe   Pengguna?          @relation("TindakLanjutDitugaskan", fields: [ditugaskanKeId], references: [id], onDelete: SetNull)
+  /// Waktu notifikasi jatuh tempo dikirim; null = belum. Dikosongkan lagi bila jatuh tempo diubah.
+  diingatkanPada DateTime?
+  selesaiPada    DateTime?
+  dibuatOlehId   String?
+  dibuatOleh     Pengguna?          @relation("BuatTindakLanjut", fields: [dibuatOlehId], references: [id], onDelete: SetNull)
+  dibuatOlehNama String
+  dibuatPada     DateTime           @default(now())
+  diubahPada     DateTime           @updatedAt
+
+  @@index([perusahaanId, status, jatuhTempo])
+  @@index([ditugaskanKeId, status, diingatkanPada, jatuhTempo])
+  @@index([leadId, jatuhTempo])
+  @@index([dibuatOlehId])
+}
+
+// ---------- Keuangan proyek (peleburan HKA, D5) ----------
+
+/// Mode bagian mitra (HKA partner.mode): PERSEN dari sisa setelah nominal tetap, atau NOMINAL rupiah tetap
+enum ModeBagiHasil {
+  PERSEN
+  NOMINAL
+}
+
+/// Jenis Pembayaran ke Mitra (HKA payout.kind): MODAL = pengembalian talangan, LABA = bagi laba
+enum JenisPembayaranMitra {
+  MODAL
+  LABA
+}
+
+/// Kategori anggaran proyek (HKA CATEGORIES + kategori buatan pengguna/impor). Global untuk semua
+/// perusahaan karena bagan akun dan pemetaannya bersama (K2). Realisasi per kategori dibaca dari jurnal
+/// bertanda proyek lewat AkunKategoriAnggaran.
+model KategoriAnggaran {
+  id         String   @id @default(cuid())
+  /// Nama tampil, spasi dirapikan, 1-60 karakter
+  nama       String
+  /// nama huruf kecil dengan spasi tunggal: kunci unik tanpa beda huruf besar (pengganti _canon HKA)
+  namaKunci  String   @unique
+  /// Urutan tampil; kategori bawaan 10, 20, ... 90, buatan pengguna/impor 1000
+  urutan     Int      @default(1000)
+  /// true untuk 9 kategori bawaan HKA (boleh diganti nama, tidak boleh dihapus selama dipakai)
+  bawaan     Boolean  @default(false)
+  dibuatPada DateTime @default(now())
+
+  akun          AkunKategoriAnggaran[]
+  barisAnggaran BarisAnggaranProyek[]
+
+  @@index([urutan])
+}
+
+/// Pemetaan akun beban → kategori anggaran. Satu akun paling banyak satu kategori (akunId sebagai PK).
+/// Akun kelompok boleh dipetakan: berlaku untuk seluruh keturunannya kecuali keturunan yang dipetakan
+/// sendiri (pemetaan terdekat menang, lihat kategoriUntukAkun di src/lib/kategoriAnggaran.ts).
+model AkunKategoriAnggaran {
+  akunId     String           @id
+  akun       Akun             @relation(fields: [akunId], references: [id], onDelete: Cascade)
+  kategoriId String
+  kategori   KategoriAnggaran @relation(fields: [kategoriId], references: [id], onDelete: Cascade)
+
+  @@index([kategoriId])
+}
+
+/// Baris anggaran (rencana biaya) proyek per kategori (HKA project_budget_lines). Tanpa jurnal.
+/// Perusahaan dibaca dari proyek (anak proyek, tanpa kolom perusahaanId sendiri).
+model BarisAnggaranProyek {
+  id                String              @id @default(cuid())
+  proyekId          String
+  proyek            Proyek              @relation(fields: [proyekId], references: [id], onDelete: Cascade)
+  kategoriId        String
+  kategori          KategoriAnggaran    @relation(fields: [kategoriId], references: [id], onDelete: Restrict)
+  /// Uraian item (HKA description), 1-200 karakter
+  deskripsi         String
+  /// Vendor/mitra rencana, teks bebas ≤120
+  vendor            String?
+  /// Rencana biaya tanpa PPN (HKA planned), 0 s.d. 10 triliun
+  rencana           Decimal             @default(0) @db.Decimal(18, 2)
+  /// Catatan ≤1000
+  catatan           String?
+  /// Nilai baris di dokumen sumber saat terakhir disinkron (HKA ref_amount); acuan, tidak masuk hitungan
+  nilaiAcuan        Decimal?            @db.Decimal(18, 2)
+  /// Dokumen sumber impor (paling banyak satu terisi, CHECK di migrasi). SetNull supaya hapus penawaran/pesanan lama tidak terhalang
+  sumberPenawaranId String?
+  sumberPenawaran   PenawaranPenjualan? @relation("SumberPenawaranAnggaran", fields: [sumberPenawaranId], references: [id], onDelete: SetNull)
+  sumberPesananId   String?
+  sumberPesanan     PesananPenjualan?   @relation("SumberPesananAnggaran", fields: [sumberPesananId], references: [id], onDelete: SetNull)
+  /// Kunci baris sumber "{nama}|{bagian}|{n}" huruf kecil (HKA source_key)
+  kunciSumber       String?
+  /// 16 karakter awal SHA-1 isi dokumen sumber saat terakhir disinkron (HKA source_sig)
+  tandaSumber       String?
+  disinkronPada     DateTime?
+  /// true bila baris ini tidak ada lagi di dokumen sumber (HKA removed_from_quotation); tetap dihitung di anggaran
+  dihapusDariSumber Boolean             @default(false)
+  dibuatPada        DateTime            @default(now())
+  diubahPada        DateTime            @updatedAt
+
+  @@index([proyekId])
+  @@index([kategoriId])
+  @@index([sumberPenawaranId])
+  @@index([sumberPesananId])
+}
+
+/// Mitra bagi hasil proyek (HKA project_partners). Urutan (naik) menentukan siapa yang dibayar dulu di
+/// antara mitra NOMINAL. Anak proyek: perusahaan dibaca dari proyek.
+model MitraProyek {
+  id         String        @id @default(cuid())
+  proyekId   String
+  proyek     Proyek        @relation(fields: [proyekId], references: [id], onDelete: Cascade)
+  /// 1-120 karakter, tidak harus unik (HKA)
+  nama       String
+  mode       ModeBagiHasil @default(PERSEN)
+  /// PERSEN: 0 < nilai ≤ 100 (persen dari sisa setelah nominal tetap). NOMINAL: 0 < nilai ≤ 10 triliun rupiah
+  nilai      Decimal       @db.Decimal(18, 2)
+  /// Catatan ≤1000
+  catatan    String?
+  /// Bawaan = urutan terbesar di proyek + 1 saat dibuat (setara urutan created_at HKA)
+  urutan     Int           @default(0)
+  dibuatPada DateTime      @default(now())
+  diubahPada DateTime      @updatedAt
+
+  talangan   TalanganMitra[]
+  pembayaran PembayaranMitra[]
+
+  @@index([proyekId, urutan])
+}
+
+/// Talangan Mitra (TLM): biaya proyek yang dibayar mitra dengan uangnya sendiri (HKA cost funded_by = mitra).
+/// Jurnal JU-TLM saat disetujui: Dr akun beban pilihan / Cr Hutang Mitra Proyek, bertanda proyek.
+/// Ikut alur persetujuan (BERKAS "talanganMitra" di src/lib/persetujuan.ts).
+model TalanganMitra {
+  id                String            @id @default(cuid())
+  nomor             String            @unique
+  /// Tanggal biaya (dipilih pengguna, tidak boleh di masa depan); jurnal memakai tanggal ini
+  tanggal           DateTime
+  /// Diwarisi dari proyek (bukan dari formulir)
+  perusahaanId      String            @default("utama")
+  perusahaan        Perusahaan        @relation(fields: [perusahaanId], references: [id])
+  proyekId          String
+  proyek            Proyek            @relation(fields: [proyekId], references: [id], onDelete: Restrict)
+  mitraId           String
+  mitra             MitraProyek       @relation(fields: [mitraId], references: [id], onDelete: Restrict)
+  /// Akun beban rinci yang didebit; kategorinya mengikuti pemetaan akun (tidak disimpan di sini)
+  akunBebanId       String
+  akunBeban         Akun              @relation("AkunBebanTalanganMitra", fields: [akunBebanId], references: [id], onDelete: Restrict)
+  jumlah            Decimal           @db.Decimal(18, 2)
+  /// Uraian (HKA description) 1-200; vendor ≤120; catatan ≤1000
+  deskripsi         String
+  vendor            String?
+  catatan           String?
+  /// Terisi setelah dijurnal (langsung bila persetujuan mati, atau saat disetujui)
+  jurnalId          String?           @unique
+  jurnal            Jurnal?           @relation("JurnalTalanganMitra", fields: [jurnalId], references: [id], onDelete: SetNull)
+  dicatatOlehId     String?
+  dicatatOleh       Pengguna?         @relation("CatatTalanganMitra", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
+  dicatatOlehNama   String
+  dibuatPada        DateTime          @default(now())
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?         @relation("AjukanTalanganMitra", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?         @relation("SetujuiTalanganMitra", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?         @relation("TolakTalanganMitra", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
+  @@index([perusahaanId])
+  @@index([proyekId])
+  @@index([mitraId])
+  @@index([akunBebanId])
+  @@index([dicatatOlehId])
+  @@index([tanggal])
+  @@index([statusPersetujuan])
+}
+
+/// Pembayaran ke Mitra (BYM): MODAL = pengembalian talangan (Dr Hutang Mitra Proyek / Cr Kas),
+/// LABA = bagi laba (Dr Bagi Hasil Mitra Proyek / Cr Kas). Jurnal JU-BYM bertanda proyek.
+/// Ikut alur persetujuan (BERKAS "pembayaranMitra").
+model PembayaranMitra {
+  id                String               @id @default(cuid())
+  nomor             String               @unique
+  tanggal           DateTime
+  perusahaanId      String               @default("utama")
+  perusahaan        Perusahaan           @relation(fields: [perusahaanId], references: [id])
+  proyekId          String
+  proyek            Proyek               @relation(fields: [proyekId], references: [id], onDelete: Restrict)
+  mitraId           String
+  mitra             MitraProyek          @relation(fields: [mitraId], references: [id], onDelete: Restrict)
+  /// Bawaan LABA mengikuti HKA (kind = profit); formulir memilih MODAL bila masih ada modal terutang
+  jenis             JenisPembayaranMitra @default(LABA)
+  jumlah            Decimal              @db.Decimal(18, 2)
+  /// Akun kas/bank sumber pembayaran (kasBank, rinci, milik perusahaan dokumen atau bersama)
+  akunKasId         String
+  akunKas           Akun                 @relation("AkunKasPembayaranMitra", fields: [akunKasId], references: [id], onDelete: Restrict)
+  /// Catatan/referensi transfer ≤1000
+  catatan           String?
+  jurnalId          String?              @unique
+  jurnal            Jurnal?              @relation("JurnalPembayaranMitra", fields: [jurnalId], references: [id], onDelete: SetNull)
+  dicatatOlehId     String?
+  dicatatOleh       Pengguna?            @relation("CatatPembayaranMitra", fields: [dicatatOlehId], references: [id], onDelete: SetNull)
+  dicatatOlehNama   String
+  dibuatPada        DateTime             @default(now())
+  /// Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
+  statusPersetujuan StatusPersetujuan    @default(DRAFT)
+  diajukanOlehId    String?
+  diajukanOleh      Pengguna?            @relation("AjukanPembayaranMitra", fields: [diajukanOlehId], references: [id])
+  diajukanPada      DateTime?
+  disetujuiOlehId   String?
+  disetujuiOleh     Pengguna?            @relation("SetujuiPembayaranMitra", fields: [disetujuiOlehId], references: [id])
+  disetujuiPada     DateTime?
+  ditolakOlehId     String?
+  ditolakOleh       Pengguna?            @relation("TolakPembayaranMitra", fields: [ditolakOlehId], references: [id])
+  ditolakPada       DateTime?
+  catatanPenolakan  String?
+
+  @@index([perusahaanId])
+  @@index([proyekId])
+  @@index([mitraId, jenis])
+  @@index([akunKasId])
+  @@index([dicatatOlehId])
+  @@index([tanggal])
+  @@index([statusPersetujuan])
+}
+
+// ============================================================================
+// Modul Pemasaran (D6): perencana konten, tugas desain, perencana iklan Meta.
+// Tidak ada yang menjurnal. Kepala data punya perusahaanId; anak membaca dari induk.
+// ============================================================================
+
+enum PlatformKonten {
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  THREADS
+}
+
+/// Status kerja konten, urutan = kolom kanban. DITINJAU hanya dicapai lewat ajukanKonten.
+enum StatusKonten {
+  IDE
+  DRAF
+  DESAIN
+  DITINJAU
+  DISETUJUI
+  TERJADWAL
+  TERBIT
+}
+
+/// Persetujuan konten oleh pemegang konten.setujui. Terpisah dari StatusPersetujuan (maker-checker dokumen berjurnal).
+enum StatusPersetujuanKonten {
+  TIDAK_ADA
+  MENUNGGU
+  DISETUJUI
+  DITOLAK
+}
+
+enum AksiRiwayatKonten {
+  DIAJUKAN
+  DISETUJUI
+  DITOLAK
+  DITARIK
+}
+
+/// Status tugas desain, urutan = kolom kanban. DISETUJUI dan SELESAI hanya oleh pemegang tugas-desain.setujui.
+enum StatusTugasDesain {
+  PERMINTAAN
+  DITUGASKAN
+  DIKERJAKAN
+  DITINJAU
+  REVISI
+  DISETUJUI
+  SELESAI
+}
+
+enum PrioritasDesain {
+  RENDAH
+  SEDANG
+  TINGGI
+  MENDESAK
+}
+
+enum SumberTugasDesain {
+  MANUAL
+  KONTEN
+}
+
+enum KeputusanRevisiDesain {
+  DISETUJUI
+  MINTA_REVISI
+}
+
+/// Tujuan kampanye mengikuti istilah Meta Ads Manager berbahasa Indonesia.
+enum TujuanKampanye {
+  KESADARAN
+  TRAFFIC
+  INTERAKSI
+  PROSPEK
+  PROMOSI_APLIKASI
+  PENJUALAN
+}
+
+enum StatusKampanye {
+  DIRENCANAKAN
+  AKTIF
+  DIJEDA
+  SELESAI
+}
+
+enum GenderAudiens {
+  SEMUA
+  PEREMPUAN
+  LAKI_LAKI
+}
+
+/// Konten media sosial (HKA social_posts). Milik satu perusahaan; hapus = arsip lunak.
+model Konten {
+  id                 String                  @id @default(cuid())
+  perusahaanId       String                  @default("utama")
+  perusahaan         Perusahaan              @relation(fields: [perusahaanId], references: [id])
+  judul              String
+  platform           PlatformKonten          @default(INSTAGRAM)
+  /// Teks bebas; pilihan formulir dari PengaturanPemasaran.jenisKonten
+  jenisKonten        String?
+  /// Teks bebas; pilihan formulir dari PengaturanPemasaran.pilarKonten
+  pilar              String?
+  caption            String?
+  cta                String?
+  /// Satu string, mis. "#dpro #event" (seperti HKA)
+  tagar              String?
+  /// Tanggal terbit, disimpan pukul 12.00 waktu server seperti tanggal dokumen lain; null = belum dijadwalkan
+  tanggalTerbit      DateTime?
+  /// "HH:MM" dibaca dalam ZONA_WAKTU; hanya boleh diisi bila tanggalTerbit diisi
+  jamTerbit          String?
+  status             StatusKonten            @default(IDE)
+  statusPersetujuan  StatusPersetujuanKonten @default(TIDAK_ADA)
+  smmId              String?
+  smm                Pengguna?               @relation("SmmKonten", fields: [smmId], references: [id], onDelete: SetNull)
+  desainerId         String?
+  desainer           Pengguna?               @relation("DesainerKonten", fields: [desainerId], references: [id], onDelete: SetNull)
+  proyekId           String?
+  proyek             Proyek?                 @relation(fields: [proyekId], references: [id], onDelete: SetNull)
+  /// Satu-satunya sumber brief untuk desainer; tugas desain membacanya langsung (tidak disalin)
+  briefDesain        String?
+  catatan            String?
+  dibuatOlehId       String?
+  dibuatOleh         Pengguna?               @relation("BuatKonten", fields: [dibuatOlehId], references: [id], onDelete: SetNull)
+  dibuatOlehNama     String
+  dibuatPada         DateTime                @default(now())
+  diubahPada         DateTime                @updatedAt
+  diarsipkanPada     DateTime?
+  diarsipkanOlehNama String?
+
+  riwayat     RiwayatPersetujuanKonten[]
+  tugasDesain TugasDesain[]
+
+  @@index([perusahaanId, tanggalTerbit])
+  @@index([perusahaanId, status])
+  @@index([proyekId])
+  @@index([smmId])
+  @@index([desainerId])
+  @@index([dibuatOlehId])
+  @@index([diarsipkanPada])
+}
+
+/// Riwayat persetujuan konten (HKA social_approvals), hanya ditambah.
+model RiwayatPersetujuanKonten {
+  id           String            @id @default(cuid())
+  kontenId     String
+  konten       Konten            @relation(fields: [kontenId], references: [id], onDelete: Cascade)
+  aksi         AksiRiwayatKonten
+  /// Catatan pengaju (DIAJUKAN) atau masukan penyetuju (DISETUJUI/DITOLAK)
+  masukan      String?
+  /// Tanpa relasi Prisma (pola LogAktivitas): riwayat tetap utuh bila pengguna dihapus
+  penggunaId   String?
+  penggunaNama String
+  dibuatPada   DateTime          @default(now())
+
+  @@index([kontenId, dibuatPada])
+}
+
+/// Tugas desain (HKA design_tasks). Milik satu perusahaan; hapus = arsip lunak.
+model TugasDesain {
+  id                 String            @id @default(cuid())
+  perusahaanId       String            @default("utama")
+  perusahaan         Perusahaan        @relation(fields: [perusahaanId], references: [id])
+  judul              String
+  /// Bila tertaut konten: instruksi tambahan (brief tetap di konten). Bila tidak: brief tugas ini.
+  deskripsi          String?
+  prioritas          PrioritasDesain   @default(SEDANG)
+  tenggat            DateTime?
+  status             StatusTugasDesain @default(PERMINTAAN)
+  desainerId         String?
+  desainer           Pengguna?         @relation("DesainerTugas", fields: [desainerId], references: [id], onDelete: SetNull)
+  kontenId           String?
+  /// Restrict: konten hanya diarsipkan, tidak pernah dihapus fisik oleh aplikasi; hapus fisik (reset, uji)
+  /// harus menghapus tugasnya dulu. SetNull akan bentrok dengan CHECK TugasDesain_kunci_konten_cocok.
+  konten             Konten?           @relation(fields: [kontenId], references: [id], onDelete: Restrict)
+  /// Salinan kontenId selama tugas belum diarsipkan (null bila tanpa konten atau sudah diarsipkan).
+  /// Unik: satu tugas desain aktif per konten di semua jalur.
+  kunciKontenAktif   String?           @unique
+  kampanyeId         String?
+  kampanye           Kampanye?         @relation(fields: [kampanyeId], references: [id], onDelete: SetNull)
+  proyekId           String?
+  proyek             Proyek?           @relation(fields: [proyekId], references: [id], onDelete: SetNull)
+  jumlahRevisi       Int               @default(0)
+  /// Catatan tinjauan terakhir (null bila disetujui tanpa catatan)
+  catatanRevisi      String?
+  sumber             SumberTugasDesain @default(MANUAL)
+  dibuatOlehNama     String
+  dibuatPada         DateTime          @default(now())
+  diubahPada         DateTime          @updatedAt
+  diarsipkanPada     DateTime?
+  diarsipkanOlehNama String?
+
+  revisi RevisiDesain[]
+
+  @@index([perusahaanId, status])
+  @@index([desainerId, status])
+  @@index([kontenId])
+  @@index([kampanyeId])
+  @@index([proyekId])
+  @@index([tenggat])
+  @@index([diarsipkanPada])
+}
+
+/// Satu baris per keputusan tinjauan desain (HKA design_revisions).
+model RevisiDesain {
+  id               String                @id @default(cuid())
+  tugasId          String
+  tugas            TugasDesain           @relation(fields: [tugasId], references: [id], onDelete: Cascade)
+  nomorRevisi      Int
+  keputusan        KeputusanRevisiDesain
+  catatan          String?
+  /// [{ "id": string, "nama": string }] = berkasBaru baris RevisiDesain sebelumnya (atau [])
+  berkasSebelumnya Json
+  /// [{ "id": string, "nama": string }] berkas hasil aktif saat tinjauan; nama disalin supaya tetap terbaca walau berkas dihapus
+  berkasBaru       Json
+  peninjauId       String?
+  peninjauNama     String
+  dibuatPada       DateTime              @default(now())
+
+  @@index([tugasId, dibuatPada])
+}
+
+/// Kampanye iklan Meta (HKA campaigns). Perencanaan saja, tidak menjurnal.
+model Kampanye {
+  id                 String         @id @default(cuid())
+  perusahaanId       String         @default("utama")
+  perusahaan         Perusahaan     @relation(fields: [perusahaanId], references: [id])
+  nama               String
+  tujuan             TujuanKampanye @default(PROSPEK)
+  /// Anggaran rencana, satu angka seperti HKA (tanpa pembeda harian/lifetime)
+  anggaran           Decimal        @default(0) @db.Decimal(18, 2)
+  tanggalMulai       DateTime?
+  tanggalSelesai     DateTime?
+  status             StatusKampanye @default(DIRENCANAKAN)
+  proyekId           String?
+  proyek             Proyek?        @relation(fields: [proyekId], references: [id], onDelete: SetNull)
+  catatan            String?
+  dibuatOlehNama     String
+  dibuatPada         DateTime       @default(now())
+  diubahPada         DateTime       @updatedAt
+  diarsipkanPada     DateTime?
+  diarsipkanOlehNama String?
+
+  setIklan    SetIklan[]
+  metrik      MetrikIklan[]
+  tugasDesain TugasDesain[]
+
+  @@index([perusahaanId, status])
+  @@index([proyekId])
+  @@index([diarsipkanPada])
+}
+
+/// Set iklan (Meta: ad set). Proyek dan perusahaan mengikuti kampanye.
+model SetIklan {
+  id         String        @id @default(cuid())
+  kampanyeId String
+  kampanye   Kampanye      @relation(fields: [kampanyeId], references: [id], onDelete: Cascade)
+  nama       String
+  audiens    String?
+  lokasi     String?
+  /// Teks bebas, mis. "22-40"
+  usia       String?
+  gender     GenderAudiens @default(SEMUA)
+  penempatan String?
+  anggaran   Decimal       @default(0) @db.Decimal(18, 2)
+  catatan    String?
+  dibuatPada DateTime      @default(now())
+  diubahPada DateTime      @updatedAt
+
+  iklan Iklan[]
+
+  @@index([kampanyeId])
+}
+
+/// Iklan di dalam set iklan. Kampanye dibaca lewat setIklan.
+model Iklan {
+  id              String   @id @default(cuid())
+  setIklanId      String
+  /// Restrict: set iklan yang masih punya iklan tidak bisa dihapus
+  setIklan        SetIklan @relation(fields: [setIklanId], references: [id], onDelete: Restrict)
+  nama            String
+  berkasKreatifId String?
+  berkasKreatif   Berkas?  @relation("KreatifIklan", fields: [berkasKreatifId], references: [id], onDelete: SetNull)
+  teksUtama       String?
+  judulIklan      String?
+  cta             String?
+  /// Wajib diawali http:// atau https:// bila diisi
+  urlTujuan       String?
+  catatan         String?
+  dibuatPada      DateTime @default(now())
+  diubahPada      DateTime @updatedAt
+
+  @@index([setIklanId])
+  @@index([berkasKreatifId])
+}
+
+/// Laporan hasil harian per kampanye, diketik manual. Satu baris per kampanye per tanggal.
+model MetrikIklan {
+  id              String   @id @default(cuid())
+  kampanyeId      String
+  kampanye        Kampanye @relation(fields: [kampanyeId], references: [id], onDelete: Cascade)
+  tanggal         DateTime
+  belanja         Decimal  @default(0) @db.Decimal(18, 2)
+  jangkauan       Int      @default(0)
+  tayangan        Int      @default(0)
+  klik            Int      @default(0)
+  leads           Int      @default(0)
+  konversi        Int      @default(0)
+  /// "Hasil" seperti kolom Results di Ads Manager; null = otomatis dari tujuan kampanye (src/lib/iklan.ts)
+  hasil           Int?
+  pendapatan      Decimal  @default(0) @db.Decimal(18, 2)
+  /// Nilai ketikan manual menimpa hitungan; null = dihitung dari angka dasar
+  ctrManual       Decimal? @db.Decimal(18, 2)
+  cpcManual       Decimal? @db.Decimal(18, 2)
+  cpmManual       Decimal? @db.Decimal(18, 2)
+  catatan         String?
+  dicatatOlehNama String
+  dibuatPada      DateTime @default(now())
+  diubahPada      DateTime @updatedAt
+
+  @@unique([kampanyeId, tanggal])
+  @@index([tanggal])
+}
+
+/// Daftar pilihan jenis & pilar konten per perusahaan (HKA content_types, content_pillars). Tanpa baris = bawaan di src/lib/pemasaran.ts.
+/// perusahaanId sebagai kunci utama tanpa bawaan "utama" (D6 menyimpang dari kontrak): penyimpanan yang lupa
+/// mengirim perusahaan harus gagal, bukan diam-diam menimpa pengaturan DPRO.
+model PengaturanPemasaran {
+  perusahaanId   String     @id
+  perusahaan     Perusahaan @relation(fields: [perusahaanId], references: [id], onDelete: Cascade)
+  jenisKonten    String[]
+  pilarKonten    String[]
+  diubahOlehNama String?
+  diubahPada     DateTime   @updatedAt
 }

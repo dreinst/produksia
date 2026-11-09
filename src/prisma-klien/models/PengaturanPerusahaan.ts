@@ -14,7 +14,9 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model PengaturanPerusahaan
- * 
+ * Satu baris per perusahaan. Baris perusahaan utama SELALU ber-id "default" (kompatibel dengan kode & uji lama
+ * yang memakai where: { id: "default" }); baris perusahaan lain ber-id sama dengan perusahaanId (idPengaturan()).
+ * tahunBuku dan wajibPersetujuan bersifat GLOBAL: hanya nilai di baris "default" yang dibaca dan ditulis.
  */
 export type PengaturanPerusahaanModel = runtime.Types.Result.DefaultSelection<Prisma.$PengaturanPerusahaanPayload>
 
@@ -55,6 +57,7 @@ export type PengaturanPerusahaanMinAggregateOutputType = {
   pphFinalPersen: runtime.Decimal | null
   akunBebanPphFinalId: string | null
   akunHutangPphFinalId: string | null
+  perusahaanId: string | null
 }
 
 export type PengaturanPerusahaanMaxAggregateOutputType = {
@@ -72,6 +75,7 @@ export type PengaturanPerusahaanMaxAggregateOutputType = {
   pphFinalPersen: runtime.Decimal | null
   akunBebanPphFinalId: string | null
   akunHutangPphFinalId: string | null
+  perusahaanId: string | null
 }
 
 export type PengaturanPerusahaanCountAggregateOutputType = {
@@ -89,6 +93,7 @@ export type PengaturanPerusahaanCountAggregateOutputType = {
   pphFinalPersen: number
   akunBebanPphFinalId: number
   akunHutangPphFinalId: number
+  perusahaanId: number
   _all: number
 }
 
@@ -122,6 +127,7 @@ export type PengaturanPerusahaanMinAggregateInputType = {
   pphFinalPersen?: true
   akunBebanPphFinalId?: true
   akunHutangPphFinalId?: true
+  perusahaanId?: true
 }
 
 export type PengaturanPerusahaanMaxAggregateInputType = {
@@ -139,6 +145,7 @@ export type PengaturanPerusahaanMaxAggregateInputType = {
   pphFinalPersen?: true
   akunBebanPphFinalId?: true
   akunHutangPphFinalId?: true
+  perusahaanId?: true
 }
 
 export type PengaturanPerusahaanCountAggregateInputType = {
@@ -156,6 +163,7 @@ export type PengaturanPerusahaanCountAggregateInputType = {
   pphFinalPersen?: true
   akunBebanPphFinalId?: true
   akunHutangPphFinalId?: true
+  perusahaanId?: true
   _all?: true
 }
 
@@ -260,6 +268,7 @@ export type PengaturanPerusahaanGroupByOutputType = {
   pphFinalPersen: runtime.Decimal
   akunBebanPphFinalId: string | null
   akunHutangPphFinalId: string | null
+  perusahaanId: string
   _count: PengaturanPerusahaanCountAggregateOutputType | null
   _avg: PengaturanPerusahaanAvgAggregateOutputType | null
   _sum: PengaturanPerusahaanSumAggregateOutputType | null
@@ -300,12 +309,14 @@ export type PengaturanPerusahaanWhereInput = {
   pphFinalPersen?: Prisma.DecimalFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
   akunHutangPphFinalId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"PengaturanPerusahaan"> | string
   akunPpnKeluaran?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPpnMasukan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPph23Dimuka?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPph23Dipotong?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunBebanPphFinal?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunHutangPphFinal?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
 }
 
 export type PengaturanPerusahaanOrderByWithRelationInput = {
@@ -323,22 +334,19 @@ export type PengaturanPerusahaanOrderByWithRelationInput = {
   pphFinalPersen?: Prisma.SortOrder
   akunBebanPphFinalId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunHutangPphFinalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunPpnKeluaran?: Prisma.AkunOrderByWithRelationInput
   akunPpnMasukan?: Prisma.AkunOrderByWithRelationInput
   akunPph23Dimuka?: Prisma.AkunOrderByWithRelationInput
   akunPph23Dipotong?: Prisma.AkunOrderByWithRelationInput
   akunBebanPphFinal?: Prisma.AkunOrderByWithRelationInput
   akunHutangPphFinal?: Prisma.AkunOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
 }
 
 export type PengaturanPerusahaanWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  akunPpnKeluaranId?: string
-  akunPpnMasukanId?: string
-  akunPph23DimukaId?: string
-  akunPph23DipotongId?: string
-  akunBebanPphFinalId?: string
-  akunHutangPphFinalId?: string
+  perusahaanId?: string
   AND?: Prisma.PengaturanPerusahaanWhereInput | Prisma.PengaturanPerusahaanWhereInput[]
   OR?: Prisma.PengaturanPerusahaanWhereInput[]
   NOT?: Prisma.PengaturanPerusahaanWhereInput | Prisma.PengaturanPerusahaanWhereInput[]
@@ -348,14 +356,21 @@ export type PengaturanPerusahaanWhereUniqueInput = Prisma.AtLeast<{
   terminHari?: Prisma.IntFilter<"PengaturanPerusahaan"> | number
   tahunBuku?: Prisma.IntNullableFilter<"PengaturanPerusahaan"> | number | null
   wajibPersetujuan?: Prisma.BoolFilter<"PengaturanPerusahaan"> | boolean
+  akunPpnKeluaranId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunPpnMasukanId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunPph23DimukaId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunPph23DipotongId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
   pphFinalPersen?: Prisma.DecimalFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunHutangPphFinalId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
   akunPpnKeluaran?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPpnMasukan?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPph23Dimuka?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunPph23Dipotong?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunBebanPphFinal?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
   akunHutangPphFinal?: Prisma.XOR<Prisma.AkunNullableScalarRelationFilter, Prisma.AkunWhereInput> | null
-}, "id" | "akunPpnKeluaranId" | "akunPpnMasukanId" | "akunPph23DimukaId" | "akunPph23DipotongId" | "akunBebanPphFinalId" | "akunHutangPphFinalId">
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
+}, "id" | "perusahaanId">
 
 export type PengaturanPerusahaanOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -372,6 +387,7 @@ export type PengaturanPerusahaanOrderByWithAggregationInput = {
   pphFinalPersen?: Prisma.SortOrder
   akunBebanPphFinalId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunHutangPphFinalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   _count?: Prisma.PengaturanPerusahaanCountOrderByAggregateInput
   _avg?: Prisma.PengaturanPerusahaanAvgOrderByAggregateInput
   _max?: Prisma.PengaturanPerusahaanMaxOrderByAggregateInput
@@ -397,6 +413,7 @@ export type PengaturanPerusahaanScalarWhereWithAggregatesInput = {
   pphFinalPersen?: Prisma.DecimalWithAggregatesFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.StringNullableWithAggregatesFilter<"PengaturanPerusahaan"> | string | null
   akunHutangPphFinalId?: Prisma.StringNullableWithAggregatesFilter<"PengaturanPerusahaan"> | string | null
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"PengaturanPerusahaan"> | string
 }
 
 export type PengaturanPerusahaanCreateInput = {
@@ -414,6 +431,7 @@ export type PengaturanPerusahaanCreateInput = {
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
   akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
   akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateInput = {
@@ -431,6 +449,7 @@ export type PengaturanPerusahaanUncheckedCreateInput = {
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanUpdateInput = {
@@ -448,6 +467,7 @@ export type PengaturanPerusahaanUpdateInput = {
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
   akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
   akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateInput = {
@@ -465,6 +485,7 @@ export type PengaturanPerusahaanUncheckedUpdateInput = {
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanCreateManyInput = {
@@ -482,6 +503,7 @@ export type PengaturanPerusahaanCreateManyInput = {
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanUpdateManyMutationInput = {
@@ -510,11 +532,22 @@ export type PengaturanPerusahaanUncheckedUpdateManyInput = {
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanNullableScalarRelationFilter = {
   is?: Prisma.PengaturanPerusahaanWhereInput | null
   isNot?: Prisma.PengaturanPerusahaanWhereInput | null
+}
+
+export type PengaturanPerusahaanListRelationFilter = {
+  every?: Prisma.PengaturanPerusahaanWhereInput
+  some?: Prisma.PengaturanPerusahaanWhereInput
+  none?: Prisma.PengaturanPerusahaanWhereInput
+}
+
+export type PengaturanPerusahaanOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type PengaturanPerusahaanCountOrderByAggregateInput = {
@@ -532,6 +565,7 @@ export type PengaturanPerusahaanCountOrderByAggregateInput = {
   pphFinalPersen?: Prisma.SortOrder
   akunBebanPphFinalId?: Prisma.SortOrder
   akunHutangPphFinalId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PengaturanPerusahaanAvgOrderByAggregateInput = {
@@ -556,6 +590,7 @@ export type PengaturanPerusahaanMaxOrderByAggregateInput = {
   pphFinalPersen?: Prisma.SortOrder
   akunBebanPphFinalId?: Prisma.SortOrder
   akunHutangPphFinalId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PengaturanPerusahaanMinOrderByAggregateInput = {
@@ -573,6 +608,7 @@ export type PengaturanPerusahaanMinOrderByAggregateInput = {
   pphFinalPersen?: Prisma.SortOrder
   akunBebanPphFinalId?: Prisma.SortOrder
   akunHutangPphFinalId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PengaturanPerusahaanSumOrderByAggregateInput = {
@@ -582,196 +618,288 @@ export type PengaturanPerusahaanSumOrderByAggregateInput = {
   pphFinalPersen?: Prisma.SortOrder
 }
 
-export type PengaturanPerusahaanCreateNestedOneWithoutAkunPpnKeluaranInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput
+export type PengaturanPerusahaanCreateNestedOneWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput>
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutPerusahaanInput
   connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
 }
 
-export type PengaturanPerusahaanCreateNestedOneWithoutAkunPpnMasukanInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput
+export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput>
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutPerusahaanInput
   connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
 }
 
-export type PengaturanPerusahaanCreateNestedOneWithoutAkunPph23DimukaInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanCreateNestedOneWithoutAkunPph23DipotongInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanCreateNestedOneWithoutAkunBebanPphFinalInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanCreateNestedOneWithoutAkunHutangPphFinalInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnKeluaranInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPpnMasukanInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPph23DimukaInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunPph23DipotongInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunBebanPphFinalInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUncheckedCreateNestedOneWithoutAkunHutangPphFinalInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-}
-
-export type PengaturanPerusahaanUpdateOneWithoutAkunPpnKeluaranNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPpnKeluaranInput
+export type PengaturanPerusahaanUpdateOneWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput>
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutPerusahaanInput
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutPerusahaanInput
   disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
   delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
   connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUpdateWithoutPerusahaanInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutPerusahaanInput>
 }
 
-export type PengaturanPerusahaanUpdateOneWithoutAkunPpnMasukanNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPpnMasukanInput
+export type PengaturanPerusahaanUncheckedUpdateOneWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput>
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutPerusahaanInput
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutPerusahaanInput
   disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
   delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
   connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUpdateWithoutPerusahaanInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutPerusahaanInput>
 }
 
-export type PengaturanPerusahaanUpdateOneWithoutAkunPph23DimukaNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPph23DimukaInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput>
+export type PengaturanPerusahaanCreateNestedManyWithoutAkunPpnKeluaranInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnKeluaranInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUpdateOneWithoutAkunPph23DipotongNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPph23DipotongInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
+export type PengaturanPerusahaanCreateNestedManyWithoutAkunPpnMasukanInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnMasukanInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUpdateOneWithoutAkunBebanPphFinalNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunBebanPphFinalInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput>
+export type PengaturanPerusahaanCreateNestedManyWithoutAkunPph23DimukaInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DimukaInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUpdateOneWithoutAkunHutangPphFinalNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunHutangPphFinalInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput>
+export type PengaturanPerusahaanCreateNestedManyWithoutAkunPph23DipotongInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DipotongInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnKeluaranNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPpnKeluaranInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput>
+export type PengaturanPerusahaanCreateNestedManyWithoutAkunBebanPphFinalInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunBebanPphFinalInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPpnMasukanNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPpnMasukanInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput>
+export type PengaturanPerusahaanCreateNestedManyWithoutAkunHutangPphFinalInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunHutangPphFinalInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DimukaNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPph23DimukaInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput>
+export type PengaturanPerusahaanUncheckedCreateNestedManyWithoutAkunPpnKeluaranInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnKeluaranInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunPph23DipotongNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunPph23DipotongInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
+export type PengaturanPerusahaanUncheckedCreateNestedManyWithoutAkunPpnMasukanInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnMasukanInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunBebanPphFinalNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunBebanPphFinalInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput>
+export type PengaturanPerusahaanUncheckedCreateNestedManyWithoutAkunPph23DimukaInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DimukaInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
 }
 
-export type PengaturanPerusahaanUncheckedUpdateOneWithoutAkunHutangPphFinalNestedInput = {
-  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
-  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput
-  upsert?: Prisma.PengaturanPerusahaanUpsertWithoutAkunHutangPphFinalInput
-  disconnect?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  delete?: Prisma.PengaturanPerusahaanWhereInput | boolean
-  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput>, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput>
+export type PengaturanPerusahaanUncheckedCreateNestedManyWithoutAkunPph23DipotongInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DipotongInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+}
+
+export type PengaturanPerusahaanUncheckedCreateNestedManyWithoutAkunBebanPphFinalInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunBebanPphFinalInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+}
+
+export type PengaturanPerusahaanUncheckedCreateNestedManyWithoutAkunHutangPphFinalInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunHutangPphFinalInputEnvelope
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+}
+
+export type PengaturanPerusahaanUpdateManyWithoutAkunPpnKeluaranNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnKeluaranInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnKeluaranInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnKeluaranInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnKeluaranInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUpdateManyWithoutAkunPpnMasukanNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnMasukanInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnMasukanInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnMasukanInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnMasukanInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUpdateManyWithoutAkunPph23DimukaNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DimukaInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DimukaInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DimukaInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DimukaInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUpdateManyWithoutAkunPph23DipotongNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DipotongInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DipotongInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DipotongInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DipotongInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUpdateManyWithoutAkunBebanPphFinalNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunBebanPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunBebanPphFinalInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunBebanPphFinalInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunBebanPphFinalInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUpdateManyWithoutAkunHutangPphFinalNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunHutangPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunHutangPphFinalInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunHutangPphFinalInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunHutangPphFinalInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPpnKeluaranNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnKeluaranInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnKeluaranInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnKeluaranInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnKeluaranInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPpnMasukanNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnMasukanInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPpnMasukanInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnMasukanInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnMasukanInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnMasukanInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPph23DimukaNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DimukaInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DimukaInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DimukaInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DimukaInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DimukaInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPph23DipotongNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DipotongInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunPph23DipotongInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DipotongInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DipotongInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DipotongInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunBebanPphFinalNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunBebanPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunBebanPphFinalInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunBebanPphFinalInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunBebanPphFinalInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunHutangPphFinalNestedInput = {
+  create?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput> | Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput[] | Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput[]
+  connectOrCreate?: Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput[]
+  upsert?: Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunHutangPphFinalInput[]
+  createMany?: Prisma.PengaturanPerusahaanCreateManyAkunHutangPphFinalInputEnvelope
+  set?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  disconnect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  delete?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  connect?: Prisma.PengaturanPerusahaanWhereUniqueInput | Prisma.PengaturanPerusahaanWhereUniqueInput[]
+  update?: Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunHutangPphFinalInput[]
+  updateMany?: Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanUpdateManyWithWhereWithoutAkunHutangPphFinalInput[]
+  deleteMany?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -780,6 +908,90 @@ export type NullableIntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type PengaturanPerusahaanCreateWithoutPerusahaanInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunPpnKeluaran?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnKeluaranInput
+  akunPpnMasukan?: Prisma.AkunCreateNestedOneWithoutPengaturanPpnMasukanInput
+  akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
+  akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
+  akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
+  akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+}
+
+export type PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnKeluaranId?: string | null
+  akunPpnMasukanId?: string | null
+  akunPph23DimukaId?: string | null
+  akunPph23DipotongId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: string | null
+  akunHutangPphFinalId?: string | null
+}
+
+export type PengaturanPerusahaanCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PengaturanPerusahaanUpsertWithoutPerusahaanInput = {
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutPerusahaanInput>
+  where?: Prisma.PengaturanPerusahaanWhereInput
+}
+
+export type PengaturanPerusahaanUpdateToOneWithWhereWithoutPerusahaanInput = {
+  where?: Prisma.PengaturanPerusahaanWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutPerusahaanInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type PengaturanPerusahaanUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunPpnKeluaran?: Prisma.AkunUpdateOneWithoutPengaturanPpnKeluaranNestedInput
+  akunPpnMasukan?: Prisma.AkunUpdateOneWithoutPengaturanPpnMasukanNestedInput
+  akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
+  akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
+  akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
+  akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+}
+
+export type PengaturanPerusahaanUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput = {
@@ -796,6 +1008,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput = {
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
   akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
   akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput = {
@@ -812,11 +1025,17 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput = {
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanCreateOrConnectWithoutAkunPpnKeluaranInput = {
   where: Prisma.PengaturanPerusahaanWhereUniqueInput
   create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
+}
+
+export type PengaturanPerusahaanCreateManyAkunPpnKeluaranInputEnvelope = {
+  data: Prisma.PengaturanPerusahaanCreateManyAkunPpnKeluaranInput | Prisma.PengaturanPerusahaanCreateManyAkunPpnKeluaranInput[]
+  skipDuplicates?: boolean
 }
 
 export type PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput = {
@@ -833,6 +1052,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput = {
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
   akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
   akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput = {
@@ -849,11 +1069,17 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput = {
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanCreateOrConnectWithoutAkunPpnMasukanInput = {
   where: Prisma.PengaturanPerusahaanWhereUniqueInput
   create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
+}
+
+export type PengaturanPerusahaanCreateManyAkunPpnMasukanInputEnvelope = {
+  data: Prisma.PengaturanPerusahaanCreateManyAkunPpnMasukanInput | Prisma.PengaturanPerusahaanCreateManyAkunPpnMasukanInput[]
+  skipDuplicates?: boolean
 }
 
 export type PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput = {
@@ -870,6 +1096,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput = {
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
   akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
   akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput = {
@@ -886,11 +1113,17 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput = {
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DimukaInput = {
   where: Prisma.PengaturanPerusahaanWhereUniqueInput
   create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
+}
+
+export type PengaturanPerusahaanCreateManyAkunPph23DimukaInputEnvelope = {
+  data: Prisma.PengaturanPerusahaanCreateManyAkunPph23DimukaInput | Prisma.PengaturanPerusahaanCreateManyAkunPph23DimukaInput[]
+  skipDuplicates?: boolean
 }
 
 export type PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput = {
@@ -907,6 +1140,7 @@ export type PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput = {
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
   akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
   akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput = {
@@ -923,11 +1157,17 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput = {
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanCreateOrConnectWithoutAkunPph23DipotongInput = {
   where: Prisma.PengaturanPerusahaanWhereUniqueInput
   create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
+}
+
+export type PengaturanPerusahaanCreateManyAkunPph23DipotongInputEnvelope = {
+  data: Prisma.PengaturanPerusahaanCreateManyAkunPph23DipotongInput | Prisma.PengaturanPerusahaanCreateManyAkunPph23DipotongInput[]
+  skipDuplicates?: boolean
 }
 
 export type PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput = {
@@ -944,6 +1184,7 @@ export type PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput = {
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
   akunHutangPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanHutangPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput = {
@@ -960,11 +1201,17 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput = {
   akunPph23DipotongId?: string | null
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunHutangPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanCreateOrConnectWithoutAkunBebanPphFinalInput = {
   where: Prisma.PengaturanPerusahaanWhereUniqueInput
   create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
+}
+
+export type PengaturanPerusahaanCreateManyAkunBebanPphFinalInputEnvelope = {
+  data: Prisma.PengaturanPerusahaanCreateManyAkunBebanPphFinalInput | Prisma.PengaturanPerusahaanCreateManyAkunBebanPphFinalInput[]
+  skipDuplicates?: boolean
 }
 
 export type PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput = {
@@ -981,6 +1228,7 @@ export type PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput = {
   akunPph23Dimuka?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DimukaInput
   akunPph23Dipotong?: Prisma.AkunCreateNestedOneWithoutPengaturanPph23DipotongInput
   akunBebanPphFinal?: Prisma.AkunCreateNestedOneWithoutPengaturanBebanPphFinalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPengaturanInput
 }
 
 export type PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput = {
@@ -997,6 +1245,7 @@ export type PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput = 
   akunPph23DipotongId?: string | null
   pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput = {
@@ -1004,15 +1253,228 @@ export type PengaturanPerusahaanCreateOrConnectWithoutAkunHutangPphFinalInput = 
   create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
 }
 
-export type PengaturanPerusahaanUpsertWithoutAkunPpnKeluaranInput = {
-  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput>
-  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
-  where?: Prisma.PengaturanPerusahaanWhereInput
+export type PengaturanPerusahaanCreateManyAkunHutangPphFinalInputEnvelope = {
+  data: Prisma.PengaturanPerusahaanCreateManyAkunHutangPphFinalInput | Prisma.PengaturanPerusahaanCreateManyAkunHutangPphFinalInput[]
+  skipDuplicates?: boolean
 }
 
-export type PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPpnKeluaranInput = {
-  where?: Prisma.PengaturanPerusahaanWhereInput
+export type PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnKeluaranInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnKeluaranInput>
+}
+
+export type PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnKeluaranInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
   data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput>
+}
+
+export type PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnKeluaranInput = {
+  where: Prisma.PengaturanPerusahaanScalarWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateManyMutationInput, Prisma.PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPpnKeluaranInput>
+}
+
+export type PengaturanPerusahaanScalarWhereInput = {
+  AND?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+  OR?: Prisma.PengaturanPerusahaanScalarWhereInput[]
+  NOT?: Prisma.PengaturanPerusahaanScalarWhereInput | Prisma.PengaturanPerusahaanScalarWhereInput[]
+  id?: Prisma.StringFilter<"PengaturanPerusahaan"> | string
+  nama?: Prisma.StringFilter<"PengaturanPerusahaan"> | string
+  pkp?: Prisma.BoolFilter<"PengaturanPerusahaan"> | boolean
+  tarifPpnPersen?: Prisma.DecimalFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFilter<"PengaturanPerusahaan"> | number
+  tahunBuku?: Prisma.IntNullableFilter<"PengaturanPerusahaan"> | number | null
+  wajibPersetujuan?: Prisma.BoolFilter<"PengaturanPerusahaan"> | boolean
+  akunPpnKeluaranId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunPpnMasukanId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunPph23DimukaId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunPph23DipotongId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  pphFinalPersen?: Prisma.DecimalFilter<"PengaturanPerusahaan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  akunHutangPphFinalId?: Prisma.StringNullableFilter<"PengaturanPerusahaan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"PengaturanPerusahaan"> | string
+}
+
+export type PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPpnMasukanInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
+}
+
+export type PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPpnMasukanInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput>
+}
+
+export type PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPpnMasukanInput = {
+  where: Prisma.PengaturanPerusahaanScalarWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateManyMutationInput, Prisma.PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPpnMasukanInput>
+}
+
+export type PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DimukaInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
+}
+
+export type PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DimukaInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput>
+}
+
+export type PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DimukaInput = {
+  where: Prisma.PengaturanPerusahaanScalarWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateManyMutationInput, Prisma.PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPph23DimukaInput>
+}
+
+export type PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunPph23DipotongInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
+}
+
+export type PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunPph23DipotongInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
+}
+
+export type PengaturanPerusahaanUpdateManyWithWhereWithoutAkunPph23DipotongInput = {
+  where: Prisma.PengaturanPerusahaanScalarWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateManyMutationInput, Prisma.PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPph23DipotongInput>
+}
+
+export type PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunBebanPphFinalInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
+}
+
+export type PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunBebanPphFinalInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput>
+}
+
+export type PengaturanPerusahaanUpdateManyWithWhereWithoutAkunBebanPphFinalInput = {
+  where: Prisma.PengaturanPerusahaanScalarWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateManyMutationInput, Prisma.PengaturanPerusahaanUncheckedUpdateManyWithoutAkunBebanPphFinalInput>
+}
+
+export type PengaturanPerusahaanUpsertWithWhereUniqueWithoutAkunHutangPphFinalInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput>
+  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
+}
+
+export type PengaturanPerusahaanUpdateWithWhereUniqueWithoutAkunHutangPphFinalInput = {
+  where: Prisma.PengaturanPerusahaanWhereUniqueInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput>
+}
+
+export type PengaturanPerusahaanUpdateManyWithWhereWithoutAkunHutangPphFinalInput = {
+  where: Prisma.PengaturanPerusahaanScalarWhereInput
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateManyMutationInput, Prisma.PengaturanPerusahaanUncheckedUpdateManyWithoutAkunHutangPphFinalInput>
+}
+
+export type PengaturanPerusahaanCreateManyAkunPpnKeluaranInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnMasukanId?: string | null
+  akunPph23DimukaId?: string | null
+  akunPph23DipotongId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: string | null
+  akunHutangPphFinalId?: string | null
+  perusahaanId?: string
+}
+
+export type PengaturanPerusahaanCreateManyAkunPpnMasukanInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnKeluaranId?: string | null
+  akunPph23DimukaId?: string | null
+  akunPph23DipotongId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: string | null
+  akunHutangPphFinalId?: string | null
+  perusahaanId?: string
+}
+
+export type PengaturanPerusahaanCreateManyAkunPph23DimukaInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnKeluaranId?: string | null
+  akunPpnMasukanId?: string | null
+  akunPph23DipotongId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: string | null
+  akunHutangPphFinalId?: string | null
+  perusahaanId?: string
+}
+
+export type PengaturanPerusahaanCreateManyAkunPph23DipotongInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnKeluaranId?: string | null
+  akunPpnMasukanId?: string | null
+  akunPph23DimukaId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: string | null
+  akunHutangPphFinalId?: string | null
+  perusahaanId?: string
+}
+
+export type PengaturanPerusahaanCreateManyAkunBebanPphFinalInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnKeluaranId?: string | null
+  akunPpnMasukanId?: string | null
+  akunPph23DimukaId?: string | null
+  akunPph23DipotongId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunHutangPphFinalId?: string | null
+  perusahaanId?: string
+}
+
+export type PengaturanPerusahaanCreateManyAkunHutangPphFinalInput = {
+  id?: string
+  nama?: string
+  pkp?: boolean
+  tarifPpnPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: number
+  tahunBuku?: number | null
+  wajibPersetujuan?: boolean
+  akunPpnKeluaranId?: string | null
+  akunPpnMasukanId?: string | null
+  akunPph23DimukaId?: string | null
+  akunPph23DipotongId?: string | null
+  pphFinalPersen?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: string | null
+  perusahaanId?: string
 }
 
 export type PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput = {
@@ -1029,6 +1491,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPpnKeluaranInput = {
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
   akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
   akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput = {
@@ -1045,17 +1508,24 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnKeluaranInput = {
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type PengaturanPerusahaanUpsertWithoutAkunPpnMasukanInput = {
-  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput>
-  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPpnMasukanInput>
-  where?: Prisma.PengaturanPerusahaanWhereInput
-}
-
-export type PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPpnMasukanInput = {
-  where?: Prisma.PengaturanPerusahaanWhereInput
-  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput>
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPpnKeluaranInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput = {
@@ -1072,6 +1542,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPpnMasukanInput = {
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
   akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
   akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput = {
@@ -1088,17 +1559,24 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPpnMasukanInput = {
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type PengaturanPerusahaanUpsertWithoutAkunPph23DimukaInput = {
-  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput>
-  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DimukaInput>
-  where?: Prisma.PengaturanPerusahaanWhereInput
-}
-
-export type PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DimukaInput = {
-  where?: Prisma.PengaturanPerusahaanWhereInput
-  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput>
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPpnMasukanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput = {
@@ -1115,6 +1593,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPph23DimukaInput = {
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
   akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
   akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput = {
@@ -1131,17 +1610,24 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DimukaInput = {
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type PengaturanPerusahaanUpsertWithoutAkunPph23DipotongInput = {
-  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
-  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunPph23DipotongInput>
-  where?: Prisma.PengaturanPerusahaanWhereInput
-}
-
-export type PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunPph23DipotongInput = {
-  where?: Prisma.PengaturanPerusahaanWhereInput
-  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput>
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPph23DimukaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput = {
@@ -1158,6 +1644,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunPph23DipotongInput = {
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
   akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
   akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput = {
@@ -1174,17 +1661,24 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunPph23DipotongInput = {
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type PengaturanPerusahaanUpsertWithoutAkunBebanPphFinalInput = {
-  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput>
-  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunBebanPphFinalInput>
-  where?: Prisma.PengaturanPerusahaanWhereInput
-}
-
-export type PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunBebanPphFinalInput = {
-  where?: Prisma.PengaturanPerusahaanWhereInput
-  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput>
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunPph23DipotongInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput = {
@@ -1201,6 +1695,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunBebanPphFinalInput = {
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
   akunHutangPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanHutangPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput = {
@@ -1217,17 +1712,24 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunBebanPphFinalInput = {
   akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
-export type PengaturanPerusahaanUpsertWithoutAkunHutangPphFinalInput = {
-  update: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput>
-  create: Prisma.XOR<Prisma.PengaturanPerusahaanCreateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedCreateWithoutAkunHutangPphFinalInput>
-  where?: Prisma.PengaturanPerusahaanWhereInput
-}
-
-export type PengaturanPerusahaanUpdateToOneWithWhereWithoutAkunHutangPphFinalInput = {
-  where?: Prisma.PengaturanPerusahaanWhereInput
-  data: Prisma.XOR<Prisma.PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput, Prisma.PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput>
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunBebanPphFinalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunHutangPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput = {
@@ -1244,6 +1746,7 @@ export type PengaturanPerusahaanUpdateWithoutAkunHutangPphFinalInput = {
   akunPph23Dimuka?: Prisma.AkunUpdateOneWithoutPengaturanPph23DimukaNestedInput
   akunPph23Dipotong?: Prisma.AkunUpdateOneWithoutPengaturanPph23DipotongNestedInput
   akunBebanPphFinal?: Prisma.AkunUpdateOneWithoutPengaturanBebanPphFinalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPengaturanNestedInput
 }
 
 export type PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput = {
@@ -1260,6 +1763,24 @@ export type PengaturanPerusahaanUncheckedUpdateWithoutAkunHutangPphFinalInput = 
   akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type PengaturanPerusahaanUncheckedUpdateManyWithoutAkunHutangPphFinalInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pkp?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tarifPpnPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  terminHari?: Prisma.IntFieldUpdateOperationsInput | number
+  tahunBuku?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  wajibPersetujuan?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  akunPpnKeluaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPpnMasukanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DimukaId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPph23DipotongId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pphFinalPersen?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  akunBebanPphFinalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1279,12 +1800,14 @@ export type PengaturanPerusahaanSelect<ExtArgs extends runtime.Types.Extensions.
   pphFinalPersen?: boolean
   akunBebanPphFinalId?: boolean
   akunHutangPphFinalId?: boolean
+  perusahaanId?: boolean
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
   akunPpnMasukan?: boolean | Prisma.PengaturanPerusahaan$akunPpnMasukanArgs<ExtArgs>
   akunPph23Dimuka?: boolean | Prisma.PengaturanPerusahaan$akunPph23DimukaArgs<ExtArgs>
   akunPph23Dipotong?: boolean | Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>
   akunBebanPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>
   akunHutangPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pengaturanPerusahaan"]>
 
 export type PengaturanPerusahaanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1302,12 +1825,14 @@ export type PengaturanPerusahaanSelectCreateManyAndReturn<ExtArgs extends runtim
   pphFinalPersen?: boolean
   akunBebanPphFinalId?: boolean
   akunHutangPphFinalId?: boolean
+  perusahaanId?: boolean
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
   akunPpnMasukan?: boolean | Prisma.PengaturanPerusahaan$akunPpnMasukanArgs<ExtArgs>
   akunPph23Dimuka?: boolean | Prisma.PengaturanPerusahaan$akunPph23DimukaArgs<ExtArgs>
   akunPph23Dipotong?: boolean | Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>
   akunBebanPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>
   akunHutangPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pengaturanPerusahaan"]>
 
 export type PengaturanPerusahaanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1325,12 +1850,14 @@ export type PengaturanPerusahaanSelectUpdateManyAndReturn<ExtArgs extends runtim
   pphFinalPersen?: boolean
   akunBebanPphFinalId?: boolean
   akunHutangPphFinalId?: boolean
+  perusahaanId?: boolean
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
   akunPpnMasukan?: boolean | Prisma.PengaturanPerusahaan$akunPpnMasukanArgs<ExtArgs>
   akunPph23Dimuka?: boolean | Prisma.PengaturanPerusahaan$akunPph23DimukaArgs<ExtArgs>
   akunPph23Dipotong?: boolean | Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>
   akunBebanPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>
   akunHutangPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["pengaturanPerusahaan"]>
 
 export type PengaturanPerusahaanSelectScalar = {
@@ -1348,9 +1875,10 @@ export type PengaturanPerusahaanSelectScalar = {
   pphFinalPersen?: boolean
   akunBebanPphFinalId?: boolean
   akunHutangPphFinalId?: boolean
+  perusahaanId?: boolean
 }
 
-export type PengaturanPerusahaanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama" | "pkp" | "tarifPpnPersen" | "terminHari" | "tahunBuku" | "wajibPersetujuan" | "akunPpnKeluaranId" | "akunPpnMasukanId" | "akunPph23DimukaId" | "akunPph23DipotongId" | "pphFinalPersen" | "akunBebanPphFinalId" | "akunHutangPphFinalId", ExtArgs["result"]["pengaturanPerusahaan"]>
+export type PengaturanPerusahaanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nama" | "pkp" | "tarifPpnPersen" | "terminHari" | "tahunBuku" | "wajibPersetujuan" | "akunPpnKeluaranId" | "akunPpnMasukanId" | "akunPph23DimukaId" | "akunPph23DipotongId" | "pphFinalPersen" | "akunBebanPphFinalId" | "akunHutangPphFinalId" | "perusahaanId", ExtArgs["result"]["pengaturanPerusahaan"]>
 export type PengaturanPerusahaanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
   akunPpnMasukan?: boolean | Prisma.PengaturanPerusahaan$akunPpnMasukanArgs<ExtArgs>
@@ -1358,6 +1886,7 @@ export type PengaturanPerusahaanInclude<ExtArgs extends runtime.Types.Extensions
   akunPph23Dipotong?: boolean | Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>
   akunBebanPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>
   akunHutangPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type PengaturanPerusahaanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
@@ -1366,6 +1895,7 @@ export type PengaturanPerusahaanIncludeCreateManyAndReturn<ExtArgs extends runti
   akunPph23Dipotong?: boolean | Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>
   akunBebanPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>
   akunHutangPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type PengaturanPerusahaanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunPpnKeluaran?: boolean | Prisma.PengaturanPerusahaan$akunPpnKeluaranArgs<ExtArgs>
@@ -1374,6 +1904,7 @@ export type PengaturanPerusahaanIncludeUpdateManyAndReturn<ExtArgs extends runti
   akunPph23Dipotong?: boolean | Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>
   akunBebanPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>
   akunHutangPphFinal?: boolean | Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 
 export type $PengaturanPerusahaanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1385,9 +1916,13 @@ export type $PengaturanPerusahaanPayload<ExtArgs extends runtime.Types.Extension
     akunPph23Dipotong: Prisma.$AkunPayload<ExtArgs> | null
     akunBebanPphFinal: Prisma.$AkunPayload<ExtArgs> | null
     akunHutangPphFinal: Prisma.$AkunPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    /**
+     * Salinan Perusahaan.nama (ditulis bersamaan); dipertahankan untuk PengaturanPajak.nama lama
+     */
     nama: string
     /**
      * Pengusaha Kena Pajak: faktur memungut PPN
@@ -1399,11 +1934,11 @@ export type $PengaturanPerusahaanPayload<ExtArgs extends runtime.Types.Extension
      */
     terminHari: number
     /**
-     * Tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
+     * GLOBAL (hanya baris "default"): tahun buku yang sedang dibuka (kosong = mengikuti tahun kalender); bawaan periode laporan
      */
     tahunBuku: number | null
     /**
-     * Alur persetujuan maker-checker aktif. Menyala (bawaan): dokumen dibuat sebagai DRAFT, harus
+     * GLOBAL (hanya baris "default"): alur persetujuan maker-checker aktif. Menyala (bawaan): dokumen dibuat sebagai DRAFT, harus
      * diajukan lalu disetujui orang lain sebelum jurnalnya masuk buku besar. Dimatikan hanya untuk
      * usaha yang stafnya terlalu sedikit untuk memisahkan tugas; pengendaliannya hilang.
      */
@@ -1424,6 +1959,10 @@ export type $PengaturanPerusahaanPayload<ExtArgs extends runtime.Types.Extension
     pphFinalPersen: runtime.Decimal
     akunBebanPphFinalId: string | null
     akunHutangPphFinalId: string | null
+    /**
+     * Pemilik baris pengaturan ini (satu baris per perusahaan)
+     */
+    perusahaanId: string
   }, ExtArgs["result"]["pengaturanPerusahaan"]>
   composites: {}
 }
@@ -1824,6 +2363,7 @@ export interface Prisma__PengaturanPerusahaanClient<T, Null = never, ExtArgs ext
   akunPph23Dipotong<T extends Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PengaturanPerusahaan$akunPph23DipotongArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   akunBebanPphFinal<T extends Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PengaturanPerusahaan$akunBebanPphFinalArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   akunHutangPphFinal<T extends Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PengaturanPerusahaan$akunHutangPphFinalArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1867,6 +2407,7 @@ export interface PengaturanPerusahaanFieldRefs {
   readonly pphFinalPersen: Prisma.FieldRef<"PengaturanPerusahaan", 'Decimal'>
   readonly akunBebanPphFinalId: Prisma.FieldRef<"PengaturanPerusahaan", 'String'>
   readonly akunHutangPphFinalId: Prisma.FieldRef<"PengaturanPerusahaan", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"PengaturanPerusahaan", 'String'>
 }
     
 
@@ -2090,7 +2631,7 @@ export type PengaturanPerusahaanCreateArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * The data needed to create a PengaturanPerusahaan.
    */
-  data?: Prisma.XOR<Prisma.PengaturanPerusahaanCreateInput, Prisma.PengaturanPerusahaanUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.PengaturanPerusahaanCreateInput, Prisma.PengaturanPerusahaanUncheckedCreateInput>
 }
 
 /**

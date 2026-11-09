@@ -54,6 +54,7 @@ export type PriveMinAggregateOutputType = {
   ditolakOlehId: string | null
   ditolakPada: Date | null
   catatanPenolakan: string | null
+  perusahaanId: string | null
 }
 
 export type PriveMaxAggregateOutputType = {
@@ -76,6 +77,7 @@ export type PriveMaxAggregateOutputType = {
   ditolakOlehId: string | null
   ditolakPada: Date | null
   catatanPenolakan: string | null
+  perusahaanId: string | null
 }
 
 export type PriveCountAggregateOutputType = {
@@ -98,6 +100,7 @@ export type PriveCountAggregateOutputType = {
   ditolakOlehId: number
   ditolakPada: number
   catatanPenolakan: number
+  perusahaanId: number
   _all: number
 }
 
@@ -130,6 +133,7 @@ export type PriveMinAggregateInputType = {
   ditolakOlehId?: true
   ditolakPada?: true
   catatanPenolakan?: true
+  perusahaanId?: true
 }
 
 export type PriveMaxAggregateInputType = {
@@ -152,6 +156,7 @@ export type PriveMaxAggregateInputType = {
   ditolakOlehId?: true
   ditolakPada?: true
   catatanPenolakan?: true
+  perusahaanId?: true
 }
 
 export type PriveCountAggregateInputType = {
@@ -174,6 +179,7 @@ export type PriveCountAggregateInputType = {
   ditolakOlehId?: true
   ditolakPada?: true
   catatanPenolakan?: true
+  perusahaanId?: true
   _all?: true
 }
 
@@ -283,6 +289,7 @@ export type PriveGroupByOutputType = {
   ditolakOlehId: string | null
   ditolakPada: Date | null
   catatanPenolakan: string | null
+  perusahaanId: string
   _count: PriveCountAggregateOutputType | null
   _avg: PriveAvgAggregateOutputType | null
   _sum: PriveSumAggregateOutputType | null
@@ -328,12 +335,14 @@ export type PriveWhereInput = {
   ditolakOlehId?: Prisma.StringNullableFilter<"Prive"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"Prive"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"Prive"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Prive"> | string
   akunKas?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   akunPrive?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
 }
 
 export type PriveOrderByWithRelationInput = {
@@ -356,12 +365,14 @@ export type PriveOrderByWithRelationInput = {
   ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunKas?: Prisma.AkunOrderByWithRelationInput
   akunPrive?: Prisma.AkunOrderByWithRelationInput
   jurnal?: Prisma.JurnalOrderByWithRelationInput
   diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
   disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
   ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
 }
 
 export type PriveWhereUniqueInput = Prisma.AtLeast<{
@@ -387,12 +398,14 @@ export type PriveWhereUniqueInput = Prisma.AtLeast<{
   ditolakOlehId?: Prisma.StringNullableFilter<"Prive"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"Prive"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"Prive"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Prive"> | string
   akunKas?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   akunPrive?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
 }, "id" | "nomor" | "jurnalId">
 
 export type PriveOrderByWithAggregationInput = {
@@ -415,6 +428,7 @@ export type PriveOrderByWithAggregationInput = {
   ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   _count?: Prisma.PriveCountOrderByAggregateInput
   _avg?: Prisma.PriveAvgOrderByAggregateInput
   _max?: Prisma.PriveMaxOrderByAggregateInput
@@ -445,6 +459,7 @@ export type PriveScalarWhereWithAggregatesInput = {
   ditolakOlehId?: Prisma.StringNullableWithAggregatesFilter<"Prive"> | string | null
   ditolakPada?: Prisma.DateTimeNullableWithAggregatesFilter<"Prive"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableWithAggregatesFilter<"Prive"> | string | null
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"Prive"> | string
 }
 
 export type PriveCreateInput = {
@@ -467,6 +482,7 @@ export type PriveCreateInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateInput = {
@@ -489,6 +505,7 @@ export type PriveUncheckedCreateInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveUpdateInput = {
@@ -511,6 +528,7 @@ export type PriveUpdateInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateInput = {
@@ -533,6 +551,7 @@ export type PriveUncheckedUpdateInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveCreateManyInput = {
@@ -555,6 +574,7 @@ export type PriveCreateManyInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveUpdateManyMutationInput = {
@@ -593,6 +613,7 @@ export type PriveUncheckedUpdateManyInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveListRelationFilter = {
@@ -630,6 +651,7 @@ export type PriveCountOrderByAggregateInput = {
   ditolakOlehId?: Prisma.SortOrder
   ditolakPada?: Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PriveAvgOrderByAggregateInput = {
@@ -656,6 +678,7 @@ export type PriveMaxOrderByAggregateInput = {
   ditolakOlehId?: Prisma.SortOrder
   ditolakPada?: Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PriveMinOrderByAggregateInput = {
@@ -678,6 +701,7 @@ export type PriveMinOrderByAggregateInput = {
   ditolakOlehId?: Prisma.SortOrder
   ditolakPada?: Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type PriveSumOrderByAggregateInput = {
@@ -807,6 +831,48 @@ export type PriveUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   connect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
   update?: Prisma.PriveUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.PriveUpdateWithWhereUniqueWithoutDitolakOlehInput[]
   updateMany?: Prisma.PriveUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.PriveUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.PriveScalarWhereInput | Prisma.PriveScalarWhereInput[]
+}
+
+export type PriveCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PriveCreateWithoutPerusahaanInput, Prisma.PriveUncheckedCreateWithoutPerusahaanInput> | Prisma.PriveCreateWithoutPerusahaanInput[] | Prisma.PriveUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PriveCreateOrConnectWithoutPerusahaanInput | Prisma.PriveCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.PriveCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+}
+
+export type PriveUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PriveCreateWithoutPerusahaanInput, Prisma.PriveUncheckedCreateWithoutPerusahaanInput> | Prisma.PriveCreateWithoutPerusahaanInput[] | Prisma.PriveUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PriveCreateOrConnectWithoutPerusahaanInput | Prisma.PriveCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.PriveCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+}
+
+export type PriveUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PriveCreateWithoutPerusahaanInput, Prisma.PriveUncheckedCreateWithoutPerusahaanInput> | Prisma.PriveCreateWithoutPerusahaanInput[] | Prisma.PriveUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PriveCreateOrConnectWithoutPerusahaanInput | Prisma.PriveCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.PriveUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.PriveUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.PriveCreateManyPerusahaanInputEnvelope
+  set?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  disconnect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  delete?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  connect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  update?: Prisma.PriveUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.PriveUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.PriveUpdateManyWithWhereWithoutPerusahaanInput | Prisma.PriveUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.PriveScalarWhereInput | Prisma.PriveScalarWhereInput[]
+}
+
+export type PriveUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PriveCreateWithoutPerusahaanInput, Prisma.PriveUncheckedCreateWithoutPerusahaanInput> | Prisma.PriveCreateWithoutPerusahaanInput[] | Prisma.PriveUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PriveCreateOrConnectWithoutPerusahaanInput | Prisma.PriveCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.PriveUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.PriveUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.PriveCreateManyPerusahaanInputEnvelope
+  set?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  disconnect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  delete?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  connect?: Prisma.PriveWhereUniqueInput | Prisma.PriveWhereUniqueInput[]
+  update?: Prisma.PriveUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.PriveUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.PriveUpdateManyWithWhereWithoutPerusahaanInput | Prisma.PriveUpdateManyWithWhereWithoutPerusahaanInput[]
   deleteMany?: Prisma.PriveScalarWhereInput | Prisma.PriveScalarWhereInput[]
 }
 
@@ -945,6 +1011,7 @@ export type PriveCreateWithoutDiajukanOlehInput = {
   jurnal?: Prisma.JurnalCreateNestedOneWithoutPriveInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateWithoutDiajukanOlehInput = {
@@ -966,6 +1033,7 @@ export type PriveUncheckedCreateWithoutDiajukanOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateOrConnectWithoutDiajukanOlehInput = {
@@ -997,6 +1065,7 @@ export type PriveCreateWithoutDisetujuiOlehInput = {
   jurnal?: Prisma.JurnalCreateNestedOneWithoutPriveInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateWithoutDisetujuiOlehInput = {
@@ -1018,6 +1087,7 @@ export type PriveUncheckedCreateWithoutDisetujuiOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateOrConnectWithoutDisetujuiOlehInput = {
@@ -1049,6 +1119,7 @@ export type PriveCreateWithoutDitolakOlehInput = {
   jurnal?: Prisma.JurnalCreateNestedOneWithoutPriveInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateWithoutDitolakOlehInput = {
@@ -1070,6 +1141,7 @@ export type PriveUncheckedCreateWithoutDitolakOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateOrConnectWithoutDitolakOlehInput = {
@@ -1121,6 +1193,7 @@ export type PriveScalarWhereInput = {
   ditolakOlehId?: Prisma.StringNullableFilter<"Prive"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"Prive"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"Prive"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Prive"> | string
 }
 
 export type PriveUpsertWithWhereUniqueWithoutDisetujuiOlehInput = {
@@ -1155,6 +1228,76 @@ export type PriveUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.PriveUpdateManyMutationInput, Prisma.PriveUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
+export type PriveCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pemilikNama: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  penggunaNama: string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  akunKas: Prisma.AkunCreateNestedOneWithoutPriveKasInput
+  akunPrive: Prisma.AkunCreateNestedOneWithoutPriveModalInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutPriveInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+}
+
+export type PriveUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pemilikNama: string
+  akunKasId: string
+  akunPriveId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  jurnalId?: string | null
+  penggunaNama: string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PriveCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.PriveWhereUniqueInput
+  create: Prisma.XOR<Prisma.PriveCreateWithoutPerusahaanInput, Prisma.PriveUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PriveCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.PriveCreateManyPerusahaanInput | Prisma.PriveCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type PriveUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.PriveWhereUniqueInput
+  update: Prisma.XOR<Prisma.PriveUpdateWithoutPerusahaanInput, Prisma.PriveUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.PriveCreateWithoutPerusahaanInput, Prisma.PriveUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PriveUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.PriveWhereUniqueInput
+  data: Prisma.XOR<Prisma.PriveUpdateWithoutPerusahaanInput, Prisma.PriveUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type PriveUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.PriveScalarWhereInput
+  data: Prisma.XOR<Prisma.PriveUpdateManyMutationInput, Prisma.PriveUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
 export type PriveCreateWithoutAkunKasInput = {
   id?: string
   nomor: string
@@ -1174,6 +1317,7 @@ export type PriveCreateWithoutAkunKasInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateWithoutAkunKasInput = {
@@ -1195,6 +1339,7 @@ export type PriveUncheckedCreateWithoutAkunKasInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateOrConnectWithoutAkunKasInput = {
@@ -1226,6 +1371,7 @@ export type PriveCreateWithoutAkunPriveInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateWithoutAkunPriveInput = {
@@ -1247,6 +1393,7 @@ export type PriveUncheckedCreateWithoutAkunPriveInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateOrConnectWithoutAkunPriveInput = {
@@ -1310,6 +1457,7 @@ export type PriveCreateWithoutJurnalInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPriveInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPriveInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPriveInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPriveInput
 }
 
 export type PriveUncheckedCreateWithoutJurnalInput = {
@@ -1331,6 +1479,7 @@ export type PriveUncheckedCreateWithoutJurnalInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateOrConnectWithoutJurnalInput = {
@@ -1368,6 +1517,7 @@ export type PriveUpdateWithoutJurnalInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateWithoutJurnalInput = {
@@ -1389,6 +1539,7 @@ export type PriveUncheckedUpdateWithoutJurnalInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveCreateManyDiajukanOlehInput = {
@@ -1410,6 +1561,7 @@ export type PriveCreateManyDiajukanOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateManyDisetujuiOlehInput = {
@@ -1431,6 +1583,7 @@ export type PriveCreateManyDisetujuiOlehInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateManyDitolakOlehInput = {
@@ -1452,6 +1605,7 @@ export type PriveCreateManyDitolakOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveUpdateWithoutDiajukanOlehInput = {
@@ -1473,6 +1627,7 @@ export type PriveUpdateWithoutDiajukanOlehInput = {
   jurnal?: Prisma.JurnalUpdateOneWithoutPriveNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateWithoutDiajukanOlehInput = {
@@ -1494,6 +1649,7 @@ export type PriveUncheckedUpdateWithoutDiajukanOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUncheckedUpdateManyWithoutDiajukanOlehInput = {
@@ -1515,6 +1671,7 @@ export type PriveUncheckedUpdateManyWithoutDiajukanOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUpdateWithoutDisetujuiOlehInput = {
@@ -1536,6 +1693,7 @@ export type PriveUpdateWithoutDisetujuiOlehInput = {
   jurnal?: Prisma.JurnalUpdateOneWithoutPriveNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateWithoutDisetujuiOlehInput = {
@@ -1557,6 +1715,7 @@ export type PriveUncheckedUpdateWithoutDisetujuiOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUncheckedUpdateManyWithoutDisetujuiOlehInput = {
@@ -1578,6 +1737,7 @@ export type PriveUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUpdateWithoutDitolakOlehInput = {
@@ -1599,6 +1759,7 @@ export type PriveUpdateWithoutDitolakOlehInput = {
   jurnal?: Prisma.JurnalUpdateOneWithoutPriveNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateWithoutDitolakOlehInput = {
@@ -1620,6 +1781,7 @@ export type PriveUncheckedUpdateWithoutDitolakOlehInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUncheckedUpdateManyWithoutDitolakOlehInput = {
@@ -1639,6 +1801,95 @@ export type PriveUncheckedUpdateManyWithoutDitolakOlehInput = {
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type PriveCreateManyPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  pemilikNama: string
+  akunKasId: string
+  akunPriveId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  jurnalId?: string | null
+  penggunaNama: string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PriveUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pemilikNama?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunKas?: Prisma.AkunUpdateOneRequiredWithoutPriveKasNestedInput
+  akunPrive?: Prisma.AkunUpdateOneRequiredWithoutPriveModalNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutPriveNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+}
+
+export type PriveUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pemilikNama?: Prisma.StringFieldUpdateOperationsInput | string
+  akunKasId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunPriveId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PriveUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pemilikNama?: Prisma.StringFieldUpdateOperationsInput | string
+  akunKasId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunPriveId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penggunaNama?: Prisma.StringFieldUpdateOperationsInput | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1662,6 +1913,7 @@ export type PriveCreateManyAkunKasInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveCreateManyAkunPriveInput = {
@@ -1683,6 +1935,7 @@ export type PriveCreateManyAkunPriveInput = {
   ditolakOlehId?: string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaanId?: string
 }
 
 export type PriveUpdateWithoutAkunKasInput = {
@@ -1704,6 +1957,7 @@ export type PriveUpdateWithoutAkunKasInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateWithoutAkunKasInput = {
@@ -1725,6 +1979,7 @@ export type PriveUncheckedUpdateWithoutAkunKasInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUncheckedUpdateManyWithoutAkunKasInput = {
@@ -1746,6 +2001,7 @@ export type PriveUncheckedUpdateManyWithoutAkunKasInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUpdateWithoutAkunPriveInput = {
@@ -1767,6 +2023,7 @@ export type PriveUpdateWithoutAkunPriveInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPriveNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPriveNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPriveNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPriveNestedInput
 }
 
 export type PriveUncheckedUpdateWithoutAkunPriveInput = {
@@ -1788,6 +2045,7 @@ export type PriveUncheckedUpdateWithoutAkunPriveInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type PriveUncheckedUpdateManyWithoutAkunPriveInput = {
@@ -1809,6 +2067,7 @@ export type PriveUncheckedUpdateManyWithoutAkunPriveInput = {
   ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1833,12 +2092,14 @@ export type PriveSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunPrive?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.Prive$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Prive$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Prive$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Prive$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["prive"]>
 
 export type PriveSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1861,12 +2122,14 @@ export type PriveSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunPrive?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.Prive$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Prive$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Prive$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Prive$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["prive"]>
 
 export type PriveSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1889,12 +2152,14 @@ export type PriveSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunPrive?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.Prive$jurnalArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Prive$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Prive$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Prive$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["prive"]>
 
 export type PriveSelectScalar = {
@@ -1917,9 +2182,10 @@ export type PriveSelectScalar = {
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaanId?: boolean
 }
 
-export type PriveOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pemilikNama" | "akunKasId" | "akunPriveId" | "jumlah" | "keterangan" | "jurnalId" | "penggunaNama" | "dibuatPada" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["prive"]>
+export type PriveOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "pemilikNama" | "akunKasId" | "akunPriveId" | "jumlah" | "keterangan" | "jurnalId" | "penggunaNama" | "dibuatPada" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan" | "perusahaanId", ExtArgs["result"]["prive"]>
 export type PriveInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunPrive?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -1927,6 +2193,7 @@ export type PriveInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   diajukanOleh?: boolean | Prisma.Prive$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Prive$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Prive$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type PriveIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -1935,6 +2202,7 @@ export type PriveIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   diajukanOleh?: boolean | Prisma.Prive$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Prive$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Prive$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type PriveIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -1943,6 +2211,7 @@ export type PriveIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   diajukanOleh?: boolean | Prisma.Prive$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Prive$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Prive$ditolakOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 
 export type $PrivePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1954,6 +2223,7 @@ export type $PrivePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1978,6 +2248,10 @@ export type $PrivePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     ditolakOlehId: string | null
     ditolakPada: Date | null
     catatanPenolakan: string | null
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
   }, ExtArgs["result"]["prive"]>
   composites: {}
 }
@@ -2378,6 +2652,7 @@ export interface Prisma__PriveClient<T, Null = never, ExtArgs extends runtime.Ty
   diajukanOleh<T extends Prisma.Prive$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prive$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   disetujuiOleh<T extends Prisma.Prive$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prive$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ditolakOleh<T extends Prisma.Prive$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Prive$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2426,6 +2701,7 @@ export interface PriveFieldRefs {
   readonly ditolakOlehId: Prisma.FieldRef<"Prive", 'String'>
   readonly ditolakPada: Prisma.FieldRef<"Prive", 'DateTime'>
   readonly catatanPenolakan: Prisma.FieldRef<"Prive", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"Prive", 'String'>
 }
     
 

@@ -454,14 +454,6 @@ export type KursMataUangUncheckedUpdateManyWithoutMataUangNestedInput = {
   deleteMany?: Prisma.KursMataUangScalarWhereInput | Prisma.KursMataUangScalarWhereInput[]
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type KursMataUangCreateWithoutMataUangInput = {
   id?: string
   tanggal: Date | string

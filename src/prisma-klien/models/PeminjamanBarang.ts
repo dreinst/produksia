@@ -45,6 +45,7 @@ export type PeminjamanBarangMinAggregateOutputType = {
   penyesuaianId: string | null
   dicatatOlehId: string | null
   dicatatOlehNama: string | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -71,6 +72,7 @@ export type PeminjamanBarangMaxAggregateOutputType = {
   penyesuaianId: string | null
   dicatatOlehId: string | null
   dicatatOlehNama: string | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -97,6 +99,7 @@ export type PeminjamanBarangCountAggregateOutputType = {
   penyesuaianId: number
   dicatatOlehId: number
   dicatatOlehNama: number
+  perusahaanId: number
   statusPersetujuan: number
   diajukanOlehId: number
   diajukanPada: number
@@ -125,6 +128,7 @@ export type PeminjamanBarangMinAggregateInputType = {
   penyesuaianId?: true
   dicatatOlehId?: true
   dicatatOlehNama?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -151,6 +155,7 @@ export type PeminjamanBarangMaxAggregateInputType = {
   penyesuaianId?: true
   dicatatOlehId?: true
   dicatatOlehNama?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -177,6 +182,7 @@ export type PeminjamanBarangCountAggregateInputType = {
   penyesuaianId?: true
   dicatatOlehId?: true
   dicatatOlehNama?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -276,6 +282,7 @@ export type PeminjamanBarangGroupByOutputType = {
   penyesuaianId: string | null
   dicatatOlehId: string | null
   dicatatOlehNama: string
+  perusahaanId: string
   statusPersetujuan: $Enums.StatusPersetujuan
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -323,6 +330,7 @@ export type PeminjamanBarangWhereInput = {
   penyesuaianId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   dicatatOlehId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   dicatatOlehNama?: Prisma.StringFilter<"PeminjamanBarang"> | string
+  perusahaanId?: Prisma.StringFilter<"PeminjamanBarang"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"PeminjamanBarang"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"PeminjamanBarang"> | Date | string | null
@@ -335,6 +343,7 @@ export type PeminjamanBarangWhereInput = {
   proyek?: Prisma.XOR<Prisma.ProyekNullableScalarRelationFilter, Prisma.ProyekWhereInput> | null
   penyesuaian?: Prisma.XOR<Prisma.PenyesuaianPersediaanNullableScalarRelationFilter, Prisma.PenyesuaianPersediaanWhereInput> | null
   dicatatOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   baris?: Prisma.BarisPeminjamanBarangListRelationFilter
   foto?: Prisma.FotoListRelationFilter
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
@@ -358,6 +367,7 @@ export type PeminjamanBarangOrderByWithRelationInput = {
   penyesuaianId?: Prisma.SortOrderInput | Prisma.SortOrder
   dicatatOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   dicatatOlehNama?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -370,6 +380,7 @@ export type PeminjamanBarangOrderByWithRelationInput = {
   proyek?: Prisma.ProyekOrderByWithRelationInput
   penyesuaian?: Prisma.PenyesuaianPersediaanOrderByWithRelationInput
   dicatatOleh?: Prisma.PenggunaOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   baris?: Prisma.BarisPeminjamanBarangOrderByRelationAggregateInput
   foto?: Prisma.FotoOrderByRelationAggregateInput
   diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
@@ -396,6 +407,7 @@ export type PeminjamanBarangWhereUniqueInput = Prisma.AtLeast<{
   penyesuaianId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   dicatatOlehId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   dicatatOlehNama?: Prisma.StringFilter<"PeminjamanBarang"> | string
+  perusahaanId?: Prisma.StringFilter<"PeminjamanBarang"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"PeminjamanBarang"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"PeminjamanBarang"> | Date | string | null
@@ -408,6 +420,7 @@ export type PeminjamanBarangWhereUniqueInput = Prisma.AtLeast<{
   proyek?: Prisma.XOR<Prisma.ProyekNullableScalarRelationFilter, Prisma.ProyekWhereInput> | null
   penyesuaian?: Prisma.XOR<Prisma.PenyesuaianPersediaanNullableScalarRelationFilter, Prisma.PenyesuaianPersediaanWhereInput> | null
   dicatatOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   baris?: Prisma.BarisPeminjamanBarangListRelationFilter
   foto?: Prisma.FotoListRelationFilter
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
@@ -431,6 +444,7 @@ export type PeminjamanBarangOrderByWithAggregationInput = {
   penyesuaianId?: Prisma.SortOrderInput | Prisma.SortOrder
   dicatatOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   dicatatOlehNama?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -463,6 +477,7 @@ export type PeminjamanBarangScalarWhereWithAggregatesInput = {
   penyesuaianId?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
   dicatatOlehId?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
   dicatatOlehNama?: Prisma.StringWithAggregatesFilter<"PeminjamanBarang"> | string
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"PeminjamanBarang"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"PeminjamanBarang"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"PeminjamanBarang"> | string | null
   diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"PeminjamanBarang"> | Date | string | null
@@ -494,6 +509,7 @@ export type PeminjamanBarangCreateInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -517,6 +533,7 @@ export type PeminjamanBarangUncheckedCreateInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -550,6 +567,7 @@ export type PeminjamanBarangUpdateInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -573,6 +591,7 @@ export type PeminjamanBarangUncheckedUpdateInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -601,6 +620,7 @@ export type PeminjamanBarangCreateManyInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -646,6 +666,7 @@ export type PeminjamanBarangUncheckedUpdateManyInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -687,6 +708,7 @@ export type PeminjamanBarangCountOrderByAggregateInput = {
   penyesuaianId?: Prisma.SortOrder
   dicatatOlehId?: Prisma.SortOrder
   dicatatOlehNama?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -713,6 +735,7 @@ export type PeminjamanBarangMaxOrderByAggregateInput = {
   penyesuaianId?: Prisma.SortOrder
   dicatatOlehId?: Prisma.SortOrder
   dicatatOlehNama?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -739,6 +762,7 @@ export type PeminjamanBarangMinOrderByAggregateInput = {
   penyesuaianId?: Prisma.SortOrder
   dicatatOlehId?: Prisma.SortOrder
   dicatatOlehNama?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -922,6 +946,48 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   deleteMany?: Prisma.PeminjamanBarangScalarWhereInput | Prisma.PeminjamanBarangScalarWhereInput[]
 }
 
+export type PeminjamanBarangCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput> | Prisma.PeminjamanBarangCreateWithoutPerusahaanInput[] | Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput | Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.PeminjamanBarangCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+}
+
+export type PeminjamanBarangUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput> | Prisma.PeminjamanBarangCreateWithoutPerusahaanInput[] | Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput | Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.PeminjamanBarangCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+}
+
+export type PeminjamanBarangUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput> | Prisma.PeminjamanBarangCreateWithoutPerusahaanInput[] | Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput | Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.PeminjamanBarangUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.PeminjamanBarangUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.PeminjamanBarangCreateManyPerusahaanInputEnvelope
+  set?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  disconnect?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  delete?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  connect?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  update?: Prisma.PeminjamanBarangUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.PeminjamanBarangUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.PeminjamanBarangUpdateManyWithWhereWithoutPerusahaanInput | Prisma.PeminjamanBarangUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.PeminjamanBarangScalarWhereInput | Prisma.PeminjamanBarangScalarWhereInput[]
+}
+
+export type PeminjamanBarangUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput> | Prisma.PeminjamanBarangCreateWithoutPerusahaanInput[] | Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput | Prisma.PeminjamanBarangCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.PeminjamanBarangUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.PeminjamanBarangUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.PeminjamanBarangCreateManyPerusahaanInputEnvelope
+  set?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  disconnect?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  delete?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  connect?: Prisma.PeminjamanBarangWhereUniqueInput | Prisma.PeminjamanBarangWhereUniqueInput[]
+  update?: Prisma.PeminjamanBarangUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.PeminjamanBarangUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.PeminjamanBarangUpdateManyWithWhereWithoutPerusahaanInput | Prisma.PeminjamanBarangUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.PeminjamanBarangScalarWhereInput | Prisma.PeminjamanBarangScalarWhereInput[]
+}
+
 export type PeminjamanBarangCreateNestedManyWithoutProyekInput = {
   create?: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutProyekInput, Prisma.PeminjamanBarangUncheckedCreateWithoutProyekInput> | Prisma.PeminjamanBarangCreateWithoutProyekInput[] | Prisma.PeminjamanBarangUncheckedCreateWithoutProyekInput[]
   connectOrCreate?: Prisma.PeminjamanBarangCreateOrConnectWithoutProyekInput | Prisma.PeminjamanBarangCreateOrConnectWithoutProyekInput[]
@@ -1098,6 +1164,7 @@ export type PeminjamanBarangCreateWithoutDicatatOlehInput = {
   gudang: Prisma.GudangCreateNestedOneWithoutPeminjamanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -1120,6 +1187,7 @@ export type PeminjamanBarangUncheckedCreateWithoutDicatatOlehInput = {
   catatanKembali?: string | null
   penyesuaianId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1163,6 +1231,7 @@ export type PeminjamanBarangCreateWithoutDiajukanOlehInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPeminjamanBarangInput
@@ -1185,6 +1254,7 @@ export type PeminjamanBarangUncheckedCreateWithoutDiajukanOlehInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1227,6 +1297,7 @@ export type PeminjamanBarangCreateWithoutDisetujuiOlehInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -1249,6 +1320,7 @@ export type PeminjamanBarangUncheckedCreateWithoutDisetujuiOlehInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1291,6 +1363,7 @@ export type PeminjamanBarangCreateWithoutDitolakOlehInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -1313,6 +1386,7 @@ export type PeminjamanBarangUncheckedCreateWithoutDitolakOlehInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1369,6 +1443,7 @@ export type PeminjamanBarangScalarWhereInput = {
   penyesuaianId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   dicatatOlehId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   dicatatOlehNama?: Prisma.StringFilter<"PeminjamanBarang"> | string
+  perusahaanId?: Prisma.StringFilter<"PeminjamanBarang"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"PeminjamanBarang"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"PeminjamanBarang"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"PeminjamanBarang"> | Date | string | null
@@ -1427,6 +1502,88 @@ export type PeminjamanBarangUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.PeminjamanBarangUpdateManyMutationInput, Prisma.PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
+export type PeminjamanBarangCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
+  keterangan?: string | null
+  waktuKeluar?: Date | string
+  rencanaKembali?: Date | string | null
+  ditutupPada?: Date | string | null
+  catatanKembali?: string | null
+  dicatatOlehNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  gudang: Prisma.GudangCreateNestedOneWithoutPeminjamanInput
+  proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
+  penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
+  dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
+  foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPeminjamanBarangInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakPeminjamanBarangInput
+}
+
+export type PeminjamanBarangUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  gudangId: string
+  proyekId?: string | null
+  namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
+  keterangan?: string | null
+  waktuKeluar?: Date | string
+  rencanaKembali?: Date | string | null
+  ditutupPada?: Date | string | null
+  catatanKembali?: string | null
+  penyesuaianId?: string | null
+  dicatatOlehId?: string | null
+  dicatatOlehNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutPeminjamanInput
+  foto?: Prisma.FotoUncheckedCreateNestedManyWithoutPeminjamanInput
+}
+
+export type PeminjamanBarangCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.PeminjamanBarangWhereUniqueInput
+  create: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PeminjamanBarangCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.PeminjamanBarangCreateManyPerusahaanInput | Prisma.PeminjamanBarangCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type PeminjamanBarangUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.PeminjamanBarangWhereUniqueInput
+  update: Prisma.XOR<Prisma.PeminjamanBarangUpdateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.PeminjamanBarangCreateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type PeminjamanBarangUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.PeminjamanBarangWhereUniqueInput
+  data: Prisma.XOR<Prisma.PeminjamanBarangUpdateWithoutPerusahaanInput, Prisma.PeminjamanBarangUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type PeminjamanBarangUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.PeminjamanBarangScalarWhereInput
+  data: Prisma.XOR<Prisma.PeminjamanBarangUpdateManyMutationInput, Prisma.PeminjamanBarangUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
 export type PeminjamanBarangCreateWithoutProyekInput = {
   id?: string
   nomor: string
@@ -1447,6 +1604,7 @@ export type PeminjamanBarangCreateWithoutProyekInput = {
   gudang: Prisma.GudangCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -1469,6 +1627,7 @@ export type PeminjamanBarangUncheckedCreateWithoutProyekInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1527,6 +1686,7 @@ export type PeminjamanBarangCreateWithoutGudangInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -1549,6 +1709,7 @@ export type PeminjamanBarangUncheckedCreateWithoutGudangInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1607,6 +1768,7 @@ export type PeminjamanBarangCreateWithoutPenyesuaianInput = {
   gudang: Prisma.GudangCreateNestedOneWithoutPeminjamanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
@@ -1629,6 +1791,7 @@ export type PeminjamanBarangUncheckedCreateWithoutPenyesuaianInput = {
   catatanKembali?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1688,6 +1851,7 @@ export type PeminjamanBarangCreateWithoutFotoInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   baris?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPeminjamanBarangInput
@@ -1710,6 +1874,7 @@ export type PeminjamanBarangUncheckedCreateWithoutFotoInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1758,6 +1923,7 @@ export type PeminjamanBarangUpdateWithoutFotoInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPeminjamanBarangNestedInput
@@ -1780,6 +1946,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutFotoInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1812,6 +1979,7 @@ export type PeminjamanBarangCreateWithoutBarisInput = {
   proyek?: Prisma.ProyekCreateNestedOneWithoutPeminjamanInput
   penyesuaian?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutPeminjamanInput
   dicatatOleh?: Prisma.PenggunaCreateNestedOneWithoutCatatPeminjamanBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutPeminjamanBarangInput
   foto?: Prisma.FotoCreateNestedManyWithoutPeminjamanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanPeminjamanBarangInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiPeminjamanBarangInput
@@ -1834,6 +2002,7 @@ export type PeminjamanBarangUncheckedCreateWithoutBarisInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1882,6 +2051,7 @@ export type PeminjamanBarangUpdateWithoutBarisInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPeminjamanBarangNestedInput
@@ -1904,6 +2074,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutBarisInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1930,6 +2101,7 @@ export type PeminjamanBarangCreateManyDicatatOlehInput = {
   catatanKembali?: string | null
   penyesuaianId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1956,6 +2128,7 @@ export type PeminjamanBarangCreateManyDiajukanOlehInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1981,6 +2154,7 @@ export type PeminjamanBarangCreateManyDisetujuiOlehInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2006,6 +2180,7 @@ export type PeminjamanBarangCreateManyDitolakOlehInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2035,6 +2210,7 @@ export type PeminjamanBarangUpdateWithoutDicatatOlehInput = {
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPeminjamanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -2057,6 +2233,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutDicatatOlehInput = {
   catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2084,6 +2261,7 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDicatatOlehInput = {
   catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2115,6 +2293,7 @@ export type PeminjamanBarangUpdateWithoutDiajukanOlehInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPeminjamanBarangNestedInput
@@ -2137,6 +2316,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutDiajukanOlehInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2164,6 +2344,7 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDiajukanOlehInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2194,6 +2375,7 @@ export type PeminjamanBarangUpdateWithoutDisetujuiOlehInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -2216,6 +2398,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutDisetujuiOlehInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2243,6 +2426,7 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2273,6 +2457,7 @@ export type PeminjamanBarangUpdateWithoutDitolakOlehInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -2295,6 +2480,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutDitolakOlehInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2322,11 +2508,120 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutDitolakOlehInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type PeminjamanBarangCreateManyPerusahaanInput = {
+  id?: string
+  nomor: string
+  gudangId: string
+  proyekId?: string | null
+  namaPengambil: string
+  nomorTelepon?: string | null
+  nomorTeleponKembali?: string | null
+  keterangan?: string | null
+  waktuKeluar?: Date | string
+  rencanaKembali?: Date | string | null
+  ditutupPada?: Date | string | null
+  catatanKembali?: string | null
+  penyesuaianId?: string | null
+  dicatatOlehId?: string | null
+  dicatatOlehNama: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type PeminjamanBarangUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gudang?: Prisma.GudangUpdateOneRequiredWithoutPeminjamanNestedInput
+  proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
+  penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
+  dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
+  foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiPeminjamanBarangNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakPeminjamanBarangNestedInput
+}
+
+export type PeminjamanBarangUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutPeminjamanNestedInput
+  foto?: Prisma.FotoUncheckedUpdateManyWithoutPeminjamanNestedInput
+}
+
+export type PeminjamanBarangUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaPengambil?: Prisma.StringFieldUpdateOperationsInput | string
+  nomorTelepon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nomorTeleponKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  waktuKeluar?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rencanaKembali?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditutupPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -2346,6 +2641,7 @@ export type PeminjamanBarangCreateManyProyekInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2376,6 +2672,7 @@ export type PeminjamanBarangUpdateWithoutProyekInput = {
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -2398,6 +2695,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutProyekInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2425,6 +2723,7 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutProyekInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2450,6 +2749,7 @@ export type PeminjamanBarangCreateManyGudangInput = {
   penyesuaianId?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2480,6 +2780,7 @@ export type PeminjamanBarangUpdateWithoutGudangInput = {
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   penyesuaian?: Prisma.PenyesuaianPersediaanUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -2502,6 +2803,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutGudangInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2529,6 +2831,7 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutGudangInput = {
   penyesuaianId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2554,6 +2857,7 @@ export type PeminjamanBarangCreateManyPenyesuaianInput = {
   catatanKembali?: string | null
   dicatatOlehId?: string | null
   dicatatOlehNama: string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2584,6 +2888,7 @@ export type PeminjamanBarangUpdateWithoutPenyesuaianInput = {
   gudang?: Prisma.GudangUpdateOneRequiredWithoutPeminjamanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutPeminjamanNestedInput
   dicatatOleh?: Prisma.PenggunaUpdateOneWithoutCatatPeminjamanBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutPeminjamanBarangNestedInput
   baris?: Prisma.BarisPeminjamanBarangUpdateManyWithoutPeminjamanNestedInput
   foto?: Prisma.FotoUpdateManyWithoutPeminjamanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanPeminjamanBarangNestedInput
@@ -2606,6 +2911,7 @@ export type PeminjamanBarangUncheckedUpdateWithoutPenyesuaianInput = {
   catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2633,6 +2939,7 @@ export type PeminjamanBarangUncheckedUpdateManyWithoutPenyesuaianInput = {
   catatanKembali?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dicatatOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2699,6 +3006,7 @@ export type PeminjamanBarangSelect<ExtArgs extends runtime.Types.Extensions.Inte
   penyesuaianId?: boolean
   dicatatOlehId?: boolean
   dicatatOlehNama?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2711,6 +3019,7 @@ export type PeminjamanBarangSelect<ExtArgs extends runtime.Types.Extensions.Inte
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
   penyesuaian?: boolean | Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>
   dicatatOleh?: boolean | Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.PeminjamanBarang$barisArgs<ExtArgs>
   foto?: boolean | Prisma.PeminjamanBarang$fotoArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>
@@ -2735,6 +3044,7 @@ export type PeminjamanBarangSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   penyesuaianId?: boolean
   dicatatOlehId?: boolean
   dicatatOlehNama?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2747,6 +3057,7 @@ export type PeminjamanBarangSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
   penyesuaian?: boolean | Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>
   dicatatOleh?: boolean | Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PeminjamanBarang$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PeminjamanBarang$ditolakOlehArgs<ExtArgs>
@@ -2768,6 +3079,7 @@ export type PeminjamanBarangSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   penyesuaianId?: boolean
   dicatatOlehId?: boolean
   dicatatOlehNama?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2780,6 +3092,7 @@ export type PeminjamanBarangSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
   penyesuaian?: boolean | Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>
   dicatatOleh?: boolean | Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PeminjamanBarang$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PeminjamanBarang$ditolakOlehArgs<ExtArgs>
@@ -2801,6 +3114,7 @@ export type PeminjamanBarangSelectScalar = {
   penyesuaianId?: boolean
   dicatatOlehId?: boolean
   dicatatOlehNama?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2811,12 +3125,13 @@ export type PeminjamanBarangSelectScalar = {
   catatanPenolakan?: boolean
 }
 
-export type PeminjamanBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "gudangId" | "proyekId" | "namaPengambil" | "nomorTelepon" | "nomorTeleponKembali" | "keterangan" | "waktuKeluar" | "rencanaKembali" | "ditutupPada" | "catatanKembali" | "penyesuaianId" | "dicatatOlehId" | "dicatatOlehNama" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["peminjamanBarang"]>
+export type PeminjamanBarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "gudangId" | "proyekId" | "namaPengambil" | "nomorTelepon" | "nomorTeleponKembali" | "keterangan" | "waktuKeluar" | "rencanaKembali" | "ditutupPada" | "catatanKembali" | "penyesuaianId" | "dicatatOlehId" | "dicatatOlehNama" | "perusahaanId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["peminjamanBarang"]>
 export type PeminjamanBarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
   penyesuaian?: boolean | Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>
   dicatatOleh?: boolean | Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.PeminjamanBarang$barisArgs<ExtArgs>
   foto?: boolean | Prisma.PeminjamanBarang$fotoArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>
@@ -2829,6 +3144,7 @@ export type PeminjamanBarangIncludeCreateManyAndReturn<ExtArgs extends runtime.T
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
   penyesuaian?: boolean | Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>
   dicatatOleh?: boolean | Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PeminjamanBarang$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PeminjamanBarang$ditolakOlehArgs<ExtArgs>
@@ -2838,6 +3154,7 @@ export type PeminjamanBarangIncludeUpdateManyAndReturn<ExtArgs extends runtime.T
   proyek?: boolean | Prisma.PeminjamanBarang$proyekArgs<ExtArgs>
   penyesuaian?: boolean | Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>
   dicatatOleh?: boolean | Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.PeminjamanBarang$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.PeminjamanBarang$ditolakOlehArgs<ExtArgs>
@@ -2850,6 +3167,7 @@ export type $PeminjamanBarangPayload<ExtArgs extends runtime.Types.Extensions.In
     proyek: Prisma.$ProyekPayload<ExtArgs> | null
     penyesuaian: Prisma.$PenyesuaianPersediaanPayload<ExtArgs> | null
     dicatatOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
     baris: Prisma.$BarisPeminjamanBarangPayload<ExtArgs>[]
     foto: Prisma.$FotoPayload<ExtArgs>[]
     diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
@@ -2885,6 +3203,10 @@ export type $PeminjamanBarangPayload<ExtArgs extends runtime.Types.Extensions.In
     penyesuaianId: string | null
     dicatatOlehId: string | null
     dicatatOlehNama: string
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
     /**
      * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts. Kru mengajukan (MENUNGGU), Gudang
      * menyetujui (stok dikurangi saat itu) atau menolak.
@@ -3295,6 +3617,7 @@ export interface Prisma__PeminjamanBarangClient<T, Null = never, ExtArgs extends
   proyek<T extends Prisma.PeminjamanBarang$proyekArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PeminjamanBarang$proyekArgs<ExtArgs>>): Prisma.Prisma__ProyekClient<runtime.Types.Result.GetResult<Prisma.$ProyekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   penyesuaian<T extends Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PeminjamanBarang$penyesuaianArgs<ExtArgs>>): Prisma.Prisma__PenyesuaianPersediaanClient<runtime.Types.Result.GetResult<Prisma.$PenyesuaianPersediaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   dicatatOleh<T extends Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PeminjamanBarang$dicatatOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   baris<T extends Prisma.PeminjamanBarang$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PeminjamanBarang$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   foto<T extends Prisma.PeminjamanBarang$fotoArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PeminjamanBarang$fotoArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   diajukanOleh<T extends Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PeminjamanBarang$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -3344,6 +3667,7 @@ export interface PeminjamanBarangFieldRefs {
   readonly penyesuaianId: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly dicatatOlehId: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly dicatatOlehNama: Prisma.FieldRef<"PeminjamanBarang", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly statusPersetujuan: Prisma.FieldRef<"PeminjamanBarang", 'StatusPersetujuan'>
   readonly diajukanOlehId: Prisma.FieldRef<"PeminjamanBarang", 'String'>
   readonly diajukanPada: Prisma.FieldRef<"PeminjamanBarang", 'DateTime'>

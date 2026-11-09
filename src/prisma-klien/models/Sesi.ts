@@ -30,6 +30,7 @@ export type SesiMinAggregateOutputType = {
   penggunaId: string | null
   kedaluwarsa: Date | null
   dibuatPada: Date | null
+  perusahaanAktifId: string | null
 }
 
 export type SesiMaxAggregateOutputType = {
@@ -38,6 +39,7 @@ export type SesiMaxAggregateOutputType = {
   penggunaId: string | null
   kedaluwarsa: Date | null
   dibuatPada: Date | null
+  perusahaanAktifId: string | null
 }
 
 export type SesiCountAggregateOutputType = {
@@ -46,6 +48,7 @@ export type SesiCountAggregateOutputType = {
   penggunaId: number
   kedaluwarsa: number
   dibuatPada: number
+  perusahaanAktifId: number
   _all: number
 }
 
@@ -56,6 +59,7 @@ export type SesiMinAggregateInputType = {
   penggunaId?: true
   kedaluwarsa?: true
   dibuatPada?: true
+  perusahaanAktifId?: true
 }
 
 export type SesiMaxAggregateInputType = {
@@ -64,6 +68,7 @@ export type SesiMaxAggregateInputType = {
   penggunaId?: true
   kedaluwarsa?: true
   dibuatPada?: true
+  perusahaanAktifId?: true
 }
 
 export type SesiCountAggregateInputType = {
@@ -72,6 +77,7 @@ export type SesiCountAggregateInputType = {
   penggunaId?: true
   kedaluwarsa?: true
   dibuatPada?: true
+  perusahaanAktifId?: true
   _all?: true
 }
 
@@ -153,6 +159,7 @@ export type SesiGroupByOutputType = {
   penggunaId: string
   kedaluwarsa: Date
   dibuatPada: Date
+  perusahaanAktifId: string | null
   _count: SesiCountAggregateOutputType | null
   _min: SesiMinAggregateOutputType | null
   _max: SesiMaxAggregateOutputType | null
@@ -182,7 +189,9 @@ export type SesiWhereInput = {
   penggunaId?: Prisma.StringFilter<"Sesi"> | string
   kedaluwarsa?: Prisma.DateTimeFilter<"Sesi"> | Date | string
   dibuatPada?: Prisma.DateTimeFilter<"Sesi"> | Date | string
+  perusahaanAktifId?: Prisma.StringNullableFilter<"Sesi"> | string | null
   pengguna?: Prisma.XOR<Prisma.PenggunaScalarRelationFilter, Prisma.PenggunaWhereInput>
+  perusahaanAktif?: Prisma.XOR<Prisma.PerusahaanNullableScalarRelationFilter, Prisma.PerusahaanWhereInput> | null
 }
 
 export type SesiOrderByWithRelationInput = {
@@ -191,7 +200,9 @@ export type SesiOrderByWithRelationInput = {
   penggunaId?: Prisma.SortOrder
   kedaluwarsa?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanAktifId?: Prisma.SortOrderInput | Prisma.SortOrder
   pengguna?: Prisma.PenggunaOrderByWithRelationInput
+  perusahaanAktif?: Prisma.PerusahaanOrderByWithRelationInput
 }
 
 export type SesiWhereUniqueInput = Prisma.AtLeast<{
@@ -203,7 +214,9 @@ export type SesiWhereUniqueInput = Prisma.AtLeast<{
   penggunaId?: Prisma.StringFilter<"Sesi"> | string
   kedaluwarsa?: Prisma.DateTimeFilter<"Sesi"> | Date | string
   dibuatPada?: Prisma.DateTimeFilter<"Sesi"> | Date | string
+  perusahaanAktifId?: Prisma.StringNullableFilter<"Sesi"> | string | null
   pengguna?: Prisma.XOR<Prisma.PenggunaScalarRelationFilter, Prisma.PenggunaWhereInput>
+  perusahaanAktif?: Prisma.XOR<Prisma.PerusahaanNullableScalarRelationFilter, Prisma.PerusahaanWhereInput> | null
 }, "id" | "tokenHash">
 
 export type SesiOrderByWithAggregationInput = {
@@ -212,6 +225,7 @@ export type SesiOrderByWithAggregationInput = {
   penggunaId?: Prisma.SortOrder
   kedaluwarsa?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanAktifId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SesiCountOrderByAggregateInput
   _max?: Prisma.SesiMaxOrderByAggregateInput
   _min?: Prisma.SesiMinOrderByAggregateInput
@@ -226,6 +240,7 @@ export type SesiScalarWhereWithAggregatesInput = {
   penggunaId?: Prisma.StringWithAggregatesFilter<"Sesi"> | string
   kedaluwarsa?: Prisma.DateTimeWithAggregatesFilter<"Sesi"> | Date | string
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"Sesi"> | Date | string
+  perusahaanAktifId?: Prisma.StringNullableWithAggregatesFilter<"Sesi"> | string | null
 }
 
 export type SesiCreateInput = {
@@ -234,6 +249,7 @@ export type SesiCreateInput = {
   kedaluwarsa: Date | string
   dibuatPada?: Date | string
   pengguna: Prisma.PenggunaCreateNestedOneWithoutSesiInput
+  perusahaanAktif?: Prisma.PerusahaanCreateNestedOneWithoutSesiAktifInput
 }
 
 export type SesiUncheckedCreateInput = {
@@ -242,6 +258,7 @@ export type SesiUncheckedCreateInput = {
   penggunaId: string
   kedaluwarsa: Date | string
   dibuatPada?: Date | string
+  perusahaanAktifId?: string | null
 }
 
 export type SesiUpdateInput = {
@@ -250,6 +267,7 @@ export type SesiUpdateInput = {
   kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pengguna?: Prisma.PenggunaUpdateOneRequiredWithoutSesiNestedInput
+  perusahaanAktif?: Prisma.PerusahaanUpdateOneWithoutSesiAktifNestedInput
 }
 
 export type SesiUncheckedUpdateInput = {
@@ -258,6 +276,7 @@ export type SesiUncheckedUpdateInput = {
   penggunaId?: Prisma.StringFieldUpdateOperationsInput | string
   kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanAktifId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SesiCreateManyInput = {
@@ -266,6 +285,7 @@ export type SesiCreateManyInput = {
   penggunaId: string
   kedaluwarsa: Date | string
   dibuatPada?: Date | string
+  perusahaanAktifId?: string | null
 }
 
 export type SesiUpdateManyMutationInput = {
@@ -281,6 +301,7 @@ export type SesiUncheckedUpdateManyInput = {
   penggunaId?: Prisma.StringFieldUpdateOperationsInput | string
   kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanAktifId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SesiListRelationFilter = {
@@ -299,6 +320,7 @@ export type SesiCountOrderByAggregateInput = {
   penggunaId?: Prisma.SortOrder
   kedaluwarsa?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanAktifId?: Prisma.SortOrder
 }
 
 export type SesiMaxOrderByAggregateInput = {
@@ -307,6 +329,7 @@ export type SesiMaxOrderByAggregateInput = {
   penggunaId?: Prisma.SortOrder
   kedaluwarsa?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanAktifId?: Prisma.SortOrder
 }
 
 export type SesiMinOrderByAggregateInput = {
@@ -315,6 +338,7 @@ export type SesiMinOrderByAggregateInput = {
   penggunaId?: Prisma.SortOrder
   kedaluwarsa?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanAktifId?: Prisma.SortOrder
 }
 
 export type SesiCreateNestedManyWithoutPenggunaInput = {
@@ -359,11 +383,54 @@ export type SesiUncheckedUpdateManyWithoutPenggunaNestedInput = {
   deleteMany?: Prisma.SesiScalarWhereInput | Prisma.SesiScalarWhereInput[]
 }
 
+export type SesiCreateNestedManyWithoutPerusahaanAktifInput = {
+  create?: Prisma.XOR<Prisma.SesiCreateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput> | Prisma.SesiCreateWithoutPerusahaanAktifInput[] | Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput[]
+  connectOrCreate?: Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput | Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput[]
+  createMany?: Prisma.SesiCreateManyPerusahaanAktifInputEnvelope
+  connect?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+}
+
+export type SesiUncheckedCreateNestedManyWithoutPerusahaanAktifInput = {
+  create?: Prisma.XOR<Prisma.SesiCreateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput> | Prisma.SesiCreateWithoutPerusahaanAktifInput[] | Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput[]
+  connectOrCreate?: Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput | Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput[]
+  createMany?: Prisma.SesiCreateManyPerusahaanAktifInputEnvelope
+  connect?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+}
+
+export type SesiUpdateManyWithoutPerusahaanAktifNestedInput = {
+  create?: Prisma.XOR<Prisma.SesiCreateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput> | Prisma.SesiCreateWithoutPerusahaanAktifInput[] | Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput[]
+  connectOrCreate?: Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput | Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput[]
+  upsert?: Prisma.SesiUpsertWithWhereUniqueWithoutPerusahaanAktifInput | Prisma.SesiUpsertWithWhereUniqueWithoutPerusahaanAktifInput[]
+  createMany?: Prisma.SesiCreateManyPerusahaanAktifInputEnvelope
+  set?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  disconnect?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  delete?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  connect?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  update?: Prisma.SesiUpdateWithWhereUniqueWithoutPerusahaanAktifInput | Prisma.SesiUpdateWithWhereUniqueWithoutPerusahaanAktifInput[]
+  updateMany?: Prisma.SesiUpdateManyWithWhereWithoutPerusahaanAktifInput | Prisma.SesiUpdateManyWithWhereWithoutPerusahaanAktifInput[]
+  deleteMany?: Prisma.SesiScalarWhereInput | Prisma.SesiScalarWhereInput[]
+}
+
+export type SesiUncheckedUpdateManyWithoutPerusahaanAktifNestedInput = {
+  create?: Prisma.XOR<Prisma.SesiCreateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput> | Prisma.SesiCreateWithoutPerusahaanAktifInput[] | Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput[]
+  connectOrCreate?: Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput | Prisma.SesiCreateOrConnectWithoutPerusahaanAktifInput[]
+  upsert?: Prisma.SesiUpsertWithWhereUniqueWithoutPerusahaanAktifInput | Prisma.SesiUpsertWithWhereUniqueWithoutPerusahaanAktifInput[]
+  createMany?: Prisma.SesiCreateManyPerusahaanAktifInputEnvelope
+  set?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  disconnect?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  delete?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  connect?: Prisma.SesiWhereUniqueInput | Prisma.SesiWhereUniqueInput[]
+  update?: Prisma.SesiUpdateWithWhereUniqueWithoutPerusahaanAktifInput | Prisma.SesiUpdateWithWhereUniqueWithoutPerusahaanAktifInput[]
+  updateMany?: Prisma.SesiUpdateManyWithWhereWithoutPerusahaanAktifInput | Prisma.SesiUpdateManyWithWhereWithoutPerusahaanAktifInput[]
+  deleteMany?: Prisma.SesiScalarWhereInput | Prisma.SesiScalarWhereInput[]
+}
+
 export type SesiCreateWithoutPenggunaInput = {
   id?: string
   tokenHash: string
   kedaluwarsa: Date | string
   dibuatPada?: Date | string
+  perusahaanAktif?: Prisma.PerusahaanCreateNestedOneWithoutSesiAktifInput
 }
 
 export type SesiUncheckedCreateWithoutPenggunaInput = {
@@ -371,6 +438,7 @@ export type SesiUncheckedCreateWithoutPenggunaInput = {
   tokenHash: string
   kedaluwarsa: Date | string
   dibuatPada?: Date | string
+  perusahaanAktifId?: string | null
 }
 
 export type SesiCreateOrConnectWithoutPenggunaInput = {
@@ -408,6 +476,49 @@ export type SesiScalarWhereInput = {
   penggunaId?: Prisma.StringFilter<"Sesi"> | string
   kedaluwarsa?: Prisma.DateTimeFilter<"Sesi"> | Date | string
   dibuatPada?: Prisma.DateTimeFilter<"Sesi"> | Date | string
+  perusahaanAktifId?: Prisma.StringNullableFilter<"Sesi"> | string | null
+}
+
+export type SesiCreateWithoutPerusahaanAktifInput = {
+  id?: string
+  tokenHash: string
+  kedaluwarsa: Date | string
+  dibuatPada?: Date | string
+  pengguna: Prisma.PenggunaCreateNestedOneWithoutSesiInput
+}
+
+export type SesiUncheckedCreateWithoutPerusahaanAktifInput = {
+  id?: string
+  tokenHash: string
+  penggunaId: string
+  kedaluwarsa: Date | string
+  dibuatPada?: Date | string
+}
+
+export type SesiCreateOrConnectWithoutPerusahaanAktifInput = {
+  where: Prisma.SesiWhereUniqueInput
+  create: Prisma.XOR<Prisma.SesiCreateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput>
+}
+
+export type SesiCreateManyPerusahaanAktifInputEnvelope = {
+  data: Prisma.SesiCreateManyPerusahaanAktifInput | Prisma.SesiCreateManyPerusahaanAktifInput[]
+  skipDuplicates?: boolean
+}
+
+export type SesiUpsertWithWhereUniqueWithoutPerusahaanAktifInput = {
+  where: Prisma.SesiWhereUniqueInput
+  update: Prisma.XOR<Prisma.SesiUpdateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedUpdateWithoutPerusahaanAktifInput>
+  create: Prisma.XOR<Prisma.SesiCreateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedCreateWithoutPerusahaanAktifInput>
+}
+
+export type SesiUpdateWithWhereUniqueWithoutPerusahaanAktifInput = {
+  where: Prisma.SesiWhereUniqueInput
+  data: Prisma.XOR<Prisma.SesiUpdateWithoutPerusahaanAktifInput, Prisma.SesiUncheckedUpdateWithoutPerusahaanAktifInput>
+}
+
+export type SesiUpdateManyWithWhereWithoutPerusahaanAktifInput = {
+  where: Prisma.SesiScalarWhereInput
+  data: Prisma.XOR<Prisma.SesiUpdateManyMutationInput, Prisma.SesiUncheckedUpdateManyWithoutPerusahaanAktifInput>
 }
 
 export type SesiCreateManyPenggunaInput = {
@@ -415,6 +526,7 @@ export type SesiCreateManyPenggunaInput = {
   tokenHash: string
   kedaluwarsa: Date | string
   dibuatPada?: Date | string
+  perusahaanAktifId?: string | null
 }
 
 export type SesiUpdateWithoutPenggunaInput = {
@@ -422,6 +534,7 @@ export type SesiUpdateWithoutPenggunaInput = {
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
   kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanAktif?: Prisma.PerusahaanUpdateOneWithoutSesiAktifNestedInput
 }
 
 export type SesiUncheckedUpdateWithoutPenggunaInput = {
@@ -429,11 +542,45 @@ export type SesiUncheckedUpdateWithoutPenggunaInput = {
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
   kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanAktifId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type SesiUncheckedUpdateManyWithoutPenggunaInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanAktifId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type SesiCreateManyPerusahaanAktifInput = {
+  id?: string
+  tokenHash: string
+  penggunaId: string
+  kedaluwarsa: Date | string
+  dibuatPada?: Date | string
+}
+
+export type SesiUpdateWithoutPerusahaanAktifInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pengguna?: Prisma.PenggunaUpdateOneRequiredWithoutSesiNestedInput
+}
+
+export type SesiUncheckedUpdateWithoutPerusahaanAktifInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  penggunaId?: Prisma.StringFieldUpdateOperationsInput | string
+  kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SesiUncheckedUpdateManyWithoutPerusahaanAktifInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  penggunaId?: Prisma.StringFieldUpdateOperationsInput | string
   kedaluwarsa?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -446,7 +593,9 @@ export type SesiSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   penggunaId?: boolean
   kedaluwarsa?: boolean
   dibuatPada?: boolean
+  perusahaanAktifId?: boolean
   pengguna?: boolean | Prisma.PenggunaDefaultArgs<ExtArgs>
+  perusahaanAktif?: boolean | Prisma.Sesi$perusahaanAktifArgs<ExtArgs>
 }, ExtArgs["result"]["sesi"]>
 
 export type SesiSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -455,7 +604,9 @@ export type SesiSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   penggunaId?: boolean
   kedaluwarsa?: boolean
   dibuatPada?: boolean
+  perusahaanAktifId?: boolean
   pengguna?: boolean | Prisma.PenggunaDefaultArgs<ExtArgs>
+  perusahaanAktif?: boolean | Prisma.Sesi$perusahaanAktifArgs<ExtArgs>
 }, ExtArgs["result"]["sesi"]>
 
 export type SesiSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -464,7 +615,9 @@ export type SesiSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   penggunaId?: boolean
   kedaluwarsa?: boolean
   dibuatPada?: boolean
+  perusahaanAktifId?: boolean
   pengguna?: boolean | Prisma.PenggunaDefaultArgs<ExtArgs>
+  perusahaanAktif?: boolean | Prisma.Sesi$perusahaanAktifArgs<ExtArgs>
 }, ExtArgs["result"]["sesi"]>
 
 export type SesiSelectScalar = {
@@ -473,23 +626,28 @@ export type SesiSelectScalar = {
   penggunaId?: boolean
   kedaluwarsa?: boolean
   dibuatPada?: boolean
+  perusahaanAktifId?: boolean
 }
 
-export type SesiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tokenHash" | "penggunaId" | "kedaluwarsa" | "dibuatPada", ExtArgs["result"]["sesi"]>
+export type SesiOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tokenHash" | "penggunaId" | "kedaluwarsa" | "dibuatPada" | "perusahaanAktifId", ExtArgs["result"]["sesi"]>
 export type SesiInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pengguna?: boolean | Prisma.PenggunaDefaultArgs<ExtArgs>
+  perusahaanAktif?: boolean | Prisma.Sesi$perusahaanAktifArgs<ExtArgs>
 }
 export type SesiIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pengguna?: boolean | Prisma.PenggunaDefaultArgs<ExtArgs>
+  perusahaanAktif?: boolean | Prisma.Sesi$perusahaanAktifArgs<ExtArgs>
 }
 export type SesiIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pengguna?: boolean | Prisma.PenggunaDefaultArgs<ExtArgs>
+  perusahaanAktif?: boolean | Prisma.Sesi$perusahaanAktifArgs<ExtArgs>
 }
 
 export type $SesiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Sesi"
   objects: {
     pengguna: Prisma.$PenggunaPayload<ExtArgs>
+    perusahaanAktif: Prisma.$PerusahaanPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -497,6 +655,10 @@ export type $SesiPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     penggunaId: string
     kedaluwarsa: Date
     dibuatPada: Date
+    /**
+     * Lingkup perusahaan pilihan pengguna di sesi ini; null = belum memilih (gabungan bila berhak, selain itu utama)
+     */
+    perusahaanAktifId: string | null
   }, ExtArgs["result"]["sesi"]>
   composites: {}
 }
@@ -892,6 +1054,7 @@ readonly fields: SesiFieldRefs;
 export interface Prisma__SesiClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   pengguna<T extends Prisma.PenggunaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PenggunaDefaultArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  perusahaanAktif<T extends Prisma.Sesi$perusahaanAktifArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Sesi$perusahaanAktifArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -926,6 +1089,7 @@ export interface SesiFieldRefs {
   readonly penggunaId: Prisma.FieldRef<"Sesi", 'String'>
   readonly kedaluwarsa: Prisma.FieldRef<"Sesi", 'DateTime'>
   readonly dibuatPada: Prisma.FieldRef<"Sesi", 'DateTime'>
+  readonly perusahaanAktifId: Prisma.FieldRef<"Sesi", 'String'>
 }
     
 
@@ -1324,6 +1488,25 @@ export type SesiDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Sesis to delete.
    */
   limit?: number
+}
+
+/**
+ * Sesi.perusahaanAktif
+ */
+export type Sesi$perusahaanAktifArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Perusahaan
+   */
+  select?: Prisma.PerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Perusahaan
+   */
+  omit?: Prisma.PerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PerusahaanInclude<ExtArgs> | null
+  where?: Prisma.PerusahaanWhereInput
 }
 
 /**

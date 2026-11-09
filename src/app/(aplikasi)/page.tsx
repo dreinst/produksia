@@ -30,6 +30,9 @@ export default async function Beranda() {
   // Kru/Guest cuma punya hak Peminjaman Barang; Beranda tidak berguna baginya dan haknya tidak cukup untuk memuat data di halaman ini.
   if (pengguna.peran === "KRU" || pengguna.peran === "GUEST") redirect("/persediaan/peminjaman");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  // Ringkasan keuangan hanya untuk pemegang beranda-keuangan.lihat (bawaan Admin, Kasir, Pemilik, Superadmin).
+  // Peran pemasaran tidak memegangnya; penjaga sementara sampai beranda bertab dari paket dashboard terpasang.
+  if (!boleh("beranda-keuangan.lihat")) redirect("/tanpa-akses?hak=beranda-keuangan.lihat");
   const now = new Date();
   const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);
   const labelPeriode = now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });

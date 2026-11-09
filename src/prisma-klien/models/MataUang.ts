@@ -482,14 +482,6 @@ export type MataUangNullableScalarRelationFilter = {
   isNot?: Prisma.MataUangWhereInput | null
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type MataUangCreateNestedOneWithoutKursInput = {
   create?: Prisma.XOR<Prisma.MataUangCreateWithoutKursInput, Prisma.MataUangUncheckedCreateWithoutKursInput>
   connectOrCreate?: Prisma.MataUangCreateOrConnectWithoutKursInput

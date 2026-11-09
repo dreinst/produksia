@@ -36,7 +36,10 @@ export const PeranPengguna = {
   KASIR: 'KASIR',
   GUDANG: 'GUDANG',
   KRU: 'KRU',
-  GUEST: 'GUEST'
+  GUEST: 'GUEST',
+  SOSMED: 'SOSMED',
+  IKLAN: 'IKLAN',
+  DESAINER: 'DESAINER'
 } as const
 
 export type PeranPengguna = (typeof PeranPengguna)[keyof typeof PeranPengguna]
@@ -66,7 +69,9 @@ export const SumberJurnal = {
   PENYUSUTAN: 'PENYUSUTAN',
   PERSEDIAAN: 'PERSEDIAAN',
   ASET_TETAP: 'ASET_TETAP',
-  PENGGAJIAN: 'PENGGAJIAN'
+  PENGGAJIAN: 'PENGGAJIAN',
+  ANTAR_PERUSAHAAN: 'ANTAR_PERUSAHAAN',
+  MITRA_PROYEK: 'MITRA_PROYEK'
 } as const
 
 export type SumberJurnal = (typeof SumberJurnal)[keyof typeof SumberJurnal]
@@ -105,3 +110,320 @@ export const TahapFoto = {
 } as const
 
 export type TahapFoto = (typeof TahapFoto)[keyof typeof TahapFoto]
+
+
+export const JenisPerusahaan = {
+  AGENSI: 'AGENSI',
+  MEREK: 'MEREK',
+  KLIEN: 'KLIEN'
+} as const
+
+export type JenisPerusahaan = (typeof JenisPerusahaan)[keyof typeof JenisPerusahaan]
+
+
+export const JenisAntarPerusahaan = {
+  TAGIH: 'TAGIH',
+  LUNAS: 'LUNAS'
+} as const
+
+export type JenisAntarPerusahaan = (typeof JenisAntarPerusahaan)[keyof typeof JenisAntarPerusahaan]
+
+
+export const TagBerkas = {
+  REFERENSI: 'REFERENSI',
+  HASIL: 'HASIL',
+  DOKUMEN: 'DOKUMEN'
+} as const
+
+export type TagBerkas = (typeof TagBerkas)[keyof typeof TagBerkas]
+
+
+export const JenisNotifikasi = {
+  PENUGASAN: 'PENUGASAN',
+  STATUS: 'STATUS',
+  PERSETUJUAN: 'PERSETUJUAN',
+  HASIL_PERSETUJUAN: 'HASIL_PERSETUJUAN',
+  REVISI: 'REVISI',
+  TINDAK_LANJUT: 'TINDAK_LANJUT',
+  JATUH_TEMPO: 'JATUH_TEMPO'
+} as const
+
+export type JenisNotifikasi = (typeof JenisNotifikasi)[keyof typeof JenisNotifikasi]
+
+
+export const ModeDokumen = {
+  STANDAR: 'STANDAR',
+  EVENT: 'EVENT'
+} as const
+
+export type ModeDokumen = (typeof ModeDokumen)[keyof typeof ModeDokumen]
+
+
+export const TampilanEvent = {
+  RINCI: 'RINCI',
+  RINGKAS: 'RINGKAS'
+} as const
+
+export type TampilanEvent = (typeof TampilanEvent)[keyof typeof TampilanEvent]
+
+
+export const JenisNilai = {
+  NOMINAL: 'NOMINAL',
+  PERSEN: 'PERSEN'
+} as const
+
+export type JenisNilai = (typeof JenisNilai)[keyof typeof JenisNilai]
+
+
+export const StatusKomersial = {
+  DRAF: 'DRAF',
+  TERKIRIM: 'TERKIRIM',
+  DITERIMA: 'DITERIMA',
+  DITOLAK: 'DITOLAK',
+  KEDALUWARSA: 'KEDALUWARSA'
+} as const
+
+export type StatusKomersial = (typeof StatusKomersial)[keyof typeof StatusKomersial]
+
+
+export const ResetNomor = {
+  TAHUNAN: 'TAHUNAN',
+  BULANAN: 'BULANAN',
+  TIDAK_PERNAH: 'TIDAK_PERNAH'
+} as const
+
+export type ResetNomor = (typeof ResetNomor)[keyof typeof ResetNomor]
+
+
+export const JenisDokumenCetak = {
+  PENAWARAN: 'PENAWARAN',
+  TAGIHAN_TERMIN: 'TAGIHAN_TERMIN',
+  FAKTUR: 'FAKTUR',
+  KWITANSI: 'KWITANSI',
+  KWITANSI_DP: 'KWITANSI_DP'
+} as const
+
+export type JenisDokumenCetak = (typeof JenisDokumenCetak)[keyof typeof JenisDokumenCetak]
+
+
+export const TataLetakCetak = {
+  HKA_STANDAR: 'HKA_STANDAR',
+  HKA_BERMEREK: 'HKA_BERMEREK',
+  HKA_SURAT: 'HKA_SURAT',
+  HKA_MINIMAL: 'HKA_MINIMAL',
+  DPRO_INVOICE: 'DPRO_INVOICE',
+  DPRO_PROPOSAL: 'DPRO_PROPOSAL',
+  KWITANSI_ENTITAS: 'KWITANSI_ENTITAS',
+  KWITANSI_POLOS: 'KWITANSI_POLOS'
+} as const
+
+export type TataLetakCetak = (typeof TataLetakCetak)[keyof typeof TataLetakCetak]
+
+
+export const UkuranKertas = {
+  A4: 'A4',
+  A5: 'A5',
+  A5_LANDSCAPE: 'A5_LANDSCAPE'
+} as const
+
+export type UkuranKertas = (typeof UkuranKertas)[keyof typeof UkuranKertas]
+
+
+export const GayaAngka = {
+  TITIK: 'TITIK',
+  KOMA: 'KOMA'
+} as const
+
+export type GayaAngka = (typeof GayaAngka)[keyof typeof GayaAngka]
+
+
+export const GayaEntitas = {
+  DPRO: 'DPRO',
+  TAPUSSA: 'TAPUSSA',
+  BONANOVA: 'BONANOVA',
+  SAHARA: 'SAHARA',
+  NAWASENA: 'NAWASENA'
+} as const
+
+export type GayaEntitas = (typeof GayaEntitas)[keyof typeof GayaEntitas]
+
+
+export const JenisAsetKop = {
+  KOP: 'KOP',
+  KAKI: 'KAKI',
+  WATERMARK: 'WATERMARK',
+  LOGO: 'LOGO',
+  JUDUL_INVOICE: 'JUDUL_INVOICE',
+  JUDUL_KWITANSI: 'JUDUL_KWITANSI',
+  LABEL_PEMBAYARAN: 'LABEL_PEMBAYARAN',
+  LABEL_SALAM: 'LABEL_SALAM',
+  TANDA_TANGAN: 'TANDA_TANGAN',
+  STEMPEL: 'STEMPEL'
+} as const
+
+export type JenisAsetKop = (typeof JenisAsetKop)[keyof typeof JenisAsetKop]
+
+
+export const JenisTahapLead = {
+  BERJALAN: 'BERJALAN',
+  MENANG: 'MENANG',
+  KALAH: 'KALAH'
+} as const
+
+export type JenisTahapLead = (typeof JenisTahapLead)[keyof typeof JenisTahapLead]
+
+
+export const StatusTindakLanjut = {
+  MENUNGGU: 'MENUNGGU',
+  SELESAI: 'SELESAI',
+  DIBATALKAN: 'DIBATALKAN'
+} as const
+
+export type StatusTindakLanjut = (typeof StatusTindakLanjut)[keyof typeof StatusTindakLanjut]
+
+
+export const JenisAktivitasLead = {
+  DIBUAT: 'DIBUAT',
+  DIUBAH: 'DIUBAH',
+  TAHAP_DIUBAH: 'TAHAP_DIUBAH',
+  MENANG: 'MENANG',
+  KALAH: 'KALAH',
+  CATATAN: 'CATATAN',
+  TINDAK_LANJUT_DIJADWALKAN: 'TINDAK_LANJUT_DIJADWALKAN',
+  TINDAK_LANJUT_STATUS: 'TINDAK_LANJUT_STATUS',
+  DIKONVERSI: 'DIKONVERSI',
+  PENAWARAN_DIBUAT: 'PENAWARAN_DIBUAT',
+  DIARSIPKAN: 'DIARSIPKAN',
+  DIPULIHKAN: 'DIPULIHKAN'
+} as const
+
+export type JenisAktivitasLead = (typeof JenisAktivitasLead)[keyof typeof JenisAktivitasLead]
+
+
+export const ModeBagiHasil = {
+  PERSEN: 'PERSEN',
+  NOMINAL: 'NOMINAL'
+} as const
+
+export type ModeBagiHasil = (typeof ModeBagiHasil)[keyof typeof ModeBagiHasil]
+
+
+export const JenisPembayaranMitra = {
+  MODAL: 'MODAL',
+  LABA: 'LABA'
+} as const
+
+export type JenisPembayaranMitra = (typeof JenisPembayaranMitra)[keyof typeof JenisPembayaranMitra]
+
+
+export const PlatformKonten = {
+  INSTAGRAM: 'INSTAGRAM',
+  FACEBOOK: 'FACEBOOK',
+  TIKTOK: 'TIKTOK',
+  THREADS: 'THREADS'
+} as const
+
+export type PlatformKonten = (typeof PlatformKonten)[keyof typeof PlatformKonten]
+
+
+export const StatusKonten = {
+  IDE: 'IDE',
+  DRAF: 'DRAF',
+  DESAIN: 'DESAIN',
+  DITINJAU: 'DITINJAU',
+  DISETUJUI: 'DISETUJUI',
+  TERJADWAL: 'TERJADWAL',
+  TERBIT: 'TERBIT'
+} as const
+
+export type StatusKonten = (typeof StatusKonten)[keyof typeof StatusKonten]
+
+
+export const StatusPersetujuanKonten = {
+  TIDAK_ADA: 'TIDAK_ADA',
+  MENUNGGU: 'MENUNGGU',
+  DISETUJUI: 'DISETUJUI',
+  DITOLAK: 'DITOLAK'
+} as const
+
+export type StatusPersetujuanKonten = (typeof StatusPersetujuanKonten)[keyof typeof StatusPersetujuanKonten]
+
+
+export const AksiRiwayatKonten = {
+  DIAJUKAN: 'DIAJUKAN',
+  DISETUJUI: 'DISETUJUI',
+  DITOLAK: 'DITOLAK',
+  DITARIK: 'DITARIK'
+} as const
+
+export type AksiRiwayatKonten = (typeof AksiRiwayatKonten)[keyof typeof AksiRiwayatKonten]
+
+
+export const StatusTugasDesain = {
+  PERMINTAAN: 'PERMINTAAN',
+  DITUGASKAN: 'DITUGASKAN',
+  DIKERJAKAN: 'DIKERJAKAN',
+  DITINJAU: 'DITINJAU',
+  REVISI: 'REVISI',
+  DISETUJUI: 'DISETUJUI',
+  SELESAI: 'SELESAI'
+} as const
+
+export type StatusTugasDesain = (typeof StatusTugasDesain)[keyof typeof StatusTugasDesain]
+
+
+export const PrioritasDesain = {
+  RENDAH: 'RENDAH',
+  SEDANG: 'SEDANG',
+  TINGGI: 'TINGGI',
+  MENDESAK: 'MENDESAK'
+} as const
+
+export type PrioritasDesain = (typeof PrioritasDesain)[keyof typeof PrioritasDesain]
+
+
+export const SumberTugasDesain = {
+  MANUAL: 'MANUAL',
+  KONTEN: 'KONTEN'
+} as const
+
+export type SumberTugasDesain = (typeof SumberTugasDesain)[keyof typeof SumberTugasDesain]
+
+
+export const KeputusanRevisiDesain = {
+  DISETUJUI: 'DISETUJUI',
+  MINTA_REVISI: 'MINTA_REVISI'
+} as const
+
+export type KeputusanRevisiDesain = (typeof KeputusanRevisiDesain)[keyof typeof KeputusanRevisiDesain]
+
+
+export const TujuanKampanye = {
+  KESADARAN: 'KESADARAN',
+  TRAFFIC: 'TRAFFIC',
+  INTERAKSI: 'INTERAKSI',
+  PROSPEK: 'PROSPEK',
+  PROMOSI_APLIKASI: 'PROMOSI_APLIKASI',
+  PENJUALAN: 'PENJUALAN'
+} as const
+
+export type TujuanKampanye = (typeof TujuanKampanye)[keyof typeof TujuanKampanye]
+
+
+export const StatusKampanye = {
+  DIRENCANAKAN: 'DIRENCANAKAN',
+  AKTIF: 'AKTIF',
+  DIJEDA: 'DIJEDA',
+  SELESAI: 'SELESAI'
+} as const
+
+export type StatusKampanye = (typeof StatusKampanye)[keyof typeof StatusKampanye]
+
+
+export const GenderAudiens = {
+  SEMUA: 'SEMUA',
+  PEREMPUAN: 'PEREMPUAN',
+  LAKI_LAKI: 'LAKI_LAKI'
+} as const
+
+export type GenderAudiens = (typeof GenderAudiens)[keyof typeof GenderAudiens]
