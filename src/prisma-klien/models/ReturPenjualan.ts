@@ -29,6 +29,7 @@ export type AggregateReturPenjualan = {
 export type ReturPenjualanAvgAggregateOutputType = {
   total: runtime.Decimal | null
   diskon: runtime.Decimal | null
+  fee: runtime.Decimal | null
   dpp: runtime.Decimal | null
   ppn: runtime.Decimal | null
 }
@@ -36,6 +37,7 @@ export type ReturPenjualanAvgAggregateOutputType = {
 export type ReturPenjualanSumAggregateOutputType = {
   total: runtime.Decimal | null
   diskon: runtime.Decimal | null
+  fee: runtime.Decimal | null
   dpp: runtime.Decimal | null
   ppn: runtime.Decimal | null
 }
@@ -49,9 +51,11 @@ export type ReturPenjualanMinAggregateOutputType = {
   alasan: string | null
   total: runtime.Decimal | null
   diskon: runtime.Decimal | null
+  fee: runtime.Decimal | null
   dpp: runtime.Decimal | null
   ppn: runtime.Decimal | null
   jurnalId: string | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -71,9 +75,11 @@ export type ReturPenjualanMaxAggregateOutputType = {
   alasan: string | null
   total: runtime.Decimal | null
   diskon: runtime.Decimal | null
+  fee: runtime.Decimal | null
   dpp: runtime.Decimal | null
   ppn: runtime.Decimal | null
   jurnalId: string | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -93,9 +99,11 @@ export type ReturPenjualanCountAggregateOutputType = {
   alasan: number
   total: number
   diskon: number
+  fee: number
   dpp: number
   ppn: number
   jurnalId: number
+  perusahaanId: number
   statusPersetujuan: number
   diajukanOlehId: number
   diajukanPada: number
@@ -111,6 +119,7 @@ export type ReturPenjualanCountAggregateOutputType = {
 export type ReturPenjualanAvgAggregateInputType = {
   total?: true
   diskon?: true
+  fee?: true
   dpp?: true
   ppn?: true
 }
@@ -118,6 +127,7 @@ export type ReturPenjualanAvgAggregateInputType = {
 export type ReturPenjualanSumAggregateInputType = {
   total?: true
   diskon?: true
+  fee?: true
   dpp?: true
   ppn?: true
 }
@@ -131,9 +141,11 @@ export type ReturPenjualanMinAggregateInputType = {
   alasan?: true
   total?: true
   diskon?: true
+  fee?: true
   dpp?: true
   ppn?: true
   jurnalId?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -153,9 +165,11 @@ export type ReturPenjualanMaxAggregateInputType = {
   alasan?: true
   total?: true
   diskon?: true
+  fee?: true
   dpp?: true
   ppn?: true
   jurnalId?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -175,9 +189,11 @@ export type ReturPenjualanCountAggregateInputType = {
   alasan?: true
   total?: true
   diskon?: true
+  fee?: true
   dpp?: true
   ppn?: true
   jurnalId?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -284,9 +300,11 @@ export type ReturPenjualanGroupByOutputType = {
   alasan: string | null
   total: runtime.Decimal
   diskon: runtime.Decimal
+  fee: runtime.Decimal
   dpp: runtime.Decimal
   ppn: runtime.Decimal
   jurnalId: string | null
+  perusahaanId: string
   statusPersetujuan: $Enums.StatusPersetujuan
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -329,9 +347,11 @@ export type ReturPenjualanWhereInput = {
   alasan?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
   total?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"ReturPenjualan"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"ReturPenjualan"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"ReturPenjualan"> | Date | string | null
@@ -343,6 +363,7 @@ export type ReturPenjualanWhereInput = {
   faktur?: Prisma.XOR<Prisma.FakturPenjualanScalarRelationFilter, Prisma.FakturPenjualanWhereInput>
   gudang?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   baris?: Prisma.BarisReturPenjualanListRelationFilter
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
@@ -358,9 +379,11 @@ export type ReturPenjualanOrderByWithRelationInput = {
   alasan?: Prisma.SortOrderInput | Prisma.SortOrder
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -372,6 +395,7 @@ export type ReturPenjualanOrderByWithRelationInput = {
   faktur?: Prisma.FakturPenjualanOrderByWithRelationInput
   gudang?: Prisma.GudangOrderByWithRelationInput
   jurnal?: Prisma.JurnalOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   baris?: Prisma.BarisReturPenjualanOrderByRelationAggregateInput
   diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
   disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
@@ -391,8 +415,10 @@ export type ReturPenjualanWhereUniqueInput = Prisma.AtLeast<{
   alasan?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
   total?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  perusahaanId?: Prisma.StringFilter<"ReturPenjualan"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"ReturPenjualan"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"ReturPenjualan"> | Date | string | null
@@ -404,6 +430,7 @@ export type ReturPenjualanWhereUniqueInput = Prisma.AtLeast<{
   faktur?: Prisma.XOR<Prisma.FakturPenjualanScalarRelationFilter, Prisma.FakturPenjualanWhereInput>
   gudang?: Prisma.XOR<Prisma.GudangScalarRelationFilter, Prisma.GudangWhereInput>
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   baris?: Prisma.BarisReturPenjualanListRelationFilter
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
@@ -419,9 +446,11 @@ export type ReturPenjualanOrderByWithAggregationInput = {
   alasan?: Prisma.SortOrderInput | Prisma.SortOrder
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -449,9 +478,11 @@ export type ReturPenjualanScalarWhereWithAggregatesInput = {
   alasan?: Prisma.StringNullableWithAggregatesFilter<"ReturPenjualan"> | string | null
   total?: Prisma.DecimalWithAggregatesFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalWithAggregatesFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalWithAggregatesFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalWithAggregatesFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalWithAggregatesFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.StringNullableWithAggregatesFilter<"ReturPenjualan"> | string | null
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"ReturPenjualan"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"ReturPenjualan"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"ReturPenjualan"> | string | null
   diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"ReturPenjualan"> | Date | string | null
@@ -469,6 +500,7 @@ export type ReturPenjualanCreateInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -479,6 +511,7 @@ export type ReturPenjualanCreateInput = {
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
@@ -494,9 +527,11 @@ export type ReturPenjualanUncheckedCreateInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -515,6 +550,7 @@ export type ReturPenjualanUpdateInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -525,6 +561,7 @@ export type ReturPenjualanUpdateInput = {
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
@@ -540,9 +577,11 @@ export type ReturPenjualanUncheckedUpdateInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -563,9 +602,11 @@ export type ReturPenjualanCreateManyInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -583,6 +624,7 @@ export type ReturPenjualanUpdateManyMutationInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -601,9 +643,11 @@ export type ReturPenjualanUncheckedUpdateManyInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -633,9 +677,11 @@ export type ReturPenjualanCountOrderByAggregateInput = {
   alasan?: Prisma.SortOrder
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -649,6 +695,7 @@ export type ReturPenjualanCountOrderByAggregateInput = {
 export type ReturPenjualanAvgOrderByAggregateInput = {
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
 }
@@ -662,9 +709,11 @@ export type ReturPenjualanMaxOrderByAggregateInput = {
   alasan?: Prisma.SortOrder
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -684,9 +733,11 @@ export type ReturPenjualanMinOrderByAggregateInput = {
   alasan?: Prisma.SortOrder
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
   jurnalId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -700,6 +751,7 @@ export type ReturPenjualanMinOrderByAggregateInput = {
 export type ReturPenjualanSumOrderByAggregateInput = {
   total?: Prisma.SortOrder
   diskon?: Prisma.SortOrder
+  fee?: Prisma.SortOrder
   dpp?: Prisma.SortOrder
   ppn?: Prisma.SortOrder
 }
@@ -840,6 +892,48 @@ export type ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   deleteMany?: Prisma.ReturPenjualanScalarWhereInput | Prisma.ReturPenjualanScalarWhereInput[]
 }
 
+export type ReturPenjualanCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput> | Prisma.ReturPenjualanCreateWithoutPerusahaanInput[] | Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput | Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.ReturPenjualanCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+}
+
+export type ReturPenjualanUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput> | Prisma.ReturPenjualanCreateWithoutPerusahaanInput[] | Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput | Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.ReturPenjualanCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+}
+
+export type ReturPenjualanUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput> | Prisma.ReturPenjualanCreateWithoutPerusahaanInput[] | Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput | Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.ReturPenjualanUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.ReturPenjualanUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.ReturPenjualanCreateManyPerusahaanInputEnvelope
+  set?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  disconnect?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  delete?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  connect?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  update?: Prisma.ReturPenjualanUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.ReturPenjualanUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.ReturPenjualanUpdateManyWithWhereWithoutPerusahaanInput | Prisma.ReturPenjualanUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.ReturPenjualanScalarWhereInput | Prisma.ReturPenjualanScalarWhereInput[]
+}
+
+export type ReturPenjualanUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput> | Prisma.ReturPenjualanCreateWithoutPerusahaanInput[] | Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput | Prisma.ReturPenjualanCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.ReturPenjualanUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.ReturPenjualanUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.ReturPenjualanCreateManyPerusahaanInputEnvelope
+  set?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  disconnect?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  delete?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  connect?: Prisma.ReturPenjualanWhereUniqueInput | Prisma.ReturPenjualanWhereUniqueInput[]
+  update?: Prisma.ReturPenjualanUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.ReturPenjualanUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.ReturPenjualanUpdateManyWithWhereWithoutPerusahaanInput | Prisma.ReturPenjualanUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.ReturPenjualanScalarWhereInput | Prisma.ReturPenjualanScalarWhereInput[]
+}
+
 export type ReturPenjualanCreateNestedManyWithoutGudangInput = {
   create?: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutGudangInput, Prisma.ReturPenjualanUncheckedCreateWithoutGudangInput> | Prisma.ReturPenjualanCreateWithoutGudangInput[] | Prisma.ReturPenjualanUncheckedCreateWithoutGudangInput[]
   connectOrCreate?: Prisma.ReturPenjualanCreateOrConnectWithoutGudangInput | Prisma.ReturPenjualanCreateOrConnectWithoutGudangInput[]
@@ -977,6 +1071,7 @@ export type ReturPenjualanCreateWithoutDiajukanOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -987,6 +1082,7 @@ export type ReturPenjualanCreateWithoutDiajukanOlehInput = {
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakReturPenjualanInput
@@ -1001,9 +1097,11 @@ export type ReturPenjualanUncheckedCreateWithoutDiajukanOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1031,6 +1129,7 @@ export type ReturPenjualanCreateWithoutDisetujuiOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -1041,6 +1140,7 @@ export type ReturPenjualanCreateWithoutDisetujuiOlehInput = {
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakReturPenjualanInput
@@ -1055,9 +1155,11 @@ export type ReturPenjualanUncheckedCreateWithoutDisetujuiOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1085,6 +1187,7 @@ export type ReturPenjualanCreateWithoutDitolakOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -1095,6 +1198,7 @@ export type ReturPenjualanCreateWithoutDitolakOlehInput = {
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
@@ -1109,9 +1213,11 @@ export type ReturPenjualanUncheckedCreateWithoutDitolakOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1160,9 +1266,11 @@ export type ReturPenjualanScalarWhereInput = {
   alasan?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
   total?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFilter<"ReturPenjualan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
+  perusahaanId?: Prisma.StringFilter<"ReturPenjualan"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"ReturPenjualan"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"ReturPenjualan"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"ReturPenjualan"> | Date | string | null
@@ -1205,6 +1313,80 @@ export type ReturPenjualanUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.ReturPenjualanUpdateManyMutationInput, Prisma.ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
+export type ReturPenjualanCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  alasan?: string | null
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
+  gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakReturPenjualanInput
+}
+
+export type ReturPenjualanUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  fakturId: string
+  gudangId: string
+  alasan?: string | null
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisReturPenjualanUncheckedCreateNestedManyWithoutReturInput
+}
+
+export type ReturPenjualanCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.ReturPenjualanWhereUniqueInput
+  create: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type ReturPenjualanCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.ReturPenjualanCreateManyPerusahaanInput | Prisma.ReturPenjualanCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type ReturPenjualanUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.ReturPenjualanWhereUniqueInput
+  update: Prisma.XOR<Prisma.ReturPenjualanUpdateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.ReturPenjualanCreateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type ReturPenjualanUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.ReturPenjualanWhereUniqueInput
+  data: Prisma.XOR<Prisma.ReturPenjualanUpdateWithoutPerusahaanInput, Prisma.ReturPenjualanUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type ReturPenjualanUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.ReturPenjualanScalarWhereInput
+  data: Prisma.XOR<Prisma.ReturPenjualanUpdateManyMutationInput, Prisma.ReturPenjualanUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
 export type ReturPenjualanCreateWithoutGudangInput = {
   id?: string
   nomor: string
@@ -1212,6 +1394,7 @@ export type ReturPenjualanCreateWithoutGudangInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -1221,6 +1404,7 @@ export type ReturPenjualanCreateWithoutGudangInput = {
   catatanPenolakan?: string | null
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
@@ -1235,9 +1419,11 @@ export type ReturPenjualanUncheckedCreateWithoutGudangInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1282,6 +1468,7 @@ export type ReturPenjualanCreateWithoutFakturInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -1291,6 +1478,7 @@ export type ReturPenjualanCreateWithoutFakturInput = {
   catatanPenolakan?: string | null
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
@@ -1305,9 +1493,11 @@ export type ReturPenjualanUncheckedCreateWithoutFakturInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1352,6 +1542,7 @@ export type ReturPenjualanCreateWithoutBarisInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -1362,6 +1553,7 @@ export type ReturPenjualanCreateWithoutBarisInput = {
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakReturPenjualanInput
@@ -1376,9 +1568,11 @@ export type ReturPenjualanUncheckedCreateWithoutBarisInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1412,6 +1606,7 @@ export type ReturPenjualanUpdateWithoutBarisInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1422,6 +1617,7 @@ export type ReturPenjualanUpdateWithoutBarisInput = {
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakReturPenjualanNestedInput
@@ -1436,9 +1632,11 @@ export type ReturPenjualanUncheckedUpdateWithoutBarisInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1456,6 +1654,7 @@ export type ReturPenjualanCreateWithoutJurnalInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: $Enums.StatusPersetujuan
@@ -1465,6 +1664,7 @@ export type ReturPenjualanCreateWithoutJurnalInput = {
   catatanPenolakan?: string | null
   faktur: Prisma.FakturPenjualanCreateNestedOneWithoutReturInput
   gudang: Prisma.GudangCreateNestedOneWithoutReturPenjualanInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutReturPenjualanInput
   baris?: Prisma.BarisReturPenjualanCreateNestedManyWithoutReturInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanReturPenjualanInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiReturPenjualanInput
@@ -1480,8 +1680,10 @@ export type ReturPenjualanUncheckedCreateWithoutJurnalInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1516,6 +1718,7 @@ export type ReturPenjualanUpdateWithoutJurnalInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1525,6 +1728,7 @@ export type ReturPenjualanUpdateWithoutJurnalInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
@@ -1540,8 +1744,10 @@ export type ReturPenjualanUncheckedUpdateWithoutJurnalInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1562,9 +1768,11 @@ export type ReturPenjualanCreateManyDiajukanOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1583,9 +1791,11 @@ export type ReturPenjualanCreateManyDisetujuiOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1604,9 +1814,11 @@ export type ReturPenjualanCreateManyDitolakOlehInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1623,6 +1835,7 @@ export type ReturPenjualanUpdateWithoutDiajukanOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1633,6 +1846,7 @@ export type ReturPenjualanUpdateWithoutDiajukanOlehInput = {
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakReturPenjualanNestedInput
@@ -1647,9 +1861,11 @@ export type ReturPenjualanUncheckedUpdateWithoutDiajukanOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1669,9 +1885,11 @@ export type ReturPenjualanUncheckedUpdateManyWithoutDiajukanOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1688,6 +1906,7 @@ export type ReturPenjualanUpdateWithoutDisetujuiOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1698,6 +1917,7 @@ export type ReturPenjualanUpdateWithoutDisetujuiOlehInput = {
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakReturPenjualanNestedInput
@@ -1712,9 +1932,11 @@ export type ReturPenjualanUncheckedUpdateWithoutDisetujuiOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1734,9 +1956,11 @@ export type ReturPenjualanUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1753,6 +1977,7 @@ export type ReturPenjualanUpdateWithoutDitolakOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1763,6 +1988,7 @@ export type ReturPenjualanUpdateWithoutDitolakOlehInput = {
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
@@ -1777,9 +2003,11 @@ export type ReturPenjualanUncheckedUpdateWithoutDitolakOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1799,6 +2027,77 @@ export type ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type ReturPenjualanCreateManyPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  fakturId: string
+  gudangId: string
+  alasan?: string | null
+  total?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type ReturPenjualanUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
+  gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakReturPenjualanNestedInput
+}
+
+export type ReturPenjualanUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fakturId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1807,6 +2106,31 @@ export type ReturPenjualanUncheckedUpdateManyWithoutDitolakOlehInput = {
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisReturPenjualanUncheckedUpdateManyWithoutReturNestedInput
+}
+
+export type ReturPenjualanUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fakturId?: Prisma.StringFieldUpdateOperationsInput | string
+  gudangId?: Prisma.StringFieldUpdateOperationsInput | string
+  alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1819,9 +2143,11 @@ export type ReturPenjualanCreateManyGudangInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1839,6 +2165,7 @@ export type ReturPenjualanUpdateWithoutGudangInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1848,6 +2175,7 @@ export type ReturPenjualanUpdateWithoutGudangInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   faktur?: Prisma.FakturPenjualanUpdateOneRequiredWithoutReturNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
@@ -1862,9 +2190,11 @@ export type ReturPenjualanUncheckedUpdateWithoutGudangInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1884,9 +2214,11 @@ export type ReturPenjualanUncheckedUpdateManyWithoutGudangInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1905,9 +2237,11 @@ export type ReturPenjualanCreateManyFakturInput = {
   alasan?: string | null
   total?: runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1925,6 +2259,7 @@ export type ReturPenjualanUpdateWithoutFakturInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
@@ -1934,6 +2269,7 @@ export type ReturPenjualanUpdateWithoutFakturInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   gudang?: Prisma.GudangUpdateOneRequiredWithoutReturPenjualanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutReturPenjualanNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutReturPenjualanNestedInput
   baris?: Prisma.BarisReturPenjualanUpdateManyWithoutReturNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanReturPenjualanNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiReturPenjualanNestedInput
@@ -1948,9 +2284,11 @@ export type ReturPenjualanUncheckedUpdateWithoutFakturInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1970,9 +2308,11 @@ export type ReturPenjualanUncheckedUpdateManyWithoutFakturInput = {
   alasan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   diskon?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dpp?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   ppn?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2023,9 +2363,11 @@ export type ReturPenjualanSelect<ExtArgs extends runtime.Types.Extensions.Intern
   alasan?: boolean
   total?: boolean
   diskon?: boolean
+  fee?: boolean
   dpp?: boolean
   ppn?: boolean
   jurnalId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2037,6 +2379,7 @@ export type ReturPenjualanSelect<ExtArgs extends runtime.Types.Extensions.Intern
   faktur?: boolean | Prisma.FakturPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.ReturPenjualan$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.ReturPenjualan$barisArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>
@@ -2053,9 +2396,11 @@ export type ReturPenjualanSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   alasan?: boolean
   total?: boolean
   diskon?: boolean
+  fee?: boolean
   dpp?: boolean
   ppn?: boolean
   jurnalId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2067,6 +2412,7 @@ export type ReturPenjualanSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   faktur?: boolean | Prisma.FakturPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.ReturPenjualan$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.ReturPenjualan$ditolakOlehArgs<ExtArgs>
@@ -2081,9 +2427,11 @@ export type ReturPenjualanSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   alasan?: boolean
   total?: boolean
   diskon?: boolean
+  fee?: boolean
   dpp?: boolean
   ppn?: boolean
   jurnalId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2095,6 +2443,7 @@ export type ReturPenjualanSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   faktur?: boolean | Prisma.FakturPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.ReturPenjualan$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.ReturPenjualan$ditolakOlehArgs<ExtArgs>
@@ -2109,9 +2458,11 @@ export type ReturPenjualanSelectScalar = {
   alasan?: boolean
   total?: boolean
   diskon?: boolean
+  fee?: boolean
   dpp?: boolean
   ppn?: boolean
   jurnalId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2122,11 +2473,12 @@ export type ReturPenjualanSelectScalar = {
   catatanPenolakan?: boolean
 }
 
-export type ReturPenjualanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "fakturId" | "gudangId" | "alasan" | "total" | "diskon" | "dpp" | "ppn" | "jurnalId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["returPenjualan"]>
+export type ReturPenjualanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "fakturId" | "gudangId" | "alasan" | "total" | "diskon" | "fee" | "dpp" | "ppn" | "jurnalId" | "perusahaanId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["returPenjualan"]>
 export type ReturPenjualanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   faktur?: boolean | Prisma.FakturPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.ReturPenjualan$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.ReturPenjualan$barisArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>
@@ -2137,6 +2489,7 @@ export type ReturPenjualanIncludeCreateManyAndReturn<ExtArgs extends runtime.Typ
   faktur?: boolean | Prisma.FakturPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.ReturPenjualan$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.ReturPenjualan$ditolakOlehArgs<ExtArgs>
@@ -2145,6 +2498,7 @@ export type ReturPenjualanIncludeUpdateManyAndReturn<ExtArgs extends runtime.Typ
   faktur?: boolean | Prisma.FakturPenjualanDefaultArgs<ExtArgs>
   gudang?: boolean | Prisma.GudangDefaultArgs<ExtArgs>
   jurnal?: boolean | Prisma.ReturPenjualan$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.ReturPenjualan$ditolakOlehArgs<ExtArgs>
@@ -2156,6 +2510,7 @@ export type $ReturPenjualanPayload<ExtArgs extends runtime.Types.Extensions.Inte
     faktur: Prisma.$FakturPenjualanPayload<ExtArgs>
     gudang: Prisma.$GudangPayload<ExtArgs>
     jurnal: Prisma.$JurnalPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
     baris: Prisma.$BarisReturPenjualanPayload<ExtArgs>[]
     diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
@@ -2170,12 +2525,20 @@ export type $ReturPenjualanPayload<ExtArgs extends runtime.Types.Extensions.Inte
     alasan: string | null
     total: runtime.Decimal
     /**
-     * Bagian diskon faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon
+     * Bagian diskon faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon + fee
      */
     diskon: runtime.Decimal
+    /**
+     * bagian management fee faktur yang ikut dibalik (prorata nilai baris yang diretur); dpp = Σ baris − diskon + fee
+     */
+    fee: runtime.Decimal
     dpp: runtime.Decimal
     ppn: runtime.Decimal
     jurnalId: string | null
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
     /**
      * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
      */
@@ -2584,6 +2947,7 @@ export interface Prisma__ReturPenjualanClient<T, Null = never, ExtArgs extends r
   faktur<T extends Prisma.FakturPenjualanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FakturPenjualanDefaultArgs<ExtArgs>>): Prisma.Prisma__FakturPenjualanClient<runtime.Types.Result.GetResult<Prisma.$FakturPenjualanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   gudang<T extends Prisma.GudangDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GudangDefaultArgs<ExtArgs>>): Prisma.Prisma__GudangClient<runtime.Types.Result.GetResult<Prisma.$GudangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   jurnal<T extends Prisma.ReturPenjualan$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturPenjualan$jurnalArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   baris<T extends Prisma.ReturPenjualan$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturPenjualan$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisReturPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   diajukanOleh<T extends Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturPenjualan$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   disetujuiOleh<T extends Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReturPenjualan$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2625,9 +2989,11 @@ export interface ReturPenjualanFieldRefs {
   readonly alasan: Prisma.FieldRef<"ReturPenjualan", 'String'>
   readonly total: Prisma.FieldRef<"ReturPenjualan", 'Decimal'>
   readonly diskon: Prisma.FieldRef<"ReturPenjualan", 'Decimal'>
+  readonly fee: Prisma.FieldRef<"ReturPenjualan", 'Decimal'>
   readonly dpp: Prisma.FieldRef<"ReturPenjualan", 'Decimal'>
   readonly ppn: Prisma.FieldRef<"ReturPenjualan", 'Decimal'>
   readonly jurnalId: Prisma.FieldRef<"ReturPenjualan", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"ReturPenjualan", 'String'>
   readonly statusPersetujuan: Prisma.FieldRef<"ReturPenjualan", 'StatusPersetujuan'>
   readonly diajukanOlehId: Prisma.FieldRef<"ReturPenjualan", 'String'>
   readonly diajukanPada: Prisma.FieldRef<"ReturPenjualan", 'DateTime'>

@@ -53,6 +53,7 @@ export type DokumenKasMinAggregateOutputType = {
   jurnalId: string | null
   dibuatOleh: string | null
   dibuatPada: Date | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -76,6 +77,7 @@ export type DokumenKasMaxAggregateOutputType = {
   jurnalId: string | null
   dibuatOleh: string | null
   dibuatPada: Date | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -99,6 +101,7 @@ export type DokumenKasCountAggregateOutputType = {
   jurnalId: number
   dibuatOleh: number
   dibuatPada: number
+  perusahaanId: number
   statusPersetujuan: number
   diajukanOlehId: number
   diajukanPada: number
@@ -132,6 +135,7 @@ export type DokumenKasMinAggregateInputType = {
   jurnalId?: true
   dibuatOleh?: true
   dibuatPada?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -155,6 +159,7 @@ export type DokumenKasMaxAggregateInputType = {
   jurnalId?: true
   dibuatOleh?: true
   dibuatPada?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -178,6 +183,7 @@ export type DokumenKasCountAggregateInputType = {
   jurnalId?: true
   dibuatOleh?: true
   dibuatPada?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -288,6 +294,7 @@ export type DokumenKasGroupByOutputType = {
   jurnalId: string | null
   dibuatOleh: string
   dibuatPada: Date
+  perusahaanId: string
   statusPersetujuan: $Enums.StatusPersetujuan
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -334,6 +341,7 @@ export type DokumenKasWhereInput = {
   jurnalId?: Prisma.StringNullableFilter<"DokumenKas"> | string | null
   dibuatOleh?: Prisma.StringFilter<"DokumenKas"> | string
   dibuatPada?: Prisma.DateTimeFilter<"DokumenKas"> | Date | string
+  perusahaanId?: Prisma.StringFilter<"DokumenKas"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"DokumenKas"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"DokumenKas"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"DokumenKas"> | Date | string | null
@@ -346,6 +354,7 @@ export type DokumenKasWhereInput = {
   akunLawan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   proyek?: Prisma.XOR<Prisma.ProyekNullableScalarRelationFilter, Prisma.ProyekWhereInput> | null
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
@@ -364,6 +373,7 @@ export type DokumenKasOrderByWithRelationInput = {
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatOleh?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -376,6 +386,7 @@ export type DokumenKasOrderByWithRelationInput = {
   akunLawan?: Prisma.AkunOrderByWithRelationInput
   proyek?: Prisma.ProyekOrderByWithRelationInput
   jurnal?: Prisma.JurnalOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
   disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
   ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
@@ -397,6 +408,7 @@ export type DokumenKasWhereUniqueInput = Prisma.AtLeast<{
   proyekId?: Prisma.StringNullableFilter<"DokumenKas"> | string | null
   dibuatOleh?: Prisma.StringFilter<"DokumenKas"> | string
   dibuatPada?: Prisma.DateTimeFilter<"DokumenKas"> | Date | string
+  perusahaanId?: Prisma.StringFilter<"DokumenKas"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"DokumenKas"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"DokumenKas"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"DokumenKas"> | Date | string | null
@@ -409,6 +421,7 @@ export type DokumenKasWhereUniqueInput = Prisma.AtLeast<{
   akunLawan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   proyek?: Prisma.XOR<Prisma.ProyekNullableScalarRelationFilter, Prisma.ProyekWhereInput> | null
   jurnal?: Prisma.XOR<Prisma.JurnalNullableScalarRelationFilter, Prisma.JurnalWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
@@ -427,6 +440,7 @@ export type DokumenKasOrderByWithAggregationInput = {
   jurnalId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatOleh?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -458,6 +472,7 @@ export type DokumenKasScalarWhereWithAggregatesInput = {
   jurnalId?: Prisma.StringNullableWithAggregatesFilter<"DokumenKas"> | string | null
   dibuatOleh?: Prisma.StringWithAggregatesFilter<"DokumenKas"> | string
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"DokumenKas"> | Date | string
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"DokumenKas"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"DokumenKas"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"DokumenKas"> | string | null
   diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"DokumenKas"> | Date | string | null
@@ -486,6 +501,7 @@ export type DokumenKasCreateInput = {
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
@@ -504,6 +520,7 @@ export type DokumenKasUncheckedCreateInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -532,6 +549,7 @@ export type DokumenKasUpdateInput = {
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
@@ -550,6 +568,7 @@ export type DokumenKasUncheckedUpdateInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -573,6 +592,7 @@ export type DokumenKasCreateManyInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -612,6 +632,7 @@ export type DokumenKasUncheckedUpdateManyInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -650,6 +671,7 @@ export type DokumenKasCountOrderByAggregateInput = {
   jurnalId?: Prisma.SortOrder
   dibuatOleh?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -677,6 +699,7 @@ export type DokumenKasMaxOrderByAggregateInput = {
   jurnalId?: Prisma.SortOrder
   dibuatOleh?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -700,6 +723,7 @@ export type DokumenKasMinOrderByAggregateInput = {
   jurnalId?: Prisma.SortOrder
   dibuatOleh?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -837,6 +861,48 @@ export type DokumenKasUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   connect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
   update?: Prisma.DokumenKasUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.DokumenKasUpdateWithWhereUniqueWithoutDitolakOlehInput[]
   updateMany?: Prisma.DokumenKasUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.DokumenKasUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.DokumenKasScalarWhereInput | Prisma.DokumenKasScalarWhereInput[]
+}
+
+export type DokumenKasCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.DokumenKasCreateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput> | Prisma.DokumenKasCreateWithoutPerusahaanInput[] | Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput | Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.DokumenKasCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+}
+
+export type DokumenKasUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.DokumenKasCreateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput> | Prisma.DokumenKasCreateWithoutPerusahaanInput[] | Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput | Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.DokumenKasCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+}
+
+export type DokumenKasUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.DokumenKasCreateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput> | Prisma.DokumenKasCreateWithoutPerusahaanInput[] | Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput | Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.DokumenKasUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.DokumenKasUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.DokumenKasCreateManyPerusahaanInputEnvelope
+  set?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  disconnect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  delete?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  connect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  update?: Prisma.DokumenKasUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.DokumenKasUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.DokumenKasUpdateManyWithWhereWithoutPerusahaanInput | Prisma.DokumenKasUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.DokumenKasScalarWhereInput | Prisma.DokumenKasScalarWhereInput[]
+}
+
+export type DokumenKasUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.DokumenKasCreateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput> | Prisma.DokumenKasCreateWithoutPerusahaanInput[] | Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput | Prisma.DokumenKasCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.DokumenKasUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.DokumenKasUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.DokumenKasCreateManyPerusahaanInputEnvelope
+  set?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  disconnect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  delete?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  connect?: Prisma.DokumenKasWhereUniqueInput | Prisma.DokumenKasWhereUniqueInput[]
+  update?: Prisma.DokumenKasUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.DokumenKasUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.DokumenKasUpdateManyWithWhereWithoutPerusahaanInput | Prisma.DokumenKasUpdateManyWithWhereWithoutPerusahaanInput[]
   deleteMany?: Prisma.DokumenKasScalarWhereInput | Prisma.DokumenKasScalarWhereInput[]
 }
 
@@ -1020,6 +1086,7 @@ export type DokumenKasCreateWithoutDiajukanOlehInput = {
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
 }
@@ -1037,6 +1104,7 @@ export type DokumenKasUncheckedCreateWithoutDiajukanOlehInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1074,6 +1142,7 @@ export type DokumenKasCreateWithoutDisetujuiOlehInput = {
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
 }
@@ -1091,6 +1160,7 @@ export type DokumenKasUncheckedCreateWithoutDisetujuiOlehInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1128,6 +1198,7 @@ export type DokumenKasCreateWithoutDitolakOlehInput = {
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
 }
@@ -1145,6 +1216,7 @@ export type DokumenKasUncheckedCreateWithoutDitolakOlehInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1196,6 +1268,7 @@ export type DokumenKasScalarWhereInput = {
   jurnalId?: Prisma.StringNullableFilter<"DokumenKas"> | string | null
   dibuatOleh?: Prisma.StringFilter<"DokumenKas"> | string
   dibuatPada?: Prisma.DateTimeFilter<"DokumenKas"> | Date | string
+  perusahaanId?: Prisma.StringFilter<"DokumenKas"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"DokumenKas"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"DokumenKas"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"DokumenKas"> | Date | string | null
@@ -1238,6 +1311,78 @@ export type DokumenKasUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.DokumenKasUpdateManyMutationInput, Prisma.DokumenKasUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
+export type DokumenKasCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  jenis: $Enums.JenisDokumenKas
+  tanggal?: Date | string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  dibuatOleh: string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  akunKas: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiKasInput
+  akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
+  proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
+  jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
+}
+
+export type DokumenKasUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  nomor: string
+  jenis: $Enums.JenisDokumenKas
+  tanggal?: Date | string
+  akunKasId: string
+  akunLawanId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  proyekId?: string | null
+  jurnalId?: string | null
+  dibuatOleh: string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type DokumenKasCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.DokumenKasWhereUniqueInput
+  create: Prisma.XOR<Prisma.DokumenKasCreateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type DokumenKasCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.DokumenKasCreateManyPerusahaanInput | Prisma.DokumenKasCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type DokumenKasUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.DokumenKasWhereUniqueInput
+  update: Prisma.XOR<Prisma.DokumenKasUpdateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.DokumenKasCreateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type DokumenKasUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.DokumenKasWhereUniqueInput
+  data: Prisma.XOR<Prisma.DokumenKasUpdateWithoutPerusahaanInput, Prisma.DokumenKasUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type DokumenKasUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.DokumenKasScalarWhereInput
+  data: Prisma.XOR<Prisma.DokumenKasUpdateManyMutationInput, Prisma.DokumenKasUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
 export type DokumenKasCreateWithoutProyekInput = {
   id?: string
   nomor: string
@@ -1255,6 +1400,7 @@ export type DokumenKasCreateWithoutProyekInput = {
   akunKas: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiKasInput
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
@@ -1272,6 +1418,7 @@ export type DokumenKasUncheckedCreateWithoutProyekInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1325,6 +1472,7 @@ export type DokumenKasCreateWithoutAkunKasInput = {
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
@@ -1342,6 +1490,7 @@ export type DokumenKasUncheckedCreateWithoutAkunKasInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1379,6 +1528,7 @@ export type DokumenKasCreateWithoutAkunLawanInput = {
   akunKas: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiKasInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
   jurnal?: Prisma.JurnalCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
@@ -1396,6 +1546,7 @@ export type DokumenKasUncheckedCreateWithoutAkunLawanInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1465,6 +1616,7 @@ export type DokumenKasCreateWithoutJurnalInput = {
   akunKas: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiKasInput
   akunLawan: Prisma.AkunCreateNestedOneWithoutDokumenKasSebagaiLawanInput
   proyek?: Prisma.ProyekCreateNestedOneWithoutDokumenKasInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutDokumenKasInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanDokumenKasInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiDokumenKasInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakDokumenKasInput
@@ -1482,6 +1634,7 @@ export type DokumenKasUncheckedCreateWithoutJurnalInput = {
   proyekId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1525,6 +1678,7 @@ export type DokumenKasUpdateWithoutJurnalInput = {
   akunKas?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiKasNestedInput
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
@@ -1542,6 +1696,7 @@ export type DokumenKasUncheckedUpdateWithoutJurnalInput = {
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1565,6 +1720,7 @@ export type DokumenKasCreateManyDiajukanOlehInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1587,6 +1743,7 @@ export type DokumenKasCreateManyDisetujuiOlehInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1609,6 +1766,7 @@ export type DokumenKasCreateManyDitolakOlehInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1636,6 +1794,7 @@ export type DokumenKasUpdateWithoutDiajukanOlehInput = {
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
 }
@@ -1653,6 +1812,7 @@ export type DokumenKasUncheckedUpdateWithoutDiajukanOlehInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1675,6 +1835,7 @@ export type DokumenKasUncheckedUpdateManyWithoutDiajukanOlehInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1702,6 +1863,7 @@ export type DokumenKasUpdateWithoutDisetujuiOlehInput = {
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
 }
@@ -1719,6 +1881,7 @@ export type DokumenKasUncheckedUpdateWithoutDisetujuiOlehInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1741,6 +1904,7 @@ export type DokumenKasUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1768,6 +1932,7 @@ export type DokumenKasUpdateWithoutDitolakOlehInput = {
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
 }
@@ -1785,6 +1950,7 @@ export type DokumenKasUncheckedUpdateWithoutDitolakOlehInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1807,11 +1973,104 @@ export type DokumenKasUncheckedUpdateManyWithoutDitolakOlehInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type DokumenKasCreateManyPerusahaanInput = {
+  id?: string
+  nomor: string
+  jenis: $Enums.JenisDokumenKas
+  tanggal?: Date | string
+  akunKasId: string
+  akunLawanId: string
+  jumlah: runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: string | null
+  proyekId?: string | null
+  jurnalId?: string | null
+  dibuatOleh: string
+  dibuatPada?: Date | string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type DokumenKasUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisDokumenKasFieldUpdateOperationsInput | $Enums.JenisDokumenKas
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunKas?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiKasNestedInput
+  akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
+  proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
+  jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
+}
+
+export type DokumenKasUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisDokumenKasFieldUpdateOperationsInput | $Enums.JenisDokumenKas
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  akunKasId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunLawanId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type DokumenKasUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisDokumenKasFieldUpdateOperationsInput | $Enums.JenisDokumenKas
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  akunKasId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunLawanId?: Prisma.StringFieldUpdateOperationsInput | string
+  jumlah?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -1828,6 +2087,7 @@ export type DokumenKasCreateManyProyekInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1855,6 +2115,7 @@ export type DokumenKasUpdateWithoutProyekInput = {
   akunKas?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiKasNestedInput
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
@@ -1872,6 +2133,7 @@ export type DokumenKasUncheckedUpdateWithoutProyekInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1894,6 +2156,7 @@ export type DokumenKasUncheckedUpdateManyWithoutProyekInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1916,6 +2179,7 @@ export type DokumenKasCreateManyAkunKasInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1938,6 +2202,7 @@ export type DokumenKasCreateManyAkunLawanInput = {
   jurnalId?: string | null
   dibuatOleh: string
   dibuatPada?: Date | string
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1965,6 +2230,7 @@ export type DokumenKasUpdateWithoutAkunKasInput = {
   akunLawan?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiLawanNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
@@ -1982,6 +2248,7 @@ export type DokumenKasUncheckedUpdateWithoutAkunKasInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2004,6 +2271,7 @@ export type DokumenKasUncheckedUpdateManyWithoutAkunKasInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2031,6 +2299,7 @@ export type DokumenKasUpdateWithoutAkunLawanInput = {
   akunKas?: Prisma.AkunUpdateOneRequiredWithoutDokumenKasSebagaiKasNestedInput
   proyek?: Prisma.ProyekUpdateOneWithoutDokumenKasNestedInput
   jurnal?: Prisma.JurnalUpdateOneWithoutDokumenKasNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutDokumenKasNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanDokumenKasNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiDokumenKasNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakDokumenKasNestedInput
@@ -2048,6 +2317,7 @@ export type DokumenKasUncheckedUpdateWithoutAkunLawanInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2070,6 +2340,7 @@ export type DokumenKasUncheckedUpdateManyWithoutAkunLawanInput = {
   jurnalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatOleh?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2095,6 +2366,7 @@ export type DokumenKasSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   jurnalId?: boolean
   dibuatOleh?: boolean
   dibuatPada?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2107,6 +2379,7 @@ export type DokumenKasSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   akunLawan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.DokumenKas$proyekArgs<ExtArgs>
   jurnal?: boolean | Prisma.DokumenKas$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>
@@ -2125,6 +2398,7 @@ export type DokumenKasSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   jurnalId?: boolean
   dibuatOleh?: boolean
   dibuatPada?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2137,6 +2411,7 @@ export type DokumenKasSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   akunLawan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.DokumenKas$proyekArgs<ExtArgs>
   jurnal?: boolean | Prisma.DokumenKas$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>
@@ -2155,6 +2430,7 @@ export type DokumenKasSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   jurnalId?: boolean
   dibuatOleh?: boolean
   dibuatPada?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2167,6 +2443,7 @@ export type DokumenKasSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   akunLawan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.DokumenKas$proyekArgs<ExtArgs>
   jurnal?: boolean | Prisma.DokumenKas$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>
@@ -2185,6 +2462,7 @@ export type DokumenKasSelectScalar = {
   jurnalId?: boolean
   dibuatOleh?: boolean
   dibuatPada?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -2195,12 +2473,13 @@ export type DokumenKasSelectScalar = {
   catatanPenolakan?: boolean
 }
 
-export type DokumenKasOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "jenis" | "tanggal" | "akunKasId" | "akunLawanId" | "jumlah" | "keterangan" | "proyekId" | "jurnalId" | "dibuatOleh" | "dibuatPada" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["dokumenKas"]>
+export type DokumenKasOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "jenis" | "tanggal" | "akunKasId" | "akunLawanId" | "jumlah" | "keterangan" | "proyekId" | "jurnalId" | "dibuatOleh" | "dibuatPada" | "perusahaanId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["dokumenKas"]>
 export type DokumenKasInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   akunKas?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunLawan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.DokumenKas$proyekArgs<ExtArgs>
   jurnal?: boolean | Prisma.DokumenKas$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>
@@ -2210,6 +2489,7 @@ export type DokumenKasIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.E
   akunLawan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.DokumenKas$proyekArgs<ExtArgs>
   jurnal?: boolean | Prisma.DokumenKas$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>
@@ -2219,6 +2499,7 @@ export type DokumenKasIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   akunLawan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   proyek?: boolean | Prisma.DokumenKas$proyekArgs<ExtArgs>
   jurnal?: boolean | Prisma.DokumenKas$jurnalArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>
@@ -2231,6 +2512,7 @@ export type $DokumenKasPayload<ExtArgs extends runtime.Types.Extensions.Internal
     akunLawan: Prisma.$AkunPayload<ExtArgs>
     proyek: Prisma.$ProyekPayload<ExtArgs> | null
     jurnal: Prisma.$JurnalPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
     diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
@@ -2251,6 +2533,10 @@ export type $DokumenKasPayload<ExtArgs extends runtime.Types.Extensions.Internal
     jurnalId: string | null
     dibuatOleh: string
     dibuatPada: Date
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
     /**
      * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts
      */
@@ -2660,6 +2946,7 @@ export interface Prisma__DokumenKasClient<T, Null = never, ExtArgs extends runti
   akunLawan<T extends Prisma.AkunDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AkunDefaultArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   proyek<T extends Prisma.DokumenKas$proyekArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DokumenKas$proyekArgs<ExtArgs>>): Prisma.Prisma__ProyekClient<runtime.Types.Result.GetResult<Prisma.$ProyekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   jurnal<T extends Prisma.DokumenKas$jurnalArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DokumenKas$jurnalArgs<ExtArgs>>): Prisma.Prisma__JurnalClient<runtime.Types.Result.GetResult<Prisma.$JurnalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   diajukanOleh<T extends Prisma.DokumenKas$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DokumenKas$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   disetujuiOleh<T extends Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DokumenKas$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ditolakOleh<T extends Prisma.DokumenKas$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DokumenKas$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2704,6 +2991,7 @@ export interface DokumenKasFieldRefs {
   readonly jurnalId: Prisma.FieldRef<"DokumenKas", 'String'>
   readonly dibuatOleh: Prisma.FieldRef<"DokumenKas", 'String'>
   readonly dibuatPada: Prisma.FieldRef<"DokumenKas", 'DateTime'>
+  readonly perusahaanId: Prisma.FieldRef<"DokumenKas", 'String'>
   readonly statusPersetujuan: Prisma.FieldRef<"DokumenKas", 'StatusPersetujuan'>
   readonly diajukanOlehId: Prisma.FieldRef<"DokumenKas", 'String'>
   readonly diajukanPada: Prisma.FieldRef<"DokumenKas", 'DateTime'>

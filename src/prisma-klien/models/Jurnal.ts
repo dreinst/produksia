@@ -31,6 +31,7 @@ export type JurnalMinAggregateOutputType = {
   keterangan: string | null
   sumber: $Enums.SumberJurnal | null
   proyekId: string | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -48,6 +49,7 @@ export type JurnalMaxAggregateOutputType = {
   keterangan: string | null
   sumber: $Enums.SumberJurnal | null
   proyekId: string | null
+  perusahaanId: string | null
   statusPersetujuan: $Enums.StatusPersetujuan | null
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -65,6 +67,7 @@ export type JurnalCountAggregateOutputType = {
   keterangan: number
   sumber: number
   proyekId: number
+  perusahaanId: number
   statusPersetujuan: number
   diajukanOlehId: number
   diajukanPada: number
@@ -84,6 +87,7 @@ export type JurnalMinAggregateInputType = {
   keterangan?: true
   sumber?: true
   proyekId?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -101,6 +105,7 @@ export type JurnalMaxAggregateInputType = {
   keterangan?: true
   sumber?: true
   proyekId?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -118,6 +123,7 @@ export type JurnalCountAggregateInputType = {
   keterangan?: true
   sumber?: true
   proyekId?: true
+  perusahaanId?: true
   statusPersetujuan?: true
   diajukanOlehId?: true
   diajukanPada?: true
@@ -208,6 +214,7 @@ export type JurnalGroupByOutputType = {
   keterangan: string | null
   sumber: $Enums.SumberJurnal
   proyekId: string | null
+  perusahaanId: string
   statusPersetujuan: $Enums.StatusPersetujuan
   diajukanOlehId: string | null
   diajukanPada: Date | null
@@ -246,6 +253,7 @@ export type JurnalWhereInput = {
   keterangan?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   sumber?: Prisma.EnumSumberJurnalFilter<"Jurnal"> | $Enums.SumberJurnal
   proyekId?: Prisma.StringNullableFilter<"Jurnal"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Jurnal"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"Jurnal"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"Jurnal"> | Date | string | null
@@ -255,6 +263,7 @@ export type JurnalWhereInput = {
   ditolakPada?: Prisma.DateTimeNullableFilter<"Jurnal"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   proyek?: Prisma.XOR<Prisma.ProyekNullableScalarRelationFilter, Prisma.ProyekWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   baris?: Prisma.BarisJurnalListRelationFilter
   penyusutanAset?: Prisma.PenyusutanAsetListRelationFilter
   perolehanAset?: Prisma.XOR<Prisma.AsetTetapNullableScalarRelationFilter, Prisma.AsetTetapWhereInput> | null
@@ -277,6 +286,11 @@ export type JurnalWhereInput = {
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  tutupBukuPerusahaan?: Prisma.XOR<Prisma.TutupBukuPerusahaanNullableScalarRelationFilter, Prisma.TutupBukuPerusahaanWhereInput> | null
+  antarSebagaiPemberi?: Prisma.XOR<Prisma.TransaksiAntarPerusahaanNullableScalarRelationFilter, Prisma.TransaksiAntarPerusahaanWhereInput> | null
+  antarSebagaiPenerima?: Prisma.XOR<Prisma.TransaksiAntarPerusahaanNullableScalarRelationFilter, Prisma.TransaksiAntarPerusahaanWhereInput> | null
+  talanganMitra?: Prisma.XOR<Prisma.TalanganMitraNullableScalarRelationFilter, Prisma.TalanganMitraWhereInput> | null
+  pembayaranMitra?: Prisma.XOR<Prisma.PembayaranMitraNullableScalarRelationFilter, Prisma.PembayaranMitraWhereInput> | null
 }
 
 export type JurnalOrderByWithRelationInput = {
@@ -286,6 +300,7 @@ export type JurnalOrderByWithRelationInput = {
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   sumber?: Prisma.SortOrder
   proyekId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -295,6 +310,7 @@ export type JurnalOrderByWithRelationInput = {
   ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
   proyek?: Prisma.ProyekOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   baris?: Prisma.BarisJurnalOrderByRelationAggregateInput
   penyusutanAset?: Prisma.PenyusutanAsetOrderByRelationAggregateInput
   perolehanAset?: Prisma.AsetTetapOrderByWithRelationInput
@@ -317,6 +333,11 @@ export type JurnalOrderByWithRelationInput = {
   diajukanOleh?: Prisma.PenggunaOrderByWithRelationInput
   disetujuiOleh?: Prisma.PenggunaOrderByWithRelationInput
   ditolakOleh?: Prisma.PenggunaOrderByWithRelationInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanOrderByWithRelationInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanOrderByWithRelationInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanOrderByWithRelationInput
+  talanganMitra?: Prisma.TalanganMitraOrderByWithRelationInput
+  pembayaranMitra?: Prisma.PembayaranMitraOrderByWithRelationInput
 }
 
 export type JurnalWhereUniqueInput = Prisma.AtLeast<{
@@ -329,6 +350,7 @@ export type JurnalWhereUniqueInput = Prisma.AtLeast<{
   keterangan?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   sumber?: Prisma.EnumSumberJurnalFilter<"Jurnal"> | $Enums.SumberJurnal
   proyekId?: Prisma.StringNullableFilter<"Jurnal"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Jurnal"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"Jurnal"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"Jurnal"> | Date | string | null
@@ -338,6 +360,7 @@ export type JurnalWhereUniqueInput = Prisma.AtLeast<{
   ditolakPada?: Prisma.DateTimeNullableFilter<"Jurnal"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   proyek?: Prisma.XOR<Prisma.ProyekNullableScalarRelationFilter, Prisma.ProyekWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   baris?: Prisma.BarisJurnalListRelationFilter
   penyusutanAset?: Prisma.PenyusutanAsetListRelationFilter
   perolehanAset?: Prisma.XOR<Prisma.AsetTetapNullableScalarRelationFilter, Prisma.AsetTetapWhereInput> | null
@@ -360,6 +383,11 @@ export type JurnalWhereUniqueInput = Prisma.AtLeast<{
   diajukanOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   disetujuiOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
   ditolakOleh?: Prisma.XOR<Prisma.PenggunaNullableScalarRelationFilter, Prisma.PenggunaWhereInput> | null
+  tutupBukuPerusahaan?: Prisma.XOR<Prisma.TutupBukuPerusahaanNullableScalarRelationFilter, Prisma.TutupBukuPerusahaanWhereInput> | null
+  antarSebagaiPemberi?: Prisma.XOR<Prisma.TransaksiAntarPerusahaanNullableScalarRelationFilter, Prisma.TransaksiAntarPerusahaanWhereInput> | null
+  antarSebagaiPenerima?: Prisma.XOR<Prisma.TransaksiAntarPerusahaanNullableScalarRelationFilter, Prisma.TransaksiAntarPerusahaanWhereInput> | null
+  talanganMitra?: Prisma.XOR<Prisma.TalanganMitraNullableScalarRelationFilter, Prisma.TalanganMitraWhereInput> | null
+  pembayaranMitra?: Prisma.XOR<Prisma.PembayaranMitraNullableScalarRelationFilter, Prisma.PembayaranMitraWhereInput> | null
 }, "id" | "nomor">
 
 export type JurnalOrderByWithAggregationInput = {
@@ -369,6 +397,7 @@ export type JurnalOrderByWithAggregationInput = {
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
   sumber?: Prisma.SortOrder
   proyekId?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   diajukanPada?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -392,6 +421,7 @@ export type JurnalScalarWhereWithAggregatesInput = {
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"Jurnal"> | string | null
   sumber?: Prisma.EnumSumberJurnalWithAggregatesFilter<"Jurnal"> | $Enums.SumberJurnal
   proyekId?: Prisma.StringNullableWithAggregatesFilter<"Jurnal"> | string | null
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"Jurnal"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanWithAggregatesFilter<"Jurnal"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableWithAggregatesFilter<"Jurnal"> | string | null
   diajukanPada?: Prisma.DateTimeNullableWithAggregatesFilter<"Jurnal"> | Date | string | null
@@ -414,6 +444,7 @@ export type JurnalCreateInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -436,6 +467,11 @@ export type JurnalCreateInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateInput = {
@@ -445,6 +481,7 @@ export type JurnalUncheckedCreateInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -472,6 +509,11 @@ export type JurnalUncheckedCreateInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUpdateInput = {
@@ -486,6 +528,7 @@ export type JurnalUpdateInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -508,6 +551,11 @@ export type JurnalUpdateInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateInput = {
@@ -517,6 +565,7 @@ export type JurnalUncheckedUpdateInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -544,6 +593,11 @@ export type JurnalUncheckedUpdateInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateManyInput = {
@@ -553,6 +607,7 @@ export type JurnalCreateManyInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -583,6 +638,7 @@ export type JurnalUncheckedUpdateManyInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -615,6 +671,7 @@ export type JurnalCountOrderByAggregateInput = {
   keterangan?: Prisma.SortOrder
   sumber?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -632,6 +689,7 @@ export type JurnalMaxOrderByAggregateInput = {
   keterangan?: Prisma.SortOrder
   sumber?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -649,6 +707,7 @@ export type JurnalMinOrderByAggregateInput = {
   keterangan?: Prisma.SortOrder
   sumber?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   statusPersetujuan?: Prisma.SortOrder
   diajukanOlehId?: Prisma.SortOrder
   diajukanPada?: Prisma.SortOrder
@@ -788,6 +847,96 @@ export type JurnalUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   update?: Prisma.JurnalUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.JurnalUpdateWithWhereUniqueWithoutDitolakOlehInput[]
   updateMany?: Prisma.JurnalUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.JurnalUpdateManyWithWhereWithoutDitolakOlehInput[]
   deleteMany?: Prisma.JurnalScalarWhereInput | Prisma.JurnalScalarWhereInput[]
+}
+
+export type JurnalCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutPerusahaanInput> | Prisma.JurnalCreateWithoutPerusahaanInput[] | Prisma.JurnalUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPerusahaanInput | Prisma.JurnalCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.JurnalCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+}
+
+export type JurnalUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutPerusahaanInput> | Prisma.JurnalCreateWithoutPerusahaanInput[] | Prisma.JurnalUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPerusahaanInput | Prisma.JurnalCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.JurnalCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+}
+
+export type JurnalUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutPerusahaanInput> | Prisma.JurnalCreateWithoutPerusahaanInput[] | Prisma.JurnalUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPerusahaanInput | Prisma.JurnalCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.JurnalUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.JurnalUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.JurnalCreateManyPerusahaanInputEnvelope
+  set?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  disconnect?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  delete?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  connect?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  update?: Prisma.JurnalUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.JurnalUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.JurnalUpdateManyWithWhereWithoutPerusahaanInput | Prisma.JurnalUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.JurnalScalarWhereInput | Prisma.JurnalScalarWhereInput[]
+}
+
+export type JurnalUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutPerusahaanInput> | Prisma.JurnalCreateWithoutPerusahaanInput[] | Prisma.JurnalUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPerusahaanInput | Prisma.JurnalCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.JurnalUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.JurnalUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.JurnalCreateManyPerusahaanInputEnvelope
+  set?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  disconnect?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  delete?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  connect?: Prisma.JurnalWhereUniqueInput | Prisma.JurnalWhereUniqueInput[]
+  update?: Prisma.JurnalUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.JurnalUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.JurnalUpdateManyWithWhereWithoutPerusahaanInput | Prisma.JurnalUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.JurnalScalarWhereInput | Prisma.JurnalScalarWhereInput[]
+}
+
+export type JurnalCreateNestedOneWithoutTutupBukuPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutTutupBukuPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutTutupBukuPerusahaanInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutTutupBukuPerusahaanInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutTutupBukuPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutTutupBukuPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutTutupBukuPerusahaanInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutTutupBukuPerusahaanInput
+  upsert?: Prisma.JurnalUpsertWithoutTutupBukuPerusahaanInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutTutupBukuPerusahaanInput, Prisma.JurnalUpdateWithoutTutupBukuPerusahaanInput>, Prisma.JurnalUncheckedUpdateWithoutTutupBukuPerusahaanInput>
+}
+
+export type JurnalCreateNestedOneWithoutAntarSebagaiPemberiInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPemberiInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPemberiInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutAntarSebagaiPemberiInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalCreateNestedOneWithoutAntarSebagaiPenerimaInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPenerimaInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutAntarSebagaiPenerimaInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutAntarSebagaiPemberiNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPemberiInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPemberiInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutAntarSebagaiPemberiInput
+  upsert?: Prisma.JurnalUpsertWithoutAntarSebagaiPemberiInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutAntarSebagaiPemberiInput, Prisma.JurnalUpdateWithoutAntarSebagaiPemberiInput>, Prisma.JurnalUncheckedUpdateWithoutAntarSebagaiPemberiInput>
+}
+
+export type JurnalUpdateOneWithoutAntarSebagaiPenerimaNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPenerimaInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutAntarSebagaiPenerimaInput
+  upsert?: Prisma.JurnalUpsertWithoutAntarSebagaiPenerimaInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUpdateWithoutAntarSebagaiPenerimaInput>, Prisma.JurnalUncheckedUpdateWithoutAntarSebagaiPenerimaInput>
 }
 
 export type JurnalCreateNestedManyWithoutProyekInput = {
@@ -1138,6 +1287,38 @@ export type JurnalUpdateOneWithoutPenggajianNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPenggajianInput, Prisma.JurnalUpdateWithoutPenggajianInput>, Prisma.JurnalUncheckedUpdateWithoutPenggajianInput>
 }
 
+export type JurnalCreateNestedOneWithoutTalanganMitraInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutTalanganMitraInput, Prisma.JurnalUncheckedCreateWithoutTalanganMitraInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutTalanganMitraInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutTalanganMitraNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutTalanganMitraInput, Prisma.JurnalUncheckedCreateWithoutTalanganMitraInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutTalanganMitraInput
+  upsert?: Prisma.JurnalUpsertWithoutTalanganMitraInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutTalanganMitraInput, Prisma.JurnalUpdateWithoutTalanganMitraInput>, Prisma.JurnalUncheckedUpdateWithoutTalanganMitraInput>
+}
+
+export type JurnalCreateNestedOneWithoutPembayaranMitraInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPembayaranMitraInput, Prisma.JurnalUncheckedCreateWithoutPembayaranMitraInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPembayaranMitraInput
+  connect?: Prisma.JurnalWhereUniqueInput
+}
+
+export type JurnalUpdateOneWithoutPembayaranMitraNestedInput = {
+  create?: Prisma.XOR<Prisma.JurnalCreateWithoutPembayaranMitraInput, Prisma.JurnalUncheckedCreateWithoutPembayaranMitraInput>
+  connectOrCreate?: Prisma.JurnalCreateOrConnectWithoutPembayaranMitraInput
+  upsert?: Prisma.JurnalUpsertWithoutPembayaranMitraInput
+  disconnect?: Prisma.JurnalWhereInput | boolean
+  delete?: Prisma.JurnalWhereInput | boolean
+  connect?: Prisma.JurnalWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.JurnalUpdateToOneWithWhereWithoutPembayaranMitraInput, Prisma.JurnalUpdateWithoutPembayaranMitraInput>, Prisma.JurnalUncheckedUpdateWithoutPembayaranMitraInput>
+}
+
 export type JurnalCreateWithoutDiajukanOlehInput = {
   id?: string
   nomor: string
@@ -1150,6 +1331,7 @@ export type JurnalCreateWithoutDiajukanOlehInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1171,6 +1353,11 @@ export type JurnalCreateWithoutDiajukanOlehInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutDiajukanOlehInput = {
@@ -1180,6 +1367,7 @@ export type JurnalUncheckedCreateWithoutDiajukanOlehInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -1206,6 +1394,11 @@ export type JurnalUncheckedCreateWithoutDiajukanOlehInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutDiajukanOlehInput = {
@@ -1230,6 +1423,7 @@ export type JurnalCreateWithoutDisetujuiOlehInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1251,6 +1445,11 @@ export type JurnalCreateWithoutDisetujuiOlehInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutDisetujuiOlehInput = {
@@ -1260,6 +1459,7 @@ export type JurnalUncheckedCreateWithoutDisetujuiOlehInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1286,6 +1486,11 @@ export type JurnalUncheckedCreateWithoutDisetujuiOlehInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutDisetujuiOlehInput = {
@@ -1310,6 +1515,7 @@ export type JurnalCreateWithoutDitolakOlehInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1331,6 +1537,11 @@ export type JurnalCreateWithoutDitolakOlehInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutDitolakOlehInput = {
@@ -1340,6 +1551,7 @@ export type JurnalUncheckedCreateWithoutDitolakOlehInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1366,6 +1578,11 @@ export type JurnalUncheckedCreateWithoutDitolakOlehInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutDitolakOlehInput = {
@@ -1404,6 +1621,7 @@ export type JurnalScalarWhereInput = {
   keterangan?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   sumber?: Prisma.EnumSumberJurnalFilter<"Jurnal"> | $Enums.SumberJurnal
   proyekId?: Prisma.StringNullableFilter<"Jurnal"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Jurnal"> | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFilter<"Jurnal"> | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.StringNullableFilter<"Jurnal"> | string | null
   diajukanPada?: Prisma.DateTimeNullableFilter<"Jurnal"> | Date | string | null
@@ -1446,7 +1664,7 @@ export type JurnalUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.JurnalUpdateManyMutationInput, Prisma.JurnalUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
-export type JurnalCreateWithoutProyekInput = {
+export type JurnalCreateWithoutPerusahaanInput = {
   id?: string
   nomor: string
   tanggal?: Date | string
@@ -1457,6 +1675,7 @@ export type JurnalCreateWithoutProyekInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1479,14 +1698,20 @@ export type JurnalCreateWithoutProyekInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
-export type JurnalUncheckedCreateWithoutProyekInput = {
+export type JurnalUncheckedCreateWithoutPerusahaanInput = {
   id?: string
   nomor: string
   tanggal?: Date | string
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1514,6 +1739,659 @@ export type JurnalUncheckedCreateWithoutProyekInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type JurnalCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.JurnalCreateManyPerusahaanInput | Prisma.JurnalCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type JurnalUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutPerusahaanInput, Prisma.JurnalUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type JurnalUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutPerusahaanInput, Prisma.JurnalUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type JurnalUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.JurnalScalarWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateManyMutationInput, Prisma.JurnalUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
+export type JurnalCreateWithoutTutupBukuPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutTutupBukuPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutTutupBukuPerusahaanInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutTutupBukuPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutTutupBukuPerusahaanInput>
+}
+
+export type JurnalUpsertWithoutTutupBukuPerusahaanInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutTutupBukuPerusahaanInput, Prisma.JurnalUncheckedUpdateWithoutTutupBukuPerusahaanInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutTutupBukuPerusahaanInput, Prisma.JurnalUncheckedCreateWithoutTutupBukuPerusahaanInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutTutupBukuPerusahaanInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutTutupBukuPerusahaanInput, Prisma.JurnalUncheckedUpdateWithoutTutupBukuPerusahaanInput>
+}
+
+export type JurnalUpdateWithoutTutupBukuPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutTutupBukuPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutAntarSebagaiPemberiInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutAntarSebagaiPemberiInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutAntarSebagaiPemberiInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPemberiInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPemberiInput>
+}
+
+export type JurnalCreateWithoutAntarSebagaiPenerimaInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutAntarSebagaiPenerimaInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutAntarSebagaiPenerimaInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPenerimaInput>
+}
+
+export type JurnalUpsertWithoutAntarSebagaiPemberiInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutAntarSebagaiPemberiInput, Prisma.JurnalUncheckedUpdateWithoutAntarSebagaiPemberiInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPemberiInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPemberiInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutAntarSebagaiPemberiInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutAntarSebagaiPemberiInput, Prisma.JurnalUncheckedUpdateWithoutAntarSebagaiPemberiInput>
+}
+
+export type JurnalUpdateWithoutAntarSebagaiPemberiInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutAntarSebagaiPemberiInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUpsertWithoutAntarSebagaiPenerimaInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUncheckedUpdateWithoutAntarSebagaiPenerimaInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUncheckedCreateWithoutAntarSebagaiPenerimaInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutAntarSebagaiPenerimaInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutAntarSebagaiPenerimaInput, Prisma.JurnalUncheckedUpdateWithoutAntarSebagaiPenerimaInput>
+}
+
+export type JurnalUpdateWithoutAntarSebagaiPenerimaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutAntarSebagaiPenerimaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutProyekInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutProyekInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutProyekInput = {
@@ -1554,6 +2432,7 @@ export type JurnalCreateWithoutPengirimanInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1575,6 +2454,11 @@ export type JurnalCreateWithoutPengirimanInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPengirimanInput = {
@@ -1584,6 +2468,7 @@ export type JurnalUncheckedCreateWithoutPengirimanInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1610,6 +2495,11 @@ export type JurnalUncheckedCreateWithoutPengirimanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPengirimanInput = {
@@ -1640,6 +2530,7 @@ export type JurnalUpdateWithoutPengirimanInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -1661,6 +2552,11 @@ export type JurnalUpdateWithoutPengirimanInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPengirimanInput = {
@@ -1670,6 +2566,7 @@ export type JurnalUncheckedUpdateWithoutPengirimanInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1696,6 +2593,11 @@ export type JurnalUncheckedUpdateWithoutPengirimanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutFakturPenjualanInput = {
@@ -1710,6 +2612,7 @@ export type JurnalCreateWithoutFakturPenjualanInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1731,6 +2634,11 @@ export type JurnalCreateWithoutFakturPenjualanInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutFakturPenjualanInput = {
@@ -1740,6 +2648,7 @@ export type JurnalUncheckedCreateWithoutFakturPenjualanInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1766,6 +2675,11 @@ export type JurnalUncheckedCreateWithoutFakturPenjualanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutFakturPenjualanInput = {
@@ -1796,6 +2710,7 @@ export type JurnalUpdateWithoutFakturPenjualanInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -1817,6 +2732,11 @@ export type JurnalUpdateWithoutFakturPenjualanInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutFakturPenjualanInput = {
@@ -1826,6 +2746,7 @@ export type JurnalUncheckedUpdateWithoutFakturPenjualanInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1852,6 +2773,11 @@ export type JurnalUncheckedUpdateWithoutFakturPenjualanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutUangMukaPelangganInput = {
@@ -1866,6 +2792,7 @@ export type JurnalCreateWithoutUangMukaPelangganInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -1887,6 +2814,11 @@ export type JurnalCreateWithoutUangMukaPelangganInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutUangMukaPelangganInput = {
@@ -1896,6 +2828,7 @@ export type JurnalUncheckedCreateWithoutUangMukaPelangganInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -1922,6 +2855,11 @@ export type JurnalUncheckedCreateWithoutUangMukaPelangganInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutUangMukaPelangganInput = {
@@ -1952,6 +2890,7 @@ export type JurnalUpdateWithoutUangMukaPelangganInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -1973,6 +2912,11 @@ export type JurnalUpdateWithoutUangMukaPelangganInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutUangMukaPelangganInput = {
@@ -1982,6 +2926,7 @@ export type JurnalUncheckedUpdateWithoutUangMukaPelangganInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2008,6 +2953,11 @@ export type JurnalUncheckedUpdateWithoutUangMukaPelangganInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPenerimaanPenjualanInput = {
@@ -2022,6 +2972,7 @@ export type JurnalCreateWithoutPenerimaanPenjualanInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -2043,6 +2994,11 @@ export type JurnalCreateWithoutPenerimaanPenjualanInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPenerimaanPenjualanInput = {
@@ -2052,6 +3008,7 @@ export type JurnalUncheckedCreateWithoutPenerimaanPenjualanInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2078,6 +3035,11 @@ export type JurnalUncheckedCreateWithoutPenerimaanPenjualanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPenerimaanPenjualanInput = {
@@ -2108,6 +3070,7 @@ export type JurnalUpdateWithoutPenerimaanPenjualanInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -2129,6 +3092,11 @@ export type JurnalUpdateWithoutPenerimaanPenjualanInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPenerimaanPenjualanInput = {
@@ -2138,6 +3106,7 @@ export type JurnalUncheckedUpdateWithoutPenerimaanPenjualanInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2164,6 +3133,11 @@ export type JurnalUncheckedUpdateWithoutPenerimaanPenjualanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutReturPenjualanInput = {
@@ -2178,6 +3152,7 @@ export type JurnalCreateWithoutReturPenjualanInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -2199,6 +3174,11 @@ export type JurnalCreateWithoutReturPenjualanInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutReturPenjualanInput = {
@@ -2208,6 +3188,7 @@ export type JurnalUncheckedCreateWithoutReturPenjualanInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2234,6 +3215,11 @@ export type JurnalUncheckedCreateWithoutReturPenjualanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutReturPenjualanInput = {
@@ -2264,6 +3250,7 @@ export type JurnalUpdateWithoutReturPenjualanInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -2285,6 +3272,11 @@ export type JurnalUpdateWithoutReturPenjualanInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutReturPenjualanInput = {
@@ -2294,6 +3286,7 @@ export type JurnalUncheckedUpdateWithoutReturPenjualanInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2320,6 +3313,11 @@ export type JurnalUncheckedUpdateWithoutReturPenjualanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPenerimaanBarangInput = {
@@ -2334,6 +3332,7 @@ export type JurnalCreateWithoutPenerimaanBarangInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -2355,6 +3354,11 @@ export type JurnalCreateWithoutPenerimaanBarangInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPenerimaanBarangInput = {
@@ -2364,6 +3368,7 @@ export type JurnalUncheckedCreateWithoutPenerimaanBarangInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2390,6 +3395,11 @@ export type JurnalUncheckedCreateWithoutPenerimaanBarangInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPenerimaanBarangInput = {
@@ -2420,6 +3430,7 @@ export type JurnalUpdateWithoutPenerimaanBarangInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -2441,6 +3452,11 @@ export type JurnalUpdateWithoutPenerimaanBarangInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPenerimaanBarangInput = {
@@ -2450,6 +3466,7 @@ export type JurnalUncheckedUpdateWithoutPenerimaanBarangInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2476,6 +3493,11 @@ export type JurnalUncheckedUpdateWithoutPenerimaanBarangInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutFakturPembelianInput = {
@@ -2490,6 +3512,7 @@ export type JurnalCreateWithoutFakturPembelianInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -2511,6 +3534,11 @@ export type JurnalCreateWithoutFakturPembelianInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutFakturPembelianInput = {
@@ -2520,6 +3548,7 @@ export type JurnalUncheckedCreateWithoutFakturPembelianInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2546,6 +3575,11 @@ export type JurnalUncheckedCreateWithoutFakturPembelianInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutFakturPembelianInput = {
@@ -2576,6 +3610,7 @@ export type JurnalUpdateWithoutFakturPembelianInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -2597,6 +3632,11 @@ export type JurnalUpdateWithoutFakturPembelianInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutFakturPembelianInput = {
@@ -2606,6 +3646,7 @@ export type JurnalUncheckedUpdateWithoutFakturPembelianInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2632,6 +3673,11 @@ export type JurnalUncheckedUpdateWithoutFakturPembelianInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPembayaranPembelianInput = {
@@ -2646,6 +3692,7 @@ export type JurnalCreateWithoutPembayaranPembelianInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -2667,6 +3714,11 @@ export type JurnalCreateWithoutPembayaranPembelianInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPembayaranPembelianInput = {
@@ -2676,6 +3728,7 @@ export type JurnalUncheckedCreateWithoutPembayaranPembelianInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2702,6 +3755,11 @@ export type JurnalUncheckedCreateWithoutPembayaranPembelianInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPembayaranPembelianInput = {
@@ -2732,6 +3790,7 @@ export type JurnalUpdateWithoutPembayaranPembelianInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -2753,6 +3812,11 @@ export type JurnalUpdateWithoutPembayaranPembelianInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPembayaranPembelianInput = {
@@ -2762,6 +3826,7 @@ export type JurnalUncheckedUpdateWithoutPembayaranPembelianInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2788,6 +3853,11 @@ export type JurnalUncheckedUpdateWithoutPembayaranPembelianInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutReturPembelianInput = {
@@ -2802,6 +3872,7 @@ export type JurnalCreateWithoutReturPembelianInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -2823,6 +3894,11 @@ export type JurnalCreateWithoutReturPembelianInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutReturPembelianInput = {
@@ -2832,6 +3908,7 @@ export type JurnalUncheckedCreateWithoutReturPembelianInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -2858,6 +3935,11 @@ export type JurnalUncheckedCreateWithoutReturPembelianInput = {
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutReturPembelianInput = {
@@ -2888,6 +3970,7 @@ export type JurnalUpdateWithoutReturPembelianInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -2909,6 +3992,11 @@ export type JurnalUpdateWithoutReturPembelianInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutReturPembelianInput = {
@@ -2918,6 +4006,7 @@ export type JurnalUncheckedUpdateWithoutReturPembelianInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2944,6 +4033,11 @@ export type JurnalUncheckedUpdateWithoutReturPembelianInput = {
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutBarisInput = {
@@ -2958,6 +4052,7 @@ export type JurnalCreateWithoutBarisInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
@@ -2979,6 +4074,11 @@ export type JurnalCreateWithoutBarisInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutBarisInput = {
@@ -2988,6 +4088,7 @@ export type JurnalUncheckedCreateWithoutBarisInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3014,6 +4115,11 @@ export type JurnalUncheckedCreateWithoutBarisInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutBarisInput = {
@@ -3044,6 +4150,7 @@ export type JurnalUpdateWithoutBarisInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
@@ -3065,6 +4172,11 @@ export type JurnalUpdateWithoutBarisInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutBarisInput = {
@@ -3074,6 +4186,7 @@ export type JurnalUncheckedUpdateWithoutBarisInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3100,6 +4213,11 @@ export type JurnalUncheckedUpdateWithoutBarisInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutDokumenKasInput = {
@@ -3114,6 +4232,7 @@ export type JurnalCreateWithoutDokumenKasInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -3135,6 +4254,11 @@ export type JurnalCreateWithoutDokumenKasInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutDokumenKasInput = {
@@ -3144,6 +4268,7 @@ export type JurnalUncheckedCreateWithoutDokumenKasInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3170,6 +4295,11 @@ export type JurnalUncheckedCreateWithoutDokumenKasInput = {
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutDokumenKasInput = {
@@ -3200,6 +4330,7 @@ export type JurnalUpdateWithoutDokumenKasInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -3221,6 +4352,11 @@ export type JurnalUpdateWithoutDokumenKasInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutDokumenKasInput = {
@@ -3230,6 +4366,7 @@ export type JurnalUncheckedUpdateWithoutDokumenKasInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3256,6 +4393,11 @@ export type JurnalUncheckedUpdateWithoutDokumenKasInput = {
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPerolehanAsetInput = {
@@ -3270,6 +4412,7 @@ export type JurnalCreateWithoutPerolehanAsetInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
@@ -3291,6 +4434,11 @@ export type JurnalCreateWithoutPerolehanAsetInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPerolehanAsetInput = {
@@ -3300,6 +4448,7 @@ export type JurnalUncheckedCreateWithoutPerolehanAsetInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3326,6 +4475,11 @@ export type JurnalUncheckedCreateWithoutPerolehanAsetInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPerolehanAsetInput = {
@@ -3356,6 +4510,7 @@ export type JurnalUpdateWithoutPerolehanAsetInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
@@ -3377,6 +4532,11 @@ export type JurnalUpdateWithoutPerolehanAsetInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPerolehanAsetInput = {
@@ -3386,6 +4546,7 @@ export type JurnalUncheckedUpdateWithoutPerolehanAsetInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3412,6 +4573,11 @@ export type JurnalUncheckedUpdateWithoutPerolehanAsetInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPelepasanAsetInput = {
@@ -3426,6 +4592,7 @@ export type JurnalCreateWithoutPelepasanAsetInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -3447,6 +4614,11 @@ export type JurnalCreateWithoutPelepasanAsetInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPelepasanAsetInput = {
@@ -3456,6 +4628,7 @@ export type JurnalUncheckedCreateWithoutPelepasanAsetInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3482,6 +4655,11 @@ export type JurnalUncheckedCreateWithoutPelepasanAsetInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPelepasanAsetInput = {
@@ -3512,6 +4690,7 @@ export type JurnalUpdateWithoutPelepasanAsetInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -3533,6 +4712,11 @@ export type JurnalUpdateWithoutPelepasanAsetInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPelepasanAsetInput = {
@@ -3542,6 +4726,7 @@ export type JurnalUncheckedUpdateWithoutPelepasanAsetInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3568,6 +4753,11 @@ export type JurnalUncheckedUpdateWithoutPelepasanAsetInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPenyusutanAsetInput = {
@@ -3582,6 +4772,7 @@ export type JurnalCreateWithoutPenyusutanAsetInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
@@ -3603,6 +4794,11 @@ export type JurnalCreateWithoutPenyusutanAsetInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPenyusutanAsetInput = {
@@ -3612,6 +4808,7 @@ export type JurnalUncheckedCreateWithoutPenyusutanAsetInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3638,6 +4835,11 @@ export type JurnalUncheckedCreateWithoutPenyusutanAsetInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPenyusutanAsetInput = {
@@ -3668,6 +4870,7 @@ export type JurnalUpdateWithoutPenyusutanAsetInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
   penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
@@ -3689,6 +4892,11 @@ export type JurnalUpdateWithoutPenyusutanAsetInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPenyusutanAsetInput = {
@@ -3698,6 +4906,7 @@ export type JurnalUncheckedUpdateWithoutPenyusutanAsetInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3724,6 +4933,11 @@ export type JurnalUncheckedUpdateWithoutPenyusutanAsetInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPenyesuaianPersediaanInput = {
@@ -3738,6 +4952,7 @@ export type JurnalCreateWithoutPenyesuaianPersediaanInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -3759,6 +4974,11 @@ export type JurnalCreateWithoutPenyesuaianPersediaanInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput = {
@@ -3768,6 +4988,7 @@ export type JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3794,6 +5015,11 @@ export type JurnalUncheckedCreateWithoutPenyesuaianPersediaanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPenyesuaianPersediaanInput = {
@@ -3824,6 +5050,7 @@ export type JurnalUpdateWithoutPenyesuaianPersediaanInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -3845,6 +5072,11 @@ export type JurnalUpdateWithoutPenyesuaianPersediaanInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput = {
@@ -3854,6 +5086,7 @@ export type JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3880,6 +5113,11 @@ export type JurnalUncheckedUpdateWithoutPenyesuaianPersediaanInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutTutupBukuInput = {
@@ -3894,6 +5132,7 @@ export type JurnalCreateWithoutTutupBukuInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -3915,6 +5154,11 @@ export type JurnalCreateWithoutTutupBukuInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutTutupBukuInput = {
@@ -3924,6 +5168,7 @@ export type JurnalUncheckedCreateWithoutTutupBukuInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -3950,6 +5195,11 @@ export type JurnalUncheckedCreateWithoutTutupBukuInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutTutupBukuInput = {
@@ -3980,6 +5230,7 @@ export type JurnalUpdateWithoutTutupBukuInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -4001,6 +5252,11 @@ export type JurnalUpdateWithoutTutupBukuInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutTutupBukuInput = {
@@ -4010,6 +5266,7 @@ export type JurnalUncheckedUpdateWithoutTutupBukuInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4036,6 +5293,11 @@ export type JurnalUncheckedUpdateWithoutTutupBukuInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPphFinalInput = {
@@ -4050,6 +5312,7 @@ export type JurnalCreateWithoutPphFinalInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -4071,6 +5334,11 @@ export type JurnalCreateWithoutPphFinalInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPphFinalInput = {
@@ -4080,6 +5348,7 @@ export type JurnalUncheckedCreateWithoutPphFinalInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -4106,6 +5375,11 @@ export type JurnalUncheckedCreateWithoutPphFinalInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPphFinalInput = {
@@ -4136,6 +5410,7 @@ export type JurnalUpdateWithoutPphFinalInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -4157,6 +5432,11 @@ export type JurnalUpdateWithoutPphFinalInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPphFinalInput = {
@@ -4166,6 +5446,7 @@ export type JurnalUncheckedUpdateWithoutPphFinalInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4192,6 +5473,11 @@ export type JurnalUncheckedUpdateWithoutPphFinalInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPriveInput = {
@@ -4206,6 +5492,7 @@ export type JurnalCreateWithoutPriveInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -4227,6 +5514,11 @@ export type JurnalCreateWithoutPriveInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPriveInput = {
@@ -4236,6 +5528,7 @@ export type JurnalUncheckedCreateWithoutPriveInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -4262,6 +5555,11 @@ export type JurnalUncheckedCreateWithoutPriveInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPriveInput = {
@@ -4292,6 +5590,7 @@ export type JurnalUpdateWithoutPriveInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -4313,6 +5612,11 @@ export type JurnalUpdateWithoutPriveInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPriveInput = {
@@ -4322,6 +5626,7 @@ export type JurnalUncheckedUpdateWithoutPriveInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4348,6 +5653,11 @@ export type JurnalUncheckedUpdateWithoutPriveInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateWithoutPenggajianInput = {
@@ -4362,6 +5672,7 @@ export type JurnalCreateWithoutPenggajianInput = {
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
   proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
   baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
   penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
   perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
@@ -4383,6 +5694,11 @@ export type JurnalCreateWithoutPenggajianInput = {
   diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
   disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
   ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalUncheckedCreateWithoutPenggajianInput = {
@@ -4392,6 +5708,7 @@ export type JurnalUncheckedCreateWithoutPenggajianInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -4418,6 +5735,11 @@ export type JurnalUncheckedCreateWithoutPenggajianInput = {
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
   returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
 }
 
 export type JurnalCreateOrConnectWithoutPenggajianInput = {
@@ -4448,6 +5770,7 @@ export type JurnalUpdateWithoutPenggajianInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -4469,6 +5792,11 @@ export type JurnalUpdateWithoutPenggajianInput = {
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutPenggajianInput = {
@@ -4478,6 +5806,7 @@ export type JurnalUncheckedUpdateWithoutPenggajianInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4504,6 +5833,371 @@ export type JurnalUncheckedUpdateWithoutPenggajianInput = {
   pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutTalanganMitraInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutTalanganMitraInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutTalanganMitraInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutTalanganMitraInput, Prisma.JurnalUncheckedCreateWithoutTalanganMitraInput>
+}
+
+export type JurnalUpsertWithoutTalanganMitraInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutTalanganMitraInput, Prisma.JurnalUncheckedUpdateWithoutTalanganMitraInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutTalanganMitraInput, Prisma.JurnalUncheckedCreateWithoutTalanganMitraInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutTalanganMitraInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutTalanganMitraInput, Prisma.JurnalUncheckedUpdateWithoutTalanganMitraInput>
+}
+
+export type JurnalUpdateWithoutTalanganMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutTalanganMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalCreateWithoutPembayaranMitraInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  proyek?: Prisma.ProyekCreateNestedOneWithoutJurnalInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutJurnalInput
+  baris?: Prisma.BarisJurnalCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedOneWithoutJurnalInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanJurnalInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiJurnalInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalUncheckedCreateWithoutPembayaranMitraInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  baris?: Prisma.BarisJurnalUncheckedCreateNestedManyWithoutJurnalInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutJurnalInput
+  perolehanAset?: Prisma.AsetTetapUncheckedCreateNestedOneWithoutJurnalPerolehanInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedCreateNestedOneWithoutJurnalInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBuku?: Prisma.TutupBukuUncheckedCreateNestedOneWithoutJurnalInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedCreateNestedOneWithoutJurnalInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutJurnalInput
+  prive?: Prisma.PriveUncheckedCreateNestedOneWithoutJurnalInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedCreateNestedOneWithoutJurnalInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  returPembelian?: Prisma.ReturPembelianUncheckedCreateNestedOneWithoutJurnalInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedOneWithoutJurnalInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedOneWithoutJurnalInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedCreateNestedOneWithoutJurnalInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPemberiInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedOneWithoutJurnalPenerimaInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedOneWithoutJurnalInput
+}
+
+export type JurnalCreateOrConnectWithoutPembayaranMitraInput = {
+  where: Prisma.JurnalWhereUniqueInput
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPembayaranMitraInput, Prisma.JurnalUncheckedCreateWithoutPembayaranMitraInput>
+}
+
+export type JurnalUpsertWithoutPembayaranMitraInput = {
+  update: Prisma.XOR<Prisma.JurnalUpdateWithoutPembayaranMitraInput, Prisma.JurnalUncheckedUpdateWithoutPembayaranMitraInput>
+  create: Prisma.XOR<Prisma.JurnalCreateWithoutPembayaranMitraInput, Prisma.JurnalUncheckedCreateWithoutPembayaranMitraInput>
+  where?: Prisma.JurnalWhereInput
+}
+
+export type JurnalUpdateToOneWithWhereWithoutPembayaranMitraInput = {
+  where?: Prisma.JurnalWhereInput
+  data: Prisma.XOR<Prisma.JurnalUpdateWithoutPembayaranMitraInput, Prisma.JurnalUncheckedUpdateWithoutPembayaranMitraInput>
+}
+
+export type JurnalUpdateWithoutPembayaranMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutPembayaranMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalCreateManyDiajukanOlehInput = {
@@ -4513,6 +6207,7 @@ export type JurnalCreateManyDiajukanOlehInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanPada?: Date | string | null
   disetujuiOlehId?: string | null
@@ -4529,6 +6224,7 @@ export type JurnalCreateManyDisetujuiOlehInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -4545,6 +6241,7 @@ export type JurnalCreateManyDitolakOlehInput = {
   keterangan?: string | null
   sumber?: $Enums.SumberJurnal
   proyekId?: string | null
+  perusahaanId?: string
   statusPersetujuan?: $Enums.StatusPersetujuan
   diajukanOlehId?: string | null
   diajukanPada?: Date | string | null
@@ -4566,6 +6263,7 @@ export type JurnalUpdateWithoutDiajukanOlehInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -4587,6 +6285,11 @@ export type JurnalUpdateWithoutDiajukanOlehInput = {
   dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutDiajukanOlehInput = {
@@ -4596,6 +6299,7 @@ export type JurnalUncheckedUpdateWithoutDiajukanOlehInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4622,6 +6326,11 @@ export type JurnalUncheckedUpdateWithoutDiajukanOlehInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateManyWithoutDiajukanOlehInput = {
@@ -4631,6 +6340,7 @@ export type JurnalUncheckedUpdateManyWithoutDiajukanOlehInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4652,6 +6362,7 @@ export type JurnalUpdateWithoutDisetujuiOlehInput = {
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
   baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
   penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
   perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
@@ -4673,6 +6384,11 @@ export type JurnalUpdateWithoutDisetujuiOlehInput = {
   dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateWithoutDisetujuiOlehInput = {
@@ -4682,6 +6398,7 @@ export type JurnalUncheckedUpdateWithoutDisetujuiOlehInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4708,6 +6425,11 @@ export type JurnalUncheckedUpdateWithoutDisetujuiOlehInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateManyWithoutDisetujuiOlehInput = {
@@ -4717,6 +6439,7 @@ export type JurnalUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4727,6 +6450,122 @@ export type JurnalUncheckedUpdateManyWithoutDisetujuiOlehInput = {
 }
 
 export type JurnalUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  proyek?: Prisma.ProyekUpdateOneWithoutJurnalNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateManyWithoutDitolakOlehInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type JurnalCreateManyPerusahaanInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  proyekId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type JurnalUpdateWithoutPerusahaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4759,116 +6598,21 @@ export type JurnalUpdateWithoutDitolakOlehInput = {
   dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
   diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
   disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
-}
-
-export type JurnalUncheckedUpdateWithoutDitolakOlehInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  nomor?: Prisma.StringFieldUpdateOperationsInput | string
-  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
-  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
-  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
-  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
-  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
-  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
-  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
-  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
-  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
-  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
-  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
-  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
-  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
-  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
-  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
-  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
-  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
-  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
-  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
-  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
-  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
-}
-
-export type JurnalUncheckedUpdateManyWithoutDitolakOlehInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  nomor?: Prisma.StringFieldUpdateOperationsInput | string
-  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
-  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
-  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-}
-
-export type JurnalCreateManyProyekInput = {
-  id?: string
-  nomor: string
-  tanggal?: Date | string
-  keterangan?: string | null
-  sumber?: $Enums.SumberJurnal
-  statusPersetujuan?: $Enums.StatusPersetujuan
-  diajukanOlehId?: string | null
-  diajukanPada?: Date | string | null
-  disetujuiOlehId?: string | null
-  disetujuiPada?: Date | string | null
-  ditolakOlehId?: string | null
-  ditolakPada?: Date | string | null
-  catatanPenolakan?: string | null
-}
-
-export type JurnalUpdateWithoutProyekInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  nomor?: Prisma.StringFieldUpdateOperationsInput | string
-  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
-  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
-  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
-  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
-  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
-  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
-  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
-  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
-  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
-  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
-  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
-  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
-  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
-  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
-  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
-  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
-  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
-  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
-  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
-  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
-  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
-  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
-  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
   ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
 }
 
-export type JurnalUncheckedUpdateWithoutProyekInput = {
+export type JurnalUncheckedUpdateWithoutPerusahaanInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4896,6 +6640,127 @@ export type JurnalUncheckedUpdateWithoutProyekInput = {
   returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
   penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type JurnalCreateManyProyekInput = {
+  id?: string
+  nomor: string
+  tanggal?: Date | string
+  keterangan?: string | null
+  sumber?: $Enums.SumberJurnal
+  perusahaanId?: string
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type JurnalUpdateWithoutProyekInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutJurnalNestedInput
+  baris?: Prisma.BarisJurnalUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateOneWithoutJurnalNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanJurnalNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiJurnalNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateOneWithoutJurnalNestedInput
+}
+
+export type JurnalUncheckedUpdateWithoutProyekInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nomor?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baris?: Prisma.BarisJurnalUncheckedUpdateManyWithoutJurnalNestedInput
+  penyusutanAset?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutJurnalNestedInput
+  perolehanAset?: Prisma.AsetTetapUncheckedUpdateOneWithoutJurnalPerolehanNestedInput
+  penyesuaianPersediaan?: Prisma.PenyesuaianPersediaanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanBarang?: Prisma.PenerimaanBarangUncheckedUpdateOneWithoutJurnalNestedInput
+  pengiriman?: Prisma.PengirimanPesananUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPenjualan?: Prisma.FakturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  penerimaanPenjualan?: Prisma.PenerimaanPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  uangMukaPelanggan?: Prisma.UangMukaPelangganUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBuku?: Prisma.TutupBukuUncheckedUpdateOneWithoutJurnalNestedInput
+  pphFinal?: Prisma.PphFinalBulananUncheckedUpdateOneWithoutJurnalNestedInput
+  pelepasanAset?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutJurnalNestedInput
+  prive?: Prisma.PriveUncheckedUpdateOneWithoutJurnalNestedInput
+  returPenjualan?: Prisma.ReturPenjualanUncheckedUpdateOneWithoutJurnalNestedInput
+  fakturPembelian?: Prisma.FakturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranPembelian?: Prisma.PembayaranPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  returPembelian?: Prisma.ReturPembelianUncheckedUpdateOneWithoutJurnalNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateOneWithoutJurnalNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateOneWithoutJurnalNestedInput
+  tutupBukuPerusahaan?: Prisma.TutupBukuPerusahaanUncheckedUpdateOneWithoutJurnalNestedInput
+  antarSebagaiPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPemberiNestedInput
+  antarSebagaiPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateOneWithoutJurnalPenerimaNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateOneWithoutJurnalNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateOneWithoutJurnalNestedInput
 }
 
 export type JurnalUncheckedUpdateManyWithoutProyekInput = {
@@ -4904,6 +6769,7 @@ export type JurnalUncheckedUpdateManyWithoutProyekInput = {
   tanggal?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sumber?: Prisma.EnumSumberJurnalFieldUpdateOperationsInput | $Enums.SumberJurnal
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
   diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4961,6 +6827,7 @@ export type JurnalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   keterangan?: boolean
   sumber?: boolean
   proyekId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -4970,6 +6837,7 @@ export type JurnalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   ditolakPada?: boolean
   catatanPenolakan?: boolean
   proyek?: boolean | Prisma.Jurnal$proyekArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.Jurnal$barisArgs<ExtArgs>
   penyusutanAset?: boolean | Prisma.Jurnal$penyusutanAsetArgs<ExtArgs>
   perolehanAset?: boolean | Prisma.Jurnal$perolehanAsetArgs<ExtArgs>
@@ -4992,6 +6860,11 @@ export type JurnalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   diajukanOleh?: boolean | Prisma.Jurnal$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Jurnal$ditolakOlehArgs<ExtArgs>
+  tutupBukuPerusahaan?: boolean | Prisma.Jurnal$tutupBukuPerusahaanArgs<ExtArgs>
+  antarSebagaiPemberi?: boolean | Prisma.Jurnal$antarSebagaiPemberiArgs<ExtArgs>
+  antarSebagaiPenerima?: boolean | Prisma.Jurnal$antarSebagaiPenerimaArgs<ExtArgs>
+  talanganMitra?: boolean | Prisma.Jurnal$talanganMitraArgs<ExtArgs>
+  pembayaranMitra?: boolean | Prisma.Jurnal$pembayaranMitraArgs<ExtArgs>
   _count?: boolean | Prisma.JurnalCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["jurnal"]>
 
@@ -5002,6 +6875,7 @@ export type JurnalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   keterangan?: boolean
   sumber?: boolean
   proyekId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -5011,6 +6885,7 @@ export type JurnalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   ditolakPada?: boolean
   catatanPenolakan?: boolean
   proyek?: boolean | Prisma.Jurnal$proyekArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Jurnal$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Jurnal$ditolakOlehArgs<ExtArgs>
@@ -5023,6 +6898,7 @@ export type JurnalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   keterangan?: boolean
   sumber?: boolean
   proyekId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -5032,6 +6908,7 @@ export type JurnalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   ditolakPada?: boolean
   catatanPenolakan?: boolean
   proyek?: boolean | Prisma.Jurnal$proyekArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Jurnal$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Jurnal$ditolakOlehArgs<ExtArgs>
@@ -5044,6 +6921,7 @@ export type JurnalSelectScalar = {
   keterangan?: boolean
   sumber?: boolean
   proyekId?: boolean
+  perusahaanId?: boolean
   statusPersetujuan?: boolean
   diajukanOlehId?: boolean
   diajukanPada?: boolean
@@ -5054,9 +6932,10 @@ export type JurnalSelectScalar = {
   catatanPenolakan?: boolean
 }
 
-export type JurnalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "keterangan" | "sumber" | "proyekId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["jurnal"]>
+export type JurnalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nomor" | "tanggal" | "keterangan" | "sumber" | "proyekId" | "perusahaanId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["jurnal"]>
 export type JurnalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proyek?: boolean | Prisma.Jurnal$proyekArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   baris?: boolean | Prisma.Jurnal$barisArgs<ExtArgs>
   penyusutanAset?: boolean | Prisma.Jurnal$penyusutanAsetArgs<ExtArgs>
   perolehanAset?: boolean | Prisma.Jurnal$perolehanAsetArgs<ExtArgs>
@@ -5079,16 +6958,23 @@ export type JurnalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   diajukanOleh?: boolean | Prisma.Jurnal$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Jurnal$ditolakOlehArgs<ExtArgs>
+  tutupBukuPerusahaan?: boolean | Prisma.Jurnal$tutupBukuPerusahaanArgs<ExtArgs>
+  antarSebagaiPemberi?: boolean | Prisma.Jurnal$antarSebagaiPemberiArgs<ExtArgs>
+  antarSebagaiPenerima?: boolean | Prisma.Jurnal$antarSebagaiPenerimaArgs<ExtArgs>
+  talanganMitra?: boolean | Prisma.Jurnal$talanganMitraArgs<ExtArgs>
+  pembayaranMitra?: boolean | Prisma.Jurnal$pembayaranMitraArgs<ExtArgs>
   _count?: boolean | Prisma.JurnalCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type JurnalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proyek?: boolean | Prisma.Jurnal$proyekArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Jurnal$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Jurnal$ditolakOlehArgs<ExtArgs>
 }
 export type JurnalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proyek?: boolean | Prisma.Jurnal$proyekArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   diajukanOleh?: boolean | Prisma.Jurnal$diajukanOlehArgs<ExtArgs>
   disetujuiOleh?: boolean | Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>
   ditolakOleh?: boolean | Prisma.Jurnal$ditolakOlehArgs<ExtArgs>
@@ -5098,6 +6984,7 @@ export type $JurnalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Jurnal"
   objects: {
     proyek: Prisma.$ProyekPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
     baris: Prisma.$BarisJurnalPayload<ExtArgs>[]
     penyusutanAset: Prisma.$PenyusutanAsetPayload<ExtArgs>[]
     perolehanAset: Prisma.$AsetTetapPayload<ExtArgs> | null
@@ -5120,6 +7007,11 @@ export type $JurnalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     diajukanOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     disetujuiOleh: Prisma.$PenggunaPayload<ExtArgs> | null
     ditolakOleh: Prisma.$PenggunaPayload<ExtArgs> | null
+    tutupBukuPerusahaan: Prisma.$TutupBukuPerusahaanPayload<ExtArgs> | null
+    antarSebagaiPemberi: Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs> | null
+    antarSebagaiPenerima: Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs> | null
+    talanganMitra: Prisma.$TalanganMitraPayload<ExtArgs> | null
+    pembayaranMitra: Prisma.$PembayaranMitraPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5131,6 +7023,10 @@ export type $JurnalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
      * Dimensi event/proyek: diwarisi dari pesanan (jurnal otomatis) atau dipilih di jurnal manual/kas
      */
     proyekId: string | null
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
     /**
      * Persetujuan (maker-checker); lihat src/lib/persetujuan.ts.
      * Untuk Jurnal bawaannya DISETUJUI karena berlaku aturan tetap: ADANYA satu baris Jurnal berarti
@@ -5540,6 +7436,7 @@ readonly fields: JurnalFieldRefs;
 export interface Prisma__JurnalClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   proyek<T extends Prisma.Jurnal$proyekArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$proyekArgs<ExtArgs>>): Prisma.Prisma__ProyekClient<runtime.Types.Result.GetResult<Prisma.$ProyekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   baris<T extends Prisma.Jurnal$barisArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$barisArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisJurnalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   penyusutanAset<T extends Prisma.Jurnal$penyusutanAsetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$penyusutanAsetArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenyusutanAsetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   perolehanAset<T extends Prisma.Jurnal$perolehanAsetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$perolehanAsetArgs<ExtArgs>>): Prisma.Prisma__AsetTetapClient<runtime.Types.Result.GetResult<Prisma.$AsetTetapPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -5562,6 +7459,11 @@ export interface Prisma__JurnalClient<T, Null = never, ExtArgs extends runtime.T
   diajukanOleh<T extends Prisma.Jurnal$diajukanOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$diajukanOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   disetujuiOleh<T extends Prisma.Jurnal$disetujuiOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$disetujuiOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   ditolakOleh<T extends Prisma.Jurnal$ditolakOlehArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$ditolakOlehArgs<ExtArgs>>): Prisma.Prisma__PenggunaClient<runtime.Types.Result.GetResult<Prisma.$PenggunaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tutupBukuPerusahaan<T extends Prisma.Jurnal$tutupBukuPerusahaanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$tutupBukuPerusahaanArgs<ExtArgs>>): Prisma.Prisma__TutupBukuPerusahaanClient<runtime.Types.Result.GetResult<Prisma.$TutupBukuPerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  antarSebagaiPemberi<T extends Prisma.Jurnal$antarSebagaiPemberiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$antarSebagaiPemberiArgs<ExtArgs>>): Prisma.Prisma__TransaksiAntarPerusahaanClient<runtime.Types.Result.GetResult<Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  antarSebagaiPenerima<T extends Prisma.Jurnal$antarSebagaiPenerimaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$antarSebagaiPenerimaArgs<ExtArgs>>): Prisma.Prisma__TransaksiAntarPerusahaanClient<runtime.Types.Result.GetResult<Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  talanganMitra<T extends Prisma.Jurnal$talanganMitraArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$talanganMitraArgs<ExtArgs>>): Prisma.Prisma__TalanganMitraClient<runtime.Types.Result.GetResult<Prisma.$TalanganMitraPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  pembayaranMitra<T extends Prisma.Jurnal$pembayaranMitraArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Jurnal$pembayaranMitraArgs<ExtArgs>>): Prisma.Prisma__PembayaranMitraClient<runtime.Types.Result.GetResult<Prisma.$PembayaranMitraPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5597,6 +7499,7 @@ export interface JurnalFieldRefs {
   readonly keterangan: Prisma.FieldRef<"Jurnal", 'String'>
   readonly sumber: Prisma.FieldRef<"Jurnal", 'SumberJurnal'>
   readonly proyekId: Prisma.FieldRef<"Jurnal", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"Jurnal", 'String'>
   readonly statusPersetujuan: Prisma.FieldRef<"Jurnal", 'StatusPersetujuan'>
   readonly diajukanOlehId: Prisma.FieldRef<"Jurnal", 'String'>
   readonly diajukanPada: Prisma.FieldRef<"Jurnal", 'DateTime'>
@@ -6450,6 +8353,101 @@ export type Jurnal$ditolakOlehArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   include?: Prisma.PenggunaInclude<ExtArgs> | null
   where?: Prisma.PenggunaWhereInput
+}
+
+/**
+ * Jurnal.tutupBukuPerusahaan
+ */
+export type Jurnal$tutupBukuPerusahaanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TutupBukuPerusahaan
+   */
+  select?: Prisma.TutupBukuPerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TutupBukuPerusahaan
+   */
+  omit?: Prisma.TutupBukuPerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TutupBukuPerusahaanInclude<ExtArgs> | null
+  where?: Prisma.TutupBukuPerusahaanWhereInput
+}
+
+/**
+ * Jurnal.antarSebagaiPemberi
+ */
+export type Jurnal$antarSebagaiPemberiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TransaksiAntarPerusahaan
+   */
+  select?: Prisma.TransaksiAntarPerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TransaksiAntarPerusahaan
+   */
+  omit?: Prisma.TransaksiAntarPerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransaksiAntarPerusahaanInclude<ExtArgs> | null
+  where?: Prisma.TransaksiAntarPerusahaanWhereInput
+}
+
+/**
+ * Jurnal.antarSebagaiPenerima
+ */
+export type Jurnal$antarSebagaiPenerimaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TransaksiAntarPerusahaan
+   */
+  select?: Prisma.TransaksiAntarPerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TransaksiAntarPerusahaan
+   */
+  omit?: Prisma.TransaksiAntarPerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransaksiAntarPerusahaanInclude<ExtArgs> | null
+  where?: Prisma.TransaksiAntarPerusahaanWhereInput
+}
+
+/**
+ * Jurnal.talanganMitra
+ */
+export type Jurnal$talanganMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TalanganMitra
+   */
+  select?: Prisma.TalanganMitraSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TalanganMitra
+   */
+  omit?: Prisma.TalanganMitraOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TalanganMitraInclude<ExtArgs> | null
+  where?: Prisma.TalanganMitraWhereInput
+}
+
+/**
+ * Jurnal.pembayaranMitra
+ */
+export type Jurnal$pembayaranMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PembayaranMitra
+   */
+  select?: Prisma.PembayaranMitraSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PembayaranMitra
+   */
+  omit?: Prisma.PembayaranMitraOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PembayaranMitraInclude<ExtArgs> | null
+  where?: Prisma.PembayaranMitraWhereInput
 }
 
 /**

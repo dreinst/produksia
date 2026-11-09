@@ -33,6 +33,9 @@ export type LogAktivitasMinAggregateOutputType = {
   jenis: string | null
   nomor: string | null
   keterangan: string | null
+  modul: string | null
+  entitasId: string | null
+  perusahaanId: string | null
 }
 
 export type LogAktivitasMaxAggregateOutputType = {
@@ -44,6 +47,9 @@ export type LogAktivitasMaxAggregateOutputType = {
   jenis: string | null
   nomor: string | null
   keterangan: string | null
+  modul: string | null
+  entitasId: string | null
+  perusahaanId: string | null
 }
 
 export type LogAktivitasCountAggregateOutputType = {
@@ -55,6 +61,10 @@ export type LogAktivitasCountAggregateOutputType = {
   jenis: number
   nomor: number
   keterangan: number
+  modul: number
+  entitasId: number
+  meta: number
+  perusahaanId: number
   _all: number
 }
 
@@ -68,6 +78,9 @@ export type LogAktivitasMinAggregateInputType = {
   jenis?: true
   nomor?: true
   keterangan?: true
+  modul?: true
+  entitasId?: true
+  perusahaanId?: true
 }
 
 export type LogAktivitasMaxAggregateInputType = {
@@ -79,6 +92,9 @@ export type LogAktivitasMaxAggregateInputType = {
   jenis?: true
   nomor?: true
   keterangan?: true
+  modul?: true
+  entitasId?: true
+  perusahaanId?: true
 }
 
 export type LogAktivitasCountAggregateInputType = {
@@ -90,6 +106,10 @@ export type LogAktivitasCountAggregateInputType = {
   jenis?: true
   nomor?: true
   keterangan?: true
+  modul?: true
+  entitasId?: true
+  meta?: true
+  perusahaanId?: true
   _all?: true
 }
 
@@ -174,6 +194,10 @@ export type LogAktivitasGroupByOutputType = {
   jenis: string
   nomor: string
   keterangan: string | null
+  modul: string | null
+  entitasId: string | null
+  meta: runtime.JsonValue | null
+  perusahaanId: string | null
   _count: LogAktivitasCountAggregateOutputType | null
   _min: LogAktivitasMinAggregateOutputType | null
   _max: LogAktivitasMaxAggregateOutputType | null
@@ -206,6 +230,10 @@ export type LogAktivitasWhereInput = {
   jenis?: Prisma.StringFilter<"LogAktivitas"> | string
   nomor?: Prisma.StringFilter<"LogAktivitas"> | string
   keterangan?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
+  modul?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
+  entitasId?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
+  meta?: Prisma.JsonNullableFilter<"LogAktivitas">
+  perusahaanId?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
 }
 
 export type LogAktivitasOrderByWithRelationInput = {
@@ -217,6 +245,10 @@ export type LogAktivitasOrderByWithRelationInput = {
   jenis?: Prisma.SortOrder
   nomor?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
+  modul?: Prisma.SortOrderInput | Prisma.SortOrder
+  entitasId?: Prisma.SortOrderInput | Prisma.SortOrder
+  meta?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrderInput | Prisma.SortOrder
 }
 
 export type LogAktivitasWhereUniqueInput = Prisma.AtLeast<{
@@ -231,6 +263,10 @@ export type LogAktivitasWhereUniqueInput = Prisma.AtLeast<{
   jenis?: Prisma.StringFilter<"LogAktivitas"> | string
   nomor?: Prisma.StringFilter<"LogAktivitas"> | string
   keterangan?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
+  modul?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
+  entitasId?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
+  meta?: Prisma.JsonNullableFilter<"LogAktivitas">
+  perusahaanId?: Prisma.StringNullableFilter<"LogAktivitas"> | string | null
 }, "id">
 
 export type LogAktivitasOrderByWithAggregationInput = {
@@ -242,6 +278,10 @@ export type LogAktivitasOrderByWithAggregationInput = {
   jenis?: Prisma.SortOrder
   nomor?: Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
+  modul?: Prisma.SortOrderInput | Prisma.SortOrder
+  entitasId?: Prisma.SortOrderInput | Prisma.SortOrder
+  meta?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.LogAktivitasCountOrderByAggregateInput
   _max?: Prisma.LogAktivitasMaxOrderByAggregateInput
   _min?: Prisma.LogAktivitasMinOrderByAggregateInput
@@ -259,6 +299,10 @@ export type LogAktivitasScalarWhereWithAggregatesInput = {
   jenis?: Prisma.StringWithAggregatesFilter<"LogAktivitas"> | string
   nomor?: Prisma.StringWithAggregatesFilter<"LogAktivitas"> | string
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"LogAktivitas"> | string | null
+  modul?: Prisma.StringNullableWithAggregatesFilter<"LogAktivitas"> | string | null
+  entitasId?: Prisma.StringNullableWithAggregatesFilter<"LogAktivitas"> | string | null
+  meta?: Prisma.JsonNullableWithAggregatesFilter<"LogAktivitas">
+  perusahaanId?: Prisma.StringNullableWithAggregatesFilter<"LogAktivitas"> | string | null
 }
 
 export type LogAktivitasCreateInput = {
@@ -270,6 +314,10 @@ export type LogAktivitasCreateInput = {
   jenis: string
   nomor: string
   keterangan?: string | null
+  modul?: string | null
+  entitasId?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: string | null
 }
 
 export type LogAktivitasUncheckedCreateInput = {
@@ -281,6 +329,10 @@ export type LogAktivitasUncheckedCreateInput = {
   jenis: string
   nomor: string
   keterangan?: string | null
+  modul?: string | null
+  entitasId?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: string | null
 }
 
 export type LogAktivitasUpdateInput = {
@@ -292,6 +344,10 @@ export type LogAktivitasUpdateInput = {
   jenis?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modul?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LogAktivitasUncheckedUpdateInput = {
@@ -303,6 +359,10 @@ export type LogAktivitasUncheckedUpdateInput = {
   jenis?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modul?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LogAktivitasCreateManyInput = {
@@ -314,6 +374,10 @@ export type LogAktivitasCreateManyInput = {
   jenis: string
   nomor: string
   keterangan?: string | null
+  modul?: string | null
+  entitasId?: string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: string | null
 }
 
 export type LogAktivitasUpdateManyMutationInput = {
@@ -325,6 +389,10 @@ export type LogAktivitasUpdateManyMutationInput = {
   jenis?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modul?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LogAktivitasUncheckedUpdateManyInput = {
@@ -336,6 +404,10 @@ export type LogAktivitasUncheckedUpdateManyInput = {
   jenis?: Prisma.StringFieldUpdateOperationsInput | string
   nomor?: Prisma.StringFieldUpdateOperationsInput | string
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  modul?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type LogAktivitasCountOrderByAggregateInput = {
@@ -347,6 +419,10 @@ export type LogAktivitasCountOrderByAggregateInput = {
   jenis?: Prisma.SortOrder
   nomor?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  modul?: Prisma.SortOrder
+  entitasId?: Prisma.SortOrder
+  meta?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type LogAktivitasMaxOrderByAggregateInput = {
@@ -358,6 +434,9 @@ export type LogAktivitasMaxOrderByAggregateInput = {
   jenis?: Prisma.SortOrder
   nomor?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  modul?: Prisma.SortOrder
+  entitasId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type LogAktivitasMinOrderByAggregateInput = {
@@ -369,6 +448,9 @@ export type LogAktivitasMinOrderByAggregateInput = {
   jenis?: Prisma.SortOrder
   nomor?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  modul?: Prisma.SortOrder
+  entitasId?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 
@@ -382,6 +464,10 @@ export type LogAktivitasSelect<ExtArgs extends runtime.Types.Extensions.Internal
   jenis?: boolean
   nomor?: boolean
   keterangan?: boolean
+  modul?: boolean
+  entitasId?: boolean
+  meta?: boolean
+  perusahaanId?: boolean
 }, ExtArgs["result"]["logAktivitas"]>
 
 export type LogAktivitasSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -393,6 +479,10 @@ export type LogAktivitasSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   jenis?: boolean
   nomor?: boolean
   keterangan?: boolean
+  modul?: boolean
+  entitasId?: boolean
+  meta?: boolean
+  perusahaanId?: boolean
 }, ExtArgs["result"]["logAktivitas"]>
 
 export type LogAktivitasSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -404,6 +494,10 @@ export type LogAktivitasSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   jenis?: boolean
   nomor?: boolean
   keterangan?: boolean
+  modul?: boolean
+  entitasId?: boolean
+  meta?: boolean
+  perusahaanId?: boolean
 }, ExtArgs["result"]["logAktivitas"]>
 
 export type LogAktivitasSelectScalar = {
@@ -415,9 +509,13 @@ export type LogAktivitasSelectScalar = {
   jenis?: boolean
   nomor?: boolean
   keterangan?: boolean
+  modul?: boolean
+  entitasId?: boolean
+  meta?: boolean
+  perusahaanId?: boolean
 }
 
-export type LogAktivitasOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "waktu" | "penggunaId" | "penggunaNama" | "aksi" | "jenis" | "nomor" | "keterangan", ExtArgs["result"]["logAktivitas"]>
+export type LogAktivitasOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "waktu" | "penggunaId" | "penggunaNama" | "aksi" | "jenis" | "nomor" | "keterangan" | "modul" | "entitasId" | "meta" | "perusahaanId", ExtArgs["result"]["logAktivitas"]>
 
 export type $LogAktivitasPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "LogAktivitas"
@@ -437,6 +535,22 @@ export type $LogAktivitasPayload<ExtArgs extends runtime.Types.Extensions.Intern
     jenis: string
     nomor: string
     keterangan: string | null
+    /**
+     * Modul asal (null = catatan lama/akuntansi umum). Nilai dan hak lihatnya: MODUL_LOG di src/lib/log.ts
+     */
+    modul: string | null
+    /**
+     * id entitas yang disentuh (tanpa FK supaya log tidak pernah tersangkut penghapusan)
+     */
+    entitasId: string | null
+    /**
+     * Rincian terstruktur. Untuk modul "berkas" kunci folder dan proyekId SELALU ditulis (boleh null)
+     */
+    meta: runtime.JsonValue | null
+    /**
+     * Perusahaan tempat kejadian (null = tingkat sistem). Tanpa FK, sama alasannya dengan penggunaId
+     */
+    perusahaanId: string | null
   }, ExtArgs["result"]["logAktivitas"]>
   composites: {}
 }
@@ -868,6 +982,10 @@ export interface LogAktivitasFieldRefs {
   readonly jenis: Prisma.FieldRef<"LogAktivitas", 'String'>
   readonly nomor: Prisma.FieldRef<"LogAktivitas", 'String'>
   readonly keterangan: Prisma.FieldRef<"LogAktivitas", 'String'>
+  readonly modul: Prisma.FieldRef<"LogAktivitas", 'String'>
+  readonly entitasId: Prisma.FieldRef<"LogAktivitas", 'String'>
+  readonly meta: Prisma.FieldRef<"LogAktivitas", 'Json'>
+  readonly perusahaanId: Prisma.FieldRef<"LogAktivitas", 'String'>
 }
     
 

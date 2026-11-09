@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash, randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
-import { LABEL_PERAN, NAMA_COOKIE_SESI, SEMUA_HAK, hitungHak, labelHak, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import { LABEL_PERAN, NAMA_COOKIE_SESI, PERAN_TAMBAHAN_BOLEH, SEMUA_HAK, hitungHakPengguna, labelHak, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 import type { PeranPengguna } from "@/prisma-klien/client";
 
 export { hashKataSandi, verifikasiKataSandi, periksaKekuatanKataSandi, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/kataSandi";
@@ -75,16 +75,19 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
       // (pengaju & pemeriksa) yang id-nya bisa disimpan sebagai kunci asing di dokumen.
       const namaPengguna = process.env.UJI_PENGGUNA;
       if (namaPengguna) {
-        const p = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, aktif: true } });
+        const p = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, peranTambahan: true, aktif: true } });
         if (!p) throw new Error(`UJI_PENGGUNA=${namaPengguna} tidak ada di tabel Pengguna`);
         if (!p.aktif) throw new Error(`UJI_PENGGUNA=${namaPengguna} nonaktif`);
-        const penyesuaianNyata = await db.hakAksesPeran.findMany({ where: { peran: p.peran }, select: { hak: true, boleh: true } });
-        return { id: p.id, nama: p.nama, namaPengguna: p.namaPengguna, email: p.email, nomorTelepon: p.nomorTelepon, peran: p.peran, hak: hitungHak(p.peran, penyesuaianNyata) };
+        const penyesuaianNyata = await db.hakAksesPeran.findMany({ where: { peran: { in: [p.peran, ...p.peranTambahan] } }, select: { peran: true, hak: true, boleh: true } });
+        return { id: p.id, nama: p.nama, namaPengguna: p.namaPengguna, email: p.email, nomorTelepon: p.nomorTelepon, peran: p.peran, peranTambahan: p.peranTambahan, hak: hitungHakPengguna(p.peran, p.peranTambahan, penyesuaianNyata) };
       }
-      // UJI_PERAN=KASIR dsb. meniru peran lain (hak bawaan ± penyesuaian di tabel HakAksesPeran)
+      // UJI_PERAN=KASIR dsb. meniru peran lain (hak bawaan ± penyesuaian di tabel HakAksesPeran).
+      // UJI_PERAN_TAMBAHAN=SOSMED,DESAINER menambah peran tambahan (kosong = perilaku lama).
       const peran = (process.env.UJI_PERAN as PeranPengguna | undefined) ?? "PEMILIK";
-      const penyesuaian = peran === "PEMILIK" ? [] : await db.hakAksesPeran.findMany({ where: { peran }, select: { hak: true, boleh: true } });
-      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, nomorTelepon: null, peran, hak: peran === "PEMILIK" ? SEMUA_HAK : hitungHak(peran, penyesuaian) };
+      const peranTambahan = (process.env.UJI_PERAN_TAMBAHAN ?? "").split(",").map((x) => x.trim()).filter((x): x is PeranPengguna => (PERAN_TAMBAHAN_BOLEH as readonly string[]).includes(x));
+      if (peran === "PEMILIK") return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, nomorTelepon: null, peran, peranTambahan, hak: SEMUA_HAK };
+      const penyesuaian = await db.hakAksesPeran.findMany({ where: { peran: { in: [peran, ...peranTambahan] } }, select: { peran: true, hak: true, boleh: true } });
+      return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, nomorTelepon: null, peran, peranTambahan, hak: hitungHakPengguna(peran, peranTambahan, penyesuaian) };
     }
     return null;
   }
@@ -92,13 +95,14 @@ export const penggunaSaatIni = cache(async (): Promise<PenggunaSesi | null> => {
 
   const sesi = await db.sesi.findUnique({
     where: { tokenHash: hashToken(token) },
-    include: { pengguna: { select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, aktif: true } } },
+    include: { pengguna: { select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, peranTambahan: true, aktif: true } } },
   });
   if (!sesi || sesi.kedaluwarsa < new Date() || !sesi.pengguna.aktif) return null;
-  const { id, nama, namaPengguna, email, nomorTelepon, peran } = sesi.pengguna;
-  // hak efektif = bawaan peran ± penyesuaian di Pengaturan › Hak Akses (dibaca tiap permintaan, jadi perubahan langsung berlaku)
-  const penyesuaian = await db.hakAksesPeran.findMany({ where: { peran }, select: { hak: true, boleh: true } });
-  return { id, nama, namaPengguna, email, nomorTelepon, peran, hak: hitungHak(peran, penyesuaian) };
+  const { id, nama, namaPengguna, email, nomorTelepon, peran, peranTambahan } = sesi.pengguna;
+  // hak efektif = bawaan peran ± penyesuaian di Pengaturan › Hak Akses (dibaca tiap permintaan, jadi perubahan langsung berlaku),
+  // digabung dengan hak peran tambahan (masing-masing dengan penyesuaiannya sendiri)
+  const penyesuaian = await db.hakAksesPeran.findMany({ where: { peran: { in: [peran, ...peranTambahan] } }, select: { peran: true, hak: true, boleh: true } });
+  return { id, nama, namaPengguna, email, nomorTelepon, peran, peranTambahan, hak: hitungHakPengguna(peran, peranTambahan, penyesuaian) };
 });
 
 /** Untuk halaman: belum masuk → dialihkan ke /masuk. */

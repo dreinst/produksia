@@ -24,7 +24,9 @@ export async function catatPphFinal(dataFormulir: FormData) {
   if (bulan < 1 || bulan > 12 || tahun < 2000 || tahun > 2100) throw new Error("Periode tidak valid");
   const { dari, sampai } = batasBulan(tahun, bulan);
   if (dari > new Date()) throw new Error(`Periode ${periode} belum berjalan`);
-  if (await db.pphFinalBulanan.findUnique({ where: { periode } })) throw new Error(`PPh Final periode ${periode} sudah dicatat`);
+  // PPh Final unik per perusahaan (D1 §2.4.4). Sementara "utama"; paket fondasi memakai perusahaan lingkup halaman Pajak.
+  const perusahaanId = "utama";
+  if (await db.pphFinalBulanan.findUnique({ where: { perusahaanId_periode: { perusahaanId, periode } } })) throw new Error(`PPh Final periode ${periode} sudah dicatat`);
   const pengaturan = await ambilPengaturanPerusahaan(db);
   if (!pengaturan.akunBebanPphFinalId || !pengaturan.akunHutangPphFinalId) {
     throw new Error("Akun Beban PPh Final dan Hutang PPh Final belum diatur di Pengaturan > Perusahaan & Pajak");

@@ -104,7 +104,9 @@ export async function buatPenggajian(dataFormulir: FormData) {
     const penggajian = await tx.penggajian.create({
       data: {
         nomor,
+        // D1 §2.4.3: periode = kunci unik (utama: sama dengan bulan), bulan = bulan gaji untuk semua perusahaan
         periode,
+        bulan: periode,
         tanggal,
         akunKasId,
         proyekId,

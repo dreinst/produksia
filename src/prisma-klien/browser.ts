@@ -34,6 +34,28 @@ export type Sesi = Prisma.SesiModel
  */
 export type PercobaanMasuk = Prisma.PercobaanMasukModel
 /**
+ * Model Perusahaan
+ * Satu entitas/badan usaha dengan pembukuan sendiri. id "utama" = D'Production (DPRO): pemilik semua data
+ * sebelum multi perusahaan dan nilai bawaan setiap kolom perusahaanId. Perusahaan utama tidak boleh dinonaktifkan.
+ * id perusahaan standar D'Pro berupa slug tetap (utama, tapussa, smara, bonanova, sahara, nawasena); perusahaan
+ * yang dibuat lewat UI memakai cuid. Tidak ada hapus fisik: arsip = aktif false (relasi Restrict menolak hapus).
+ */
+export type Perusahaan = Prisma.PerusahaanModel
+/**
+ * Model TutupBukuPerusahaan
+ * Rincian tutup buku serentak (K4): satu baris per perusahaan yang punya saldo pendapatan/beban di tahun itu,
+ * dengan JU-TUTUP milik perusahaan itu. TutupBuku.tahun tetap unik global (satu kunci tahun untuk semua perusahaan).
+ */
+export type TutupBukuPerusahaan = Prisma.TutupBukuPerusahaanModel
+/**
+ * Model TransaksiAntarPerusahaan
+ * Transaksi antar perusahaan grup (K5): DUA jurnal dalam satu transaksi basis data, satu di buku tiap perusahaan,
+ * masing-masing seimbang. Pengecualian kontrak "satu perusahaanId per dokumen": dokumen ini milik dua perusahaan.
+ * TAGIH: pemberi  Dr Piutang Antar Perusahaan / Cr akunPemberi;  penerima Dr akunPenerima / Cr Hutang Antar Perusahaan.
+ * LUNAS: penerima Dr Hutang Antar Perusahaan / Cr akunPenerima;  pemberi  Dr akunPemberi / Cr Piutang Antar Perusahaan.
+ */
+export type TransaksiAntarPerusahaan = Prisma.TransaksiAntarPerusahaanModel
+/**
  * Model MataUang
  * Mata uang transaksi. IDR adalah mata uang fungsional (mata uang pelaporan): seluruh buku besar
  * tetap dicatat dalam IDR, mata uang asing hanya melekat pada dokumen dan saldo piutang/hutangnya.
@@ -303,7 +325,9 @@ export type LaporanKerusakanBarang = Prisma.LaporanKerusakanBarangModel
 export type BarisKerusakanBarang = Prisma.BarisKerusakanBarangModel
 /**
  * Model PengaturanPerusahaan
- * 
+ * Satu baris per perusahaan. Baris perusahaan utama SELALU ber-id "default" (kompatibel dengan kode & uji lama
+ * yang memakai where: { id: "default" }); baris perusahaan lain ber-id sama dengan perusahaanId (idPengaturan()).
+ * tahunBuku dan wajibPersetujuan bersifat GLOBAL: hanya nilai di baris "default" yang dibaca dan ditulis.
  */
 export type PengaturanPerusahaan = Prisma.PengaturanPerusahaanModel
 /**
@@ -357,3 +381,203 @@ export type PemetaanAkunTambahan = Prisma.PemetaanAkunTambahanModel
  * 
  */
 export type LogAktivitas = Prisma.LogAktivitasModel
+/**
+ * Model FolderBerkas
+ * Folder logis berkas (pengganti subfolder Drive HKA). Global untuk semua perusahaan.
+ * Folder sistem dibuat migrasi dan tidak bisa dihapus/diganti kode; folder buatan boleh ditambah Superadmin/Pemilik.
+ * terbatas = file_restrictions HKA: hanya peran di peranBoleh + pemegang berkas.akses-penuh yang bisa melihat isinya.
+ */
+export type FolderBerkas = Prisma.FolderBerkasModel
+/**
+ * Model Berkas
+ * Metadata berkas yang disimpan di server. Isi biner di IsiBerkas (tabel terpisah supaya daftar, cek hak,
+ * dan jawaban 304 tidak pernah membaca biner). Lampiran polimorfik lewat jenisEntitas + entitasId
+ * (daftar jenis dan haknya di JENIS_LAMPIRAN, src/lib/berkas.ts). null = unggahan umum dari halaman Berkas.
+ */
+export type Berkas = Prisma.BerkasModel
+/**
+ * Model IsiBerkas
+ * Isi biner berkas. Kolom isi memakai STORAGE EXTERNAL (SQL manual di migrasi): media sudah terkompresi,
+ * jadi kompresi pglz hanya membuang CPU, dan substring bytea tetap murah bila kelak dukungan Range ditambah.
+ */
+export type IsiBerkas = Prisma.IsiBerkasModel
+/**
+ * Model TautanBagiBerkas
+ * Tautan bagi publik bertoken (pengganti tautan publik Drive). Token asli hanya ditampilkan sekali;
+ * yang disimpan SHA-256-nya (pola Sesi.tokenHash). Satu berkas boleh punya beberapa tautan.
+ */
+export type TautanBagiBerkas = Prisma.TautanBagiBerkasModel
+/**
+ * Model AksesBerkasProyek
+ * Pembatasan berkas per proyek (file_access HKA). Baris ada = terbatas. Berkas proyek ini hanya terlihat oleh
+ * peran di peranBoleh, pengguna di daftar pengguna, dan pemegang berkas.akses-penuh. Hapus baris = buka pembatasan.
+ */
+export type AksesBerkasProyek = Prisma.AksesBerkasProyekModel
+/**
+ * Model AksesBerkasProyekPengguna
+ * 
+ */
+export type AksesBerkasProyekPengguna = Prisma.AksesBerkasProyekPenggunaModel
+/**
+ * Model Notifikasi
+ * Notifikasi dalam aplikasi milik satu pengguna (lintas perusahaan, seperti HKA). Teks disimpan jadi (bahasa Indonesia).
+ * perusahaanId = perusahaan data yang dirujuk; dipakai untuk mengganti lingkup aktif saat diklik (null = tidak perlu).
+ * kunci = pencegah ganda untuk pengingat otomatis (mis. "jatuh-tempo:faktur:<id>"); null untuk notifikasi biasa.
+ */
+export type Notifikasi = Prisma.NotifikasiModel
+/**
+ * Model RencanaTermin
+ * Jadwal termin pembayaran penawaran/pesanan. TIDAK berjurnal: tagihan termin hanya cetakan;
+ * uang yang masuk dicatat sebagai UangMukaPelanggan dengan rencanaTerminId; pendapatan tetap diakui di faktur (K9, PSAK 72).
+ * Tepat satu dari penawaranId / pesananId terisi (CHECK di migration.sql). Disalin dari penawaran ke pesanan saat konversi.
+ */
+export type RencanaTermin = Prisma.RencanaTerminModel
+/**
+ * Model FormatNomor
+ * Format nomor cetak per perusahaan per jenis dokumen, mis. "{SEQ3}/{KODE}-INV2/{ROMAN}/{YYYY}".
+ * Tidak ada baris (atau aktif = false) = nomor cetak mati untuk jenis itu; cetakan memakai nomor internal.
+ */
+export type FormatNomor = Prisma.FormatNomorModel
+/**
+ * Model PenghitungNomor
+ * Penghitung atomik nomor cetak. Kunci gabungan (bukan cuid) karena dinaikkan lewat
+ * INSERT ... ON CONFLICT DO UPDATE ... RETURNING di dalam transaksi dokumen (src/lib/nomorCetak.ts).
+ */
+export type PenghitungNomor = Prisma.PenghitungNomorModel
+/**
+ * Model PengaturanDokumenPenjualan
+ * Bawaan dokumen penjualan per perusahaan (isian awal formulir). Tidak ada baris = konstanta bawaan di src/lib/dokumenPenjualan.ts
+ * (daftar seksi HKA dan teks pembuka/penutup proposal D'Pro).
+ */
+export type PengaturanDokumenPenjualan = Prisma.PengaturanDokumenPenjualanModel
+/**
+ * Model KopSurat
+ * Kop surat milik satu perusahaan: gaya, warna, tata letak, aset gambar, dan penimpa identitas cetak.
+ * Kolom identitas kosong = kolom bernama sama di Perusahaan (D1). Hapus lunak: dokumen lama boleh tetap
+ * menunjuknya, tetapi saat dicetak kop terhapus diganti kop bawaan perusahaan (src/lib/cetak/kop.ts).
+ */
+export type KopSurat = Prisma.KopSuratModel
+/**
+ * Model TemplateCetak
+ * Pilihan tata letak per kop per jenis dokumen. Tidak ada baris = KopSurat.tataLetakUmum, A4, gaya angka bawaan.
+ */
+export type TemplateCetak = Prisma.TemplateCetakModel
+/**
+ * Model AsetKopSurat
+ * Gambar unggahan untuk satu slot kop. Isi biner ada di Berkas/IsiBerkas (D7, jenisEntitas "kop-surat",
+ * folder KOP, hak lihat = pengaturan.tulis). Slot tanpa baris ini memakai aset bawaan repo menurut
+ * KopSurat.gayaEntitas (kecuali TANDA_TANGAN dan STEMPEL).
+ */
+export type AsetKopSurat = Prisma.AsetKopSuratModel
+/**
+ * Model TahapLead
+ * Tahap pipeline per perusahaan. Urutan = urutan kolom kanban dan corong; tahap urutan terkecil = tahap awal lead baru (wajib BERJALAN).
+ */
+export type TahapLead = Prisma.TahapLeadModel
+/**
+ * Model SumberLead
+ * Daftar pilihan sumber lead per perusahaan. Lead menyimpan NAMA sumber (teks), jadi menghapus sumber tidak mengubah lead lama.
+ */
+export type SumberLead = Prisma.SumberLeadModel
+/**
+ * Model Lead
+ * Calon klien (lead) CRM. Milik satu perusahaan; perusahaan tidak bisa diganti setelah dibuat (tahap per perusahaan berbeda).
+ */
+export type Lead = Prisma.LeadModel
+/**
+ * Model AktivitasLead
+ * Entri linimasa lead. Tidak bisa diubah atau dihapus dari aplikasi.
+ */
+export type AktivitasLead = Prisma.AktivitasLeadModel
+/**
+ * Model TindakLanjut
+ * Pengingat tindak lanjut; boleh tanpa lead (pengingat umum). Bila ada lead, perusahaanId = perusahaan lead.
+ */
+export type TindakLanjut = Prisma.TindakLanjutModel
+/**
+ * Model KategoriAnggaran
+ * Kategori anggaran proyek (HKA CATEGORIES + kategori buatan pengguna/impor). Global untuk semua
+ * perusahaan karena bagan akun dan pemetaannya bersama (K2). Realisasi per kategori dibaca dari jurnal
+ * bertanda proyek lewat AkunKategoriAnggaran.
+ */
+export type KategoriAnggaran = Prisma.KategoriAnggaranModel
+/**
+ * Model AkunKategoriAnggaran
+ * Pemetaan akun beban → kategori anggaran. Satu akun paling banyak satu kategori (akunId sebagai PK).
+ * Akun kelompok boleh dipetakan: berlaku untuk seluruh keturunannya kecuali keturunan yang dipetakan
+ * sendiri (pemetaan terdekat menang, lihat kategoriUntukAkun di src/lib/kategoriAnggaran.ts).
+ */
+export type AkunKategoriAnggaran = Prisma.AkunKategoriAnggaranModel
+/**
+ * Model BarisAnggaranProyek
+ * Baris anggaran (rencana biaya) proyek per kategori (HKA project_budget_lines). Tanpa jurnal.
+ * Perusahaan dibaca dari proyek (anak proyek, tanpa kolom perusahaanId sendiri).
+ */
+export type BarisAnggaranProyek = Prisma.BarisAnggaranProyekModel
+/**
+ * Model MitraProyek
+ * Mitra bagi hasil proyek (HKA project_partners). Urutan (naik) menentukan siapa yang dibayar dulu di
+ * antara mitra NOMINAL. Anak proyek: perusahaan dibaca dari proyek.
+ */
+export type MitraProyek = Prisma.MitraProyekModel
+/**
+ * Model TalanganMitra
+ * Talangan Mitra (TLM): biaya proyek yang dibayar mitra dengan uangnya sendiri (HKA cost funded_by = mitra).
+ * Jurnal JU-TLM saat disetujui: Dr akun beban pilihan / Cr Hutang Mitra Proyek, bertanda proyek.
+ * Ikut alur persetujuan (BERKAS "talanganMitra" di src/lib/persetujuan.ts).
+ */
+export type TalanganMitra = Prisma.TalanganMitraModel
+/**
+ * Model PembayaranMitra
+ * Pembayaran ke Mitra (BYM): MODAL = pengembalian talangan (Dr Hutang Mitra Proyek / Cr Kas),
+ * LABA = bagi laba (Dr Bagi Hasil Mitra Proyek / Cr Kas). Jurnal JU-BYM bertanda proyek.
+ * Ikut alur persetujuan (BERKAS "pembayaranMitra").
+ */
+export type PembayaranMitra = Prisma.PembayaranMitraModel
+/**
+ * Model Konten
+ * Konten media sosial (HKA social_posts). Milik satu perusahaan; hapus = arsip lunak.
+ */
+export type Konten = Prisma.KontenModel
+/**
+ * Model RiwayatPersetujuanKonten
+ * Riwayat persetujuan konten (HKA social_approvals), hanya ditambah.
+ */
+export type RiwayatPersetujuanKonten = Prisma.RiwayatPersetujuanKontenModel
+/**
+ * Model TugasDesain
+ * Tugas desain (HKA design_tasks). Milik satu perusahaan; hapus = arsip lunak.
+ */
+export type TugasDesain = Prisma.TugasDesainModel
+/**
+ * Model RevisiDesain
+ * Satu baris per keputusan tinjauan desain (HKA design_revisions).
+ */
+export type RevisiDesain = Prisma.RevisiDesainModel
+/**
+ * Model Kampanye
+ * Kampanye iklan Meta (HKA campaigns). Perencanaan saja, tidak menjurnal.
+ */
+export type Kampanye = Prisma.KampanyeModel
+/**
+ * Model SetIklan
+ * Set iklan (Meta: ad set). Proyek dan perusahaan mengikuti kampanye.
+ */
+export type SetIklan = Prisma.SetIklanModel
+/**
+ * Model Iklan
+ * Iklan di dalam set iklan. Kampanye dibaca lewat setIklan.
+ */
+export type Iklan = Prisma.IklanModel
+/**
+ * Model MetrikIklan
+ * Laporan hasil harian per kampanye, diketik manual. Satu baris per kampanye per tanggal.
+ */
+export type MetrikIklan = Prisma.MetrikIklanModel
+/**
+ * Model PengaturanPemasaran
+ * Daftar pilihan jenis & pilar konten per perusahaan (HKA content_types, content_pillars). Tanpa baris = bawaan di src/lib/pemasaran.ts.
+ * perusahaanId sebagai kunci utama tanpa bawaan "utama" (D6 menyimpang dari kontrak): penyimpanan yang lupa
+ * mengirim perusahaan harus gagal, bukan diam-diam menimpa pengaturan DPRO.
+ */
+export type PengaturanPemasaran = Prisma.PengaturanPemasaranModel

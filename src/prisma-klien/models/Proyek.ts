@@ -47,6 +47,9 @@ export type ProyekMinAggregateOutputType = {
   tanggalMulai: Date | null
   tanggalSelesai: Date | null
   keterangan: string | null
+  warna: string | null
+  namaKlien: string | null
+  perusahaanId: string | null
 }
 
 export type ProyekMaxAggregateOutputType = {
@@ -60,6 +63,9 @@ export type ProyekMaxAggregateOutputType = {
   tanggalMulai: Date | null
   tanggalSelesai: Date | null
   keterangan: string | null
+  warna: string | null
+  namaKlien: string | null
+  perusahaanId: string | null
 }
 
 export type ProyekCountAggregateOutputType = {
@@ -73,6 +79,9 @@ export type ProyekCountAggregateOutputType = {
   tanggalMulai: number
   tanggalSelesai: number
   keterangan: number
+  warna: number
+  namaKlien: number
+  perusahaanId: number
   _all: number
 }
 
@@ -98,6 +107,9 @@ export type ProyekMinAggregateInputType = {
   tanggalMulai?: true
   tanggalSelesai?: true
   keterangan?: true
+  warna?: true
+  namaKlien?: true
+  perusahaanId?: true
 }
 
 export type ProyekMaxAggregateInputType = {
@@ -111,6 +123,9 @@ export type ProyekMaxAggregateInputType = {
   tanggalMulai?: true
   tanggalSelesai?: true
   keterangan?: true
+  warna?: true
+  namaKlien?: true
+  perusahaanId?: true
 }
 
 export type ProyekCountAggregateInputType = {
@@ -124,6 +139,9 @@ export type ProyekCountAggregateInputType = {
   tanggalMulai?: true
   tanggalSelesai?: true
   keterangan?: true
+  warna?: true
+  namaKlien?: true
+  perusahaanId?: true
   _all?: true
 }
 
@@ -224,6 +242,9 @@ export type ProyekGroupByOutputType = {
   tanggalMulai: Date | null
   tanggalSelesai: Date | null
   keterangan: string | null
+  warna: string | null
+  namaKlien: string | null
+  perusahaanId: string
   _count: ProyekCountAggregateOutputType | null
   _avg: ProyekAvgAggregateOutputType | null
   _sum: ProyekSumAggregateOutputType | null
@@ -260,7 +281,11 @@ export type ProyekWhereInput = {
   tanggalMulai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
   tanggalSelesai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
   keterangan?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  warna?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  namaKlien?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Proyek"> | string
   pelanggan?: Prisma.XOR<Prisma.PelangganNullableScalarRelationFilter, Prisma.PelangganWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   penawaran?: Prisma.PenawaranPenjualanListRelationFilter
   pesanan?: Prisma.PesananPenjualanListRelationFilter
   pesananPembelian?: Prisma.PesananPembelianListRelationFilter
@@ -269,6 +294,17 @@ export type ProyekWhereInput = {
   dokumenKas?: Prisma.DokumenKasListRelationFilter
   peminjaman?: Prisma.PeminjamanBarangListRelationFilter
   kerusakan?: Prisma.LaporanKerusakanBarangListRelationFilter
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanListRelationFilter
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanListRelationFilter
+  berkas?: Prisma.BerkasListRelationFilter
+  aksesBerkas?: Prisma.XOR<Prisma.AksesBerkasProyekNullableScalarRelationFilter, Prisma.AksesBerkasProyekWhereInput> | null
+  barisAnggaran?: Prisma.BarisAnggaranProyekListRelationFilter
+  mitra?: Prisma.MitraProyekListRelationFilter
+  talanganMitra?: Prisma.TalanganMitraListRelationFilter
+  pembayaranMitra?: Prisma.PembayaranMitraListRelationFilter
+  konten?: Prisma.KontenListRelationFilter
+  tugasDesain?: Prisma.TugasDesainListRelationFilter
+  kampanye?: Prisma.KampanyeListRelationFilter
 }
 
 export type ProyekOrderByWithRelationInput = {
@@ -282,7 +318,11 @@ export type ProyekOrderByWithRelationInput = {
   tanggalMulai?: Prisma.SortOrderInput | Prisma.SortOrder
   tanggalSelesai?: Prisma.SortOrderInput | Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
+  warna?: Prisma.SortOrderInput | Prisma.SortOrder
+  namaKlien?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   pelanggan?: Prisma.PelangganOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   penawaran?: Prisma.PenawaranPenjualanOrderByRelationAggregateInput
   pesanan?: Prisma.PesananPenjualanOrderByRelationAggregateInput
   pesananPembelian?: Prisma.PesananPembelianOrderByRelationAggregateInput
@@ -291,6 +331,17 @@ export type ProyekOrderByWithRelationInput = {
   dokumenKas?: Prisma.DokumenKasOrderByRelationAggregateInput
   peminjaman?: Prisma.PeminjamanBarangOrderByRelationAggregateInput
   kerusakan?: Prisma.LaporanKerusakanBarangOrderByRelationAggregateInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanOrderByRelationAggregateInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanOrderByRelationAggregateInput
+  berkas?: Prisma.BerkasOrderByRelationAggregateInput
+  aksesBerkas?: Prisma.AksesBerkasProyekOrderByWithRelationInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekOrderByRelationAggregateInput
+  mitra?: Prisma.MitraProyekOrderByRelationAggregateInput
+  talanganMitra?: Prisma.TalanganMitraOrderByRelationAggregateInput
+  pembayaranMitra?: Prisma.PembayaranMitraOrderByRelationAggregateInput
+  konten?: Prisma.KontenOrderByRelationAggregateInput
+  tugasDesain?: Prisma.TugasDesainOrderByRelationAggregateInput
+  kampanye?: Prisma.KampanyeOrderByRelationAggregateInput
 }
 
 export type ProyekWhereUniqueInput = Prisma.AtLeast<{
@@ -307,7 +358,11 @@ export type ProyekWhereUniqueInput = Prisma.AtLeast<{
   tanggalMulai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
   tanggalSelesai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
   keterangan?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  warna?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  namaKlien?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Proyek"> | string
   pelanggan?: Prisma.XOR<Prisma.PelangganNullableScalarRelationFilter, Prisma.PelangganWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   penawaran?: Prisma.PenawaranPenjualanListRelationFilter
   pesanan?: Prisma.PesananPenjualanListRelationFilter
   pesananPembelian?: Prisma.PesananPembelianListRelationFilter
@@ -316,6 +371,17 @@ export type ProyekWhereUniqueInput = Prisma.AtLeast<{
   dokumenKas?: Prisma.DokumenKasListRelationFilter
   peminjaman?: Prisma.PeminjamanBarangListRelationFilter
   kerusakan?: Prisma.LaporanKerusakanBarangListRelationFilter
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanListRelationFilter
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanListRelationFilter
+  berkas?: Prisma.BerkasListRelationFilter
+  aksesBerkas?: Prisma.XOR<Prisma.AksesBerkasProyekNullableScalarRelationFilter, Prisma.AksesBerkasProyekWhereInput> | null
+  barisAnggaran?: Prisma.BarisAnggaranProyekListRelationFilter
+  mitra?: Prisma.MitraProyekListRelationFilter
+  talanganMitra?: Prisma.TalanganMitraListRelationFilter
+  pembayaranMitra?: Prisma.PembayaranMitraListRelationFilter
+  konten?: Prisma.KontenListRelationFilter
+  tugasDesain?: Prisma.TugasDesainListRelationFilter
+  kampanye?: Prisma.KampanyeListRelationFilter
 }, "id" | "kode">
 
 export type ProyekOrderByWithAggregationInput = {
@@ -329,6 +395,9 @@ export type ProyekOrderByWithAggregationInput = {
   tanggalMulai?: Prisma.SortOrderInput | Prisma.SortOrder
   tanggalSelesai?: Prisma.SortOrderInput | Prisma.SortOrder
   keterangan?: Prisma.SortOrderInput | Prisma.SortOrder
+  warna?: Prisma.SortOrderInput | Prisma.SortOrder
+  namaKlien?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   _count?: Prisma.ProyekCountOrderByAggregateInput
   _avg?: Prisma.ProyekAvgOrderByAggregateInput
   _max?: Prisma.ProyekMaxOrderByAggregateInput
@@ -350,6 +419,9 @@ export type ProyekScalarWhereWithAggregatesInput = {
   tanggalMulai?: Prisma.DateTimeNullableWithAggregatesFilter<"Proyek"> | Date | string | null
   tanggalSelesai?: Prisma.DateTimeNullableWithAggregatesFilter<"Proyek"> | Date | string | null
   keterangan?: Prisma.StringNullableWithAggregatesFilter<"Proyek"> | string | null
+  warna?: Prisma.StringNullableWithAggregatesFilter<"Proyek"> | string | null
+  namaKlien?: Prisma.StringNullableWithAggregatesFilter<"Proyek"> | string | null
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"Proyek"> | string
 }
 
 export type ProyekCreateInput = {
@@ -362,7 +434,10 @@ export type ProyekCreateInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -371,6 +446,17 @@ export type ProyekCreateInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateInput = {
@@ -384,6 +470,9 @@ export type ProyekUncheckedCreateInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -392,6 +481,17 @@ export type ProyekUncheckedCreateInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUpdateInput = {
@@ -404,7 +504,10 @@ export type ProyekUpdateInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -413,6 +516,17 @@ export type ProyekUpdateInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateInput = {
@@ -426,6 +540,9 @@ export type ProyekUncheckedUpdateInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -434,6 +551,17 @@ export type ProyekUncheckedUpdateInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateManyInput = {
@@ -447,6 +575,9 @@ export type ProyekCreateManyInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
 }
 
 export type ProyekUpdateManyMutationInput = {
@@ -459,6 +590,8 @@ export type ProyekUpdateManyMutationInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ProyekUncheckedUpdateManyInput = {
@@ -472,6 +605,9 @@ export type ProyekUncheckedUpdateManyInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ProyekListRelationFilter = {
@@ -482,6 +618,11 @@ export type ProyekListRelationFilter = {
 
 export type ProyekOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type ProyekNullableScalarRelationFilter = {
+  is?: Prisma.ProyekWhereInput | null
+  isNot?: Prisma.ProyekWhereInput | null
 }
 
 export type ProyekCountOrderByAggregateInput = {
@@ -495,6 +636,9 @@ export type ProyekCountOrderByAggregateInput = {
   tanggalMulai?: Prisma.SortOrder
   tanggalSelesai?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  warna?: Prisma.SortOrder
+  namaKlien?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type ProyekAvgOrderByAggregateInput = {
@@ -513,6 +657,9 @@ export type ProyekMaxOrderByAggregateInput = {
   tanggalMulai?: Prisma.SortOrder
   tanggalSelesai?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  warna?: Prisma.SortOrder
+  namaKlien?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type ProyekMinOrderByAggregateInput = {
@@ -526,6 +673,9 @@ export type ProyekMinOrderByAggregateInput = {
   tanggalMulai?: Prisma.SortOrder
   tanggalSelesai?: Prisma.SortOrder
   keterangan?: Prisma.SortOrder
+  warna?: Prisma.SortOrder
+  namaKlien?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
 }
 
 export type ProyekSumOrderByAggregateInput = {
@@ -533,9 +683,83 @@ export type ProyekSumOrderByAggregateInput = {
   anggaranBiaya?: Prisma.SortOrder
 }
 
-export type ProyekNullableScalarRelationFilter = {
-  is?: Prisma.ProyekWhereInput | null
-  isNot?: Prisma.ProyekWhereInput | null
+export type ProyekScalarRelationFilter = {
+  is?: Prisma.ProyekWhereInput
+  isNot?: Prisma.ProyekWhereInput
+}
+
+export type ProyekCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutPerusahaanInput, Prisma.ProyekUncheckedCreateWithoutPerusahaanInput> | Prisma.ProyekCreateWithoutPerusahaanInput[] | Prisma.ProyekUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPerusahaanInput | Prisma.ProyekCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.ProyekCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+}
+
+export type ProyekUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutPerusahaanInput, Prisma.ProyekUncheckedCreateWithoutPerusahaanInput> | Prisma.ProyekCreateWithoutPerusahaanInput[] | Prisma.ProyekUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPerusahaanInput | Prisma.ProyekCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.ProyekCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+}
+
+export type ProyekUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutPerusahaanInput, Prisma.ProyekUncheckedCreateWithoutPerusahaanInput> | Prisma.ProyekCreateWithoutPerusahaanInput[] | Prisma.ProyekUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPerusahaanInput | Prisma.ProyekCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.ProyekUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.ProyekUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.ProyekCreateManyPerusahaanInputEnvelope
+  set?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  disconnect?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  delete?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  connect?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  update?: Prisma.ProyekUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.ProyekUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.ProyekUpdateManyWithWhereWithoutPerusahaanInput | Prisma.ProyekUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.ProyekScalarWhereInput | Prisma.ProyekScalarWhereInput[]
+}
+
+export type ProyekUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutPerusahaanInput, Prisma.ProyekUncheckedCreateWithoutPerusahaanInput> | Prisma.ProyekCreateWithoutPerusahaanInput[] | Prisma.ProyekUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPerusahaanInput | Prisma.ProyekCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.ProyekUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.ProyekUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.ProyekCreateManyPerusahaanInputEnvelope
+  set?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  disconnect?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  delete?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  connect?: Prisma.ProyekWhereUniqueInput | Prisma.ProyekWhereUniqueInput[]
+  update?: Prisma.ProyekUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.ProyekUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.ProyekUpdateManyWithWhereWithoutPerusahaanInput | Prisma.ProyekUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.ProyekScalarWhereInput | Prisma.ProyekScalarWhereInput[]
+}
+
+export type ProyekCreateNestedOneWithoutAntarSebagaiProyekPemberiInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPemberiInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutAntarSebagaiProyekPemberiInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekCreateNestedOneWithoutAntarSebagaiProyekPenerimaInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPenerimaInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutAntarSebagaiProyekPenerimaInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneWithoutAntarSebagaiProyekPemberiNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPemberiInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutAntarSebagaiProyekPemberiInput
+  upsert?: Prisma.ProyekUpsertWithoutAntarSebagaiProyekPemberiInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUpdateWithoutAntarSebagaiProyekPemberiInput>, Prisma.ProyekUncheckedUpdateWithoutAntarSebagaiProyekPemberiInput>
+}
+
+export type ProyekUpdateOneWithoutAntarSebagaiProyekPenerimaNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPenerimaInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutAntarSebagaiProyekPenerimaInput
+  upsert?: Prisma.ProyekUpsertWithoutAntarSebagaiProyekPenerimaInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUpdateWithoutAntarSebagaiProyekPenerimaInput>, Prisma.ProyekUncheckedUpdateWithoutAntarSebagaiProyekPenerimaInput>
 }
 
 export type ProyekCreateNestedManyWithoutPelangganInput = {
@@ -716,6 +940,557 @@ export type ProyekUpdateOneWithoutPenggajianNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutPenggajianInput, Prisma.ProyekUpdateWithoutPenggajianInput>, Prisma.ProyekUncheckedUpdateWithoutPenggajianInput>
 }
 
+export type ProyekCreateNestedOneWithoutBerkasInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutBerkasInput, Prisma.ProyekUncheckedCreateWithoutBerkasInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutBerkasInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneWithoutBerkasNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutBerkasInput, Prisma.ProyekUncheckedCreateWithoutBerkasInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutBerkasInput
+  upsert?: Prisma.ProyekUpsertWithoutBerkasInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutBerkasInput, Prisma.ProyekUpdateWithoutBerkasInput>, Prisma.ProyekUncheckedUpdateWithoutBerkasInput>
+}
+
+export type ProyekCreateNestedOneWithoutAksesBerkasInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutAksesBerkasInput, Prisma.ProyekUncheckedCreateWithoutAksesBerkasInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutAksesBerkasInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneRequiredWithoutAksesBerkasNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutAksesBerkasInput, Prisma.ProyekUncheckedCreateWithoutAksesBerkasInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutAksesBerkasInput
+  upsert?: Prisma.ProyekUpsertWithoutAksesBerkasInput
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutAksesBerkasInput, Prisma.ProyekUpdateWithoutAksesBerkasInput>, Prisma.ProyekUncheckedUpdateWithoutAksesBerkasInput>
+}
+
+export type ProyekCreateNestedOneWithoutBarisAnggaranInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutBarisAnggaranInput, Prisma.ProyekUncheckedCreateWithoutBarisAnggaranInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutBarisAnggaranInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneRequiredWithoutBarisAnggaranNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutBarisAnggaranInput, Prisma.ProyekUncheckedCreateWithoutBarisAnggaranInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutBarisAnggaranInput
+  upsert?: Prisma.ProyekUpsertWithoutBarisAnggaranInput
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutBarisAnggaranInput, Prisma.ProyekUpdateWithoutBarisAnggaranInput>, Prisma.ProyekUncheckedUpdateWithoutBarisAnggaranInput>
+}
+
+export type ProyekCreateNestedOneWithoutMitraInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutMitraInput, Prisma.ProyekUncheckedCreateWithoutMitraInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutMitraInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneRequiredWithoutMitraNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutMitraInput, Prisma.ProyekUncheckedCreateWithoutMitraInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutMitraInput
+  upsert?: Prisma.ProyekUpsertWithoutMitraInput
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutMitraInput, Prisma.ProyekUpdateWithoutMitraInput>, Prisma.ProyekUncheckedUpdateWithoutMitraInput>
+}
+
+export type ProyekCreateNestedOneWithoutTalanganMitraInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutTalanganMitraInput, Prisma.ProyekUncheckedCreateWithoutTalanganMitraInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutTalanganMitraInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneRequiredWithoutTalanganMitraNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutTalanganMitraInput, Prisma.ProyekUncheckedCreateWithoutTalanganMitraInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutTalanganMitraInput
+  upsert?: Prisma.ProyekUpsertWithoutTalanganMitraInput
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutTalanganMitraInput, Prisma.ProyekUpdateWithoutTalanganMitraInput>, Prisma.ProyekUncheckedUpdateWithoutTalanganMitraInput>
+}
+
+export type ProyekCreateNestedOneWithoutPembayaranMitraInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutPembayaranMitraInput, Prisma.ProyekUncheckedCreateWithoutPembayaranMitraInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPembayaranMitraInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneRequiredWithoutPembayaranMitraNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutPembayaranMitraInput, Prisma.ProyekUncheckedCreateWithoutPembayaranMitraInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutPembayaranMitraInput
+  upsert?: Prisma.ProyekUpsertWithoutPembayaranMitraInput
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutPembayaranMitraInput, Prisma.ProyekUpdateWithoutPembayaranMitraInput>, Prisma.ProyekUncheckedUpdateWithoutPembayaranMitraInput>
+}
+
+export type ProyekCreateNestedOneWithoutKontenInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutKontenInput, Prisma.ProyekUncheckedCreateWithoutKontenInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutKontenInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneWithoutKontenNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutKontenInput, Prisma.ProyekUncheckedCreateWithoutKontenInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutKontenInput
+  upsert?: Prisma.ProyekUpsertWithoutKontenInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutKontenInput, Prisma.ProyekUpdateWithoutKontenInput>, Prisma.ProyekUncheckedUpdateWithoutKontenInput>
+}
+
+export type ProyekCreateNestedOneWithoutTugasDesainInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutTugasDesainInput, Prisma.ProyekUncheckedCreateWithoutTugasDesainInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutTugasDesainInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneWithoutTugasDesainNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutTugasDesainInput, Prisma.ProyekUncheckedCreateWithoutTugasDesainInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutTugasDesainInput
+  upsert?: Prisma.ProyekUpsertWithoutTugasDesainInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutTugasDesainInput, Prisma.ProyekUpdateWithoutTugasDesainInput>, Prisma.ProyekUncheckedUpdateWithoutTugasDesainInput>
+}
+
+export type ProyekCreateNestedOneWithoutKampanyeInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutKampanyeInput, Prisma.ProyekUncheckedCreateWithoutKampanyeInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutKampanyeInput
+  connect?: Prisma.ProyekWhereUniqueInput
+}
+
+export type ProyekUpdateOneWithoutKampanyeNestedInput = {
+  create?: Prisma.XOR<Prisma.ProyekCreateWithoutKampanyeInput, Prisma.ProyekUncheckedCreateWithoutKampanyeInput>
+  connectOrCreate?: Prisma.ProyekCreateOrConnectWithoutKampanyeInput
+  upsert?: Prisma.ProyekUpsertWithoutKampanyeInput
+  disconnect?: Prisma.ProyekWhereInput | boolean
+  delete?: Prisma.ProyekWhereInput | boolean
+  connect?: Prisma.ProyekWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProyekUpdateToOneWithWhereWithoutKampanyeInput, Prisma.ProyekUpdateWithoutKampanyeInput>, Prisma.ProyekUncheckedUpdateWithoutKampanyeInput>
+}
+
+export type ProyekCreateWithoutPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutPerusahaanInput, Prisma.ProyekUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type ProyekCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.ProyekCreateManyPerusahaanInput | Prisma.ProyekCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type ProyekUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutPerusahaanInput, Prisma.ProyekUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutPerusahaanInput, Prisma.ProyekUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type ProyekUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutPerusahaanInput, Prisma.ProyekUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type ProyekUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.ProyekScalarWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateManyMutationInput, Prisma.ProyekUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
+export type ProyekScalarWhereInput = {
+  AND?: Prisma.ProyekScalarWhereInput | Prisma.ProyekScalarWhereInput[]
+  OR?: Prisma.ProyekScalarWhereInput[]
+  NOT?: Prisma.ProyekScalarWhereInput | Prisma.ProyekScalarWhereInput[]
+  id?: Prisma.StringFilter<"Proyek"> | string
+  kode?: Prisma.StringFilter<"Proyek"> | string
+  nama?: Prisma.StringFilter<"Proyek"> | string
+  pelangganId?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  status?: Prisma.StringFilter<"Proyek"> | string
+  nilaiKontrak?: Prisma.DecimalNullableFilter<"Proyek"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.DecimalNullableFilter<"Proyek"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
+  tanggalSelesai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
+  keterangan?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  warna?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  namaKlien?: Prisma.StringNullableFilter<"Proyek"> | string | null
+  perusahaanId?: Prisma.StringFilter<"Proyek"> | string
+}
+
+export type ProyekCreateWithoutAntarSebagaiProyekPemberiInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutAntarSebagaiProyekPemberiInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutAntarSebagaiProyekPemberiInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPemberiInput>
+}
+
+export type ProyekCreateWithoutAntarSebagaiProyekPenerimaInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutAntarSebagaiProyekPenerimaInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutAntarSebagaiProyekPenerimaInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPenerimaInput>
+}
+
+export type ProyekUpsertWithoutAntarSebagaiProyekPemberiInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUncheckedUpdateWithoutAntarSebagaiProyekPemberiInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPemberiInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutAntarSebagaiProyekPemberiInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutAntarSebagaiProyekPemberiInput, Prisma.ProyekUncheckedUpdateWithoutAntarSebagaiProyekPemberiInput>
+}
+
+export type ProyekUpdateWithoutAntarSebagaiProyekPemberiInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutAntarSebagaiProyekPemberiInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUpsertWithoutAntarSebagaiProyekPenerimaInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUncheckedUpdateWithoutAntarSebagaiProyekPenerimaInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUncheckedCreateWithoutAntarSebagaiProyekPenerimaInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutAntarSebagaiProyekPenerimaInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutAntarSebagaiProyekPenerimaInput, Prisma.ProyekUncheckedUpdateWithoutAntarSebagaiProyekPenerimaInput>
+}
+
+export type ProyekUpdateWithoutAntarSebagaiProyekPenerimaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutAntarSebagaiProyekPenerimaInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
 export type ProyekCreateWithoutPelangganInput = {
   id?: string
   kode: string
@@ -726,6 +1501,9 @@ export type ProyekCreateWithoutPelangganInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -734,6 +1512,17 @@ export type ProyekCreateWithoutPelangganInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPelangganInput = {
@@ -746,6 +1535,9 @@ export type ProyekUncheckedCreateWithoutPelangganInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -754,6 +1546,17 @@ export type ProyekUncheckedCreateWithoutPelangganInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPelangganInput = {
@@ -782,22 +1585,6 @@ export type ProyekUpdateManyWithWhereWithoutPelangganInput = {
   data: Prisma.XOR<Prisma.ProyekUpdateManyMutationInput, Prisma.ProyekUncheckedUpdateManyWithoutPelangganInput>
 }
 
-export type ProyekScalarWhereInput = {
-  AND?: Prisma.ProyekScalarWhereInput | Prisma.ProyekScalarWhereInput[]
-  OR?: Prisma.ProyekScalarWhereInput[]
-  NOT?: Prisma.ProyekScalarWhereInput | Prisma.ProyekScalarWhereInput[]
-  id?: Prisma.StringFilter<"Proyek"> | string
-  kode?: Prisma.StringFilter<"Proyek"> | string
-  nama?: Prisma.StringFilter<"Proyek"> | string
-  pelangganId?: Prisma.StringNullableFilter<"Proyek"> | string | null
-  status?: Prisma.StringFilter<"Proyek"> | string
-  nilaiKontrak?: Prisma.DecimalNullableFilter<"Proyek"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  anggaranBiaya?: Prisma.DecimalNullableFilter<"Proyek"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  tanggalMulai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
-  tanggalSelesai?: Prisma.DateTimeNullableFilter<"Proyek"> | Date | string | null
-  keterangan?: Prisma.StringNullableFilter<"Proyek"> | string | null
-}
-
 export type ProyekCreateWithoutPenawaranInput = {
   id?: string
   kode: string
@@ -808,7 +1595,10 @@ export type ProyekCreateWithoutPenawaranInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
@@ -816,6 +1606,17 @@ export type ProyekCreateWithoutPenawaranInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPenawaranInput = {
@@ -829,6 +1630,9 @@ export type ProyekUncheckedCreateWithoutPenawaranInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
@@ -836,6 +1640,17 @@ export type ProyekUncheckedCreateWithoutPenawaranInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPenawaranInput = {
@@ -864,7 +1679,10 @@ export type ProyekUpdateWithoutPenawaranInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
@@ -872,6 +1690,17 @@ export type ProyekUpdateWithoutPenawaranInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPenawaranInput = {
@@ -885,6 +1714,9 @@ export type ProyekUncheckedUpdateWithoutPenawaranInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
@@ -892,6 +1724,17 @@ export type ProyekUncheckedUpdateWithoutPenawaranInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutPesananInput = {
@@ -904,7 +1747,10 @@ export type ProyekCreateWithoutPesananInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
@@ -912,6 +1758,17 @@ export type ProyekCreateWithoutPesananInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPesananInput = {
@@ -925,6 +1782,9 @@ export type ProyekUncheckedCreateWithoutPesananInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
@@ -932,6 +1792,17 @@ export type ProyekUncheckedCreateWithoutPesananInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPesananInput = {
@@ -960,7 +1831,10 @@ export type ProyekUpdateWithoutPesananInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
@@ -968,6 +1842,17 @@ export type ProyekUpdateWithoutPesananInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPesananInput = {
@@ -981,6 +1866,9 @@ export type ProyekUncheckedUpdateWithoutPesananInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
@@ -988,6 +1876,17 @@ export type ProyekUncheckedUpdateWithoutPesananInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutPesananPembelianInput = {
@@ -1000,7 +1899,10 @@ export type ProyekCreateWithoutPesananPembelianInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
@@ -1008,6 +1910,17 @@ export type ProyekCreateWithoutPesananPembelianInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPesananPembelianInput = {
@@ -1021,6 +1934,9 @@ export type ProyekUncheckedCreateWithoutPesananPembelianInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
@@ -1028,6 +1944,17 @@ export type ProyekUncheckedCreateWithoutPesananPembelianInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPesananPembelianInput = {
@@ -1056,7 +1983,10 @@ export type ProyekUpdateWithoutPesananPembelianInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
@@ -1064,6 +1994,17 @@ export type ProyekUpdateWithoutPesananPembelianInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPesananPembelianInput = {
@@ -1077,6 +2018,9 @@ export type ProyekUncheckedUpdateWithoutPesananPembelianInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
@@ -1084,6 +2028,17 @@ export type ProyekUncheckedUpdateWithoutPesananPembelianInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutJurnalInput = {
@@ -1096,7 +2051,10 @@ export type ProyekCreateWithoutJurnalInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -1104,6 +2062,17 @@ export type ProyekCreateWithoutJurnalInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutJurnalInput = {
@@ -1117,6 +2086,9 @@ export type ProyekUncheckedCreateWithoutJurnalInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -1124,6 +2096,17 @@ export type ProyekUncheckedCreateWithoutJurnalInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutJurnalInput = {
@@ -1152,7 +2135,10 @@ export type ProyekUpdateWithoutJurnalInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -1160,6 +2146,17 @@ export type ProyekUpdateWithoutJurnalInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutJurnalInput = {
@@ -1173,6 +2170,9 @@ export type ProyekUncheckedUpdateWithoutJurnalInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -1180,6 +2180,17 @@ export type ProyekUncheckedUpdateWithoutJurnalInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutDokumenKasInput = {
@@ -1192,7 +2203,10 @@ export type ProyekCreateWithoutDokumenKasInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -1200,6 +2214,17 @@ export type ProyekCreateWithoutDokumenKasInput = {
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutDokumenKasInput = {
@@ -1213,6 +2238,9 @@ export type ProyekUncheckedCreateWithoutDokumenKasInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -1220,6 +2248,17 @@ export type ProyekUncheckedCreateWithoutDokumenKasInput = {
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutDokumenKasInput = {
@@ -1248,7 +2287,10 @@ export type ProyekUpdateWithoutDokumenKasInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -1256,6 +2298,17 @@ export type ProyekUpdateWithoutDokumenKasInput = {
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutDokumenKasInput = {
@@ -1269,6 +2322,9 @@ export type ProyekUncheckedUpdateWithoutDokumenKasInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -1276,6 +2332,17 @@ export type ProyekUncheckedUpdateWithoutDokumenKasInput = {
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutPeminjamanInput = {
@@ -1288,7 +2355,10 @@ export type ProyekCreateWithoutPeminjamanInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -1296,6 +2366,17 @@ export type ProyekCreateWithoutPeminjamanInput = {
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPeminjamanInput = {
@@ -1309,6 +2390,9 @@ export type ProyekUncheckedCreateWithoutPeminjamanInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -1316,6 +2400,17 @@ export type ProyekUncheckedCreateWithoutPeminjamanInput = {
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPeminjamanInput = {
@@ -1344,7 +2439,10 @@ export type ProyekUpdateWithoutPeminjamanInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -1352,6 +2450,17 @@ export type ProyekUpdateWithoutPeminjamanInput = {
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPeminjamanInput = {
@@ -1365,6 +2474,9 @@ export type ProyekUncheckedUpdateWithoutPeminjamanInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -1372,6 +2484,17 @@ export type ProyekUncheckedUpdateWithoutPeminjamanInput = {
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutKerusakanInput = {
@@ -1384,7 +2507,10 @@ export type ProyekCreateWithoutKerusakanInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -1392,6 +2518,17 @@ export type ProyekCreateWithoutKerusakanInput = {
   penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutKerusakanInput = {
@@ -1405,6 +2542,9 @@ export type ProyekUncheckedCreateWithoutKerusakanInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -1412,6 +2552,17 @@ export type ProyekUncheckedCreateWithoutKerusakanInput = {
   penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutKerusakanInput = {
@@ -1440,7 +2591,10 @@ export type ProyekUpdateWithoutKerusakanInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -1448,6 +2602,17 @@ export type ProyekUpdateWithoutKerusakanInput = {
   penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutKerusakanInput = {
@@ -1461,6 +2626,9 @@ export type ProyekUncheckedUpdateWithoutKerusakanInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -1468,6 +2636,17 @@ export type ProyekUncheckedUpdateWithoutKerusakanInput = {
   penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekCreateWithoutPenggajianInput = {
@@ -1480,7 +2659,10 @@ export type ProyekCreateWithoutPenggajianInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
   pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
   penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
@@ -1488,6 +2670,17 @@ export type ProyekCreateWithoutPenggajianInput = {
   dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekUncheckedCreateWithoutPenggajianInput = {
@@ -1501,6 +2694,9 @@ export type ProyekUncheckedCreateWithoutPenggajianInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
   penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
@@ -1508,6 +2704,17 @@ export type ProyekUncheckedCreateWithoutPenggajianInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
 }
 
 export type ProyekCreateOrConnectWithoutPenggajianInput = {
@@ -1536,7 +2743,10 @@ export type ProyekUpdateWithoutPenggajianInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -1544,6 +2754,17 @@ export type ProyekUpdateWithoutPenggajianInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPenggajianInput = {
@@ -1557,6 +2778,9 @@ export type ProyekUncheckedUpdateWithoutPenggajianInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -1564,6 +2788,1483 @@ export type ProyekUncheckedUpdateWithoutPenggajianInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutBerkasInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutBerkasInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutBerkasInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutBerkasInput, Prisma.ProyekUncheckedCreateWithoutBerkasInput>
+}
+
+export type ProyekUpsertWithoutBerkasInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutBerkasInput, Prisma.ProyekUncheckedUpdateWithoutBerkasInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutBerkasInput, Prisma.ProyekUncheckedCreateWithoutBerkasInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutBerkasInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutBerkasInput, Prisma.ProyekUncheckedUpdateWithoutBerkasInput>
+}
+
+export type ProyekUpdateWithoutBerkasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutBerkasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutAksesBerkasInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutAksesBerkasInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutAksesBerkasInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutAksesBerkasInput, Prisma.ProyekUncheckedCreateWithoutAksesBerkasInput>
+}
+
+export type ProyekUpsertWithoutAksesBerkasInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutAksesBerkasInput, Prisma.ProyekUncheckedUpdateWithoutAksesBerkasInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutAksesBerkasInput, Prisma.ProyekUncheckedCreateWithoutAksesBerkasInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutAksesBerkasInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutAksesBerkasInput, Prisma.ProyekUncheckedUpdateWithoutAksesBerkasInput>
+}
+
+export type ProyekUpdateWithoutAksesBerkasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutAksesBerkasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutBarisAnggaranInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutBarisAnggaranInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutBarisAnggaranInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutBarisAnggaranInput, Prisma.ProyekUncheckedCreateWithoutBarisAnggaranInput>
+}
+
+export type ProyekUpsertWithoutBarisAnggaranInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutBarisAnggaranInput, Prisma.ProyekUncheckedUpdateWithoutBarisAnggaranInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutBarisAnggaranInput, Prisma.ProyekUncheckedCreateWithoutBarisAnggaranInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutBarisAnggaranInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutBarisAnggaranInput, Prisma.ProyekUncheckedUpdateWithoutBarisAnggaranInput>
+}
+
+export type ProyekUpdateWithoutBarisAnggaranInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutBarisAnggaranInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutMitraInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutMitraInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutMitraInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutMitraInput, Prisma.ProyekUncheckedCreateWithoutMitraInput>
+}
+
+export type ProyekUpsertWithoutMitraInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutMitraInput, Prisma.ProyekUncheckedUpdateWithoutMitraInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutMitraInput, Prisma.ProyekUncheckedCreateWithoutMitraInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutMitraInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutMitraInput, Prisma.ProyekUncheckedUpdateWithoutMitraInput>
+}
+
+export type ProyekUpdateWithoutMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutTalanganMitraInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutTalanganMitraInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutTalanganMitraInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutTalanganMitraInput, Prisma.ProyekUncheckedCreateWithoutTalanganMitraInput>
+}
+
+export type ProyekUpsertWithoutTalanganMitraInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutTalanganMitraInput, Prisma.ProyekUncheckedUpdateWithoutTalanganMitraInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutTalanganMitraInput, Prisma.ProyekUncheckedCreateWithoutTalanganMitraInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutTalanganMitraInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutTalanganMitraInput, Prisma.ProyekUncheckedUpdateWithoutTalanganMitraInput>
+}
+
+export type ProyekUpdateWithoutTalanganMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutTalanganMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutPembayaranMitraInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutPembayaranMitraInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutPembayaranMitraInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutPembayaranMitraInput, Prisma.ProyekUncheckedCreateWithoutPembayaranMitraInput>
+}
+
+export type ProyekUpsertWithoutPembayaranMitraInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutPembayaranMitraInput, Prisma.ProyekUncheckedUpdateWithoutPembayaranMitraInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutPembayaranMitraInput, Prisma.ProyekUncheckedCreateWithoutPembayaranMitraInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutPembayaranMitraInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutPembayaranMitraInput, Prisma.ProyekUncheckedUpdateWithoutPembayaranMitraInput>
+}
+
+export type ProyekUpdateWithoutPembayaranMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutPembayaranMitraInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutKontenInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutKontenInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutKontenInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutKontenInput, Prisma.ProyekUncheckedCreateWithoutKontenInput>
+}
+
+export type ProyekUpsertWithoutKontenInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutKontenInput, Prisma.ProyekUncheckedUpdateWithoutKontenInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutKontenInput, Prisma.ProyekUncheckedCreateWithoutKontenInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutKontenInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutKontenInput, Prisma.ProyekUncheckedUpdateWithoutKontenInput>
+}
+
+export type ProyekUpdateWithoutKontenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutKontenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutTugasDesainInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutTugasDesainInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  kampanye?: Prisma.KampanyeUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutTugasDesainInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutTugasDesainInput, Prisma.ProyekUncheckedCreateWithoutTugasDesainInput>
+}
+
+export type ProyekUpsertWithoutTugasDesainInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutTugasDesainInput, Prisma.ProyekUncheckedUpdateWithoutTugasDesainInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutTugasDesainInput, Prisma.ProyekUncheckedCreateWithoutTugasDesainInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutTugasDesainInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutTugasDesainInput, Prisma.ProyekUncheckedUpdateWithoutTugasDesainInput>
+}
+
+export type ProyekUpdateWithoutTugasDesainInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutTugasDesainInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateWithoutKampanyeInput = {
+  id?: string
+  kode: string
+  nama: string
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  pelanggan?: Prisma.PelangganCreateNestedOneWithoutProyekInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutProyekInput
+  penawaran?: Prisma.PenawaranPenjualanCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekUncheckedCreateWithoutKampanyeInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesanan?: Prisma.PesananPenjualanUncheckedCreateNestedManyWithoutProyekInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedCreateNestedManyWithoutProyekInput
+  jurnal?: Prisma.JurnalUncheckedCreateNestedManyWithoutProyekInput
+  penggajian?: Prisma.PenggajianUncheckedCreateNestedManyWithoutProyekInput
+  dokumenKas?: Prisma.DokumenKasUncheckedCreateNestedManyWithoutProyekInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedCreateNestedManyWithoutProyekInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedCreateNestedManyWithoutProyekInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPemberiInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedCreateNestedManyWithoutProyekPenerimaInput
+  berkas?: Prisma.BerkasUncheckedCreateNestedManyWithoutProyekInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedCreateNestedOneWithoutProyekInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedCreateNestedManyWithoutProyekInput
+  mitra?: Prisma.MitraProyekUncheckedCreateNestedManyWithoutProyekInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedCreateNestedManyWithoutProyekInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedCreateNestedManyWithoutProyekInput
+  konten?: Prisma.KontenUncheckedCreateNestedManyWithoutProyekInput
+  tugasDesain?: Prisma.TugasDesainUncheckedCreateNestedManyWithoutProyekInput
+}
+
+export type ProyekCreateOrConnectWithoutKampanyeInput = {
+  where: Prisma.ProyekWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutKampanyeInput, Prisma.ProyekUncheckedCreateWithoutKampanyeInput>
+}
+
+export type ProyekUpsertWithoutKampanyeInput = {
+  update: Prisma.XOR<Prisma.ProyekUpdateWithoutKampanyeInput, Prisma.ProyekUncheckedUpdateWithoutKampanyeInput>
+  create: Prisma.XOR<Prisma.ProyekCreateWithoutKampanyeInput, Prisma.ProyekUncheckedCreateWithoutKampanyeInput>
+  where?: Prisma.ProyekWhereInput
+}
+
+export type ProyekUpdateToOneWithWhereWithoutKampanyeInput = {
+  where?: Prisma.ProyekWhereInput
+  data: Prisma.XOR<Prisma.ProyekUpdateWithoutKampanyeInput, Prisma.ProyekUncheckedUpdateWithoutKampanyeInput>
+}
+
+export type ProyekUpdateWithoutKampanyeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutKampanyeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekCreateManyPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  pelangganId?: string | null
+  status?: string
+  nilaiKontrak?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Date | string | null
+  tanggalSelesai?: Date | string | null
+  keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+}
+
+export type ProyekUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pelanggan?: Prisma.PelangganUpdateOneWithoutProyekNestedInput
+  penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
+  pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
+  jurnal?: Prisma.JurnalUncheckedUpdateManyWithoutProyekNestedInput
+  penggajian?: Prisma.PenggajianUncheckedUpdateManyWithoutProyekNestedInput
+  dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
+  peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
+}
+
+export type ProyekUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  pelangganId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nilaiKontrak?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  anggaranBiaya?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ProyekCreateManyPelangganInput = {
@@ -1576,6 +4277,9 @@ export type ProyekCreateManyPelangganInput = {
   tanggalMulai?: Date | string | null
   tanggalSelesai?: Date | string | null
   keterangan?: string | null
+  warna?: string | null
+  namaKlien?: string | null
+  perusahaanId?: string
 }
 
 export type ProyekUpdateWithoutPelangganInput = {
@@ -1588,6 +4292,9 @@ export type ProyekUpdateWithoutPelangganInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutProyekNestedInput
   penawaran?: Prisma.PenawaranPenjualanUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUpdateManyWithoutProyekNestedInput
@@ -1596,6 +4303,17 @@ export type ProyekUpdateWithoutPelangganInput = {
   dokumenKas?: Prisma.DokumenKasUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateWithoutPelangganInput = {
@@ -1608,6 +4326,9 @@ export type ProyekUncheckedUpdateWithoutPelangganInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   penawaran?: Prisma.PenawaranPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesanan?: Prisma.PesananPenjualanUncheckedUpdateManyWithoutProyekNestedInput
   pesananPembelian?: Prisma.PesananPembelianUncheckedUpdateManyWithoutProyekNestedInput
@@ -1616,6 +4337,17 @@ export type ProyekUncheckedUpdateWithoutPelangganInput = {
   dokumenKas?: Prisma.DokumenKasUncheckedUpdateManyWithoutProyekNestedInput
   peminjaman?: Prisma.PeminjamanBarangUncheckedUpdateManyWithoutProyekNestedInput
   kerusakan?: Prisma.LaporanKerusakanBarangUncheckedUpdateManyWithoutProyekNestedInput
+  antarSebagaiProyekPemberi?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPemberiNestedInput
+  antarSebagaiProyekPenerima?: Prisma.TransaksiAntarPerusahaanUncheckedUpdateManyWithoutProyekPenerimaNestedInput
+  berkas?: Prisma.BerkasUncheckedUpdateManyWithoutProyekNestedInput
+  aksesBerkas?: Prisma.AksesBerkasProyekUncheckedUpdateOneWithoutProyekNestedInput
+  barisAnggaran?: Prisma.BarisAnggaranProyekUncheckedUpdateManyWithoutProyekNestedInput
+  mitra?: Prisma.MitraProyekUncheckedUpdateManyWithoutProyekNestedInput
+  talanganMitra?: Prisma.TalanganMitraUncheckedUpdateManyWithoutProyekNestedInput
+  pembayaranMitra?: Prisma.PembayaranMitraUncheckedUpdateManyWithoutProyekNestedInput
+  konten?: Prisma.KontenUncheckedUpdateManyWithoutProyekNestedInput
+  tugasDesain?: Prisma.TugasDesainUncheckedUpdateManyWithoutProyekNestedInput
+  kampanye?: Prisma.KampanyeUncheckedUpdateManyWithoutProyekNestedInput
 }
 
 export type ProyekUncheckedUpdateManyWithoutPelangganInput = {
@@ -1628,6 +4360,9 @@ export type ProyekUncheckedUpdateManyWithoutPelangganInput = {
   tanggalMulai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tanggalSelesai?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   keterangan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  namaKlien?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -1644,6 +4379,16 @@ export type ProyekCountOutputType = {
   dokumenKas: number
   peminjaman: number
   kerusakan: number
+  antarSebagaiProyekPemberi: number
+  antarSebagaiProyekPenerima: number
+  berkas: number
+  barisAnggaran: number
+  mitra: number
+  talanganMitra: number
+  pembayaranMitra: number
+  konten: number
+  tugasDesain: number
+  kampanye: number
 }
 
 export type ProyekCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1655,6 +4400,16 @@ export type ProyekCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   dokumenKas?: boolean | ProyekCountOutputTypeCountDokumenKasArgs
   peminjaman?: boolean | ProyekCountOutputTypeCountPeminjamanArgs
   kerusakan?: boolean | ProyekCountOutputTypeCountKerusakanArgs
+  antarSebagaiProyekPemberi?: boolean | ProyekCountOutputTypeCountAntarSebagaiProyekPemberiArgs
+  antarSebagaiProyekPenerima?: boolean | ProyekCountOutputTypeCountAntarSebagaiProyekPenerimaArgs
+  berkas?: boolean | ProyekCountOutputTypeCountBerkasArgs
+  barisAnggaran?: boolean | ProyekCountOutputTypeCountBarisAnggaranArgs
+  mitra?: boolean | ProyekCountOutputTypeCountMitraArgs
+  talanganMitra?: boolean | ProyekCountOutputTypeCountTalanganMitraArgs
+  pembayaranMitra?: boolean | ProyekCountOutputTypeCountPembayaranMitraArgs
+  konten?: boolean | ProyekCountOutputTypeCountKontenArgs
+  tugasDesain?: boolean | ProyekCountOutputTypeCountTugasDesainArgs
+  kampanye?: boolean | ProyekCountOutputTypeCountKampanyeArgs
 }
 
 /**
@@ -1723,6 +4478,76 @@ export type ProyekCountOutputTypeCountKerusakanArgs<ExtArgs extends runtime.Type
   where?: Prisma.LaporanKerusakanBarangWhereInput
 }
 
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountAntarSebagaiProyekPemberiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransaksiAntarPerusahaanWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountAntarSebagaiProyekPenerimaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransaksiAntarPerusahaanWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountBerkasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BerkasWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountBarisAnggaranArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BarisAnggaranProyekWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MitraProyekWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountTalanganMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TalanganMitraWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountPembayaranMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PembayaranMitraWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountKontenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.KontenWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountTugasDesainArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TugasDesainWhereInput
+}
+
+/**
+ * ProyekCountOutputType without action
+ */
+export type ProyekCountOutputTypeCountKampanyeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.KampanyeWhereInput
+}
+
 
 export type ProyekSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1735,7 +4560,11 @@ export type ProyekSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   tanggalMulai?: boolean
   tanggalSelesai?: boolean
   keterangan?: boolean
+  warna?: boolean
+  namaKlien?: boolean
+  perusahaanId?: boolean
   pelanggan?: boolean | Prisma.Proyek$pelangganArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   penawaran?: boolean | Prisma.Proyek$penawaranArgs<ExtArgs>
   pesanan?: boolean | Prisma.Proyek$pesananArgs<ExtArgs>
   pesananPembelian?: boolean | Prisma.Proyek$pesananPembelianArgs<ExtArgs>
@@ -1744,6 +4573,17 @@ export type ProyekSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   dokumenKas?: boolean | Prisma.Proyek$dokumenKasArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Proyek$peminjamanArgs<ExtArgs>
   kerusakan?: boolean | Prisma.Proyek$kerusakanArgs<ExtArgs>
+  antarSebagaiProyekPemberi?: boolean | Prisma.Proyek$antarSebagaiProyekPemberiArgs<ExtArgs>
+  antarSebagaiProyekPenerima?: boolean | Prisma.Proyek$antarSebagaiProyekPenerimaArgs<ExtArgs>
+  berkas?: boolean | Prisma.Proyek$berkasArgs<ExtArgs>
+  aksesBerkas?: boolean | Prisma.Proyek$aksesBerkasArgs<ExtArgs>
+  barisAnggaran?: boolean | Prisma.Proyek$barisAnggaranArgs<ExtArgs>
+  mitra?: boolean | Prisma.Proyek$mitraArgs<ExtArgs>
+  talanganMitra?: boolean | Prisma.Proyek$talanganMitraArgs<ExtArgs>
+  pembayaranMitra?: boolean | Prisma.Proyek$pembayaranMitraArgs<ExtArgs>
+  konten?: boolean | Prisma.Proyek$kontenArgs<ExtArgs>
+  tugasDesain?: boolean | Prisma.Proyek$tugasDesainArgs<ExtArgs>
+  kampanye?: boolean | Prisma.Proyek$kampanyeArgs<ExtArgs>
   _count?: boolean | Prisma.ProyekCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proyek"]>
 
@@ -1758,7 +4598,11 @@ export type ProyekSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   tanggalMulai?: boolean
   tanggalSelesai?: boolean
   keterangan?: boolean
+  warna?: boolean
+  namaKlien?: boolean
+  perusahaanId?: boolean
   pelanggan?: boolean | Prisma.Proyek$pelangganArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proyek"]>
 
 export type ProyekSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1772,7 +4616,11 @@ export type ProyekSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   tanggalMulai?: boolean
   tanggalSelesai?: boolean
   keterangan?: boolean
+  warna?: boolean
+  namaKlien?: boolean
+  perusahaanId?: boolean
   pelanggan?: boolean | Prisma.Proyek$pelangganArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proyek"]>
 
 export type ProyekSelectScalar = {
@@ -1786,11 +4634,15 @@ export type ProyekSelectScalar = {
   tanggalMulai?: boolean
   tanggalSelesai?: boolean
   keterangan?: boolean
+  warna?: boolean
+  namaKlien?: boolean
+  perusahaanId?: boolean
 }
 
-export type ProyekOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "pelangganId" | "status" | "nilaiKontrak" | "anggaranBiaya" | "tanggalMulai" | "tanggalSelesai" | "keterangan", ExtArgs["result"]["proyek"]>
+export type ProyekOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "pelangganId" | "status" | "nilaiKontrak" | "anggaranBiaya" | "tanggalMulai" | "tanggalSelesai" | "keterangan" | "warna" | "namaKlien" | "perusahaanId", ExtArgs["result"]["proyek"]>
 export type ProyekInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pelanggan?: boolean | Prisma.Proyek$pelangganArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   penawaran?: boolean | Prisma.Proyek$penawaranArgs<ExtArgs>
   pesanan?: boolean | Prisma.Proyek$pesananArgs<ExtArgs>
   pesananPembelian?: boolean | Prisma.Proyek$pesananPembelianArgs<ExtArgs>
@@ -1799,19 +4651,33 @@ export type ProyekInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   dokumenKas?: boolean | Prisma.Proyek$dokumenKasArgs<ExtArgs>
   peminjaman?: boolean | Prisma.Proyek$peminjamanArgs<ExtArgs>
   kerusakan?: boolean | Prisma.Proyek$kerusakanArgs<ExtArgs>
+  antarSebagaiProyekPemberi?: boolean | Prisma.Proyek$antarSebagaiProyekPemberiArgs<ExtArgs>
+  antarSebagaiProyekPenerima?: boolean | Prisma.Proyek$antarSebagaiProyekPenerimaArgs<ExtArgs>
+  berkas?: boolean | Prisma.Proyek$berkasArgs<ExtArgs>
+  aksesBerkas?: boolean | Prisma.Proyek$aksesBerkasArgs<ExtArgs>
+  barisAnggaran?: boolean | Prisma.Proyek$barisAnggaranArgs<ExtArgs>
+  mitra?: boolean | Prisma.Proyek$mitraArgs<ExtArgs>
+  talanganMitra?: boolean | Prisma.Proyek$talanganMitraArgs<ExtArgs>
+  pembayaranMitra?: boolean | Prisma.Proyek$pembayaranMitraArgs<ExtArgs>
+  konten?: boolean | Prisma.Proyek$kontenArgs<ExtArgs>
+  tugasDesain?: boolean | Prisma.Proyek$tugasDesainArgs<ExtArgs>
+  kampanye?: boolean | Prisma.Proyek$kampanyeArgs<ExtArgs>
   _count?: boolean | Prisma.ProyekCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProyekIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pelanggan?: boolean | Prisma.Proyek$pelangganArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 export type ProyekIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pelanggan?: boolean | Prisma.Proyek$pelangganArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
 }
 
 export type $ProyekPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Proyek"
   objects: {
     pelanggan: Prisma.$PelangganPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
     penawaran: Prisma.$PenawaranPenjualanPayload<ExtArgs>[]
     pesanan: Prisma.$PesananPenjualanPayload<ExtArgs>[]
     pesananPembelian: Prisma.$PesananPembelianPayload<ExtArgs>[]
@@ -1820,6 +4686,17 @@ export type $ProyekPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     dokumenKas: Prisma.$DokumenKasPayload<ExtArgs>[]
     peminjaman: Prisma.$PeminjamanBarangPayload<ExtArgs>[]
     kerusakan: Prisma.$LaporanKerusakanBarangPayload<ExtArgs>[]
+    antarSebagaiProyekPemberi: Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs>[]
+    antarSebagaiProyekPenerima: Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs>[]
+    berkas: Prisma.$BerkasPayload<ExtArgs>[]
+    aksesBerkas: Prisma.$AksesBerkasProyekPayload<ExtArgs> | null
+    barisAnggaran: Prisma.$BarisAnggaranProyekPayload<ExtArgs>[]
+    mitra: Prisma.$MitraProyekPayload<ExtArgs>[]
+    talanganMitra: Prisma.$TalanganMitraPayload<ExtArgs>[]
+    pembayaranMitra: Prisma.$PembayaranMitraPayload<ExtArgs>[]
+    konten: Prisma.$KontenPayload<ExtArgs>[]
+    tugasDesain: Prisma.$TugasDesainPayload<ExtArgs>[]
+    kampanye: Prisma.$KampanyePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1835,6 +4712,18 @@ export type $ProyekPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     tanggalMulai: Date | null
     tanggalSelesai: Date | null
     keterangan: string | null
+    /**
+     * Warna lencana proyek, format #rrggbb huruf kecil (HKA color). Kosong = abu-abu bawaan (#71717a)
+     */
+    warna: string | null
+    /**
+     * Nama klien teks bebas (HKA client_name, ≤160). Dipakai bila pelangganId kosong
+     */
+    namaKlien: string | null
+    /**
+     * Pemilik data (lihat model Perusahaan); dipilih wajib di formulir data induk
+     */
+    perusahaanId: string
   }, ExtArgs["result"]["proyek"]>
   composites: {}
 }
@@ -2230,6 +5119,7 @@ readonly fields: ProyekFieldRefs;
 export interface Prisma__ProyekClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   pelanggan<T extends Prisma.Proyek$pelangganArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$pelangganArgs<ExtArgs>>): Prisma.Prisma__PelangganClient<runtime.Types.Result.GetResult<Prisma.$PelangganPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   penawaran<T extends Prisma.Proyek$penawaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$penawaranArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PenawaranPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pesanan<T extends Prisma.Proyek$pesananArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$pesananArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PesananPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pesananPembelian<T extends Prisma.Proyek$pesananPembelianArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$pesananPembelianArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PesananPembelianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2238,6 +5128,17 @@ export interface Prisma__ProyekClient<T, Null = never, ExtArgs extends runtime.T
   dokumenKas<T extends Prisma.Proyek$dokumenKasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$dokumenKasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DokumenKasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   peminjaman<T extends Prisma.Proyek$peminjamanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$peminjamanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PeminjamanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   kerusakan<T extends Prisma.Proyek$kerusakanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$kerusakanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LaporanKerusakanBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  antarSebagaiProyekPemberi<T extends Prisma.Proyek$antarSebagaiProyekPemberiArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$antarSebagaiProyekPemberiArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  antarSebagaiProyekPenerima<T extends Prisma.Proyek$antarSebagaiProyekPenerimaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$antarSebagaiProyekPenerimaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransaksiAntarPerusahaanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  berkas<T extends Prisma.Proyek$berkasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$berkasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BerkasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  aksesBerkas<T extends Prisma.Proyek$aksesBerkasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$aksesBerkasArgs<ExtArgs>>): Prisma.Prisma__AksesBerkasProyekClient<runtime.Types.Result.GetResult<Prisma.$AksesBerkasProyekPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  barisAnggaran<T extends Prisma.Proyek$barisAnggaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$barisAnggaranArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisAnggaranProyekPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  mitra<T extends Prisma.Proyek$mitraArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$mitraArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MitraProyekPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  talanganMitra<T extends Prisma.Proyek$talanganMitraArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$talanganMitraArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TalanganMitraPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pembayaranMitra<T extends Prisma.Proyek$pembayaranMitraArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$pembayaranMitraArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PembayaranMitraPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  konten<T extends Prisma.Proyek$kontenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$kontenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KontenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tugasDesain<T extends Prisma.Proyek$tugasDesainArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$tugasDesainArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TugasDesainPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  kampanye<T extends Prisma.Proyek$kampanyeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Proyek$kampanyeArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KampanyePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2277,6 +5178,9 @@ export interface ProyekFieldRefs {
   readonly tanggalMulai: Prisma.FieldRef<"Proyek", 'DateTime'>
   readonly tanggalSelesai: Prisma.FieldRef<"Proyek", 'DateTime'>
   readonly keterangan: Prisma.FieldRef<"Proyek", 'String'>
+  readonly warna: Prisma.FieldRef<"Proyek", 'String'>
+  readonly namaKlien: Prisma.FieldRef<"Proyek", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"Proyek", 'String'>
 }
     
 
@@ -2886,6 +5790,265 @@ export type Proyek$kerusakanArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.LaporanKerusakanBarangScalarFieldEnum | Prisma.LaporanKerusakanBarangScalarFieldEnum[]
+}
+
+/**
+ * Proyek.antarSebagaiProyekPemberi
+ */
+export type Proyek$antarSebagaiProyekPemberiArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TransaksiAntarPerusahaan
+   */
+  select?: Prisma.TransaksiAntarPerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TransaksiAntarPerusahaan
+   */
+  omit?: Prisma.TransaksiAntarPerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransaksiAntarPerusahaanInclude<ExtArgs> | null
+  where?: Prisma.TransaksiAntarPerusahaanWhereInput
+  orderBy?: Prisma.TransaksiAntarPerusahaanOrderByWithRelationInput | Prisma.TransaksiAntarPerusahaanOrderByWithRelationInput[]
+  cursor?: Prisma.TransaksiAntarPerusahaanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransaksiAntarPerusahaanScalarFieldEnum | Prisma.TransaksiAntarPerusahaanScalarFieldEnum[]
+}
+
+/**
+ * Proyek.antarSebagaiProyekPenerima
+ */
+export type Proyek$antarSebagaiProyekPenerimaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TransaksiAntarPerusahaan
+   */
+  select?: Prisma.TransaksiAntarPerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TransaksiAntarPerusahaan
+   */
+  omit?: Prisma.TransaksiAntarPerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransaksiAntarPerusahaanInclude<ExtArgs> | null
+  where?: Prisma.TransaksiAntarPerusahaanWhereInput
+  orderBy?: Prisma.TransaksiAntarPerusahaanOrderByWithRelationInput | Prisma.TransaksiAntarPerusahaanOrderByWithRelationInput[]
+  cursor?: Prisma.TransaksiAntarPerusahaanWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransaksiAntarPerusahaanScalarFieldEnum | Prisma.TransaksiAntarPerusahaanScalarFieldEnum[]
+}
+
+/**
+ * Proyek.berkas
+ */
+export type Proyek$berkasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Berkas
+   */
+  select?: Prisma.BerkasSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Berkas
+   */
+  omit?: Prisma.BerkasOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BerkasInclude<ExtArgs> | null
+  where?: Prisma.BerkasWhereInput
+  orderBy?: Prisma.BerkasOrderByWithRelationInput | Prisma.BerkasOrderByWithRelationInput[]
+  cursor?: Prisma.BerkasWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BerkasScalarFieldEnum | Prisma.BerkasScalarFieldEnum[]
+}
+
+/**
+ * Proyek.aksesBerkas
+ */
+export type Proyek$aksesBerkasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AksesBerkasProyek
+   */
+  select?: Prisma.AksesBerkasProyekSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AksesBerkasProyek
+   */
+  omit?: Prisma.AksesBerkasProyekOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AksesBerkasProyekInclude<ExtArgs> | null
+  where?: Prisma.AksesBerkasProyekWhereInput
+}
+
+/**
+ * Proyek.barisAnggaran
+ */
+export type Proyek$barisAnggaranArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BarisAnggaranProyek
+   */
+  select?: Prisma.BarisAnggaranProyekSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BarisAnggaranProyek
+   */
+  omit?: Prisma.BarisAnggaranProyekOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BarisAnggaranProyekInclude<ExtArgs> | null
+  where?: Prisma.BarisAnggaranProyekWhereInput
+  orderBy?: Prisma.BarisAnggaranProyekOrderByWithRelationInput | Prisma.BarisAnggaranProyekOrderByWithRelationInput[]
+  cursor?: Prisma.BarisAnggaranProyekWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BarisAnggaranProyekScalarFieldEnum | Prisma.BarisAnggaranProyekScalarFieldEnum[]
+}
+
+/**
+ * Proyek.mitra
+ */
+export type Proyek$mitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MitraProyek
+   */
+  select?: Prisma.MitraProyekSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MitraProyek
+   */
+  omit?: Prisma.MitraProyekOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MitraProyekInclude<ExtArgs> | null
+  where?: Prisma.MitraProyekWhereInput
+  orderBy?: Prisma.MitraProyekOrderByWithRelationInput | Prisma.MitraProyekOrderByWithRelationInput[]
+  cursor?: Prisma.MitraProyekWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MitraProyekScalarFieldEnum | Prisma.MitraProyekScalarFieldEnum[]
+}
+
+/**
+ * Proyek.talanganMitra
+ */
+export type Proyek$talanganMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TalanganMitra
+   */
+  select?: Prisma.TalanganMitraSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TalanganMitra
+   */
+  omit?: Prisma.TalanganMitraOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TalanganMitraInclude<ExtArgs> | null
+  where?: Prisma.TalanganMitraWhereInput
+  orderBy?: Prisma.TalanganMitraOrderByWithRelationInput | Prisma.TalanganMitraOrderByWithRelationInput[]
+  cursor?: Prisma.TalanganMitraWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TalanganMitraScalarFieldEnum | Prisma.TalanganMitraScalarFieldEnum[]
+}
+
+/**
+ * Proyek.pembayaranMitra
+ */
+export type Proyek$pembayaranMitraArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PembayaranMitra
+   */
+  select?: Prisma.PembayaranMitraSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PembayaranMitra
+   */
+  omit?: Prisma.PembayaranMitraOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PembayaranMitraInclude<ExtArgs> | null
+  where?: Prisma.PembayaranMitraWhereInput
+  orderBy?: Prisma.PembayaranMitraOrderByWithRelationInput | Prisma.PembayaranMitraOrderByWithRelationInput[]
+  cursor?: Prisma.PembayaranMitraWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PembayaranMitraScalarFieldEnum | Prisma.PembayaranMitraScalarFieldEnum[]
+}
+
+/**
+ * Proyek.konten
+ */
+export type Proyek$kontenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Konten
+   */
+  select?: Prisma.KontenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Konten
+   */
+  omit?: Prisma.KontenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KontenInclude<ExtArgs> | null
+  where?: Prisma.KontenWhereInput
+  orderBy?: Prisma.KontenOrderByWithRelationInput | Prisma.KontenOrderByWithRelationInput[]
+  cursor?: Prisma.KontenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.KontenScalarFieldEnum | Prisma.KontenScalarFieldEnum[]
+}
+
+/**
+ * Proyek.tugasDesain
+ */
+export type Proyek$tugasDesainArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TugasDesain
+   */
+  select?: Prisma.TugasDesainSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TugasDesain
+   */
+  omit?: Prisma.TugasDesainOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TugasDesainInclude<ExtArgs> | null
+  where?: Prisma.TugasDesainWhereInput
+  orderBy?: Prisma.TugasDesainOrderByWithRelationInput | Prisma.TugasDesainOrderByWithRelationInput[]
+  cursor?: Prisma.TugasDesainWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TugasDesainScalarFieldEnum | Prisma.TugasDesainScalarFieldEnum[]
+}
+
+/**
+ * Proyek.kampanye
+ */
+export type Proyek$kampanyeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Kampanye
+   */
+  select?: Prisma.KampanyeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Kampanye
+   */
+  omit?: Prisma.KampanyeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KampanyeInclude<ExtArgs> | null
+  where?: Prisma.KampanyeWhereInput
+  orderBy?: Prisma.KampanyeOrderByWithRelationInput | Prisma.KampanyeOrderByWithRelationInput[]
+  cursor?: Prisma.KampanyeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.KampanyeScalarFieldEnum | Prisma.KampanyeScalarFieldEnum[]
 }
 
 /**

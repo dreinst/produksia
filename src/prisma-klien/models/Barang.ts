@@ -52,6 +52,8 @@ export type BarangMinAggregateOutputType = {
   hargaJual: runtime.Decimal | null
   hargaMinimum: runtime.Decimal | null
   stokMinimum: runtime.Decimal | null
+  deskripsi: string | null
+  perusahaanId: string | null
   dibuatPada: Date | null
   akunPendapatanId: string | null
   akunHppId: string | null
@@ -71,6 +73,8 @@ export type BarangMaxAggregateOutputType = {
   hargaJual: runtime.Decimal | null
   hargaMinimum: runtime.Decimal | null
   stokMinimum: runtime.Decimal | null
+  deskripsi: string | null
+  perusahaanId: string | null
   dibuatPada: Date | null
   akunPendapatanId: string | null
   akunHppId: string | null
@@ -90,6 +94,8 @@ export type BarangCountAggregateOutputType = {
   hargaJual: number
   hargaMinimum: number
   stokMinimum: number
+  deskripsi: number
+  perusahaanId: number
   dibuatPada: number
   akunPendapatanId: number
   akunHppId: number
@@ -125,6 +131,8 @@ export type BarangMinAggregateInputType = {
   hargaJual?: true
   hargaMinimum?: true
   stokMinimum?: true
+  deskripsi?: true
+  perusahaanId?: true
   dibuatPada?: true
   akunPendapatanId?: true
   akunHppId?: true
@@ -144,6 +152,8 @@ export type BarangMaxAggregateInputType = {
   hargaJual?: true
   hargaMinimum?: true
   stokMinimum?: true
+  deskripsi?: true
+  perusahaanId?: true
   dibuatPada?: true
   akunPendapatanId?: true
   akunHppId?: true
@@ -163,6 +173,8 @@ export type BarangCountAggregateInputType = {
   hargaJual?: true
   hargaMinimum?: true
   stokMinimum?: true
+  deskripsi?: true
+  perusahaanId?: true
   dibuatPada?: true
   akunPendapatanId?: true
   akunHppId?: true
@@ -269,6 +281,8 @@ export type BarangGroupByOutputType = {
   hargaJual: runtime.Decimal
   hargaMinimum: runtime.Decimal
   stokMinimum: runtime.Decimal
+  deskripsi: string | null
+  perusahaanId: string | null
   dibuatPada: Date
   akunPendapatanId: string | null
   akunHppId: string | null
@@ -311,12 +325,15 @@ export type BarangWhereInput = {
   hargaJual?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.StringNullableFilter<"Barang"> | string | null
+  perusahaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Barang"> | Date | string
   akunPendapatanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   akunHppId?: Prisma.StringNullableFilter<"Barang"> | string | null
   akunPersediaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   akunBebanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   kelompok?: Prisma.XOR<Prisma.KelompokBarangNullableScalarRelationFilter, Prisma.KelompokBarangWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanNullableScalarRelationFilter, Prisma.PerusahaanWhereInput> | null
   stok?: Prisma.StokBarangListRelationFilter
   barisPenawaran?: Prisma.BarisPenawaranPenjualanListRelationFilter
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanListRelationFilter
@@ -350,12 +367,15 @@ export type BarangOrderByWithRelationInput = {
   hargaJual?: Prisma.SortOrder
   hargaMinimum?: Prisma.SortOrder
   stokMinimum?: Prisma.SortOrder
+  deskripsi?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   akunPendapatanId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunHppId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunPersediaanId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunBebanId?: Prisma.SortOrderInput | Prisma.SortOrder
   kelompok?: Prisma.KelompokBarangOrderByWithRelationInput
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   stok?: Prisma.StokBarangOrderByRelationAggregateInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanOrderByRelationAggregateInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanOrderByRelationAggregateInput
@@ -392,12 +412,15 @@ export type BarangWhereUniqueInput = Prisma.AtLeast<{
   hargaJual?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.StringNullableFilter<"Barang"> | string | null
+  perusahaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   dibuatPada?: Prisma.DateTimeFilter<"Barang"> | Date | string
   akunPendapatanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   akunHppId?: Prisma.StringNullableFilter<"Barang"> | string | null
   akunPersediaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   akunBebanId?: Prisma.StringNullableFilter<"Barang"> | string | null
   kelompok?: Prisma.XOR<Prisma.KelompokBarangNullableScalarRelationFilter, Prisma.KelompokBarangWhereInput> | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanNullableScalarRelationFilter, Prisma.PerusahaanWhereInput> | null
   stok?: Prisma.StokBarangListRelationFilter
   barisPenawaran?: Prisma.BarisPenawaranPenjualanListRelationFilter
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanListRelationFilter
@@ -431,6 +454,8 @@ export type BarangOrderByWithAggregationInput = {
   hargaJual?: Prisma.SortOrder
   hargaMinimum?: Prisma.SortOrder
   stokMinimum?: Prisma.SortOrder
+  deskripsi?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrderInput | Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   akunPendapatanId?: Prisma.SortOrderInput | Prisma.SortOrder
   akunHppId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -458,6 +483,8 @@ export type BarangScalarWhereWithAggregatesInput = {
   hargaJual?: Prisma.DecimalWithAggregatesFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalWithAggregatesFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalWithAggregatesFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.StringNullableWithAggregatesFilter<"Barang"> | string | null
+  perusahaanId?: Prisma.StringNullableWithAggregatesFilter<"Barang"> | string | null
   dibuatPada?: Prisma.DateTimeWithAggregatesFilter<"Barang"> | Date | string
   akunPendapatanId?: Prisma.StringNullableWithAggregatesFilter<"Barang"> | string | null
   akunHppId?: Prisma.StringNullableWithAggregatesFilter<"Barang"> | string | null
@@ -476,8 +503,10 @@ export type BarangCreateInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -511,6 +540,8 @@ export type BarangUncheckedCreateInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -544,8 +575,10 @@ export type BarangUpdateInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -579,6 +612,8 @@ export type BarangUncheckedUpdateInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -613,6 +648,8 @@ export type BarangCreateManyInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -631,6 +668,7 @@ export type BarangUpdateManyMutationInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -646,6 +684,8 @@ export type BarangUncheckedUpdateManyInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -675,6 +715,8 @@ export type BarangCountOrderByAggregateInput = {
   hargaJual?: Prisma.SortOrder
   hargaMinimum?: Prisma.SortOrder
   stokMinimum?: Prisma.SortOrder
+  deskripsi?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   akunPendapatanId?: Prisma.SortOrder
   akunHppId?: Prisma.SortOrder
@@ -701,6 +743,8 @@ export type BarangMaxOrderByAggregateInput = {
   hargaJual?: Prisma.SortOrder
   hargaMinimum?: Prisma.SortOrder
   stokMinimum?: Prisma.SortOrder
+  deskripsi?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   akunPendapatanId?: Prisma.SortOrder
   akunHppId?: Prisma.SortOrder
@@ -720,6 +764,8 @@ export type BarangMinOrderByAggregateInput = {
   hargaJual?: Prisma.SortOrder
   hargaMinimum?: Prisma.SortOrder
   stokMinimum?: Prisma.SortOrder
+  deskripsi?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   dibuatPada?: Prisma.SortOrder
   akunPendapatanId?: Prisma.SortOrder
   akunHppId?: Prisma.SortOrder
@@ -742,6 +788,48 @@ export type BarangScalarRelationFilter = {
 export type BarangNullableScalarRelationFilter = {
   is?: Prisma.BarangWhereInput | null
   isNot?: Prisma.BarangWhereInput | null
+}
+
+export type BarangCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.BarangCreateWithoutPerusahaanInput, Prisma.BarangUncheckedCreateWithoutPerusahaanInput> | Prisma.BarangCreateWithoutPerusahaanInput[] | Prisma.BarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.BarangCreateOrConnectWithoutPerusahaanInput | Prisma.BarangCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.BarangCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+}
+
+export type BarangUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.BarangCreateWithoutPerusahaanInput, Prisma.BarangUncheckedCreateWithoutPerusahaanInput> | Prisma.BarangCreateWithoutPerusahaanInput[] | Prisma.BarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.BarangCreateOrConnectWithoutPerusahaanInput | Prisma.BarangCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.BarangCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+}
+
+export type BarangUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.BarangCreateWithoutPerusahaanInput, Prisma.BarangUncheckedCreateWithoutPerusahaanInput> | Prisma.BarangCreateWithoutPerusahaanInput[] | Prisma.BarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.BarangCreateOrConnectWithoutPerusahaanInput | Prisma.BarangCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.BarangUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.BarangUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.BarangCreateManyPerusahaanInputEnvelope
+  set?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  disconnect?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  delete?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  connect?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  update?: Prisma.BarangUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.BarangUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.BarangUpdateManyWithWhereWithoutPerusahaanInput | Prisma.BarangUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.BarangScalarWhereInput | Prisma.BarangScalarWhereInput[]
+}
+
+export type BarangUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.BarangCreateWithoutPerusahaanInput, Prisma.BarangUncheckedCreateWithoutPerusahaanInput> | Prisma.BarangCreateWithoutPerusahaanInput[] | Prisma.BarangUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.BarangCreateOrConnectWithoutPerusahaanInput | Prisma.BarangCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.BarangUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.BarangUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.BarangCreateManyPerusahaanInputEnvelope
+  set?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  disconnect?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  delete?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  connect?: Prisma.BarangWhereUniqueInput | Prisma.BarangWhereUniqueInput[]
+  update?: Prisma.BarangUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.BarangUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.BarangUpdateManyWithWhereWithoutPerusahaanInput | Prisma.BarangUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.BarangScalarWhereInput | Prisma.BarangScalarWhereInput[]
 }
 
 export type BarangCreateNestedManyWithoutKelompokInput = {
@@ -1170,6 +1258,126 @@ export type BarangUpdateOneRequiredWithoutBarisKerusakanNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BarangUpdateToOneWithWhereWithoutBarisKerusakanInput, Prisma.BarangUpdateWithoutBarisKerusakanInput>, Prisma.BarangUncheckedUpdateWithoutBarisKerusakanInput>
 }
 
+export type BarangCreateWithoutPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis?: $Enums.JenisBarang
+  satuan?: string
+  warna?: string | null
+  hargaBeli?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  dibuatPada?: Date | string
+  kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
+  barisPengiriman?: Prisma.BarisPengirimanCreateNestedManyWithoutBarangInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanCreateNestedManyWithoutBarangInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanCreateNestedManyWithoutBarangInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianCreateNestedManyWithoutBarangInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangCreateNestedManyWithoutBarangInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianCreateNestedManyWithoutBarangInput
+  barisReturPembelian?: Prisma.BarisReturPembelianCreateNestedManyWithoutBarangInput
+  akunPendapatan?: Prisma.AkunCreateNestedOneWithoutBarangPendapatanInput
+  akunHpp?: Prisma.AkunCreateNestedOneWithoutBarangHppInput
+  akunPersediaan?: Prisma.AkunCreateNestedOneWithoutBarangPersediaanInput
+  akunBeban?: Prisma.AkunCreateNestedOneWithoutBarangBebanInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanCreateNestedManyWithoutBarangInput
+  barisPindah?: Prisma.BarisPindahBarangCreateNestedManyWithoutBarangInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangCreateNestedManyWithoutBarangInput
+  foto?: Prisma.FotoCreateNestedManyWithoutBarangInput
+}
+
+export type BarangUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis?: $Enums.JenisBarang
+  kelompokId?: string | null
+  satuan?: string
+  warna?: string | null
+  hargaBeli?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  dibuatPada?: Date | string
+  akunPendapatanId?: string | null
+  akunHppId?: string | null
+  akunPersediaanId?: string | null
+  akunBebanId?: string | null
+  stok?: Prisma.StokBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisPengiriman?: Prisma.BarisPengirimanUncheckedCreateNestedManyWithoutBarangInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanUncheckedCreateNestedManyWithoutBarangInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianUncheckedCreateNestedManyWithoutBarangInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianUncheckedCreateNestedManyWithoutBarangInput
+  barisReturPembelian?: Prisma.BarisReturPembelianUncheckedCreateNestedManyWithoutBarangInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedCreateNestedManyWithoutBarangInput
+  barisPindah?: Prisma.BarisPindahBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedCreateNestedManyWithoutBarangInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedCreateNestedManyWithoutBarangInput
+  foto?: Prisma.FotoUncheckedCreateNestedManyWithoutBarangInput
+}
+
+export type BarangCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.BarangWhereUniqueInput
+  create: Prisma.XOR<Prisma.BarangCreateWithoutPerusahaanInput, Prisma.BarangUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type BarangCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.BarangCreateManyPerusahaanInput | Prisma.BarangCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type BarangUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.BarangWhereUniqueInput
+  update: Prisma.XOR<Prisma.BarangUpdateWithoutPerusahaanInput, Prisma.BarangUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.BarangCreateWithoutPerusahaanInput, Prisma.BarangUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type BarangUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.BarangWhereUniqueInput
+  data: Prisma.XOR<Prisma.BarangUpdateWithoutPerusahaanInput, Prisma.BarangUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type BarangUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.BarangScalarWhereInput
+  data: Prisma.XOR<Prisma.BarangUpdateManyMutationInput, Prisma.BarangUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
+export type BarangScalarWhereInput = {
+  AND?: Prisma.BarangScalarWhereInput | Prisma.BarangScalarWhereInput[]
+  OR?: Prisma.BarangScalarWhereInput[]
+  NOT?: Prisma.BarangScalarWhereInput | Prisma.BarangScalarWhereInput[]
+  id?: Prisma.StringFilter<"Barang"> | string
+  kode?: Prisma.StringFilter<"Barang"> | string
+  nama?: Prisma.StringFilter<"Barang"> | string
+  jenis?: Prisma.EnumJenisBarangFilter<"Barang"> | $Enums.JenisBarang
+  kelompokId?: Prisma.StringNullableFilter<"Barang"> | string | null
+  satuan?: Prisma.StringFilter<"Barang"> | string
+  warna?: Prisma.StringNullableFilter<"Barang"> | string | null
+  hargaBeli?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.StringNullableFilter<"Barang"> | string | null
+  perusahaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
+  dibuatPada?: Prisma.DateTimeFilter<"Barang"> | Date | string
+  akunPendapatanId?: Prisma.StringNullableFilter<"Barang"> | string | null
+  akunHppId?: Prisma.StringNullableFilter<"Barang"> | string | null
+  akunPersediaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
+  akunBebanId?: Prisma.StringNullableFilter<"Barang"> | string | null
+}
+
 export type BarangCreateWithoutKelompokInput = {
   id?: string
   kode: string
@@ -1181,7 +1389,9 @@ export type BarangCreateWithoutKelompokInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -1214,6 +1424,8 @@ export type BarangUncheckedCreateWithoutKelompokInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -1262,28 +1474,6 @@ export type BarangUpdateManyWithWhereWithoutKelompokInput = {
   data: Prisma.XOR<Prisma.BarangUpdateManyMutationInput, Prisma.BarangUncheckedUpdateManyWithoutKelompokInput>
 }
 
-export type BarangScalarWhereInput = {
-  AND?: Prisma.BarangScalarWhereInput | Prisma.BarangScalarWhereInput[]
-  OR?: Prisma.BarangScalarWhereInput[]
-  NOT?: Prisma.BarangScalarWhereInput | Prisma.BarangScalarWhereInput[]
-  id?: Prisma.StringFilter<"Barang"> | string
-  kode?: Prisma.StringFilter<"Barang"> | string
-  nama?: Prisma.StringFilter<"Barang"> | string
-  jenis?: Prisma.EnumJenisBarangFilter<"Barang"> | $Enums.JenisBarang
-  kelompokId?: Prisma.StringNullableFilter<"Barang"> | string | null
-  satuan?: Prisma.StringFilter<"Barang"> | string
-  warna?: Prisma.StringNullableFilter<"Barang"> | string | null
-  hargaBeli?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  hargaJual?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  hargaMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  stokMinimum?: Prisma.DecimalFilter<"Barang"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  dibuatPada?: Prisma.DateTimeFilter<"Barang"> | Date | string
-  akunPendapatanId?: Prisma.StringNullableFilter<"Barang"> | string | null
-  akunHppId?: Prisma.StringNullableFilter<"Barang"> | string | null
-  akunPersediaanId?: Prisma.StringNullableFilter<"Barang"> | string | null
-  akunBebanId?: Prisma.StringNullableFilter<"Barang"> | string | null
-}
-
 export type BarangCreateWithoutStokInput = {
   id?: string
   kode: string
@@ -1295,8 +1485,10 @@ export type BarangCreateWithoutStokInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
   barisPengiriman?: Prisma.BarisPengirimanCreateNestedManyWithoutBarangInput
@@ -1329,6 +1521,8 @@ export type BarangUncheckedCreateWithoutStokInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -1377,8 +1571,10 @@ export type BarangUpdateWithoutStokInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
   barisPengiriman?: Prisma.BarisPengirimanUpdateManyWithoutBarangNestedInput
@@ -1411,6 +1607,8 @@ export type BarangUncheckedUpdateWithoutStokInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1443,8 +1641,10 @@ export type BarangCreateWithoutBarisPenawaranInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
   barisPengiriman?: Prisma.BarisPengirimanCreateNestedManyWithoutBarangInput
@@ -1477,6 +1677,8 @@ export type BarangUncheckedCreateWithoutBarisPenawaranInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -1525,8 +1727,10 @@ export type BarangUpdateWithoutBarisPenawaranInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
   barisPengiriman?: Prisma.BarisPengirimanUpdateManyWithoutBarangNestedInput
@@ -1559,6 +1763,8 @@ export type BarangUncheckedUpdateWithoutBarisPenawaranInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1591,8 +1797,10 @@ export type BarangCreateWithoutBarisPesananPenjualanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPengiriman?: Prisma.BarisPengirimanCreateNestedManyWithoutBarangInput
@@ -1625,6 +1833,8 @@ export type BarangUncheckedCreateWithoutBarisPesananPenjualanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -1673,8 +1883,10 @@ export type BarangUpdateWithoutBarisPesananPenjualanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPengiriman?: Prisma.BarisPengirimanUpdateManyWithoutBarangNestedInput
@@ -1707,6 +1919,8 @@ export type BarangUncheckedUpdateWithoutBarisPesananPenjualanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1739,8 +1953,10 @@ export type BarangCreateWithoutBarisPengirimanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -1773,6 +1989,8 @@ export type BarangUncheckedCreateWithoutBarisPengirimanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -1821,8 +2039,10 @@ export type BarangUpdateWithoutBarisPengirimanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -1855,6 +2075,8 @@ export type BarangUncheckedUpdateWithoutBarisPengirimanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1887,8 +2109,10 @@ export type BarangCreateWithoutBarisFakturPenjualanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -1921,6 +2145,8 @@ export type BarangUncheckedCreateWithoutBarisFakturPenjualanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -1969,8 +2195,10 @@ export type BarangUpdateWithoutBarisFakturPenjualanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -2003,6 +2231,8 @@ export type BarangUncheckedUpdateWithoutBarisFakturPenjualanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2035,8 +2265,10 @@ export type BarangCreateWithoutBarisReturPenjualanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2069,6 +2301,8 @@ export type BarangUncheckedCreateWithoutBarisReturPenjualanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -2117,8 +2351,10 @@ export type BarangUpdateWithoutBarisReturPenjualanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -2151,6 +2387,8 @@ export type BarangUncheckedUpdateWithoutBarisReturPenjualanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2183,8 +2421,10 @@ export type BarangCreateWithoutBarisPesananPembelianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2217,6 +2457,8 @@ export type BarangUncheckedCreateWithoutBarisPesananPembelianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -2265,8 +2507,10 @@ export type BarangUpdateWithoutBarisPesananPembelianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -2299,6 +2543,8 @@ export type BarangUncheckedUpdateWithoutBarisPesananPembelianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2331,8 +2577,10 @@ export type BarangCreateWithoutBarisPenerimaanBarangInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2365,6 +2613,8 @@ export type BarangUncheckedCreateWithoutBarisPenerimaanBarangInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -2413,8 +2663,10 @@ export type BarangUpdateWithoutBarisPenerimaanBarangInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -2447,6 +2699,8 @@ export type BarangUncheckedUpdateWithoutBarisPenerimaanBarangInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2479,8 +2733,10 @@ export type BarangCreateWithoutBarisFakturPembelianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2513,6 +2769,8 @@ export type BarangUncheckedCreateWithoutBarisFakturPembelianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -2561,8 +2819,10 @@ export type BarangUpdateWithoutBarisFakturPembelianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -2595,6 +2855,8 @@ export type BarangUncheckedUpdateWithoutBarisFakturPembelianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2627,8 +2889,10 @@ export type BarangCreateWithoutBarisReturPembelianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2661,6 +2925,8 @@ export type BarangUncheckedCreateWithoutBarisReturPembelianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -2709,8 +2975,10 @@ export type BarangUpdateWithoutBarisReturPembelianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -2743,6 +3011,8 @@ export type BarangUncheckedUpdateWithoutBarisReturPembelianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2775,8 +3045,10 @@ export type BarangCreateWithoutAkunPendapatanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2809,6 +3081,8 @@ export type BarangUncheckedCreateWithoutAkunPendapatanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunHppId?: string | null
   akunPersediaanId?: string | null
@@ -2851,8 +3125,10 @@ export type BarangCreateWithoutAkunHppInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2885,6 +3161,8 @@ export type BarangUncheckedCreateWithoutAkunHppInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunPersediaanId?: string | null
@@ -2927,8 +3205,10 @@ export type BarangCreateWithoutAkunPersediaanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -2961,6 +3241,8 @@ export type BarangUncheckedCreateWithoutAkunPersediaanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3003,8 +3285,10 @@ export type BarangCreateWithoutAkunBebanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -3037,6 +3321,8 @@ export type BarangUncheckedCreateWithoutAkunBebanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3143,8 +3429,10 @@ export type BarangCreateWithoutBarisPindahInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -3177,6 +3465,8 @@ export type BarangUncheckedCreateWithoutBarisPindahInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3225,8 +3515,10 @@ export type BarangUpdateWithoutBarisPindahInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -3259,6 +3551,8 @@ export type BarangUncheckedUpdateWithoutBarisPindahInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3291,8 +3585,10 @@ export type BarangCreateWithoutBarisPenyesuaianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -3325,6 +3621,8 @@ export type BarangUncheckedCreateWithoutBarisPenyesuaianInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3373,8 +3671,10 @@ export type BarangUpdateWithoutBarisPenyesuaianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -3407,6 +3707,8 @@ export type BarangUncheckedUpdateWithoutBarisPenyesuaianInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3439,8 +3741,10 @@ export type BarangCreateWithoutFotoInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -3473,6 +3777,8 @@ export type BarangUncheckedCreateWithoutFotoInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3521,8 +3827,10 @@ export type BarangUpdateWithoutFotoInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -3555,6 +3863,8 @@ export type BarangUncheckedUpdateWithoutFotoInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3587,8 +3897,10 @@ export type BarangCreateWithoutBarisPeminjamanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -3621,6 +3933,8 @@ export type BarangUncheckedCreateWithoutBarisPeminjamanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3669,8 +3983,10 @@ export type BarangUpdateWithoutBarisPeminjamanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -3703,6 +4019,8 @@ export type BarangUncheckedUpdateWithoutBarisPeminjamanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3735,8 +4053,10 @@ export type BarangCreateWithoutBarisKerusakanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
   dibuatPada?: Date | string
   kelompok?: Prisma.KelompokBarangCreateNestedOneWithoutBarangInput
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutBarangInput
   stok?: Prisma.StokBarangCreateNestedManyWithoutBarangInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanCreateNestedManyWithoutBarangInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanCreateNestedManyWithoutBarangInput
@@ -3769,6 +4089,8 @@ export type BarangUncheckedCreateWithoutBarisKerusakanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3817,8 +4139,10 @@ export type BarangUpdateWithoutBarisKerusakanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -3851,6 +4175,8 @@ export type BarangUncheckedUpdateWithoutBarisKerusakanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3872,6 +4198,116 @@ export type BarangUncheckedUpdateWithoutBarisKerusakanInput = {
   foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
 }
 
+export type BarangCreateManyPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  jenis?: $Enums.JenisBarang
+  kelompokId?: string | null
+  satuan?: string
+  warna?: string | null
+  hargaBeli?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  dibuatPada?: Date | string
+  akunPendapatanId?: string | null
+  akunHppId?: string | null
+  akunPersediaanId?: string | null
+  akunBebanId?: string | null
+}
+
+export type BarangUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisBarangFieldUpdateOperationsInput | $Enums.JenisBarang
+  satuan?: Prisma.StringFieldUpdateOperationsInput | string
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hargaBeli?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
+  barisPengiriman?: Prisma.BarisPengirimanUpdateManyWithoutBarangNestedInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanUpdateManyWithoutBarangNestedInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanUpdateManyWithoutBarangNestedInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianUpdateManyWithoutBarangNestedInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangUpdateManyWithoutBarangNestedInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianUpdateManyWithoutBarangNestedInput
+  barisReturPembelian?: Prisma.BarisReturPembelianUpdateManyWithoutBarangNestedInput
+  akunPendapatan?: Prisma.AkunUpdateOneWithoutBarangPendapatanNestedInput
+  akunHpp?: Prisma.AkunUpdateOneWithoutBarangHppNestedInput
+  akunPersediaan?: Prisma.AkunUpdateOneWithoutBarangPersediaanNestedInput
+  akunBeban?: Prisma.AkunUpdateOneWithoutBarangBebanNestedInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUpdateManyWithoutBarangNestedInput
+  barisPindah?: Prisma.BarisPindahBarangUpdateManyWithoutBarangNestedInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUpdateManyWithoutBarangNestedInput
+  foto?: Prisma.FotoUpdateManyWithoutBarangNestedInput
+}
+
+export type BarangUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisBarangFieldUpdateOperationsInput | $Enums.JenisBarang
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  satuan?: Prisma.StringFieldUpdateOperationsInput | string
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hargaBeli?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stok?: Prisma.StokBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisPenawaran?: Prisma.BarisPenawaranPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPesananPenjualan?: Prisma.BarisPesananPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPengiriman?: Prisma.BarisPengirimanUncheckedUpdateManyWithoutBarangNestedInput
+  barisFakturPenjualan?: Prisma.BarisFakturPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisReturPenjualan?: Prisma.BarisReturPenjualanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPesananPembelian?: Prisma.BarisPesananPembelianUncheckedUpdateManyWithoutBarangNestedInput
+  barisPenerimaanBarang?: Prisma.BarisPenerimaanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisFakturPembelian?: Prisma.BarisFakturPembelianUncheckedUpdateManyWithoutBarangNestedInput
+  barisReturPembelian?: Prisma.BarisReturPembelianUncheckedUpdateManyWithoutBarangNestedInput
+  barisPenyesuaian?: Prisma.BarisPenyesuaianPersediaanUncheckedUpdateManyWithoutBarangNestedInput
+  barisPindah?: Prisma.BarisPindahBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisPeminjaman?: Prisma.BarisPeminjamanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  barisKerusakan?: Prisma.BarisKerusakanBarangUncheckedUpdateManyWithoutBarangNestedInput
+  foto?: Prisma.FotoUncheckedUpdateManyWithoutBarangNestedInput
+}
+
+export type BarangUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  jenis?: Prisma.EnumJenisBarangFieldUpdateOperationsInput | $Enums.JenisBarang
+  kelompokId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  satuan?: Prisma.StringFieldUpdateOperationsInput | string
+  warna?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hargaBeli?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunBebanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
 export type BarangCreateManyKelompokInput = {
   id?: string
   kode: string
@@ -3883,6 +4319,8 @@ export type BarangCreateManyKelompokInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -3901,7 +4339,9 @@ export type BarangUpdateWithoutKelompokInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -3934,6 +4374,8 @@ export type BarangUncheckedUpdateWithoutKelompokInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3967,6 +4409,8 @@ export type BarangUncheckedUpdateManyWithoutKelompokInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3986,6 +4430,8 @@ export type BarangCreateManyAkunPendapatanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunHppId?: string | null
   akunPersediaanId?: string | null
@@ -4004,6 +4450,8 @@ export type BarangCreateManyAkunHppInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunPersediaanId?: string | null
@@ -4022,6 +4470,8 @@ export type BarangCreateManyAkunPersediaanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -4040,6 +4490,8 @@ export type BarangCreateManyAkunBebanInput = {
   hargaJual?: runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: string | null
+  perusahaanId?: string | null
   dibuatPada?: Date | string
   akunPendapatanId?: string | null
   akunHppId?: string | null
@@ -4057,8 +4509,10 @@ export type BarangUpdateWithoutAkunPendapatanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -4091,6 +4545,8 @@ export type BarangUncheckedUpdateWithoutAkunPendapatanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4124,6 +4580,8 @@ export type BarangUncheckedUpdateManyWithoutAkunPendapatanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4141,8 +4599,10 @@ export type BarangUpdateWithoutAkunHppInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -4175,6 +4635,8 @@ export type BarangUncheckedUpdateWithoutAkunHppInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4208,6 +4670,8 @@ export type BarangUncheckedUpdateManyWithoutAkunHppInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunPersediaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4225,8 +4689,10 @@ export type BarangUpdateWithoutAkunPersediaanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -4259,6 +4725,8 @@ export type BarangUncheckedUpdateWithoutAkunPersediaanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4292,6 +4760,8 @@ export type BarangUncheckedUpdateManyWithoutAkunPersediaanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4309,8 +4779,10 @@ export type BarangUpdateWithoutAkunBebanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   kelompok?: Prisma.KelompokBarangUpdateOneWithoutBarangNestedInput
+  perusahaan?: Prisma.PerusahaanUpdateOneWithoutBarangNestedInput
   stok?: Prisma.StokBarangUpdateManyWithoutBarangNestedInput
   barisPenawaran?: Prisma.BarisPenawaranPenjualanUpdateManyWithoutBarangNestedInput
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanUpdateManyWithoutBarangNestedInput
@@ -4343,6 +4815,8 @@ export type BarangUncheckedUpdateWithoutAkunBebanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4376,6 +4850,8 @@ export type BarangUncheckedUpdateManyWithoutAkunBebanInput = {
   hargaJual?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   hargaMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   stokMinimum?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  deskripsi?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   akunPendapatanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   akunHppId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4551,12 +5027,15 @@ export type BarangSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   hargaJual?: boolean
   hargaMinimum?: boolean
   stokMinimum?: boolean
+  deskripsi?: boolean
+  perusahaanId?: boolean
   dibuatPada?: boolean
   akunPendapatanId?: boolean
   akunHppId?: boolean
   akunPersediaanId?: boolean
   akunBebanId?: boolean
   kelompok?: boolean | Prisma.Barang$kelompokArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.Barang$perusahaanArgs<ExtArgs>
   stok?: boolean | Prisma.Barang$stokArgs<ExtArgs>
   barisPenawaran?: boolean | Prisma.Barang$barisPenawaranArgs<ExtArgs>
   barisPesananPenjualan?: boolean | Prisma.Barang$barisPesananPenjualanArgs<ExtArgs>
@@ -4591,12 +5070,15 @@ export type BarangSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   hargaJual?: boolean
   hargaMinimum?: boolean
   stokMinimum?: boolean
+  deskripsi?: boolean
+  perusahaanId?: boolean
   dibuatPada?: boolean
   akunPendapatanId?: boolean
   akunHppId?: boolean
   akunPersediaanId?: boolean
   akunBebanId?: boolean
   kelompok?: boolean | Prisma.Barang$kelompokArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.Barang$perusahaanArgs<ExtArgs>
   akunPendapatan?: boolean | Prisma.Barang$akunPendapatanArgs<ExtArgs>
   akunHpp?: boolean | Prisma.Barang$akunHppArgs<ExtArgs>
   akunPersediaan?: boolean | Prisma.Barang$akunPersediaanArgs<ExtArgs>
@@ -4615,12 +5097,15 @@ export type BarangSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   hargaJual?: boolean
   hargaMinimum?: boolean
   stokMinimum?: boolean
+  deskripsi?: boolean
+  perusahaanId?: boolean
   dibuatPada?: boolean
   akunPendapatanId?: boolean
   akunHppId?: boolean
   akunPersediaanId?: boolean
   akunBebanId?: boolean
   kelompok?: boolean | Prisma.Barang$kelompokArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.Barang$perusahaanArgs<ExtArgs>
   akunPendapatan?: boolean | Prisma.Barang$akunPendapatanArgs<ExtArgs>
   akunHpp?: boolean | Prisma.Barang$akunHppArgs<ExtArgs>
   akunPersediaan?: boolean | Prisma.Barang$akunPersediaanArgs<ExtArgs>
@@ -4639,6 +5124,8 @@ export type BarangSelectScalar = {
   hargaJual?: boolean
   hargaMinimum?: boolean
   stokMinimum?: boolean
+  deskripsi?: boolean
+  perusahaanId?: boolean
   dibuatPada?: boolean
   akunPendapatanId?: boolean
   akunHppId?: boolean
@@ -4646,9 +5133,10 @@ export type BarangSelectScalar = {
   akunBebanId?: boolean
 }
 
-export type BarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "jenis" | "kelompokId" | "satuan" | "warna" | "hargaBeli" | "hargaJual" | "hargaMinimum" | "stokMinimum" | "dibuatPada" | "akunPendapatanId" | "akunHppId" | "akunPersediaanId" | "akunBebanId", ExtArgs["result"]["barang"]>
+export type BarangOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "jenis" | "kelompokId" | "satuan" | "warna" | "hargaBeli" | "hargaJual" | "hargaMinimum" | "stokMinimum" | "deskripsi" | "perusahaanId" | "dibuatPada" | "akunPendapatanId" | "akunHppId" | "akunPersediaanId" | "akunBebanId", ExtArgs["result"]["barang"]>
 export type BarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kelompok?: boolean | Prisma.Barang$kelompokArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.Barang$perusahaanArgs<ExtArgs>
   stok?: boolean | Prisma.Barang$stokArgs<ExtArgs>
   barisPenawaran?: boolean | Prisma.Barang$barisPenawaranArgs<ExtArgs>
   barisPesananPenjualan?: boolean | Prisma.Barang$barisPesananPenjualanArgs<ExtArgs>
@@ -4672,6 +5160,7 @@ export type BarangInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 }
 export type BarangIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kelompok?: boolean | Prisma.Barang$kelompokArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.Barang$perusahaanArgs<ExtArgs>
   akunPendapatan?: boolean | Prisma.Barang$akunPendapatanArgs<ExtArgs>
   akunHpp?: boolean | Prisma.Barang$akunHppArgs<ExtArgs>
   akunPersediaan?: boolean | Prisma.Barang$akunPersediaanArgs<ExtArgs>
@@ -4679,6 +5168,7 @@ export type BarangIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 }
 export type BarangIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   kelompok?: boolean | Prisma.Barang$kelompokArgs<ExtArgs>
+  perusahaan?: boolean | Prisma.Barang$perusahaanArgs<ExtArgs>
   akunPendapatan?: boolean | Prisma.Barang$akunPendapatanArgs<ExtArgs>
   akunHpp?: boolean | Prisma.Barang$akunHppArgs<ExtArgs>
   akunPersediaan?: boolean | Prisma.Barang$akunPersediaanArgs<ExtArgs>
@@ -4689,6 +5179,7 @@ export type $BarangPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name: "Barang"
   objects: {
     kelompok: Prisma.$KelompokBarangPayload<ExtArgs> | null
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs> | null
     stok: Prisma.$StokBarangPayload<ExtArgs>[]
     barisPenawaran: Prisma.$BarisPenawaranPenjualanPayload<ExtArgs>[]
     barisPesananPenjualan: Prisma.$BarisPesananPenjualanPayload<ExtArgs>[]
@@ -4724,6 +5215,16 @@ export type $BarangPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
      */
     hargaMinimum: runtime.Decimal
     stokMinimum: runtime.Decimal
+    /**
+     * deskripsi katalog; hanya isian awal deskripsi baris dokumen penjualan (≤ 3000)
+     */
+    deskripsi: string | null
+    /**
+     * Pemilik barang. BARANG (stok) WAJIB terisi (CHECK DB Barang_barang_wajib_milik_perusahaan) sehingga harga pokok
+     * rata-rata satu barang hanya memuat stok satu perusahaan dan src/lib/stok.ts tidak berubah (K3).
+     * JASA boleh null = jasa bersama. Bawaan "utama" supaya create lama tanpa isian tetap sah.
+     */
+    perusahaanId: string | null
     dibuatPada: Date
     /**
      * Akun khusus per barang (opsional; kosong = pakai PemetaanAkun)
@@ -5130,6 +5631,7 @@ readonly fields: BarangFieldRefs;
 export interface Prisma__BarangClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   kelompok<T extends Prisma.Barang$kelompokArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$kelompokArgs<ExtArgs>>): Prisma.Prisma__KelompokBarangClient<runtime.Types.Result.GetResult<Prisma.$KelompokBarangPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  perusahaan<T extends Prisma.Barang$perusahaanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$perusahaanArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   stok<T extends Prisma.Barang$stokArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$stokArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StokBarangPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   barisPenawaran<T extends Prisma.Barang$barisPenawaranArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$barisPenawaranArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPenawaranPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   barisPesananPenjualan<T extends Prisma.Barang$barisPesananPenjualanArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Barang$barisPesananPenjualanArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BarisPesananPenjualanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5189,6 +5691,8 @@ export interface BarangFieldRefs {
   readonly hargaJual: Prisma.FieldRef<"Barang", 'Decimal'>
   readonly hargaMinimum: Prisma.FieldRef<"Barang", 'Decimal'>
   readonly stokMinimum: Prisma.FieldRef<"Barang", 'Decimal'>
+  readonly deskripsi: Prisma.FieldRef<"Barang", 'String'>
+  readonly perusahaanId: Prisma.FieldRef<"Barang", 'String'>
   readonly dibuatPada: Prisma.FieldRef<"Barang", 'DateTime'>
   readonly akunPendapatanId: Prisma.FieldRef<"Barang", 'String'>
   readonly akunHppId: Prisma.FieldRef<"Barang", 'String'>
@@ -5611,6 +6115,25 @@ export type Barang$kelompokArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.KelompokBarangInclude<ExtArgs> | null
   where?: Prisma.KelompokBarangWhereInput
+}
+
+/**
+ * Barang.perusahaan
+ */
+export type Barang$perusahaanArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Perusahaan
+   */
+  select?: Prisma.PerusahaanSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Perusahaan
+   */
+  omit?: Prisma.PerusahaanOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PerusahaanInclude<ExtArgs> | null
+  where?: Prisma.PerusahaanWhereInput
 }
 
 /**

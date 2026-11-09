@@ -47,6 +47,7 @@ export type AsetTetapMinAggregateOutputType = {
   nilaiSisa: runtime.Decimal | null
   umurBulan: number | null
   status: $Enums.StatusAset | null
+  perusahaanId: string | null
   akunAsetId: string | null
   akunBebanPenyusutanId: string | null
   akunAkumulasiPenyusutanId: string | null
@@ -71,6 +72,7 @@ export type AsetTetapMaxAggregateOutputType = {
   nilaiSisa: runtime.Decimal | null
   umurBulan: number | null
   status: $Enums.StatusAset | null
+  perusahaanId: string | null
   akunAsetId: string | null
   akunBebanPenyusutanId: string | null
   akunAkumulasiPenyusutanId: string | null
@@ -95,6 +97,7 @@ export type AsetTetapCountAggregateOutputType = {
   nilaiSisa: number
   umurBulan: number
   status: number
+  perusahaanId: number
   akunAsetId: number
   akunBebanPenyusutanId: number
   akunAkumulasiPenyusutanId: number
@@ -133,6 +136,7 @@ export type AsetTetapMinAggregateInputType = {
   nilaiSisa?: true
   umurBulan?: true
   status?: true
+  perusahaanId?: true
   akunAsetId?: true
   akunBebanPenyusutanId?: true
   akunAkumulasiPenyusutanId?: true
@@ -157,6 +161,7 @@ export type AsetTetapMaxAggregateInputType = {
   nilaiSisa?: true
   umurBulan?: true
   status?: true
+  perusahaanId?: true
   akunAsetId?: true
   akunBebanPenyusutanId?: true
   akunAkumulasiPenyusutanId?: true
@@ -181,6 +186,7 @@ export type AsetTetapCountAggregateInputType = {
   nilaiSisa?: true
   umurBulan?: true
   status?: true
+  perusahaanId?: true
   akunAsetId?: true
   akunBebanPenyusutanId?: true
   akunAkumulasiPenyusutanId?: true
@@ -292,6 +298,7 @@ export type AsetTetapGroupByOutputType = {
   nilaiSisa: runtime.Decimal
   umurBulan: number
   status: $Enums.StatusAset
+  perusahaanId: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -339,6 +346,7 @@ export type AsetTetapWhereInput = {
   nilaiSisa?: Prisma.DecimalFilter<"AsetTetap"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFilter<"AsetTetap"> | number
   status?: Prisma.EnumStatusAsetFilter<"AsetTetap"> | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFilter<"AsetTetap"> | string
   akunAsetId?: Prisma.StringFilter<"AsetTetap"> | string
   akunBebanPenyusutanId?: Prisma.StringFilter<"AsetTetap"> | string
   akunAkumulasiPenyusutanId?: Prisma.StringFilter<"AsetTetap"> | string
@@ -352,6 +360,7 @@ export type AsetTetapWhereInput = {
   ditolakOlehId?: Prisma.StringNullableFilter<"AsetTetap"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"AsetTetap"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"AsetTetap"> | string | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   akunAset?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   akunBebanPenyusutan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   akunAkumulasiPenyusutan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
@@ -373,6 +382,7 @@ export type AsetTetapOrderByWithRelationInput = {
   nilaiSisa?: Prisma.SortOrder
   umurBulan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunAsetId?: Prisma.SortOrder
   akunBebanPenyusutanId?: Prisma.SortOrder
   akunAkumulasiPenyusutanId?: Prisma.SortOrder
@@ -386,6 +396,7 @@ export type AsetTetapOrderByWithRelationInput = {
   ditolakOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
   ditolakPada?: Prisma.SortOrderInput | Prisma.SortOrder
   catatanPenolakan?: Prisma.SortOrderInput | Prisma.SortOrder
+  perusahaan?: Prisma.PerusahaanOrderByWithRelationInput
   akunAset?: Prisma.AkunOrderByWithRelationInput
   akunBebanPenyusutan?: Prisma.AkunOrderByWithRelationInput
   akunAkumulasiPenyusutan?: Prisma.AkunOrderByWithRelationInput
@@ -411,6 +422,7 @@ export type AsetTetapWhereUniqueInput = Prisma.AtLeast<{
   nilaiSisa?: Prisma.DecimalFilter<"AsetTetap"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFilter<"AsetTetap"> | number
   status?: Prisma.EnumStatusAsetFilter<"AsetTetap"> | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFilter<"AsetTetap"> | string
   akunAsetId?: Prisma.StringFilter<"AsetTetap"> | string
   akunBebanPenyusutanId?: Prisma.StringFilter<"AsetTetap"> | string
   akunAkumulasiPenyusutanId?: Prisma.StringFilter<"AsetTetap"> | string
@@ -423,6 +435,7 @@ export type AsetTetapWhereUniqueInput = Prisma.AtLeast<{
   ditolakOlehId?: Prisma.StringNullableFilter<"AsetTetap"> | string | null
   ditolakPada?: Prisma.DateTimeNullableFilter<"AsetTetap"> | Date | string | null
   catatanPenolakan?: Prisma.StringNullableFilter<"AsetTetap"> | string | null
+  perusahaan?: Prisma.XOR<Prisma.PerusahaanScalarRelationFilter, Prisma.PerusahaanWhereInput>
   akunAset?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   akunBebanPenyusutan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
   akunAkumulasiPenyusutan?: Prisma.XOR<Prisma.AkunScalarRelationFilter, Prisma.AkunWhereInput>
@@ -444,6 +457,7 @@ export type AsetTetapOrderByWithAggregationInput = {
   nilaiSisa?: Prisma.SortOrder
   umurBulan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunAsetId?: Prisma.SortOrder
   akunBebanPenyusutanId?: Prisma.SortOrder
   akunAkumulasiPenyusutanId?: Prisma.SortOrder
@@ -476,6 +490,7 @@ export type AsetTetapScalarWhereWithAggregatesInput = {
   nilaiSisa?: Prisma.DecimalWithAggregatesFilter<"AsetTetap"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntWithAggregatesFilter<"AsetTetap"> | number
   status?: Prisma.EnumStatusAsetWithAggregatesFilter<"AsetTetap"> | $Enums.StatusAset
+  perusahaanId?: Prisma.StringWithAggregatesFilter<"AsetTetap"> | string
   akunAsetId?: Prisma.StringWithAggregatesFilter<"AsetTetap"> | string
   akunBebanPenyusutanId?: Prisma.StringWithAggregatesFilter<"AsetTetap"> | string
   akunAkumulasiPenyusutanId?: Prisma.StringWithAggregatesFilter<"AsetTetap"> | string
@@ -505,6 +520,7 @@ export type AsetTetapCreateInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -526,6 +542,7 @@ export type AsetTetapUncheckedCreateInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -557,6 +574,7 @@ export type AsetTetapUpdateInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -578,6 +596,7 @@ export type AsetTetapUncheckedUpdateInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -604,6 +623,7 @@ export type AsetTetapCreateManyInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -644,6 +664,7 @@ export type AsetTetapUncheckedUpdateManyInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -683,6 +704,7 @@ export type AsetTetapCountOrderByAggregateInput = {
   nilaiSisa?: Prisma.SortOrder
   umurBulan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunAsetId?: Prisma.SortOrder
   akunBebanPenyusutanId?: Prisma.SortOrder
   akunAkumulasiPenyusutanId?: Prisma.SortOrder
@@ -713,6 +735,7 @@ export type AsetTetapMaxOrderByAggregateInput = {
   nilaiSisa?: Prisma.SortOrder
   umurBulan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunAsetId?: Prisma.SortOrder
   akunBebanPenyusutanId?: Prisma.SortOrder
   akunAkumulasiPenyusutanId?: Prisma.SortOrder
@@ -737,6 +760,7 @@ export type AsetTetapMinOrderByAggregateInput = {
   nilaiSisa?: Prisma.SortOrder
   umurBulan?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  perusahaanId?: Prisma.SortOrder
   akunAsetId?: Prisma.SortOrder
   akunBebanPenyusutanId?: Prisma.SortOrder
   akunAkumulasiPenyusutanId?: Prisma.SortOrder
@@ -886,6 +910,48 @@ export type AsetTetapUncheckedUpdateManyWithoutDitolakOlehNestedInput = {
   connect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
   update?: Prisma.AsetTetapUpdateWithWhereUniqueWithoutDitolakOlehInput | Prisma.AsetTetapUpdateWithWhereUniqueWithoutDitolakOlehInput[]
   updateMany?: Prisma.AsetTetapUpdateManyWithWhereWithoutDitolakOlehInput | Prisma.AsetTetapUpdateManyWithWhereWithoutDitolakOlehInput[]
+  deleteMany?: Prisma.AsetTetapScalarWhereInput | Prisma.AsetTetapScalarWhereInput[]
+}
+
+export type AsetTetapCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput> | Prisma.AsetTetapCreateWithoutPerusahaanInput[] | Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput | Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.AsetTetapCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+}
+
+export type AsetTetapUncheckedCreateNestedManyWithoutPerusahaanInput = {
+  create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput> | Prisma.AsetTetapCreateWithoutPerusahaanInput[] | Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput | Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput[]
+  createMany?: Prisma.AsetTetapCreateManyPerusahaanInputEnvelope
+  connect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+}
+
+export type AsetTetapUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput> | Prisma.AsetTetapCreateWithoutPerusahaanInput[] | Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput | Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.AsetTetapUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.AsetTetapUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.AsetTetapCreateManyPerusahaanInputEnvelope
+  set?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  disconnect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  delete?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  connect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  update?: Prisma.AsetTetapUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.AsetTetapUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.AsetTetapUpdateManyWithWhereWithoutPerusahaanInput | Prisma.AsetTetapUpdateManyWithWhereWithoutPerusahaanInput[]
+  deleteMany?: Prisma.AsetTetapScalarWhereInput | Prisma.AsetTetapScalarWhereInput[]
+}
+
+export type AsetTetapUncheckedUpdateManyWithoutPerusahaanNestedInput = {
+  create?: Prisma.XOR<Prisma.AsetTetapCreateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput> | Prisma.AsetTetapCreateWithoutPerusahaanInput[] | Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput[]
+  connectOrCreate?: Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput | Prisma.AsetTetapCreateOrConnectWithoutPerusahaanInput[]
+  upsert?: Prisma.AsetTetapUpsertWithWhereUniqueWithoutPerusahaanInput | Prisma.AsetTetapUpsertWithWhereUniqueWithoutPerusahaanInput[]
+  createMany?: Prisma.AsetTetapCreateManyPerusahaanInputEnvelope
+  set?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  disconnect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  delete?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  connect?: Prisma.AsetTetapWhereUniqueInput | Prisma.AsetTetapWhereUniqueInput[]
+  update?: Prisma.AsetTetapUpdateWithWhereUniqueWithoutPerusahaanInput | Prisma.AsetTetapUpdateWithWhereUniqueWithoutPerusahaanInput[]
+  updateMany?: Prisma.AsetTetapUpdateManyWithWhereWithoutPerusahaanInput | Prisma.AsetTetapUpdateManyWithWhereWithoutPerusahaanInput[]
   deleteMany?: Prisma.AsetTetapScalarWhereInput | Prisma.AsetTetapScalarWhereInput[]
 }
 
@@ -1135,6 +1201,7 @@ export type AsetTetapCreateWithoutDiajukanOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1155,6 +1222,7 @@ export type AsetTetapUncheckedCreateWithoutDiajukanOlehInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1195,6 +1263,7 @@ export type AsetTetapCreateWithoutDisetujuiOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1215,6 +1284,7 @@ export type AsetTetapUncheckedCreateWithoutDisetujuiOlehInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1255,6 +1325,7 @@ export type AsetTetapCreateWithoutDitolakOlehInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1275,6 +1346,7 @@ export type AsetTetapUncheckedCreateWithoutDitolakOlehInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1329,6 +1401,7 @@ export type AsetTetapScalarWhereInput = {
   nilaiSisa?: Prisma.DecimalFilter<"AsetTetap"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFilter<"AsetTetap"> | number
   status?: Prisma.EnumStatusAsetFilter<"AsetTetap"> | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFilter<"AsetTetap"> | string
   akunAsetId?: Prisma.StringFilter<"AsetTetap"> | string
   akunBebanPenyusutanId?: Prisma.StringFilter<"AsetTetap"> | string
   akunAkumulasiPenyusutanId?: Prisma.StringFilter<"AsetTetap"> | string
@@ -1376,6 +1449,84 @@ export type AsetTetapUpdateManyWithWhereWithoutDitolakOlehInput = {
   data: Prisma.XOR<Prisma.AsetTetapUpdateManyMutationInput, Prisma.AsetTetapUncheckedUpdateManyWithoutDitolakOlehInput>
 }
 
+export type AsetTetapCreateWithoutPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  tanggalPerolehan?: Date | string
+  hargaPerolehan: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan: number
+  status?: $Enums.StatusAset
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanPada?: Date | string | null
+  disetujuiPada?: Date | string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
+  akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
+  akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
+  akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
+  jurnalPerolehan?: Prisma.JurnalCreateNestedOneWithoutPerolehanAsetInput
+  penyusutan?: Prisma.PenyusutanAsetCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetCreateNestedOneWithoutAsetInput
+  diajukanOleh?: Prisma.PenggunaCreateNestedOneWithoutAjukanAsetTetapInput
+  disetujuiOleh?: Prisma.PenggunaCreateNestedOneWithoutSetujuiAsetTetapInput
+  ditolakOleh?: Prisma.PenggunaCreateNestedOneWithoutTolakAsetTetapInput
+}
+
+export type AsetTetapUncheckedCreateWithoutPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  tanggalPerolehan?: Date | string
+  hargaPerolehan: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan: number
+  status?: $Enums.StatusAset
+  akunAsetId: string
+  akunBebanPenyusutanId: string
+  akunAkumulasiPenyusutanId: string
+  akunPembayaranId?: string | null
+  jurnalPerolehanId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+  penyusutan?: Prisma.PenyusutanAsetUncheckedCreateNestedManyWithoutAsetInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedCreateNestedOneWithoutAsetInput
+}
+
+export type AsetTetapCreateOrConnectWithoutPerusahaanInput = {
+  where: Prisma.AsetTetapWhereUniqueInput
+  create: Prisma.XOR<Prisma.AsetTetapCreateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type AsetTetapCreateManyPerusahaanInputEnvelope = {
+  data: Prisma.AsetTetapCreateManyPerusahaanInput | Prisma.AsetTetapCreateManyPerusahaanInput[]
+  skipDuplicates?: boolean
+}
+
+export type AsetTetapUpsertWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.AsetTetapWhereUniqueInput
+  update: Prisma.XOR<Prisma.AsetTetapUpdateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedUpdateWithoutPerusahaanInput>
+  create: Prisma.XOR<Prisma.AsetTetapCreateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedCreateWithoutPerusahaanInput>
+}
+
+export type AsetTetapUpdateWithWhereUniqueWithoutPerusahaanInput = {
+  where: Prisma.AsetTetapWhereUniqueInput
+  data: Prisma.XOR<Prisma.AsetTetapUpdateWithoutPerusahaanInput, Prisma.AsetTetapUncheckedUpdateWithoutPerusahaanInput>
+}
+
+export type AsetTetapUpdateManyWithWhereWithoutPerusahaanInput = {
+  where: Prisma.AsetTetapScalarWhereInput
+  data: Prisma.XOR<Prisma.AsetTetapUpdateManyMutationInput, Prisma.AsetTetapUncheckedUpdateManyWithoutPerusahaanInput>
+}
+
 export type AsetTetapCreateWithoutAkunAsetInput = {
   id?: string
   kode: string
@@ -1390,6 +1541,7 @@ export type AsetTetapCreateWithoutAkunAsetInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
@@ -1410,6 +1562,7 @@ export type AsetTetapUncheckedCreateWithoutAkunAsetInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
   akunPembayaranId?: string | null
@@ -1450,6 +1603,7 @@ export type AsetTetapCreateWithoutAkunBebanPenyusutanInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
@@ -1470,6 +1624,7 @@ export type AsetTetapUncheckedCreateWithoutAkunBebanPenyusutanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunAkumulasiPenyusutanId: string
   akunPembayaranId?: string | null
@@ -1510,6 +1665,7 @@ export type AsetTetapCreateWithoutAkunAkumulasiPenyusutanInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunPembayaran?: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunPembayaranInput
@@ -1530,6 +1686,7 @@ export type AsetTetapUncheckedCreateWithoutAkunAkumulasiPenyusutanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunPembayaranId?: string | null
@@ -1570,6 +1727,7 @@ export type AsetTetapCreateWithoutAkunPembayaranInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1590,6 +1748,7 @@ export type AsetTetapUncheckedCreateWithoutAkunPembayaranInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1694,6 +1853,7 @@ export type AsetTetapCreateWithoutJurnalPerolehanInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1714,6 +1874,7 @@ export type AsetTetapUncheckedCreateWithoutJurnalPerolehanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1760,6 +1921,7 @@ export type AsetTetapUpdateWithoutJurnalPerolehanInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -1780,6 +1942,7 @@ export type AsetTetapUncheckedUpdateWithoutJurnalPerolehanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1810,6 +1973,7 @@ export type AsetTetapCreateWithoutPelepasanInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1830,6 +1994,7 @@ export type AsetTetapUncheckedCreateWithoutPelepasanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1876,6 +2041,7 @@ export type AsetTetapUpdateWithoutPelepasanInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -1896,6 +2062,7 @@ export type AsetTetapUncheckedUpdateWithoutPelepasanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1926,6 +2093,7 @@ export type AsetTetapCreateWithoutPenyusutanInput = {
   disetujuiPada?: Date | string | null
   ditolakPada?: Date | string | null
   catatanPenolakan?: string | null
+  perusahaan?: Prisma.PerusahaanCreateNestedOneWithoutAsetTetapInput
   akunAset: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAsetInput
   akunBebanPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunBebanInput
   akunAkumulasiPenyusutan: Prisma.AkunCreateNestedOneWithoutAsetSebagaiAkunAkumulasiInput
@@ -1946,6 +2114,7 @@ export type AsetTetapUncheckedCreateWithoutPenyusutanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -1992,6 +2161,7 @@ export type AsetTetapUpdateWithoutPenyusutanInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -2012,6 +2182,7 @@ export type AsetTetapUncheckedUpdateWithoutPenyusutanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2037,6 +2208,7 @@ export type AsetTetapCreateManyDiajukanOlehInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -2060,6 +2232,7 @@ export type AsetTetapCreateManyDisetujuiOlehInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -2083,6 +2256,7 @@ export type AsetTetapCreateManyDitolakOlehInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -2111,6 +2285,7 @@ export type AsetTetapUpdateWithoutDiajukanOlehInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -2131,6 +2306,7 @@ export type AsetTetapUncheckedUpdateWithoutDiajukanOlehInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2156,6 +2332,7 @@ export type AsetTetapUncheckedUpdateManyWithoutDiajukanOlehInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2184,6 +2361,7 @@ export type AsetTetapUpdateWithoutDisetujuiOlehInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -2204,6 +2382,7 @@ export type AsetTetapUncheckedUpdateWithoutDisetujuiOlehInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2229,6 +2408,7 @@ export type AsetTetapUncheckedUpdateManyWithoutDisetujuiOlehInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2257,6 +2437,7 @@ export type AsetTetapUpdateWithoutDitolakOlehInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -2277,6 +2458,7 @@ export type AsetTetapUncheckedUpdateWithoutDitolakOlehInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2302,6 +2484,7 @@ export type AsetTetapUncheckedUpdateManyWithoutDitolakOlehInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2316,6 +2499,106 @@ export type AsetTetapUncheckedUpdateManyWithoutDitolakOlehInput = {
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
+export type AsetTetapCreateManyPerusahaanInput = {
+  id?: string
+  kode: string
+  nama: string
+  tanggalPerolehan?: Date | string
+  hargaPerolehan: runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan: number
+  status?: $Enums.StatusAset
+  akunAsetId: string
+  akunBebanPenyusutanId: string
+  akunAkumulasiPenyusutanId: string
+  akunPembayaranId?: string | null
+  jurnalPerolehanId?: string | null
+  statusPersetujuan?: $Enums.StatusPersetujuan
+  diajukanOlehId?: string | null
+  diajukanPada?: Date | string | null
+  disetujuiOlehId?: string | null
+  disetujuiPada?: Date | string | null
+  ditolakOlehId?: string | null
+  ditolakPada?: Date | string | null
+  catatanPenolakan?: string | null
+}
+
+export type AsetTetapUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalPerolehan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hargaPerolehan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
+  akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
+  akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
+  akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
+  jurnalPerolehan?: Prisma.JurnalUpdateOneWithoutPerolehanAsetNestedInput
+  penyusutan?: Prisma.PenyusutanAsetUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUpdateOneWithoutAsetNestedInput
+  diajukanOleh?: Prisma.PenggunaUpdateOneWithoutAjukanAsetTetapNestedInput
+  disetujuiOleh?: Prisma.PenggunaUpdateOneWithoutSetujuiAsetTetapNestedInput
+  ditolakOleh?: Prisma.PenggunaUpdateOneWithoutTolakAsetTetapNestedInput
+}
+
+export type AsetTetapUncheckedUpdateWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalPerolehan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hargaPerolehan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  penyusutan?: Prisma.PenyusutanAsetUncheckedUpdateManyWithoutAsetNestedInput
+  pelepasan?: Prisma.PelepasanAsetUncheckedUpdateOneWithoutAsetNestedInput
+}
+
+export type AsetTetapUncheckedUpdateManyWithoutPerusahaanInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kode?: Prisma.StringFieldUpdateOperationsInput | string
+  nama?: Prisma.StringFieldUpdateOperationsInput | string
+  tanggalPerolehan?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  hargaPerolehan?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
+  akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  jurnalPerolehanId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusPersetujuan?: Prisma.EnumStatusPersetujuanFieldUpdateOperationsInput | $Enums.StatusPersetujuan
+  diajukanOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  diajukanPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disetujuiOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ditolakOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
 export type AsetTetapCreateManyAkunAsetInput = {
   id?: string
   kode: string
@@ -2325,6 +2608,7 @@ export type AsetTetapCreateManyAkunAsetInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
   akunPembayaranId?: string | null
@@ -2348,6 +2632,7 @@ export type AsetTetapCreateManyAkunBebanPenyusutanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunAkumulasiPenyusutanId: string
   akunPembayaranId?: string | null
@@ -2371,6 +2656,7 @@ export type AsetTetapCreateManyAkunAkumulasiPenyusutanInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunPembayaranId?: string | null
@@ -2394,6 +2680,7 @@ export type AsetTetapCreateManyAkunPembayaranInput = {
   nilaiSisa?: runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan: number
   status?: $Enums.StatusAset
+  perusahaanId?: string
   akunAsetId: string
   akunBebanPenyusutanId: string
   akunAkumulasiPenyusutanId: string
@@ -2422,6 +2709,7 @@ export type AsetTetapUpdateWithoutAkunAsetInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
@@ -2442,6 +2730,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunAsetInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2467,6 +2756,7 @@ export type AsetTetapUncheckedUpdateManyWithoutAkunAsetInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2495,6 +2785,7 @@ export type AsetTetapUpdateWithoutAkunBebanPenyusutanInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
@@ -2515,6 +2806,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunBebanPenyusutanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2540,6 +2832,7 @@ export type AsetTetapUncheckedUpdateManyWithoutAkunBebanPenyusutanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2568,6 +2861,7 @@ export type AsetTetapUpdateWithoutAkunAkumulasiPenyusutanInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunPembayaran?: Prisma.AkunUpdateOneWithoutAsetSebagaiAkunPembayaranNestedInput
@@ -2588,6 +2882,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunAkumulasiPenyusutanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2613,6 +2908,7 @@ export type AsetTetapUncheckedUpdateManyWithoutAkunAkumulasiPenyusutanInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunPembayaranId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2641,6 +2937,7 @@ export type AsetTetapUpdateWithoutAkunPembayaranInput = {
   disetujuiPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   ditolakPada?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   catatanPenolakan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  perusahaan?: Prisma.PerusahaanUpdateOneRequiredWithoutAsetTetapNestedInput
   akunAset?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAsetNestedInput
   akunBebanPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunBebanNestedInput
   akunAkumulasiPenyusutan?: Prisma.AkunUpdateOneRequiredWithoutAsetSebagaiAkunAkumulasiNestedInput
@@ -2661,6 +2958,7 @@ export type AsetTetapUncheckedUpdateWithoutAkunPembayaranInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2686,6 +2984,7 @@ export type AsetTetapUncheckedUpdateManyWithoutAkunPembayaranInput = {
   nilaiSisa?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   umurBulan?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumStatusAsetFieldUpdateOperationsInput | $Enums.StatusAset
+  perusahaanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAsetId?: Prisma.StringFieldUpdateOperationsInput | string
   akunBebanPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
   akunAkumulasiPenyusutanId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2740,6 +3039,7 @@ export type AsetTetapSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   nilaiSisa?: boolean
   umurBulan?: boolean
   status?: boolean
+  perusahaanId?: boolean
   akunAsetId?: boolean
   akunBebanPenyusutanId?: boolean
   akunAkumulasiPenyusutanId?: boolean
@@ -2753,6 +3053,7 @@ export type AsetTetapSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   akunAset?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunBebanPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunAkumulasiPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2775,6 +3076,7 @@ export type AsetTetapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   nilaiSisa?: boolean
   umurBulan?: boolean
   status?: boolean
+  perusahaanId?: boolean
   akunAsetId?: boolean
   akunBebanPenyusutanId?: boolean
   akunAkumulasiPenyusutanId?: boolean
@@ -2788,6 +3090,7 @@ export type AsetTetapSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   akunAset?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunBebanPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunAkumulasiPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2807,6 +3110,7 @@ export type AsetTetapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   nilaiSisa?: boolean
   umurBulan?: boolean
   status?: boolean
+  perusahaanId?: boolean
   akunAsetId?: boolean
   akunBebanPenyusutanId?: boolean
   akunAkumulasiPenyusutanId?: boolean
@@ -2820,6 +3124,7 @@ export type AsetTetapSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   ditolakOlehId?: boolean
   ditolakPada?: boolean
   catatanPenolakan?: boolean
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   akunAset?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunBebanPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunAkumulasiPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2839,6 +3144,7 @@ export type AsetTetapSelectScalar = {
   nilaiSisa?: boolean
   umurBulan?: boolean
   status?: boolean
+  perusahaanId?: boolean
   akunAsetId?: boolean
   akunBebanPenyusutanId?: boolean
   akunAkumulasiPenyusutanId?: boolean
@@ -2854,8 +3160,9 @@ export type AsetTetapSelectScalar = {
   catatanPenolakan?: boolean
 }
 
-export type AsetTetapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "tanggalPerolehan" | "hargaPerolehan" | "nilaiSisa" | "umurBulan" | "status" | "akunAsetId" | "akunBebanPenyusutanId" | "akunAkumulasiPenyusutanId" | "akunPembayaranId" | "jurnalPerolehanId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["asetTetap"]>
+export type AsetTetapOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kode" | "nama" | "tanggalPerolehan" | "hargaPerolehan" | "nilaiSisa" | "umurBulan" | "status" | "perusahaanId" | "akunAsetId" | "akunBebanPenyusutanId" | "akunAkumulasiPenyusutanId" | "akunPembayaranId" | "jurnalPerolehanId" | "statusPersetujuan" | "diajukanOlehId" | "diajukanPada" | "disetujuiOlehId" | "disetujuiPada" | "ditolakOlehId" | "ditolakPada" | "catatanPenolakan", ExtArgs["result"]["asetTetap"]>
 export type AsetTetapInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   akunAset?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunBebanPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunAkumulasiPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2869,6 +3176,7 @@ export type AsetTetapInclude<ExtArgs extends runtime.Types.Extensions.InternalAr
   _count?: boolean | Prisma.AsetTetapCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AsetTetapIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   akunAset?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunBebanPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunAkumulasiPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2879,6 +3187,7 @@ export type AsetTetapIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   ditolakOleh?: boolean | Prisma.AsetTetap$ditolakOlehArgs<ExtArgs>
 }
 export type AsetTetapIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   akunAset?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunBebanPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
   akunAkumulasiPenyusutan?: boolean | Prisma.AkunDefaultArgs<ExtArgs>
@@ -2892,6 +3201,7 @@ export type AsetTetapIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type $AsetTetapPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AsetTetap"
   objects: {
+    perusahaan: Prisma.$PerusahaanPayload<ExtArgs>
     akunAset: Prisma.$AkunPayload<ExtArgs>
     akunBebanPenyusutan: Prisma.$AkunPayload<ExtArgs>
     akunAkumulasiPenyusutan: Prisma.$AkunPayload<ExtArgs>
@@ -2912,6 +3222,10 @@ export type $AsetTetapPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     nilaiSisa: runtime.Decimal
     umurBulan: number
     status: $Enums.StatusAset
+    /**
+     * Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
+     */
+    perusahaanId: string
     akunAsetId: string
     akunBebanPenyusutanId: string
     akunAkumulasiPenyusutanId: string
@@ -3325,6 +3639,7 @@ readonly fields: AsetTetapFieldRefs;
  */
 export interface Prisma__AsetTetapClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  perusahaan<T extends Prisma.PerusahaanDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PerusahaanDefaultArgs<ExtArgs>>): Prisma.Prisma__PerusahaanClient<runtime.Types.Result.GetResult<Prisma.$PerusahaanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   akunAset<T extends Prisma.AkunDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AkunDefaultArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   akunBebanPenyusutan<T extends Prisma.AkunDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AkunDefaultArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   akunAkumulasiPenyusutan<T extends Prisma.AkunDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AkunDefaultArgs<ExtArgs>>): Prisma.Prisma__AkunClient<runtime.Types.Result.GetResult<Prisma.$AkunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -3372,6 +3687,7 @@ export interface AsetTetapFieldRefs {
   readonly nilaiSisa: Prisma.FieldRef<"AsetTetap", 'Decimal'>
   readonly umurBulan: Prisma.FieldRef<"AsetTetap", 'Int'>
   readonly status: Prisma.FieldRef<"AsetTetap", 'StatusAset'>
+  readonly perusahaanId: Prisma.FieldRef<"AsetTetap", 'String'>
   readonly akunAsetId: Prisma.FieldRef<"AsetTetap", 'String'>
   readonly akunBebanPenyusutanId: Prisma.FieldRef<"AsetTetap", 'String'>
   readonly akunAkumulasiPenyusutanId: Prisma.FieldRef<"AsetTetap", 'String'>
