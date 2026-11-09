@@ -14,6 +14,8 @@ const GAYA_STATUS: Record<string, { cls: string; label: string }> = {
   DIJUAL: { cls: "lencana-slate", label: "Dijual" },
   DIHAPUS: { cls: "lencana-rose", label: "Dihapus" },
   OPEN: { cls: "lencana-blue", label: "Berjalan" },
+  // CRM (D4 §7.6): tindak lanjut MENUNGGU yang jatuh temponya sudah lewat
+  TERLAMBAT: { cls: "lencana-rose", label: "Terlambat" },
 };
 
 export function LencanaStatus({ status }: { status: string }) {
