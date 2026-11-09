@@ -6,9 +6,12 @@ import GrafikTren from "@/komponen/ui/GrafikTren";
 
 const rp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
-/** Kartu tren kas 12 bulan di beranda (basis kas: uang yang masuk dan keluar untuk operasi). Komponen server async di dalam <Suspense>. */
-export default async function PanelTren({ tahun }: { tahun: number }) {
-  const tren = await labaRugiKasBulanan(db, tahun);
+/**
+ * Kartu tren kas 12 bulan di beranda (basis kas: uang yang masuk dan keluar untuk operasi). Komponen server async di dalam <Suspense>.
+ * perusahaanId kosong = gabungan (perilaku lama); diisi = jurnal dan akun kas perusahaan itu saja (D1 §4.8).
+ */
+export default async function PanelTren({ tahun, perusahaanId = null }: { tahun: number; perusahaanId?: string | null }) {
+  const tren = perusahaanId ? await labaRugiKasBulanan(db, tahun, { perusahaanId }) : await labaRugiKasBulanan(db, tahun);
   const bulan = tren.bulan.map((m) => ({ bulan: m.bulan, pendapatan: m.diterima, bebanPokok: m.dikeluarkan, bebanLain: D(0), labaBersih: m.surplus }));
   return (
         <div className="kartu">

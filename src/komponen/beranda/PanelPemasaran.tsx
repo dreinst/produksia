@@ -85,19 +85,20 @@ export default async function PanelPemasaran({ pengguna, perusahaanId }: { pengg
                         const p = petaPerusahaan.get(k.perusahaanId);
                         const persetujuan = STATUS_PERSETUJUAN_KONTEN[k.statusPersetujuan];
                         return (
-                          <li key={k.id} className="py-2 flex items-start justify-between gap-3 text-sm">
-                            <div className="min-w-0">
-                              <div className="font-medium text-slate-800 truncate">{k.judul}</div>
-                              <div className="text-xs text-slate-500 flex items-center gap-1.5">
+                          // Judul memakai lebar penuh; platform dan tanggal tidak dipatahkan; lencana boleh turun ke baris berikutnya.
+                          <li key={k.id} className="py-2 text-sm space-y-1">
+                            <div className="font-medium text-slate-800 truncate" title={k.judul}>{k.judul}</div>
+                            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                              <div className="text-xs text-slate-500 flex items-center gap-1.5 whitespace-nowrap">
                                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TITIK_PLATFORM[k.platform]}`} aria-hidden="true" />
                                 {LABEL_PLATFORM[k.platform]} · {formatTanggal(k.tanggalTerbit)}
                                 {k.jamTerbit ? `, ${k.jamTerbit.replace(":", ".")}` : ""}
                               </div>
-                            </div>
-                            <div className="flex flex-wrap justify-end items-center gap-1.5 shrink-0">
-                              {p && <LencanaPerusahaan kode={p.kode} warna={p.warna} nama={p.nama} />}
-                              <span className={kelasLencana(STATUS_KONTEN[k.status].warna)}>{STATUS_KONTEN[k.status].label}</span>
-                              {persetujuan && k.statusPersetujuan !== "DISETUJUI" && <span className={kelasLencana(persetujuan.warna)}>{persetujuan.label}</span>}
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {p && <LencanaPerusahaan kode={p.kode} warna={p.warna} nama={p.nama} />}
+                                <span className={kelasLencana(STATUS_KONTEN[k.status].warna)}>{STATUS_KONTEN[k.status].label}</span>
+                                {persetujuan && k.statusPersetujuan !== "DISETUJUI" && <span className={kelasLencana(persetujuan.warna)}>{persetujuan.label}</span>}
+                              </div>
                             </div>
                           </li>
                         );

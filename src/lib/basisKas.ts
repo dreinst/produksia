@@ -54,15 +54,21 @@ type CatatanKas = {
 const tambah = (peta: Map<string, Desimal>, k: string, v: Desimal) => peta.set(k, (peta.get(k) ?? D(0)).plus(v));
 
 async function kumpulkanKas(klien: PrismaClient, dari: Date, sampai: Date, opsi: OpsiLaporan) {
+  // Satu perusahaan (D1 §4.6, §4.8): akun kas milik perusahaan itu atau bersama, jurnal perusahaan itu saja, dan akun
+  // PPh 23 dimuka dari pengaturan SEMUA perusahaan (aman karena jurnalnya sudah tersaring). Tanpa perusahaanId kuerinya
+  // sama persis dengan sebelumnya (pengaturan baris "default" saja).
+  const p = opsi.perusahaanId || null;
   const [akunKas, pemetaan, pengaturan, daftarAkun] = await Promise.all([
-    klien.akun.findMany({ where: { kasBank: true, kelompok: false }, select: { id: true } }),
+    klien.akun.findMany({ where: { kasBank: true, kelompok: false, ...(p ? { OR: [{ perusahaanId: p }, { perusahaanId: null }] } : {}) }, select: { id: true } }),
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
-    klien.pengaturanPerusahaan.findUnique({ where: { id: "default" }, select: { akunPph23DimukaId: true } }),
+    p
+      ? klien.pengaturanPerusahaan.findMany({ select: { akunPph23DimukaId: true } })
+      : klien.pengaturanPerusahaan.findUnique({ where: { id: "default" }, select: { akunPph23DimukaId: true } }).then((r) => (r ? [r] : [])),
     klien.akun.findMany({ select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } }),
   ]);
   const idKas = akunKas.map((a) => a.id);
   const daftarJurnal = await klien.jurnal.findMany({
-    where: { tanggal: { gte: dari, lte: sampai }, baris: { some: { akunId: { in: idKas } } }, ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}) },
+    where: { tanggal: { gte: dari, lte: sampai }, baris: { some: { akunId: { in: idKas } } }, ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}), ...(p ? { perusahaanId: p } : {}) },
     select: {
       id: true,
       tanggal: true,
@@ -82,7 +88,7 @@ async function kumpulkanKas(klien: PrismaClient, dari: Date, sampai: Date, opsi:
     },
   });
   const akunPendapatanBawaan = pemetaan?.pendapatanPenjualanId ?? null;
-  const milikPelanggan = new Set([pemetaan?.piutangUsahaId, pemetaan?.uangMukaPelangganId, pengaturan?.akunPph23DimukaId].filter((x): x is string => Boolean(x)));
+  const milikPelanggan = new Set([pemetaan?.piutangUsahaId, pemetaan?.uangMukaPelangganId, ...pengaturan.map((r) => r.akunPph23DimukaId)].filter((x): x is string => Boolean(x)));
   const nol = D(0);
   const catatan: CatatanKas[] = [];
   for (const j of daftarJurnal) {
