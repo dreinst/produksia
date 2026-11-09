@@ -36,7 +36,7 @@ export default async function DasborModul({ tab, daftarTab, pengguna }: { tab: K
   );
 }
 
-/** Panel per tab. Tab pemasaran dan proyek dipasang bersama panelnya (belum aktif di beranda.ts). */
+/** Panel per tab; tiap panel async punya Suspense sendiri (D7 §3.5 no. 6). Tab pemasaran dan proyek dipasang bersama panelnya (belum aktif di beranda.ts). */
 function IsiTab({ tab, pengguna, perusahaanId }: { tab: KodeTab; pengguna: PenggunaSesi; perusahaanId: string | null }) {
   switch (tab) {
     case "saya":
@@ -44,8 +44,12 @@ function IsiTab({ tab, pengguna, perusahaanId }: { tab: KodeTab; pengguna: Pengg
     case "penjualan":
       return (
         <div className="space-y-7">
-          <PanelCrmBeranda pengguna={pengguna} perusahaanId={perusahaanId} />
-          <PanelPenjualanDokumen pengguna={pengguna} perusahaanId={perusahaanId} />
+          <Suspense fallback={<KerangkaPanel />}>
+            <PanelCrmBeranda pengguna={pengguna} perusahaanId={perusahaanId} />
+          </Suspense>
+          <Suspense fallback={<KerangkaPanel />}>
+            <PanelPenjualanDokumen pengguna={pengguna} perusahaanId={perusahaanId} />
+          </Suspense>
         </div>
       );
     case "sistem":

@@ -10,6 +10,8 @@ const TUJUH_HARI_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * Log dalam lingkup: satu perusahaan = log perusahaan itu ditambah log tingkat sistem (perusahaanId null).
+ * Pencatat lama belum mengisi perusahaanId, jadi catatan tanpa perusahaan bisa berasal dari perusahaan lain;
+ * karena itu panel menandainya di subjudul.
  * Daftar terbaru hanya memuat catatan tanpa modul (akuntansi dan umum), yang memang terbuka bagi pemegang
  * log-aktivitas.lihat; catatan modul baru menunggu aturan visibilitas per modul (D7 §3.7.4).
  */
@@ -20,10 +22,12 @@ function saringLogLingkup(perusahaanId: string | null): Prisma.LogAktivitasWhere
 export async function muatRingkasanSistem(perusahaanId: string | null, sekarang: Date = new Date()) {
   const sejak = new Date(sekarang.getTime() - TUJUH_HARI_MS);
   const lingkup = saringLogLingkup(perusahaanId);
-  const [perusahaan, pengguna, penggunaAktif, masuk7Hari, aktivitas7Hari, terbaru] = await Promise.all([
+  const [perusahaan, pengguna, penggunaAktif, logAuth, masuk7Hari, aktivitas7Hari, terbaru] = await Promise.all([
     daftarPerusahaan(false, db),
     db.pengguna.count(),
     db.pengguna.count({ where: { aktif: true } }),
+    // pencatatan MASUK modul auth (D7 §3.7.3) belum dibangun; selama belum ada satu pun, angka masuk tidak bermakna
+    db.logAktivitas.count({ where: { modul: "auth" } }),
     db.logAktivitas.count({ where: { AND: [lingkup, { aksi: "MASUK", modul: "auth", waktu: { gte: sejak } }] } }),
     db.logAktivitas.count({ where: { AND: [lingkup, { waktu: { gte: sejak } }] } }),
     db.logAktivitas.findMany({
@@ -33,7 +37,7 @@ export async function muatRingkasanSistem(perusahaanId: string | null, sekarang:
       select: { id: true, waktu: true, penggunaNama: true, aksi: true, jenis: true, nomor: true, keterangan: true },
     }),
   ]);
-  return { perusahaanAktif: perusahaan.length, pengguna, penggunaAktif, masuk7Hari, aktivitas7Hari, terbaru };
+  return { perusahaanAktif: perusahaan.length, pengguna, penggunaAktif, pencatatanMasukAktif: logAuth > 0, masuk7Hari, aktivitas7Hari, terbaru };
 }
 
 /** Tab "Sistem" beranda (D7 §3.5): butuh pengguna.kelola dan log-aktivitas.lihat. */
@@ -46,15 +50,27 @@ export default async function PanelSistem({ pengguna, perusahaanId }: { pengguna
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <KartuKpi judul="Perusahaan aktif" ikon="domain" nilai={data.perusahaanAktif} awalan="" />
         <KartuKpi judul="Pengguna" ikon="group" nilai={data.pengguna} awalan="" sub={`${data.penggunaAktif.toLocaleString("id-ID")} aktif`} />
-        <KartuKpi judul="Masuk 7 hari" ikon="person" nilai={data.masuk7Hari} awalan="" />
-        <KartuKpi judul="Aktivitas 7 hari" ikon="history" nilai={data.aktivitas7Hari} awalan="" />
+        {data.pencatatanMasukAktif ? (
+          <KartuKpi judul="Masuk 7 hari" ikon="person" nilai={data.masuk7Hari} awalan="" />
+        ) : (
+          <KartuKpi judul="Masuk 7 hari" ikon="person" nilai="Belum dicatat" sub="Pencatatan masuk belum aktif" />
+        )}
+        <KartuKpi
+          judul="Aktivitas 7 hari"
+          ikon="history"
+          nilai={data.aktivitas7Hari}
+          awalan=""
+          sub={perusahaanId ? "Termasuk catatan tanpa perusahaan" : undefined}
+        />
       </div>
 
       <div className="kartu">
         <div className="kepala-kartu">
           <div>
             <h2 className="judul-kartu">Aktivitas terbaru</h2>
-            <p className="subjudul-kartu">Delapan catatan terakhir di log aktivitas.</p>
+            <p className="subjudul-kartu">
+              {perusahaanId ? "Delapan catatan terakhir, termasuk catatan tanpa perusahaan." : "Delapan catatan terakhir di log aktivitas."}
+            </p>
           </div>
           <Link href="/pengaturan/log-aktivitas" className="tombol tombol-lembut tombol-kecil">Buka log aktivitas</Link>
         </div>

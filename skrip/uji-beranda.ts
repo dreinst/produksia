@@ -118,12 +118,16 @@ async function bersihkanDataUji() {
 }
 
 async function main() {
-  const mulaiUji = new Date();
   await bersihkanDataUji();
 
   console.log("=== 1. Tab beranda menurut hak ===");
   pastikan(sama(TAB_BERANDA.map((t) => t.kode), ["keuangan", "saya", "penjualan", "pemasaran", "proyek", "sistem"]), "urutan tab lengkap: keuangan, saya, penjualan, pemasaran, proyek, sistem");
   pastikan(TAB_BERANDA.filter((t) => !t.tersedia).map((t) => t.kode).join() === "pemasaran,proyek", "tab pemasaran dan proyek belum aktif (panelnya paket berikutnya)");
+  pastikan(
+    TAB_BERANDA.filter((t) => !t.tersedia && (t.salahSatu.some((h) => HAK_BAWAAN.KASIR.includes(h)) || (t.semua.length > 0 && t.semua.every((h) => HAK_BAWAAN.KASIR.includes(h))))).length === 0,
+    "KASIR bawaan tidak memegang syarat tab yang belum aktif (tetap satu tab setelah DF4)",
+  );
+  pastikan(sama(TAB_BERANDA.find((t) => t.kode === "proyek")?.salahSatu ?? [], ["anggaran-proyek.lihat"]), "tab Keuangan Proyek disyaratkan anggaran-proyek.lihat, bukan proyek.lihat");
   const harap: Record<PeranPengguna, KodeTab[]> = {
     SUPERADMIN: ["keuangan", "saya", "penjualan", "sistem"],
     PEMILIK: ["keuangan", "saya", "penjualan", "sistem"],
@@ -329,6 +333,13 @@ async function main() {
   pastikan(hanyaPenawaran.penawaranPerStatus !== null && hanyaPenawaran.fakturBelumLunas === null && hanyaPenawaran.pendapatanLunas === null, "hanya penawaran.lihat: angka faktur dan pendapatan tidak dimuat");
 
   console.log("=== 9. Data panel sistem ===");
+  const adaLogAuth = (await db.logAktivitas.count({ where: { modul: "auth" } })) > 0;
+  const sebelumMasuk = await muatRingkasanSistem(null);
+  pastikan(sebelumMasuk.pencatatanMasukAktif === adaLogAuth, "pencatatan masuk dianggap aktif hanya bila sudah ada log modul auth");
+  if (!adaLogAuth) {
+    const kartu = await render(PanelSistem({ pengguna: pemilik, perusahaanId: null }));
+    pastikan(kartu.teks.includes("Belum dicatat") && kartu.teks.includes("Pencatatan masuk belum aktif"), "tanpa log auth: kartu Masuk 7 hari bertanda belum aktif, bukan angka 0");
+  }
   await db.logAktivitas.createMany({
     data: [
       { penggunaNama: "Skrip Uji", aksi: "MASUK", jenis: "Sesi", nomor: "UJB-MASUK", modul: "auth", perusahaanId: null },
@@ -340,7 +351,11 @@ async function main() {
   const sisP1 = await muatRingkasanSistem(p1.id);
   pastikan(sisGab.perusahaanAktif === (await db.perusahaan.count({ where: { aktif: true } })), "perusahaan aktif dihitung dari daftar perusahaan");
   pastikan(sisGab.pengguna === (await db.pengguna.count()) && sisGab.penggunaAktif === (await db.pengguna.count({ where: { aktif: true } })), "jumlah pengguna total dan aktif");
-  pastikan(sisGab.masuk7Hari >= 1, "masuk 7 hari menghitung log MASUK modul auth");
+  pastikan(sisGab.pencatatanMasukAktif && sisGab.masuk7Hari >= 1, "masuk 7 hari menghitung log MASUK modul auth");
+  const sistemP1 = await render(PanelSistem({ pengguna: pemilik, perusahaanId: p1.id }));
+  pastikan(sistemP1.teks.includes("termasuk catatan tanpa perusahaan") && sistemP1.teks.includes("Termasuk catatan tanpa perusahaan"), "lingkup satu perusahaan: subjudul menyebut catatan tanpa perusahaan");
+  const sistemGab = await render(PanelSistem({ pengguna: pemilik, perusahaanId: null }));
+  pastikan(!sistemGab.teks.includes("tanpa perusahaan"), "gabungan: tanpa keterangan catatan tanpa perusahaan");
   pastikan(sisGab.aktivitas7Hari - sisP1.aktivitas7Hari === 1, "lingkup satu perusahaan tidak menghitung log perusahaan lain");
   pastikan(!sisGab.terbaru.some((l) => l.nomor === "UJB-CRM") && sisGab.terbaru.length <= 8, "daftar terbaru tanpa catatan modul (menunggu aturan visibilitas modul), maks 8");
   pastikan(!sisP1.terbaru.some((l) => l.nomor === "UJB-P2") && sisGab.terbaru.some((l) => l.nomor === "UJB-P2"), "log perusahaan dua hanya tampil di gabungan");
@@ -375,7 +390,6 @@ async function main() {
 
   console.log("=== Bersih-bersih ===");
   await bersihkanDataUji();
-  await db.logAktivitas.deleteMany({ where: { waktu: { gte: mulaiUji } } });
   pastikan((await db.tahapLead.count({ where: { perusahaanId: { in: [p1.id, p2.id] } } })) === 0, "tahap uji ikut terhapus bersama perusahaan");
   const sesudah = await statistikCrm(db, sekarang, null);
   pastikan(sesudah.totalLead === sebelumGabungan.totalLead && (await db.perusahaan.count({ where: { kode: { in: ["UJB1", "UJB2"] } } })) === 0, "data uji CRM dan perusahaan uji sudah bersih");
