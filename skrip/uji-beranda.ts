@@ -99,11 +99,17 @@ async function render(node: ReactNode): Promise<{ teks: string; href: string[] }
   return { teks: teks.join(""), href };
 }
 
-/** Tautan internal harus menuju halaman yang ada di src/app/(aplikasi). */
+/** Tautan internal harus menuju halaman yang ada di src/app/(aplikasi); segmen yang tidak ada boleh cocok dengan folder [param]. */
 function ruteAda(href: string): boolean {
   const jalur = href.split("?")[0].split("#")[0];
   if (jalur === "/" || jalur === "") return existsSync("src/app/(aplikasi)/page.tsx");
-  return existsSync(`src/app/(aplikasi)${jalur}/page.tsx`);
+  let dir = "src/app/(aplikasi)";
+  for (const seg of jalur.split("/").filter(Boolean)) {
+    if (existsSync(`${dir}/${seg}`)) dir = `${dir}/${seg}`;
+    else if (existsSync(`${dir}/[id]`)) dir = `${dir}/[id]`;
+    else return false;
+  }
+  return existsSync(`${dir}/page.tsx`);
 }
 
 /** Hapus data uji (juga sisa percobaan yang terputus). Urutan aman FK: dokumen, tindak lanjut, lead, perusahaan (tahap Cascade), pengguna. */
@@ -122,29 +128,29 @@ async function main() {
 
   console.log("=== 1. Tab beranda menurut hak ===");
   pastikan(sama(TAB_BERANDA.map((t) => t.kode), ["keuangan", "saya", "penjualan", "pemasaran", "proyek", "sistem"]), "urutan tab lengkap: keuangan, saya, penjualan, pemasaran, proyek, sistem");
-  pastikan(TAB_BERANDA.filter((t) => !t.tersedia).map((t) => t.kode).join() === "pemasaran,proyek", "tab pemasaran dan proyek belum aktif (panelnya paket berikutnya)");
+  pastikan(TAB_BERANDA.every((t) => t.tersedia), "semua tab aktif, termasuk pemasaran dan proyek (paket DF4)");
   pastikan(
-    TAB_BERANDA.filter((t) => !t.tersedia && (t.salahSatu.some((h) => HAK_BAWAAN.KASIR.includes(h)) || (t.semua.length > 0 && t.semua.every((h) => HAK_BAWAAN.KASIR.includes(h))))).length === 0,
-    "KASIR bawaan tidak memegang syarat tab yang belum aktif (tetap satu tab setelah DF4)",
+    TAB_BERANDA.filter((t) => (t.kode === "pemasaran" || t.kode === "proyek") && (t.salahSatu.some((h) => HAK_BAWAAN.KASIR.includes(h)) || (t.semua.length > 0 && t.semua.every((h) => HAK_BAWAAN.KASIR.includes(h))))).length === 0,
+    "KASIR bawaan tidak memegang syarat tab pemasaran dan proyek (tetap satu tab setelah DF4)",
   );
   pastikan(sama(TAB_BERANDA.find((t) => t.kode === "proyek")?.salahSatu ?? [], ["anggaran-proyek.lihat"]), "tab Keuangan Proyek disyaratkan anggaran-proyek.lihat, bukan proyek.lihat");
   const harap: Record<PeranPengguna, KodeTab[]> = {
-    SUPERADMIN: ["keuangan", "saya", "penjualan", "sistem"],
-    PEMILIK: ["keuangan", "saya", "penjualan", "sistem"],
-    ADMIN: ["keuangan", "saya", "penjualan"],
+    SUPERADMIN: ["keuangan", "saya", "penjualan", "pemasaran", "proyek", "sistem"],
+    PEMILIK: ["keuangan", "saya", "penjualan", "pemasaran", "proyek", "sistem"],
+    ADMIN: ["keuangan", "saya", "penjualan", "pemasaran", "proyek"],
     KASIR: ["keuangan"],
     GUDANG: [],
     KRU: [],
     GUEST: [],
-    SOSMED: ["saya"],
-    IKLAN: [],
-    DESAINER: ["saya"],
+    SOSMED: ["saya", "pemasaran"],
+    IKLAN: ["pemasaran"],
+    DESAINER: ["saya", "pemasaran"],
   };
   for (const peran of Object.keys(harap) as PeranPengguna[]) {
     pastikan(sama(tabBeranda({ hak: HAK_BAWAAN[peran] }), harap[peran]), `${peran}: tab ${JSON.stringify(harap[peran])}`);
   }
   pastikan(sama(tabBeranda({ hak: [...hitungHak("KASIR"), "lead.lihat"] }), ["keuangan", "penjualan"]), "KASIR yang diberi lead.lihat mendapat tab Penjualan & CRM (hak, bukan nama peran)");
-  pastikan(sama(tabBeranda({ hak: hitungHak("ADMIN").filter((h) => h !== "beranda-keuangan.lihat") }), ["saya", "penjualan"]), "ADMIN yang dicabut beranda-keuangan.lihat kehilangan tab keuangan");
+  pastikan(sama(tabBeranda({ hak: hitungHak("ADMIN").filter((h) => h !== "beranda-keuangan.lihat") }), ["saya", "penjualan", "pemasaran", "proyek"]), "ADMIN yang dicabut beranda-keuangan.lihat kehilangan tab keuangan");
   pastikan(sama(tabBeranda({ hak: ["pengguna.kelola"] }), []), "sistem butuh pengguna.kelola DAN log-aktivitas.lihat (hanya satu: tidak tampil)");
   pastikan(sama(tabBeranda({ hak: ["pengguna.kelola", "log-aktivitas.lihat"] }), ["sistem"]), "keduanya: tab sistem");
   pastikan(sama(tabBeranda({ hak: [] }), []), "tanpa hak: tidak ada tab");
@@ -152,7 +158,7 @@ async function main() {
   pastikan(pilihTab(tabAdmin, "penjualan") === "penjualan", "pilihTab: tab yang boleh dipakai");
   pastikan(pilihTab(tabAdmin, "sistem") === "keuangan", "pilihTab: tab yang tidak boleh jatuh ke bawaan");
   pastikan(pilihTab(tabAdmin, "ngawur") === "keuangan", "pilihTab: ?tab tidak dikenal jatuh ke bawaan");
-  pastikan(pilihTab(tabAdmin, "pemasaran") === "keuangan", "pilihTab: tab yang belum aktif jatuh ke bawaan");
+  pastikan(pilihTab(tabAdmin, "pemasaran") === "pemasaran", "pilihTab: tab pemasaran yang boleh dipakai");
   pastikan(pilihTab(tabAdmin, undefined) === "keuangan", "pilihTab: tanpa ?tab = tab pertama");
   pastikan(pilihTab(tabAdmin, ["saya", "penjualan"]) === "saya", "pilihTab: ?tab ganda memakai nilai pertama");
   pastikan(pilihTab(["saya"], "keuangan") === "saya", "pilihTab: SOSMED meminta keuangan mendapat Tugas Saya");
@@ -168,17 +174,19 @@ async function main() {
   pastikan(cariDangkal(await muat("KASIR", "penjualan"), TabBeranda).length === 0 && cariDangkal(await muat("KASIR", "penjualan"), "h1").length > 0, "KASIR ?tab=penjualan: tetap beranda keuangan");
   const halPemilik = await muat("PEMILIK");
   const barisTab = cariDangkal(halPemilik, TabBeranda);
-  pastikan(barisTab.length === 1 && sama(barisTab[0].props.daftar as KodeTab[], harap.PEMILIK) && barisTab[0].props.aktif === "keuangan", "PEMILIK: baris tab empat tab dengan Keuangan aktif");
+  pastikan(barisTab.length === 1 && sama(barisTab[0].props.daftar as KodeTab[], harap.PEMILIK) && barisTab[0].props.aktif === "keuangan", "PEMILIK: baris tab enam tab dengan Keuangan aktif");
   pastikan(sama((halPemilik as ReactElement<{ children: ReactNode[] }>).props.children.slice(0, 1).map((c) => isValidElement(c) && c.type === TabBeranda), [true]), "PEMILIK: baris tab adalah anak pertama beranda keuangan");
   const halSuper = await muat("SUPERADMIN");
   pastikan(cariDangkal(halSuper, TabBeranda).length === 1, "SUPERADMIN: baris tab tampil");
   const halSistem = (await muat("PEMILIK", "sistem")) as ReactElement<Record<string, unknown>>;
   pastikan(halSistem.type === DasborModul && halSistem.props.tab === "sistem", "PEMILIK ?tab=sistem: DasborModul tab sistem (jalur keuangan tidak dijalankan)");
-  pastikan(((await muat("PEMILIK", "pemasaran")) as ReactElement).type !== DasborModul, "PEMILIK ?tab=pemasaran (belum aktif): kembali ke keuangan");
+  const halPemasaran = (await muat("PEMILIK", "pemasaran")) as ReactElement<Record<string, unknown>>;
+  pastikan(halPemasaran.type === DasborModul && halPemasaran.props.tab === "pemasaran", "PEMILIK ?tab=pemasaran: DasborModul tab pemasaran");
   pastikan(((await muat("ADMIN", "sistem")) as ReactElement).type !== DasborModul, "ADMIN ?tab=sistem (tanpa hak): kembali ke keuangan");
   const halSosmed = (await muat("SOSMED")) as ReactElement<Record<string, unknown>>;
-  pastikan(halSosmed.type === DasborModul && halSosmed.props.tab === "saya" && sama(halSosmed.props.daftarTab as KodeTab[], ["saya"]), "SOSMED: Tugas Saya, bukan kartu saldo keuangan");
-  pastikan(((await muat("IKLAN")) as ReactElement).type === BerandaKosong, "IKLAN: belum ada tab, beranda kosong");
+  pastikan(halSosmed.type === DasborModul && halSosmed.props.tab === "saya" && sama(halSosmed.props.daftarTab as KodeTab[], ["saya", "pemasaran"]), "SOSMED: Tugas Saya, bukan kartu saldo keuangan");
+  const halIklan = (await muat("IKLAN")) as ReactElement<Record<string, unknown>>;
+  pastikan(halIklan.type === DasborModul && halIklan.props.tab === "pemasaran" && halIklan.type !== BerandaKosong, "IKLAN: tab Pemasaran, bukan beranda kosong");
   let dialihkan = "";
   try {
     await muat("GUDANG");

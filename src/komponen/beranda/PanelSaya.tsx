@@ -2,22 +2,31 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 import { tindakLanjutSaya, tindakLanjutTerlambat } from "@/lib/crm";
+import { ringkasanDesainBeranda, tugasLewatTenggat, SYARAT_TUGAS_AKTIF } from "@/lib/desain";
+import { SYARAT_KONTEN_AKTIF } from "@/lib/konten";
+import { STATUS_DESAIN, kelasLencana } from "@/lib/labelPemasaran";
 import { daftarPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
-import { formatWaktu } from "@/lib/waktu";
+import { formatTanggal, formatWaktu } from "@/lib/waktu";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import Ikon from "@/komponen/ui/Ikon";
 
 /*
- * Tab "Tugas Saya" (D7 §3.5, §7.4): tindak lanjut saya dan dokumen yang menunggu persetujuan pengguna.
- * Kartu tugas desain saya serta konten/desain yang menunggu persetujuan ditambahkan paket pemasaran.
+ * Tab "Tugas Saya" (D7 §3.5, §7.4): tugas desain saya, tindak lanjut saya, dan yang menunggu persetujuan pengguna
+ * (dokumen maker-checker, konten, dan tinjauan desain). Tautan ke halaman Pemasaran dipasang paket Pemasaran setelah
+ * halamannya ada.
  */
 
 type BarisMenunggu = { kode: string; label: string; jumlah: number };
 
+/** Kode baris "menunggu" modul Pemasaran; sisanya dokumen maker-checker yang ditangani halaman /persetujuan. */
+export const KODE_MENUNGGU_PEMASARAN: readonly string[] = ["konten", "desain"];
+
 /**
  * Jumlah dokumen maker-checker berstatus MENUNGGU yang boleh pengguna setujui dan bukan ajuannya sendiri
- * (pemisahan tugas, sama dengan pastikanBukanPengaju), dalam lingkup perusahaan (null = gabungan).
+ * (pemisahan tugas, sama dengan pastikanBukanPengaju), ditambah konten yang menunggu persetujuan (konten.setujui) dan
+ * tugas desain yang menunggu tinjauan (tugas-desain.setujui), dalam lingkup perusahaan (null = gabungan). Konten dan
+ * desain tidak memakai pemisahan tugas karena penyetuju boleh meninjau ajuannya sendiri (D6 §3.1.4).
  */
 export async function menungguPersetujuanSaya(pengguna: PenggunaSesi, perusahaanId: string | null): Promise<BarisMenunggu[]> {
   const where = {
@@ -37,6 +46,16 @@ export async function menungguPersetujuanSaya(pengguna: PenggunaSesi, perusahaan
     ["kerusakan", "Laporan Kerusakan Barang", boleh("kerusakan.setujui") ? db.laporanKerusakanBarang.count({ where }) : nol],
     ["aset", "Aset Tetap", boleh("aset.setujui") ? db.asetTetap.count({ where }) : nol],
     ["penggajian", "Penggajian", boleh("penggajian.setujui") ? db.penggajian.count({ where }) : nol],
+    [
+      "konten",
+      "Konten media sosial",
+      boleh("konten.setujui") ? db.konten.count({ where: { ...SYARAT_KONTEN_AKTIF, ...saringPerusahaan(perusahaanId), statusPersetujuan: "MENUNGGU" } }) : nol,
+    ],
+    [
+      "desain",
+      "Tinjauan desain",
+      boleh("tugas-desain.setujui") ? db.tugasDesain.count({ where: { ...SYARAT_TUGAS_AKTIF, ...saringPerusahaan(perusahaanId), status: "DITINJAU" } }) : nol,
+    ],
   ];
   const jumlah = await Promise.all(daftar.map((d) => d[2]));
   return daftar.map(([kode, label], i) => ({ kode, label, jumlah: jumlah[i] })).filter((b) => b.jumlah > 0);
@@ -44,17 +63,60 @@ export async function menungguPersetujuanSaya(pengguna: PenggunaSesi, perusahaan
 
 export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: PenggunaSesi; perusahaanId: string | null }) {
   const bolehLead = punyaHak(pengguna, "lead.lihat");
+  const bolehDesain = punyaHak(pengguna, "tugas-desain.lihat");
   const sekarang = new Date();
-  const [tindakLanjut, menunggu, perusahaan] = await Promise.all([
+  const [desain, tindakLanjut, menunggu, perusahaan] = await Promise.all([
+    bolehDesain ? ringkasanDesainBeranda(db, pengguna.id, perusahaanId) : Promise.resolve(null),
     bolehLead ? tindakLanjutSaya(db, pengguna.id, 10, perusahaanId) : Promise.resolve([]),
     menungguPersetujuanSaya(pengguna, perusahaanId),
     perusahaanId === null ? daftarPerusahaan(true) : Promise.resolve([]),
   ]);
   const petaPerusahaan = new Map(perusahaan.map((p) => [p.id, p]));
   const totalMenunggu = menunggu.reduce((s, b) => s + b.jumlah, 0);
+  const adaDokumen = menunggu.some((b) => !KODE_MENUNGGU_PEMASARAN.includes(b.kode));
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
+      {desain && (
+        <div className="kartu">
+          <div className="kepala-kartu">
+            <div>
+              <h2 className="judul-kartu">Tugas desain saya</h2>
+              <p className="subjudul-kartu">Tugas yang ditugaskan ke Anda dan belum selesai, urut tenggat.</p>
+            </div>
+            {desain.revisiSaya > 0 && <span className="lencana lencana-rose">Revisi untuk Anda: {desain.revisiSaya.toLocaleString("id-ID")}</span>}
+          </div>
+          {desain.tugasSaya.length === 0 ? (
+            <p className="text-sm text-slate-500">Tidak ada tugas desain aktif.</p>
+          ) : (
+            <ul className="divide-y divide-slate-100">
+              {desain.tugasSaya.map((t) => {
+                const p = petaPerusahaan.get(t.perusahaanId);
+                const lewat = tugasLewatTenggat(t, sekarang);
+                return (
+                  <li key={t.id} className="py-2.5 flex items-start justify-between gap-3 text-sm">
+                    <div className="min-w-0">
+                      <div className="font-medium text-slate-800 truncate">{t.judul}</div>
+                      <div className={`text-xs truncate ${lewat ? "text-rose-600 font-medium" : "text-slate-500"}`}>
+                        {t.tenggat ? `Tenggat ${formatTanggal(t.tenggat)}` : "Tanpa tenggat"}
+                        {lewat ? " · Lewat tenggat" : ""}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {p && <LencanaPerusahaan kode={p.kode} warna={p.warna} nama={p.nama} />}
+                      <span className={kelasLencana(STATUS_DESAIN[t.status].warna)}>{STATUS_DESAIN[t.status].label}</span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {desain.ditugaskanKeSaya > desain.tugasSaya.length && (
+            <p className="text-xs text-slate-500 mt-3">{desain.ditugaskanKeSaya.toLocaleString("id-ID")} tugas aktif, menampilkan {desain.tugasSaya.length}.</p>
+          )}
+        </div>
+      )}
+
       {bolehLead && (
         <div className="kartu">
           <div className="kepala-kartu">
@@ -93,9 +155,9 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
         <div className="kepala-kartu">
           <div>
             <h2 className="judul-kartu">Menunggu persetujuan Anda</h2>
-            <p className="subjudul-kartu">Dokumen yang diajukan pengguna lain dan boleh Anda setujui.</p>
+            <p className="subjudul-kartu">Dokumen, konten, dan desain yang menunggu keputusan Anda.</p>
           </div>
-          {totalMenunggu > 0 && <span className="lencana lencana-amber">{totalMenunggu} dokumen</span>}
+          {totalMenunggu > 0 && <span className="lencana lencana-amber">{totalMenunggu.toLocaleString("id-ID")} menunggu</span>}
         </div>
         {menunggu.length === 0 ? (
           <p className="text-sm text-slate-500">Tidak ada yang menunggu persetujuan Anda.</p>
@@ -109,12 +171,14 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
                 </li>
               ))}
             </ul>
-            <div className="mt-4">
-              <Link href="/persetujuan" className="tombol tombol-lembut tombol-kecil">
-                <Ikon nama="fact_check" className="!text-[18px] text-slate-500" />
-                Buka Persetujuan
-              </Link>
-            </div>
+            {adaDokumen && (
+              <div className="mt-4">
+                <Link href="/persetujuan" className="tombol tombol-lembut tombol-kecil">
+                  <Ikon nama="fact_check" className="!text-[18px] text-slate-500" />
+                  Buka Persetujuan
+                </Link>
+              </div>
+            )}
           </>
         )}
       </div>
