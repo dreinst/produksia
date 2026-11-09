@@ -132,7 +132,8 @@ async function formulirHalaman(peranBertanda: readonly PeranPengguna[], ubah: (i
   return fd;
 }
 
-const jumlahLogHakAkses = (sejak: Date) => db.logAktivitas.count({ where: { waktu: { gte: sejak }, jenis: "Hak Akses" } });
+// Dihitung sebagai selisih jumlah total, bukan saringan waktu: stempel waktu log bermikrodetik bisa jatuh di milidetik yang sama dengan penanda.
+const jumlahLogHakAkses = () => db.logAktivitas.count({ where: { jenis: "Hak Akses" } });
 
 async function main() {
   const kunciBaru = SEMUA_HAK.filter((h) => !kunciSebelumPeleburan(h));
@@ -217,31 +218,31 @@ async function main() {
   const baca = bacaMatriksFormulir(formulir({ "PEMILIK|faktur.buat": "on", "KASIR|faktur.buat": "on", "GUDANG|faktur.buat": "off" }));
   pastikan(samaUrut(baca.peranDiproses, ["KASIR"]), "bacaMatriksFormulir: peran di luar PERAN_DAPAT_DIATUR dan kotak bukan 'on' diabaikan");
 
-  let sejak = new Date();
+  let logAwal = await jumlahLogHakAkses();
   await jalankan("simpan formulir UI sungguhan (delapan peran bertanda)", async () => simpanHakAkses(await formulirHalaman(PERAN_DAPAT_DIATUR)));
   pastikan((await db.hakAksesPeran.count()) === 0, "formulir UI tanpa perubahan tidak menyimpan penyesuaian");
-  pastikan((await jumlahLogHakAkses(sejak)) === 0, "simpan tanpa perubahan tidak menulis log");
+  pastikan((await jumlahLogHakAkses()) - logAwal === 0, "simpan tanpa perubahan tidak menulis log");
   const tersimpan = await db.hakAksesPeran.findMany();
   const efektif = (p: PeranPengguna) => hitungHak(p, tersimpan.filter((x) => x.peran === p));
   pastikan(efektif("ADMIN").includes("faktur.setujui") && efektif("GUDANG").includes("peminjaman.setujui") && efektif("GUDANG").includes("kerusakan.setujui") && efektif("SOSMED").includes("tugas-desain.setujui"), "hak setujui ADMIN, GUDANG, SOSMED tetap utuh setelah simpan dari halaman");
 
-  sejak = new Date();
+  logAwal = await jumlahLogHakAkses();
   await jalankan("simpan dengan penanda SOSMED saja, konten.hapus dicabut", async () => simpanHakAkses(await formulirHalaman(["SOSMED"], (m) => m.set("SOSMED|konten.hapus", false))));
   const barisSosmed = await db.hakAksesPeran.findMany();
   pastikan(barisSosmed.length === 1 && barisSosmed[0].peran === "SOSMED" && barisSosmed[0].hak === "konten.hapus" && !barisSosmed[0].boleh, "tepat satu baris: SOSMED konten.hapus = tidak");
-  pastikan((await jumlahLogHakAkses(sejak)) === 1, "satu log Hak Akses untuk simpan yang mengubah");
+  pastikan((await jumlahLogHakAkses()) - logAwal === 1, "satu log Hak Akses untuk simpan yang mengubah");
   await jalankan("pulihkan bawaan", () => pulihkanHakBawaan());
 
   await jalankan("simpan dengan penanda DESAINER tanpa kotak", () => simpanHakAkses(formulir({ peranDirender: "DESAINER" })));
   const barisDesainer = await db.hakAksesPeran.findMany();
   pastikan(barisDesainer.length === HAK_BAWAAN.DESAINER.length && barisDesainer.every((b) => b.peran === "DESAINER" && !b.boleh), `penanda tanpa kotak mencabut semua bawaan DESAINER (${barisDesainer.length} baris)`);
 
-  sejak = new Date();
+  logAwal = await jumlahLogHakAkses();
   const isianLama: Record<string, string> = {};
   for (const p of PERAN_LAMA) for (const h of HAK_BAWAAN[p]) isianLama[`${p}|${h}`] = "on";
   await jalankan("simpan formulir gaya lama (tanpa penanda, lima peran lama)", () => simpanHakAkses(formulir(isianLama)));
   pastikan((await db.hakAksesPeran.count()) === HAK_BAWAAN.DESAINER.length && (await db.hakAksesPeran.count({ where: { peran: "DESAINER" } })) === HAK_BAWAAN.DESAINER.length, "formulir tanpa penanda tidak menyentuh peran yang tidak dirender");
-  pastikan((await jumlahLogHakAkses(sejak)) === 0, "formulir gaya lama tanpa selisih tidak menulis log");
+  pastikan((await jumlahLogHakAkses()) - logAwal === 0, "formulir gaya lama tanpa selisih tidak menulis log");
 
   await jalankan("pulihkan bawaan", () => pulihkanHakBawaan());
   pastikan((await db.hakAksesPeran.count()) === 0, "pulihkanHakBawaan mengosongkan penyesuaian");
