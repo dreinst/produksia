@@ -49,7 +49,7 @@ export default async function PanelPemasaran({ pengguna, perusahaanId }: { pengg
         <section className="space-y-3" aria-label="Iklan Meta">
           <h2 className="judul-kartu">Iklan Meta</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <KartuKpi judul="Kampanye aktif" ikon="campaign" nilai={iklan.aktif} awalan="" sub={`dari ${iklan.jumlahKampanye.toLocaleString("id-ID")} kampanye`} />
+            <KartuKpi judul="Kampanye aktif" ikon="bolt" nilai={iklan.aktif} awalan="" sub={`dari ${iklan.jumlahKampanye.toLocaleString("id-ID")} kampanye`} />
             <KartuKpi judul="Belanja iklan" ikon="payments" nilai={Number(iklan.total.belanja)} sub={`Anggaran rencana ${rupiah(iklan.anggaranRencana)}`} />
             <KartuKpi judul="Leads" ikon="group" nilai={iklan.total.leads} awalan="" sub={`${iklan.total.klik.toLocaleString("id-ID")} klik`} />
             <KartuKpi judul="ROAS" ikon="monitoring" nilai={kali(iklan.total.roas)} sub={`Pendapatan ${rupiah(iklan.total.pendapatan)}`} />
