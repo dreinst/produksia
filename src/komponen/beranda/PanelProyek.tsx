@@ -13,7 +13,8 @@ export const STATUS_PROYEK_AKTIF = "BERJALAN";
 const BARIS_TAMPIL = 10;
 
 const rupiah = (n: Desimal) => `Rp ${Number(n).toLocaleString("id-ID")}`;
-const teksPersen = (p: Desimal | null) => (p === null ? "-" : `${Number(p).toLocaleString("id-ID", { maximumFractionDigits: 1 })}%`);
+/** Persen margin seragam satu desimal, mis. "35,0%". */
+export const teksPersen = (p: Desimal | null) => (p === null ? "-" : `${Number(p).toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`);
 
 /**
  * Tab "Keuangan Proyek" beranda: proyek berjalan dalam lingkup perusahaan dengan pendapatan (kontrak), tagihan,
@@ -61,7 +62,7 @@ export default async function PanelProyek({ pengguna, perusahaanId }: { pengguna
                 <th className="text-right">Diterima (Rp)</th>
                 <th className="text-right">Anggaran (Rp)</th>
                 <th className="text-right">Biaya aktual (Rp)</th>
-                <th className="text-right">Margin kas</th>
+                <th className="text-right">Margin kas (Rp)</th>
                 {bolehLpj && <th className="td-lekat" />}
               </tr>
             </thead>

@@ -22,7 +22,8 @@ export default function KartuKpi({
   lencana?: { teks: string; cls: string };
 }) {
   return (
-    <div className="kartu kartu-statistik p-5 flex flex-col justify-between">
+    // Isi rata atas (tanpa justify-between) supaya angka sejajar di satu baris kartu, dengan atau tanpa subteks.
+    <div className="kartu kartu-statistik p-5 flex flex-col">
       <div className="flex items-center justify-between mb-3 gap-2">
         <span className="flex items-center gap-2 text-xs font-semibold text-slate-500">
           <span className="ubin-ikon"><Ikon nama={ikon} className="!text-[16px]" /></span>

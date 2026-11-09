@@ -51,15 +51,18 @@ export type AkunSaldo = {
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
 
 /** Saldo tiap akun rinci dari jurnal bertanggal dalam [dari, sampai]; `tanpaPenutup` mengabaikan jurnal penutup tahun. */
-/** Filter tambahan laporan: proyek/event tertentu. */
-export type OpsiLaporan = { proyekId?: string | null };
+/**
+ * Filter tambahan laporan: proyek/event tertentu dan perusahaan tertentu (D1 §4.6). Keduanya kosong = semua,
+ * hasilnya sama persis dengan sebelum ada isian itu. perusahaanId menyaring jurnal menurut Jurnal.perusahaanId.
+ */
+export type OpsiLaporan = { proyekId?: string | null; perusahaanId?: string | null };
 
 export async function saldoAkunPeriode(klien: PrismaClient, dari: Date | null, sampai: Date, tanpaPenutup = false, opsi: OpsiLaporan = {}): Promise<AkunSaldo[]> {
   const [daftarAkun, agregat] = await Promise.all([
     klien.akun.findMany({ orderBy: { kode: "asc" } }),
     klien.barisJurnal.groupBy({
       by: ["akunId"],
-      where: { jurnal: { tanggal: { ...(dari ? { gte: dari } : {}), lte: sampai }, ...(tanpaPenutup ? { sumber: { not: "PENUTUP" as const } } : {}), ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}) } },
+      where: { jurnal: { tanggal: { ...(dari ? { gte: dari } : {}), lte: sampai }, ...(tanpaPenutup ? { sumber: { not: "PENUTUP" as const } } : {}), ...(opsi.proyekId ? { proyekId: opsi.proyekId } : {}), ...(opsi.perusahaanId ? { perusahaanId: opsi.perusahaanId } : {}) } },
       _sum: { debit: true, kredit: true },
     }),
   ]);
@@ -226,6 +229,7 @@ export async function hitungLabaRugiBulanan(klien: PrismaClient = db, tahun: num
       WHERE j."tanggal" >= ${dari} AND j."tanggal" <= ${sampai} AND j."sumber" <> 'PENUTUP'
         AND a."jenis" IN ('PENDAPATAN', 'BEBAN')
         ${opsi.proyekId ? Prisma.sql`AND j."proyekId" = ${opsi.proyekId}` : Prisma.empty}
+        ${opsi.perusahaanId ? Prisma.sql`AND j."perusahaanId" = ${opsi.perusahaanId}` : Prisma.empty}
       GROUP BY 1, 2, 3`,
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     klien.akun.findMany({ select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } }),

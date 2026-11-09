@@ -9,6 +9,15 @@ import KartuKpi from "@/komponen/ui/KartuKpi";
 const TUJUH_HARI_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
+ * Warna lencana aksi log. Halaman Pengaturan › Log Aktivitas lama memakai rose untuk semua aksi, jadi tidak ada
+ * pemetaan lama yang bisa diikuti; di sini BUAT hijau, UBAH biru, HAPUS merah, aksi lain abu-abu.
+ */
+const WARNA_AKSI_LOG: Record<string, string> = { BUAT: "lencana-emerald", UBAH: "lencana-blue", HAPUS: "lencana-rose" };
+export function kelasLencanaAksiLog(aksi: string): string {
+  return `lencana ${WARNA_AKSI_LOG[aksi] ?? "lencana-slate"}`;
+}
+
+/**
  * Log dalam lingkup: satu perusahaan = log perusahaan itu ditambah log tingkat sistem (perusahaanId null).
  * Pencatat lama belum mengisi perusahaanId, jadi catatan tanpa perusahaan bisa berasal dari perusahaan lain;
  * karena itu panel menandainya di subjudul.
@@ -82,7 +91,7 @@ export default async function PanelSistem({ pengguna, perusahaanId }: { pengguna
               <li key={l.id} className="py-2.5 flex flex-wrap items-start justify-between gap-x-3 gap-y-1 text-sm">
                 <div className="min-w-0">
                   <div className="text-slate-800">
-                    <span className="lencana lencana-rose mr-2">{l.aksi}</span>
+                    <span className={`${kelasLencanaAksiLog(l.aksi)} mr-2`}>{l.aksi}</span>
                     <span className="text-slate-500">{l.jenis}</span> <span className="mono font-semibold">{l.nomor}</span>
                   </div>
                   {l.keterangan && <div className="text-xs text-slate-500 truncate">{l.keterangan}</div>}

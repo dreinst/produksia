@@ -81,9 +81,26 @@ export function akunDalamLingkup(akun: { perusahaanId: string | null }, perusaha
 }
 
 /**
- * true bila ada jurnal atau barang stok milik perusahaan selain `perusahaanId`. Dipakai beranda untuk panel yang
- * belum bisa disaring per perusahaan (tren kas dan pemeriksaan integritas memakai fungsi laporan lama yang
- * menghitung semua perusahaan): bila tidak ada data perusahaan lain, angka global sama dengan angka lingkup.
+ * Urutan rincian akun kas di kartu "Kas & Bank Tersedia". Gabungan, atau satu perusahaan yang belum punya akun kas
+ * sendiri (sesudah migrasi semua akun lama bersama): urutan semula (kode akun), sama dengan sebelum multi perusahaan.
+ * Satu perusahaan yang punya akun kas sendiri: akun itu lebih dulu, lalu akun bersama bersaldo, lalu akun bersama
+ * bersaldo nol, masing-masing tetap dalam urutan semula, supaya rincian dua baris teratas tidak terisi akun bersama
+ * Rp 0 sementara rekening perusahaan itu sendiri tersembunyi. Daftar dan totalnya tidak berubah.
+ */
+export function urutkanAkunKas<T extends { perusahaanId: string | null; balance: number }>(akun: readonly T[], perusahaanId: string | null): T[] {
+  if (!perusahaanId || !akun.some((a) => a.perusahaanId === perusahaanId)) return [...akun];
+  const peringkat = (a: T) => (a.perusahaanId === perusahaanId ? 0 : a.balance !== 0 ? 1 : 2);
+  return akun
+    .map((a, i) => ({ a, i }))
+    .sort((x, y) => peringkat(x.a) - peringkat(y.a) || x.i - y.i)
+    .map((x) => x.a);
+}
+
+/**
+ * true bila ada jurnal atau barang stok milik perusahaan selain `perusahaanId`. Dulu dipakai beranda untuk
+ * menyembunyikan tren kas dan Integritas di lingkup satu perusahaan; sejak labaRugiKasBulanan dan periksaSinkron
+ * menerima perusahaanId (DF5) beranda tidak memakainya lagi. Dipertahankan karena skrip/uji-lingkup-perusahaan.ts
+ * memanggilnya.
  */
 export async function adaDataPerusahaanLain(perusahaanId: string): Promise<boolean> {
   const [jurnal, barang] = await Promise.all([

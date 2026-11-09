@@ -12,7 +12,7 @@ import PanelTren, { KerangkaTren } from "@/komponen/beranda/PanelTren";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { lingkupPerusahaan } from "@/lib/perusahaan";
-import { adaDataPerusahaanLain, akunDalamLingkup, muatDataBerandaKeuangan } from "@/lib/berandaKeuangan";
+import { akunDalamLingkup, muatDataBerandaKeuangan, urutkanAkunKas } from "@/lib/berandaKeuangan";
 import { pilihTab, tabBeranda } from "@/lib/beranda";
 import TabBeranda from "@/komponen/beranda/TabBeranda";
 import DasborModul from "@/komponen/beranda/DasborModul";
@@ -52,9 +52,6 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
   const lingkup = await lingkupPerusahaan();
   const lingkupId = lingkup.perusahaanId;
   const gabungan = lingkupId === null;
-  // Tren kas dan pemeriksaan integritas memakai fungsi laporan lama yang menghitung semua perusahaan.
-  // Angkanya hanya ditampilkan bila sama dengan angka lingkup (gabungan, atau belum ada data perusahaan lain).
-  const panelGlobalSesuai = gabungan || !(await adaDataPerusahaanLain(lingkupId));
 
   const {
     fakturJualBelumLunas,
@@ -77,7 +74,8 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
   } = await muatDataBerandaKeuangan(lingkupId, now);
 
   const [sinkron, pengaturan, permintaanLupa] = await Promise.all([
-    panelGlobalSesuai ? periksaSinkron(db) : Promise.resolve(null),
+    // Integritas per lingkup (D1 §4.9): gabungan memanggil periksaSinkron persis seperti sebelumnya
+    gabungan ? periksaSinkron(db) : periksaSinkron(db, { perusahaanId: lingkupId }),
     ambilPengaturanPerusahaan(db),
     boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
   ]);
@@ -109,6 +107,8 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
   const bertanda = saldoAkun.filter((a) => a.kasBank && !a.kelompok && akunDalamLingkup(a, lingkupId));
   const akunKas = bertanda.length > 0 ? bertanda : saldoAkun.filter((a) => a.jenis === "ASET" && !a.kelompok && akunDalamLingkup(a, lingkupId) && /\b(kas|bank)\b/i.test(a.nama));
   const kas = akunKas.reduce((s, a) => s + a.balance, 0);
+  // rincian kartu: di lingkup satu perusahaan rekening milik perusahaan itu tampil lebih dulu
+  const akunKasTampil = urutkanAkunKas(akunKas, lingkupId);
 
   // ---- KPI 4: Persediaan ----
   const nilaiPersediaan = daftarStok.reduce((s, st) => s + Number(st.jumlah) * Number(st.barang.hargaBeli), 0);
@@ -274,8 +274,8 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
           ikon="account_balance"
           lencana={{ teks: `${akunKas.length} Akun`, cls: "lencana-blue" }}
           nilai={kas}
-          catatan={akunKas.map((a) => a.nama).join(" + ") || "Belum ada akun kas/bank"}
-          isian={akunKas.slice(0, 2).map((a) => ({ k: a.nama, v: rp(a.balance) }))}
+          catatan={akunKasTampil.map((a) => a.nama).join(" + ") || "Belum ada akun kas/bank"}
+          isian={akunKasTampil.slice(0, 2).map((a) => ({ k: a.nama, v: rp(a.balance) }))}
         />
         <Ringkasan
           judul="Nilai Persediaan"
@@ -319,17 +319,11 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
         </div>
       </div>
 
-      {boleh("buku-besar.lihat") &&
-        (panelGlobalSesuai ? (
-          <Suspense fallback={<KerangkaTren />}>
-            <PanelTren tahun={pengaturan.tahunBuku} />
-          </Suspense>
-        ) : (
-          <div className="kartu text-sm text-slate-500 flex items-start gap-2.5">
-            <Ikon nama="hub" className="!text-[18px] text-slate-400 mt-0.5" />
-            <span>Tren kas masuk &amp; keluar per perusahaan belum tersedia.{lingkup.bolehGabungan && " Pilih \"Semua perusahaan\" di bilah samping untuk melihat tren gabungan."}</span>
-          </div>
-        ))}
+      {boleh("buku-besar.lihat") && (
+        <Suspense key={lingkupId ?? "semua"} fallback={<KerangkaTren />}>
+          <PanelTren tahun={pengaturan.tahunBuku} perusahaanId={lingkupId} />
+        </Suspense>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 daftarBarang-awal">
         {/* Kiri */}
@@ -522,33 +516,31 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
               <Ikon nama="verified_user" className="!text-[22px] text-blue-400" />
               <h3 className="text-sm font-bold">Integritas &amp; Sinkronisasi</h3>
             </div>
-            {sinkron ? (
-              <>
-                <p className="text-xs text-slate-400 leading-relaxed">Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:</p>
-                <div className="space-y-3 text-xs">
-                  {[
-                    { t: "Jurnal seimbang", ok: sinkron.seimbang, d: `Σ debit ${rp(Number(sinkron.totalDebit))} · Σ kredit ${rp(Number(sinkron.totalKredit))}` },
-                    { t: "Persediaan = stok fisik × harga pokok", ok: sinkron.persediaan.sinkron, d: `Buku besar ${rp(Number(sinkron.persediaan.bukuBesar))} · stok ${rp(Number(sinkron.persediaan.dokumen))}` },
-                    { t: "Piutang = sisa faktur penjualan", ok: sinkron.piutang.sinkron, d: `Buku besar ${rp(Number(sinkron.piutang.bukuBesar))} · dokumen ${rp(Number(sinkron.piutang.dokumen))}` },
-                    { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
-                    { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
-                    { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
-                    { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
-                    { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
-                  ].map(({ t, ok, d }) => (
-                    <div key={t} className="flex items-start gap-2.5">
-                      <Ikon nama={ok ? "check_circle" : "error"} className={`!text-[18px] mt-0.5 ${ok ? "text-emerald-400" : "text-rose-400"}`} />
-                      <div>
-                        <span className={`font-semibold ${ok ? "text-white" : "text-rose-300"}`}>{t}</span>
-                        <p className="text-slate-400 text-[11px] mt-0.5">{d}</p>
-                      </div>
-                    </div>
-                  ))}
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {gabungan
+                ? "Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:"
+                : `Buku besar ${lingkup.perusahaan?.nama ?? "perusahaan ini"} dicocokkan dengan dokumen dan stok barang miliknya setiap kali beranda dibuka:`}
+            </p>
+            <div className="space-y-3 text-xs">
+              {[
+                { t: "Jurnal seimbang", ok: sinkron.seimbang, d: `Σ debit ${rp(Number(sinkron.totalDebit))} · Σ kredit ${rp(Number(sinkron.totalKredit))}` },
+                { t: "Persediaan = stok fisik × harga pokok", ok: sinkron.persediaan.sinkron, d: `Buku besar ${rp(Number(sinkron.persediaan.bukuBesar))} · stok ${rp(Number(sinkron.persediaan.dokumen))}` },
+                { t: "Piutang = sisa faktur penjualan", ok: sinkron.piutang.sinkron, d: `Buku besar ${rp(Number(sinkron.piutang.bukuBesar))} · dokumen ${rp(Number(sinkron.piutang.dokumen))}` },
+                { t: "Hutang = sisa faktur pembelian", ok: sinkron.hutang.sinkron, d: `Buku besar ${rp(Number(sinkron.hutang.bukuBesar))} · dokumen ${rp(Number(sinkron.hutang.dokumen))}` },
+                { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
+                { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
+                { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
+                { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
+              ].map(({ t, ok, d }) => (
+                <div key={t} className="flex items-start gap-2.5">
+                  <Ikon nama={ok ? "check_circle" : "error"} className={`!text-[18px] mt-0.5 ${ok ? "text-emerald-400" : "text-rose-400"}`} />
+                  <div>
+                    <span className={`font-semibold ${ok ? "text-white" : "text-rose-300"}`}>{t}</span>
+                    <p className="text-slate-400 text-[11px] mt-0.5">{d}</p>
+                  </div>
                 </div>
-              </>
-            ) : (
-              <p className="text-xs text-slate-400 leading-relaxed">Pencocokan buku besar dengan dokumen dan stok per perusahaan belum tersedia.{lingkup.bolehGabungan && " Pilih \"Semua perusahaan\" di bilah samping untuk melihat pemeriksaan gabungan."}</p>
-            )}
+              ))}
+            </div>
             <div className="pt-3 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-400 font-mono">
               <span>PostgreSQL 18 • Prisma 7</span>
               <span className={seimbang ? "text-emerald-400 font-semibold" : "text-rose-400 font-semibold"}>{seimbang ? "Buku besar seimbang" : "Buku besar tidak seimbang"}</span>

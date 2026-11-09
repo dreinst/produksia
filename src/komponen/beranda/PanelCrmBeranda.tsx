@@ -1,20 +1,28 @@
 import { db } from "@/lib/db";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { ringkasRupiah, statistikCrm, tindakLanjutSaya, tindakLanjutTerlambat } from "@/lib/crm";
+import { daftarPerusahaan } from "@/lib/perusahaan";
 import { formatWaktu } from "@/lib/waktu";
 import KartuKpi from "@/komponen/ui/KartuKpi";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 
 const persen = (x: { toFixed(n: number): string }) => `${Number(x.toFixed(1)).toLocaleString("id-ID", { maximumFractionDigits: 1 })}%`;
 
 /**
  * Ringkasan CRM untuk tab "Penjualan & CRM" beranda (D4 §7.5). Angka dari statistikCrm menurut lingkup perusahaan.
+ * Pada lingkup gabungan tiap tindak lanjut diberi lencana perusahaan, sama dengan tab Tugas Saya.
  * Tautan ke dasbor CRM menyusul bersama halaman CRM.
  */
 export default async function PanelCrmBeranda({ pengguna, perusahaanId }: { pengguna: PenggunaSesi; perusahaanId: string | null }) {
   if (!punyaHak(pengguna, "lead.lihat")) return null;
   const sekarang = new Date();
-  const [stat, saya] = await Promise.all([statistikCrm(db, sekarang, perusahaanId), tindakLanjutSaya(db, pengguna.id, 10, perusahaanId)]);
+  const [stat, saya, perusahaan] = await Promise.all([
+    statistikCrm(db, sekarang, perusahaanId),
+    tindakLanjutSaya(db, pengguna.id, 10, perusahaanId),
+    perusahaanId === null ? daftarPerusahaan(true) : Promise.resolve([]),
+  ]);
+  const petaPerusahaan = new Map(perusahaan.map((p) => [p.id, p]));
   const sumberTeratas = stat.kinerjaSumber.slice(0, 5);
 
   return (
@@ -38,15 +46,21 @@ export default async function PanelCrmBeranda({ pengguna, perusahaanId }: { peng
             <p className="text-sm text-slate-500">Tidak ada tindak lanjut yang menunggu.</p>
           ) : (
             <ul className="divide-y divide-slate-100">
-              {saya.map((t) => (
-                <li key={t.id} className="py-2.5 flex items-start justify-between gap-3 text-sm">
-                  <div className="min-w-0">
-                    <div className="font-medium text-slate-800 truncate">{t.judul}</div>
-                    <div className="text-xs text-slate-500 truncate">{t.namaLead ?? "Tanpa lead"} · {formatWaktu(t.jatuhTempo)}</div>
-                  </div>
-                  {tindakLanjutTerlambat(t, sekarang) && <LencanaStatus status="TERLAMBAT" />}
-                </li>
-              ))}
+              {saya.map((t) => {
+                const p = petaPerusahaan.get(t.perusahaanId);
+                return (
+                  <li key={t.id} className="py-2.5 flex items-start justify-between gap-3 text-sm">
+                    <div className="min-w-0">
+                      <div className="font-medium text-slate-800 truncate">{t.judul}</div>
+                      <div className="text-xs text-slate-500 truncate">{t.namaLead ?? "Tanpa lead"} · {formatWaktu(t.jatuhTempo)}</div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {p && <LencanaPerusahaan kode={p.kode} warna={p.warna} nama={p.nama} />}
+                      {tindakLanjutTerlambat(t, sekarang) && <LencanaStatus status="TERLAMBAT" />}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
