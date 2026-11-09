@@ -13,6 +13,10 @@ import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { adaDataPerusahaanLain, akunDalamLingkup, muatDataBerandaKeuangan } from "@/lib/berandaKeuangan";
+import { pilihTab, tabBeranda } from "@/lib/beranda";
+import TabBeranda from "@/komponen/beranda/TabBeranda";
+import DasborModul from "@/komponen/beranda/DasborModul";
+import BerandaKosong from "@/komponen/beranda/BerandaKosong";
 
 const rp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
@@ -27,16 +31,19 @@ type Terbaru = {
   aksi?: { label: string; href: string; ikon: string };
 };
 
-export default async function Beranda() {
+export default async function Beranda({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibMasuk();
   // Gudang murni input/output stok; Beranda (ringkasan keuangan) di luar fokusnya (permintaan pemilik).
   if (pengguna.peran === "GUDANG") redirect("/data-induk/barang");
   // Kru/Guest cuma punya hak Peminjaman Barang; Beranda tidak berguna baginya dan haknya tidak cukup untuk memuat data di halaman ini.
   if (pengguna.peran === "KRU" || pengguna.peran === "GUEST") redirect("/persediaan/peminjaman");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
-  // Ringkasan keuangan hanya untuk pemegang beranda-keuangan.lihat (bawaan Admin, Kasir, Pemilik, Superadmin).
-  // Peran pemasaran tidak memegangnya; penjaga sementara sampai beranda bertab dari paket dashboard terpasang.
-  if (!boleh("beranda-keuangan.lihat")) redirect("/tanpa-akses?hak=beranda-keuangan.lihat");
+  // Beranda per tab (D7 §3.5): tab ditentukan hak. Tab keuangan hanya bagi pemegang beranda-keuangan.lihat
+  // (bawaan Admin, Kasir, Pemilik, Superadmin). Tab lain kembali lebih awal, sebelum kueri keuangan dijalankan.
+  const daftarTab = tabBeranda(pengguna);
+  const tab = pilihTab(daftarTab, (await searchParams).tab);
+  if (tab === null) return <BerandaKosong pengguna={pengguna} />;
+  if (tab !== "keuangan") return <DasborModul tab={tab} daftarTab={daftarTab} pengguna={pengguna} />;
   const now = new Date();
   const labelPeriode = now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 
@@ -184,6 +191,7 @@ export default async function Beranda() {
 
   return (
     <div className="space-y-7">
+      {daftarTab.length > 1 && <TabBeranda daftar={daftarTab} aktif="keuangan" />}
       {permintaanLupa > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex flex-wrap items-center justify-between gap-2">
           <span><strong>{permintaanLupa} permintaan lupa kata sandi</strong> menunggu ditangani.</span>
