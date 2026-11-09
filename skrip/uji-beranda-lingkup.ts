@@ -13,13 +13,14 @@ import { ambilPengaturanPerusahaan } from "../src/lib/pengaturanPerusahaan";
 import { alasanKontenSaya, geserTanggalIso, kontenSaya } from "../src/lib/konten";
 import { tanggalIso } from "../src/lib/waktu";
 import { D } from "../src/lib/uang";
-import { buatPesanan, buatFaktur, buatPenerimaan } from "../src/lib/aksi/penjualan";
+import { buatPesanan, buatFaktur, buatPenerimaan, buatPengiriman, buatUangMuka } from "../src/lib/aksi/penjualan";
+import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian } from "../src/lib/aksi/pembelian";
 import { buatKasMasuk, buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import Beranda from "../src/app/(aplikasi)/page";
 import DasborModul from "../src/komponen/beranda/DasborModul";
-import PanelSaya, { HAK_SETUJUI_TUGAS_SAYA, kartuTugasSaya } from "../src/komponen/beranda/PanelSaya";
+import PanelSaya, { HAK_SETUJUI_TUGAS_SAYA, LENCANA_ALASAN, kartuTugasSaya, menungguPersetujuanSaya } from "../src/komponen/beranda/PanelSaya";
 import PanelCrmBeranda from "../src/komponen/beranda/PanelCrmBeranda";
 import { kelasLencanaAksiLog } from "../src/komponen/beranda/PanelSistem";
 import PanelProyek, { teksPersen } from "../src/komponen/beranda/PanelProyek";
@@ -116,23 +117,60 @@ function semuaCocok(s: HasilSinkron) {
   return s.seimbang && BUTIR.every((b) => s[b].sinkron);
 }
 
+/** Hapus dokumen lewat aksi; kegagalan dicatat lalu dilewati supaya sisa data lain tetap dibersihkan. */
+async function hapusSisa(jenis: Parameters<typeof hapusDokumen>[0], id: string, nomor: string) {
+  // jalankan mengabaikan galat revalidatePath di luar permintaan HTTP (datanya sudah terhapus saat itu)
+  await jalankan(`hapus sisa ${nomor}`, () => hapusDokumen(jenis, id)).catch((e: unknown) => console.warn(`[bersih] ${nomor} gagal dihapus: ${(e as Error).message}`));
+}
+
+/**
+ * Membersihkan sisa data uji dari percobaan yang terputus (pastikan memanggil process.exit, jadi pembersihan akhir
+ * bisa terlewat). Dokumen keuangan dikembalikan ke utama lalu dihapus lewat aksi supaya stok dan jurnal ikut dibalik,
+ * baru data induk berkode UJL-* dan perusahaan uji dihapus. Aman dijalankan berulang di basis data yang sama.
+ */
 async function bersihkanDataUji() {
   const ids = (await db.perusahaan.findMany({ where: { kode: { in: ["UJL1", "UJL2"] } }, select: { id: true } })).map((p) => p.id);
   await db.tugasDesain.deleteMany({ where: { perusahaanId: { in: ids } } });
   await db.konten.deleteMany({ where: { perusahaanId: { in: ids } } });
   await db.tindakLanjut.deleteMany({ where: { perusahaanId: { in: ids } } });
   await db.pengguna.deleteMany({ where: { namaPengguna: { startsWith: PREFIKS } } });
-  // dokumen keuangan uji yang tertinggal dari percobaan terputus dikembalikan ke utama supaya bisa dihapus
-  // lewat aksi; perusahaan uji hanya dihapus bila sudah tidak dirujuk apa pun
   for (const id of ids) {
     await db.jurnal.updateMany({ where: { perusahaanId: id }, data: { perusahaanId: "utama" } });
-    for (const t of ["penyesuaianPersediaan", "pesananPenjualan", "fakturPenjualan", "penerimaanPenjualan", "dokumenKas"] as const) {
+    for (const t of [
+      "penyesuaianPersediaan", "pesananPenjualan", "fakturPenjualan", "penerimaanPenjualan", "dokumenKas", "pengirimanPesanan", "uangMukaPelanggan",
+      "pesananPembelian", "penerimaanBarang", "fakturPembelian",
+    ] as const) {
       await (db[t] as unknown as { updateMany: (a: unknown) => Promise<unknown> }).updateMany({ where: { perusahaanId: id }, data: { perusahaanId: "utama" } });
     }
     await db.akun.updateMany({ where: { perusahaanId: id }, data: { perusahaanId: null } });
     await db.barang.updateMany({ where: { perusahaanId: id }, data: { perusahaanId: "utama" } });
   }
-  await db.perusahaan.deleteMany({ where: { id: { in: ids } } }).catch(() => undefined);
+
+  const akunUji = (await db.akun.findMany({ where: { kode: { startsWith: "UJL-" } }, select: { id: true } })).map((a) => a.id);
+  const barangUji = (await db.barang.findMany({ where: { kode: { in: ["UJL-BRG", "UJL-JASA"] } }, select: { id: true } })).map((b) => b.id);
+  const pelanggan = { pelanggan: { kode: "UJL-CUST" } };
+  const pemasok = { pemasok: { kode: "UJL-SUP" } };
+  const terbaru = { orderBy: { tanggal: "desc" as const }, select: { id: true, nomor: true } };
+  for (const d of await db.dokumenKas.findMany({ where: { OR: [{ akunKasId: { in: akunUji } }, { akunLawanId: { in: akunUji } }] }, select: { id: true, nomor: true } })) await hapusSisa("dokumenKas", d.id, d.nomor);
+  for (const j of await db.jurnal.findMany({ where: { sumber: { in: ["KAS_MASUK", "KAS_KELUAR"] }, baris: { some: { akunId: { in: akunUji } } } }, select: { id: true, nomor: true } })) await hapusSisa("jurnal", j.id, j.nomor);
+  for (const d of await db.uangMukaPelanggan.findMany({ where: { pesanan: pelanggan }, ...terbaru })) await hapusSisa("uangMuka", d.id, d.nomor);
+  for (const d of await db.penerimaanPenjualan.findMany({ where: { faktur: pelanggan }, ...terbaru })) await hapusSisa("penerimaan", d.id, d.nomor);
+  for (const d of await db.fakturPenjualan.findMany({ where: pelanggan, ...terbaru })) await hapusSisa("faktur", d.id, d.nomor);
+  for (const d of await db.pengirimanPesanan.findMany({ where: { pesanan: pelanggan }, ...terbaru })) await hapusSisa("pengiriman", d.id, d.nomor);
+  for (const d of await db.pesananPenjualan.findMany({ where: pelanggan, ...terbaru })) await hapusSisa("pesanan", d.id, d.nomor);
+  for (const d of await db.fakturPembelian.findMany({ where: pemasok, ...terbaru })) await hapusSisa("fakturPembelian", d.id, d.nomor);
+  for (const d of await db.penerimaanBarang.findMany({ where: { pesanan: pemasok }, ...terbaru })) await hapusSisa("penerimaanBarang", d.id, d.nomor);
+  for (const d of await db.pesananPembelian.findMany({ where: pemasok, ...terbaru })) await hapusSisa("pesananPembelian", d.id, d.nomor);
+  for (const d of await db.penyesuaianPersediaan.findMany({ where: { baris: { some: { barangId: { in: barangUji } } } }, ...terbaru })) await hapusSisa("penyesuaian", d.id, d.nomor);
+
+  const abaikan = () => undefined;
+  await db.stokBarang.deleteMany({ where: { barangId: { in: barangUji } } }).catch(abaikan);
+  await db.barang.deleteMany({ where: { id: { in: barangUji } } }).catch(abaikan);
+  await db.gudang.deleteMany({ where: { kode: "UJL-GDG" } }).catch(abaikan);
+  await db.pelanggan.deleteMany({ where: { kode: "UJL-CUST" } }).catch(abaikan);
+  await db.pemasok.deleteMany({ where: { kode: "UJL-SUP" } }).catch(abaikan);
+  await db.akun.deleteMany({ where: { id: { in: akunUji } } }).catch(abaikan);
+  await db.perusahaan.deleteMany({ where: { id: { in: ids } } }).catch(abaikan);
 }
 
 async function main() {
@@ -148,8 +186,14 @@ async function main() {
     { kode: "1-1300", perusahaanId: null, balance: -9 },
   ];
   pastikan(sama(urutkanAkunKas(akunContoh, null), akunContoh), "urutkanAkunKas gabungan: urutan semula (identik dengan sebelum perbaikan)");
-  pastikan(sama(urutkanAkunKas(akunContoh, "x").map((a) => a.kode), ["1-1210", "1-1300", "1-1200", "1-1100"]), "urutkanAkunKas satu perusahaan: milik sendiri, lalu bersama bersaldo (terbesar dulu), lalu bersama nol");
+  pastikan(sama(urutkanAkunKas(akunContoh, "x").map((a) => a.kode), ["1-1210", "1-1200", "1-1300", "1-1100"]), "urutkanAkunKas satu perusahaan: milik sendiri, lalu bersama bersaldo, lalu bersama nol, masing-masing urut kode");
   pastikan(urutkanAkunKas(akunContoh, "x").length === akunContoh.length, "urutkanAkunKas tidak membuang akun (total kas tetap)");
+  const akunBersama = [
+    { kode: "1-1100", perusahaanId: null, balance: 0 },
+    { kode: "1-1200", perusahaanId: null, balance: 5 },
+    { kode: "1-1300", perusahaanId: null, balance: 9 },
+  ];
+  pastikan(sama(urutkanAkunKas(akunBersama, "utama"), urutkanAkunKas(akunBersama, null)) && sama(urutkanAkunKas(akunBersama, "utama"), akunBersama), "lingkup satu perusahaan tanpa akun sendiri (mis. KASIR di utama sesudah migrasi): urutan sama dengan gabungan, tidak menurut saldo");
   pastikan(kelasLencanaAksiLog("BUAT").includes("lencana-emerald") && kelasLencanaAksiLog("UBAH").includes("lencana-blue") && kelasLencanaAksiLog("HAPUS").includes("lencana-rose"), "lencana aksi log: BUAT hijau, UBAH biru, HAPUS merah");
   pastikan(["TOLAK", "TUTUP", "MASUK", ""].every((a) => kelasLencanaAksiLog(a) === "lencana lencana-slate"), "aksi log lain abu-abu");
   pastikan(teksPersen(D(35)) === "35,0%" && teksPersen(D("12.34")) === "12,3%" && teksPersen(D("-4.05")) === "-4,1%" && teksPersen(null) === "-", "persen margin seragam satu desimal (35,0%; 12,3%; -4,1%), kosong = -");
@@ -165,7 +209,10 @@ async function main() {
   pastikan(sama(alasan("DRAF", "DITOLAK", null, null), ["DITOLAK", "BELUM_SELESAI"]), "alasan konten: ditolak + masih draf");
   pastikan(sama(alasan("DESAIN", "TIDAK_ADA", null, "REVISI"), ["REVISI_DESAIN"]) && sama(alasan("DESAIN", "TIDAK_ADA", null, "SELESAI"), ["DESAIN_SIAP"]), "alasan konten: desain direvisi, desain selesai = siap diajukan");
   pastikan(sama(alasan("TERJADWAL", "DISETUJUI", 3, null), ["AKAN_TERBIT"]) && sama(alasan("TERJADWAL", "DISETUJUI", 14, null), ["AKAN_TERBIT"]), "alasan konten: terjadwal 3 dan 14 hari lagi = akan terbit");
-  pastikan(alasan("TERJADWAL", "DISETUJUI", 15, null).length === 0 && alasan("TERBIT", "DISETUJUI", 2, null).length === 0 && alasan("DITINJAU", "MENUNGGU", null, "DISETUJUI").length === 0 && alasan("DISETUJUI", "DISETUJUI", -1, null).length === 0, "bukan tindakan: terbit 15 hari lagi, sudah terbit, menunggu penyetuju, tanggal lewat");
+  pastikan(sama(alasan("DISETUJUI", "DISETUJUI", -1, null), ["LEWAT_TERBIT"]) && sama(alasan("TERJADWAL", "DISETUJUI", -10, null), ["LEWAT_TERBIT"]), "alasan konten: disetujui/terjadwal dengan tanggal terbit lewat dan belum ditandai terbit = lewat terbit");
+  pastikan(sama(alasan("DISETUJUI", "DISETUJUI", null, null), ["BELUM_DIJADWALKAN"]) && sama(alasan("DISETUJUI", "DISETUJUI", 0, null), ["AKAN_TERBIT"]), "alasan konten: disetujui tanpa tanggal = perlu dijadwalkan; terbit hari ini = akan terbit, belum lewat");
+  pastikan(alasan("TERJADWAL", "DISETUJUI", 15, null).length === 0 && alasan("TERBIT", "DISETUJUI", 2, null).length === 0 && alasan("TERBIT", "DISETUJUI", -3, null).length === 0 && alasan("DITINJAU", "MENUNGGU", null, "DISETUJUI").length === 0 && alasan("DITINJAU", "MENUNGGU", -2, null).length === 0 && alasan("TERJADWAL", "DISETUJUI", null, null).length === 0, "bukan tindakan: terbit 15 hari lagi, sudah terbit (juga yang tanggalnya lewat), menunggu penyetuju (walau tanggal lewat), terjadwal tanpa tanggal");
+  pastikan(LENCANA_ALASAN.LEWAT_TERBIT?.warna === "rose" && !!LENCANA_ALASAN.BELUM_DIJADWALKAN && !!LENCANA_ALASAN.DITOLAK, "lencana alasan lewat terbit (merah) dan perlu dijadwalkan tersedia");
 
   console.log("=== 2. Kartu Tugas Saya per hak bawaan ===");
   const k = (peran: PeranPengguna, n: number | null = 0) => kartuTugasSaya({ hak: hitungHak(peran) }, n);
@@ -177,6 +224,7 @@ async function main() {
   pastikan(kartuTugasSaya({ hak: ["tugas-desain.lihat", "tugas-desain.buat"] }, 5).desain === false, "tanpa tugas-desain.ubah tidak ada kartu tugas desain walau ada angka");
   pastikan(kartuTugasSaya({ hak: ["kas-masuk.setujui"] }, null).menunggu && !kartuTugasSaya({ hak: ["kas-masuk.lihat", "kas-masuk.buat"] }, null).menunggu, "menunggu persetujuan: cukup satu hak setujui; tanpa hak setujui tidak ada");
   pastikan(HAK_SETUJUI_TUGAS_SAYA.every((h) => h.endsWith(".setujui")) && new Set(HAK_SETUJUI_TUGAS_SAYA).size === HAK_SETUJUI_TUGAS_SAYA.length, "daftar hak setujui Tugas Saya hanya kunci setujui, tanpa ganda");
+  pastikan(HAK_SETUJUI_TUGAS_SAYA.length === 11 && HAK_SETUJUI_TUGAS_SAYA.includes("konten.setujui") && HAK_SETUJUI_TUGAS_SAYA.includes("tugas-desain.setujui") && HAK_SETUJUI_TUGAS_SAYA.includes("penggajian.setujui"), "hak setujui Tugas Saya diturunkan dari baris penghitung menunggu persetujuan (11 baris)");
 
   console.log("=== 3. Sebelum data uji: panggilan lama = gabungan, gabungan = utama ===");
   const trenLama = await labaRugiKasBulanan(db, tahun);
@@ -312,8 +360,61 @@ async function main() {
   const halAdmin = await muat("ADMIN", "utama");
   pastikan(halAdmin.teks.includes("Tren Kas Masuk & Keluar") && halAdmin.grafik.length === 1 && json(halAdmin.grafik[0].bulan.map((m) => String(m.pendapatan))) === json(tU.bulan.map((m) => String(m.diterima))), "ADMIN lingkup utama (perusahaan lain punya data): tren kas tampil dengan angka utama saja");
   pastikan(!halKasir.teks.includes("Kas Uji Lingkup Satu"), "KASIR tidak melihat rekening perusahaan lain");
+  const namaKasBersama = (await db.akun.findMany({ where: { kasBank: true, kelompok: false, perusahaanId: null }, orderBy: { kode: "asc" }, select: { nama: true } })).map((a) => a.nama).join(" + ");
+  pastikan(potong(halKasir.teks, "Kas & Bank Tersedia", "Nilai Persediaan").includes(namaKasBersama) && kartuKasG.includes(`${namaKasBersama} + Kas Uji Lingkup Satu`), `KASIR (lingkup utama tanpa akun sendiri): rincian Kas & Bank urut kode akun seperti gabungan, tidak menurut saldo (${namaKasBersama})`);
   const halSosmed = (await denganEnv({ UJI_PERAN: "SOSMED", UJI_PERUSAHAAN: p1.id }, () => Beranda({ searchParams: Promise.resolve({ tab: "keuangan" }) }))) as ReactElement;
   pastikan(halSosmed.type === DasborModul, "SOSMED tanpa beranda-keuangan.lihat: tidak mendapat tab keuangan (tren dan Integritas tidak dimuat)");
+
+  console.log("=== 6b. Butir Integritas lain per perusahaan: hutang, barang belum ditagih, barang terkirim, uang muka ===");
+  const pemasok = await db.pemasok.create({ data: { kode: "UJL-SUP", nama: "Pemasok Uji Lingkup" } });
+  const idJurnalSebelumLain = new Set((await db.jurnal.findMany({ select: { id: true } })).map((j) => j.id));
+  await jalankan("PSB barang 10 @ 6.000", () => buatPesananPembelian(formulir({ pemasokId: pemasok.id, baris: [{ barangId: barang.id, jumlah: 10, harga: 6000 }] })));
+  const psb = await db.pesananPembelian.findFirstOrThrow({ where: { pemasokId: pemasok.id }, include: { baris: true } });
+  await jalankan("TB sebagian 4 dari 10", () => buatPenerimaanBarang(formulir({ pesananId: psb.id, gudangId: gudang.id, baris: [{ barisPesananId: psb.baris[0].id, barangId: barang.id, jumlah: 4 }] })));
+  const tb = await db.penerimaanBarang.findFirstOrThrow({ where: { pesananId: psb.id } });
+  await jalankan("FB 2 dari 4 yang diterima", () => buatFakturPembelian(formulir({ pesananId: psb.id, baris: [{ barangId: barang.id, jumlah: 2, harga: 6000 }] })));
+  const fb = await db.fakturPembelian.findFirstOrThrow({ where: { pesananId: psb.id } });
+  await jalankan("PSJ barang 5 @ 9.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: barang.id, jumlah: 5, harga: 9000 }] })));
+  const psj2 = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, NOT: { id: psj.id } }, include: { baris: true } });
+  await jalankan("SJ 3 dari 5, belum difaktur", () => buatPengiriman(formulir({ pesananId: psj2.id, gudangId: gudang.id, baris: [{ barisPesananId: psj2.baris[0].id, barangId: barang.id, jumlah: 3 }] })));
+  const sj = await db.pengirimanPesanan.findFirstOrThrow({ where: { pesananId: psj2.id }, include: { baris: true } });
+  await jalankan("UM 25.000 ke kas perusahaan satu", () => buatUangMuka(formulir({ pesananId: psj2.id, akunId: kas1.id, jumlah: 25000 })));
+  const um = await db.uangMukaPelanggan.findFirstOrThrow({ where: { pesananId: psj2.id } });
+  const jurnalLain = (await db.jurnal.findMany({ select: { id: true, nomor: true } })).filter((j) => !idJurnalSebelumLain.has(j.id));
+  pastikan(jurnalLain.length === 4, `TB, FB, SJ, dan UM masing-masing satu jurnal (${jurnalLain.length})`);
+  const pindahLain = async (ke: string) =>
+    db.$transaction(async (tx) => {
+      await tx.pesananPembelian.update({ where: { id: psb.id }, data: { perusahaanId: ke } });
+      await tx.penerimaanBarang.update({ where: { id: tb.id }, data: { perusahaanId: ke } });
+      await tx.fakturPembelian.update({ where: { id: fb.id }, data: { perusahaanId: ke } });
+      await tx.pesananPenjualan.update({ where: { id: psj2.id }, data: { perusahaanId: ke } });
+      await tx.pengirimanPesanan.update({ where: { id: sj.id }, data: { perusahaanId: ke } });
+      await tx.uangMukaPelanggan.update({ where: { id: um.id }, data: { perusahaanId: ke } });
+      await tx.jurnal.updateMany({ where: { id: { in: jurnalLain.map((j) => j.id) } }, data: { perusahaanId: ke } });
+    });
+  await pindahLain(p1.id);
+  const s1b = await periksaSinkron(db, { perusahaanId: p1.id });
+  pastikan(semuaCocok(s1b), "perusahaan satu dengan pembelian, surat jalan, dan uang muka: semua butir cocok");
+  pastikan(BUTIR.every((b) => !s1b[b].dokumen.isZero() && !s1b[b].bukuBesar.isZero()), `setiap butir perusahaan satu bukan nol (${BUTIR.map((b) => `${b} ${s1b[b].dokumen}`).join(", ")})`);
+  pastikan(s1b.barangBelumDitagih.dokumen.equals(D(12000)), `barang belum ditagih perusahaan satu = (4 diterima - 2 difaktur) × 6.000 (${s1b.barangBelumDitagih.dokumen})`);
+  pastikan(s1b.hutang.dokumen.equals(D(fb.total)), `hutang perusahaan satu = total FB ${fb.total}`);
+  pastikan(s1b.barangTerkirim.dokumen.equals(D(sj.baris[0].hargaPokok).times(3)), `barang terkirim perusahaan satu = 3 × harga pokok saat kirim (${s1b.barangTerkirim.dokumen})`);
+  pastikan(s1b.uangMuka.dokumen.equals(D(25000)), "uang muka perusahaan satu = 25.000");
+  const sUb = await periksaSinkron(db, { perusahaanId: "utama" });
+  pastikan(json(sUb) === json(sinkronUtamaAwal), "utama tetap identik dengan sebelum data uji");
+  const sGb = await periksaSinkron(db);
+  pastikan(semuaCocok(sGb) && BUTIR.every((b) => sGb[b].bukuBesar.equals(sUb[b].bukuBesar.plus(s1b[b].bukuBesar)) && sGb[b].dokumen.equals(sUb[b].dokumen.plus(s1b[b].dokumen))), "gabungan cocok dan setiap butir = utama + perusahaan satu");
+  pastikan(semuaCocok(await periksaSinkron(db, { perusahaanId: p2.id })), "perusahaan dua tetap kosong dan cocok");
+  // pesanan pembelian di perusahaan lain dengan penerimaan tetap di perusahaan satu: barang belum ditagih tiap perusahaan tidak cocok
+  await db.pesananPembelian.update({ where: { id: psb.id }, data: { perusahaanId: "utama" } });
+  const s1bSalah = await periksaSinkron(db, { perusahaanId: p1.id });
+  pastikan(!s1bSalah.barangBelumDitagih.sinkron && s1bSalah.persediaan.sinkron && s1bSalah.hutang.sinkron, "PSB pindah perusahaan: barang belum ditagih perusahaan satu tidak cocok, butir lain tetap cocok");
+  await db.pesananPembelian.update({ where: { id: psb.id }, data: { perusahaanId: p1.id } });
+  await db.uangMukaPelanggan.update({ where: { id: um.id }, data: { perusahaanId: "utama" } });
+  const s1bUm = await periksaSinkron(db, { perusahaanId: p1.id });
+  pastikan(!s1bUm.uangMuka.sinkron && s1bUm.piutang.sinkron, "UM pindah perusahaan tanpa jurnalnya: uang muka perusahaan satu tidak cocok");
+  await db.uangMukaPelanggan.update({ where: { id: um.id }, data: { perusahaanId: p1.id } });
+  pastikan(semuaCocok(await periksaSinkron(db, { perusahaanId: p1.id })), "dokumen dikembalikan: perusahaan satu cocok lagi");
 
   console.log("=== 7. Tugas Saya: Konten saya dan kartu per hak ===");
   const uS = await db.pengguna.create({ data: { namaPengguna: `${PREFIKS}s`, nama: "Uji Lingkup Sosmed", peran: "SOSMED", kataSandiHash: "-" } });
@@ -332,6 +433,9 @@ async function main() {
   const kSiap = await konten(p1.id, "UJL Desain siap", "DESAIN", null);
   const kTerbit = await konten(p1.id, "UJL Akan terbit", "TERJADWAL", 3, { persetujuan: "DISETUJUI" });
   const kIde = await konten(p1.id, "UJL Ide", "IDE", null);
+  const kLewat = await konten(p1.id, "UJL Lewat terbit", "TERJADWAL", -2, { persetujuan: "DISETUJUI" });
+  const kTanpaTanggal = await konten(p1.id, "UJL Belum dijadwalkan", "DISETUJUI", null, { persetujuan: "DISETUJUI" });
+  await konten(p1.id, "UJL Terbit lalu", "TERBIT", -5, { persetujuan: "DISETUJUI" });
   await konten(p1.id, "UJL Menunggu", "DITINJAU", null, { persetujuan: "MENUNGGU" });
   await konten(p1.id, "UJL Sudah terbit", "TERBIT", 2, { persetujuan: "DISETUJUI" });
   await konten(p1.id, "UJL Jauh", "TERJADWAL", 20, { persetujuan: "DISETUJUI" });
@@ -345,11 +449,14 @@ async function main() {
   await tugas(kSiap.id, "UJL Tugas selesai", "SELESAI", uD.id);
 
   const ks1 = await kontenSaya(db, uS.id, p1.id);
-  pastikan(sama(ks1.baris.map((x) => x.id), [kDitolak.id, kRevisi.id, kSiap.id, kTerbit.id, kBuatan.id, kIde.id]), `Konten saya lingkup satu: ditolak, revisi desain, desain siap, akan terbit, lalu ide/draf; tanpa menunggu, sudah terbit, jauh, milik orang lain, arsip, perusahaan lain (${ks1.baris.map((x) => x.judul).join(", ")})`);
-  pastikan(ks1.total === 6 && ks1.baris[1].statusDesain === "REVISI" && sama(ks1.baris[0].alasan, ["DITOLAK", "BELUM_SELESAI"]), "total 6, status desain dan alasan terbaca");
+  pastikan(
+    sama(ks1.baris.map((x) => x.id), [kDitolak.id, kLewat.id, kRevisi.id, kSiap.id, kTerbit.id, kTanpaTanggal.id, kBuatan.id, kIde.id]),
+    `Konten saya lingkup satu: ditolak, lewat tanggal terbit, revisi desain, desain siap, akan terbit, disetujui tanpa tanggal, lalu ide/draf; tanpa menunggu, sudah terbit, jauh, milik orang lain, arsip, perusahaan lain (${ks1.baris.map((x) => x.judul).join(", ")})`,
+  );
+  pastikan(ks1.total === 8 && ks1.baris[2].statusDesain === "REVISI" && sama(ks1.baris[0].alasan, ["DITOLAK", "BELUM_SELESAI"]) && sama(ks1.baris[1].alasan, ["LEWAT_TERBIT"]), "total 8, status desain dan alasan terbaca");
   const ksG = await kontenSaya(db, uS.id, null);
-  pastikan(ksG.total === 7 && ksG.baris.some((x) => x.id === kDua.id), "Konten saya gabungan memuat konten perusahaan dua");
-  pastikan((await kontenSaya(db, uS.id, p1.id, 2)).baris.length === 2 && (await kontenSaya(db, uS.id, p1.id, 2)).total === 6, "batas baris tidak mengubah total");
+  pastikan(ksG.total === 9 && ksG.baris.some((x) => x.id === kDua.id), "Konten saya gabungan memuat konten perusahaan dua");
+  pastikan((await kontenSaya(db, uS.id, p1.id, 2)).baris.length === 2 && (await kontenSaya(db, uS.id, p1.id, 2)).total === 8, "batas baris tidak mengubah total");
   pastikan((await kontenSaya(db, uD.id, p1.id)).total === 1, "pengguna lain hanya melihat konten yang ia tangani");
 
   const sosmed = (await sebagai(`${PREFIKS}s`, async () => (await import("../src/lib/otentikasi")).penggunaSaatIni()))!;
@@ -358,7 +465,11 @@ async function main() {
   pastikan(sosmed.id === uS.id && desainer.id === uD.id && admin.id === uA.id, "pengguna nyata terbaca lewat UJI_PENGGUNA");
   const sayaS = await render(PanelSaya({ pengguna: sosmed, perusahaanId: p1.id }));
   pastikan(sayaS.teks.includes("Konten saya") && sayaS.teks.includes("UJL Ditolak") && sayaS.teks.includes("Desain direvisi") && sayaS.teks.includes("Desain siap, ajukan") && sayaS.teks.includes("Terbit "), "SOSMED: kartu Konten saya dengan alasan dan tanggal terbit");
-  pastikan(!sayaS.teks.includes("UJL Menunggu") && !sayaS.teks.includes("UJL Orang lain") && !sayaS.teks.includes("UJL Perusahaan dua"), "SOSMED lingkup satu: tanpa konten menunggu penyetuju, milik orang lain, dan perusahaan lain");
+  pastikan(!sayaS.teks.includes("UJL Menunggu") && !sayaS.teks.includes("UJL Orang lain") && !sayaS.teks.includes("UJL Perusahaan dua") && !sayaS.teks.includes("UJL Terbit lalu"), "SOSMED lingkup satu: tanpa konten menunggu penyetuju, milik orang lain, perusahaan lain, dan yang sudah terbit");
+  pastikan(sayaS.teks.includes("UJL Lewat terbit") && sayaS.teks.includes("Lewat tanggal terbit") && sayaS.teks.includes("Perlu dijadwalkan"), "SOSMED: konten lewat tanggal terbit dan disetujui tanpa tanggal tampil dengan lencananya");
+  const hanyaKonten = await menungguPersetujuanSaya(penggunaSintetis("IKLAN", ["konten.setujui"]), p1.id);
+  pastikan(json(hanyaKonten) === json([{ kode: "konten", label: "Konten media sosial", jumlah: 1 }]), "pemegang konten.setujui saja: baris menunggu konten (kartu dan penghitung memakai daftar hak yang sama)");
+  pastikan((await menungguPersetujuanSaya(penggunaSintetis("IKLAN", ["konten.lihat", "konten.ubah"]), p1.id)).length === 0, "tanpa hak setujui: tidak ada baris menunggu");
   pastikan(!sayaS.teks.includes("Tugas desain saya") && sayaS.teks.includes("Menunggu persetujuan Anda"), "SOSMED tanpa tugas yang ditugaskan: tanpa kartu tugas desain kosong, dengan kartu menunggu persetujuan");
   pastikan(sayaS.href.length === 0, "kartu Tugas Saya SOSMED tidak menaut ke halaman yang belum ada");
   await db.tugasDesain.create({ data: { perusahaanId: p1.id, judul: "UJL Tugas untuk sosmed", status: "DITUGASKAN", desainerId: uS.id, dibuatOlehNama: "Skrip Uji" } });
@@ -388,19 +499,30 @@ async function main() {
   await db.tugasDesain.deleteMany({ where: { perusahaanId: { in: [p1.id, p2.id] } } });
   await db.konten.deleteMany({ where: { perusahaanId: { in: [p1.id, p2.id] } } });
   await db.pengguna.deleteMany({ where: { namaPengguna: { startsWith: PREFIKS } } });
+  await pindahLain("utama");
   await pindah("utama");
-  const nomorDok = [ps.nomor, psj.nomor, fj.nomor, trm.nomor, ...dokKas.map((d) => d.nomor), ...jurnalBaru.map((j) => j.nomor)];
+  const nomorDok = [
+    ps.nomor, psj.nomor, fj.nomor, trm.nomor, ...dokKas.map((d) => d.nomor), ...jurnalBaru.map((j) => j.nomor),
+    psb.nomor, tb.nomor, fb.nomor, psj2.nomor, sj.nomor, um.nomor, ...jurnalLain.map((j) => j.nomor),
+  ];
+  await jalankan("hapus UM", () => hapusDokumen("uangMuka", um.id));
+  await jalankan("hapus SJ", () => hapusDokumen("pengiriman", sj.id));
+  await jalankan("hapus PSJ barang", () => hapusDokumen("pesanan", psj2.id));
+  await jalankan("hapus FB", () => hapusDokumen("fakturPembelian", fb.id));
+  await jalankan("hapus TB", () => hapusDokumen("penerimaanBarang", tb.id));
+  await jalankan("hapus PSB", () => hapusDokumen("pesananPembelian", psb.id));
   for (const d of dokKas) await jalankan(`hapus ${d.nomor}`, () => hapusDokumen("dokumenKas", d.id));
   for (const j of jurnalKas) if (await db.jurnal.findUnique({ where: { id: j.id } })) await jalankan(`hapus ${j.nomor}`, () => hapusDokumen("jurnal", j.id));
   await jalankan("hapus TRM", () => hapusDokumen("penerimaan", trm.id));
   await jalankan("hapus FJ", () => hapusDokumen("faktur", fj.id));
   await jalankan("hapus PSJ", () => hapusDokumen("pesanan", psj.id));
   await jalankan("hapus PS", () => hapusDokumen("penyesuaian", ps.id));
-  pastikan((await db.jurnal.count({ where: { id: { in: jurnalBaru.map((j) => j.id) } } })) === 0, "jurnal uji sudah terhapus");
+  pastikan((await db.jurnal.count({ where: { id: { in: [...jurnalBaru, ...jurnalLain].map((j) => j.id) } } })) === 0, "jurnal uji sudah terhapus");
   await db.stokBarang.deleteMany({ where: { barangId: barang.id } });
   await db.barang.deleteMany({ where: { id: { in: [barang.id, jasa.id] } } });
   await db.gudang.delete({ where: { id: gudang.id } });
   await db.pelanggan.delete({ where: { id: pelanggan.id } });
+  await db.pemasok.delete({ where: { id: pemasok.id } });
   await db.akun.deleteMany({ where: { id: { in: [kas1.id, modal.id, beban.id] } } });
   const logUji = await db.logAktivitas.findMany({ where: { nomor: { in: nomorDok } }, select: { id: true } });
   await db.logAktivitas.deleteMany({ where: { id: { in: logUji.map((l) => l.id).filter((id) => !idLogAwal.has(id)) } } });

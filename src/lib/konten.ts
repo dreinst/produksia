@@ -79,13 +79,17 @@ export async function ringkasanKontenBeranda(klien: Klien, perusahaanId?: string
 }
 
 /** Alasan konten masuk kartu "Konten saya" di tab Tugas Saya, urut dari yang paling mendesak. */
-export type AlasanKontenSaya = "DITOLAK" | "REVISI_DESAIN" | "DESAIN_SIAP" | "AKAN_TERBIT" | "BELUM_SELESAI";
-export const URUTAN_ALASAN_KONTEN_SAYA: readonly AlasanKontenSaya[] = ["DITOLAK", "REVISI_DESAIN", "DESAIN_SIAP", "AKAN_TERBIT", "BELUM_SELESAI"];
+export type AlasanKontenSaya = "DITOLAK" | "LEWAT_TERBIT" | "REVISI_DESAIN" | "DESAIN_SIAP" | "AKAN_TERBIT" | "BELUM_DIJADWALKAN" | "BELUM_SELESAI";
+export const URUTAN_ALASAN_KONTEN_SAYA: readonly AlasanKontenSaya[] = [
+  "DITOLAK", "LEWAT_TERBIT", "REVISI_DESAIN", "DESAIN_SIAP", "AKAN_TERBIT", "BELUM_DIJADWALKAN", "BELUM_SELESAI",
+];
 
 /** Status konten yang masih harus dikerjakan penanggung jawabnya (belum masuk desain atau tinjauan). */
 const STATUS_KONTEN_BELUM_SELESAI: readonly StatusKonten[] = ["IDE", "DRAF"];
 /** Status tugas desain yang berarti desainnya sudah bisa dipakai untuk mengajukan konten (D6 §3.2.2). */
 const STATUS_DESAIN_SIAP: readonly StatusTugasDesain[] = ["DISETUJUI", "SELESAI"];
+/** Status konten yang sudah boleh terbit tetapi belum diterbitkan; penerbitan dicatat manual (D6 §3.1). */
+const STATUS_KONTEN_SIAP_TERBIT: readonly StatusKonten[] = ["DISETUJUI", "TERJADWAL"];
 
 export type KontenSaya = Omit<KontenMendatang, "tanggalTerbit"> & {
   tanggalTerbit: Date | null;
@@ -95,9 +99,10 @@ export type KontenSaya = Omit<KontenMendatang, "tanggalTerbit"> & {
 };
 
 /**
- * Alasan sebuah konten perlu perhatian penanggung jawabnya: ditolak penyetuju, desainnya sedang direvisi, desainnya
- * sudah disetujui sementara konten masih di tahap Desain (siap diajukan), akan terbit dalam rentang [dari, sampai)
- * dan belum terbit, atau masih Ide/Draf. Kosong = tidak perlu tindakan. Murni, diuji langsung.
+ * Alasan sebuah konten perlu perhatian penanggung jawabnya: ditolak penyetuju, sudah Disetujui/Terjadwal tetapi tanggal
+ * terbitnya sebelum `dari` (awal hari ini) dan belum ditandai Terbit, desainnya sedang direvisi, desainnya sudah
+ * disetujui sementara konten masih di tahap Desain (siap diajukan), akan terbit dalam rentang [dari, sampai) dan belum
+ * terbit, sudah Disetujui tanpa tanggal terbit, atau masih Ide/Draf. Kosong = tidak perlu tindakan. Murni, diuji langsung.
  */
 export function alasanKontenSaya(
   k: { status: StatusKonten; statusPersetujuan: StatusPersetujuanKonten; tanggalTerbit: Date | null; statusDesain: StatusTugasDesain | null },
@@ -106,16 +111,19 @@ export function alasanKontenSaya(
 ): AlasanKontenSaya[] {
   const alasan: AlasanKontenSaya[] = [];
   if (k.statusPersetujuan === "DITOLAK") alasan.push("DITOLAK");
+  if (STATUS_KONTEN_SIAP_TERBIT.includes(k.status) && k.tanggalTerbit && k.tanggalTerbit < dari) alasan.push("LEWAT_TERBIT");
   if (k.statusDesain === "REVISI") alasan.push("REVISI_DESAIN");
   if (k.status === "DESAIN" && k.statusDesain !== null && STATUS_DESAIN_SIAP.includes(k.statusDesain)) alasan.push("DESAIN_SIAP");
   if (k.status !== "TERBIT" && k.tanggalTerbit && k.tanggalTerbit >= dari && k.tanggalTerbit < sampai) alasan.push("AKAN_TERBIT");
+  if (k.status === "DISETUJUI" && !k.tanggalTerbit) alasan.push("BELUM_DIJADWALKAN");
   if (STATUS_KONTEN_BELUM_SELESAI.includes(k.status)) alasan.push("BELUM_SELESAI");
   return alasan;
 }
 
 /**
  * Konten yang ditangani pengguna (sebagai Social Media Manager konten itu, atau pembuatnya bila SMM belum diisi) dan
- * perlu tindakan menurut alasanKontenSaya, termasuk yang akan terbit 14 hari ke depan. Hanya konten aktif dalam
+ * perlu tindakan menurut alasanKontenSaya, termasuk yang tanggal terbitnya sudah lewat tetapi belum ditandai Terbit dan
+ * yang akan terbit 14 hari ke depan. Hanya konten aktif dalam
  * lingkup perusahaan (null/undefined = gabungan). Urut alasan paling mendesak, lalu tanggal terbit (kosong terakhir).
  * `total` = semua konten yang memenuhi syarat; `baris` paling banyak `batas`.
  */
@@ -132,6 +140,8 @@ export async function kontenSaya(klien: Klien, penggunaId: string, perusahaanId?
       {
         OR: [
           { statusPersetujuan: "DITOLAK" },
+          { status: { in: [...STATUS_KONTEN_SIAP_TERBIT] }, tanggalTerbit: { lt: dari } },
+          { status: "DISETUJUI", tanggalTerbit: null },
           { status: { in: [...STATUS_KONTEN_BELUM_SELESAI] } },
           { tugasDesain: { some: { ...tugasAktif, status: "REVISI" } } },
           { status: "DESAIN", tugasDesain: { some: { ...tugasAktif, status: { in: [...STATUS_DESAIN_SIAP] } } } },

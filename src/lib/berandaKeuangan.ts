@@ -81,17 +81,18 @@ export function akunDalamLingkup(akun: { perusahaanId: string | null }, perusaha
 }
 
 /**
- * Urutan rincian akun kas di kartu "Kas & Bank Tersedia". Gabungan: urutan semula (kode akun), sama dengan sebelum
- * multi perusahaan. Satu perusahaan: akun milik perusahaan itu lebih dulu, lalu akun bersama yang bersaldo di
- * perusahaan itu (terbesar dulu), lalu akun bersama bersaldo nol, supaya rincian dua baris teratas tidak terisi akun
- * bersama Rp 0 sementara rekening perusahaan itu sendiri tersembunyi. Daftar dan totalnya tidak berubah.
+ * Urutan rincian akun kas di kartu "Kas & Bank Tersedia". Gabungan, atau satu perusahaan yang belum punya akun kas
+ * sendiri (sesudah migrasi semua akun lama bersama): urutan semula (kode akun), sama dengan sebelum multi perusahaan.
+ * Satu perusahaan yang punya akun kas sendiri: akun itu lebih dulu, lalu akun bersama bersaldo, lalu akun bersama
+ * bersaldo nol, masing-masing tetap dalam urutan semula, supaya rincian dua baris teratas tidak terisi akun bersama
+ * Rp 0 sementara rekening perusahaan itu sendiri tersembunyi. Daftar dan totalnya tidak berubah.
  */
 export function urutkanAkunKas<T extends { perusahaanId: string | null; balance: number }>(akun: readonly T[], perusahaanId: string | null): T[] {
-  if (!perusahaanId) return [...akun];
+  if (!perusahaanId || !akun.some((a) => a.perusahaanId === perusahaanId)) return [...akun];
   const peringkat = (a: T) => (a.perusahaanId === perusahaanId ? 0 : a.balance !== 0 ? 1 : 2);
   return akun
     .map((a, i) => ({ a, i }))
-    .sort((x, y) => peringkat(x.a) - peringkat(y.a) || (peringkat(x.a) === 1 ? Math.abs(y.a.balance) - Math.abs(x.a.balance) : 0) || x.i - y.i)
+    .sort((x, y) => peringkat(x.a) - peringkat(y.a) || x.i - y.i)
     .map((x) => x.a);
 }
 
