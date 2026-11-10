@@ -46,7 +46,7 @@ export default async function PanelProyek({ pengguna, perusahaanId }: { pengguna
             <p className="subjudul-kartu">
               {jumlahTotal.toLocaleString("id-ID")} proyek. Pendapatan tanpa PPN; biaya dari jurnal yang bertanda proyek.
               {baris.length > BARIS_TAMPIL ? ` Menampilkan ${BARIS_TAMPIL} terbaru.` : ""}
-              {terpotong ? ` Total dihitung dari ${BATAS_PROYEK_MUAT.toLocaleString("id-ID")} proyek pertama.` : ""}
+              {terpotong && ` Total dihitung dari ${BATAS_PROYEK_MUAT.toLocaleString("id-ID")} proyek pertama.`}
             </p>
           </div>
           {bolehLpj && (
