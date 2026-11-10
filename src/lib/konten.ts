@@ -121,10 +121,20 @@ export function alasanKontenSaya(
 }
 
 /**
+ * Konten yang alasannya hanya AKAN_TERBIT sementara persetujuannya masih MENUNGGU: yang harus bertindak penyetuju,
+ * bukan penanggung jawab konten. Di kartu Konten saya diurutkan paling akhir (sesudah BELUM_SELESAI), supaya ide dan
+ * draf tanpa tanggal milik pengguna sendiri tidak terdesak keluar dari batas baris. Murni, diuji langsung.
+ */
+export function menungguPenyetujuSaja(k: { statusPersetujuan: StatusPersetujuanKonten; alasan: readonly AlasanKontenSaya[] }): boolean {
+  return k.statusPersetujuan === "MENUNGGU" && k.alasan.length > 0 && k.alasan.every((a) => a === "AKAN_TERBIT");
+}
+
+/**
  * Konten yang ditangani pengguna (sebagai Social Media Manager konten itu, atau pembuatnya bila SMM belum diisi) dan
  * perlu tindakan menurut alasanKontenSaya, termasuk yang tanggal terbitnya sudah lewat tetapi belum ditandai Terbit dan
  * yang akan terbit 14 hari ke depan. Hanya konten aktif dalam
- * lingkup perusahaan (null/undefined = gabungan). Urut alasan paling mendesak, lalu tanggal terbit (kosong terakhir).
+ * lingkup perusahaan (null/undefined = gabungan). Urut alasan paling mendesak (yang hanya menunggu penyetuju paling akhir,
+ * lihat menungguPenyetujuSaja), lalu tanggal terbit (kosong terakhir).
  * `total` = semua konten yang memenuhi syarat; `baris` paling banyak `batas`.
  */
 export async function kontenSaya(klien: Klien, penggunaId: string, perusahaanId?: string | null, batas = 10): Promise<{ total: number; baris: KontenSaya[] }> {
@@ -161,7 +171,8 @@ export async function kontenSaya(klien: Klien, penggunaId: string, perusahaanId?
     const statusDesain = tugasDesain[0]?.status ?? null;
     return { ...k, statusDesain, alasan: alasanKontenSaya({ ...k, statusDesain }, dari, sampai) };
   });
-  const peringkat = (k: KontenSaya) => Math.min(...k.alasan.map((a) => URUTAN_ALASAN_KONTEN_SAYA.indexOf(a)), URUTAN_ALASAN_KONTEN_SAYA.length);
+  const peringkat = (k: KontenSaya) =>
+    menungguPenyetujuSaja(k) ? URUTAN_ALASAN_KONTEN_SAYA.length : Math.min(...k.alasan.map((a) => URUTAN_ALASAN_KONTEN_SAYA.indexOf(a)), URUTAN_ALASAN_KONTEN_SAYA.length);
   baris.sort(
     (a, b) =>
       peringkat(a) - peringkat(b) ||

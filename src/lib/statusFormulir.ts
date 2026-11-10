@@ -19,6 +19,21 @@ function galatInternalTakTerduga(galat: unknown): boolean {
   return x.code != null || x.errno != null || x.syscall != null || x.severity != null || x.clientVersion != null;
 }
 
+/**
+ * SQLSTATE PostgreSQL di balik galat Prisma/driver: dari adapter pg (meta.driverAdapterError.cause.originalCode),
+ * dari kueri mentah lama (meta.code), atau dari galat pg langsung (code lima karakter). null bila tidak ada.
+ */
+function kodeSqlState(e: { code?: unknown; meta?: unknown }): string | null {
+  const meta = e.meta as { code?: unknown; driverAdapterError?: { cause?: { originalCode?: unknown } } } | undefined;
+  for (const k of [meta?.driverAdapterError?.cause?.originalCode, meta?.code, e.code]) {
+    if (typeof k === "string" && /^[0-9A-Z]{5}$/.test(k)) return k;
+  }
+  return null;
+}
+
+/** 23503 foreign_key_violation; 23001 restrict_violation (FK ON DELETE RESTRICT, mis. hapus perusahaan yang punya data). */
+const SQLSTATE_MASIH_DIPAKAI = new Set(["23503", "23001"]);
+
 function pesanRamah(galat: unknown): string {
   const e = galat as { code?: string; message?: string; meta?: { target?: string[] } };
   if (e?.code === "P2002") {
@@ -27,7 +42,7 @@ function pesanRamah(galat: unknown): string {
       ? `Data dengan ${bidang} yang sama sudah ada (harus unik).`
       : "Data dengan nilai yang sama sudah ada (harus unik).";
   }
-  if (e?.code === "P2003") {
+  if (e?.code === "P2003" || SQLSTATE_MASIH_DIPAKAI.has(kodeSqlState(e ?? {}) ?? "")) {
     return "Data ini masih dipakai oleh data/transaksi lain, tidak bisa dihapus atau diubah.";
   }
   if (e?.code === "P2025") {
@@ -38,6 +53,9 @@ function pesanRamah(galat: unknown): string {
   }
   if (e?.message?.includes("BarisPeminjamanBarang_kembali_tidak_melebihi")) {
     return "Jumlah kembali melebihi yang dibawa keluar. Muat ulang halaman lalu coba lagi.";
+  }
+  if (e?.message?.includes("Barang_barang_wajib_milik_perusahaan")) {
+    return "Barang jenis BARANG wajib milik satu perusahaan. Pilih perusahaan pemiliknya.";
   }
   // Galat internal tak terduga hanya dicatat di server (console.error di jalankanFormulir),
   // klien cukup dapat pesan generik supaya detail internal tidak bocor.

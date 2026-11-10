@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import { peranTertinggi, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 import { tindakLanjutSaya, tindakLanjutTerlambat } from "@/lib/crm";
 import { ringkasanDesainBeranda, tugasLewatTenggat, SYARAT_TUGAS_AKTIF, type RingkasanDesainBeranda } from "@/lib/desain";
 import { SYARAT_KONTEN_AKTIF, kontenSaya, type AlasanKontenSaya } from "@/lib/konten";
-import { LABEL_PLATFORM, STATUS_DESAIN, STATUS_KONTEN, TITIK_PLATFORM, kelasLencana, type GayaLabel } from "@/lib/labelPemasaran";
+import { LABEL_PLATFORM, STATUS_DESAIN, STATUS_KONTEN, STATUS_PERSETUJUAN_KONTEN, TITIK_PLATFORM, kelasLencana, type GayaLabel } from "@/lib/labelPemasaran";
 import { daftarPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
 import { formatTanggal, formatWaktu } from "@/lib/waktu";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
@@ -32,13 +32,28 @@ type SaringMenunggu = {
  * Baris kartu "Menunggu persetujuan Anda": hak setujui yang membuka baris itu dan cara menghitungnya. Satu-satunya
  * sumber daftar hak setujui Tugas Saya; HAK_SETUJUI_TUGAS_SAYA (penentu kartu tampil) diturunkan dari sini.
  */
-const BARIS_MENUNGGU: readonly { kode: string; label: string; hak: Hak; hitung: (where: SaringMenunggu, perusahaanId: string | null) => Promise<number> }[] = [
+const BARIS_MENUNGGU: readonly {
+  kode: string;
+  label: string;
+  hak: Hak;
+  hitung: (where: SaringMenunggu, perusahaanId: string | null, pengguna: PenggunaSesi) => Promise<number>;
+}[] = [
   { kode: "faktur", label: "Faktur Penjualan", hak: "faktur.setujui", hitung: (where) => db.fakturPenjualan.count({ where }) },
   { kode: "faktur-pembelian", label: "Faktur Pembelian", hak: "faktur-pembelian.setujui", hitung: (where) => db.fakturPembelian.count({ where }) },
   { kode: "kas-masuk", label: "Kas Masuk", hak: "kas-masuk.setujui", hitung: (where) => db.dokumenKas.count({ where: { ...where, jenis: "MASUK" } }) },
   { kode: "kas-keluar", label: "Kas Keluar", hak: "kas-keluar.setujui", hitung: (where) => db.dokumenKas.count({ where: { ...where, jenis: "KELUAR" } }) },
   { kode: "penyesuaian", label: "Penyesuaian Stok", hak: "penyesuaian.setujui", hitung: (where) => db.penyesuaianPersediaan.count({ where }) },
-  { kode: "peminjaman", label: "Peminjaman Barang", hak: "peminjaman.setujui", hitung: (where) => db.peminjamanBarang.count({ where }) },
+  {
+    kode: "peminjaman",
+    label: "Peminjaman Barang",
+    hak: "peminjaman.setujui",
+    // Ajuan pengguna GUDANG hanya boleh disetujui Pemilik/Superadmin (pastikanBolehSetujui peminjaman di src/lib/persetujuan.ts),
+    // jadi bagi peran lain tidak dihitung. Syarat ditambahkan lewat AND supaya OR pemisahan tugas tetap utuh.
+    hitung: (where, _perusahaanId, pengguna) =>
+      db.peminjamanBarang.count({
+        where: peranTertinggi(pengguna.peran) ? where : { ...where, AND: [{ OR: [{ diajukanOlehId: null }, { diajukanOleh: { peran: { not: "GUDANG" } } }] }] },
+      }),
+  },
   { kode: "kerusakan", label: "Laporan Kerusakan Barang", hak: "kerusakan.setujui", hitung: (where) => db.laporanKerusakanBarang.count({ where }) },
   { kode: "aset", label: "Aset Tetap", hak: "aset.setujui", hitung: (where) => db.asetTetap.count({ where }) },
   { kode: "penggajian", label: "Penggajian", hak: "penggajian.setujui", hitung: (where) => db.penggajian.count({ where }) },
@@ -100,7 +115,7 @@ export async function menungguPersetujuanSaya(pengguna: PenggunaSesi, perusahaan
     ...saringPerusahaan(perusahaanId),
     OR: [{ diajukanOlehId: null }, { diajukanOlehId: { not: pengguna.id } }],
   };
-  const jumlah = await Promise.all(BARIS_MENUNGGU.map((b) => (punyaHak(pengguna, b.hak) ? b.hitung(where, perusahaanId) : Promise.resolve(0))));
+  const jumlah = await Promise.all(BARIS_MENUNGGU.map((b) => (punyaHak(pengguna, b.hak) ? b.hitung(where, perusahaanId, pengguna) : Promise.resolve(0))));
   return BARIS_MENUNGGU.map(({ kode, label }, i) => ({ kode, label, jumlah: jumlah[i] })).filter((b) => b.jumlah > 0);
 }
 
@@ -194,6 +209,10 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
                       <div className="flex flex-wrap items-center gap-1.5">
                         {p && <LencanaPerusahaan kode={p.kode} warna={p.warna} nama={p.nama} />}
                         <span className={kelasLencana(STATUS_KONTEN[k.status].warna)}>{STATUS_KONTEN[k.status].label}</span>
+                        {/* seperti PanelPemasaran; Ditolak sudah tampil lewat lencana alasan, jadi di sini hanya Menunggu persetujuan */}
+                        {k.statusPersetujuan === "MENUNGGU" && STATUS_PERSETUJUAN_KONTEN.MENUNGGU && (
+                          <span className={kelasLencana(STATUS_PERSETUJUAN_KONTEN.MENUNGGU.warna)}>{STATUS_PERSETUJUAN_KONTEN.MENUNGGU.label}</span>
+                        )}
                         {k.alasan.map((a) => {
                           const gaya = LENCANA_ALASAN[a];
                           return gaya ? <span key={a} className={kelasLencana(gaya.warna)}>{gaya.label}</span> : null;

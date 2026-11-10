@@ -2,6 +2,7 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { createHash, randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { db } from "../src/lib/db";
 import { punyaHak, type PenggunaSesi } from "../src/lib/hakAkses";
 import { penggunaSaatIni } from "../src/lib/otentikasi";
@@ -21,6 +22,7 @@ import {
 } from "../src/lib/perusahaan";
 import { adaDataPerusahaanLain, akunDalamLingkup, muatDataBerandaKeuangan } from "../src/lib/berandaKeuangan";
 import { gantiPerusahaanAktif } from "../src/lib/aksi/perusahaan";
+import { jalankanFormulir } from "../src/lib/statusFormulir";
 import { formulir, harusDitolak, pastikan, sebagai } from "./bantuan";
 
 /** Menjalankan fn dengan UJI_PERUSAHAAN (dan opsional UJI_PERAN) sementara; "semua" = gabungan. */
@@ -118,6 +120,10 @@ async function main() {
   pastikan(tentukanLingkup({ pilihan: null, bolehGabungan: true, adaIds: ada }) === null, "belum memilih + boleh gabungan → gabungan");
   pastikan(tentukanLingkup({ pilihan: null, bolehGabungan: false, adaIds: ada }) === "utama", "belum memilih + tanpa hak gabungan → utama");
   pastikan(tentukanLingkup({ pilihan: null, bolehGabungan: false, adaIds: new Set(["smara", "sahara"]) }) === "smara", "utama tidak ada → perusahaan pertama");
+  // prisma/reset.ts memakai salinan lokal (impor perusahaan.ts akan memuat modul Next); isinya harus tetap sama
+  const salinanReset = readFileSync("prisma/reset.ts", "utf8").match(/const ID_PERUSAHAAN_STANDAR = \[([^\]]*)\]/)?.[1];
+  const idReset = (salinanReset ?? "").split(",").map((x) => x.trim().replace(/^"|"$/g, "")).filter(Boolean);
+  pastikan(idReset.length > 0 && idReset.join(",") === ID_PERUSAHAAN_STANDAR.join(","), `ID_PERUSAHAAN_STANDAR di prisma/reset.ts sama dengan src/lib/perusahaan.ts (${idReset.join(", ")})`);
 
   console.log("=== 2. lingkupPerusahaan di luar HTTP (K5: UJI_PERUSAHAAN atau utama) ===");
   pastikan((await dengan({}, lingkupPerusahaan)).perusahaanId === "utama", "tanpa UJI_PERUSAHAAN → utama");
@@ -203,6 +209,12 @@ async function main() {
   await harusDitolak("dokumen baru untuk perusahaan tak dikenal", () => perusahaanDokumenBaru(formulir({ perusahaanId: "tidak-ada" })), "Perusahaan tidak ditemukan");
   const arsip = await db.perusahaan.create({ data: { kode: "UJILP", nama: "PT Uji Lingkup Arsip", aktif: false, urutan: 99 } });
   await harusDitolak("dokumen baru untuk perusahaan arsip", () => perusahaanDokumenBaru(formulir({ perusahaanId: arsip.id })), "sudah diarsipkan");
+  // D1 §3.2 butir 6: perusahaan arsip yang tersimpan di sesi tetap menjadi lingkup (melihat pembukuan arsip)
+  const lArsip = await dengan({ perusahaan: arsip.id, peran: "KASIR" }, lingkupPerusahaan);
+  pastikan(lArsip.perusahaanId === arsip.id && lArsip.perusahaan?.aktif === false && lArsip.perusahaan.kode === "UJILP", "lingkup tersimpan pada perusahaan arsip tetap dipakai (KASIR), perusahaan.aktif false");
+  const lArsipPemilik = await dengan({ perusahaan: arsip.id }, lingkupPerusahaan);
+  pastikan(lArsipPemilik.perusahaanId === arsip.id && lArsipPemilik.perusahaan?.aktif === false, "lingkup perusahaan arsip juga berlaku bagi pemegang hak gabungan (tidak jatuh ke gabungan)");
+  pastikan(!(await daftarPerusahaan()).some((p) => p.id === arsip.id) && (await daftarPerusahaan(true)).some((p) => p.id === arsip.id), "daftar bawaan tanpa perusahaan arsip, daftar lengkap memuatnya");
   pastikan(perusahaanDariInduk({ perusahaanId: "smara", nomor: "FJ-X" }) === "smara", "perusahaanDariInduk mewarisi induk");
   pastikan(perusahaanDariInduk({ perusahaanId: "smara", nomor: "FJ-X" }, formulir({ perusahaanId: "smara" })) === "smara", "perusahaanDariInduk menerima isian yang sama");
   await harusDitolak("dokumen anak beda perusahaan", async () => perusahaanDariInduk({ perusahaanId: "smara", nomor: "FJ-X" }, formulir({ perusahaanId: "utama" })), "Dokumen induk FJ-X milik perusahaan lain");
@@ -247,6 +259,44 @@ async function main() {
   console.log("=== 10. Aksi gantiPerusahaanAktif ===");
   await harusDitolak("ganti lingkup di luar peramban", () => gantiPerusahaanAktif(formulir({ perusahaanId: "tapussa" })), "hanya bisa diganti dari peramban");
   await harusDitolak("ganti lingkup gabungan oleh Kasir di luar peramban", () => dengan({ peran: "KASIR" }, () => gantiPerusahaanAktif(formulir({ perusahaanId: "semua" }))), "hanya bisa diganti dari peramban");
+
+  console.log("=== 11. Pesan ramah galat basis data (statusFormulir) ===");
+  // jalankanFormulir mencatat galat asli lewat console.error; di bagian ini catatan itu memang diharapkan, jadi diredam
+  const consoleErrorAsli = console.error;
+  console.error = () => undefined;
+  const galatCheck = await jalankanFormulir(async () => {
+    await db.barang.create({ data: { kode: "UJILP-CHK", nama: "Barang tanpa pemilik", jenis: "BARANG", perusahaanId: null } });
+  });
+  pastikan(galatCheck.galat === "Barang jenis BARANG wajib milik satu perusahaan. Pilih perusahaan pemiliknya." && (await db.barang.count({ where: { kode: "UJILP-CHK" } })) === 0, `CHECK Barang_barang_wajib_milik_perusahaan: pesan ramah, barang tidak tersimpan ("${galatCheck.galat}")`);
+  const jasaTanpaPemilik = await jalankanFormulir(async () => {
+    await db.barang.create({ data: { kode: "UJILP-JASA", nama: "Jasa bersama", jenis: "JASA", perusahaanId: null } });
+  });
+  pastikan(jasaTanpaPemilik.ok === true, "jasa tanpa perusahaan (bersama) tetap boleh");
+  await db.barang.deleteMany({ where: { kode: "UJILP-JASA" } });
+  const PESAN_DIPAKAI = "Data ini masih dipakai oleh data/transaksi lain, tidak bisa dihapus atau diubah.";
+  // dalam transaksi yang selalu dibatalkan: penghapusan utama pasti ditolak FK RESTRICT, tapi tetap aman bila tidak
+  const BATAL = "batalkan transaksi uji";
+  const hapusUtama = await jalankanFormulir(() =>
+    db.$transaction(async (tx) => {
+      await tx.perusahaan.delete({ where: { id: PERUSAHAAN_UTAMA } });
+      throw new Error(BATAL);
+    }),
+  );
+  pastikan(hapusUtama.galat === PESAN_DIPAKAI, `hapus perusahaan yang punya data (SQLSTATE 23001 lewat Prisma): pesan data masih dipakai ("${hapusUtama.galat}")`);
+  const hapusUtamaMentah = await jalankanFormulir(() =>
+    db.$transaction(async (tx) => {
+      await tx.$executeRaw`DELETE FROM "Perusahaan" WHERE "id" = ${PERUSAHAAN_UTAMA}`;
+      throw new Error(BATAL);
+    }),
+  );
+  pastikan(hapusUtamaMentah.galat === PESAN_DIPAKAI, `hapus perusahaan lewat SQL mentah (P2010 berkode 23001): pesan data masih dipakai ("${hapusUtamaMentah.galat}")`);
+  const galatPg = (code: string) => Object.assign(new Error(`galat driver ${code} memuat nama tabel internal`), { code });
+  pastikan((await jalankanFormulir(async () => { throw galatPg("23001"); })).galat === PESAN_DIPAKAI, "galat pg langsung 23001 dikenali seperti 23503");
+  pastikan((await jalankanFormulir(async () => { throw galatPg("23503"); })).galat === PESAN_DIPAKAI, "galat pg langsung 23503 dikenali");
+  pastikan((await jalankanFormulir(async () => { throw galatPg("42P01"); })).galat === "Terjadi kesalahan. Coba lagi.", "galat pg lain tetap pesan generik (detail internal tidak bocor)");
+  pastikan((await jalankanFormulir(async () => { throw new Error("Pesan validasi biasa"); })).galat === "Pesan validasi biasa", "galat validasi aplikasi tetap tampil apa adanya");
+  pastikan((await db.perusahaan.count({ where: { id: PERUSAHAAN_UTAMA } })) === 1, "perusahaan utama tetap ada");
+  console.error = consoleErrorAsli;
 
   console.log("=== Bersih-bersih ===");
   await db.sesi.deleteMany({ where: { id: { in: idSesiUji } } });

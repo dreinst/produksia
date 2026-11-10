@@ -2,7 +2,9 @@ import "dotenv/config";
 import { db } from "../src/lib/db";
 
 // Enam perusahaan standar dibuat migrasi 20261109160000_lebur_hka dan menjadi nilai bawaan FK, jadi tidak dihapus.
-// Sama dengan ID_PERUSAHAAN_STANDAR rancangan D1 §2.7; ganti dengan impor dari src/lib/perusahaan.ts bila berkas itu sudah ada.
+// Sengaja salinan lokal, bukan impor ID_PERUSAHAAN_STANDAR dari src/lib/perusahaan.ts: berkas itu memuat otentikasi.ts
+// beserta next/headers dan next/navigation, sedangkan skrip ini dijalankan lewat tsx tanpa Next. skrip/uji-lingkup-perusahaan.ts
+// memeriksa isi keduanya tetap sama.
 const ID_PERUSAHAAN_STANDAR = ["utama", "tapussa", "smara", "bonanova", "sahara", "nawasena"];
 
 async function main() {

@@ -50,7 +50,9 @@ export async function simpanHakAkses(dataFormulir: FormData) {
       }
     }
     if (berubah) await catat(pengguna.id, pengguna.nama, `${berubah} hak diubah untuk peran ${peranDiproses.map((p) => LABEL_PERAN[p]).join(", ")}`);
-  });
+    // satu tulis per kotak yang berubah (paling banyak delapan peran × semua kotak); batas bawaan Prisma 5 detik bisa
+    // terlewati lewat koneksi lambat, dan seluruh simpanan batal
+  }, { timeout: 30_000 });
   revalidatePath(HALAMAN);
   revalidatePath("/", "layout");
 }

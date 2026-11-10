@@ -28,6 +28,8 @@ import { pastikan, sebagai } from "./bantuan";
  * Uji beranda per tab (paket DF3): pilihan tab menurut hak, jalur keuangan tanpa baris tab bagi Kasir,
  * fungsi baca CRM (statistikCrm D4 §3.12, tindakLanjutSaya), data panel Tugas Saya, Penjualan, dan Sistem
  * menurut lingkup perusahaan, penolakan panel tanpa hak, dan tautan panel hanya ke rute yang sudah ada.
+ * Tambahan P01: tab tersedia:false lewat daftar definisi uji, jalur BerandaKosong lewat pengguna IKLAN nyata yang hak
+ * lihat pemasarannya dicabut sementara, dan peminjaman ajuan GUDANG yang hanya dihitung bagi Pemilik/Superadmin.
  * Data uji memakai perusahaan UJB1/UJB2 dan pengguna ujiberanda-*; semuanya dibersihkan di akhir.
  */
 
@@ -112,10 +114,15 @@ function ruteAda(href: string): boolean {
   return existsSync(`${dir}/page.tsx`);
 }
 
+/** Hak lihat modul pemasaran IKLAN yang dicabut sementara untuk menguji BerandaKosong (lewat HakAksesPeran). */
+const HAK_DICABUT_IKLAN = ["konten.lihat", "tugas-desain.lihat", "kampanye.lihat"] as const;
+
 /** Hapus data uji (juga sisa percobaan yang terputus). Urutan aman FK: dokumen, tindak lanjut, lead, perusahaan (tahap Cascade), pengguna. */
 async function bersihkanDataUji() {
   const ids = (await db.perusahaan.findMany({ where: { kode: { in: ["UJB1", "UJB2"] } }, select: { id: true } })).map((p) => p.id);
+  await db.hakAksesPeran.deleteMany({ where: { peran: "IKLAN", hak: { in: [...HAK_DICABUT_IKLAN] } } });
   await db.dokumenKas.deleteMany({ where: { nomor: { startsWith: "UJB-KK-" } } });
+  await db.peminjamanBarang.deleteMany({ where: { nomor: { startsWith: "UJB-PJM-" } } });
   await db.tindakLanjut.deleteMany({ where: { perusahaanId: { in: ids } } });
   await db.lead.deleteMany({ where: { perusahaanId: { in: ids } } });
   await db.perusahaan.deleteMany({ where: { id: { in: ids } } });
@@ -163,6 +170,13 @@ async function main() {
   pastikan(pilihTab(tabAdmin, ["saya", "penjualan"]) === "saya", "pilihTab: ?tab ganda memakai nilai pertama");
   pastikan(pilihTab(["saya"], "keuangan") === "saya", "pilihTab: SOSMED meminta keuangan mendapat Tugas Saya");
   pastikan(pilihTab([], "keuangan") === null, "pilihTab: daftar kosong = null");
+  // tab yang belum tersedia tidak pernah muncul walau haknya ada, dan ?tab ke sana jatuh ke tab bawaan
+  const definisiUji = TAB_BERANDA.map((t) => (t.kode === "pemasaran" ? { ...t, tersedia: false } : t));
+  const tabUji = tabBeranda({ hak: HAK_BAWAAN.ADMIN }, definisiUji);
+  pastikan(sama(tabUji, ["keuangan", "saya", "penjualan", "proyek"]), "tab tersedia:false tidak masuk daftar walau haknya dipegang (ADMIN tanpa Pemasaran)");
+  pastikan(pilihTab(tabUji, "pemasaran") === "keuangan", "pilihTab: ?tab ke tab yang tidak tersedia jatuh ke tab bawaan");
+  pastikan(sama(tabBeranda({ hak: HAK_BAWAAN.IKLAN }, definisiUji), []) && pilihTab(tabBeranda({ hak: HAK_BAWAAN.IKLAN }, definisiUji), "pemasaran") === null, "IKLAN dengan satu-satunya tab tidak tersedia: tanpa tab (beranda kosong)");
+  pastikan(sama(tabBeranda({ hak: HAK_BAWAAN.ADMIN }), tabBeranda({ hak: HAK_BAWAAN.ADMIN }, TAB_BERANDA)), "tanpa daftar definisi = TAB_BERANDA");
 
   console.log("=== 2. Halaman beranda: jalur keuangan dan pengalihan tab ===");
   const muat = (peran: string, tab?: string) =>
@@ -194,6 +208,26 @@ async function main() {
     dialihkan = String((e as { digest?: string }).digest ?? "");
   }
   pastikan(dialihkan.startsWith("NEXT_REDIRECT") && dialihkan.includes("/data-induk/barang"), "GUDANG: tetap dialihkan ke /data-induk/barang");
+  // Jalur BerandaKosong: pengguna IKLAN nyata yang hak lihat modul pemasarannya dicabut sementara. Penyesuaian
+  // dihapus sebelum pemeriksaan (pastikan menghentikan proses bila gagal), supaya HakAksesPeran tidak tertinggal.
+  const uIklan = await db.pengguna.create({ data: { namaPengguna: `${PREFIKS}iklan`, nama: "Uji Beranda Iklan", peran: "IKLAN", kataSandiHash: "-" } });
+  const hakIklanDicabut = HAK_DICABUT_IKLAN.filter((h) => (HAK_BAWAAN.IKLAN as readonly string[]).includes(h));
+  let halIklanKosong: unknown, tabIklanKosong: KodeTab[] = [];
+  await db.hakAksesPeran.createMany({ data: hakIklanDicabut.map((hak) => ({ peran: "IKLAN" as const, hak, boleh: false })) });
+  try {
+    await sebagai(uIklan.namaPengguna, async () => {
+      const p = await (await import("../src/lib/otentikasi")).penggunaSaatIni();
+      tabIklanKosong = p ? tabBeranda(p) : [];
+      halIklanKosong = await denganEnv({ UJI_PERAN: undefined, UJI_PERUSAHAAN: undefined }, () => Beranda({ searchParams: Promise.resolve({ tab: "pemasaran" }) }));
+    });
+  } finally {
+    await db.hakAksesPeran.deleteMany({ where: { peran: "IKLAN", hak: { in: [...HAK_DICABUT_IKLAN] } } });
+  }
+  pastikan(hakIklanDicabut.length === 3 && tabIklanKosong.length === 0, "IKLAN nyata tanpa konten.lihat, tugas-desain.lihat, kampanye.lihat: tidak punya tab");
+  pastikan(isValidElement(halIklanKosong) && halIklanKosong.type === BerandaKosong, "IKLAN tanpa tab: halaman beranda merender BerandaKosong");
+  pastikan((await db.hakAksesPeran.count()) === 0, "penyesuaian hak sementara sudah dihapus");
+  const halIklanPulih = (await sebagai(uIklan.namaPengguna, () => Beranda({ searchParams: Promise.resolve({}) }))) as ReactElement<Record<string, unknown>>;
+  pastikan(halIklanPulih.type === DasborModul && halIklanPulih.props.tab === "pemasaran", "setelah hak dipulihkan: IKLAN nyata kembali ke tab Pemasaran");
 
   console.log("=== 3. Pembantu waktu dan ringkasan rupiah ===");
   pastikan(bacaWaktuLokal("2026-11-09T14:30")?.toISOString() === "2026-11-09T07:30:00.000Z", "bacaWaktuLokal: jam dinding WIB ke UTC");
@@ -316,6 +350,25 @@ async function main() {
   pastikan(sebagaiA && sebagaiA.id === uA.id, "pengguna nyata A terbaca lewat UJI_PENGGUNA");
   pastikan(jumlahKk(await menungguPersetujuanSaya(sebagaiA, p1.id)) === 1, "pemisahan tugas: ajuan A sendiri tidak dihitung untuk A");
   pastikan((await menungguPersetujuanSaya(penggunaSintetis("KASIR"), p1.id)).length === 0, "KASIR tanpa hak setujui: tidak ada yang menunggu");
+  // Peminjaman yang diajukan pengguna GUDANG hanya boleh disetujui Pemilik/Superadmin (pastikanBolehSetujui peminjaman)
+  const uGudang = await db.pengguna.create({ data: { namaPengguna: `${PREFIKS}gudang`, nama: "Uji Beranda Gudang", peran: "GUDANG", kataSandiHash: "-" } });
+  const uKru = await db.pengguna.create({ data: { namaPengguna: `${PREFIKS}kru`, nama: "Uji Beranda Kru", peran: "KRU", kataSandiHash: "-" } });
+  const gudang = await db.gudang.findFirstOrThrow({ orderBy: { kode: "asc" }, select: { id: true } });
+  const pinjam = (nomor: string, diajukanOlehId: string | null) =>
+    db.peminjamanBarang.create({ data: { nomor, gudangId: gudang.id, namaPengambil: "Kru Uji", dicatatOlehNama: "Skrip Uji", perusahaanId: p1.id, statusPersetujuan: "MENUNGGU", diajukanOlehId, diajukanPada: new Date() } });
+  await pinjam("UJB-PJM-1", uGudang.id);
+  await pinjam("UJB-PJM-2", uKru.id);
+  await pinjam("UJB-PJM-3", null);
+  const jumlahPinjam = (b: { kode: string; jumlah: number }[]) => b.find((x) => x.kode === "peminjaman")?.jumlah ?? 0;
+  pastikan(jumlahPinjam(await menungguPersetujuanSaya(pemilik, p1.id)) === 3, "PEMILIK: peminjaman ajuan GUDANG ikut dihitung (3)");
+  pastikan(jumlahPinjam(await menungguPersetujuanSaya(penggunaSintetis("SUPERADMIN"), p1.id)) === 3, "SUPERADMIN: peminjaman ajuan GUDANG ikut dihitung (3)");
+  pastikan(jumlahPinjam(await menungguPersetujuanSaya(penggunaSintetis("ADMIN"), p1.id)) === 2, "ADMIN: peminjaman ajuan GUDANG tidak dihitung, ajuan KRU dan tanpa pengaju tetap (2)");
+  pastikan(jumlahPinjam(await menungguPersetujuanSaya(penggunaSintetis("GUDANG"), p1.id)) === 2, "GUDANG lain: ajuan sesama GUDANG tidak dihitung (2)");
+  const sebagaiGudang = await sebagai(`${PREFIKS}gudang`, async () => (await import("../src/lib/otentikasi")).penggunaSaatIni());
+  pastikan(sebagaiGudang && jumlahPinjam(await menungguPersetujuanSaya(sebagaiGudang, p1.id)) === 2, "GUDANG nyata: ajuannya sendiri tidak dihitung, ajuan KRU dan tanpa pengaju dihitung (2)");
+  const sebagaiKru = await sebagai(`${PREFIKS}kru`, async () => (await import("../src/lib/otentikasi")).penggunaSaatIni());
+  pastikan(sebagaiKru && jumlahPinjam(await menungguPersetujuanSaya({ ...sebagaiKru, peran: "ADMIN", hak: hitungHak("ADMIN") }, p1.id)) === 1, "ADMIN yang mengajukan sendiri: ajuannya tidak dihitung, ajuan GUDANG tetap tidak (OR pemisahan tugas utuh)");
+  pastikan(jumlahPinjam(await menungguPersetujuanSaya(pemilik, p2.id)) === 0, "peminjaman mengikuti lingkup perusahaan");
 
   console.log("=== 8. Data panel penjualan ===");
   const gabPemilik = await muatPenjualanDokumen(pemilik, null);

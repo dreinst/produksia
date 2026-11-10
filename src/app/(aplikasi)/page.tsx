@@ -11,9 +11,9 @@ import { Suspense } from "react";
 import PanelTren, { KerangkaTren } from "@/komponen/beranda/PanelTren";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
-import { lingkupPerusahaan } from "@/lib/perusahaan";
+import { daftarPerusahaan, lingkupPerusahaan } from "@/lib/perusahaan";
 import { akunDalamLingkup, muatDataBerandaKeuangan, urutkanAkunKas } from "@/lib/berandaKeuangan";
-import { pilihTab, tabBeranda } from "@/lib/beranda";
+import { kalimatIntegritas, pilihTab, tabBeranda } from "@/lib/beranda";
 import TabBeranda from "@/komponen/beranda/TabBeranda";
 import DasborModul from "@/komponen/beranda/DasborModul";
 import BerandaKosong from "@/komponen/beranda/BerandaKosong";
@@ -73,11 +73,13 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
     pembayaranTerbaru,
   } = await muatDataBerandaKeuangan(lingkupId, now);
 
-  const [sinkron, pengaturan, permintaanLupa] = await Promise.all([
+  const [sinkron, pengaturan, permintaanLupa, perusahaanAktif] = await Promise.all([
     // Integritas per lingkup (D1 §4.9): gabungan memanggil periksaSinkron persis seperti sebelumnya
     gabungan ? periksaSinkron(db) : periksaSinkron(db, { perusahaanId: lingkupId }),
     ambilPengaturanPerusahaan(db),
     boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
+    // hanya untuk kalimat Integritas: instalasi satu perusahaan memakai kalimat lama
+    gabungan ? Promise.resolve([]) : daftarPerusahaan(),
   ]);
 
   // ---- KPI 1: Piutang ----
@@ -517,9 +519,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
               <h3 className="text-sm font-bold">Integritas &amp; Sinkronisasi</h3>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
-              {gabungan
-                ? "Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:"
-                : `Buku besar ${lingkup.perusahaan?.nama ?? "perusahaan ini"} dicocokkan dengan dokumen dan stok barang miliknya setiap kali beranda dibuka:`}
+              {kalimatIntegritas({ perusahaanId: lingkupId, nama: lingkup.perusahaan?.nama ?? null }, perusahaanAktif.map((p) => p.id))}
             </p>
             <div className="space-y-3 text-xs">
               {[

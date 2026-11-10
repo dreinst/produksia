@@ -10,7 +10,9 @@ import { periksaSinkron, type HasilSinkron } from "../src/lib/sinkron";
 import { bacaPeriode, hitungLabaRugiBulanan, saldoAkunPeriode } from "../src/lib/laporan";
 import { urutkanAkunKas } from "../src/lib/berandaKeuangan";
 import { ambilPengaturanPerusahaan } from "../src/lib/pengaturanPerusahaan";
-import { alasanKontenSaya, geserTanggalIso, kontenSaya } from "../src/lib/konten";
+import { alasanKontenSaya, geserTanggalIso, kontenSaya, menungguPenyetujuSaja } from "../src/lib/konten";
+import { KALIMAT_INTEGRITAS_LAMA, kalimatIntegritas } from "../src/lib/beranda";
+import { Prisma } from "../src/prisma-klien/client";
 import { tanggalIso } from "../src/lib/waktu";
 import { D } from "../src/lib/uang";
 import { buatPesanan, buatFaktur, buatPenerimaan, buatPengiriman, buatUangMuka } from "../src/lib/aksi/penjualan";
@@ -39,7 +41,9 @@ import { formulir, jalankan, pastikan, sebagai } from "./bantuan";
  *   perusahaan lain punya data) dan rincian Kas & Bank mendahulukan rekening perusahaan itu;
  * - tab Tugas Saya per hak (kartu tugas desain, Konten saya, menunggu persetujuan) dan lencana perusahaan pada tindak
  *   lanjut CRM di lingkup gabungan;
- * - warna lencana log, KartuKpi rata atas, persen margin satu desimal.
+ * - warna lencana log, KartuKpi rata atas, persen margin satu desimal;
+ * - (P01) kalimat Integritas lama di gabungan dan di instalasi satu perusahaan aktif, lencana Menunggu persetujuan di
+ *   Konten saya, dan konten yang hanya menunggu penyetuju diurutkan sesudah ide/draf.
  * Data uji memakai perusahaan UJL1/UJL2, pengguna ujilingkup-*, dan kode UJL-*; semuanya dibersihkan di akhir.
  */
 
@@ -213,6 +217,13 @@ async function main() {
   pastikan(sama(alasan("DISETUJUI", "DISETUJUI", null, null), ["BELUM_DIJADWALKAN"]) && sama(alasan("DISETUJUI", "DISETUJUI", 0, null), ["AKAN_TERBIT"]), "alasan konten: disetujui tanpa tanggal = perlu dijadwalkan; terbit hari ini = akan terbit, belum lewat");
   pastikan(alasan("TERJADWAL", "DISETUJUI", 15, null).length === 0 && alasan("TERBIT", "DISETUJUI", 2, null).length === 0 && alasan("TERBIT", "DISETUJUI", -3, null).length === 0 && alasan("DITINJAU", "MENUNGGU", null, "DISETUJUI").length === 0 && alasan("DITINJAU", "MENUNGGU", -2, null).length === 0 && alasan("TERJADWAL", "DISETUJUI", null, null).length === 0, "bukan tindakan: terbit 15 hari lagi, sudah terbit (juga yang tanggalnya lewat), menunggu penyetuju (walau tanggal lewat), terjadwal tanpa tanggal");
   pastikan(LENCANA_ALASAN.LEWAT_TERBIT?.warna === "rose" && !!LENCANA_ALASAN.BELUM_DIJADWALKAN && !!LENCANA_ALASAN.DITOLAK, "lencana alasan lewat terbit (merah) dan perlu dijadwalkan tersedia");
+  pastikan(menungguPenyetujuSaja({ statusPersetujuan: "MENUNGGU", alasan: ["AKAN_TERBIT"] }) && !menungguPenyetujuSaja({ statusPersetujuan: "DISETUJUI", alasan: ["AKAN_TERBIT"] }), "menunggu penyetuju saja: akan terbit dan persetujuan MENUNGGU; yang sudah disetujui tidak");
+  pastikan(!menungguPenyetujuSaja({ statusPersetujuan: "MENUNGGU", alasan: ["AKAN_TERBIT", "REVISI_DESAIN"] }) && !menungguPenyetujuSaja({ statusPersetujuan: "MENUNGGU", alasan: [] }), "ada alasan lain (mis. revisi desain) atau tanpa alasan: bukan menunggu penyetuju saja");
+  // kalimat Integritas: lama di gabungan dan bila lingkup satu-satunya perusahaan aktif, selain itu menyebut nama perusahaan
+  pastikan(kalimatIntegritas({ perusahaanId: null, nama: null }, ["utama", "tapussa"]) === KALIMAT_INTEGRITAS_LAMA, "kalimat Integritas gabungan: kalimat lama");
+  pastikan(kalimatIntegritas({ perusahaanId: "utama", nama: "PT A" }, ["utama"]) === KALIMAT_INTEGRITAS_LAMA, "kalimat Integritas satu perusahaan aktif yang menjadi lingkup: kalimat lama");
+  pastikan(kalimatIntegritas({ perusahaanId: "utama", nama: "PT A" }, ["utama", "tapussa"]).startsWith("Buku besar PT A dicocokkan"), "kalimat Integritas lebih dari satu perusahaan aktif: menyebut nama perusahaan");
+  pastikan(kalimatIntegritas({ perusahaanId: "arsip", nama: "PT Arsip" }, ["utama"]).startsWith("Buku besar PT Arsip dicocokkan"), "kalimat Integritas lingkup perusahaan arsip (bukan satu-satunya yang aktif): menyebut nama perusahaan");
 
   console.log("=== 2. Kartu Tugas Saya per hak bawaan ===");
   const k = (peran: PeranPengguna, n: number | null = 0) => kartuTugasSaya({ hak: hitungHak(peran) }, n);
@@ -354,6 +365,22 @@ async function main() {
   pastikan(integritasG.includes("Buku besar dicocokkan dengan dokumen dan stok fisik") && integritasG.includes(`stok Rp ${Number(sG.persediaan.dokumen).toLocaleString("id-ID")}`), "gabungan: kalimat dan angka Integritas seperti sebelum perbaikan");
   const halKasir = await muat("KASIR", undefined);
   pastikan(halKasir.teks.includes("Jurnal seimbang") && halKasir.teks.includes("Persediaan = stok fisik") && !halKasir.teks.includes("belum tersedia"), "KASIR (lingkup utama, perusahaan lain punya data): Integritas tetap tampil dengan angka utama");
+  const namaUtama = (await db.perusahaan.findUniqueOrThrow({ where: { id: "utama" }, select: { nama: true } })).nama;
+  pastikan(potong(halKasir.teks, "Integritas & Sinkronisasi", "PostgreSQL 18").includes(`Buku besar ${namaUtama} dicocokkan`), "KASIR dengan beberapa perusahaan aktif: kalimat Integritas menyebut perusahaan lingkupnya");
+  // KASIR di instalasi satu perusahaan: perusahaan aktif lain dinonaktifkan sementara lewat SQL (diubahPada tidak tersentuh),
+  // lalu dipulihkan di finally sebelum pemeriksaan (pastikan menghentikan proses bila gagal)
+  const aktifLain = (await db.perusahaan.findMany({ where: { aktif: true, id: { not: "utama" } }, select: { id: true } })).map((p) => p.id);
+  let halKasirSatu: Awaited<ReturnType<typeof muat>> | null = null;
+  await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = false WHERE "id" IN (${Prisma.join(aktifLain)})`;
+  try {
+    halKasirSatu = await muat("KASIR", undefined);
+  } finally {
+    await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = true WHERE "id" IN (${Prisma.join(aktifLain)})`;
+  }
+  pastikan((await db.perusahaan.count({ where: { id: { in: aktifLain }, aktif: true } })) === aktifLain.length, `perusahaan yang dinonaktifkan sementara sudah aktif lagi (${aktifLain.length})`);
+  const integritasSatu = potong(halKasirSatu!.teks, "Integritas & Sinkronisasi", "PostgreSQL 18");
+  pastikan(integritasSatu.includes(KALIMAT_INTEGRITAS_LAMA) && !integritasSatu.includes(`Buku besar ${namaUtama}`) && integritasSatu.includes("Jurnal seimbang"), "KASIR dengan satu perusahaan aktif: kalimat Integritas lama seperti sebelum peleburan");
+  pastikan(potong(halG.teks, "Integritas & Sinkronisasi", "PostgreSQL 18").includes(KALIMAT_INTEGRITAS_LAMA), "gabungan tetap memakai kalimat lama");
   // Tren kas sejak sebelum multi perusahaan dijaga buku-besar.lihat; KASIR bawaan tidak memegangnya, jadi tetap tanpa tren
   const kasirBukuBesar = hitungHak("KASIR").includes("buku-besar.lihat");
   pastikan(halKasir.teks.includes("Tren Kas Masuk & Keluar") === kasirBukuBesar, `KASIR: tren kas mengikuti hak buku-besar.lihat (${kasirBukuBesar ? "punya" : "tidak punya"}), bukan data perusahaan lain`);
@@ -478,6 +505,19 @@ async function main() {
   pastikan(sayaD.teks.includes("Tugas desain saya") && sayaD.teks.includes("Tidak ada tugas desain aktif.") && !sayaD.teks.includes("Menunggu persetujuan Anda") && !sayaD.teks.includes("Konten saya"), "DESAINER: kartu tugas desain walau kosong, tanpa menunggu persetujuan dan Konten saya");
   const sayaI = await render(PanelSaya({ pengguna: penggunaSintetis("IKLAN"), perusahaanId: null }));
   pastikan(sayaI.teks.includes("Tidak ada tugas untuk Anda saat ini.") && !sayaI.teks.includes("Menunggu persetujuan Anda"), "tanpa satu pun kartu relevan: pesan kosong");
+
+  // SMM dengan 10 konten menunggu penyetuju bertanggal dekat dan satu ide tanpa tanggal: idenya tetap di 10 baris pertama
+  const uS2 = await db.pengguna.create({ data: { namaPengguna: `${PREFIKS}s2`, nama: "Uji Lingkup Sosmed Dua", peran: "SOSMED", kataSandiHash: "-" } });
+  for (let i = 1; i <= 10; i++) await konten(p1.id, `UJL Tinjau ${String(i).padStart(2, "0")}`, "DITINJAU", i, { persetujuan: "MENUNGGU", smm: uS2.id });
+  const kIdeS2 = await konten(p1.id, "UJL Ide tanpa tanggal", "IDE", null, { smm: uS2.id });
+  const ksMenunggu = await kontenSaya(db, uS2.id, p1.id);
+  pastikan(ksMenunggu.total === 11 && ksMenunggu.baris.length === 10 && ksMenunggu.baris[0].id === kIdeS2.id, `10 konten menunggu penyetuju + 1 ide: ide tanpa tanggal tetap di 10 baris pertama, paling atas (${ksMenunggu.baris.map((x) => x.judul).join(", ")})`);
+  pastikan(ksMenunggu.baris.slice(1).every((x) => x.statusPersetujuan === "MENUNGGU") && ksMenunggu.baris[1].judul === "UJL Tinjau 01", "yang menunggu penyetuju menyusul sesudah ide/draf, urut tanggal terbit");
+  const sosmed2 = (await sebagai(`${PREFIKS}s2`, async () => (await import("../src/lib/otentikasi")).penggunaSaatIni()))!;
+  const sayaS2 = await render(PanelSaya({ pengguna: sosmed2, perusahaanId: p1.id }));
+  const kartuKontenS2 = potong(sayaS2.teks, "Konten saya", "Menunggu persetujuan Anda");
+  pastikan(kartuKontenS2.includes("UJL Ide tanpa tanggal") && (kartuKontenS2.match(/Menunggu persetujuan/g) ?? []).length === 9, "kartu Konten saya: ide tampil, dan 9 konten menunggu yang tampil berlencana Menunggu persetujuan");
+  pastikan(!potong(sayaS.teks, "Konten saya", "Menunggu persetujuan Anda").includes("Menunggu persetujuan"), "konten tanpa persetujuan menunggu tidak berlencana Menunggu persetujuan");
 
   console.log("=== 8. Tindak lanjut CRM dengan lencana perusahaan di gabungan ===");
   await db.tindakLanjut.create({ data: { perusahaanId: p1.id, judul: "UJL Telepon klien satu", jatuhTempo: hari(1), ditugaskanKeId: uA.id, dibuatOlehNama: "Skrip Uji" } });

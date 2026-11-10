@@ -8,7 +8,7 @@ import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
 
 export type TabBeranda = "keuangan" | "saya" | "penjualan" | "pemasaran" | "proyek" | "sistem";
 
-type DefinisiTab = {
+export type DefinisiTab = {
   kode: TabBeranda;
   label: string;
   /** Tampil bila pengguna memegang salah satu hak ini (kosong = tidak disyaratkan). */
@@ -37,10 +37,13 @@ export function labelTab(kode: TabBeranda): string {
   return TAB_BERANDA.find((t) => t.kode === kode)?.label ?? kode;
 }
 
-/** Tab yang boleh dibuka pengguna, urut tetap. Kosong = beranda kosong. */
-export function tabBeranda(pengguna: Pick<PenggunaSesi, "hak">): TabBeranda[] {
+/**
+ * Tab yang boleh dibuka pengguna, urut tetap. Kosong = beranda kosong. `definisi` bawaan TAB_BERANDA; uji memakai daftar
+ * lain (mis. dengan tab `tersedia: false`) untuk memeriksa aturan tersedia tanpa mengubah daftar tab aplikasi.
+ */
+export function tabBeranda(pengguna: Pick<PenggunaSesi, "hak">, definisi: readonly DefinisiTab[] = TAB_BERANDA): TabBeranda[] {
   const boleh = (h: Hak) => pengguna.hak.includes(h);
-  return TAB_BERANDA.filter(
+  return definisi.filter(
     (t) => t.tersedia && (t.salahSatu.length === 0 || t.salahSatu.some(boleh)) && t.semua.every(boleh),
   ).map((t) => t.kode);
 }
@@ -50,4 +53,18 @@ export function pilihTab(daftar: readonly TabBeranda[], nilai: string | string[]
   const teks = Array.isArray(nilai) ? nilai[0] : nilai;
   if (teks && KODE_TAB.has(teks) && daftar.includes(teks as TabBeranda)) return teks as TabBeranda;
   return daftar[0] ?? null;
+}
+
+/** Kalimat pembuka kartu Integritas & Sinkronisasi sebelum multi perusahaan. */
+export const KALIMAT_INTEGRITAS_LAMA = "Buku besar dicocokkan dengan dokumen dan stok fisik setiap kali beranda dibuka:";
+
+/**
+ * Kalimat pembuka kartu Integritas di tab keuangan. Kalimat lama dipakai di lingkup gabungan dan bila lingkup adalah
+ * satu-satunya perusahaan aktif (instalasi satu perusahaan tampil seperti sebelum peleburan). Selain itu kalimat
+ * menyebut nama perusahaan lingkup. `idPerusahaanAktif` = id semua perusahaan aktif.
+ */
+export function kalimatIntegritas(lingkup: { perusahaanId: string | null; nama: string | null }, idPerusahaanAktif: readonly string[]): string {
+  const satuSatunya = idPerusahaanAktif.length === 1 && idPerusahaanAktif[0] === lingkup.perusahaanId;
+  if (lingkup.perusahaanId === null || satuSatunya) return KALIMAT_INTEGRITAS_LAMA;
+  return `Buku besar ${lingkup.nama ?? "perusahaan ini"} dicocokkan dengan dokumen dan stok barang miliknya setiap kali beranda dibuka:`;
 }

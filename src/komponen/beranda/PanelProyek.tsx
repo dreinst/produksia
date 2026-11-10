@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
-import { daftarKeuanganProyek } from "@/lib/keuanganProyek";
+import { BATAS_PROYEK_MUAT, daftarKeuanganProyek } from "@/lib/keuanganProyek";
 import type { Desimal } from "@/lib/uang";
 import KartuKpi from "@/komponen/ui/KartuKpi";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
@@ -23,7 +23,8 @@ export const teksPersen = (p: Desimal | null) => (p === null ? "-" : `${Number(p
  */
 export default async function PanelProyek({ pengguna, perusahaanId }: { pengguna: PenggunaSesi; perusahaanId: string | null }) {
   if (!punyaHak(pengguna, "anggaran-proyek.lihat")) return null;
-  const { baris, total } = await daftarKeuanganProyek(db, { status: STATUS_PROYEK_AKTIF }, perusahaanId);
+  const { baris, total, jumlahTotal } = await daftarKeuanganProyek(db, { status: STATUS_PROYEK_AKTIF }, perusahaanId);
+  const terpotong = jumlahTotal > baris.length;
   const bolehLpj = punyaHak(pengguna, "rekonsiliasi.lihat");
   const gabungan = perusahaanId === null;
   const tampil = baris.slice(0, BARIS_TAMPIL);
@@ -43,8 +44,9 @@ export default async function PanelProyek({ pengguna, perusahaanId }: { pengguna
           <div>
             <h2 className="judul-kartu">Proyek berjalan</h2>
             <p className="subjudul-kartu">
-              {baris.length.toLocaleString("id-ID")} proyek. Pendapatan tanpa PPN; biaya dari jurnal yang bertanda proyek.
+              {jumlahTotal.toLocaleString("id-ID")} proyek. Pendapatan tanpa PPN; biaya dari jurnal yang bertanda proyek.
               {baris.length > BARIS_TAMPIL ? ` Menampilkan ${BARIS_TAMPIL} terbaru.` : ""}
+              {terpotong ? ` Total dihitung dari ${BATAS_PROYEK_MUAT.toLocaleString("id-ID")} proyek pertama.` : ""}
             </p>
           </div>
           {bolehLpj && (

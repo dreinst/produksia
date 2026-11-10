@@ -381,12 +381,14 @@ export type TotalKeuanganProyek = {
 /**
  * Daftar keuangan proyek dalam lingkup (D5 §6.3): semua proyek tersaring (paling banyak 500) beserta ringkasannya,
  * urut tanggal mulai turun (tanpa tanggal di belakang) lalu kode, dan totalnya. perusahaanId null/undefined = gabungan.
+ * `total` hanya dari baris yang dimuat; `jumlahTotal` = jumlah semua proyek tersaring, jadi `jumlahTotal > baris.length`
+ * berarti daftar dan totalnya terpotong di 500 proyek pertama.
  */
 export async function daftarKeuanganProyek(
   klien: Klien,
   filter: { status?: string; q?: string } = {},
   perusahaanId?: string | null,
-): Promise<{ baris: (ProyekKeuangan & { ringkasan: RingkasanKeuangan })[]; total: TotalKeuanganProyek }> {
+): Promise<{ baris: (ProyekKeuangan & { ringkasan: RingkasanKeuangan })[]; total: TotalKeuanganProyek; jumlahTotal: number }> {
   const where: Prisma.ProyekWhereInput = { ...saringPerusahaan(perusahaanId) };
   if (filter.status) where.status = filter.status;
   const q = filter.q?.trim();
@@ -400,11 +402,16 @@ export async function daftarKeuanganProyek(
     take: BATAS_PROYEK_MUAT,
     select: PILIH_PROYEK,
   });
-  const masukan = await muatMasukanKeuangan(klien, proyek.map((p) => p.id));
+  // hitung ulang hanya bila batas tercapai; di bawah batas semua proyek sudah termuat
+  const [masukan, jumlahTotal] = await Promise.all([
+    muatMasukanKeuangan(klien, proyek.map((p) => p.id)),
+    proyek.length < BATAS_PROYEK_MUAT ? Promise.resolve(proyek.length) : klien.proyek.count({ where }),
+  ]);
   const baris = proyek.map((p) => ({ ...proyekRingkas(p), ringkasan: hitungRingkasanKeuangan(masukan.get(p.id)!) }));
   const jml = (f: (r: RingkasanKeuangan) => Desimal) => uang(jumlah(baris.map((b) => f(b.ringkasan))));
   return {
     baris,
+    jumlahTotal,
     total: {
       kontrak: jml((r) => r.kontrak),
       pendapatanRencana: jml((r) => r.pendapatanRencana),

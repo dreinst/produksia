@@ -17,8 +17,9 @@ import { jalankan, formulir, sebagai } from "./bantuan";
  * Kunci hak sesudah peleburan HKA (desain HAK.md): 171 kunci, bawaan eksplisit sepuluh peran, bagian lama
  * ADMIN beku + HAK_ADMIN_BARU, matriks Pengaturan › Hak Akses yang merender dan memproses semua aksi, dan
  * peran tambahan per pengguna. Suite ini berjalan tepat sebelum uji-hak-akses.ts (urut abjad), jadi semua
- * baris HakAksesPeran dihapus di blok finally. Pemeriksa lokal melempar galat (bukan process.exit) supaya
- * blok finally tetap berjalan saat gagal.
+ * baris HakAksesPeran dihapus di blok finally. Di awal suite tabel itu harus sudah kosong; sisa baris berarti suite
+ * sebelumnya bocor dan suite ini gagal. Pemeriksa lokal melempar galat (bukan process.exit) supaya blok finally tetap
+ * berjalan saat gagal.
  */
 
 function pastikan(kondisi: unknown, pesan: string): asserts kondisi {
@@ -289,10 +290,15 @@ async function main() {
   pastikan(Array.isArray(tanpaKolom.peranTambahan) && tanpaKolom.peranTambahan.length === 0, "pengguna lama berperan tambahan kosong");
 }
 
-async function bersihkan(mulaiUji: Date) {
+/** Sisa pengguna uji ujih-* beserta sesinya (juga dari putaran yang terputus). */
+async function hapusPenggunaUji() {
   const uji = await db.pengguna.findMany({ where: { namaPengguna: { startsWith: PREFIKS_UJI } }, select: { id: true } });
   await db.sesi.deleteMany({ where: { penggunaId: { in: uji.map((u) => u.id) } } });
   await db.pengguna.deleteMany({ where: { id: { in: uji.map((u) => u.id) } } });
+}
+
+async function bersihkan(mulaiUji: Date) {
+  await hapusPenggunaUji();
   await db.hakAksesPeran.deleteMany();
   await db.logAktivitas.deleteMany({ where: { waktu: { gte: mulaiUji } } });
 }
@@ -301,11 +307,17 @@ async function bersihkan(mulaiUji: Date) {
   const mulaiUji = new Date();
   let gagal: unknown = null;
   try {
-    await bersihkan(new Date(8.64e15)); // sisa pengguna uji dari putaran yang terputus (log lama tidak disentuh)
+    // Di awal hanya sisa pengguna uji yang dihapus. HakAksesPeran sengaja tidak dihapus (HAK.md §6.2 no. 1): baris yang
+    // sudah ada berarti suite yang berjalan lebih dulu meninggalkan penyesuaian, dan itu harus terlihat sebagai kegagalan.
+    await hapusPenggunaUji();
+    const sisa = await db.hakAksesPeran.count();
+    if (sisa !== 0) throw new Error(`[FAIL] suite sebelumnya bocor: ${sisa} baris HakAksesPeran tertinggal sebelum suite ini mulai`);
+    console.log("[ok] HakAksesPeran kosong saat suite mulai");
     await main();
   } catch (err) {
     gagal = err;
   } finally {
+    // penghapusan penuh hanya di sini
     await bersihkan(mulaiUji);
   }
   if (gagal) {
