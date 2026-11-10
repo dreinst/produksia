@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { wajibMasuk } from "@/lib/otentikasi";
-import { KETERANGAN_PERAN, LABEL_PERAN, labelHak } from "@/lib/hakAkses";
+import { KETERANGAN_PERAN, labelHak, labelPeranPengguna } from "@/lib/hakAkses";
 import Ikon from "@/komponen/ui/Ikon";
 
 export default async function HalamanTanpaAkses({ searchParams }: { searchParams: Promise<{ hak?: string }> }) {
@@ -20,7 +20,7 @@ export default async function HalamanTanpaAkses({ searchParams }: { searchParams
       </div>
       <div className="ubin text-sm space-y-1">
         <div>
-          Masuk sebagai <strong>{pengguna.nama}</strong> · peran <strong>{LABEL_PERAN[pengguna.peran]}</strong>
+          Masuk sebagai <strong>{pengguna.nama}</strong> · peran <strong>{labelPeranPengguna(pengguna)}</strong>
         </div>
         <div className="text-slate-500">{KETERANGAN_PERAN[pengguna.peran]}</div>
         {hak && (

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { DAFTAR_PERAN, PERAN_TERTINGGI, peranTertinggi, type PenggunaSesi } from "@/lib/hakAkses";
+import { DAFTAR_PERAN, PERAN_TAMBAHAN_BOLEH, PERAN_TERTINGGI, peranTertinggi, type PenggunaSesi } from "@/lib/hakAkses";
 import { bacaEmailOpsional, bacaNamaPengguna, bacaNomorTelepon } from "@/lib/identitasPengguna";
 import { hapusSemuaSesiPengguna, hashKataSandi, periksaKekuatanKataSandi, wajibHakAksi } from "@/lib/otentikasi";
 import type { PeranPengguna } from "@/prisma-klien/enums";
@@ -20,6 +20,20 @@ function bacaPeran(dataFormulir: FormData): PeranPengguna {
   const nilai = bacaTeks(dataFormulir, "peran") as PeranPengguna;
   if (!DAFTAR_PERAN.includes(nilai)) throw new Error("Peran tidak dikenal");
   return nilai;
+}
+
+/**
+ * Peran tambahan dari formulir. undefined berarti formulir tidak mengirim isian peran tambahan (penanda
+ * peranTambahanDikirim=1 tidak ada), jadi kolomnya tidak diubah. Nilai yang sama dengan peran utama dan
+ * duplikat dibuang; hasilnya diurutkan supaya perbandingan perubahan stabil.
+ */
+function bacaPeranTambahan(dataFormulir: FormData, peranUtama: PeranPengguna): PeranPengguna[] | undefined {
+  if (dataFormulir.get("peranTambahanDikirim") !== "1") return undefined;
+  const nilai = [...new Set(dataFormulir.getAll("peranTambahan").map(String))];
+  for (const v of nilai) {
+    if (!PERAN_TAMBAHAN_BOLEH.includes(v as PeranPengguna)) throw new Error("Peran tambahan hanya boleh Pengelola Media Sosial, Pengelola Iklan, atau Desainer");
+  }
+  return (nilai as PeranPengguna[]).filter((p) => p !== peranUtama).sort();
 }
 
 /** Aturan siapa boleh menyentuh akun siapa: akun Superadmin/Pemilik hanya oleh Superadmin/Pemilik. */
@@ -49,6 +63,7 @@ export async function buatPengguna(dataFormulir: FormData) {
   const email = bacaEmailOpsional(bacaTeks(dataFormulir, "email"));
   const kataSandi = bacaTeks(dataFormulir, "kataSandi");
   const peran = bacaPeran(dataFormulir);
+  const peranTambahan = bacaPeranTambahan(dataFormulir, peran) ?? [];
   // Wajib untuk semua peran KECUALI Guest (tamu/pihak luar, tidak selalu punya WhatsApp terdaftar).
   const nomorTelepon = bacaNomorTelepon(bacaTeks(dataFormulir, "nomorTelepon"), peran !== "GUEST");
 
@@ -58,7 +73,7 @@ export async function buatPengguna(dataFormulir: FormData) {
   if (peranTertinggi(peran) && !peranTertinggi(pelaku.peran)) throw new Error("Hanya Superadmin atau Pemilik yang bisa membuat akun Superadmin/Pemilik");
   await pastikanNamaPenggunaBebas(namaPengguna);
 
-  await db.pengguna.create({ data: { nama, namaPengguna, email, nomorTelepon, kataSandiHash: await hashKataSandi(kataSandi), peran } });
+  await db.pengguna.create({ data: { nama, namaPengguna, email, nomorTelepon, kataSandiHash: await hashKataSandi(kataSandi), peran, peranTambahan } });
   revalidatePath(HALAMAN);
 }
 
@@ -71,17 +86,19 @@ export async function ubahPengguna(id: string, dataFormulir: FormData) {
   const peran = bacaPeran(dataFormulir);
   const nomorTelepon = bacaNomorTelepon(bacaTeks(dataFormulir, "nomorTelepon"), peran !== "GUEST");
   const aktif = dataFormulir.get("aktif") === "on";
+  const tambahan = bacaPeranTambahan(dataFormulir, peran);
+  const tambahanBerubah = tambahan !== undefined && tambahan.join() !== [...sasaran.peranTambahan].sort().join();
   if (!nama) throw new Error("Nama wajib diisi");
   await pastikanNamaPenggunaBebas(namaPengguna, id);
 
-  if (sasaran.id === pelaku.id && (peran !== sasaran.peran || !aktif)) {
+  if (sasaran.id === pelaku.id && (peran !== sasaran.peran || !aktif || tambahanBerubah)) {
     throw new Error("Peran atau status akun sendiri tidak bisa diubah; minta Superadmin/Pemilik lain melakukannya");
   }
   if (peranTertinggi(peran) && !peranTertinggi(pelaku.peran)) throw new Error("Hanya Superadmin atau Pemilik yang bisa memberi peran Superadmin/Pemilik");
   if (peranTertinggi(sasaran.peran) && (!peranTertinggi(peran) || !aktif)) await pastikanMasihAdaPemilikAktif(sasaran.id);
 
-  await db.pengguna.update({ where: { id }, data: { nama, namaPengguna, email, nomorTelepon, peran, aktif } });
-  if (!aktif || peran !== sasaran.peran) await hapusSemuaSesiPengguna(id); // paksa masuk ulang dengan hak baru
+  await db.pengguna.update({ where: { id }, data: { nama, namaPengguna, email, nomorTelepon, peran, aktif, ...(tambahan !== undefined ? { peranTambahan: tambahan } : {}) } });
+  if (!aktif || peran !== sasaran.peran || tambahanBerubah) await hapusSemuaSesiPengguna(id); // paksa masuk ulang dengan hak baru
   revalidatePath(HALAMAN);
   revalidatePath(`${HALAMAN}/${id}`);
 }

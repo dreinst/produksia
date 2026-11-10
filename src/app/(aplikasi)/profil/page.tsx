@@ -1,6 +1,6 @@
 import { wajibMasuk, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
-import { KETERANGAN_PERAN, LABEL_PERAN, inisialNama } from "@/lib/hakAkses";
+import { KETERANGAN_PERAN, inisialNama, labelPeranPengguna } from "@/lib/hakAkses";
 import { gantiKataSandiFormulir, hapusFotoProfilFormulir, ubahFotoProfilFormulir } from "@/lib/aksi/otentikasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -32,7 +32,7 @@ export default async function HalamanProfil() {
           </div>
           <div className="ubin space-y-1">
             <div className="teks-label">Peran</div>
-            <div className="text-sm font-semibold text-slate-900">{LABEL_PERAN[pengguna.peran]}</div>
+            <div className="text-sm font-semibold text-slate-900">{labelPeranPengguna(pengguna)}</div>
             <div className="text-xs text-slate-500">{KETERANGAN_PERAN[pengguna.peran]}</div>
           </div>
           <div className="grid grid-cols-2 gap-3">

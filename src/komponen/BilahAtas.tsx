@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import { keluar } from "@/lib/aksi/otentikasi";
-import { inisialNama, LABEL_PERAN, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
+import { inisialNama, labelPeranPengguna, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
 const tautanTransaksiBaru: { href: string; label: string; kode: string; ikon: string; hak: Hak }[] = [
   { href: "/penjualan/penawaran/baru", label: "Penawaran Penjualan", kode: "PNW", ikon: "request_quote", hak: "penawaran.buat" },
@@ -134,7 +134,7 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
             </span>
             <span className="hidden md:flex flex-col text-left">
               <span className="text-xs font-semibold text-slate-900 leading-tight max-w-[10rem] truncate">{pengguna.nama}</span>
-              <span className="text-[11px] text-slate-500 leading-normal">{LABEL_PERAN[pengguna.peran]}</span>
+              <span className="text-[11px] text-slate-500 leading-normal">{labelPeranPengguna(pengguna)}</span>
             </span>
             <Ikon nama="expand_more" className="hidden md:block !text-[18px] text-slate-400" />
           </summary>

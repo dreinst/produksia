@@ -2,7 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { wajibHak, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
-import { DAFTAR_PERAN, KETERANGAN_PERAN, LABEL_PERAN, peranTertinggi } from "@/lib/hakAkses";
+import { DAFTAR_PERAN, KETERANGAN_PERAN, LABEL_PERAN, PERAN_TAMBAHAN_BOLEH, labelPeranPengguna, peranTertinggi } from "@/lib/hakAkses";
 import { buatPenggunaFormulir, buatTautanAturUlangFormulir, tolakPermintaanAturUlangFormulir } from "@/lib/aksi/pengguna";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -10,7 +10,7 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 export default async function HalamanPengguna() {
   const saya = await wajibHak("pengguna.kelola");
   const daftarPengguna = await db.pengguna.findMany({
-    select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, aktif: true, dibuatPada: true, _count: { select: { sesi: true } } },
+    select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, peranTambahan: true, aktif: true, dibuatPada: true, _count: { select: { sesi: true } } },
     orderBy: [{ peran: "asc" }, { nama: "asc" }],
   });
   const peranBolehDibuat = DAFTAR_PERAN.filter((p) => !peranTertinggi(p) || peranTertinggi(saya.peran));
@@ -111,6 +111,19 @@ export default async function HalamanPengguna() {
               ))}
             </select>
           </div>
+          <fieldset className="bidang">
+            <legend className="label mb-1">Peran tambahan (opsional)</legend>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {PERAN_TAMBAHAN_BOLEH.map((p) => (
+                <label key={p} className="flex items-center gap-2 text-sm text-slate-800">
+                  <input type="checkbox" name="peranTambahan" value={p} className="h-4 w-4 rounded border-slate-300" />
+                  {LABEL_PERAN[p]}
+                </label>
+              ))}
+            </div>
+            <input type="hidden" name="peranTambahanDikirim" value="1" />
+            <span className="petunjuk">Untuk pengguna yang juga bekerja di pemasaran, mis. Admin yang juga desainer. Hak = gabungan peran utama dan tambahan.</span>
+          </fieldset>
           <button type="submit" className="tombol tombol-utama">
             Tambah pengguna
           </button>
@@ -142,7 +155,7 @@ export default async function HalamanPengguna() {
                       <td className="font-mono text-slate-700">{p.namaPengguna}</td>
                       <td className="text-slate-500">{p.email ?? "-"}</td>
                       <td className="text-slate-500">{p.nomorTelepon ?? "-"}</td>
-                      <td>{LABEL_PERAN[p.peran]}</td>
+                      <td>{labelPeranPengguna(p)}</td>
                       <td>
                         <span className={`lencana ${p.aktif ? "lencana-emerald" : "lencana-slate"}`}>{p.aktif ? "Aktif" : "Nonaktif"}</span>
                       </td>

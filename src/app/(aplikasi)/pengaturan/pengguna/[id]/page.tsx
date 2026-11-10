@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak, PANJANG_KATA_SANDI_MINIMUM } from "@/lib/otentikasi";
-import { DAFTAR_PERAN, LABEL_PERAN, peranTertinggi } from "@/lib/hakAkses";
+import { DAFTAR_PERAN, LABEL_PERAN, PERAN_TAMBAHAN_BOLEH, peranTertinggi } from "@/lib/hakAkses";
 import { aturUlangKataSandiFormulir, hapusPenggunaFormulir, ubahPenggunaFormulir } from "@/lib/aksi/pengguna";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -12,7 +12,7 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
   const { id } = await params;
   const pengguna = await db.pengguna.findUnique({
     where: { id },
-    select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, aktif: true, dibuatPada: true, karyawan: { select: { kode: true, nama: true } } },
+    select: { id: true, nama: true, namaPengguna: true, email: true, nomorTelepon: true, peran: true, peranTambahan: true, aktif: true, dibuatPada: true, karyawan: { select: { kode: true, nama: true } } },
   });
   if (!pengguna) notFound();
 
@@ -71,6 +71,19 @@ export default async function HalamanUbahPengguna({ params }: { params: Promise<
             </select>
             {diriSendiri && <span className="petunjuk">Peran akun sendiri tidak bisa diubah</span>}
           </div>
+          <fieldset className="bidang" disabled={!bolehSentuh || diriSendiri}>
+            <legend className="label mb-1">Peran tambahan (opsional)</legend>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {PERAN_TAMBAHAN_BOLEH.map((p) => (
+                <label key={p} className="flex items-center gap-2 text-sm text-slate-800">
+                  <input type="checkbox" name="peranTambahan" value={p} defaultChecked={pengguna.peranTambahan.includes(p)} className="h-4 w-4 rounded border-slate-300" />
+                  {LABEL_PERAN[p]}
+                </label>
+              ))}
+            </div>
+            {!(!bolehSentuh || diriSendiri) && <input type="hidden" name="peranTambahanDikirim" value="1" />}
+            <span className="petunjuk">Untuk pengguna yang juga bekerja di pemasaran, mis. Admin yang juga desainer. Hak = gabungan peran utama dan tambahan.</span>
+          </fieldset>
           <label className="flex items-center gap-2 text-sm text-slate-800">
             <input type="checkbox" name="aktif" defaultChecked={pengguna.aktif} disabled={!bolehSentuh || diriSendiri} className="h-4 w-4 rounded border-slate-300" />
             Akun aktif (boleh masuk)
