@@ -8,6 +8,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
 import { bacaFotoDariFormulir } from "@/lib/foto";
 import { bacaIpKlien, pastikanBolehCoba, catatKegagalanMasuk, resetPercobaanMasuk } from "@/lib/batasMasuk";
+import { catatMasuk } from "@/lib/log";
 import {
   buatSesi,
   hapusSemuaSesiPengguna,
@@ -50,6 +51,8 @@ export async function masuk(dataFormulir: FormData) {
 
   await resetPercobaanMasuk(namaPengguna);
   await buatSesi(pengguna.id);
+  // Catatan masuk modul auth (D7 §3.7.3); galatnya ditangkap catatMasuk sehingga tidak menggagalkan masuk
+  await catatMasuk(db, pengguna);
   redirect(tujuanAman(bacaTeks(dataFormulir, "kembali")));
 }
 

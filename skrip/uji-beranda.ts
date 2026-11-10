@@ -418,7 +418,13 @@ async function main() {
   const sistemGab = await render(PanelSistem({ pengguna: pemilik, perusahaanId: null }));
   pastikan(!sistemGab.teks.includes("tanpa perusahaan"), "gabungan: tanpa keterangan catatan tanpa perusahaan");
   pastikan(sisGab.aktivitas7Hari - sisP1.aktivitas7Hari === 1, "lingkup satu perusahaan tidak menghitung log perusahaan lain");
-  pastikan(!sisGab.terbaru.some((l) => l.nomor === "UJB-CRM") && sisGab.terbaru.length <= 8, "daftar terbaru tanpa catatan modul (menunggu aturan visibilitas modul), maks 8");
+  // P04: daftar terbaru memakai syaratLogTerlihat (D7 §3.7.4); tanpa penglihat hanya catatan tanpa modul
+  pastikan(!sisGab.terbaru.some((l) => l.nomor === "UJB-CRM") && sisGab.terbaru.length <= 8, "daftar terbaru tanpa penglihat: hanya catatan tanpa modul, maks 8");
+  const terlihatPemilik = (await muatRingkasanSistem(null, new Date(), pemilik)).terbaru;
+  pastikan(terlihatPemilik.some((l) => l.nomor === "UJB-CRM") && terlihatPemilik.some((l) => l.nomor === "UJB-MASUK") && terlihatPemilik.length <= 8, "daftar terbaru Pemilik memuat catatan modul crm dan auth (syarat terlihat), maks 8");
+  const terlihatTanpaLead = (await muatRingkasanSistem(null, new Date(), penggunaSintetis("KASIR", ["log-aktivitas.lihat", "pengguna.kelola"]))).terbaru;
+  pastikan(!terlihatTanpaLead.some((l) => l.nomor === "UJB-CRM") && terlihatTanpaLead.some((l) => l.nomor === "UJB-MASUK") && terlihatTanpaLead.some((l) => l.nomor === "UJB-P2"), "daftar terbaru tanpa lead.lihat: catatan crm tersembunyi, auth dan catatan lama tetap tampil");
+  pastikan((await render(PanelSistem({ pengguna: pemilik, perusahaanId: null }))).teks.includes("UJB-CRM"), "panel Sistem Pemilik menampilkan catatan crm yang boleh dilihat");
   pastikan(!sisP1.terbaru.some((l) => l.nomor === "UJB-P2") && sisGab.terbaru.some((l) => l.nomor === "UJB-P2"), "log perusahaan dua hanya tampil di gabungan");
 
   console.log("=== 10. Panel tanpa hak dan tautan ===");
