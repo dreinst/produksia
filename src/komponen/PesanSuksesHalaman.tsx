@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 /*
@@ -8,7 +8,8 @@ import { usePathname, useSearchParams } from "next/navigation";
  * permanen, dan Cabut tautan: barisnya hilang sesudah revalidasi, jadi pesanSukses di dalam FormulirAksi tidak sempat
  * tampil). FormulirAksi dengan prop pesanSuksesHalaman menulis pesannya ke sini, dan <PesanSuksesHalaman /> yang
  * dipasang di luar baris menampilkannya dengan gaya yang sama. Pesan hanya tampil di alamat tempat aksinya dijalankan,
- * dan dihapus saat formulir lain dikirim.
+ * dan dihapus saat formulir lain dikirim, saat alamat berubah, atau saat <PesanSuksesHalaman /> dilepas (pindah
+ * halaman). Pesan dari aksi yang selesai sesudah pengguna pindah alamat dibuang.
  */
 
 type Pesan = { teks: string; alamat: string } | null;
@@ -24,12 +25,22 @@ function kabari() {
 const alamat = (jalur: string, cari: string) => `${jalur}?${cari}`;
 const alamatSaatIni = () => alamat(window.location.pathname, new URLSearchParams(window.location.search).toString());
 
-/** Dipanggil FormulirAksi: null saat pengiriman dimulai, teks saat aksi sukses. */
-export function umumkanPesanSukses(teks: string | null) {
-  const baru: Pesan = teks ? { teks, alamat: alamatSaatIni() } : null;
+function ganti(baru: Pesan) {
   if (baru?.teks === pesanSaatIni?.teks && baru?.alamat === pesanSaatIni?.alamat) return;
   pesanSaatIni = baru;
   kabari();
+}
+
+/**
+ * Dipanggil FormulirAksi. Saat pengiriman dimulai: umumkanPesanSukses(null) menghapus pesan lama dan mengembalikan
+ * alamat saat itu. Saat aksi sukses: umumkanPesanSukses(teks, alamatAwal) menampilkan pesan hanya bila pengguna masih
+ * di alamat yang sama.
+ */
+export function umumkanPesanSukses(teks: string | null, alamatAwal?: string): string {
+  const kini = alamatSaatIni();
+  if (!teks) ganti(null);
+  else if (alamatAwal === undefined || alamatAwal === kini) ganti({ teks, alamat: kini });
+  return kini;
 }
 
 function langgan(f: () => void) {
@@ -47,7 +58,13 @@ export default function PesanSuksesHalaman({ className = "" }: { className?: str
   );
   const jalur = usePathname();
   const cari = useSearchParams().toString();
-  if (!pesan || pesan.alamat !== alamat(jalur, cari)) return null;
+  const alamatKini = alamat(jalur, cari);
+  // pesan milik alamat lain dibuang supaya tidak muncul lagi saat pengguna kembali ke alamat itu
+  useEffect(() => {
+    if (pesan && pesan.alamat !== alamatKini) ganti(null);
+  }, [pesan, alamatKini]);
+  useEffect(() => () => ganti(null), []);
+  if (!pesan || pesan.alamat !== alamatKini) return null;
   return (
     <div role="status" className={`muncul rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700 ${className}`}>
       {pesan.teks}

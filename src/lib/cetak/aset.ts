@@ -61,12 +61,32 @@ export function asetBawaan(gaya: GayaEntitas, slot: JenisAsetKop): Uint8Array | 
 // ---------- Validasi gambar sinkron (D3 §6.4) ----------
 
 export const PESAN_GAMBAR_TIDAK_SAH = "Gambar tidak bisa dipakai di PDF, simpan ulang sebagai PNG atau JPEG standar";
+/**
+ * PNG dengan kedalaman selain 8 bit, tRNS pada PNG abu-abu atau RGB, dan JPEG selain SOF0/SOF1/SOF2. Semuanya
+ * struktural sah, tetapi png-js/pdfkit merendernya salah tanpa galat (masker alfa rusak, piksel nol, warna kunci
+ * salah) atau pembaca PDF tidak mendukung DCTDecode-nya.
+ */
+export const PESAN_GAMBAR_FORMAT = "Gambar tidak bisa dipakai di PDF. Simpan ulang gambar sebagai PNG 8 bit atau JPEG.";
+/** Resolusi melewati batas memori (lebar × tinggi atau data piksel mentah), walau ukuran berkasnya kecil. */
+export const PESAN_GAMBAR_TERLALU_BESAR = "Resolusi gambar terlalu besar untuk PDF. Perkecil gambar (misalnya lebar 2480 piksel) lalu unggah ulang.";
 export const SISI_GAMBAR_MIN = 16;
 export const SISI_GAMBAR_MAKS = 8000;
+/** Batas lebar × tinggi PNG (penyimpangan D3 §6.4): kop D'Pro 2480 × 415 masih jauh di bawahnya. */
+export const PIKSEL_GAMBAR_MAKS = 25_000_000;
+/** Batas data piksel mentah PNG sesudah inflate, diperiksa SEBELUM inflate (penyimpangan D3 §6.4). */
+export const DATA_MENTAH_GAMBAR_MAKS = 64 * 1024 * 1024;
 
 export type InfoGambar = { tipe: "image/png" | "image/jpeg"; lebarPx: number; tinggiPx: number };
 
-class GambarTidakSah extends Error {}
+/** Galat validasi; `pesan` berisi teks untuk pengguna bila berbeda dari PESAN_GAMBAR_TIDAK_SAH. */
+class GambarTidakSah extends Error {
+  constructor(
+    alasan: string,
+    readonly pesan: string = PESAN_GAMBAR_TIDAK_SAH,
+  ) {
+    super(alasan);
+  }
+}
 
 const TANDA_PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 
@@ -112,6 +132,7 @@ function periksaPng(d: Uint8Array): { lebar: number; tinggi: number } {
   let i = 8;
   let ihdr: { lebar: number; tinggi: number; kedalaman: number; warna: number; interlace: number } | null = null;
   let adaPlte = false;
+  let adaTrns = false;
   let adaIend = false;
   const idat: Uint8Array[] = [];
   while (i < d.length) {
@@ -130,6 +151,8 @@ function periksaPng(d: Uint8Array): { lebar: number; tinggi: number } {
       if (d[awalIsi + 10] !== 0 || d[awalIsi + 11] !== 0 || ihdr.interlace > 1) throw new GambarTidakSah("kompresi, filter, atau interlace");
     } else if (jenis === "PLTE") {
       adaPlte = true;
+    } else if (jenis === "tRNS") {
+      adaTrns = true;
     } else if (jenis === "IDAT") {
       idat.push(d.subarray(awalIsi, akhirIsi));
     } else if (jenis === "IEND") {
@@ -142,6 +165,11 @@ function periksaPng(d: Uint8Array): { lebar: number; tinggi: number } {
   if (ihdr.warna === 3 && !adaPlte) throw new GambarTidakSah("PLTE tidak ada");
   const { lebar, tinggi, kedalaman, warna, interlace } = ihdr;
   if (lebar < SISI_GAMBAR_MIN || tinggi < SISI_GAMBAR_MIN || lebar > SISI_GAMBAR_MAKS || tinggi > SISI_GAMBAR_MAKS) throw new GambarTidakSah("ukuran sisi");
+  // png-js menghitung bait per piksel sebagai pecahan untuk kedalaman < 8 bit (palet ber-tRNS dan interlace rusak),
+  // membuang bait rendah 16 bit, dan membaca tRNS abu-abu/RGB dengan salah. Hanya 8 bit dan tRNS palet yang aman.
+  if (kedalaman !== 8) throw new GambarTidakSah(`kedalaman ${kedalaman} bit`, PESAN_GAMBAR_FORMAT);
+  if (adaTrns && warna !== 3) throw new GambarTidakSah("tRNS pada PNG bukan palet", PESAN_GAMBAR_FORMAT);
+  if (lebar * tinggi > PIKSEL_GAMBAR_MAKS) throw new GambarTidakSah("jumlah piksel", PESAN_GAMBAR_TERLALU_BESAR);
 
   const gabungan = new Uint8Array(idat.reduce((n, b) => n + b.length, 0));
   let p = 0;
@@ -156,6 +184,7 @@ function periksaPng(d: Uint8Array): { lebar: number; tinggi: number } {
     .filter((l) => l.w > 0 && l.h > 0)
     .map((l) => ({ ...l, bytesBaris: 1 + Math.ceil((l.w * bitPiksel) / 8) }));
   const harapan = ukuranLintasan.reduce((n, l) => n + l.h * l.bytesBaris, 0);
+  if (harapan > DATA_MENTAH_GAMBAR_MAKS) throw new GambarTidakSah("data piksel mentah", PESAN_GAMBAR_TERLALU_BESAR);
   let mentah: Buffer;
   try {
     mentah = zlib.inflateSync(gabungan, { maxOutputLength: harapan + 1 });
@@ -173,7 +202,10 @@ function periksaPng(d: Uint8Array): { lebar: number; tinggi: number } {
   return { lebar, tinggi };
 }
 
-/** JPEG: FF D8 di awal, segmen sampai SOF (C0-CF kecuali C4, C8, CC) untuk lebar dan tinggi, dan FF D9 ada. */
+/**
+ * JPEG: FF D8 di awal, segmen sampai SOF (C0-CF kecuali C4, C8, CC) untuk lebar dan tinggi, dan FF D9 ada. Hanya
+ * SOF0, SOF1, dan SOF2 yang diterima: lossless (SOF3) dan aritmetika (SOF9 ke atas) tidak didukung kebanyakan pembaca PDF.
+ */
 function periksaJpeg(d: Uint8Array): { lebar: number; tinggi: number } {
   if (d.length < 4 || d[0] !== 0xff || d[1] !== 0xd8) throw new GambarTidakSah("tanda tangan JPEG");
   let i = 2;
@@ -190,6 +222,7 @@ function periksaJpeg(d: Uint8Array): { lebar: number; tinggi: number } {
     if (panjang < 2 || i + panjang > d.length) throw new GambarTidakSah("segmen JPEG terpotong");
     if (penanda >= 0xc0 && penanda <= 0xcf && penanda !== 0xc4 && penanda !== 0xc8 && penanda !== 0xcc) {
       if (panjang < 8) throw new GambarTidakSah("SOF");
+      if (penanda > 0xc2) throw new GambarTidakSah(`SOF${penanda - 0xc0}`, PESAN_GAMBAR_FORMAT);
       sof = { tinggi: u16(d, i + 3), lebar: u16(d, i + 5) };
     }
     i += panjang;
@@ -202,20 +235,33 @@ function periksaJpeg(d: Uint8Array): { lebar: number; tinggi: number } {
   return sof;
 }
 
+/** Dokumen uji untuk openImage, dibuat sekali: konstruktor mengurai Carlito (±600 KB) lewat fontkit. */
+let dokumenUji: (PDFKit.PDFDocument & { openImage(src: Buffer): unknown }) | null = null;
+/**
+ * Hasil validasi per objek. Aset bawaan (asetBawaan) adalah objek yang sama di setiap PDF, jadi tidak diperiksa ulang
+ * di setiap cetakan. Pemanggil tidak boleh mengubah isi Uint8Array sesudah diperiksa.
+ */
+const sudahDiperiksa = new WeakMap<Uint8Array, InfoGambar>();
+
 /**
  * Validasi gambar yang akan digambar pdfkit, seluruhnya sinkron sehingga semua galat bisa ditangkap (D3 §6.4).
  * JANGAN memvalidasi dengan menggambar di PDF uji: PNG rusak melempar dari callback zlib png-js dan mematikan proses.
- * Galat apa pun menjadi Error dengan PESAN_GAMBAR_TIDAK_SAH; alasan teknisnya ada di `cause`.
+ * Galat apa pun menjadi Error dengan PESAN_GAMBAR_TIDAK_SAH, PESAN_GAMBAR_FORMAT, atau PESAN_GAMBAR_TERLALU_BESAR
+ * (ketiganya aman ditampilkan); alasan teknisnya ada di `cause`.
  */
 export function periksaGambar(isi: Uint8Array): InfoGambar {
+  const tersimpan = sudahDiperiksa.get(isi);
+  if (tersimpan) return tersimpan;
   try {
     const png = isi.length >= 8 && isi[0] === 0x89;
     const { lebar, tinggi } = png ? periksaPng(isi) : periksaJpeg(isi);
     // pemeriksaan akhir: pdfkit mengenali formatnya (sinkron; GIF, WebP, SVG ditolak di sini)
-    const uji = new PDFDocument({ autoFirstPage: false, font: jalurFont("R") }) as PDFKit.PDFDocument & { openImage(src: Buffer): unknown };
-    uji.openImage(Buffer.from(isi.buffer, isi.byteOffset, isi.byteLength));
-    return { tipe: png ? "image/png" : "image/jpeg", lebarPx: lebar, tinggiPx: tinggi };
+    dokumenUji ??= new PDFDocument({ autoFirstPage: false, font: jalurFont("R") }) as PDFKit.PDFDocument & { openImage(src: Buffer): unknown };
+    dokumenUji.openImage(Buffer.from(isi.buffer, isi.byteOffset, isi.byteLength));
+    const info: InfoGambar = { tipe: png ? "image/png" : "image/jpeg", lebarPx: lebar, tinggiPx: tinggi };
+    sudahDiperiksa.set(isi, info);
+    return info;
   } catch (e) {
-    throw new Error(PESAN_GAMBAR_TIDAK_SAH, { cause: e });
+    throw new Error(e instanceof GambarTidakSah ? e.pesan : PESAN_GAMBAR_TIDAK_SAH, { cause: e });
   }
 }

@@ -34,7 +34,23 @@ export type OpsiTeks = {
   garisBawah?: boolean;
   /** Jarak antarhuruf dalam pt. */
   jarakHuruf?: number;
+  /**
+   * Hanya baris hasil pemecahan dengan indeks dari <= i < sampai yang digambar; baris `dari` diletakkan di y (atau di
+   * kursor). Dipakai gambarTabel untuk memecah baris tabel yang lebih tinggi dari satu halaman. Diabaikan oleh ukur.
+   */
+  rentang?: { dari: number; sampai: number };
 };
+
+/**
+ * Isi yang tetap tidak muat walau sudah di halaman kosong (mis. satu baris teks atau gambar yang lebih tinggi dari
+ * area halaman). Pesannya aman ditampilkan ke pengguna; pemanggil (rute cetak, aksi simpan PDF) menangkapnya.
+ */
+export class GalatIsiTerlaluTinggi extends Error {
+  constructor(message = "Isi dokumen terlalu tinggi untuk satu halaman dan tidak bisa dipecah. Perpendek uraiannya atau pilih kertas yang lebih besar.") {
+    super(message);
+    this.name = "GalatIsiTerlaluTinggi";
+  }
+}
 
 export type Perekam = {
   halaman: number;
@@ -193,17 +209,36 @@ export class KanvasCetak {
 
   /**
    * Pindah ke halaman lanjutan (kertas dan lapisan sama) bila sisa() < tinggi. Mengembalikan true bila halaman
-   * ditambah. Halaman yang masih kosong tidak ditambah lagi walau isinya lebih tinggi dari satu halaman (peringatan).
+   * ditambah. Halaman yang masih kosong tidak ditambah lagi walau isinya lebih tinggi dari satu halaman: tanpa
+   * `ketat` hanya peringatan dicatat, dengan `ketat` dilempar GalatIsiTerlaluTinggi supaya isi tidak terpotong diam-diam.
    */
-  pastikanRuang(tinggi: number): boolean {
+  pastikanRuang(tinggi: number, opsi: { ketat?: boolean } = {}): boolean {
     if (this.sisa() >= tinggi - 0.01) return false;
-    if (this._y <= this.area.atas + 0.01) {
+    if (this.halamanKosong()) {
+      if (opsi.ketat) throw new GalatIsiTerlaluTinggi();
       this.peringatan(`Isi setinggi ${tinggi.toFixed(1)} pt lebih tinggi dari area halaman ${this.halamanKe}`);
       return false;
     }
     const { kertas, lapisan } = this.halaman[this.indeks];
     this.halamanBaru(kertas, lapisan);
     return true;
+  }
+
+  /** Kursor masih di atas area isi (belum ada isi yang mengalir di halaman ini). */
+  halamanKosong(): boolean {
+    return this._y <= this.area.atas + 0.01;
+  }
+
+  /** Tinggi area isi satu halaman penuh. */
+  get tinggiArea(): number {
+    return this.tinggiKertas - this.area.atas - this.area.bawah;
+  }
+
+  /** Pindah ke halaman lanjutan dengan kertas dan lapisan halaman ini. */
+  lanjutHalaman(): void {
+    const { kertas, lapisan } = this.halaman[this.indeks] ?? {};
+    if (!kertas) throw new Error("KanvasCetak: belum ada halaman (panggil halamanBaru dulu)");
+    this.halamanBaru(kertas, lapisan);
   }
 
   peringatan(pesan: string): void {
@@ -316,7 +351,8 @@ export class KanvasCetak {
         tutupBaris(false);
         if (sisa) antre.unshift(sisa);
       }
-      if (baris.length || token.length === 0) tutupBaris(true);
+      // paragraf kosong atau hanya spasi tetap satu baris kosong (jarak antarparagraf dari Word atau textarea)
+      if (baris.length || !token.some((t) => !t.spasi)) tutupBaris(true);
       else if (hasil.length) hasil[hasil.length - 1].akhirParagraf = true;
     }
     // teks kosong sama sekali: nol baris
@@ -355,7 +391,7 @@ export class KanvasCetak {
   /** Menggambar teks dan mengembalikan tingginya. Tidak pernah memicu halaman baru. */
   teks(isi: string | Segmen[], opsi: OpsiTeks): number {
     const baris = this.susunBaris(isi, opsi);
-    return this.gambarBaris(baris, opsi);
+    return this.gambarBaris(opsi.rentang ? baris.slice(opsi.rentang.dari, opsi.rentang.sampai) : baris, opsi);
   }
 
   private gambarBaris(baris: BarisJadi[], opsi: OpsiTeks): number {
@@ -420,13 +456,19 @@ export class KanvasCetak {
   /** Menggambar teks berbutir, mengembalikan tinggi. Tanpa y: dimulai di kursor dan kursor turun. */
   teksBerbutir(daftar: BarisTeksCetak[], opsi: OpsiTeks): number {
     let y = opsi.y ?? this._y;
+    // indeks baris dihitung lintas butir; penanda hanya digambar bersama baris pertama butirnya
+    let ke = 0;
     for (const b of daftar) {
       const { inden, penanda } = this.butir(b);
-      if (penanda) this.teks(penanda, { ...opsi, x: opsi.x + inden - this.mm(3), y, lebar: this.mm(3), rata: "kiri", indenPertama: 0, garisBawah: false });
-      y += this.teks(
-        b.isi.map((p) => ({ teks: p.teks, tebal: p.tebal })),
-        { ...opsi, x: opsi.x + inden, y, lebar: opsi.lebar - inden, indenPertama: 0 },
-      );
+      const isi = b.isi.map((p) => ({ teks: p.teks, tebal: p.tebal }));
+      const o: OpsiTeks = { ...opsi, x: opsi.x + inden, y, lebar: opsi.lebar - inden, indenPertama: 0, rentang: undefined };
+      const n = opsi.rentang ? this.susunBaris(isi, o).length : 0;
+      const dari = opsi.rentang ? Math.max(0, opsi.rentang.dari - ke) : 0;
+      const sampai = opsi.rentang ? Math.min(n, opsi.rentang.sampai - ke) : Infinity;
+      ke += n;
+      if (opsi.rentang && sampai <= dari) continue;
+      if (penanda && dari === 0) this.teks(penanda, { ...o, x: opsi.x + inden - this.mm(3), lebar: this.mm(3), rata: "kiri", garisBawah: false });
+      y += this.teks(isi, opsi.rentang ? { ...o, rentang: { dari, sampai } } : o);
     }
     const tinggi = y - (opsi.y ?? this._y);
     if (opsi.y === undefined) this._y += tinggi;

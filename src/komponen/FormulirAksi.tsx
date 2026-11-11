@@ -96,9 +96,10 @@ export default function FormulirAksi({ aksi, children, className, pesanKonfirmas
   // Tanpa pesanSuksesHalaman, aksi server dipakai langsung seperti semula.
   const aksiDipakai = pesanSuksesHalaman
     ? async (sebelumnya: StatusFormulir, dataFormulir: FormData) => {
-        umumkanPesanSukses(null);
+        // alamat dicatat sebelum await: pesan dibuang bila pengguna sudah pindah halaman saat aksi berjalan
+        const alamatAwal = umumkanPesanSukses(null);
         const hasil = await aksi(sebelumnya, dataFormulir);
-        if (hasil.ok && !hasil.galat) umumkanPesanSukses(pesanSuksesHalaman);
+        if (hasil.ok && !hasil.galat) umumkanPesanSukses(pesanSuksesHalaman, alamatAwal);
         return hasil;
       }
     : aksi;
