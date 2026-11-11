@@ -11,6 +11,7 @@ import { bacaFotoDariFormulir } from "@/lib/foto";
 import { kurangiStok, labelBarang } from "@/lib/stok";
 import { bacaProyekId } from "@/lib/proyek";
 import { dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
+import { pastikanGudangMilik, pemilikTunggalBarang } from "@/lib/perusahaan";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 
@@ -94,10 +95,14 @@ export async function buatLaporanKerusakan(dataFormulir: FormData) {
       if (!barang) throw new Error("Barang tidak ditemukan");
       if (barang.jenis !== "BARANG") throw new Error(`${barang.kode} - ${barang.nama} adalah JASA, tidak punya stok`);
     }
+    // perusahaan dokumen = pemilik tunggal barang (D1 §3.3 catatan C); proyek boleh milik perusahaan lain (catatan B)
+    const perusahaanId = await pemilikTunggalBarang(tx, idBarang);
+    await pastikanGudangMilik(tx, [gudangId], perusahaanId);
     const nomor = await nomorDokumenBerikutnya(tx.laporanKerusakanBarang, "BR");
     const dokumen = await tx.laporanKerusakanBarang.create({
       data: {
         nomor,
+        perusahaanId,
         gudangId,
         proyekId,
         namaPelapor,
@@ -159,10 +164,12 @@ export async function tautkanPenyesuaianKerusakan(kerusakanId: string, dataFormu
     if (!dokumen) throw new Error("Laporan kerusakan tidak ditemukan");
     if (dokumen.statusPersetujuan !== "DISETUJUI") throw new Error(`${dokumen.nomor} belum disetujui`);
     if (dokumen.penyesuaianId) throw new Error(`${dokumen.nomor} sudah ditautkan ke Penyesuaian Stok`);
-    const penyesuaian = await tx.penyesuaianPersediaan.findUnique({ where: { id: penyesuaianId }, select: { nomor: true, statusPersetujuan: true, gudangId: true } });
+    const penyesuaian = await tx.penyesuaianPersediaan.findUnique({ where: { id: penyesuaianId }, select: { nomor: true, statusPersetujuan: true, gudangId: true, perusahaanId: true } });
     if (!penyesuaian) throw new Error("Penyesuaian Stok tidak ditemukan");
     if (penyesuaian.statusPersetujuan !== "DISETUJUI") throw new Error(`${penyesuaian.nomor} belum disetujui`);
     if (penyesuaian.gudangId !== dokumen.gudangId) throw new Error(`${penyesuaian.nomor} untuk gudang lain, bukan gudang dokumen ${dokumen.nomor}`);
+    // D1 §3.3: penyesuaian yang ditautkan harus satu perusahaan dengan dokumen ini (diperiksa sesudah aturan lama)
+    if (penyesuaian.perusahaanId !== dokumen.perusahaanId) throw new Error(`Penyesuaian ${penyesuaian.nomor} milik perusahaan lain`);
     await tx.laporanKerusakanBarang.update({ where: { id: kerusakanId }, data: { penyesuaianId } });
     await catatLog(tx, pengguna, "TAUTKAN", dokumen.nomor, `Ditautkan ke ${penyesuaian.nomor} untuk jejak akuntansi tambahan`);
   });

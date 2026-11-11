@@ -13,6 +13,7 @@ import { buatLaporanKerusakanFormulir } from "@/lib/aksi/kerusakan";
 import { wajibHak } from "@/lib/otentikasi";
 import { hakDataInduk, punyaHak } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
+import { PERUSAHAAN_UTAMA, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 export default async function HalamanUbahDataInduk({
   params,
@@ -29,6 +30,14 @@ export default async function HalamanUbahDataInduk({
   const rekaman = await delegasiBaca(config.model).findUnique({ where: { id } });
   if (!rekaman) notFound();
   const daftarOpsi = await ambilDaftarOpsi(config);
+  // pemilik yang sudah diarsipkan tetap muncul di pilihan supaya tidak tergeser saat data ini disimpan ulang
+  const pemilik = typeof rekaman.perusahaanId === "string" ? rekaman.perusahaanId : null;
+  if (pemilik && daftarOpsi.perusahaanId && !daftarOpsi.perusahaanId.some((o) => o.id === pemilik)) {
+    const arsip = await db.perusahaan.findUnique({ where: { id: pemilik }, select: { id: true, nama: true } });
+    if (arsip) daftarOpsi.perusahaanId = [...daftarOpsi.perusahaanId, { id: arsip.id, label: `${arsip.nama} (diarsipkan)` }];
+  }
+  // stok dan laporan kerusakan barang memakai gudang dan akun milik pemilik barang atau bersama (D1 §3.3)
+  const milikBarang = saringMilikAtauBersama(config.slug === "barang" ? (pemilik ?? PERUSAHAAN_UTAMA) : null);
   const judul = String(rekaman.nama ?? rekaman.kode ?? config.label);
   // Hanya id & ukuran; isi (Bytes) dilayani terpisah lewat /api/foto/[id]
   const daftarFoto = config.slug === "barang" ? await db.foto.findMany({ where: { barangId: id }, select: { id: true, ukuran: true, urutan: true }, orderBy: { urutan: "asc" } }) : null;
@@ -36,6 +45,7 @@ export default async function HalamanUbahDataInduk({
   // "Stok" & "Lapor barang rusak" sama-sama butuh stok per gudang barang ini; satu kueri dipakai berdua.
   const daftarGudangStok = config.slug === "barang" && rekaman.jenis === "BARANG"
     ? await db.gudang.findMany({
+        where: milikBarang,
         orderBy: { kode: "asc" },
         select: { id: true, kode: true, nama: true, stok: { where: { barangId: id }, select: { jumlah: true } } },
       })
@@ -44,7 +54,7 @@ export default async function HalamanUbahDataInduk({
   const gudangDipilih = Array.isArray(paramGudang) ? paramGudang[0] : paramGudang;
   const gudangId = daftarGudangStok.find((g) => g.id === gudangDipilih)?.id ?? daftarGudangStok[0]?.id ?? "";
   const stokSaatIni = daftarGudangStok.find((g) => g.id === gudangId)?.stok[0]?.jumlah;
-  const daftarAkun = daftarGudangStok.length > 0 ? await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true } }) : [];
+  const daftarAkun = daftarGudangStok.length > 0 ? await db.akun.findMany({ where: { kelompok: false, ...milikBarang }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true } }) : [];
 
   return (
     <div className="space-y-6">

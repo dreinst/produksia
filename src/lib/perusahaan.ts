@@ -103,7 +103,13 @@ export async function aturPerusahaanAktif(perusahaanId: string | null, opsi: { s
   return true;
 }
 
-/** Perusahaan untuk DOKUMEN AKAR baru: isian formulir "perusahaanId", kalau kosong lingkup aktif, kalau gabungan → galat. */
+/**
+ * Perusahaan untuk DOKUMEN AKAR baru: isian formulir "perusahaanId", kalau kosong lingkup aktif, kalau gabungan → galat.
+ * Isian tidak dibandingkan dengan lingkup: hak berlaku global dan lingkup hanya pilihan tampilan, jadi pengguna boleh
+ * membuat dokumen untuk perusahaan aktif mana pun (keputusan orkestrator, KONTRAK-TAMBAHAN). Syaratnya isian harus
+ * perusahaan yang ada dan aktif, dan gabungan (lingkup null) hanya terjadi bagi pemegang perusahaan-gabungan.lihat
+ * (lingkupPerusahaan), sehingga pengguna lain tanpa isian selalu mendapat perusahaan lingkupnya.
+ */
 export async function perusahaanDokumenBaru(dataFormulir: FormData, klien: Klien = db): Promise<string> {
   const isian = String(dataFormulir.get("perusahaanId") ?? "").trim();
   const id = isian || (await lingkupPerusahaan()).perusahaanId;

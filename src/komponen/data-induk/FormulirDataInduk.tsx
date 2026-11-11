@@ -1,6 +1,7 @@
 import FormulirAksi from "@/komponen/FormulirAksi";
 import type { KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import type { StatusFormulir } from "@/lib/statusFormulir";
+import { NILAI_BERSAMA } from "@/lib/perusahaan";
 
 export type DaftarOpsi = Record<string, { id: string; label: string }[]>;
 
@@ -8,6 +9,7 @@ export type DaftarOpsi = Record<string, { id: string; label: string }[]>;
  * Formulir tambah/ubah data induk yang dibangun dari konfigurasi entitas.
  * `nilai` = record yang sedang diubah (kosongkan untuk tambah baru).
  * `kecualiId` = id yang disembunyikan dari pilihan induk (mencegah induk = diri sendiri).
+ * `perusahaanBawaan` = lingkup perusahaan aktif, isian awal bidang `bawaanLingkup` saat menambah data (D1 §3.5).
  */
 export default function FormulirDataInduk({
   config,
@@ -15,6 +17,7 @@ export default function FormulirDataInduk({
   aksi,
   nilai,
   kecualiId,
+  perusahaanBawaan,
   labelTombol,
   className,
   children,
@@ -24,13 +27,16 @@ export default function FormulirDataInduk({
   aksi: (sebelumnya: StatusFormulir, dataFormulir: FormData) => Promise<StatusFormulir>;
   nilai?: Record<string, unknown>;
   kecualiId?: string;
+  perusahaanBawaan?: string | null;
   labelTombol: string;
   className?: string;
   children?: React.ReactNode;
 }) {
-  const bacaAwal = (nama: string, bawaan?: string) => {
+  const bacaAwal = (nama: string, bawaan?: string, bersama?: boolean) => {
     if (!nilai) return bawaan ?? "";
     const v = nilai[nama];
+    // pemilik kosong pada bidang yang punya opsi "Bersama" berarti data bersama
+    if (v === null && bersama) return NILAI_BERSAMA;
     if (v === null || v === undefined) return "";
     if (v instanceof Date) return v.toISOString().slice(0, 10);
     return String(v);
@@ -55,8 +61,13 @@ export default function FormulirDataInduk({
                 Ya
               </label>
             ) : bidang.jenis === "select" ? (
-              <select id={id} name={bidang.nama} defaultValue={bacaAwal(bidang.nama, bidang.nilaiBawaan)} className="isian">
-                <option value="">-</option>
+              <select
+                id={id}
+                name={bidang.nama}
+                defaultValue={bacaAwal(bidang.nama, (bidang.bawaanLingkup && perusahaanBawaan) || bidang.nilaiBawaan, !!bidang.pilihanBersama)}
+                className="isian"
+              >
+                {!bidang.pilihanBersama && <option value="">-</option>}
                 {(bidang.opsiStatis
                   ? bidang.opsiStatis.map((o) => ({ id: o, label: o }))
                   : (daftarOpsi[bidang.nama] ?? []).filter((o) => o.id !== kecualiId)
@@ -65,6 +76,7 @@ export default function FormulirDataInduk({
                     {opt.label}
                   </option>
                 ))}
+                {bidang.pilihanBersama && <option value={NILAI_BERSAMA}>{bidang.pilihanBersama}</option>}
               </select>
             ) : (
               <input
@@ -77,6 +89,7 @@ export default function FormulirDataInduk({
                 className="isian"
               />
             )}
+            {bidang.petunjuk && <span className="petunjuk">{bidang.petunjuk}</span>}
           </div>
         );
       })}

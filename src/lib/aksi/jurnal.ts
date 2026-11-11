@@ -12,6 +12,7 @@ import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import type { SumberJurnal } from "@/prisma-klien/enums";
 import { bacaProyekId } from "@/lib/proyek";
 import { persetujuanWajib } from "@/lib/persetujuan";
+import { pastikanAkunMilik, perusahaanDokumenBaru } from "@/lib/perusahaan";
 
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan?: string };
 
@@ -34,7 +35,11 @@ function bacaBarisJurnal(raw: FormDataEntryValue | null): InputBarisJurnal[] {
     .filter((l) => l.debit.gt(0) || l.kredit.gt(0));
 }
 
-async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJurnal[], sumber: SumberJurnal, prefix: string, proyekId: string | null = null) {
+/**
+ * Jurnal manual dan kas langsung (D1 §4.1): jalur jurnal.create tanpa catatJurnal, jadi perusahaan dan pemeriksaan
+ * pemilik akun diisi di sini. `perusahaanId` disisipkan sebelum `proyekId` karena fungsi ini privat.
+ */
+async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJurnal[], sumber: SumberJurnal, prefix: string, perusahaanId: string, proyekId: string | null = null) {
   if (daftarBaris.length < 2) throw new Error("Jurnal minimal punya 2 baris (debit & kredit) dengan nominal > 0");
   if (daftarBaris.some((l) => !l.akunId)) throw new Error("Setiap baris jurnal harus memilih akun");
   if (daftarBaris.some((l) => l.debit.isNegative() || l.kredit.isNegative())) throw new Error("Nominal tidak boleh negatif");
@@ -49,6 +54,7 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
   }
   if (totalDebit.isZero()) throw new Error("Jumlah jurnal tidak boleh nol");
   await pastikanAkunRinci(db, daftarBaris.map((l) => l.akunId));
+  await pastikanAkunMilik(db, daftarBaris.map((l) => l.akunId), perusahaanId);
   await pastikanTahunTerbuka(db, new Date());
 
   const nomor = await nomorDokumenBerikutnya(db.jurnal, prefix);
@@ -58,6 +64,7 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
       nomor,
       keterangan,
       sumber,
+      perusahaanId,
       proyekId,
       // Satu baris Jurnal = sudah masuk buku besar, jadi statusnya selalu DISETUJUI (lihat schema.prisma)
       statusPersetujuan: "DISETUJUI",
@@ -81,8 +88,9 @@ export async function buatJurnalManual(dataFormulir: FormData) {
   await wajibHakAksi("jurnal.buat");
   const keterangan = String(dataFormulir.get("keterangan") ?? "");
   const daftarBaris = bacaBarisJurnal(dataFormulir.get("baris"));
+  const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
 
-  await buatJurnalSeimbang(keterangan, daftarBaris, "MANUAL", "JU", await bacaProyekId(dataFormulir));
+  await buatJurnalSeimbang(keterangan, daftarBaris, "MANUAL", "JU", perusahaanId, await bacaProyekId(dataFormulir, db, perusahaanId));
 
   revalidatePath("/buku-besar/jurnal");
   redirect("/buku-besar/jurnal");
@@ -112,7 +120,8 @@ function bacaFormulirKas(dataFormulir: FormData) {
 async function buatDokumenKas(jenis: "MASUK" | "KELUAR", dataFormulir: FormData) {
   const pengguna = await wajibHakAksi(jenis === "MASUK" ? "kas-masuk.buat" : "kas-keluar.buat");
   const { akunKasId, akunLawanId, keterangan, jumlah } = bacaFormulirKas(dataFormulir);
-  const proyekId = await bacaProyekId(dataFormulir);
+  const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
+  const proyekId = await bacaProyekId(dataFormulir, db, perusahaanId);
   const zero = D(0);
   const halaman = jenis === "MASUK" ? "/kas-bank/masuk" : "/kas-bank/keluar";
   const label = jenis === "MASUK" ? "Kas Masuk" : "Kas Keluar";
@@ -131,6 +140,7 @@ async function buatDokumenKas(jenis: "MASUK" | "KELUAR", dataFormulir: FormData)
           ],
       jenis === "MASUK" ? "KAS_MASUK" : "KAS_KELUAR",
       jenis === "MASUK" ? "KM" : "KK",
+      perusahaanId,
       proyekId,
     );
     revalidatePath(halaman);
@@ -138,9 +148,11 @@ async function buatDokumenKas(jenis: "MASUK" | "KELUAR", dataFormulir: FormData)
   }
 
   await pastikanAkunRinci(db, [akunKasId, akunLawanId]);
+  // draf dengan akun milik perusahaan lain ditolak sekarang, sama dengan mode langsung, tidak menunggu disetujui
+  await pastikanAkunMilik(db, [akunKasId, akunLawanId], perusahaanId);
   const nomor = await nomorDokumenBerikutnya(db.dokumenKas, jenis === "MASUK" ? "KM" : "KK");
   await db.dokumenKas.create({
-    data: { nomor, jenis, akunKasId, akunLawanId, jumlah, keterangan: keterangan || null, proyekId, dibuatOleh: pengguna.nama, statusPersetujuan: "DRAFT" },
+    data: { nomor, perusahaanId, jenis, akunKasId, akunLawanId, jumlah, keterangan: keterangan || null, proyekId, dibuatOleh: pengguna.nama, statusPersetujuan: "DRAFT" },
   });
 
   revalidatePath(halaman);

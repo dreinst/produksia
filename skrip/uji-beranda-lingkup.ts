@@ -400,7 +400,9 @@ async function main() {
   console.log("=== 6b. Butir Integritas lain per perusahaan: hutang, barang belum ditagih, barang terkirim, uang muka ===");
   const pemasok = await db.pemasok.create({ data: { kode: "UJL-SUP", nama: "Pemasok Uji Lingkup" } });
   const idJurnalSebelumLain = new Set((await db.jurnal.findMany({ select: { id: true } })).map((j) => j.id));
-  await jalankan("PSB barang 10 @ 6.000", () => buatPesananPembelian(formulir({ pemasokId: pemasok.id, baris: [{ barangId: barang.id, jumlah: 10, harga: 6000 }] })));
+  // Sejak P13 pesanan pembelian adalah dokumen akar berperusahaan dan barangnya harus milik perusahaan itu, jadi PSB
+  // dibuat langsung untuk perusahaan satu (pemilik barang); TB dan FB mewarisinya.
+  await jalankan("PSB barang 10 @ 6.000", () => buatPesananPembelian(formulir({ pemasokId: pemasok.id, perusahaanId: p1.id, baris: [{ barangId: barang.id, jumlah: 10, harga: 6000 }] })));
   const psb = await db.pesananPembelian.findFirstOrThrow({ where: { pemasokId: pemasok.id }, include: { baris: true } });
   await jalankan("TB sebagian 4 dari 10", () => buatPenerimaanBarang(formulir({ pesananId: psb.id, gudangId: gudang.id, baris: [{ barisPesananId: psb.baris[0].id, barangId: barang.id, jumlah: 4 }] })));
   const tb = await db.penerimaanBarang.findFirstOrThrow({ where: { pesananId: psb.id } });

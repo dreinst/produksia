@@ -10,6 +10,7 @@ import { D, bacaUang, format } from "@/lib/uang";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { dataLangsungDisetujui } from "@/lib/persetujuan";
+import { pastikanAkunMilik, perusahaanDokumenBaru } from "@/lib/perusahaan";
 
 /** Prive: pemilik mengambil uang pribadi dari kas/bank. Jurnal PRV: Dr Prive (modal, saldo debit) / Cr Kas/Bank. */
 export async function buatPrive(dataFormulir: FormData) {
@@ -32,6 +33,9 @@ export async function buatPrive(dataFormulir: FormData) {
   if (!akunKas?.kasBank) throw new Error("Akun sumber harus akun kas/bank");
   if (!akunPrive || akunPrive.jenis !== "MODAL") throw new Error("Akun prive harus akun modal");
   await pastikanAkunRinci(db, [akunKasId, akunPriveId]);
+  // dokumen akar (D1 §3.3): perusahaan dari isian atau lingkup; kedua akun milik perusahaan itu atau bersama
+  const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
+  await pastikanAkunMilik(db, [akunKasId, akunPriveId], perusahaanId);
 
   await db.$transaction(async (tx) => {
     await pastikanTahunTerbuka(tx, tanggal);
@@ -43,6 +47,7 @@ export async function buatPrive(dataFormulir: FormData) {
         tanggal,
         keterangan: `Prive ${nomor} ${pemilikNama}${keterangan ? `: ${keterangan}` : ""}`,
         sumber: "PRIVE",
+        perusahaanId,
         baris: {
           create: [
             { akunId: akunPriveId, debit: jumlah, kredit: D(0), keterangan: `Prive ${pemilikNama}` },
@@ -52,7 +57,7 @@ export async function buatPrive(dataFormulir: FormData) {
       },
     });
     // Prive belum ikut alur persetujuan; jurnalnya langsung dicatat, jadi statusnya langsung DISETUJUI
-    await tx.prive.create({ data: { nomor, tanggal, pemilikNama, akunKasId, akunPriveId, jumlah, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama, ...dataLangsungDisetujui(pengguna) } });
+    await tx.prive.create({ data: { nomor, perusahaanId, tanggal, pemilikNama, akunKasId, akunPriveId, jumlah, keterangan, jurnalId: jurnal.id, penggunaNama: pengguna.nama, ...dataLangsungDisetujui(pengguna) } });
     await tx.logAktivitas.create({
       data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "BUAT", jenis: "Prive", nomor, keterangan: `${pemilikNama} mengambil ${format(jumlah)} dari ${akunKas.kode}` },
     });

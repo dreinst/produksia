@@ -10,13 +10,32 @@ export type KonfigurasiBidang = {
   virtual?: boolean;
   /** Hanya tampil saat menambah data baru, disembunyikan saat mengubah data yang sudah ada. */
   hanyaTambah?: boolean;
+  /** Label opsi bernilai NILAI_BERSAMA ("Bersama"); aksi server memetakannya ke null (D1 §3.5). Tanpa opsi "-". */
+  pilihanBersama?: string;
+  /** Saat menambah data baru, isian awalnya lingkup perusahaan aktif (diisi halaman). */
+  bawaanLingkup?: boolean;
+  /** Teks petunjuk kecil di bawah isian. */
+  petunjuk?: string;
 };
+
+/**
+ * Bidang pemilik perusahaan data induk (D1 §3.5). Isian yang tidak terkirim sama sekali dilewati (buat: bawaan basis
+ * data, ubah: tidak diubah), supaya pemanggil lama tanpa isian ini tetap berjalan seperti sebelumnya.
+ */
+export const BIDANG_PERUSAHAAN = "perusahaanId";
+const opsiPerusahaan = { model: "perusahaan", bidangNilai: "id", bidangLabel: "nama", where: { aktif: true } };
+const kolomPerusahaan = { key: "perusahaan.kode", label: "Perusahaan" };
 
 export type KonfigurasiEntitas = {
   slug: string;
   label: string;
   model: string; // Prisma client delegasi nama
   bagian: "persediaan" | "daftar";
+  /**
+   * Saringan daftar menurut lingkup perusahaan aktif: "perusahaan" = milik perusahaan itu saja (karyawan, proyek),
+   * "milikAtauBersama" = milik perusahaan itu atau bersama (akun, gudang, barang). Gabungan tidak disaring.
+   */
+  saringLingkup?: "perusahaan" | "milikAtauBersama";
   bidang: KonfigurasiBidang[];
   kolom: { key: string; label: string }[];
 };
@@ -35,9 +54,11 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     label: "Karyawan / Penjual",
     model: "karyawan",
     bagian: "daftar",
+    saringLingkup: "perusahaan",
     bidang: [
       { nama: "kode", label: "Kode", jenis: "text", wajib: true },
       { nama: "nama", label: "Nama", jenis: "text", wajib: true },
+      { nama: BIDANG_PERUSAHAAN, label: "Perusahaan pemberi kerja", jenis: "select", wajib: true, opsi: opsiPerusahaan, bawaanLingkup: true },
       { nama: "jabatan", label: "Jabatan", jenis: "text" },
       {
         nama: "departemenId",
@@ -59,6 +80,7 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
+      kolomPerusahaan,
       { key: "jabatan", label: "Jabatan" },
       { key: "departemen.nama", label: "Departemen" },
       { key: "status", label: "Status" },
@@ -127,16 +149,20 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     label: "Proyek",
     model: "proyek",
     bagian: "daftar",
+    saringLingkup: "perusahaan",
     bidang: [
       { nama: "kode", label: "Kode", jenis: "text", wajib: true },
       { nama: "nama", label: "Nama", jenis: "text", wajib: true },
+      { nama: BIDANG_PERUSAHAAN, label: "Perusahaan pemilik event", jenis: "select", wajib: true, opsi: opsiPerusahaan, bawaanLingkup: true },
       {
         nama: "pelangganId",
         label: "Pelanggan",
         jenis: "select",
         opsi: { model: "pelanggan", bidangNilai: "id", bidangLabel: "nama" },
       },
-      { nama: "status", label: "Status", jenis: "select", opsiStatis: ["BERJALAN", "SELESAI", "BATAL"], nilaiBawaan: "BERJALAN" },
+      { nama: "namaKlien", label: "Nama klien (bila belum ada di data Pelanggan)", jenis: "text" },
+      // nilai sah divalidasi server lewat validasiProyek (D5 §3.1, bug B-22 untuk Proyek.status)
+      { nama: "status", label: "Status", jenis: "select", opsiStatis: ["BERJALAN", "DITUNDA", "SELESAI", "DIARSIP", "BATAL"], nilaiBawaan: "BERJALAN" },
       { nama: "nilaiKontrak", label: "Nilai kontrak / proposal disetujui", jenis: "number" },
       { nama: "anggaranBiaya", label: "Anggaran biaya event", jenis: "number" },
       { nama: "tanggalMulai", label: "Tanggal mulai", jenis: "date" },
@@ -146,6 +172,7 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
+      kolomPerusahaan,
       { key: "pelanggan.nama", label: "Pelanggan" },
       { key: "status", label: "Status" },
       { key: "nilaiKontrak", label: "Nilai kontrak" },
@@ -157,14 +184,17 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     label: "Gudang",
     model: "gudang",
     bagian: "persediaan",
+    saringLingkup: "milikAtauBersama",
     bidang: [
       { nama: "kode", label: "Kode", jenis: "text", wajib: true },
       { nama: "nama", label: "Nama", jenis: "text", wajib: true },
       { nama: "alamat", label: "Alamat", jenis: "text" },
+      { nama: BIDANG_PERUSAHAAN, label: "Milik perusahaan", jenis: "select", opsi: opsiPerusahaan, petunjuk: "Kosongkan untuk gudang bersama yang boleh dipakai semua perusahaan." },
     ],
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
+      kolomPerusahaan,
     ],
   },
   {
@@ -191,10 +221,22 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     label: "Barang & Jasa",
     model: "barang",
     bagian: "persediaan",
+    saringLingkup: "milikAtauBersama",
     bidang: [
       { nama: "kode", label: "Nama Barang", jenis: "text", wajib: true },
       { nama: "nama", label: "Keterangan", jenis: "text", wajib: true },
+      { nama: "deskripsi", label: "Deskripsi katalog (isian awal baris penjualan)", jenis: "text" },
       { nama: "jenis", label: "Tipe", jenis: "select", opsiStatis: ["BARANG", "JASA"], nilaiBawaan: "BARANG" },
+      {
+        nama: BIDANG_PERUSAHAAN,
+        label: "Milik perusahaan",
+        jenis: "select",
+        opsi: opsiPerusahaan,
+        nilaiBawaan: "utama",
+        bawaanLingkup: true,
+        pilihanBersama: "Bersama (khusus Jasa)",
+        petunjuk: "Barang stok selalu milik satu perusahaan. Jasa boleh dipakai bersama semua perusahaan.",
+      },
       {
         nama: "kelompokId",
         label: "Kategori",
@@ -257,6 +299,7 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
       { key: "kode", label: "Nama Barang" },
       { key: "nama", label: "Keterangan" },
       { key: "jenis", label: "Tipe" },
+      kolomPerusahaan,
       { key: "satuan", label: "Satuan" },
       { key: "warna", label: "Warna" },
       { key: "hargaJual", label: "Harga Jual" },
@@ -267,6 +310,7 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
     label: "Daftar Akun",
     model: "akun",
     bagian: "daftar",
+    saringLingkup: "milikAtauBersama",
     bidang: [
       { nama: "kode", label: "Kode Akun", jenis: "text", wajib: true },
       { nama: "nama", label: "Nama Akun", jenis: "text", wajib: true },
@@ -285,12 +329,20 @@ export const entitasDataInduk: KonfigurasiEntitas[] = [
       },
       { nama: "kelompok", label: "Akun kelompok (induk; tidak bisa dijurnal)", jenis: "boolean" },
       { nama: "kasBank", label: "Akun Kas/Bank", jenis: "boolean" },
+      {
+        nama: BIDANG_PERUSAHAAN,
+        label: "Milik perusahaan",
+        jenis: "select",
+        opsi: opsiPerusahaan,
+        petunjuk: "Kosong = akun bersama. Rekening yang dipakai satu perusahaan sebaiknya diberi pemilik supaya pilihan kas dan rekonsiliasi tersaring.",
+      },
       { nama: "keterangan", label: "Keterangan", jenis: "text" },
     ],
     kolom: [
       { key: "kode", label: "Kode" },
       { key: "nama", label: "Nama" },
       { key: "jenis", label: "Tipe" },
+      kolomPerusahaan,
       { key: "induk.nama", label: "Induk" },
       { key: "kelompok", label: "Kelompok" },
       { key: "kasBank", label: "Kas/Bank" },

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import type { Prisma } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { ambilKonfigurasiEntitas, type KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
+import { BIDANG_PERUSAHAAN, ambilKonfigurasiEntitas, type KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { hakDataInduk, type PenggunaSesi } from "@/lib/hakAkses";
 import { D, bacaUang, uang, type Desimal } from "@/lib/uang";
@@ -15,6 +15,9 @@ import { perbaruiHargaRata } from "@/lib/stok";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 import { bacaFotoDariFormulir } from "@/lib/foto";
+import { NILAI_BERSAMA, PERUSAHAAN_UTAMA, namaPerusahaan, pastikanAkunMilik, pastikanGudangMilik } from "@/lib/perusahaan";
+import { LABEL_STATUS_PROYEK, statusProyekSah, validasiProyek } from "@/lib/proyek";
+import { catatAktivitas } from "@/lib/log";
 
 // Batas atas kolom uang/kuantitas Decimal(18,2) di skema (16 digit sebelum koma).
 // Semua bidang "number" data induk adalah harga/kuantitas yang tidak boleh negatif.
@@ -36,6 +39,12 @@ type DelegasiValidasi = {
 
 function delegasiValidasi(model: string): DelegasiValidasi {
   return (db as unknown as Record<string, DelegasiValidasi>)[model];
+}
+
+type DelegasiBacaSatu = { findUnique: (args: { where: { id: string } }) => Promise<Record<string, unknown> | null> };
+
+function delegasiBacaSatu(model: string): DelegasiBacaSatu {
+  return (db as unknown as Record<string, DelegasiBacaSatu>)[model];
 }
 
 async function konfigurasiDenganHak(slug: string): Promise<{ config: KonfigurasiEntitas; pengguna: PenggunaSesi }> {
@@ -64,6 +73,20 @@ async function bacaData(config: KonfigurasiEntitas, dataFormulir: FormData, untu
     if (bidang.virtual) continue; // ditangani terpisah oleh aksi server, bukan kolom Prisma sungguhan
     const mentah = dataFormulir.get(bidang.nama);
     const nilai = typeof mentah === "string" ? mentah.trim() : "";
+    if (bidang.nama === BIDANG_PERUSAHAAN) {
+      // D1 §3.5: isian yang tidak terkirim dilewati (pemanggil lama), "Bersama" = null, id diperiksa periksaPemilik
+      // bersama nilai lamanya (pemilik arsip yang tidak diganti tetap boleh)
+      if (!dataFormulir.has(bidang.nama)) continue;
+      if (nilai === NILAI_BERSAMA) {
+        if (!bidang.pilihanBersama) throw new Error(`${bidang.label} tidak valid`);
+        data[bidang.nama] = null;
+        continue;
+      }
+      if (nilai) {
+        data[bidang.nama] = nilai;
+        continue;
+      }
+    }
     if (bidang.jenis === "boolean") {
       data[bidang.nama] = mentah === "on";
       continue;
@@ -101,6 +124,132 @@ async function bacaData(config: KonfigurasiEntitas, dataFormulir: FormData, untu
   return data;
 }
 
+// ---------- Pemilik perusahaan data induk (D1 §3.5) ----------
+
+const ENTITAS_BERPEMILIK = new Set(["akun", "barang", "gudang", "proyek", "karyawan"]);
+
+type DataLama = { perusahaanId: string | null; kode: string; jenis?: string; status?: string };
+
+/** Kode perusahaan (urut) untuk pesan galat. */
+async function daftarKodePerusahaan(ids: (string | null)[]): Promise<string> {
+  const unik = [...new Set(ids.filter((x): x is string => !!x))];
+  const daftar = await db.perusahaan.findMany({ where: { id: { in: unik } }, select: { kode: true }, orderBy: { kode: "asc" } });
+  return daftar.map((p) => p.kode).join(", ");
+}
+
+/**
+ * Ganti pemilik hanya bila aman (D1 §3.5 butir 2, D5 §4.7). `baru` null = dijadikan bersama. Melempar galat yang
+ * menyebut perusahaan yang sudah memakai data ini.
+ */
+async function pastikanGantiPemilikAman(slug: string, id: string, lama: DataLama, baru: string | null): Promise<void> {
+  if (slug === "akun") {
+    if (baru === null) return; // menjadi akun bersama selalu boleh
+    const jurnal = await db.jurnal.findMany({ where: { perusahaanId: { not: baru }, baris: { some: { akunId: id } } }, distinct: ["perusahaanId"], select: { perusahaanId: true } });
+    if (jurnal.length > 0) throw new Error(`Akun ${lama.kode} sudah dipakai jurnal ${await daftarKodePerusahaan(jurnal.map((j) => j.perusahaanId))}; tidak bisa dijadikan milik ${await namaPerusahaan(db, baru)}`);
+    return;
+  }
+  if (slug === "barang") {
+    const ada = { where: { barangId: id } };
+    const jumlah = await Promise.all([
+      db.stokBarang.count({ where: { barangId: id, jumlah: { not: 0 } } }),
+      db.barisPenawaranPenjualan.count(ada),
+      db.barisPesananPenjualan.count(ada),
+      db.barisPengiriman.count(ada),
+      db.barisFakturPenjualan.count(ada),
+      db.barisReturPenjualan.count(ada),
+      db.barisPesananPembelian.count(ada),
+      db.barisPenerimaanBarang.count(ada),
+      db.barisFakturPembelian.count(ada),
+      db.barisReturPembelian.count(ada),
+      db.barisPindahBarang.count(ada),
+      db.barisPenyesuaianPersediaan.count(ada),
+      db.barisPeminjamanBarang.count(ada),
+      db.barisKerusakanBarang.count(ada),
+    ]);
+    if (jumlah.some((n) => n > 0)) throw new Error("Pemilik barang tidak bisa diganti setelah barang punya stok atau transaksi; daftarkan barang baru untuk perusahaan lain");
+    return;
+  }
+  if (slug === "gudang") {
+    if (baru === null) return; // gudang bersama boleh menyimpan barang dan dokumen perusahaan mana pun
+    const lain = { perusahaanId: { not: baru } };
+    const [stok, ...dokumen] = await Promise.all([
+      db.stokBarang.findMany({ where: { gudangId: id, jumlah: { not: 0 }, barang: { NOT: { perusahaanId: baru } } }, select: { barang: { select: { perusahaanId: true } } } }),
+      db.pengirimanPesanan.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.returPenjualan.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.penerimaanBarang.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.returPembelian.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.penyesuaianPersediaan.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.pindahBarang.findMany({ where: { OR: [{ gudangAsalId: id }, { gudangTujuanId: id }], ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.peminjamanBarang.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+      db.laporanKerusakanBarang.findMany({ where: { gudangId: id, ...lain }, select: { perusahaanId: true }, distinct: ["perusahaanId"] }),
+    ]);
+    const pemakai = [...stok.map((s) => s.barang.perusahaanId), ...dokumen.flat().map((d) => d.perusahaanId)];
+    if (pemakai.length > 0) throw new Error(`Gudang ${lama.kode} masih dipakai stok atau dokumen ${await daftarKodePerusahaan(pemakai)}; tidak bisa dijadikan milik ${await namaPerusahaan(db, baru)}`);
+    return;
+  }
+  if (slug === "proyek") {
+    if (baru === null) throw new Error("Perusahaan pemilik event wajib diisi");
+    // dokumen akar berproyek, jurnal, dokumen mitra, dan data pemasaran ikut perusahaan proyek; PJ dan BR boleh lintas
+    // perusahaan (D1 §3.3 catatan B) sehingga tidak dihitung
+    const lain = { proyekId: id, perusahaanId: { not: baru } };
+    const pilih = { select: { perusahaanId: true }, distinct: ["perusahaanId" as const] };
+    const [ap, ...dokumen] = await Promise.all([
+      db.transaksiAntarPerusahaan.findMany({ where: { OR: [{ proyekPemberiId: id, pemberiId: { not: baru } }, { proyekPenerimaId: id, penerimaId: { not: baru } }] }, select: { pemberiId: true, penerimaId: true, proyekPemberiId: true } }),
+      db.penawaranPenjualan.findMany({ where: lain, ...pilih }),
+      db.pesananPenjualan.findMany({ where: lain, ...pilih }),
+      db.pesananPembelian.findMany({ where: lain, ...pilih }),
+      db.jurnal.findMany({ where: lain, ...pilih }),
+      db.dokumenKas.findMany({ where: lain, ...pilih }),
+      db.penggajian.findMany({ where: lain, ...pilih }),
+      db.talanganMitra.findMany({ where: lain, ...pilih }),
+      db.pembayaranMitra.findMany({ where: lain, ...pilih }),
+      db.konten.findMany({ where: lain, ...pilih }),
+      db.tugasDesain.findMany({ where: lain, ...pilih }),
+      db.kampanye.findMany({ where: lain, ...pilih }),
+      db.berkas.findMany({ where: lain, ...pilih }),
+    ]);
+    const pemakai = [...ap.map((t) => (t.proyekPemberiId === id ? t.pemberiId : t.penerimaId)), ...dokumen.flat().map((d) => d.perusahaanId)];
+    if (pemakai.length > 0) throw new Error(`Proyek ${lama.kode} sudah punya jurnal atau dokumen ${await daftarKodePerusahaan(pemakai)}; perusahaan pemilik event tidak bisa diganti ke ${await namaPerusahaan(db, baru)}`);
+    return;
+  }
+  if (slug === "karyawan") {
+    if (baru === null) throw new Error("Perusahaan pemberi kerja wajib diisi");
+    const gaji = await db.penggajian.findMany({ where: { perusahaanId: { not: baru }, baris: { some: { karyawanId: id } } }, distinct: ["perusahaanId"], select: { perusahaanId: true } });
+    if (gaji.length > 0) throw new Error(`Karyawan ${lama.kode} sudah masuk penggajian ${await daftarKodePerusahaan(gaji.map((g) => g.perusahaanId))}; tidak bisa dipindah ke ${await namaPerusahaan(db, baru)}`);
+  }
+}
+
+/**
+ * Aturan pemilik perusahaan untuk lima entitas berpemilik (D1 §3.5). `lama` null = data baru. Isian pemilik harus
+ * perusahaan yang ada; perusahaan arsip hanya boleh bila pemiliknya tidak diganti. Barang jenis BARANG wajib punya
+ * pemilik (diperiksa sebelum CHECK basis data). Ganti pemilik diperiksa pastikanGantiPemilikAman.
+ */
+async function periksaPemilik(slug: string, id: string | null, data: Record<string, unknown>, lama: DataLama | null): Promise<void> {
+  if (!ENTITAS_BERPEMILIK.has(slug)) return;
+  const baru = data[BIDANG_PERUSAHAAN] as string | null | undefined;
+  if (typeof baru === "string" && baru !== lama?.perusahaanId) {
+    const p = await db.perusahaan.findUnique({ where: { id: baru }, select: { nama: true, aktif: true } });
+    if (!p) throw new Error("Perusahaan tidak ditemukan");
+    if (!p.aktif) throw new Error(`Perusahaan ${p.nama} sudah diarsipkan; pilih perusahaan yang aktif`);
+  }
+  if (slug === "barang") {
+    const jenisAkhir = (data.jenis as string | undefined) ?? lama?.jenis ?? "BARANG";
+    const pemilikAkhir = baru !== undefined ? baru : lama ? lama.perusahaanId : PERUSAHAAN_UTAMA;
+    if (jenisAkhir === "BARANG" && pemilikAkhir === null) throw new Error("Barang jenis BARANG wajib milik satu perusahaan");
+  }
+  if (lama && id && baru !== undefined && baru !== lama.perusahaanId) await pastikanGantiPemilikAman(slug, id, lama, baru);
+}
+
+const PANJANG_DESKRIPSI_BARANG = 3000;
+
+/** Validasi khusus per entitas yang tidak bisa dinyatakan lewat konfigurasi bidang. */
+function validasiKhusus(slug: string, data: Record<string, unknown>): void {
+  if (slug === "proyek") validasiProyek(data);
+  if (slug === "barang" && typeof data.deskripsi === "string" && data.deskripsi.length > PANJANG_DESKRIPSI_BARANG) {
+    throw new Error(`Deskripsi katalog maksimal ${PANJANG_DESKRIPSI_BARANG} karakter`);
+  }
+}
+
 /**
  * Jumlah Awal di formulir Barang (bidang virtual, lihat konfigurasiDataInduk.ts): kalau diisi,
  * barang dibuat SEKALIGUS dengan satu Penyesuaian Stok berjurnal, di transaksi yang sama, jadi
@@ -129,6 +278,10 @@ async function buatBarangDenganJumlahAwal(pengguna: PenggunaSesi, data: Record<s
 
   await db.$transaction(async (tx) => {
     const barang = await tx.barang.create({ data: data as Prisma.BarangCreateInput });
+    // dokumen penyesuaian mewarisi pemilik barang (D1 §3.3); BARANG selalu punya pemilik (periksaPemilik dan CHECK)
+    const perusahaanId = barang.perusahaanId ?? PERUSAHAAN_UTAMA;
+    await pastikanGudangMilik(tx, [gudangAwalId], perusahaanId);
+    await pastikanAkunMilik(tx, [akunLawanAwalId], perusahaanId);
     if (!perluPersetujuan) {
       await tx.stokBarang.upsert({
         where: { barangId_gudangId: { barangId: barang.id, gudangId: gudangAwalId } },
@@ -145,14 +298,14 @@ async function buatBarangDenganJumlahAwal(pengguna: PenggunaSesi, data: Record<s
         akunLawanId: akunLawanAwalId,
         keterangan,
         // dokumen milik pemilik barang, jadi jurnalnya sama di mode langsung dan saat disetujui (tinjauan P11 butir 1)
-        perusahaanId: barang.perusahaanId ?? undefined,
+        perusahaanId,
         ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
         baris: { create: [{ barangId: barang.id, jumlahSebelum: D(0), jumlahSesudah: jumlahAwal, hargaSatuan }] },
       },
     });
     if (perluPersetujuan) return;
     // jurnal stok awal milik pemilik barang (P11); BARANG selalu punya pemilik (CHECK basis data)
-    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId: akunLawanAwalId, keterangan, perusahaanId: barang.perusahaanId ?? undefined }, [{ barangId: barang.id, selisih: jumlahAwal, hargaSatuan }]);
+    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId: akunLawanAwalId, keterangan, perusahaanId }, [{ barangId: barang.id, selisih: jumlahAwal, hargaSatuan }]);
     if (jurnal) await tx.penyesuaianPersediaan.update({ where: { id: penyesuaian.id }, data: { jurnalId: jurnal.id } });
   });
 
@@ -165,6 +318,8 @@ async function buatBarangDenganJumlahAwal(pengguna: PenggunaSesi, data: Record<s
 export async function buatDataInduk(slug: string, dataFormulir: FormData) {
   const { config, pengguna } = await konfigurasiDenganHak(slug);
   const data = await bacaData(config, dataFormulir, false);
+  validasiKhusus(slug, data);
+  await periksaPemilik(slug, null, data, null);
   if (slug !== "barang" || !(await buatBarangDenganJumlahAwal(pengguna, data, dataFormulir))) {
     await delegasi(config.model).create({ data });
   }
@@ -176,7 +331,29 @@ export async function ubahDataInduk(slug: string, id: string, dataFormulir: Form
   const { config, pengguna } = await konfigurasiDenganHak(slug);
   const data = await bacaData(config, dataFormulir, true);
   if ("indukId" in data && data.indukId === id) throw new Error("Data tidak bisa menjadi induk dirinya sendiri");
-  await delegasi(config.model).update({ where: { id }, data });
+  validasiKhusus(slug, data);
+  const lama = ENTITAS_BERPEMILIK.has(slug) ? ((await delegasiBacaSatu(config.model).findUnique({ where: { id } })) as DataLama | null) : null;
+  await periksaPemilik(slug, id, data, lama);
+  if (slug === "proyek" && lama && typeof data.status === "string" && data.status !== lama.status) {
+    // log perubahan status proyek (D5 §3.1) di transaksi yang sama dengan perubahannya
+    const dari = lama.status ?? "", ke = data.status;
+    const label = (x: string) => (statusProyekSah(x) ? LABEL_STATUS_PROYEK[x] : x);
+    await db.$transaction(async (tx) => {
+      await tx.proyek.update({ where: { id }, data: data as Prisma.ProyekUncheckedUpdateInput });
+      await catatAktivitas(tx, pengguna, {
+        aksi: "UBAH_STATUS",
+        jenis: "Proyek",
+        nomor: String(data.kode ?? lama.kode),
+        keterangan: `Status ${label(dari)} menjadi ${label(ke)}`,
+        modul: "proyek",
+        entitasId: id,
+        meta: { dari, ke },
+        perusahaanId: (data[BIDANG_PERUSAHAAN] as string | undefined) ?? lama.perusahaanId,
+      });
+    });
+  } else {
+    await delegasi(config.model).update({ where: { id }, data });
+  }
   if (slug === "akun") await catatBaganAkun(pengguna, "UBAH", String(data.kode ?? ""), `Akun ${String(data.kode ?? "")} — ${String(data.nama ?? "")} diubah`);
   revalidatePath(`/data-induk/${slug}`);
   redirect(`/data-induk/${slug}`);
@@ -240,6 +417,10 @@ export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
 
   const hargaSatuan = D(barang.hargaBeli);
   if (selisih.gt(0) && hargaSatuan.lte(0)) throw new Error("Isi Harga Beli barang ini lebih dulu untuk menghitung nilai penyesuaian stok");
+  // dokumen koreksi stok milik pemilik barang (D1 §3.3): gudang dan akun lawan harus milik perusahaan itu atau bersama
+  const perusahaanId = barang.perusahaanId ?? PERUSAHAAN_UTAMA;
+  await pastikanGudangMilik(db, [gudangId], perusahaanId);
+  await pastikanAkunMilik(db, [akunLawanId], perusahaanId);
 
   const perluPersetujuan = await persetujuanWajib(db);
   const nomor = await nomorDokumenBerikutnya(db.penyesuaianPersediaan, "PS");
@@ -260,14 +441,14 @@ export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
         gudangId,
         akunLawanId,
         keterangan,
-        perusahaanId: barang.perusahaanId ?? undefined,
+        perusahaanId,
         ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" as const } : dataLangsungDisetujui(pengguna)),
         baris: { create: [{ barangId, jumlahSebelum, jumlahSesudah: stokBaru, hargaSatuan }] },
       },
     });
     if (perluPersetujuan) return;
     // jurnal koreksi stok milik pemilik barang (P11)
-    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId, keterangan, perusahaanId: barang.perusahaanId ?? undefined }, [{ barangId, selisih, hargaSatuan }]);
+    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId, keterangan, perusahaanId }, [{ barangId, selisih, hargaSatuan }]);
     if (jurnal) await tx.penyesuaianPersediaan.update({ where: { id: penyesuaian.id }, data: { jurnalId: jurnal.id } });
   });
 

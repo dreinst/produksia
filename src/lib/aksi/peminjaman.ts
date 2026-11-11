@@ -13,6 +13,7 @@ import { menungguKonfirmasiBaris, sisaBaris } from "@/lib/peminjaman";
 import { bacaProyekId } from "@/lib/proyek";
 import { bacaNomorTelepon } from "@/lib/identitasPengguna";
 import { dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
+import { pastikanGudangMilik, pemilikTunggalBarang } from "@/lib/perusahaan";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 
@@ -127,10 +128,14 @@ export async function buatPeminjamanBarang(dataFormulir: FormData) {
       if (!barang) throw new Error("Barang tidak ditemukan");
       if (barang.jenis !== "BARANG") throw new Error(`${barang.kode} - ${barang.nama} adalah JASA, tidak punya stok`);
     }
+    // perusahaan dokumen = pemilik tunggal barang (D1 §3.3 catatan C); proyek boleh milik perusahaan lain (catatan B)
+    const perusahaanId = await pemilikTunggalBarang(tx, idBarang);
+    await pastikanGudangMilik(tx, [gudangId], perusahaanId);
     const nomor = await nomorDokumenBerikutnya(tx.peminjamanBarang, "PJ");
     const dokumen = await tx.peminjamanBarang.create({
       data: {
         nomor,
+        perusahaanId,
         gudangId,
         proyekId,
         namaPengambil,
@@ -285,10 +290,12 @@ export async function tautkanPenyesuaianPeminjaman(peminjamanId: string, dataFor
     if (!dokumen.ditutupPada) throw new Error(`${dokumen.nomor} masih terbuka; tutup dulu dengan selisih`);
     if (dokumen.penyesuaianId) throw new Error(`${dokumen.nomor} sudah ditautkan ke Penyesuaian Stok`);
     if (!dokumen.baris.some((b) => sisaBaris(b) > 0)) throw new Error(`${dokumen.nomor} tidak punya selisih; semua barang sudah kembali`);
-    const penyesuaian = await tx.penyesuaianPersediaan.findUnique({ where: { id: penyesuaianId }, select: { nomor: true, statusPersetujuan: true, gudangId: true } });
+    const penyesuaian = await tx.penyesuaianPersediaan.findUnique({ where: { id: penyesuaianId }, select: { nomor: true, statusPersetujuan: true, gudangId: true, perusahaanId: true } });
     if (!penyesuaian) throw new Error("Penyesuaian Stok tidak ditemukan");
     if (penyesuaian.statusPersetujuan !== "DISETUJUI") throw new Error(`${penyesuaian.nomor} belum disetujui`);
     if (penyesuaian.gudangId !== dokumen.gudangId) throw new Error(`${penyesuaian.nomor} untuk gudang lain, bukan gudang dokumen ${dokumen.nomor}`);
+    // D1 §3.3: penyesuaian yang ditautkan harus satu perusahaan dengan dokumen ini (diperiksa sesudah aturan lama)
+    if (penyesuaian.perusahaanId !== dokumen.perusahaanId) throw new Error(`Penyesuaian ${penyesuaian.nomor} milik perusahaan lain`);
     await tx.peminjamanBarang.update({ where: { id: peminjamanId }, data: { penyesuaianId } });
     await catatLog(tx, pengguna, "TAUTKAN", dokumen.nomor, `Selisih ditautkan ke ${penyesuaian.nomor} untuk jejak akuntansi tambahan (stok yang hilang sudah otomatis terkurangi sejak disetujui)`);
   });

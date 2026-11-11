@@ -10,6 +10,7 @@ import { buatDataIndukFormulir, hapusDataIndukFormulir } from "@/lib/aksi/dataIn
 import { wajibHak } from "@/lib/otentikasi";
 import { hakDataInduk, punyaHak } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
+import { lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanDataInduk({
   params,
@@ -26,7 +27,12 @@ export default async function HalamanDataInduk({
   const bolehTulis = punyaHak(pengguna, hak.tulis);
 
   const param = await bacaParamDaftar(searchParams);
-  const where = wherePencarian(config, param.q);
+  // data induk berpemilik disaring lingkup perusahaan aktif (D1 §3.2, §3.5); gabungan tanpa saringan
+  const lingkup = await lingkupPerusahaan();
+  const saringan =
+    config.saringLingkup === "perusahaan" ? saringPerusahaan(lingkup.perusahaanId) : config.saringLingkup === "milikAtauBersama" ? saringMilikAtauBersama(lingkup.perusahaanId) : {};
+  const pencarian = wherePencarian(config, param.q);
+  const where = Object.keys(saringan).length === 0 ? pencarian : pencarian ? { AND: [pencarian, saringan] } : saringan;
   const delegasi = delegasiBaca(config.model);
   const kolomUrut = config.bidang.some((b) => b.nama === "kode") ? "kode" : "nama";
   const [total, daftar] = await Promise.all([
@@ -58,6 +64,7 @@ export default async function HalamanDataInduk({
           config={config}
           daftarOpsi={daftarOpsi}
           aksi={buatDataIndukFormulir.bind(null, entitas)}
+          perusahaanBawaan={lingkup.perusahaanId}
           labelTombol={`Tambah ${config.label}`}
         />
       )}
@@ -84,6 +91,14 @@ export default async function HalamanDataInduk({
                   {config.kolom.map((kolom) => {
                     const angka = config.bidang.find((b) => b.nama === kolom.key)?.jenis === "number";
                     const mentah = ambilNilai(rekaman, kolom.key);
+                    // pemilik kosong pada akun, gudang, dan jasa berarti dipakai bersama semua perusahaan
+                    if (kolom.key === "perusahaan.kode" && mentah == null) {
+                      return (
+                        <td key={kolom.key} className="text-slate-500">
+                          Bersama
+                        </td>
+                      );
+                    }
                     return (
                       <td key={kolom.key} className={angka ? "text-right angka" : undefined}>
                         {angka ? Number(String(mentah ?? 0)).toLocaleString("id-ID") : typeof mentah === "boolean" ? (mentah ? "Ya" : "–") : mentah instanceof Date ? mentah.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : String(mentah ?? "")}

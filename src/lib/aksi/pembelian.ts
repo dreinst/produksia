@@ -19,6 +19,14 @@ import { bacaProyekId } from "@/lib/proyek";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 import { bacaMataUangDokumen, nilaiDalamMataUang } from "@/lib/mataUang";
 import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
+import {
+  PERUSAHAAN_UTAMA,
+  pastikanAkunMilik,
+  pastikanBarangMilik,
+  pastikanGudangMilik,
+  perusahaanDariInduk,
+  perusahaanDokumenBaru,
+} from "@/lib/perusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
 
@@ -77,12 +85,16 @@ export async function buatPesananPembelian(dataFormulir: FormData) {
   const daftarBaris = bacaBaris(dataFormulir);
   const total = totalBaris(daftarBaris);
 
-  const proyekId = await bacaProyekId(dataFormulir);
+  // dokumen akar (D1 §3.3): perusahaan dari isian atau lingkup; barang dan proyek harus milik perusahaan itu
+  const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
+  await pastikanBarangMilik(db, daftarBaris.map((l) => l.barangId), perusahaanId);
+  const proyekId = await bacaProyekId(dataFormulir, db, perusahaanId);
   const nomor = await nomorDokumenBerikutnya(db.pesananPembelian, "PSB");
 
   await db.pesananPembelian.create({
     data: {
       nomor,
+      perusahaanId,
       pemasokId,
       proyekId,
       total,
@@ -120,6 +132,9 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
       throw new Error(`Kuantitas terima melebihi sisa pesanan (sisa ${format(sisa)}, diminta ${format(l.jumlah)})`);
     }
   }
+  // dokumen anak mewarisi perusahaan pesanan; gudang harus milik perusahaan itu atau bersama
+  const perusahaanId = perusahaanDariInduk(pesanan, dataFormulir);
+  await pastikanGudangMilik(db, [gudangId], perusahaanId);
 
   const nomor = await nomorDokumenBerikutnya(db.penerimaanBarang, "TB");
 
@@ -135,6 +150,7 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
     const penerimaan = await tx.penerimaanBarang.create({
       data: {
         nomor,
+        perusahaanId,
         pesananId,
         gudangId,
         status: "DIPROSES",
@@ -182,7 +198,10 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
   const penerimaanId = String(dataFormulir.get("penerimaanId") ?? "") || null;
   if (!pesananId) throw new Error("Pesanan wajib dipilih");
   const daftarBaris = bacaBaris(dataFormulir);
-  const pengaturan = await ambilPengaturanPerusahaan(db);
+  // catatan A D1 §3.3: pengaturan pajak perusahaan pesanan dibaca di posisi lama supaya urutan pesan galat tetap;
+  // bila pesanan tidak ada, pengaturan utama dipakai sementara dan findUniqueOrThrow di bawah melempar galat lama
+  const indukPerusahaan = await db.pesananPembelian.findUnique({ where: { id: pesananId }, select: { perusahaanId: true } });
+  const pengaturan = await ambilPengaturanPerusahaan(db, indukPerusahaan?.perusahaanId ?? PERUSAHAAN_UTAMA);
   const ppnPersen = bacaTarifPpn(dataFormulir.get("ppnPersen"), pengaturan);
   const dpp = totalBaris(daftarBaris);
   const ppn = hitungPpn(dpp, ppnPersen);
@@ -198,6 +217,7 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(sisa)}, diminta ${format(l.jumlah)})`);
     }
   }
+  const perusahaanId = perusahaanDariInduk(pesanan, dataFormulir);
   const hargaPesanan = new Map(pesanan.baris.map((ol) => [ol.barangId, D(ol.harga)]));
 
   // Mata uang transaksi: pilihan formulir, kalau kosong mengikuti mata uang bawaan pemasok
@@ -213,6 +233,7 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
     const faktur = await tx.fakturPembelian.create({
       data: {
         nomor,
+        perusahaanId,
         pemasokId: pesanan.pemasokId,
         pesananId,
         penerimaanId,
@@ -269,11 +290,15 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
   const jumlah = bacaUang(dataFormulir.get("jumlah"), "Jumlah bayar");
   const potonganMentah = dataFormulir.get("potonganPajak");
   const potonganPajak = typeof potonganMentah === "string" && potonganMentah.trim() !== "" ? bacaUang(potonganMentah, "Potongan PPh 23", { allowZero: true }) : D(0);
-  const pengaturan = await ambilPengaturanPerusahaan(db);
+  // catatan A D1 §3.3: pengaturan perusahaan faktur dibaca di posisi lama
+  const indukPerusahaan = await db.fakturPembelian.findUnique({ where: { id: fakturId }, select: { perusahaanId: true } });
+  const pengaturan = await ambilPengaturanPerusahaan(db, indukPerusahaan?.perusahaanId ?? PERUSAHAAN_UTAMA);
   if (potonganPajak.gt(0) && !pengaturan.akunPph23DipotongId) throw new Error("Akun Hutang PPh 23 belum diatur di Pengaturan > Perusahaan & Pajak");
 
   const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true, retur: true, pesanan: { select: { proyekId: true } } } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");
+  const perusahaanId = perusahaanDariInduk(faktur, dataFormulir);
+  await pastikanAkunMilik(db, [akunId], perusahaanId);
 
   const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
@@ -288,7 +313,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
 
   await db.$transaction(async (tx) => {
     const pembayaran = await tx.pembayaranPembelian.create({
-      data: { nomor, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, potonganPajak, metodeBayar, ...dataLangsungDisetujui(pengguna) },
+      data: { nomor, perusahaanId, pemasokId: faktur.pemasokId, fakturId, akunId, jumlah, potonganPajak, metodeBayar, ...dataLangsungDisetujui(pengguna) },
     });
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
     const jurnal = await catatJurnalPembayaranPembelian(tx, pembayaran, faktur.nomor, pengaturan.akunPph23DipotongId);
@@ -327,6 +352,8 @@ export async function buatReturPembelian(dataFormulir: FormData) {
       throw new Error(`Kuantitas retur melebihi yang bisa diretur (maks ${format(sisa)}, diminta ${format(l.jumlah)})`);
     }
   }
+  const perusahaanId = perusahaanDariInduk(faktur, dataFormulir);
+  await pastikanGudangMilik(db, [gudangId], perusahaanId);
 
   const barisRetur = daftarBaris.map((l) => ({
     barangId: l.barangId,
@@ -336,7 +363,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
   const dpp = totalBaris(barisRetur);
   const ppn = hitungPpn(dpp, D(faktur.ppnPersen));
   const total = dpp.plus(ppn);
-  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const pengaturan = await ambilPengaturanPerusahaan(db, perusahaanId);
   const sudahDibayar = jumlahkan(faktur.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak)));
   const sudahDiretur = jumlahkan(faktur.retur.map((r) => r.total));
   const status = statusFaktur(D(faktur.total), sudahDibayar, sudahDiretur.plus(total));
@@ -354,6 +381,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     const retur = await tx.returPembelian.create({
       data: {
         nomor,
+        perusahaanId,
         fakturId,
         gudangId,
         alasan: alasan || null,
@@ -379,7 +407,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
     await tx.fakturPembelian.update({ where: { id: fakturId }, data: { status } });
 
     // harga pokok rata-rata tidak berubah saat barang keluar, jadi jurnal aman dihitung setelah stok berkurang
-    const jurnal = await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total, ppn }, barisRetur, pengaturan.akunPpnMasukanId);
+    const jurnal = await catatJurnalReturPembelian(tx, { nomor: retur.nomor, total, ppn, perusahaanId }, barisRetur, pengaturan.akunPpnMasukanId);
     if (jurnal) await tx.returPembelian.update({ where: { id: retur.id }, data: { jurnalId: jurnal.id } });
     await tandaiProyek(tx, jurnal, faktur.pesanan?.proyekId);
   });
