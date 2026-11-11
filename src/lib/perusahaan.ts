@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { diLuarPermintaan, penggunaSaatIni, pastikanHak, sesiSaatIni, wajibMasukAksi } from "@/lib/otentikasi";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
-import { akunPemetaanTambahan, pastikanAkunMilik } from "@/lib/baganAkun";
+import { pastikanAkunMilik } from "@/lib/baganAkun";
 import { D, type Desimal } from "@/lib/uang";
 
 /*
@@ -181,33 +181,66 @@ export { pastikanAkunMilik };
 export { kunciPeriodeGaji } from "@/lib/sdm";
 
 type AkunRingkas = { id: string; kode: string; nama: string };
+type AkunCalon = AkunRingkas & { jenis: string; kelompok: boolean; perusahaanId: string | null };
+
+const PERAN_ANTAR = {
+  piutang: { label: "Piutang Antar Perusahaan", jenis: "ASET", labelJenis: "Aset", kunci: "piutang-antar-perusahaan" },
+  hutang: { label: "Hutang Antar Perusahaan", jenis: "KEWAJIBAN", labelJenis: "Kewajiban", kunci: "hutang-antar-perusahaan" },
+} as const;
 
 /**
- * Akun Piutang/Hutang Antar Perusahaan: pemetaan tambahan "piutang-antar-perusahaan"/"hutang-antar-perusahaan",
- * kalau kosong akun standar 1-1750/2-1550 (D1 §4.5). null bila keduanya tidak ada.
+ * Akun dari pemetaan tambahan atau kode standar, lalu diperiksa: jenis benar (ASET untuk piutang, KEWAJIBAN untuk
+ * hutang), bukan kelompok, dan tanpa pemilik (akun ini dipakai dua perusahaan sekaligus, jadi akun berpemilik akan
+ * ditolak catatJurnal di salah satu sisi). Kode standar 1-1750/2-1550 bisa saja sudah dipakai akun buatan pengguna
+ * sebelum bagan standar diterapkan (tinjauan P11 butir 2). Akun yang tidak cocok tidak dikembalikan; alasannya di `masalah`.
  */
-export async function akunAntarPerusahaan(klien: Klien): Promise<{ piutang: AkunRingkas | null; hutang: AkunRingkas | null }> {
-  const pilih = { id: true, kode: true, nama: true } as const;
+async function bacaAkunAntarPerusahaan(klien: Klien): Promise<{ piutang: AkunRingkas | null; hutang: AkunRingkas | null; masalah: string[] }> {
+  const pilih = { id: true, kode: true, nama: true, jenis: true, kelompok: true, perusahaanId: true } as const;
   const [petaPiutang, petaHutang, standarPiutang, standarHutang] = await Promise.all([
-    akunPemetaanTambahan(klien, "piutang-antar-perusahaan"),
-    akunPemetaanTambahan(klien, "hutang-antar-perusahaan"),
+    klien.pemetaanAkunTambahan.findUnique({ where: { kunci: PERAN_ANTAR.piutang.kunci }, select: { akun: { select: pilih } } }),
+    klien.pemetaanAkunTambahan.findUnique({ where: { kunci: PERAN_ANTAR.hutang.kunci }, select: { akun: { select: pilih } } }),
     klien.akun.findUnique({ where: { kode: "1-1750" }, select: pilih }),
     klien.akun.findUnique({ where: { kode: "2-1550" }, select: pilih }),
   ]);
-  const ringkas = (a: AkunRingkas | null) => (a ? { id: a.id, kode: a.kode, nama: a.nama } : null);
-  return { piutang: ringkas(petaPiutang ?? standarPiutang), hutang: ringkas(petaHutang ?? standarHutang) };
+  const masalah: string[] = [];
+  const periksa = (a: AkunCalon | null | undefined, peran: (typeof PERAN_ANTAR)[keyof typeof PERAN_ANTAR]): AkunRingkas | null => {
+    if (!a) return null;
+    if (a.jenis === peran.jenis && !a.kelompok && a.perusahaanId === null) return { id: a.id, kode: a.kode, nama: a.nama };
+    masalah.push(
+      `Akun ${a.kode} ${a.nama} tidak bisa dipakai sebagai ${peran.label}: harus akun ${peran.labelJenis} rinci yang dipakai bersama (tanpa pemilik). Perbaiki akunnya atau atur pemetaan tambahan ${peran.kunci} di Pengaturan, Pemetaan Akun`,
+    );
+    return null;
+  };
+  return {
+    piutang: periksa(petaPiutang?.akun ?? standarPiutang, PERAN_ANTAR.piutang),
+    hutang: periksa(petaHutang?.akun ?? standarHutang, PERAN_ANTAR.hutang),
+    masalah,
+  };
+}
+
+/**
+ * Akun Piutang/Hutang Antar Perusahaan: pemetaan tambahan "piutang-antar-perusahaan"/"hutang-antar-perusahaan",
+ * kalau kosong akun standar 1-1750/2-1550 (D1 §4.5). null bila akunnya tidak ada. Melempar galat yang menyebut akun
+ * dan cara memperbaikinya bila akun yang ditemukan bukan akun ASET/KEWAJIBAN rinci tanpa pemilik.
+ */
+export async function akunAntarPerusahaan(klien: Klien): Promise<{ piutang: AkunRingkas | null; hutang: AkunRingkas | null }> {
+  const { piutang, hutang, masalah } = await bacaAkunAntarPerusahaan(klien);
+  if (masalah.length > 0) throw new Error(masalah.join(". "));
+  return { piutang, hutang };
 }
 
 /**
  * Saldo gabungan (semua perusahaan) kedua akun antar perusahaan sampai tanggal itu, untuk catatan laporan gabungan
  * (D1 §4.6). piutang = debit - kredit, hutang = kredit - debit, selisih = piutang - hutang (0 bila semua transaksi
  * antar perusahaan tercatat di kedua sisi). akunPiutang/akunHutang berisi "kode nama", null bila akunnya tidak ada.
+ * Tidak melempar galat untuk akun yang tidak cocok (halaman laporan tetap tampil): akun itu dianggap tidak ada dan
+ * alasannya dikembalikan di `masalah`.
  */
 export async function saldoAntarPerusahaan(
   klien: Klien,
   sampai: Date,
-): Promise<{ piutang: Desimal; hutang: Desimal; selisih: Desimal; akunPiutang: string | null; akunHutang: string | null }> {
-  const akun = await akunAntarPerusahaan(klien);
+): Promise<{ piutang: Desimal; hutang: Desimal; selisih: Desimal; akunPiutang: string | null; akunHutang: string | null; masalah: string[] }> {
+  const akun = await bacaAkunAntarPerusahaan(klien);
   const jumlah = async (a: AkunRingkas | null) => {
     if (!a) return { debit: D(0), kredit: D(0) };
     const r = await klien.barisJurnal.aggregate({ where: { akunId: a.id, jurnal: { tanggal: { lte: sampai } } }, _sum: { debit: true, kredit: true } });
@@ -217,5 +250,5 @@ export async function saldoAntarPerusahaan(
   const piutang = p.debit.minus(p.kredit);
   const hutang = h.kredit.minus(h.debit);
   const label = (a: AkunRingkas | null) => (a ? `${a.kode} ${a.nama}` : null);
-  return { piutang, hutang, selisih: piutang.minus(hutang), akunPiutang: label(akun.piutang), akunHutang: label(akun.hutang) };
+  return { piutang, hutang, selisih: piutang.minus(hutang), akunPiutang: label(akun.piutang), akunHutang: label(akun.hutang), masalah: akun.masalah };
 }

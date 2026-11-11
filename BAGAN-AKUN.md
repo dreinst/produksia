@@ -2,7 +2,7 @@
 
 Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber datanya ada di `src/lib/baganAkunStandar.ts`; tabel di bawah dihasilkan oleh `npx tsx skrip/cetak-bagan-akun.ts` — ubah data di kode, lalu cetak ulang, jangan edit tabel ini secara manual.
 
-**Ringkasan:** 117 akun — 24 akun kelompok (induk) dan 93 akun rinci; 40 persis dari catatan asli, 57 usulan sesuai standar akuntansi (SAK EMKM), 20 keputusan atas butir yang semula pending.
+**Ringkasan:** 124 akun, terdiri dari 24 akun kelompok (induk) dan 100 akun rinci; 40 persis dari catatan asli, 64 usulan sesuai standar akuntansi (SAK EMKM), 20 keputusan atas butir yang semula pending.
 
 ## Cara pakai di sistem
 
@@ -68,7 +68,7 @@ Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (
 | Diskon & Cashback | Diskon Penjualan dipindah ke 4-8100 (kontra-pendapatan, mengurangi pendapatan bersih) sesuai standar; Cashback tetap di Beban Pemasaran karena sifatnya promosi. |
 | Pendapatan Flagship: tiket, sponsor, tenant | Dirinci jadi tiga akun rinci di bawah Pendapatan Event: 4-1300 Tiket, 4-1400 Sponsor, 4-1500 Tenant & Booth (14 Sep 2026). Uang tiket/sponsor sebelum acara dicatat sebagai Uang Muka Pelanggan dan diakui saat acara (PSAK 72). Jasa standar (tiket, paket sponsor, booth) dan pelanggan 'Pelanggan Umum' untuk rekap tiket ritel diterapkan bersama bagan akun. |
 | Beban Lain-lain (1) & (2) | Tetap dipisah, diberi nama tegas: Beban Sosial & Sponsorship (5-8000) dan Beban Administrasi Bank (5-8500). |
-| Penomoran kode akun | Format standar X-YZWW (umum dipakai software akuntansi komersial): digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan. |
+| Penomoran kode akun | Format standar X-YZWW: digit pertama jenis, ratusan kelompok, puluhan akun rinci; celah nomor disisakan untuk penambahan. |
 | Obligasi & Investasi | Dipindah ke kelompok baru Investasi Jangka Panjang (1-3000) sesuai usulan draft. |
 
 ## Daftar akun
@@ -85,6 +85,7 @@ Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (
 | `1-1600` | &nbsp;&nbsp;&nbsp;Persediaan | Aset | pemetaan | **usul** | Barang produksi & merchandise yang dijual (dipakai otomatis oleh modul stok) |
 | `1-1650` | &nbsp;&nbsp;&nbsp;Barang Terkirim Belum Ditagih | Aset | pemetaan | **usul** | Aset sementara antara Surat Jalan (SJ) dan Faktur Penjualan (FJ); dipakai otomatis oleh sistem |
 | `1-1700` | &nbsp;&nbsp;&nbsp;Piutang Lain-lain | Aset |  | **usul** | Kasbon karyawan/crew, piutang non-usaha |
+| `1-1750` | &nbsp;&nbsp;&nbsp;Piutang Antar Perusahaan | Aset |  | **usul** | Tagihan ke perusahaan lain dalam grup D'Pro; dipakai otomatis oleh Transaksi Antar Perusahaan |
 | `1-1800` | &nbsp;&nbsp;&nbsp;PPN Masukan | Aset |  | **usul** | PPN yang dibayar ke vendor (hanya bila PKP); dipakai otomatis oleh Faktur Pembelian |
 | `1-1900` | &nbsp;&nbsp;&nbsp;Pajak Dibayar Dimuka (PPh 23) | Aset |  | **usul** | PPh 23 yang dipotong klien dari pembayaran; dipakai otomatis oleh Penerimaan |
 | `1-2000` | **Aset Tetap** | Aset | kelompok | asli |  |
@@ -110,7 +111,9 @@ Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (
 | `2-1330` | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hutang PPN (Keluaran) | Kewajiban |  | **usul** | PPN yang dipungut dari klien (hanya bila PKP); dipakai otomatis oleh Faktur Penjualan |
 | `2-1400` | &nbsp;&nbsp;&nbsp;Beban yang Masih Harus Dibayar | Kewajiban |  | **usul** | Gaji/listrik/vendor yang sudah jadi beban tapi belum ditagih |
 | `2-1500` | &nbsp;&nbsp;&nbsp;Hutang Lain-lain | Kewajiban |  | **usul** |  |
+| `2-1550` | &nbsp;&nbsp;&nbsp;Hutang Antar Perusahaan | Kewajiban |  | **usul** | Kewajiban ke perusahaan lain dalam grup D'Pro; dipakai otomatis oleh Transaksi Antar Perusahaan |
 | `2-1600` | &nbsp;&nbsp;&nbsp;Barang Diterima Belum Ditagih | Kewajiban | pemetaan | **usul** | Kewajiban sementara antara Terima Barang (TB) dan Faktur Pembelian (FB); dipakai otomatis oleh sistem |
+| `2-1700` | &nbsp;&nbsp;&nbsp;Hutang Mitra Proyek | Kewajiban |  | **usul** | Dana talangan mitra proyek yang belum dikembalikan; dikredit saat Talangan Mitra disetujui, didebit saat modal dikembalikan |
 | `2-2000` | **Kewajiban Jangka Panjang** | Kewajiban | kelompok | **usul** |  |
 | `2-2100` | &nbsp;&nbsp;&nbsp;Hutang Bank | Kewajiban |  | **usul** |  |
 | `2-2200` | &nbsp;&nbsp;&nbsp;Hutang Pihak Berelasi | Kewajiban |  | **usul** | Pinjaman dari pemilik/keluarga/afiliasi |
@@ -141,6 +144,9 @@ Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (
 | `5-1200` | &nbsp;&nbsp;&nbsp;Biaya Langsung Event | Beban | pemetaan | **usul** | Vendor, crew lepas, sewa venue per event |
 | `5-1300` | &nbsp;&nbsp;&nbsp;Biaya Langsung Produksi | Beban |  | **usul** | Bahan dekor, cetak, jasa dokumentasi per pesanan |
 | `5-1400` | &nbsp;&nbsp;&nbsp;Selisih Persediaan | Beban | pemetaan | **usul** | Selisih opname/koreksi stok dan beda harga retur pembelian; dipakai otomatis oleh sistem |
+| `5-1500` | &nbsp;&nbsp;&nbsp;Biaya Talent / Artis | Beban |  | **usul** | Honor talent, artis, dan pengisi acara per event; akun bawaan kategori anggaran Talent / Artis |
+| `5-1600` | &nbsp;&nbsp;&nbsp;Sewa Venue Event | Beban |  | **usul** | Sewa tempat acara per event; akun bawaan kategori anggaran Venue |
+| `5-1700` | &nbsp;&nbsp;&nbsp;Bagi Hasil Mitra Proyek | Beban |  | **usul** | Bagian laba proyek yang dibayarkan ke mitra; tidak dihitung sebagai biaya aktual proyek |
 | `5-2000` | **Beban Gaji & Honor** | Beban | kelompok | asli |  |
 | `5-2100` | &nbsp;&nbsp;&nbsp;Gaji Pokok | Beban |  | asli |  |
 | `5-2200` | &nbsp;&nbsp;&nbsp;Upah Harian | Beban |  | asli |  |
@@ -183,6 +189,7 @@ Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (
 | `5-8500` | **Beban Administrasi Bank** | Beban | kelompok | **keputusan** | 'Beban Lain-lain (2)', dipisah karena sifatnya biaya keuangan, bukan sosial |
 | `5-8510` | &nbsp;&nbsp;&nbsp;Administrasi Bank – Rekening Operasional | Beban |  | asli | Satu akun per rekening, sejajar dengan 1-12x0 |
 | `5-8520` | &nbsp;&nbsp;&nbsp;Pajak Bunga Bank | Beban |  | asli |  |
+| `5-8530` | &nbsp;&nbsp;&nbsp;Selisih Kurs | Beban | pemetaan | **usul** | Laba/rugi kurs piutang & hutang mata uang asing; laba dikredit ke akun ini, rugi didebit (Pengaturan › Mata Uang & Kurs) |
 | `5-9000` | **Beban Pajak** | Beban | kelompok | asli |  |
 | `5-9100` | &nbsp;&nbsp;&nbsp;PPh Final UMKM (0,5%) | Beban |  | **usul** | Catatan asli belum punya sub-item |
 | `5-9200` | &nbsp;&nbsp;&nbsp;PBB & Pajak Kendaraan | Beban |  | **usul** |  |

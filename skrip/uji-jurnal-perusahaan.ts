@@ -4,7 +4,8 @@ process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
 import type { Prisma } from "../src/prisma-klien/client";
 import { D } from "../src/lib/uang";
-import { PERUSAHAAN_UTAMA } from "../src/lib/perusahaan";
+import { PERUSAHAAN_UTAMA, akunAntarPerusahaan, saldoAntarPerusahaan } from "../src/lib/perusahaan";
+import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
 import { BAGAN_AKUN_STANDAR } from "../src/lib/baganAkunStandar";
 import { JASA_FLAGSHIP_STANDAR, terapkanDataFlagship } from "../src/lib/flagshipStandar";
 import {
@@ -183,6 +184,38 @@ async function main() {
   const karyawanU = await db.karyawan.create({ data: { kode: `${KODE}-KRY-U`, nama: "Karyawan Uji Jurnal Perusahaan", gajiPokok: 2_000_000, perusahaanId: U } });
   const karyawanUBebanUt = await db.karyawan.create({ data: { kode: `${KODE}-KRY-U2`, nama: "Karyawan Uji Beban Utama", gajiPokok: 1_000_000, perusahaanId: U, akunBebanId: bebanUt.id } });
   pastikan(true, `perusahaan uji ${U}, akun, gudang, barang, pelanggan, dan karyawan uji dibuat`);
+
+  console.log("=== 2b. Kode akun standar yang dipakai akun lain (tinjauan P11 butir 2) ===");
+  {
+    const KODE_BARU = ["1-1750", "2-1550", "2-1700", "5-1500", "5-1600", "5-1700"];
+    const tanpaPeta = (await db.pemetaanAkunTambahan.count({ where: { kunci: { in: ["piutang-antar-perusahaan", "hutang-antar-perusahaan"] } } })) === 0;
+    const hasil = await dalamTxBatal(async (tx) => {
+      const awal = await terapkanBaganAkunStandar(tx);
+      const normal = tanpaPeta ? await akunAntarPerusahaan(tx) : null;
+      // akun pengguna yang kebetulan memakai kode standar: 1-1750 dijadikan BEBAN, 2-1550 diberi pemilik
+      await tx.akun.update({ where: { kode: "1-1750" }, data: { jenis: "BEBAN" } });
+      const beda = await terapkanBaganAkunStandar(tx);
+      let galatJenis = "";
+      await akunAntarPerusahaan(tx).catch((e: Error) => (galatJenis = e.message));
+      const saldo = await saldoAntarPerusahaan(tx, new Date());
+      await tx.akun.update({ where: { kode: "1-1750" }, data: { jenis: "ASET", kelompok: true } });
+      let galatKelompok = "";
+      await akunAntarPerusahaan(tx).catch((e: Error) => (galatKelompok = e.message));
+      await tx.akun.update({ where: { kode: "1-1750" }, data: { kelompok: false } });
+      await tx.akun.update({ where: { kode: "2-1550" }, data: { perusahaanId: U } });
+      let galatPemilik = "";
+      await akunAntarPerusahaan(tx).catch((e: Error) => (galatPemilik = e.message));
+      return { awal, normal, beda, galatJenis, saldo, galatKelompok, galatPemilik };
+    });
+    pastikan(hasil.awal.berbeda.every((b) => !KODE_BARU.includes(b.kode)), "data seed: enam kode standar baru tidak dilaporkan berbeda");
+    if (hasil.normal) pastikan(hasil.normal.piutang?.kode === "1-1750" && hasil.normal.hutang?.kode === "2-1550", "tanpa pemetaan tambahan: akunAntarPerusahaan memakai 1-1750 dan 2-1550 standar");
+    const b1750 = hasil.beda.berbeda.find((b) => b.kode === "1-1750");
+    pastikan(b1750?.jenis === "BEBAN" && b1750.jenisStandar === "ASET" && b1750.namaStandar === "Piutang Antar Perusahaan" && hasil.beda.dibuat === 0, "terapkanBaganAkunStandar melaporkan kode yang sudah ada dengan jenis berbeda, tanpa mengubahnya");
+    pastikan(hasil.galatJenis.includes("Akun 1-1750") && hasil.galatJenis.includes("tidak bisa dipakai sebagai Piutang Antar Perusahaan") && hasil.galatJenis.includes("piutang-antar-perusahaan"), `akun 1-1750 berjenis BEBAN ditolak dengan pesan jelas: "${hasil.galatJenis}"`);
+    pastikan(hasil.saldo.akunPiutang === null && hasil.saldo.piutang.isZero() && hasil.saldo.masalah.length === 1, "saldoAntarPerusahaan tidak melempar: akun yang tidak cocok dianggap tidak ada dan alasannya dikembalikan");
+    pastikan(hasil.galatKelompok.includes("Akun 1-1750"), "akun kelompok ditolak sebagai Piutang Antar Perusahaan");
+    pastikan(hasil.galatPemilik.includes("Akun 2-1550") && hasil.galatPemilik.includes("Hutang Antar Perusahaan") && !hasil.galatPemilik.includes("1-1750"), "akun berpemilik ditolak sebagai Hutang Antar Perusahaan");
+  }
 
   console.log("=== 3. catatJurnal wajib perusahaan (D1 §4.1, §9.1 kasus 22) ===");
   const barisKas = (debit: string, kredit: string, nilai = 1000) => [
@@ -369,7 +402,20 @@ async function main() {
   await dengan({ perusahaan: U }, () => jalankan("koreksi stok barang perusahaan uji", () => ubahStokBarang(barangU.id, formulir({ gudangId: gudangU.id, stok: 5, akunLawanId: pendapatanB.id }))));
   const psStok = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { baris: { some: { barangId: barangU.id } } }, include: { jurnal: true } });
   pastikan(psStok.jurnal?.perusahaanId === U && psStok.jurnal.nomor.startsWith("JU-PS"), "jurnal JU-PS koreksi stok milik pemilik barang");
+  pastikan(psStok.perusahaanId === U, "dokumen penyesuaian koreksi stok milik pemilik barang (mode langsung)");
   await jalankan("hapus koreksi stok", () => hapusDokumen("penyesuaian", psStok.id));
+  // tinjauan P11 butir 1: saat persetujuan menyala, draf dan jurnal saat disetujui juga milik pemilik barang
+  aturPersetujuan(true);
+  await dengan({ perusahaan: U }, () => jalankan("koreksi stok draf barang perusahaan uji", () => ubahStokBarang(barangU.id, formulir({ gudangId: gudangU.id, stok: 7, akunLawanId: pendapatanB.id }))));
+  aturPersetujuan(false);
+  const psDraf = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { baris: { some: { barangId: barangU.id } } } });
+  pastikan(psDraf.statusPersetujuan === "DRAFT" && psDraf.perusahaanId === U && psDraf.jurnalId === null, "koreksi stok saat persetujuan menyala: draf milik pemilik barang, belum berjurnal");
+  const posPs = await dalamTxBatal(async (tx) => {
+    await BERKAS.penyesuaian.posting(tx, psDraf.id);
+    return (await tx.penyesuaianPersediaan.findUniqueOrThrow({ where: { id: psDraf.id }, include: { jurnal: true } })).jurnal;
+  });
+  pastikan(posPs?.perusahaanId === U && posPs.nomor.startsWith("JU-PS"), "posting draf koreksi stok: jurnal JU-PS milik perusahaan dokumen = pemilik barang");
+  await jalankan("hapus koreksi stok draf", () => hapusDokumen("penyesuaian", psDraf.id));
 
   console.log("=== 10. Hapus transaksi antar perusahaan (D1 §4.5, §4.11) ===");
   const pap = await db.akun.findUniqueOrThrow({ where: { kode: "1-1750" } });

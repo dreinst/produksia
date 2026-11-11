@@ -469,6 +469,25 @@ async function main() {
     pastikan(galat instanceof GalatIsiTerlaluTinggi && (galat as Error).message.includes("Perpendek"), "baris teks lebih tinggi dari halaman kosong: GalatIsiTerlaluTinggi dengan pesan yang bisa dibaca");
     await k.selesai();
   }
+  {
+    // tinjauan P11 butir 3: kepala yang diulang ditambah satu baris teks lebih tinggi dari area halaman tidak boleh
+    // membuat halaman baru tanpa henti; sesudah satu kali pindah halaman tanpa kemajuan, galat dilempar
+    const { k } = kanvasUji(KERTAS.A5_LANDSCAPE);
+    const tinggiKepala = k.tinggiArea - 30;
+    let galat: unknown = null;
+    try {
+      gambarTabel(k, {
+        x: k.mm(15),
+        kolom: [100, 100],
+        kepala: { sel: [{ isi: "KEPALA", ukuran: 9, tinggiBaris: { pasti: tinggiKepala } }, { isi: "TINGGI", ukuran: 9 }] },
+        baris: [{ sel: [{ isi: "a\nb\nc", ukuran: 9, tinggiBaris: { pasti: 40 } }, { isi: "d", ukuran: 9 }] }],
+      });
+    } catch (e) {
+      galat = e;
+    }
+    pastikan(galat instanceof GalatIsiTerlaluTinggi && k.halamanKe <= 3, `kepala tinggi ditambah satu baris teks melebihi halaman: GalatIsiTerlaluTinggi di halaman ${k.halamanKe}, tidak berulang tanpa akhir`);
+    await k.selesai();
+  }
 
   console.log("=== 9. Impor ===");
   const sumberKlien = ["src/lib/cetak/tipe.ts", "src/lib/cetak/format.ts", "src/lib/cetak/terbilang.ts"].map((f) => readFileSync(f, "utf8"));

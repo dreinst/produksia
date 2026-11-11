@@ -140,6 +140,9 @@ function gambarBarisTerpecah(k: KanvasCetak, def: DefTabel, b: BarisTerukur, gay
   const mulai = b.sel.map(() => 0);
   const sisaTinggi = () => Math.max(0, ...b.sel.map((s, i) => (mulai[i] < s.jumlahBaris ? s.pad[0] + (s.jumlahBaris - mulai[i]) * tinggiBarisSel(s) + s.pad[2] : 0)));
   let pertama = true;
+  // true sesudah pindah halaman (dan kepala diulang). Bila tetap tidak ada kemajuan, pindah lagi tidak akan membantu:
+  // kepala ditambah satu baris teks lebih tinggi dari area halaman (tinjauan P11 butir 3).
+  let baruPindah = false;
   for (;;) {
     const ruang = k.sisa();
     const rentang = b.sel.map((s, i) => {
@@ -150,9 +153,10 @@ function gambarBarisTerpecah(k: KanvasCetak, def: DefTabel, b: BarisTerukur, gay
     const terakhir = sisaTinggi() <= ruang + 0.01;
     const maju = rentang.some((r) => r.sampai > r.dari);
     if (!terakhir && !maju) {
-      if (k.halamanKosong()) throw new GalatIsiTerlaluTinggi();
+      if (k.halamanKosong() || baruPindah) throw new GalatIsiTerlaluTinggi();
       k.lanjutHalaman();
       if (kepala && (def.ulangKepala ?? true)) gambarBaris(k, def, kepala, {});
+      baruPindah = true;
       continue;
     }
     const tinggi = terakhir ? Math.max(sisaTinggi(), pertama ? (b.baris.tinggiMin ?? 0) : 0) : ruang;
@@ -165,6 +169,7 @@ function gambarBarisTerpecah(k: KanvasCetak, def: DefTabel, b: BarisTerukur, gay
     k.peringatan(`Baris tabel lebih tinggi dari satu halaman dipecah di halaman ${k.halamanKe}`);
     k.lanjutHalaman();
     if (kepala && (def.ulangKepala ?? true)) gambarBaris(k, def, kepala, {});
+    baruPindah = true;
   }
 }
 

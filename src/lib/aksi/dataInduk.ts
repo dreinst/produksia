@@ -144,6 +144,8 @@ async function buatBarangDenganJumlahAwal(pengguna: PenggunaSesi, data: Record<s
         gudangId: gudangAwalId,
         akunLawanId: akunLawanAwalId,
         keterangan,
+        // dokumen milik pemilik barang, jadi jurnalnya sama di mode langsung dan saat disetujui (tinjauan P11 butir 1)
+        perusahaanId: barang.perusahaanId ?? undefined,
         ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
         baris: { create: [{ barangId: barang.id, jumlahSebelum: D(0), jumlahSesudah: jumlahAwal, hargaSatuan }] },
       },
@@ -258,6 +260,7 @@ export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
         gudangId,
         akunLawanId,
         keterangan,
+        perusahaanId: barang.perusahaanId ?? undefined,
         ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" as const } : dataLangsungDisetujui(pengguna)),
         baris: { create: [{ barangId, jumlahSebelum, jumlahSesudah: stokBaru, hargaSatuan }] },
       },

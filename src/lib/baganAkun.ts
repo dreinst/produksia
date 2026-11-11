@@ -1,18 +1,30 @@
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
-import { BAGAN_AKUN_STANDAR, PEMETAAN_STANDAR } from "@/lib/baganAkunStandar";
+import type { JenisAkun } from "@/prisma-klien/enums";
+import { BAGAN_AKUN_STANDAR, PEMETAAN_STANDAR, type AkunStandar } from "@/lib/baganAkunStandar";
 
 type Klien = PrismaClient | Prisma.TransactionClient;
 
-export type HasilTerapkanBagan = { dibuat: number; sudahAda: number; pemetaanDibuat: boolean };
+/** Akun yang kodenya sama dengan akun standar tetapi jenis atau tanda kelompoknya berbeda (mis. akun buatan pengguna). */
+export type AkunStandarBerbeda = { kode: string; nama: string; jenis: JenisAkun; kelompok: boolean; namaStandar: string; jenisStandar: JenisAkun; kelompokStandar: boolean };
+
+export type HasilTerapkanBagan = { dibuat: number; sudahAda: number; pemetaanDibuat: boolean; berbeda: AkunStandarBerbeda[] };
+
+/** Membandingkan akun yang sudah ada dengan definisi standarnya; null bila jenis dan tanda kelompoknya sama. */
+export function bedaDenganStandar(ada: { kode: string; nama: string; jenis: JenisAkun; kelompok: boolean }, standar: AkunStandar): AkunStandarBerbeda | null {
+  const kelompokStandar = standar.kelompok ?? false;
+  if (ada.jenis === standar.jenis && ada.kelompok === kelompokStandar) return null;
+  return { kode: ada.kode, nama: ada.nama, jenis: ada.jenis, kelompok: ada.kelompok, namaStandar: standar.nama, jenisStandar: standar.jenis, kelompokStandar };
+}
 
 /**
  * Menerapkan Bagan Akun Standar: akun yang kodenya belum ada dibuat (lengkap dengan induk & tanda),
  * yang sudah ada dibiarkan (nama/tanda buatan pengguna tidak ditimpa; hanya induk yang kosong dilengkapi).
- * Idempoten, aman dijalankan berkali-kali. Pemetaan akun dibuat bila belum ada.
+ * Idempoten, aman dijalankan berkali-kali. Pemetaan akun dibuat bila belum ada. Kode yang sudah ada dengan jenis
+ * atau tanda kelompok berbeda dari standar dilaporkan di `berbeda` (tidak diubah), supaya Pemilik bisa memutuskan.
  */
 export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<HasilTerapkanBagan> {
-  const hasil: HasilTerapkanBagan = { dibuat: 0, sudahAda: 0, pemetaanDibuat: false };
+  const hasil: HasilTerapkanBagan = { dibuat: 0, sudahAda: 0, pemetaanDibuat: false, berbeda: [] };
   const idByKode = new Map<string, string>();
 
   for (const a of BAGAN_AKUN_STANDAR) {
@@ -21,6 +33,8 @@ export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<Hasil
     if (ada) {
       idByKode.set(a.kode, ada.id);
       hasil.sudahAda++;
+      const beda = bedaDenganStandar(ada, a);
+      if (beda) hasil.berbeda.push(beda);
       if (!ada.indukId && indukId) await klien.akun.update({ where: { id: ada.id }, data: { indukId } });
       continue;
     }

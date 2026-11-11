@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { BAGAN_AKUN_STANDAR, KEPUTUSAN_KURASI, PEMETAAN_STANDAR, kedalamanAkun, type AsalAkun } from "@/lib/baganAkunStandar";
 import { terapkanBaganAkunFormulir } from "@/lib/aksi/pengaturan";
+import { bedaDenganStandar } from "@/lib/baganAkun";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import Ikon from "@/komponen/ui/Ikon";
@@ -17,12 +18,21 @@ const LABEL_JENIS: Record<string, string> = { ASET: "Aset", KEWAJIBAN: "Kewajiba
 export default async function HalamanBaganAkunStandar() {
   await wajibHak("pengaturan.tulis");
   const [daftarAda, pemetaan] = await Promise.all([
-    db.akun.findMany({ select: { kode: true } }),
+    db.akun.findMany({ select: { kode: true, nama: true, jenis: true, kelompok: true } }),
     db.pemetaanAkun.findUnique({ where: { id: "default" } }),
   ]);
   const kodeAda = new Set(daftarAda.map((a) => a.kode));
   const peta = new Map(BAGAN_AKUN_STANDAR.map((a) => [a.kode, a]));
   const belumAda = BAGAN_AKUN_STANDAR.filter((a) => !kodeAda.has(a.kode));
+  // kode standar yang sudah dipakai akun lain dengan jenis atau tanda kelompok berbeda (tidak diubah saat diterapkan)
+  const akunAda = new Map(daftarAda.map((a) => [a.kode, a]));
+  const berbeda = new Map(
+    BAGAN_AKUN_STANDAR.flatMap((a) => {
+      const ada = akunAda.get(a.kode);
+      const beda = ada ? bedaDenganStandar(ada, a) : null;
+      return beda ? [[a.kode, beda] as const] : [];
+    }),
+  );
   const jumlahKelompok = BAGAN_AKUN_STANDAR.filter((a) => a.kelompok).length;
   const ringkasanAsal = (["ASLI", "USUL", "KEPUTUSAN"] as const).map((asal) => ({
     asal,
@@ -70,6 +80,23 @@ export default async function HalamanBaganAkunStandar() {
             <Ikon nama="account_tree" className="!text-[18px]" />
             {belumAda.length === 0 ? (pemetaan ? "Semua akun sudah ada" : "Isi pemetaan akun") : `Buat ${belumAda.length} akun`}
           </button>
+          {berbeda.size > 0 && (
+            <div className="ubin border-amber-200 bg-amber-50 text-sm text-amber-800 space-y-1">
+              <p className="font-semibold">{berbeda.size} kode standar sudah dipakai akun dengan jenis berbeda</p>
+              <p className="text-xs leading-relaxed">
+                Akun ini tidak diubah saat diterapkan. Fitur yang memakai kode itu secara otomatis (mis. Piutang dan Hutang Antar Perusahaan) akan menolaknya sampai akunnya diganti kode atau pemetaan tambahannya diatur.
+              </p>
+              <ul className="text-xs list-disc pl-4">
+                {[...berbeda.values()].map((b) => (
+                  <li key={b.kode}>
+                    <span className="mono">{b.kode}</span> {b.nama}: {LABEL_JENIS[b.jenis]}
+                    {b.kelompok ? " (kelompok)" : ""}, standar {LABEL_JENIS[b.jenisStandar]}
+                    {b.kelompokStandar ? " (kelompok)" : ""} {b.namaStandar}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <p className="text-xs text-slate-500">
             Setelah diterapkan, ganti nama <span className="mono">1-1210</span> sesuai bank & nomor rekening, dan tambah rekening lain sebagai anak <span className="mono">1-1200</span> lewat Data Induk → Bagan Akun.
           </p>
@@ -140,7 +167,9 @@ export default async function HalamanBaganAkunStandar() {
                       <span className={`lencana ${LABEL_ASAL[a.asal].kelas}`}>{LABEL_ASAL[a.asal].label}</span>
                     </td>
                     <td>
-                      {ada ? (
+                      {ada && berbeda.has(a.kode) ? (
+                        <span className="inline-flex items-center gap-1 text-amber-700 text-xs font-semibold"><Ikon nama="error" className="!text-[16px]" />Ada, jenis berbeda</span>
+                      ) : ada ? (
                         <span className="inline-flex items-center gap-1 text-emerald-700 text-xs font-semibold"><Ikon nama="check_circle" className="!text-[16px]" />Ada</span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-blue-700 text-xs font-semibold"><Ikon nama="add" className="!text-[16px]" />Akan dibuat</span>
