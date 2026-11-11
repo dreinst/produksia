@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -28,9 +29,9 @@ export default async function HalamanPengirimanBaru({
         <h1 className="judul-halaman">Pengiriman Pesanan Baru</h1>
         <p className="redup">
           Pilih pesanan dari halaman{" "}
-          <a href="/penjualan/pesanan" className="font-semibold text-blue-600 hover:underline">
+          <Link href="/penjualan/pesanan" className="font-semibold text-blue-600 hover:underline">
             Pesanan Penjualan
-          </a>{" "}
+          </Link>{" "}
           lalu klik &quot;Kirim&quot;.
         </p>
       </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
@@ -36,9 +37,9 @@ export default async function HalamanPenerimaanPenjualanBaru({
         <h1 className="judul-halaman">Penerimaan Penjualan Baru</h1>
         <p className="redup">
           Pilih faktur dari halaman{" "}
-          <a href="/penjualan/faktur" className="font-semibold text-blue-600 hover:underline">
+          <Link href="/penjualan/faktur" className="font-semibold text-blue-600 hover:underline">
             Faktur Penjualan
-          </a>{" "}
+          </Link>{" "}
           lalu klik &quot;Terima Bayar&quot;.
         </p>
       </div>

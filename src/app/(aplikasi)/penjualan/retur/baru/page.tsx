@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -34,9 +35,9 @@ export default async function HalamanReturPenjualanBaru({
         <h1 className="judul-halaman">Retur Penjualan Baru</h1>
         <p className="redup">
           Pilih faktur dari halaman{" "}
-          <a href="/penjualan/faktur" className="font-semibold text-blue-600 hover:underline">
+          <Link href="/penjualan/faktur" className="font-semibold text-blue-600 hover:underline">
             Faktur Penjualan
-          </a>{" "}
+          </Link>{" "}
           lalu klik &quot;Retur&quot;.
         </p>
       </div>
