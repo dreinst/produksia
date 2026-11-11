@@ -4,24 +4,30 @@ import { NomorDokumen, Rp } from "@/komponen/ui/Lencana";
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import type { StatusPersetujuan } from "@/prisma-klien/enums";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 
 /**
  * Kas Masuk / Kas Keluar yang belum masuk buku besar (draf, menunggu, atau ditolak).
  * Dokumen yang sudah disetujui tidak tampil di sini: begitu disetujui, jurnal KM/KK-nya dibuat
  * dan barisnya muncul di tabel jurnal halaman yang sama.
+ * `perusahaanId` = lingkup halaman (KONTRAK-TAMBAHAN P18): string = hanya draf perusahaan itu, null = gabungan dengan
+ * kolom Perusahaan, tidak diisi = semua draf tanpa kolom (perilaku lama).
  */
 export default async function DaftarDokumenKasDraf({
   jenis,
   pengguna,
   bolehHapus,
+  perusahaanId,
 }: {
   jenis: "MASUK" | "KELUAR";
   pengguna: PenggunaSesi;
   bolehHapus: boolean;
+  perusahaanId?: string | null;
 }) {
+  const gabungan = perusahaanId === null;
   const daftar = await db.dokumenKas.findMany({
-    where: { jenis, statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] satisfies StatusPersetujuan[] } },
-    include: { akunKas: true, akunLawan: true, proyek: { select: { kode: true } }, diajukanOleh: { select: { nama: true } } },
+    where: { jenis, statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] satisfies StatusPersetujuan[] }, ...(perusahaanId ? { perusahaanId } : {}) },
+    include: { akunKas: true, akunLawan: true, proyek: { select: { kode: true } }, diajukanOleh: { select: { nama: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } },
     orderBy: { tanggal: "desc" },
   });
   if (daftar.length === 0) return null;
@@ -38,6 +44,7 @@ export default async function DaftarDokumenKasDraf({
           <thead>
             <tr>
               <th>No</th>
+              {gabungan && <th>Perusahaan</th>}
               <th>Tanggal</th>
               <th>Akun Kas/Bank</th>
               <th>Akun Lawan</th>
@@ -55,6 +62,11 @@ export default async function DaftarDokumenKasDraf({
                 <td>
                   <NomorDokumen nomor={d.nomor} />
                 </td>
+                {gabungan && (
+                  <td>
+                    <LencanaPerusahaan kode={d.perusahaan.kode} warna={d.perusahaan.warna} nama={d.perusahaan.nama} />
+                  </td>
+                )}
                 <td className="text-slate-500 whitespace-nowrap">
                   {d.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}
                 </td>

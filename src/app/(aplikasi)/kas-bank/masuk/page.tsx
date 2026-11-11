@@ -109,7 +109,7 @@ export default async function HalamanKasMasuk({ searchParams }: { searchParams: 
       </FormulirAksi>
       )}
 
-      <DaftarDokumenKasDraf jenis="MASUK" pengguna={pengguna} bolehHapus={bolehHapus} />
+      <DaftarDokumenKasDraf jenis="MASUK" pengguna={pengguna} bolehHapus={bolehHapus} perusahaanId={p} />
 
       <div className="kartu kartu-tabel">
         <KontrolDaftar param={param} total={total} placeholder="Cari nomor KM / keterangan…" />

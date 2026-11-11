@@ -7,15 +7,24 @@ import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import EditorBarisPenggajian from "@/komponen/sdm/EditorBarisPenggajian";
+import KolomPerusahaan from "@/komponen/KolomPerusahaan";
+import { db } from "@/lib/db";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir } from "@/lib/perusahaan";
 
-export default async function HalamanPenggajianBaru() {
+export default async function HalamanPenggajianBaru({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   await wajibHak("penggajian.buat");
-  const [daftarAkunKas, daftarKaryawan, daftarProyek, gaji] = await Promise.all([
-    daftarAkunKasBank(),
-    daftarKaryawanAktif(),
-    daftarProyekAktif(),
-    akunGajiBawaan(),
-  ]);
+  // Satu proses gaji = karyawan satu perusahaan (D1 §2.4.3, KONTRAK-TAMBAHAN P18). Lingkup satu perusahaan aktif:
+  // perusahaan lingkup (utama hanya isian tersembunyi, pola formulir halaman lama). Gabungan dan lingkup arsip:
+  // pemilih perusahaan (GET ?perusahaan=) dulu, supaya daftar karyawan, akun kas, dan event yang terisi awal milik
+  // perusahaan itu saja. Server tetap memvalidasi (pastikanKaryawanMilik, pastikanAkunMilik).
+  const [lingkup, semuaPerusahaan, sp] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan(), searchParams]);
+  const p = perusahaanFormulir(lingkup);
+  const mentah = Array.isArray(sp.perusahaan) ? sp.perusahaan[0] : sp.perusahaan;
+  const dipilih = p ? null : (semuaPerusahaan.find((x) => x.id === mentah) ?? null);
+  const pf = p ?? dipilih?.id ?? null;
+  const [daftarAkunKas, daftarKaryawan, daftarProyek, gaji] = pf
+    ? await Promise.all([daftarAkunKasBank(db, pf), daftarKaryawanAktif(db, pf), daftarProyekAktif(db, pf), akunGajiBawaan()])
+    : [[], [], [], await akunGajiBawaan()];
   const bulanIni = new Date().toISOString().slice(0, 7);
   const hariIni = new Date().toISOString().slice(0, 10);
 
@@ -33,11 +42,39 @@ export default async function HalamanPenggajianBaru() {
         </div>
       )}
 
+      {!p && (
+        <form method="get" className="kartu flex flex-wrap items-end gap-3 max-w-2xl">
+          <div className="bidang flex-1 min-w-[16rem]">
+            <label className="label" htmlFor="pilih-perusahaan">Perusahaan *</label>
+            <select id="pilih-perusahaan" name="perusahaan" required defaultValue={dipilih?.id ?? ""} className="isian">
+              <option value="">Pilih perusahaan…</option>
+              {semuaPerusahaan.map((x) => (
+                <option key={x.id} value={x.id}>{`${x.kode} - ${x.nama}`}</option>
+              ))}
+            </select>
+            <span className="petunjuk">
+              {lingkup.perusahaan && !lingkup.perusahaan.aktif ? `${lingkup.perusahaan.nama} sudah diarsipkan. ` : ""}
+              Satu proses gaji untuk karyawan satu perusahaan. Karyawan, akun kas, dan event di bawah mengikuti perusahaan yang dipilih.
+            </span>
+          </div>
+          <button type="submit" className="tombol tombol-garis">Tampilkan karyawan</button>
+        </form>
+      )}
+
+      {pf && (
       <FormulirAksi
         aksi={buatPenggajianFormulir}
         className="kartu grid grid-cols-1 md:grid-cols-2 gap-4"
         verifikasi={{ judul: "Periksa proses gaji", peringatan: [PERINGATAN_TANPA_EVENT] }}
       >
+        {lingkup.perusahaanId === PERUSAHAAN_UTAMA || dipilih ? (
+          <input type="hidden" name="perusahaanId" value={pf} />
+        ) : (
+          <>
+            <KolomPerusahaan lingkup={lingkup} daftar={semuaPerusahaan} />
+            <div className="hidden md:block" />
+          </>
+        )}
         <div className="bidang">
           <label className="label" htmlFor="periode">Periode *</label>
           <input id="periode" name="periode" type="month" required defaultValue={bulanIni} max={bulanIni} className="isian" />
@@ -81,6 +118,7 @@ export default async function HalamanPenggajianBaru() {
           </button>
         </div>
       </FormulirAksi>
+      )}
     </div>
   );
 }

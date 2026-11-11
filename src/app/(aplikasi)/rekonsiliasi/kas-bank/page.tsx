@@ -11,6 +11,7 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import Ikon from "@/komponen/ui/Ikon";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan } from "@/lib/perusahaan";
 
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
 const tgl = (d: Date) => d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
@@ -19,7 +20,12 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
   const pengguna = await wajibHak("rekonsiliasi.lihat");
   const bolehTulis = punyaHak(pengguna, "rekonsiliasi.tulis");
   const param = await searchParams;
-  const [daftarAkun, pengaturan] = await Promise.all([daftarAkunKasBank(), ambilPengaturanPerusahaan(db)]);
+  // Lingkup perusahaan (D1 §8.4, R-12): pilihan akun = akun kas/bank milik perusahaan lingkup atau bersama. Perhitungan
+  // per akun TIDAK disaring perusahaan, karena saldo rekening koran mencakup semua jurnal akun itu.
+  const { perusahaanId: p } = await lingkupPerusahaan();
+  const [daftarAkun, pengaturan, semuaPerusahaan] = await Promise.all([daftarAkunKasBank(db, p), ambilPengaturanPerusahaan(db), daftarPerusahaan(true)]);
+  const kodePerusahaan = new Map(semuaPerusahaan.map((x) => [x.id, x.kode]));
+  const akhiran = (milik: string | null) => (!p && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
   const akunParam = Array.isArray(param.akun) ? param.akun[param.akun.length - 1] : param.akun;
   const akunId = typeof akunParam === "string" && daftarAkun.some((a) => a.id === akunParam) ? akunParam : (daftarAkun[0]?.id ?? "");
   const akun = daftarAkun.find((a) => a.id === akunId);
@@ -65,12 +71,20 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
             <label className="label" htmlFor="akun">Akun kas/bank</label>
             <select id="akun" name="akun" defaultValue={akunId} className="isian isian-kecil w-auto">
               {daftarAkun.map((a) => (
-                <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+                <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaanId)}</option>
               ))}
             </select>
           </div>
         }
       />
+
+      {/* R-12: rekening bersama tidak bisa direkonsiliasi per perusahaan. Di lingkup utama tidak ditampilkan supaya
+          tampilan peran lama tetap sama (akun kas lama dipakai bersama). */}
+      {p !== PERUSAHAAN_UTAMA && !akun.perusahaanId && (
+        <div role="note" className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Akun dipakai bersama: saldo buku = gabungan semua perusahaan.
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="kartu p-4"><div className="teks-label">Saldo buku</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(saldoBuku)}</div><div className="text-xs text-slate-500">per {periode.sampaiTeks}</div></div>

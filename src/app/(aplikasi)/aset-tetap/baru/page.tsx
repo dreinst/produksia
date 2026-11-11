@@ -2,10 +2,20 @@ import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatAsetTetapFormulir } from "@/lib/aksi/asetTetap";
+import KolomPerusahaan from "@/komponen/KolomPerusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 export default async function HalamanAsetTetapBaru() {
   await wajibHak("aset.buat");
-  const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
+  // Dokumen akar (D1 §7.4 butir 2, KONTRAK-TAMBAHAN P18): lingkup satu perusahaan = akun milik perusahaan itu atau
+  // bersama; gabungan dan lingkup arsip = semua akun, yang berpemilik diberi akhiran kode. Server tetap memvalidasi.
+  const lingkup = await lingkupPerusahaan();
+  const p = perusahaanFormulir(lingkup);
+  const [daftarAkun, semuaPerusahaan] = await Promise.all([
+    db.akun.findMany({ where: { kelompok: false, ...saringMilikAtauBersama(p) }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
+    daftarPerusahaan(),
+  ]);
+  const akhiran = (milik: { kode: string } | null) => (!p && milik ? ` · ${milik.kode}` : "");
   const hariIni = new Date().toISOString().slice(0, 10);
 
   return (
@@ -13,6 +23,16 @@ export default async function HalamanAsetTetapBaru() {
       <h1 className="judul-halaman">Aset Tetap Baru</h1>
 
       <FormulirAksi aksi={buatAsetTetapFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* pola formulir akar halaman lama (KONTRAK-TAMBAHAN): utama hanya isian tersembunyi supaya tampilan peran lama
+            tetap sama; lingkup lain bidang baca saja; gabungan dan lingkup arsip pilihan wajib */}
+        {lingkup.perusahaanId === PERUSAHAAN_UTAMA && p ? (
+          <input type="hidden" name="perusahaanId" value={p} />
+        ) : (
+          <>
+            <KolomPerusahaan lingkup={lingkup} daftar={semuaPerusahaan} />
+            <div className="hidden md:block" />
+          </>
+        )}
         <div className="bidang">
           <label className="label" htmlFor="kode">Kode *</label>
           <input id="kode" type="text" name="kode" required className="isian" />
@@ -48,7 +68,7 @@ export default async function HalamanAsetTetapBaru() {
           <select id="akunAsetId" name="akunAsetId" required className="isian">
             <option value="">-</option>
             {daftarAkun.filter((a) => a.jenis === "ASET").map((a) => (
-              <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+              <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaan)}</option>
             ))}
           </select>
         </div>
@@ -58,7 +78,7 @@ export default async function HalamanAsetTetapBaru() {
           <select id="akunBebanPenyusutanId" name="akunBebanPenyusutanId" required className="isian">
             <option value="">-</option>
             {daftarAkun.filter((a) => a.jenis === "BEBAN").map((a) => (
-              <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+              <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaan)}</option>
             ))}
           </select>
         </div>
@@ -68,7 +88,7 @@ export default async function HalamanAsetTetapBaru() {
           <select id="akunAkumulasiPenyusutanId" name="akunAkumulasiPenyusutanId" required className="isian">
             <option value="">-</option>
             {daftarAkun.filter((a) => a.jenis === "ASET").map((a) => (
-              <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+              <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaan)}</option>
             ))}
           </select>
         </div>
@@ -78,7 +98,7 @@ export default async function HalamanAsetTetapBaru() {
           <select id="akunPembayaranId" name="akunPembayaranId" className="isian" defaultValue="">
             <option value="">Tidak dijurnal (aset sudah tercatat)</option>
             {daftarAkun.filter((a) => a.kasBank || a.jenis === "KEWAJIBAN").map((a) => (
-              <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+              <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaan)}</option>
             ))}
           </select>
           <span className="petunjuk">Bila dipilih, sistem menjurnal Dr Akun Aset / Cr akun ini sebesar harga perolehan</span>

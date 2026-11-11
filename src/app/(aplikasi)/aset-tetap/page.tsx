@@ -7,6 +7,8 @@ import Link from "next/link";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanAsetTetap({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("aset.lihat");
@@ -15,10 +17,13 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
   const bolehLepas = boleh("pelepasan-aset.buat");
   const bolehHapusLepas = boleh("pelepasan-aset.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ kode: cocokTeks(param.q) }, { nama: cocokTeks(param.q) }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4, §8.4): satu perusahaan = asetnya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ kode: cocokTeks(param.q) }, { nama: cocokTeks(param.q) }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftarAset] = await Promise.all([
     db.asetTetap.count({ where }),
-    db.asetTetap.findMany({ where, include: { penyusutan: true, akunAset: true, pelepasan: { include: { jurnal: { select: { nomor: true } } } } }, orderBy: { kode: "asc" }, skip: param.lewati, take: param.ambil }),
+    db.asetTetap.findMany({ where, include: { penyusutan: true, akunAset: true, pelepasan: { include: { jurnal: { select: { nomor: true } } } }, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { kode: "asc" }, skip: param.lewati, take: param.ambil }),
   ]);
 
   return (
@@ -48,6 +53,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
         <thead>
           <tr>
             <th>Kode</th>
+            {!perusahaanId && <th>Perusahaan</th>}
             <th>Nama</th>
             <th>Tanggal Perolehan</th>
             <th className="text-right angka">Harga Perolehan</th>
@@ -66,6 +72,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
             return (
               <tr key={a.id}>
                 <td>{a.kode}</td>
+                {!perusahaanId && <td><LencanaPerusahaan kode={a.perusahaan.kode} warna={a.perusahaan.warna} nama={a.perusahaan.nama} /></td>}
                 <td>{a.nama}</td>
                 <td>{a.tanggalPerolehan.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                 <td className="text-right angka">{Number(a.hargaPerolehan).toLocaleString("id-ID")}</td>
@@ -108,7 +115,7 @@ export default async function HalamanAsetTetap({ searchParams }: { searchParams:
           })}
           {daftarAset.length === 0 && (
             <tr>
-              <td colSpan={10} className="kosong">
+              <td colSpan={perusahaanId ? 10 : 11} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada aset tetap."}
               </td>
             </tr>

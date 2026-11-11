@@ -4,15 +4,28 @@ import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { jalankanPenyusutanBulananFormulir } from "@/lib/aksi/asetTetap";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanPenyusutan() {
   const pengguna = await wajibHak("penyusutan.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const bolehHapus = boleh("penyusutan.hapus");
+  // Lingkup perusahaan (D1 §4.4, §8.4): daftar dan aksi penyusutan hanya untuk aset perusahaan lingkup; gabungan =
+  // semua aset, satu jurnal per perusahaan, dengan kolom Perusahaan
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
   const daftarPenyusutan = await db.penyusutanAset.findMany({
-    include: { aset: true },
+    ...(p ? { where: { aset: saringPerusahaan(p) } } : {}),
+    include: { aset: { include: { perusahaan: { select: { kode: true, nama: true, warna: true } } } } },
     orderBy: { periode: "desc" },
   });
+  const lingkupTeks =
+    p === PERUSAHAAN_UTAMA
+      ? "Menghitung penyusutan garis lurus untuk semua aset AKTIF yang belum disusutkan pada periode ini, lalu membuat satu jurnal otomatis."
+      : p
+        ? `Menghitung penyusutan garis lurus untuk semua aset AKTIF milik ${lingkup.perusahaan?.nama ?? p} yang belum disusutkan pada periode ini, lalu membuat satu jurnal otomatis.`
+        : "Menghitung penyusutan garis lurus untuk semua aset AKTIF semua perusahaan yang belum disusutkan pada periode ini, lalu membuat satu jurnal otomatis per perusahaan.";
 
   const currentMonth = new Date().toISOString().slice(0, 7);
 
@@ -32,7 +45,7 @@ export default async function HalamanPenyusutan() {
         </button>
       </FormulirAksi>
       <p className="text-xs text-slate-500 -mt-4">
-        Menghitung penyusutan garis lurus untuk semua aset AKTIF yang belum disusutkan pada periode ini, lalu membuat satu jurnal otomatis.
+        {lingkupTeks}
       </p>
         </>
       )}
@@ -42,6 +55,7 @@ export default async function HalamanPenyusutan() {
         <thead>
           <tr>
             <th>Periode</th>
+            {!p && <th>Perusahaan</th>}
             <th>Aset</th>
             <th className="text-right angka">Jumlah Penyusutan</th>
             <th />
@@ -51,6 +65,7 @@ export default async function HalamanPenyusutan() {
           {daftarPenyusutan.map((d) => (
             <tr key={d.id}>
               <td>{d.periode.toLocaleDateString("id-ID", { year: "numeric", month: "long" })}</td>
+              {!p && <td><LencanaPerusahaan kode={d.aset.perusahaan.kode} warna={d.aset.perusahaan.warna} nama={d.aset.perusahaan.nama} /></td>}
               <td>{d.aset.nama}</td>
               <td className="text-right angka">{Number(d.jumlah).toLocaleString("id-ID")}</td>
               <td className="text-right">{d.jurnalId && <TombolHapusDokumen jenis="penyusutan" id={d.jurnalId} nomor={`penyusutan ${d.periode.toLocaleDateString("id-ID", { year: "numeric", month: "long" })}`} boleh={bolehHapus} />}</td>
@@ -58,7 +73,7 @@ export default async function HalamanPenyusutan() {
           ))}
           {daftarPenyusutan.length === 0 && (
             <tr>
-              <td colSpan={4} className="kosong">
+              <td colSpan={p ? 4 : 5} className="kosong">
                 Belum ada penyusutan yang dijalankan.
               </td>
             </tr>

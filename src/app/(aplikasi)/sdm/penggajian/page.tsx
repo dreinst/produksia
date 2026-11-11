@@ -8,6 +8,8 @@ import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
 
@@ -16,12 +18,15 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
   const bolehBuat = punyaHak(pengguna, "penggajian.buat");
   const bolehHapus = punyaHak(pengguna, "penggajian.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { bulan: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4, §8.4): satu perusahaan = penggajiannya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { bulan: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftar] = await Promise.all([
     db.penggajian.count({ where }),
     db.penggajian.findMany({
       where,
-      include: { akunKas: true, proyek: { select: { kode: true } }, jurnal: { select: { nomor: true } }, baris: { select: { id: true } } },
+      include: { akunKas: true, proyek: { select: { kode: true } }, jurnal: { select: { nomor: true } }, baris: { select: { id: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } },
       // bulan, bukan kunci periode (perusahaan selain utama berakhiran @id); periode hanya pemecah seri
       orderBy: [{ bulan: "desc" }, { periode: "desc" }],
       skip: param.lewati,
@@ -49,6 +54,7 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
             <thead>
               <tr>
                 <th>No</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Periode</th>
                 <th>Tanggal</th>
                 <th className="text-right">Karyawan</th>
@@ -67,6 +73,7 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
               {daftar.map((p) => (
                 <tr key={p.id}>
                   <td><NomorDokumen nomor={p.nomor} /></td>
+                  {!perusahaanId && <td><LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} /></td>}
                   <td className="mono">{p.bulan}</td>
                   <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                   <td className="text-right angka">{p.baris.length}</td>
@@ -92,7 +99,7 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
                   <td className="text-right"><TombolHapusDokumen jenis="penggajian" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                 </tr>
               ))}
-              {daftar.length === 0 && <tr><td colSpan={13} className="kosong">{param.q ? "Tidak ada yang cocok." : "Belum ada penggajian."}</td></tr>}
+              {daftar.length === 0 && <tr><td colSpan={perusahaanId ? 13 : 14} className="kosong">{param.q ? "Tidak ada yang cocok." : "Belum ada penggajian."}</td></tr>}
             </tbody>
           </table>
         </div>

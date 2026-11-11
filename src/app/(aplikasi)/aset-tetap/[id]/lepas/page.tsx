@@ -7,18 +7,25 @@ import { lepasAsetFormulir } from "@/lib/aksi/asetTetap";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 const rp = (n: number) => n.toLocaleString("id-ID");
 
 export default async function HalamanLepasAset({ params }: { params: Promise<{ id: string }> }) {
   await wajibHak("pelepasan-aset.buat");
   const { id } = await params;
-  const [aset, akunKas, akunLabaRugi] = await Promise.all([
-    db.asetTetap.findUnique({ where: { id }, include: { penyusutan: true, pelepasan: true, akunAset: true, akunAkumulasiPenyusutan: true } }),
-    daftarAkunKasBank(),
-    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["PENDAPATAN", "BEBAN"] } }, orderBy: { kode: "asc" } }),
+  const [aset, lingkup] = await Promise.all([
+    db.asetTetap.findUnique({ where: { id }, include: { penyusutan: true, pelepasan: true, akunAset: true, akunAkumulasiPenyusutan: true, perusahaan: { select: { kode: true, nama: true, warna: true } } } }),
+    lingkupPerusahaan(),
   ]);
   if (!aset) notFound();
+  // Dokumen anak (D1 §7.4 butir 3): jurnal pelepasan milik perusahaan aset, jadi akun kas dan akun laba/rugi yang
+  // ditawarkan milik perusahaan itu atau bersama, apa pun lingkupnya. Server memeriksa ulang (pastikanAkunMilik).
+  const [akunKas, akunLabaRugi] = await Promise.all([
+    daftarAkunKasBank(db, aset.perusahaanId),
+    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["PENDAPATAN", "BEBAN"] }, ...saringMilikAtauBersama(aset.perusahaanId) }, orderBy: { kode: "asc" } }),
+  ]);
   const akumulasi = aset.penyusutan.reduce((s, p) => s + Number(p.jumlah), 0);
   const nilaiBuku = Number(aset.hargaPerolehan) - akumulasi;
   const bawaanLabaRugi = akunLabaRugi.find((a) => a.kode === "4-9200")?.id ?? akunLabaRugi.find((a) => a.jenis === "PENDAPATAN")?.id ?? "";
@@ -30,7 +37,17 @@ export default async function HalamanLepasAset({ params }: { params: Promise<{ i
         jejak={[{ label: "Aset Tetap", href: "/aset-tetap" }, { label: aset.kode }]}
         judul={`Lepas Aset ${aset.kode} · ${aset.nama}`}
         subjudul="Menjual atau menghapusbukukan aset: aset & akumulasi penyusutannya dikeluarkan dari neraca, selisih harga jual vs nilai buku diakui sebagai laba/rugi pelepasan."
-        lencana={<LencanaStatus status={aset.status} />}
+        lencana={
+          // perusahaan aset tampil bila berbeda dari lingkup (mis. gabungan); lingkup yang sama tetap seperti dulu
+          lingkup.perusahaanId !== aset.perusahaanId ? (
+            <>
+              <LencanaStatus status={aset.status} />
+              <LencanaPerusahaan kode={aset.perusahaan.kode} warna={aset.perusahaan.warna} nama={aset.perusahaan.nama} />
+            </>
+          ) : (
+            <LencanaStatus status={aset.status} />
+          )
+        }
         aksi={<Link href="/aset-tetap" className="tombol tombol-garis">Kembali</Link>}
       />
 

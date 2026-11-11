@@ -14,10 +14,10 @@ import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 
 /**
- * Perusahaan aset baru: isian perusahaanId, kalau kosong lingkup aktif (D1 §8.3). Formulir aset belum mengirim
- * perusahaan (pemilihnya di P18), jadi di lingkup gabungan tanpa isian perusahaan diambil dari pemilik akun yang
- * dipilih, dan utama bila semua akunnya bersama (perilaku sebelum multi perusahaan). Akun milik dua perusahaan
- * berbeda ditolak pastikanAkunMilik sesudahnya.
+ * Perusahaan aset baru: isian perusahaanId, kalau kosong lingkup aktif (D1 §8.3). Formulir aset mengirim perusahaan
+ * sejak P18 (pilihan wajib di gabungan). Pemanggil tanpa isian di lingkup gabungan (mis. skrip) tetap memakai pemilik
+ * akun yang dipilih, dan utama bila semua akunnya bersama (perilaku sebelum multi perusahaan). Akun milik dua
+ * perusahaan berbeda ditolak pastikanAkunMilik sesudahnya.
  */
 async function perusahaanAsetBaru(dataFormulir: FormData, akunIds: string[]): Promise<string> {
   const isian = String(dataFormulir.get("perusahaanId") ?? "").trim();

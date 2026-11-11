@@ -3,12 +3,21 @@ import { wajibHak } from "@/lib/otentikasi";
 import { daftarRingkasanProyek } from "@/lib/proyek";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { db } from "@/lib/db";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 const angka = (v: { toString(): string } | null) => (v === null ? "-" : Number(v).toLocaleString("id-ID"));
 
 export default async function HalamanRekonsiliasi() {
   await wajibHak("rekonsiliasi.lihat");
-  const daftar = await daftarRingkasanProyek();
+  // Lingkup perusahaan (D1 §8.4): satu perusahaan = event miliknya saja; gabungan = semua event dengan kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const [daftar, pemilik] = await Promise.all([
+    daftarRingkasanProyek(db, perusahaanId),
+    perusahaanId ? Promise.resolve([]) : db.proyek.findMany({ select: { id: true, perusahaan: { select: { kode: true, nama: true, warna: true } } } }),
+  ]);
+  const perusahaanProyek = new Map(pemilik.map((x) => [x.id, x.perusahaan]));
   const totalLaba = daftar.reduce((s, p) => s + Number(p.laba), 0);
 
   return (
@@ -45,6 +54,7 @@ export default async function HalamanRekonsiliasi() {
             <thead>
               <tr>
                 <th>Event</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Klien</th>
                 <th>Status</th>
                 <th className="text-right">Nilai kontrak</th>
@@ -60,6 +70,14 @@ export default async function HalamanRekonsiliasi() {
               {daftar.map((p) => (
                 <tr key={p.id}>
                   <td><span className="mono font-semibold text-slate-900">{p.kode}</span> <span className="text-slate-700">{p.nama}</span></td>
+                  {!perusahaanId && (
+                    <td>
+                      {(() => {
+                        const milik = perusahaanProyek.get(p.id);
+                        return milik ? <LencanaPerusahaan kode={milik.kode} warna={milik.warna} nama={milik.nama} /> : "-";
+                      })()}
+                    </td>
+                  )}
                   <td className="text-slate-600">{p.pelanggan ?? "-"}</td>
                   <td><LencanaStatus status={p.status} /></td>
                   <td className="text-right angka">{angka(p.nilaiKontrak)}</td>
@@ -71,7 +89,7 @@ export default async function HalamanRekonsiliasi() {
                   <td className="text-right td-lekat"><Link href={`/rekonsiliasi/event/${p.id}`} className="tombol-tautan">Buka LPJ</Link></td>
                 </tr>
               ))}
-              {daftar.length === 0 && <tr><td colSpan={10} className="kosong">Belum ada event/proyek. Tambahkan di Data Induk → Proyek, lalu pilih event saat membuat penawaran/pesanan.</td></tr>}
+              {daftar.length === 0 && <tr><td colSpan={perusahaanId ? 10 : 11} className="kosong">Belum ada event/proyek. Tambahkan di Data Induk → Proyek, lalu pilih event saat membuat penawaran/pesanan.</td></tr>}
             </tbody>
           </table>
         </div>

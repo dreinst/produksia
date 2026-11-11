@@ -3,6 +3,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { Rp } from "@/komponen/ui/Lencana";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan } from "@/lib/perusahaan";
 import {
   catatKursFormulir,
   hapusKursFormulir,
@@ -31,6 +32,15 @@ export default async function HalamanMataUang() {
     db.pemetaanAkun.findUnique({ where: { id: "default" }, include: { selisihKurs: true } }),
   ]);
   const asing = daftarMataUang.filter((m) => !m.fungsional && m.aktif);
+  // Penilaian kembali mengikuti lingkup (D1 §4.4, §8.4): satu perusahaan = faktur perusahaan itu, gabungan = semua
+  // perusahaan dengan satu jurnal per perusahaan. Di lingkup utama teks lama dipertahankan.
+  const lingkup = await lingkupPerusahaan();
+  const petunjukLingkup =
+    lingkup.perusahaanId === PERUSAHAAN_UTAMA
+      ? null
+      : lingkup.perusahaan
+        ? `Dijalankan untuk ${lingkup.perusahaan.nama}`
+        : "Dijalankan untuk semua perusahaan, satu jurnal per perusahaan";
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -250,7 +260,11 @@ export default async function HalamanMataUang() {
       <FormulirAksi
         aksi={jalankanPenilaianKursFormulir}
         pesanSukses="Penilaian kembali dijalankan. Periksa jurnal JU-SK di Buku Besar › Jurnal Umum."
-        pesanKonfirmasi="Jalankan penilaian kembali? Satu jurnal JU-SK akan dicatat ke buku besar."
+        pesanKonfirmasi={
+          lingkup.perusahaanId
+            ? "Jalankan penilaian kembali? Satu jurnal JU-SK akan dicatat ke buku besar."
+            : "Jalankan penilaian kembali untuk semua perusahaan? Satu jurnal JU-SK dicatat untuk setiap perusahaan yang punya selisih."
+        }
         className="kartu grid grid-cols-1 md:grid-cols-2 gap-4"
       >
         <div className="md:col-span-2">
@@ -274,6 +288,7 @@ export default async function HalamanMataUang() {
           </label>
           <input id="tanggal-penilaian" name="tanggal" type="date" required defaultValue={hariIni()} className="isian" />
           <span className="petunjuk">Biasanya akhir bulan atau akhir tahun buku.</span>
+          {petunjukLingkup && <span className="petunjuk">{petunjukLingkup}</span>}
         </div>
         <div className="md:col-span-2">
           <button type="submit" className="tombol tombol-utama" disabled={!pemetaan?.selisihKursId}>

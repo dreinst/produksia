@@ -7,15 +7,23 @@ import { hapusMutasiFormulir } from "@/lib/aksi/rekonsiliasi";
 import ImporMutasi from "@/komponen/rekonsiliasi/ImporMutasi";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import { daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 export default async function HalamanImporMutasi() {
   await wajibHak("rekonsiliasi.tulis");
-  const [daftarAkun, berkas, cocok] = await Promise.all([
-    daftarAkunKasBank(),
-    db.mutasiBank.groupBy({ by: ["akunId", "berkas"], _count: { _all: true }, _min: { tanggal: true }, _max: { tanggal: true } }),
-    db.mutasiBank.groupBy({ by: ["akunId", "berkas"], where: { barisJurnalId: { not: null } }, _count: { _all: true } }),
+  // Lingkup perusahaan (D1 §8.4): pilihan akun dan berkas yang sudah diimpor hanya untuk akun kas/bank milik perusahaan
+  // lingkup atau bersama; gabungan = semua, akun berpemilik diberi akhiran kode
+  const { perusahaanId: p } = await lingkupPerusahaan();
+  const akunLingkup = p ? { akun: saringMilikAtauBersama(p) } : {};
+  const [daftarAkun, berkas, cocok, semuaPerusahaan] = await Promise.all([
+    daftarAkunKasBank(db, p),
+    db.mutasiBank.groupBy({ by: ["akunId", "berkas"], ...(p ? { where: akunLingkup } : {}), _count: { _all: true }, _min: { tanggal: true }, _max: { tanggal: true } }),
+    db.mutasiBank.groupBy({ by: ["akunId", "berkas"], where: { barisJurnalId: { not: null }, ...akunLingkup }, _count: { _all: true } }),
+    daftarPerusahaan(true),
   ]);
-  const namaAkun = new Map(daftarAkun.map((a) => [a.id, `${a.kode} - ${a.nama}`]));
+  const kodePerusahaan = new Map(semuaPerusahaan.map((x) => [x.id, x.kode]));
+  const akhiran = (milik: string | null) => (!p && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
+  const namaAkun = new Map(daftarAkun.map((a) => [a.id, `${a.kode} - ${a.nama}${akhiran(a.perusahaanId)}`]));
   const jumlahCocok = new Map(cocok.map((c) => [`${c.akunId}|${c.berkas}`, c._count._all]));
 
   return (
@@ -29,7 +37,7 @@ export default async function HalamanImporMutasi() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ImporMutasi daftarAkun={daftarAkun.map((a) => ({ id: a.id, kode: a.kode, nama: a.nama }))} contohCsv={CONTOH_CSV} />
+          <ImporMutasi daftarAkun={daftarAkun.map((a) => ({ id: a.id, kode: a.kode, nama: `${a.nama}${akhiran(a.perusahaanId)}` }))} contohCsv={CONTOH_CSV} />
         </div>
         <div className="space-y-6">
           <div className="kartu space-y-2 text-sm">
