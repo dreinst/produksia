@@ -5,9 +5,12 @@ import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormul
 import { buatPenawaranFormulir } from "@/lib/aksi/penjualan";
 import FormulirDokumenPenjualan, { PilihPerusahaanPenerbit, muatOpsiDokumenPenjualan } from "@/komponen/penjualan/FormulirDokumenPenjualan";
 
-export default async function HalamanPenawaranBaru({ searchParams }: { searchParams: Promise<{ perusahaan?: string; leadId?: string }> }) {
+export default async function HalamanPenawaranBaru({ searchParams }: { searchParams: Promise<{ perusahaan?: string | string[]; leadId?: string | string[] }> }) {
   const pengguna = await wajibHak("penawaran.buat");
-  const { perusahaan: pilihan, leadId } = await searchParams;
+  const q = await searchParams;
+  // parameter berulang (?leadId=a&leadId=b) berupa larik dan diabaikan, supaya tidak masuk ke penyaring Prisma
+  const pilihan = typeof q.perusahaan === "string" ? q.perusahaan : undefined;
+  const leadId = typeof q.leadId === "string" ? q.leadId : undefined;
   const [lingkup, perusahaanAktif] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan()]);
   // lingkup satu perusahaan aktif = perusahaan itu; gabungan dan lingkup arsip memilih perusahaan penerbit (D2 §7.1)
   const p = perusahaanFormulir(lingkup);

@@ -160,7 +160,8 @@ export default function FormulirDokumenPenjualan({
       {penawaran ? (
         <div className="bidang">
           <label className="label" htmlFor="berlakuSampai">Berlaku sampai</label>
-          <input id="berlakuSampai" name="berlakuSampai" type="date" min={tanggalIso(new Date())} defaultValue={nilaiAwal.berlakuSampai ?? ""} className="isian" />
+          {/* min hanya untuk formulir tanpa nilai awal: tanggal tersimpan yang sudah lewat tetap boleh disimpan ulang (ubahPenawaran) */}
+          <input id="berlakuSampai" name="berlakuSampai" type="date" min={nilaiAwal.berlakuSampai ? undefined : tanggalIso(new Date())} defaultValue={nilaiAwal.berlakuSampai ?? ""} className="isian" />
         </div>
       ) : (
         <div />

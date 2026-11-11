@@ -48,7 +48,7 @@ export default async function HalamanDetailUangMuka({ params }: { params: Promis
         judul={`Uang Muka ${tampil}`}
         subjudul={`${u.pelanggan.nama} · ${formatTanggal(u.tanggal)} · ${u.perusahaan.nama}`}
         lencana={<LencanaPersetujuan status={u.statusPersetujuan} />}
-        aksi={<TombolHapusDokumen jenis="uangMuka" id={u.id} nomor={u.nomor} boleh={boleh("uang-muka.hapus")} />}
+        aksi={<TombolHapusDokumen kembaliKeDaftar jenis="uangMuka" id={u.id} nomor={u.nomor} boleh={boleh("uang-muka.hapus")} />}
       />
 
       <Kartu judul="Informasi">

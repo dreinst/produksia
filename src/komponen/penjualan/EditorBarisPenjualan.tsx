@@ -133,7 +133,9 @@ export default function EditorBarisPenjualan({
                 const minimum = barang?.hargaMinimum ?? 0;
                 const diBawahBawaan = Boolean(barang) && harga < (barang?.hargaBawaan ?? 0);
                 const diBawahMinimum = minimum > 0 && harga < minimum;
-                const hargaTerkunci = !bolehNego && b.barangId !== BEBAS;
+                // tanpa hak nego harga dan nama baca saja, termasuk baris bebas dari nilai awal (halaman ubah): server
+                // selalu menolak baris bebas untuk pengguna tanpa harga.nego (periksaHakBarisBebas)
+                const hargaTerkunci = !bolehNego;
                 const akhirKelompok = event && b.bagian.trim() !== "" && (i === baris.length - 1 || kunciSeksi(baris[i + 1]) !== kunciSeksi(b));
                 return (
                   <Fragment key={b.kunci}>
@@ -164,10 +166,10 @@ export default function EditorBarisPenjualan({
                           ))}
                         </select>
                         <input
-                          className={`isian isian-kecil ${!bolehNego && b.barangId !== BEBAS ? "bg-slate-50 text-slate-500" : ""}`}
+                          className={`isian isian-kecil ${!bolehNego ? "bg-slate-50 text-slate-500" : ""}`}
                           value={b.nama}
                           maxLength={200}
-                          readOnly={!bolehNego && b.barangId !== BEBAS}
+                          readOnly={!bolehNego}
                           placeholder={barang?.nama ?? (b.barangId === BEBAS ? "Nama item" : "Nama tampil")}
                           title={!bolehNego ? "Mengganti nama barang butuh hak nego harga" : undefined}
                           onChange={(e) => ubah(i, { nama: e.target.value })}
@@ -269,6 +271,11 @@ export default function EditorBarisPenjualan({
         </div>
         {!bolehNego && <span className="text-xs text-slate-500">Harga mengikuti harga jual barang. Untuk nego harga, minta hak dari Pemilik.</span>}
       </div>
+      {!bolehNego && baris.some((b) => b.barangId === BEBAS) && (
+        <p className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Dokumen ini memuat item bebas. Menyimpan perubahan butuh hak nego harga, jadi hapus item bebasnya atau minta hak dari Pemilik.
+        </p>
+      )}
       {event ? (
         <p className="petunjuk">Baris dengan seksi yang sama dicetak di bawah satu judul, jadi letakkan berdekatan.</p>
       ) : (

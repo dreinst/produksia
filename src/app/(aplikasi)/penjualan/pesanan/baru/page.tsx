@@ -4,9 +4,10 @@ import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormul
 import { buatPesananFormulir } from "@/lib/aksi/penjualan";
 import FormulirDokumenPenjualan, { PilihPerusahaanPenerbit, muatOpsiDokumenPenjualan } from "@/komponen/penjualan/FormulirDokumenPenjualan";
 
-export default async function HalamanPesananPenjualanBaru({ searchParams }: { searchParams: Promise<{ perusahaan?: string }> }) {
+export default async function HalamanPesananPenjualanBaru({ searchParams }: { searchParams: Promise<{ perusahaan?: string | string[] }> }) {
   const pengguna = await wajibHak("pesanan.buat");
-  const { perusahaan: pilihan } = await searchParams;
+  const q = await searchParams;
+  const pilihan = typeof q.perusahaan === "string" ? q.perusahaan : undefined;
   const [lingkup, perusahaanAktif] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan()]);
   // lingkup satu perusahaan aktif = perusahaan itu; gabungan dan lingkup arsip memilih perusahaan penerbit (D2 §7.1)
   const p = perusahaanFormulir(lingkup);

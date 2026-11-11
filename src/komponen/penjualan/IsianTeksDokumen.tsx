@@ -45,7 +45,9 @@ function Isian({ b, nilai, awalan }: { b: Bidang; nilai: string; awalan: string 
       {panjang ? (
         <textarea id={id} name={b.nama} rows={3} maxLength={b.batas} defaultValue={nilai} placeholder={b.placeholder} className="isian" />
       ) : (
-        <input id={id} name={b.nama} type={b.jenis === "email" ? "email" : "text"} maxLength={b.batas} defaultValue={nilai} placeholder={b.placeholder} className="isian" />
+        // email memakai type="text" + inputMode: validasi email peramban lebih ketat dari POLA_EMAIL server, dan isian di
+        // dalam <details> tertutup yang ditolak peramban memblokir kirim tanpa pesan. Server tetap memvalidasi.
+        <input id={id} name={b.nama} type="text" inputMode={b.jenis === "email" ? "email" : undefined} maxLength={b.batas} defaultValue={nilai} placeholder={b.placeholder} className="isian" />
       )}
       {b.petunjuk && <span className="petunjuk">{b.petunjuk}</span>}
     </div>

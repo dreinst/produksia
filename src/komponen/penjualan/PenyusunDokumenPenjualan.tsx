@@ -52,12 +52,16 @@ export default function PenyusunDokumenPenjualan({
   nilaiAwal?: NilaiAwalPenyusun;
 }) {
   const [mode, setMode] = useState<"STANDAR" | "EVENT">(nilaiAwal.mode ?? "STANDAR");
+  const [tampilanEvent, setTampilanEvent] = useState<"RINCI" | "RINGKAS">(nilaiAwal.tampilanEvent ?? tampilanEventBawaan);
   const [baris, setBaris] = useState<BarisEditor[]>(() => (nilaiAwal.baris?.length ? nilaiAwal.baris.map((b) => ({ ...b, kunci: kunciBarisBaru() })) : [barisKosong()]));
   const [jenisDiskon, setJenisDiskon] = useState<JenisNilaiKlien>(nilaiAwal.jenisDiskon ?? "NOMINAL");
   const [nilaiDiskon, setNilaiDiskon] = useState(nilaiAwal.nilaiDiskon ?? "");
   const [jenisFee, setJenisFee] = useState<JenisNilaiKlien>(nilaiAwal.jenisFee ?? "PERSEN");
   const [nilaiFee, setNilaiFee] = useState(nilaiAwal.nilaiFee ?? "");
-  const [ppnPersen, setPpnPersen] = useState(nilaiAwal.ppnPersen ?? (pajak.pkp ? pajak.tarif : 0));
+  // non-PKP selalu 0% (server memakai 0 karena isian tidak dirender); tarif tersimpan yang berbeda dari tarif sekarang
+  // ditambahkan sebagai opsi supaya nilai terpilih sama dengan yang terkirim dan dipratinjau
+  const [ppnPersen, setPpnPersen] = useState(pajak.pkp ? (nilaiAwal.ppnPersen ?? pajak.tarif) : 0);
+  const opsiPpn = [...new Set([0, pajak.tarif, ...(pajak.pkp && nilaiAwal.ppnPersen !== undefined ? [nilaiAwal.ppnPersen] : [])])];
   const event = mode === "EVENT";
 
   const dipakai = baris.filter(barisDipakai).map((b) => ({ jumlah: b.jumlah, harga: b.harga, frekuensi: event ? b.frekuensi : undefined }));
@@ -81,38 +85,48 @@ export default function PenyusunDokumenPenjualan({
             </label>
           </div>
         </div>
-        {event && (
+        {/*
+          Isian event selalu dirender (disembunyikan di mode Standar) supaya semua kunci selalu terkirim (kontrak P25) dan
+          ketikan tidak hilang saat mode ditukar. Mode Standar mengirim nama event, venue, dan tanggal kosong (isian aslinya
+          dinonaktifkan sehingga tidak ikut terkirim), jadi nilai event tersimpan dikosongkan. Tampilan cetak event tetap
+          terkirim apa adanya (lewat isian tersembunyi) karena hanya dipakai saat mode Event.
+        */}
+        {!event && (
           <>
-            <div className="bidang">
-              <label className="label" htmlFor="tampilanEvent">
-                Tampilan cetak event
-              </label>
-              <select id="tampilanEvent" name="tampilanEvent" defaultValue={nilaiAwal.tampilanEvent ?? tampilanEventBawaan} className="isian">
-                <option value="RINCI">Rinci: satu halaman</option>
-                <option value="RINGKAS">Ringkas: ringkasan + lampiran RAB</option>
-              </select>
-            </div>
-            <div className="bidang">
-              <label className="label" htmlFor="namaEvent">
-                Nama event
-              </label>
-              <input id="namaEvent" name="namaEvent" maxLength={160} defaultValue={nilaiAwal.namaEvent ?? ""} className="isian" />
-            </div>
-            <div className="bidang">
-              <label className="label" htmlFor="venue">
-                Venue
-              </label>
-              <input id="venue" name="venue" maxLength={160} defaultValue={nilaiAwal.venue ?? ""} className="isian" />
-            </div>
-            <div className="bidang">
-              <label className="label" htmlFor="tanggalEvent">
-                Tanggal event (teks)
-              </label>
-              <input id="tanggalEvent" name="tanggalEvent" maxLength={80} defaultValue={nilaiAwal.tanggalEvent ?? ""} placeholder="mis. 12 - 14 Desember 2026" className="isian" />
-              <span className="petunjuk">Kosong = rentang tanggal proyek</span>
-            </div>
+            <input type="hidden" name="namaEvent" value="" />
+            <input type="hidden" name="venue" value="" />
+            <input type="hidden" name="tanggalEvent" value="" />
+            <input type="hidden" name="tampilanEvent" value={tampilanEvent} />
           </>
         )}
+        <div className={event ? "bidang" : "hidden"}>
+          <label className="label" htmlFor="tampilanEvent">
+            Tampilan cetak event
+          </label>
+          <select id="tampilanEvent" name="tampilanEvent" disabled={!event} value={tampilanEvent} onChange={(e) => setTampilanEvent(e.target.value as "RINCI" | "RINGKAS")} className="isian">
+            <option value="RINCI">Rinci: satu halaman</option>
+            <option value="RINGKAS">Ringkas: ringkasan + lampiran RAB</option>
+          </select>
+        </div>
+        <div className={event ? "bidang" : "hidden"}>
+          <label className="label" htmlFor="namaEvent">
+            Nama event
+          </label>
+          <input id="namaEvent" name="namaEvent" disabled={!event} maxLength={160} defaultValue={nilaiAwal.namaEvent ?? ""} className="isian" />
+        </div>
+        <div className={event ? "bidang" : "hidden"}>
+          <label className="label" htmlFor="venue">
+            Venue
+          </label>
+          <input id="venue" name="venue" disabled={!event} maxLength={160} defaultValue={nilaiAwal.venue ?? ""} className="isian" />
+        </div>
+        <div className={event ? "bidang" : "hidden"}>
+          <label className="label" htmlFor="tanggalEvent">
+            Tanggal event (teks)
+          </label>
+          <input id="tanggalEvent" name="tanggalEvent" disabled={!event} maxLength={80} defaultValue={nilaiAwal.tanggalEvent ?? ""} placeholder="mis. 12 - 14 Desember 2026" className="isian" />
+          <span className="petunjuk">Kosong = rentang tanggal proyek</span>
+        </div>
       </div>
 
       <EditorBarisPenjualan baris={baris} ubahSemua={setBaris} event={event} daftarBarang={daftarBarang} daftarSeksi={daftarSeksi} bolehNego={bolehNego} bolehBawahMinimum={bolehBawahMinimum} />
@@ -158,8 +172,11 @@ export default function PenyusunDokumenPenjualan({
             {pajak.pkp ? (
               <span className="flex items-center gap-2">
                 <select id="ppnPersen" name="ppnPersen" value={ppnPersen} onChange={(e) => setPpnPersen(Number(e.target.value))} className="isian isian-kecil w-auto" aria-label="Tarif PPN">
-                  <option value={0}>0%</option>
-                  <option value={pajak.tarif}>{pajak.tarif}%</option>
+                  {opsiPpn.map((t) => (
+                    <option key={t} value={t}>
+                      {t}%
+                    </option>
+                  ))}
                 </select>
                 <span className="angka w-28 text-right">{rupiah(r.ppn)}</span>
               </span>

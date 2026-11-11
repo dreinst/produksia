@@ -11,9 +11,12 @@ import IsianKwitansi from "@/komponen/penjualan/IsianKwitansi";
 import { PERUSAHAAN_UTAMA } from "@/lib/perusahaan";
 import { nilaiBrutoKontrak, progresTermin } from "@/lib/rencanaTermin";
 
-export default async function HalamanUangMukaBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string; rencanaTerminId?: string }> }) {
+export default async function HalamanUangMukaBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string | string[]; rencanaTerminId?: string | string[] }> }) {
   await wajibHak("uang-muka.buat");
-  const { pesananId, rencanaTerminId } = await searchParams;
+  const q = await searchParams;
+  // parameter berulang berupa larik dan diabaikan, supaya tidak masuk ke penyaring Prisma
+  const pesananId = typeof q.pesananId === "string" ? q.pesananId : undefined;
+  const rencanaTerminId = typeof q.rencanaTerminId === "string" ? q.rencanaTerminId : undefined;
   const pesanan = pesananId
     ? await db.pesananPenjualan.findUnique({ where: { id: pesananId }, include: { pelanggan: true, baris: true, uangMuka: { orderBy: { tanggal: "asc" } }, rencanaTermin: { select: { id: true } } } })
     : null;
@@ -114,8 +117,11 @@ export default async function HalamanUangMukaBaru({ searchParams }: { searchPara
           </div>
           <div className="bidang">
             <label className="label" htmlFor="jumlah">Jumlah Uang Muka *</label>
-            <input id="jumlah" type="number" name="jumlah" step="0.01" min={0} max={maks} defaultValue={maks} required className="isian" />
-            <span className="petunjuk">Maksimal {rp(maks)}.</span>
+            {/* batas peramban = batas pesanan, karena pilihan termin bisa diganti; batas per butir diperiksa server */}
+            <input id="jumlah" type="number" name="jumlah" step="0.01" min={0} max={batas} defaultValue={maks} required className="isian" />
+            <span className="petunjuk">
+              Maksimal {rp(batas)}.{progres && " Bila memilih termin, jumlah tidak boleh melebihi sisa termin itu (tertera di pilihan termin)."}
+            </span>
           </div>
           <div className="bidang">
             <label className="label" htmlFor="metodeBayar">Metode Pembayaran</label>

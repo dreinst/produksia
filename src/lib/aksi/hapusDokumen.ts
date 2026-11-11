@@ -2,6 +2,7 @@
 
 import { pastikanHak, wajibHakAksi, wajibMasukAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
@@ -631,4 +632,22 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
 // Dipakai lewat .bind(null, jenis, id); argumen (prevState, dataFormulir) dari useActionState sengaja diabaikan
 export async function hapusDokumenFormulir(jenis: JenisDokumen, id: string): Promise<StatusFormulir> {
   return jalankanFormulir(() => hapusDokumen(jenis, id));
+}
+
+/** Daftar tujuan sesudah hapus dari halaman detail; tetap di kode supaya tujuan pengalihan tidak bisa diatur klien. */
+const DAFTAR_SESUDAH_HAPUS: Partial<Record<JenisDokumen, string>> = {
+  penawaran: "/penjualan/penawaran",
+  pesanan: "/penjualan/pesanan",
+  faktur: "/penjualan/faktur",
+  uangMuka: "/penjualan/uang-muka",
+  penerimaan: "/penjualan/penerimaan",
+};
+
+// Tombol Hapus di halaman detail: sama dengan hapusDokumenFormulir, lalu mengalihkan ke daftar jenisnya bila berhasil,
+// karena halaman detail dokumen yang sudah terhapus menjadi 404. Galat tetap dikembalikan ke formulir.
+export async function hapusDokumenLaluKembaliFormulir(jenis: JenisDokumen, id: string): Promise<StatusFormulir> {
+  const hasil = await jalankanFormulir(() => hapusDokumen(jenis, id));
+  const tujuan = DAFTAR_SESUDAH_HAPUS[jenis];
+  if (hasil.ok && !hasil.galat && tujuan) redirect(tujuan);
+  return hasil;
 }

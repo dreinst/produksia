@@ -92,7 +92,7 @@ export default async function HalamanDetailFaktur({ params }: { params: Promise<
                 Retur
               </Link>
             )}
-            <TombolHapusDokumen jenis="faktur" id={f.id} nomor={f.nomor} boleh={boleh("faktur.hapus")} />
+            <TombolHapusDokumen kembaliKeDaftar jenis="faktur" id={f.id} nomor={f.nomor} boleh={boleh("faktur.hapus")} />
           </>
         }
       />

@@ -39,6 +39,8 @@ export type PenjualanPenyusun = {
   akunFee: string | null;
   teks: { nilai: NilaiTeksDokumen; daftarKop: KopPilihan[] };
   nomorOtomatis: boolean;
+  /** PPN awal komposer dari pesanan (D2 §3.9); undefined = tarif perusahaan seperti semula */
+  ppnAwal?: number;
 };
 
 export type PropsPenyusun = {
@@ -91,7 +93,9 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
   const [diskonIsian, setDiskonIsian] = useState<{ jenis: JenisNilaiKlien; nilai: string } | null>(null);
   const [status, aksiFormulir, sedangProses] = useActionState(p.aksi, { galat: null });
   const [isian, setIsian] = useState(p.daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.sisa, harga: b.harga })));
-  const [ppnPersen, setPpnPersen] = useState(p.pajak.pkp ? p.pajak.tarif : 0);
+  const [ppnPersen, setPpnPersen] = useState(p.pajak.pkp ? (pj?.ppnAwal ?? p.pajak.tarif) : 0);
+  // penjualan: tarif pesanan yang berbeda dari tarif sekarang (mis. 11 lawan 12) ikut ditawarkan; pembelian tetap 0 dan tarif
+  const opsiPpn = [...new Set([0, p.pajak.tarif, ...(pj?.ppnAwal !== undefined ? [pj.ppnAwal] : [])])];
   const uangMukaTersedia = adalahPenjualan ? (p.uangMukaTersedia ?? 0) : 0;
   const [uangMukaInput, setUangMukaInput] = useState(uangMukaTersedia);
   const [diskonInput, setDiskonInput] = useState(0);
@@ -499,8 +503,18 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                   {p.pajak.pkp ? (
                     <span className="flex items-center gap-2">
                       <select value={ppnPersen} onChange={(e) => setPpnPersen(Number(e.target.value))} className="isian isian-kecil w-auto" aria-label="Tarif PPN">
-                        <option value={0}>0%</option>
-                        <option value={p.pajak.tarif}>{p.pajak.tarif}%</option>
+                        {pj ? (
+                          opsiPpn.map((t) => (
+                            <option key={t} value={t}>
+                              {t}%
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value={0}>0%</option>
+                            <option value={p.pajak.tarif}>{p.pajak.tarif}%</option>
+                          </>
+                        )}
                       </select>
                       <span className="angka text-slate-900">Rp {format(hitung.ppn)}</span>
                     </span>

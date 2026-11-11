@@ -31,6 +31,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
           uangMuka: true,
           proyek: { select: { kode: true, nama: true, tanggalSelesai: true } },
           faktur: { select: { fee: true, diskon: true } },
+          rencanaTermin: { select: { id: true } },
         },
       })
     : null;
@@ -78,6 +79,10 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
   for (const k of KOLOM_TEKS_FAKTUR) teksWarisan[k] = k === "judulCetak" ? null : pesanan[k];
   teksWarisan.syaratPembayaran = pesanan.syaratPembayaran?.trim() ? pesanan.syaratPembayaran : (pengaturanDokumen?.syaratPembayaran ?? null);
   const label = (a: { kode: string; nama: string }) => `${a.kode} • ${a.nama}`;
+  // PPN awal komposer = PPN pesanan (D2 §3.9) bila pesanan bertermin (termin bruto dan batas uang muka dihitung dengan
+  // PPN itu) atau PPN-nya bukan 0. Pesanan lama tanpa termin bernilai 0 bawaan migrasi, jadi tetap mulai dari tarif
+  // perusahaan seperti semula.
+  const ppnAwalPesanan = pesanan.rencanaTermin.length > 0 || Number(pesanan.ppnPersen) > 0 ? Number(pesanan.ppnPersen) : undefined;
 
   return (
     <PenyusunFaktur
@@ -123,6 +128,7 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
         akunFee: akunFee ? label(akunFee) : null,
         teks: { nilai: teksWarisan, daftarKop },
         nomorOtomatis: !!formatNomor?.aktif,
+        ppnAwal: ppnAwalPesanan,
       }}
       dokumenSebelumnya={pesanan.pengiriman.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal.toISOString() }))}
       pemetaan={

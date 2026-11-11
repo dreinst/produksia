@@ -44,7 +44,7 @@ export default async function HalamanDetailPenerimaan({ params }: { params: Prom
         judul={`Penerimaan ${tampil}`}
         subjudul={`${r.pelanggan.nama} · ${formatTanggal(r.tanggal)} · ${r.perusahaan.nama}`}
         lencana={<LencanaPersetujuan status={r.statusPersetujuan} />}
-        aksi={<TombolHapusDokumen jenis="penerimaan" id={r.id} nomor={r.nomor} boleh={boleh("penerimaan.hapus")} />}
+        aksi={<TombolHapusDokumen kembaliKeDaftar jenis="penerimaan" id={r.id} nomor={r.nomor} boleh={boleh("penerimaan.hapus")} />}
       />
 
       <Kartu judul="Informasi">

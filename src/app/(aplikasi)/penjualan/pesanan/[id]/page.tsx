@@ -95,7 +95,7 @@ export default async function HalamanDetailPesanan({ params }: { params: Promise
                 Fakturkan
               </Link>
             )}
-            <TombolHapusDokumen jenis="pesanan" id={p.id} nomor={p.nomor} boleh={boleh("pesanan.hapus")} />
+            <TombolHapusDokumen kembaliKeDaftar jenis="pesanan" id={p.id} nomor={p.nomor} boleh={boleh("pesanan.hapus")} />
           </>
         }
       />

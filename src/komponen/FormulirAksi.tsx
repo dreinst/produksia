@@ -6,6 +6,7 @@ import type { StatusFormulir } from "@/lib/statusFormulir";
 import type { Verifikasi } from "@/lib/verifikasi";
 import DialogVerifikasi, { type RingkasanVerifikasi } from "@/komponen/ui/DialogVerifikasi";
 import { umumkanPesanSukses } from "@/komponen/PesanSuksesHalaman";
+import { subtotalKlien, type AngkaKlien } from "@/lib/hitungDokumenKlien";
 
 type Props = {
   aksi: (sebelumnya: StatusFormulir, dataFormulir: FormData) => Promise<StatusFormulir>;
@@ -40,17 +41,22 @@ function ringkasBaris(form: HTMLFormElement, mentah: string): string {
   const terisi = daftar.filter((b) => b.barangId || b.akunId || b.karyawanId || b.nama);
   if (terisi.length === 0) return "-";
   if (terisi[0].barangId !== undefined) {
-    // frekuensi (mode event penjualan) ikut dikalikan; tanpa frekuensi = ×1 seperti semula
-    // baris penjualan baru (berkunci frekuensi atau nama) dibulatkan per baris ke sen seperti server; baris lama tetap
+    // Formulir penawaran/pesanan penjualan baru (PenyusunDokumenPenjualan, bertanda isian jenisFee): jumlah baris hanya
+    // subtotal sebelum diskon, fee, dan PPN, jadi labelnya "Subtotal baris", dan angkanya dihitung dalam sen bulat lewat
+    // hitungDokumenKlien seperti server. Baris berkunci frekuensi atau nama di formulir lain dibulatkan per baris ke sen.
+    // JSON lama tetap memakai hitungan semula.
+    const penyusunBaru = form.elements.namedItem("jenisFee") !== null;
     const nilai = (b: Record<string, unknown>) => {
       const v = Number(b.jumlah ?? 0) * Number(b.frekuensi || 1) * Number(b.harga ?? 0);
       return b.frekuensi !== undefined || b.nama !== undefined ? Math.round(v * 100) / 100 : v;
     };
-    const total = terisi.reduce((s, b) => s + nilai(b), 0);
+    const total = penyusunBaru
+      ? subtotalKlien(terisi.map((b) => ({ jumlah: b.jumlah as AngkaKlien, harga: b.harga as AngkaKlien, frekuensi: b.frekuensi as AngkaKlien })))
+      : terisi.reduce((s, b) => s + nilai(b), 0);
     const nama = (b: Record<string, unknown>) => (b.barangId ? teksOpsi(b.barangId) : String(b.nama));
     const frek = (b: Record<string, unknown>) => (b.frekuensi ? ` × ${b.frekuensi}${b.satuanFrekuensi ? ` ${b.satuanFrekuensi}` : ""}` : "");
     const rinci = terisi.map((b) => `${rupiah(Number(b.jumlah ?? 0))} × ${nama(b)}${frek(b)}${b.harga !== undefined ? ` @ ${rupiah(Number(b.harga))}` : ""}`);
-    return `${rinci.join("\n")}${terisi.some((b) => b.harga !== undefined) ? `\nTotal Rp ${rupiah(total)}` : ""}`;
+    return `${rinci.join("\n")}${terisi.some((b) => b.harga !== undefined) ? `\n${penyusunBaru ? "Subtotal baris" : "Total"} Rp ${rupiah(total)}` : ""}`;
   }
   if (terisi[0].karyawanId !== undefined) {
     const diterima = (b: Record<string, unknown>) => Number(b.gajiPokok ?? 0) + Number(b.tunjangan ?? 0) - Number(b.potongan ?? 0);

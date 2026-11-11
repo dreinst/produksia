@@ -74,7 +74,7 @@ export default async function HalamanDetailPenawaran({ params }: { params: Promi
                 </button>
               </FormulirAksi>
             )}
-            <TombolHapusDokumen jenis="penawaran" id={p.id} nomor={p.nomor} boleh={boleh("penawaran.hapus")} />
+            <TombolHapusDokumen kembaliKeDaftar jenis="penawaran" id={p.id} nomor={p.nomor} boleh={boleh("penawaran.hapus")} />
           </>
         }
       />
