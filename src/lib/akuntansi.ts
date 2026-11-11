@@ -63,23 +63,48 @@ const NOL = D(0);
  */
 export const KUNCI_AKUN_FEE = "pendapatan-fee-manajemen";
 
-/** Akun di kelompok Diskon Penjualan dan Pendapatan Lain-lain: himpunan yang sama dengan `bukanOmzet` di pajak.ts. */
-async function idBukanOmzet(tx: Tx, m: { diskonPenjualanId: string | null; pendapatanLainId: string | null }): Promise<Set<string>> {
-  const daftar = await tx.akun.findMany({ where: { jenis: "PENDAPATAN" }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } });
-  const dasar: AkunSaldo[] = daftar.map((a) => ({ ...a, debit: NOL, kredit: NOL, saldo: NOL }));
+type AkunPohon = Omit<AkunSaldo, "debit" | "kredit" | "saldo">;
+type PemetaanOmzet = { diskonPenjualanId: string | null; pendapatanLainId: string | null };
+
+/**
+ * Akun di kelompok Diskon Penjualan dan Pendapatan Lain-lain dari daftar akun yang sudah dimuat: himpunan yang sama
+ * dengan `bukanOmzet` di pajak.ts. Fungsi murni, dipakai jurnal faktur dan basis kas.
+ */
+export function idBukanOmzetDari(daftar: readonly AkunPohon[], m: PemetaanOmzet): Set<string> {
+  const dasar: AkunSaldo[] = daftar.filter((a) => a.jenis === "PENDAPATAN").map((a) => ({ ...a, debit: NOL, kredit: NOL, saldo: NOL }));
   return new Set([...keturunanDari(dasar, akarDari(dasar, m.diskonPenjualanId ?? undefined)), ...keturunanDari(dasar, m.pendapatanLainId ?? null)]);
+}
+
+async function idBukanOmzet(tx: Tx, m: PemetaanOmzet): Promise<Set<string>> {
+  const daftar = await tx.akun.findMany({ where: { jenis: "PENDAPATAN" }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } });
+  return idBukanOmzetDari(daftar, m);
+}
+
+export const PESAN_AKUN_FEE_BUKAN_RINCI = "Akun 'Pendapatan Fee Manajemen' di Pemetaan Akun harus akun rinci jenis Pendapatan";
+export const PESAN_AKUN_FEE_BUKAN_OMZET = "Akun fee manajemen tidak boleh berada di kelompok Diskon Penjualan atau Pendapatan Lain-lain";
+
+/**
+ * Satu aturan akun fee untuk jurnal faktur (akunFeeManajemen) dan basis kas (tinjauan perbaikan P21 butir 3): akun
+ * rinci jenis Pendapatan di luar kelompok Diskon Penjualan dan Pendapatan Lain-lain. Mengembalikan null bila sah,
+ * selain itu pesan penolakannya.
+ */
+export function alasanAkunFeeTidakSah(akun: { id: string; jenis: string; kelompok: boolean }, bukanOmzet: ReadonlySet<string>): string | null {
+  if (akun.jenis !== "PENDAPATAN" || akun.kelompok) return PESAN_AKUN_FEE_BUKAN_RINCI;
+  if (bukanOmzet.has(akun.id)) return PESAN_AKUN_FEE_BUKAN_OMZET;
+  return null;
 }
 
 /**
  * Akun pendapatan management fee (D2 §4.2): pemetaan tambahan KUNCI_AKUN_FEE, kalau tidak ada akun Pendapatan
- * Penjualan pemetaan (faktur ber-fee tidak terblokir). Akun pemetaan wajib akun rinci jenis Pendapatan dan bukan
- * bagian kelompok Diskon Penjualan atau Pendapatan Lain-lain, supaya fee selalu ikut omzet PPh Final.
+ * Penjualan pemetaan (faktur ber-fee tidak terblokir). Akun pemetaan wajib lolos alasanAkunFeeTidakSah, supaya fee
+ * selalu ikut omzet PPh Final.
  */
-export async function akunFeeManajemen(tx: Tx, m: { pendapatanPenjualanId: string; diskonPenjualanId: string | null; pendapatanLainId: string | null }): Promise<string> {
+export async function akunFeeManajemen(tx: Tx, m: { pendapatanPenjualanId: string } & PemetaanOmzet): Promise<string> {
   const akun = await akunPemetaanTambahan(tx, KUNCI_AKUN_FEE);
   if (!akun) return m.pendapatanPenjualanId;
-  if (akun.jenis !== "PENDAPATAN" || akun.kelompok) throw new Error("Akun 'Pendapatan Fee Manajemen' di Pemetaan Akun harus akun rinci jenis Pendapatan");
-  if ((await idBukanOmzet(tx, m)).has(akun.id)) throw new Error("Akun fee manajemen tidak boleh berada di kelompok Diskon Penjualan atau Pendapatan Lain-lain");
+  // akun bukan rinci Pendapatan ditolak tanpa memuat daftar akun (urutan pemeriksaan sama dengan sebelumnya)
+  const alasan = alasanAkunFeeTidakSah(akun, akun.jenis === "PENDAPATAN" && !akun.kelompok ? await idBukanOmzet(tx, m) : new Set());
+  if (alasan) throw new Error(alasan);
   return akun.id;
 }
 

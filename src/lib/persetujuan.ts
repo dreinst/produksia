@@ -81,6 +81,8 @@ export function pastikanTransisi(dok: DokumenPersetujuan, ke: Exclude<StatusPers
   if (dok.statusPersetujuan === "DISETUJUI") {
     throw new Error(`${label} ${dok.nomor} sudah disetujui dan jurnalnya sudah masuk buku besar; koreksi dilakukan dengan menghapus dokumen, bukan mengubah statusnya`);
   }
+  // klik ganda atau dua tab: aksi kedua menemukan status tujuannya sudah tercapai (tinjauan perbaikan P21 butir 5)
+  if (dok.statusPersetujuan === ke) throw new Error(`${label} ${dok.nomor} sudah berstatus "${sekarang}". Muat ulang halaman untuk melihat status terbarunya`);
   throw new Error(`${label} ${dok.nomor} berstatus "${sekarang}", tidak bisa diubah menjadi "${tujuan}"`);
 }
 
@@ -173,10 +175,12 @@ type Berkas = {
   kode: KodeDokumen;
   jalur: readonly string[];
   /**
-   * Mengunci baris dokumen (SELECT ... FOR UPDATE) di transaksi transisi, SEBELUM statusnya dibaca. Dua transisi
-   * serentak atas dokumen yang sama (dua setujui, atau setujui dan tolak) jadi berurutan: yang kedua menunggu yang
-   * pertama selesai, lalu membaca status terbarunya dan ditolak pastikanTransisi. Tanpa kunci keduanya bisa melihat
-   * MENUNGGU dan mencatat dua jurnal (tinjauan P21 butir 1). Wajib ada di setiap berkas, termasuk jenis baru.
+   * Mengunci baris dokumen (SELECT ... FOR NO KEY UPDATE) di transaksi transisi dan hapus, SEBELUM statusnya dibaca.
+   * Dua transisi serentak atas dokumen yang sama (dua setujui, atau setujui dan tolak), juga setujui dan hapus, jadi
+   * berurutan: yang kedua menunggu yang pertama selesai, lalu membaca status terbarunya dan ditolak pastikanTransisi.
+   * Tanpa kunci keduanya bisa melihat MENUNGGU dan mencatat dua jurnal (tinjauan P21 butir 1). NO KEY UPDATE cukup
+   * untuk menyerialkan sesamanya dan DELETE, tetapi tidak menghalangi sisipan baris anak yang hanya mengambil
+   * FOR KEY SHARE lewat kunci asing (tinjauan perbaikan P21 butir 6). Wajib ada di setiap berkas, termasuk jenis baru.
    */
   kunci: (tx: Tx, id: string) => Promise<void>;
   baca: (tx: Tx, id: string) => Promise<DokumenPersetujuan | null>;
@@ -218,7 +222,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Faktur Penjualan",
     kode: "faktur",
     jalur: ["/penjualan/faktur", "/penjualan/pesanan", "/buku-besar/jurnal"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "FakturPenjualan" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "FakturPenjualan" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: (tx, id) => tx.fakturPenjualan.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.fakturPenjualan.update({ where: { id }, data })),
     posting: async (tx, id) => {
@@ -264,7 +268,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Faktur Pembelian",
     kode: "faktur-pembelian",
     jalur: ["/pembelian/faktur", "/pembelian/pesanan", "/buku-besar/jurnal"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "FakturPembelian" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "FakturPembelian" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: (tx, id) => tx.fakturPembelian.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.fakturPembelian.update({ where: { id }, data })),
     posting: async (tx, id) => {
@@ -295,7 +299,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     // Hak diperiksa per jenis (kas-masuk / kas-keluar) di hakSetujui(); nilai ini hanya cadangan
     kode: "kas-keluar",
     jalur: ["/kas-bank/masuk", "/kas-bank/keluar", "/buku-besar/jurnal"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "DokumenKas" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "DokumenKas" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: (tx, id) => tx.dokumenKas.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.dokumenKas.update({ where: { id }, data })),
     posting: async (tx, id) => {
@@ -330,7 +334,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Penyesuaian Stok",
     kode: "penyesuaian",
     jalur: ["/persediaan/penyesuaian", "/persediaan", "/buku-besar/jurnal"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "PenyesuaianPersediaan" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "PenyesuaianPersediaan" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: (tx, id) => tx.penyesuaianPersediaan.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.penyesuaianPersediaan.update({ where: { id }, data })),
     /**
@@ -347,7 +351,15 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       // sama dengan pastikanPerusahaanAktif (tinjauan P15 butir 10A): draf yang dibuat sebelum perusahaannya
       // diarsipkan tidak boleh mengubah stok dan buku perusahaan arsip saat disetujui
       if (!p.perusahaan.aktif) throw new Error(`Perusahaan ${p.perusahaan.nama} sudah diarsipkan; aktifkan dulu`);
-      for (const b of p.baris) {
+      // Baris stok dikunci FOR UPDATE sebelum dibandingkan, urut barangId (satu gudang per dokumen), supaya mutasi
+      // stok lain (SJ, terima barang, penyesuaian lain) tidak bisa masuk di antara pemeriksaan dan penulisan nilai
+      // absolut di bawah, dan dua dokumen berbaris banyak mengunci dengan urutan yang sama (tinjauan perbaikan P21
+      // butir 2). Baris stok yang belum ada untuk barang yang berubah dibuat nol lebih dulu supaya ikut terkunci.
+      const diurut = [...p.baris].sort((x, y) => (x.barangId < y.barangId ? -1 : x.barangId > y.barangId ? 1 : 0));
+      const berubah = diurut.filter((b) => !D(b.jumlahSesudah).equals(D(b.jumlahSebelum)));
+      if (berubah.length) await tx.stokBarang.createMany({ data: berubah.map((b) => ({ barangId: b.barangId, gudangId: p.gudangId, jumlah: 0 })), skipDuplicates: true });
+      for (const b of diurut) await tx.$queryRaw`SELECT 1 FROM "StokBarang" WHERE "barangId" = ${b.barangId} AND "gudangId" = ${p.gudangId} FOR UPDATE`;
+      for (const b of diurut) {
         const stok = await tx.stokBarang.findUnique({ where: { barangId_gudangId: { barangId: b.barangId, gudangId: p.gudangId } } });
         const sekarang = D(stok?.jumlah ?? 0);
         if (!sekarang.equals(D(b.jumlahSebelum))) {
@@ -382,7 +394,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Peminjaman Barang",
     kode: "peminjaman",
     jalur: ["/persediaan/peminjaman", "/persediaan"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "PeminjamanBarang" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "PeminjamanBarang" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: async (tx, id) => {
       const p = await tx.peminjamanBarang.findUnique({
         where: { id },
@@ -426,7 +438,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Laporan Kerusakan Barang",
     kode: "kerusakan",
     jalur: ["/persediaan/kerusakan", "/persediaan"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "LaporanKerusakanBarang" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "LaporanKerusakanBarang" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: async (tx, id) => {
       const k = await tx.laporanKerusakanBarang.findUnique({
         where: { id },
@@ -459,7 +471,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Aset Tetap",
     kode: "aset",
     jalur: ["/aset-tetap", "/buku-besar/jurnal"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "AsetTetap" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "AsetTetap" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: async (tx, id) => {
       const a = await tx.asetTetap.findUnique({
         where: { id },
@@ -489,7 +501,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Penggajian",
     kode: "penggajian",
     jalur: ["/sdm/penggajian", "/buku-besar/jurnal"],
-    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "Penggajian" WHERE "id" = ${id} FOR UPDATE`),
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "Penggajian" WHERE "id" = ${id} FOR NO KEY UPDATE`),
     baca: (tx, id) => tx.penggajian.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.penggajian.update({ where: { id }, data })),
     posting: async (tx, id) => {

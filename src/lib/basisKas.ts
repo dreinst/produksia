@@ -4,7 +4,7 @@ import { D, jumlahkan, type Desimal } from "@/lib/uang";
 import { susunHierarki, type AkunSaldo, type BarisLaporan, type OpsiLaporan, type Periode } from "@/lib/laporan";
 import { kelasArus } from "@/lib/arusKas";
 import { akunPemetaanTambahan } from "@/lib/baganAkun";
-import { KUNCI_AKUN_FEE } from "@/lib/akuntansi";
+import { KUNCI_AKUN_FEE, alasanAkunFeeTidakSah, idBukanOmzetDari } from "@/lib/akuntansi";
 import { bobotBaris } from "@/lib/nilaiBaris";
 
 /*
@@ -92,10 +92,13 @@ async function kumpulkanKas(klien: PrismaClient, dari: Date, sampai: Date, opsi:
     },
   });
   const akunPendapatanBawaan = pemetaan?.pendapatanPenjualanId ?? null;
-  // akun fee sama dengan jurnal faktur (D2 §4.4); tanpa pemetaan tambahan = akun pendapatan bawaan. Pemetaan yang bukan
-  // akun rinci Pendapatan juga jatuh ke akun bawaan: jurnal faktur menolaknya, tetapi uang muka pesanan ber-fee tetap
-  // tercatat, dan bagian fee kasnya akan hilang dari Laba Rugi kas bila dialokasikan ke akun itu (tinjauan P21 butir 3).
-  const akunFee = akunFeeTambahan && akunFeeTambahan.jenis === "PENDAPATAN" && !akunFeeTambahan.kelompok ? akunFeeTambahan.id : akunPendapatanBawaan;
+  // akun fee sama dengan jurnal faktur (D2 §4.4); tanpa pemetaan tambahan = akun pendapatan bawaan. Pemetaan yang ditolak
+  // aturan jurnal faktur (alasanAkunFeeTidakSah: bukan akun rinci Pendapatan, atau di kelompok Diskon Penjualan dan
+  // Pendapatan Lain-lain) juga jatuh ke akun bawaan: uang muka pesanan ber-fee tetap tercatat, dan bagian fee kasnya
+  // akan hilang dari pendapatan atau masuk kelompok yang salah bila dialokasikan ke akun itu (tinjauan P21 butir 3 dan
+  // tinjauan perbaikan P21 butir 3).
+  const bukanOmzet = idBukanOmzetDari(daftarAkun, { diskonPenjualanId: pemetaan?.diskonPenjualanId ?? null, pendapatanLainId: pemetaan?.pendapatanLainId ?? null });
+  const akunFee = akunFeeTambahan && alasanAkunFeeTidakSah(akunFeeTambahan, bukanOmzet) === null ? akunFeeTambahan.id : akunPendapatanBawaan;
   /**
    * Bobot alokasi satu dokumen. Tanpa fee persis seperti sebelumnya (diskon tidak menggeser bobot). Dengan fee > 0,
    * diskon hanya mengurangi baris barang (fee dihitung sesudah diskon), lalu fee menjadi entri terakhir. Entri fee

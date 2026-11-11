@@ -12,10 +12,12 @@ import { bentrokNomorCetak, simpanNomorCetak } from "../src/lib/nomorCetak";
 import {
   KUNCI_AKUN_FEE,
   akunFeeManajemen,
+  alasanAkunFeeTidakSah,
   catatJurnalFakturPenjualan,
   catatJurnalPenerimaanPenjualan,
   catatJurnalReturPenjualan,
   catatJurnalUangMuka,
+  idBukanOmzetDari,
   type BarisDokumen,
 } from "../src/lib/akuntansi";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
@@ -35,8 +37,9 @@ import { harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
  *    rencana termin; hak hapus dan setujui;
  * 8. persetujuan bersamaan (tinjauan P21 butir 1): dua setujui atas faktur atau kas masuk yang sama menghasilkan satu
  *    jurnal dan satu nomor cetak, setujui dan tolak bersamaan berakhir konsisten, ajukan ganda tercatat sekali;
- * 9. basis kas memakai akun Pendapatan Penjualan untuk bagian fee bila pemetaan fee bukan akun rinci Pendapatan
- *    (tinjauan P21 butir 3);
+ * 9. basis kas memakai akun Pendapatan Penjualan untuk bagian fee bila pemetaan fee ditolak aturan jurnal faktur
+ *    (bukan akun rinci Pendapatan, atau di kelompok Diskon Penjualan dan Pendapatan Lain-lain), lewat satu fungsi
+ *    alasanAkunFeeTidakSah yang sama dengan akunFeeManajemen (tinjauan P21 butir 3 dan tinjauan perbaikan P21 butir 3);
  * 10. hapus dan setujui serentak atas faktur dan kas masuk yang sama (temuan sampingan perbaikan P21): hasilnya selalu
  *    konsisten, tidak ada jurnal tanpa dokumen.
  * Bagian 1-6 dan 9 berjalan di transaksi yang selalu dibatalkan. Data bagian 5 (alur sungguhan), 7, 8, dan 10 dihapus di akhir,
@@ -513,7 +516,19 @@ async function main() {
     pastikan(p2002Bersyarat === "Nomor cetak UJIJP-GANDA sudah dipakai dokumen lain.", `P2002 nomor cetak dari updateMany diterjemahkan: ${p2002Bersyarat}`);
 
     console.log("=== 9. Basis kas: pemetaan fee yang bukan akun rinci Pendapatan memakai akun Pendapatan Penjualan ===");
-    for (const [label, akunPeta] of [["akun Kewajiban", kPpnK], ["akun kelompok Pendapatan", k4000]] as const) {
+    // satu aturan: alasanAkunFeeTidakSah memberi hasil yang sama dengan akunFeeManajemen untuk setiap calon akun
+    const semuaAkun = await db.akun.findMany({ select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } });
+    const bukanOmzet = idBukanOmzetDari(semuaAkun, m);
+    for (const calon of [k4000, kKas, kPpnK, akunLain.id, akunPotongan.id, m.diskonPenjualanId!, akunFee.id, k4200]) {
+      const akunCalon = semuaAkun.find((a) => a.id === calon)!;
+      const dariJurnal = await galat(() => dalamTransaksiBatal(async (tx) => {
+        await tx.pemetaanAkunTambahan.create({ data: { kunci: KUNCI_AKUN_FEE, label: "Pendapatan Fee Manajemen", dibuatOleh: "uji", akunId: calon } });
+        return akunFeeManajemen(tx, m as Parameters<typeof akunFeeManajemen>[1]);
+      }));
+      const murni = alasanAkunFeeTidakSah(akunCalon, bukanOmzet) ?? "";
+      pastikan(dariJurnal === murni, `aturan akun fee ${akunCalon.kode}: jurnal faktur dan fungsi bersama sama ("${murni || "sah"}")`);
+    }
+    for (const [label, akunPeta] of [["akun Kewajiban", kPpnK], ["akun kelompok Pendapatan", k4000], ["akun di kelompok Pendapatan Lain-lain", akunLain.id], ["akun di kelompok Diskon Penjualan", akunPotongan.id]] as const) {
       const hasil = await dalamTransaksiBatal(async (tx) => {
         await tx.pemetaanAkunTambahan.create({ data: { kunci: KUNCI_AKUN_FEE, label: "Pendapatan Fee Manajemen", dibuatOleh: "uji", akunId: akunPeta } });
         const kini = new Date();
