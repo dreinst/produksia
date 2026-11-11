@@ -26,6 +26,9 @@ import {
  * Notifikasi (D7 §3.4.4) dikirim di transaksi yang sama setelah log; galatnya tidak menggagalkan persetujuan.
  */
 
+/** Batas waktu transaksi persetujuan (bawaan Prisma 5 detik); notifikasi menambah beberapa kueri ke posting yang berat. */
+const BATAS_WAKTU_PERSETUJUAN = 15_000;
+
 async function segarkan(jenis: JenisPersetujuan) {
   for (const jalur of BERKAS[jenis].jalur) revalidatePath(jalur);
   revalidatePath("/persetujuan");
@@ -45,7 +48,7 @@ export async function ajukanDokumen(jenis: JenisPersetujuan, id: string) {
     const rinci = berkas.ringkas ? await berkas.ringkas(tx, id) : "";
     await catatLogPersetujuan(tx, pengguna, "AJUKAN", berkas.label, dok.nomor, `Diajukan untuk persetujuan${rinci ? `; ${rinci}` : ""}`);
     await beritahuPersetujuan(tx, { aksi: "AJUKAN", jenis, id, pelaku: pengguna, nomor: dok.nomor, pengajuId: dok.diajukanOlehId });
-  });
+  }, { timeout: BATAS_WAKTU_PERSETUJUAN });
 
   await segarkan(jenis);
 }
@@ -71,7 +74,7 @@ export async function setujuiDokumen(jenis: JenisPersetujuan, id: string) {
     const rinci = berkas.ringkas ? await berkas.ringkas(tx, id) : "";
     await catatLogPersetujuan(tx, pengguna, "SETUJUI", berkas.label, dok.nomor, `Disetujui, jurnal dicatat${rinci ? `; ${rinci}` : ""}`);
     await beritahuPersetujuan(tx, { aksi: "SETUJUI", jenis, id, pelaku: pengguna, nomor: dok.nomor, pengajuId: dok.diajukanOlehId });
-  });
+  }, { timeout: BATAS_WAKTU_PERSETUJUAN });
 
   await segarkan(jenis);
 }
@@ -92,7 +95,7 @@ export async function tolakDokumen(jenis: JenisPersetujuan, id: string, catatan:
     await berkas.simpan(tx, id, dataTolak(pengguna, alasan));
     await catatLogPersetujuan(tx, pengguna, "TOLAK", berkas.label, dok.nomor, `Ditolak: ${alasan}`);
     await beritahuPersetujuan(tx, { aksi: "TOLAK", jenis, id, pelaku: pengguna, nomor: dok.nomor, pengajuId: dok.diajukanOlehId, catatan: alasan });
-  });
+  }, { timeout: BATAS_WAKTU_PERSETUJUAN });
 
   await segarkan(jenis);
 }

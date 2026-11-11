@@ -17,6 +17,7 @@ import { buatKasKeluar, buatKasMasuk } from "../src/lib/aksi/jurnal";
 import { buatPeminjamanBarang } from "../src/lib/aksi/peminjaman";
 import { buatFaktur, buatPesanan } from "../src/lib/aksi/penjualan";
 import { tanggalIso } from "../src/lib/waktu";
+import { periksaSinkron } from "../src/lib/sinkron";
 import { GET } from "../src/app/api/notifikasi/route";
 import { aturPersetujuan, formulir, jalankan, sebagai } from "./bantuan";
 
@@ -24,7 +25,9 @@ import { aturPersetujuan, formulir, jalankan, sebagai } from "./bantuan";
  * Uji notifikasi dan pengingat (D7 §9.4, D4 §9.1 bagian 10): kirimNotifikasi, penggunaDenganHak (termasuk peran
  * tambahan), notifikasi maker-checker beserta pembungkus SAVEPOINT (DESAIN G14), pengingat faktur dan tindak lanjut,
  * baca/buka/tandai, aturPerusahaanAktif, route GET /api/notifikasi, dan hapus pengguna. Data uji: pengguna ujin-*,
- * kode UJIN-*, perusahaan UJINA; notifikasi dan log sejak mulaiUji. Pemeriksa lokal melempar galat (bukan
+ * kode UJIN-*, perusahaan UJINA. Notifikasi dan log pengguna lain (mis. pemeriksa bawaan seed) dibuang menurut
+ * penanda suite: nomor dokumen uji atau teks "UJIN", bukan rentang waktu, supaya data penulis lain tidak ikut terhapus.
+ * periksaSinkron sebelum dan sesudah suite harus identik (DESAIN G15). Pemeriksa lokal melempar galat (bukan
  * process.exit) supaya blok finally selalu membersihkan data dan baris HakAksesPeran.
  */
 
@@ -62,11 +65,25 @@ const sesiDari = async (namaPengguna: string) => {
   return s;
 };
 
-async function bersihkan(mulaiUji: Date | null) {
-  await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "faktur.setujui" } });
+/** Pemicu sementara yang membuat sisipan Notifikasi gagal di basis data (uji G14 lewat aksi nyata). */
+const PEMICU_GAGAL = "ujin_notifikasi_gagal";
+async function buangPemicuGagal() {
+  await db.$executeRawUnsafe(`DROP TRIGGER IF EXISTS ${PEMICU_GAGAL} ON "Notifikasi"`);
+  await db.$executeRawUnsafe(`DROP FUNCTION IF EXISTS ${PEMICU_GAGAL}()`);
+}
+
+async function bersihkan() {
+  await buangPemicuGagal();
+  await db.hakAksesPeran.deleteMany({ where: { OR: [{ peran: "ADMIN", hak: { in: ["faktur.setujui", "kas-masuk.setujui"] } }] } });
   // dokumen uji: kas, faktur dan pesanan, peminjaman, beserta jurnalnya
-  const kas = await db.dokumenKas.findMany({ where: { keterangan: { startsWith: KET_KAS } }, select: { id: true, jurnalId: true } });
-  const faktur = await db.fakturPenjualan.findMany({ where: { pelanggan: { kode: "UJIN-CUST" } }, select: { id: true, jurnalId: true } });
+  const kas = await db.dokumenKas.findMany({ where: { keterangan: { startsWith: KET_KAS } }, select: { id: true, jurnalId: true, nomor: true } });
+  const faktur = await db.fakturPenjualan.findMany({ where: { pelanggan: { kode: "UJIN-CUST" } }, select: { id: true, jurnalId: true, nomor: true } });
+  const pesanan = await db.pesananPenjualan.findMany({ where: { pelanggan: { kode: "UJIN-CUST" } }, select: { nomor: true } });
+  const pinjam = await db.peminjamanBarang.findMany({ where: { gudang: { kode: "UJIN-WH" } }, select: { nomor: true } });
+  const nomorUji = [...kas, ...faktur, ...pesanan, ...pinjam].map((d) => d.nomor);
+  // notifikasi dan log suite ini untuk pengguna di luar ujin-* (pemeriksa bawaan seed); milik ujin-* ikut terhapus Cascade
+  await db.notifikasi.deleteMany({ where: { OR: [{ judul: { contains: "UJIN" } }, ...nomorUji.flatMap((n) => [{ judul: { endsWith: ` ${n}` } }, { judul: { contains: ` ${n} ` } }])] } });
+  await db.logAktivitas.deleteMany({ where: { OR: [{ nomor: { startsWith: "UJIN" } }, { nomor: { in: nomorUji } }] } });
   const jurnalIds = [...kas, ...faktur].map((d) => d.jurnalId).filter((x): x is string => !!x);
   await db.dokumenKas.deleteMany({ where: { id: { in: kas.map((k) => k.id) } } });
   await db.barisFakturPenjualan.deleteMany({ where: { faktur: { pelanggan: { kode: "UJIN-CUST" } } } });
@@ -87,11 +104,6 @@ async function bersihkan(mulaiUji: Date | null) {
   await db.gudang.deleteMany({ where: { kode: "UJIN-WH" } });
   await db.pelanggan.deleteMany({ where: { kode: "UJIN-CUST" } });
   await db.akun.deleteMany({ where: { kode: { in: ["UJIN-KAS", "UJIN-PDPT"] } } });
-  if (mulaiUji) {
-    // notifikasi pemeriksa bawaan seed (owner, admin, ...) dan log persetujuan dari suite ini
-    await db.notifikasi.deleteMany({ where: { dibuatPada: { gte: mulaiUji } } });
-    await db.logAktivitas.deleteMany({ where: { waktu: { gte: mulaiUji } } });
-  }
   await db.pengguna.deleteMany({ where: { namaPengguna: { startsWith: P } } });
   await db.perusahaan.deleteMany({ where: { kode: "UJINA" } });
 }
@@ -103,8 +115,10 @@ async function buatPengguna(nama: string, peran: PeranPengguna, ekstra: { aktif?
 }
 
 async function main() {
-  await bersihkan(null);
+  await bersihkan();
   pastikan((await db.hakAksesPeran.count()) === 0, "HakAksesPeran kosong sebelum suite mulai");
+  const sinkronAwal = JSON.stringify(await periksaSinkron(db));
+  const idSeed = (await db.pengguna.findMany({ where: { NOT: { namaPengguna: { startsWith: P } } }, select: { id: true } })).map((p) => p.id);
   const mulaiUji = new Date();
   try {
     console.log("=== 0. Persiapan ===");
@@ -123,11 +137,16 @@ async function main() {
     pastikan(n1 === 1 && (await notif(admin.id, "UJIN satu")).length === 1, "duplikat, null, kosong, skrip-uji, nonaktif, dan pelaku dibuang: 1 baris untuk admin");
     pastikan((await notif(nonaktif.id)).length === 0 && (await notif(pemilik.id)).length === 0, "nonaktif dan pelaku tidak menerima");
     pastikan((await kirimNotifikasi(db, { penggunaIds: [null, "skrip-uji"], judul: "UJIN kosong", jenis: "STATUS" })) === 0, "tanpa penerima sah: 0");
-    for (const [t, harap] of [["https://luar.contoh/x", null], ["//x", null], ["crm", null], ["/crm/lead/1", "/crm/lead/1"]] as const) {
-      await kirimNotifikasi(db, { penggunaIds: [admin.id], judul: `UJIN tautan ${t}`, tautan: t, jenis: "STATUS" });
-      const [b] = await notif(admin.id, `UJIN tautan ${t}`);
-      pastikan(b.tautan === harap, `tautan ${t} disimpan ${harap ?? "null"}`);
+    for (const [t, harap] of [["https://luar.contoh/x", null], ["//x", null], ["crm", null], ["/\\x", null], ["/\t/x", null], ["/\\luar.contoh/x", null], ["/a\nb", null], ["/a\u007fb", null], ["/crm/lead/1", "/crm/lead/1"], [" /penjualan/faktur?q=1 ", "/penjualan/faktur?q=1"]] as const) {
+      const judul = `UJIN tautan ${JSON.stringify(t)}`;
+      await kirimNotifikasi(db, { penggunaIds: [admin.id], judul, tautan: t, jenis: "STATUS" });
+      const [b] = await notif(admin.id, judul);
+      pastikan(b.tautan === harap, `tautan ${JSON.stringify(t)} disimpan ${harap ?? "null"}`);
     }
+    for (const t of ["/\\x", "/\t/x", "/a\u007fb"]) {
+      await harusDitolak(`CHECK basis data untuk tautan ${JSON.stringify(t)}`, () => db.notifikasi.create({ data: { penggunaId: admin.id, judul: "UJIN tautan mentah", tautan: t, jenis: "STATUS" } }), "Notifikasi_tautan_tanpa_kendali");
+    }
+    pastikan((await notif(admin.id, "UJIN tautan mentah")).length === 0, "sisipan mentah bertautan berbahaya tidak tersimpan");
     await kirimNotifikasi(db, { penggunaIds: [admin.id], judul: `UJIN ${"j".repeat(195)}`, isi: "i".repeat(800), jenis: "STATUS" });
     const panjang = (await db.notifikasi.findFirstOrThrow({ where: { penggunaId: admin.id, judul: { startsWith: "UJIN jjj" } } }));
     pastikan(panjang.judul.length === 120 && panjang.judul.endsWith("…") && panjang.isi?.length === 500, "judul 200 karakter jadi 120 dengan …, isi 800 jadi 500");
@@ -210,6 +229,28 @@ async function main() {
     const penerimaPj = await db.notifikasi.findMany({ where: { judul: judulPj }, select: { pengguna: { select: { peran: true } } } });
     pastikan(penerimaPj.length > 0 && penerimaPj.every((n) => n.pengguna.peran === "PEMILIK"), "semua penerima peminjaman Gudang berperan utama Pemilik (Superadmin dibuang karena ada Pemilik)");
 
+    console.log("=== 3a. Pemilik tunggal mengajukan lewat ajukanDokumen: Superadmin tetap menerima ===");
+    // Pemegang kas-masuk.setujui dibuat hanya pelaku (Pemilik uji) dan Superadmin: ADMIN dimatikan lewat HakAksesPeran,
+    // Pemilik lain (termasuk bawaan seed) dinonaktifkan sementara dan dipulihkan di finally.
+    const pemilikLain = (await db.pengguna.findMany({ where: { peran: "PEMILIK", aktif: true, id: { not: pemilik.id } }, select: { id: true } })).map((p) => p.id);
+    await db.hakAksesPeran.create({ data: { peran: "ADMIN", hak: "kas-masuk.setujui", boleh: false } });
+    await db.pengguna.updateMany({ where: { id: { in: pemilikLain } }, data: { aktif: false } });
+    try {
+      const pemegang = await penggunaDenganHak(db, "kas-masuk.setujui");
+      pastikan(pemegang.some((p) => p.id === pemilik.id) && pemegang.every((p) => p.id === pemilik.id || p.peran === "SUPERADMIN"), "pemegang kas-masuk.setujui hanya Pemilik uji dan Superadmin");
+      await sebagai(`${P}pemilik`, () => jalankan("pemilik membuat Kas Masuk (DRAFT)", () => buatKasMasuk(formulir({ akunKasId: akunKas.id, akunLawanId: akunPdpt.id, jumlah: 70000, keterangan: `${KET_KAS} tunggal` }))));
+      const kmT = await db.dokumenKas.findFirstOrThrow({ where: { keterangan: `${KET_KAS} tunggal` } });
+      await sebagai(`${P}pemilik`, () => jalankan("pemilik tunggal mengajukan Kas Masuk", () => ajukanDokumen("dokumenKas", kmT.id)));
+      const judulT = `Persetujuan diminta: Kas Masuk ${kmT.nomor}`;
+      const penerimaT = await db.notifikasi.findMany({ where: { judul: judulT }, select: { penggunaId: true, isi: true, pengguna: { select: { peran: true } } } });
+      pastikan((await notif(superadmin.id, judulT)).length === 1 && (await notif(pemilik.id, judulT)).length === 0, "Superadmin uji menerima permintaan, pelaku tidak");
+      pastikan(penerimaT.length > 0 && penerimaT.every((n) => n.pengguna.peran === "SUPERADMIN" && n.isi === "Diajukan oleh Pemilik"), `semua penerima Superadmin (${penerimaT.length}), isi "Diajukan oleh Pemilik"`);
+    } finally {
+      await db.pengguna.updateMany({ where: { id: { in: pemilikLain } }, data: { aktif: true } });
+      await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "kas-masuk.setujui" } });
+    }
+    pastikan((await db.pengguna.count({ where: { id: { in: pemilikLain }, aktif: true } })) === pemilikLain.length && (await db.hakAksesPeran.count()) === 0, "Pemilik lain aktif lagi dan HakAksesPeran kosong");
+
     console.log("=== 3b. Galat notifikasi tidak menggagalkan transaksi (SAVEPOINT) ===");
     const pelakuPemilik = await sesiDari(`${P}pemilik`);
     const hasilGagal = await db.$transaction(async (tx) => {
@@ -229,6 +270,31 @@ async function main() {
     const hasilBaik = await db.$transaction((tx) => beritahuPersetujuan(tx, { aksi: "SETUJUI", jenis: "faktur", id: "tidak-ada", pelaku: pelakuPemilik, nomor: "UJIN-G14", pengajuId: admin.id }));
     const [nBaik] = await notif(admin.id, "Faktur Penjualan UJIN-G14 disetujui");
     pastikan(hasilBaik === 1 && nBaik?.perusahaanId === null && nBaik.tautan === "/penjualan/faktur", "kontrol: tanpa galat, notifikasi tersimpan (dokumen tidak ada: perusahaan null)");
+
+    console.log("=== 3c. Sisipan notifikasi gagal di basis data saat setujuiDokumen: dokumen tetap disetujui (G14) ===");
+    await sebagai(`${P}kasir`, () => jalankan("kasir membuat Kas Masuk G14", () => buatKasMasuk(formulir({ akunKasId: akunKas.id, akunLawanId: akunPdpt.id, jumlah: 30000, keterangan: `${KET_KAS} g14` }))));
+    const kmG = await db.dokumenKas.findFirstOrThrow({ where: { keterangan: `${KET_KAS} g14` } });
+    await sebagai(`${P}kasir`, () => jalankan("kasir mengajukan Kas Masuk G14", () => ajukanDokumen("dokumenKas", kmG.id)));
+    await db.$executeRawUnsafe(`CREATE FUNCTION ${PEMICU_GAGAL}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'notifikasi uji gagal'; END $$`);
+    await db.$executeRawUnsafe(`CREATE TRIGGER ${PEMICU_GAGAL} BEFORE INSERT ON "Notifikasi" FOR EACH ROW WHEN (NEW."penggunaId" = '${kasir.id}') EXECUTE FUNCTION ${PEMICU_GAGAL}()`);
+    try {
+      await harusDitolak("kontrol: pemicu menolak sisipan notifikasi untuk kasir", () => kirimNotifikasi(db, { penggunaIds: [kasir.id], judul: "UJIN pemicu", jenis: "STATUS" }), "notifikasi uji gagal");
+      await sebagai(`${P}admin`, () => jalankan("admin menyetujui Kas Masuk G14 saat sisipan notifikasi gagal", () => setujuiDokumen("dokumenKas", kmG.id)));
+    } finally {
+      await buangPemicuGagal();
+    }
+    const kmGSetelah = await db.dokumenKas.findUniqueOrThrow({ where: { id: kmG.id } });
+    pastikan(kmGSetelah.statusPersetujuan === "DISETUJUI" && !!kmGSetelah.jurnalId && kmGSetelah.disetujuiOlehId === admin.id, "Kas Masuk G14 tetap DISETUJUI dengan jurnal dan penyetuju");
+    pastikan((await db.logAktivitas.count({ where: { nomor: kmG.nomor, aksi: "SETUJUI", waktu: { gte: mulaiUji } } })) === 1, "log SETUJUI Kas Masuk G14 tercatat");
+    pastikan((await notif(kasir.id, `Kas Masuk ${kmG.nomor} disetujui`)).length === 0, "notifikasi hasil yang gagal tidak tersimpan");
+    pastikan((await kirimNotifikasi(db, { penggunaIds: [kasir.id], judul: "UJIN pemicu", jenis: "STATUS" })) === 1, "pemicu sudah dibuang: sisipan untuk kasir berhasil lagi");
+
+    console.log("=== 3d. Tautan antrean Laporan Kerusakan ===");
+    const pelakuGudang = await sesiDari(`${P}gudang`);
+    const jumlahKr = await db.$transaction((tx) => beritahuPersetujuan(tx, { aksi: "AJUKAN", jenis: "kerusakan", id: "tidak-ada", pelaku: pelakuGudang, nomor: "UJIN-KR", pengajuId: gudang.id }));
+    const nKr = await db.notifikasi.findMany({ where: { judul: { endsWith: " UJIN-KR" } } });
+    const nKrPemilik = nKr.find((n) => n.penggunaId === pemilik.id);
+    pastikan(jumlahKr > 0 && nKrPemilik?.tautan === "/persediaan/kerusakan" && nKrPemilik.judul.startsWith("Persetujuan diminta: ") && nKr.every((n) => n.tautan === "/persediaan/kerusakan" && n.penggunaId !== gudang.id), "pengajuan Laporan Kerusakan menautkan ke /persediaan/kerusakan, pelaku tidak menerima");
     aturPersetujuan(false);
 
     console.log("=== 4. Pengingat faktur ===");
@@ -275,6 +341,20 @@ async function main() {
     const sesiAdmin = await sesiDari(`${P}admin`);
     pastikan((await periksaPengingat(sesiAdmin, { paksa: true })) === 0, "pengguna yang bukan pengaju faktur tidak diingatkan");
     pastikan((await periksaPengingat({ ...sesiKasir, id: "skrip-uji" }, { paksa: true })) === 0, "pengguna skrip-uji diabaikan");
+    const f7 = await fakturBaru("F7");
+    await db.fakturPenjualan.update({ where: { id: f7.id }, data: { jatuhTempo: new Date(`${geserHari(-2)}T12:00:00+07:00`), status: "DIBATALKAN" } });
+    pastikan((await periksaPengingat(sesiKasir, { paksa: true })) === 0 && (await kunciF(f7.id)).length === 0, "F7 DIBATALKAN: tidak diingatkan");
+    // batas 50 per pemeriksaan (DESAIN R-15): 51 faktur jatuh tempo dibuat langsung tanpa baris dan jurnal
+    const contohF = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: f6.id } });
+    await db.fakturPenjualan.createMany({
+      data: Array.from({ length: 51 }, (_, i) => ({
+        nomor: `UJIN-FB-${String(i).padStart(2, "0")}`, pelangganId: pelanggan.id, perusahaanId: contohF.perusahaanId, status: contohF.status,
+        statusPersetujuan: "DISETUJUI" as const, diajukanOlehId: kasir.id, jatuhTempo: new Date(`${geserHari(-5)}T12:00:00+07:00`),
+      })),
+    });
+    pastikan((await periksaPengingat(sesiKasir, { paksa: true })) === 50, "51 faktur jatuh tempo: pemeriksaan pertama tepat 50 (BATAS_PENGINGAT)");
+    pastikan((await periksaPengingat(sesiKasir, { paksa: true })) === 1, "pemeriksaan kedua: sisanya 1");
+    pastikan((await periksaPengingat(sesiKasir, { paksa: true })) === 0 && (await db.notifikasi.count({ where: { penggunaId: kasir.id, kunci: { startsWith: AWALAN_KUNCI_FAKTUR } } })) === 55, "pemeriksaan ketiga: 0, total kunci faktur kasir 55 (F1, F2, F5, F6, dan 51)");
 
     console.log("=== 4b. Pengingat tindak lanjut (D4 §3.5) ===");
     const tahap = await db.tahapLead.create({ data: { perusahaanId: "utama", nama: "UJIN Tahap", urutan: 99 } });
@@ -291,14 +371,14 @@ async function main() {
     const t1 = await tl("UJIN T1", jam(-1));
     pastikan((await periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })) === 1, "T1 lewat 1 jam: 1 notifikasi");
     const [nT1] = await tlAdmin();
-    pastikan(nT1?.jenis === "TINDAK_LANJUT" && nT1.isi === "UJIN T1" && nT1.tautan === "/crm/tindak-lanjut" && nT1.perusahaanId === "utama", "isi judul, tautan /crm/tindak-lanjut tanpa lead, perusahaan tindak lanjut");
+    pastikan(nT1?.jenis === "TINDAK_LANJUT" && nT1.isi === "UJIN T1" && nT1.tautan === null && nT1.perusahaanId === "utama", "isi judul, tautan null sampai rute /crm ada (P32), perusahaan tindak lanjut");
     pastikan((await db.tindakLanjut.findUniqueOrThrow({ where: { id: t1.id } })).diingatkanPada?.getTime() === kini.getTime(), "diingatkanPada T1 terisi");
     pastikan((await periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })) === 0, "dipanggil lagi: 0");
     const t2 = await tl("UJIN T2", jam(-2), { leadId: leadAktif.id });
     const serentak = await Promise.all([periksaPengingatTindakLanjut(admin.id, kini, { paksa: true }), periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })]);
     const nT2 = (await tlAdmin()).filter((n) => n.isi?.startsWith("UJIN T2"));
     pastikan(serentak[0] + serentak[1] === 1 && nT2.length === 1, `T2 dengan dua panggilan serentak: total tepat 1 (${serentak.join("+")})`);
-    pastikan(nT2[0].isi === "UJIN T2 · UJIN Lead Aktif" && nT2[0].tautan === `/crm/lead/${leadAktif.id}`, "isi memuat nama lead, tautan ke lead");
+    pastikan(nT2[0].isi === "UJIN T2 · UJIN Lead Aktif" && nT2[0].tautan === null, "isi memuat nama lead, tautan null sampai P32");
     void t2;
     const t3 = await tl("UJIN T3", jam(24));
     pastikan((await periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })) === 0, "T3 besok: tidak diingatkan");
@@ -313,6 +393,11 @@ async function main() {
     pastikan((await periksaPengingatTindakLanjut(null, kini, { paksa: true })) === 0 && (await periksaPengingatTindakLanjut("skrip-uji", kini, { paksa: true })) === 0, "null dan skrip-uji: 0");
     await tl("UJIN T7", jam(-1), { ditugaskanKeId: nonaktif.id });
     pastikan((await periksaPengingatTindakLanjut(nonaktif.id, kini, { paksa: true })) === 0 && (await notif(nonaktif.id)).length === 0, "penerima nonaktif tidak mendapat notifikasi");
+    const t8 = await tl("UJIN T8", jam(-1));
+    pastikan(sesiAdmin.hak.includes("lead.lihat"), "admin memegang lead.lihat");
+    const adminTanpaLead = { ...sesiAdmin, hak: sesiAdmin.hak.filter((h) => h !== "lead.lihat") };
+    pastikan((await periksaPengingat(adminTanpaLead, { paksa: true, sekarang: kini })) === 0 && (await db.tindakLanjut.findUniqueOrThrow({ where: { id: t8.id } })).diingatkanPada === null, "periksaPengingat untuk penerima tanpa lead.lihat: T8 tidak diingatkan");
+    pastikan((await periksaPengingat(sesiAdmin, { paksa: true, sekarang: kini })) === 1 && (await tlAdmin()).some((n) => n.isi === "UJIN T8"), "kontrol: dengan lead.lihat, T8 diingatkan lewat periksaPengingat");
     void t3;
 
     console.log("=== 5. Baca dan buka ===");
@@ -357,6 +442,11 @@ async function main() {
     await harusDitolak("admin memilih perusahaan arsip", () => sebagai(`${P}admin`, () => aturPerusahaanAktif(arsip.id, { sesiId: sesiAdminId })), "sudah diarsipkan");
     await harusDitolak("simpanLingkupSesi perusahaan arsip (pembanding)", () => simpanLingkupSesi(db, sesiAdminId, arsip.id, sesiAdmin), "sudah diarsipkan");
     await harusDitolak("perusahaan tidak ada", () => sebagai(`${P}admin`, () => aturPerusahaanAktif("tidak-ada", { sesiId: sesiAdminId })), "Perusahaan tidak ditemukan");
+    // notifikasi yang merujuk perusahaan arsip tetap bisa dibuka; penggantian lingkup yang ditolak tidak menggagalkannya
+    await kirimNotifikasi(db, { penggunaIds: [kasir.id], judul: "UJIN perusahaan arsip", jenis: "STATUS", tautan: "/penjualan/faktur", perusahaanId: arsip.id });
+    const [nArsip] = await notif(kasir.id, "UJIN perusahaan arsip");
+    await denganEnv({ UJI_PERUSAHAAN: "utama" }, () => sebagai(`${P}kasir`, () => jalankan("kasir membuka notifikasi milik perusahaan arsip", () => bukaNotifikasi(nArsip.id))));
+    pastikan((await db.notifikasi.findUniqueOrThrow({ where: { id: nArsip.id } })).dibaca && (await tandaiDibuka(db, kasir.id, nArsip.id))?.tautan === "/penjualan/faktur", "notifikasi perusahaan arsip terbuka tanpa galat dan tautannya tetap");
     pastikan((await lingkupSesi(sesiAdminId)) === null, "penolakan tidak mengubah lingkup sesi");
     await harusDitolak("kasir memilih gabungan", () => sebagai(`${P}kasir`, () => aturPerusahaanAktif(null, { sesiId: sesiKasirId })), "tidak punya hak");
     pastikan((await sebagai(`${P}kasir`, () => aturPerusahaanAktif("tapussa", { sesiId: sesiKasirId }))) && (await lingkupSesi(sesiKasirId)) === "tapussa", "kasir boleh memilih perusahaan aktif");
@@ -381,10 +471,12 @@ async function main() {
     pastikan((await db.notifikasi.count({ where: { penggunaId: desainer.id } })) === 0, "hapus pengguna berhasil tanpa P2003, notifikasinya ikut terhapus");
   } finally {
     aturPersetujuan(false);
-    await bersihkan(mulaiUji);
+    await bersihkan();
   }
   pastikan((await db.pengguna.count({ where: { namaPengguna: { startsWith: P } } })) === 0, "pengguna uji terhapus");
-  pastikan((await db.notifikasi.count({ where: { dibuatPada: { gte: mulaiUji } } })) === 0, "notifikasi uji terhapus");
+  pastikan((await db.notifikasi.count({ where: { judul: { contains: "UJIN" } } })) === 0 && (await db.logAktivitas.count({ where: { nomor: { startsWith: "UJIN" } } })) === 0, "notifikasi dan log berpenanda UJIN terhapus");
+  pastikan((await db.notifikasi.count({ where: { dibuatPada: { gte: mulaiUji }, penggunaId: { in: idSeed } } })) === 0, "notifikasi pemeriksa bawaan seed dari suite ini terhapus lewat nomor dokumen uji");
+  pastikan(JSON.stringify(await periksaSinkron(db)) === sinkronAwal, "periksaSinkron sesudah bersih identik dengan sebelum suite (G15)");
   pastikan((await db.hakAksesPeran.count()) === 0, "tidak ada HakAksesPeran tertinggal");
   console.log("=== DONE, semua pemeriksaan notifikasi lulus ===");
 }

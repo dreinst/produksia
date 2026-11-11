@@ -39,9 +39,15 @@ export type MasukanNotifikasi = {
   kunci?: string | null;
 };
 
-/** Tautan hanya path internal ("/x", bukan "//x" atau URL luar); selain itu null. */
+/**
+ * Tautan hanya path internal ("/x", bukan "//x" atau URL luar); selain itu null. Garis miring terbalik dan karakter
+ * kendali ditolak karena peramban mengubah "\" menjadi "/" dan membuang tab atau baris baru, sehingga "/\luar.contoh"
+ * dan "/<TAB>/luar.contoh" terbuka sebagai URL luar. Basis data menjaga hal yang sama lewat CHECK
+ * Notifikasi_tautan_tanpa_kendali.
+ */
 export function tautanInternal(tautan: string | null | undefined): string | null {
   const t = (tautan ?? "").trim();
+  if (/[\\\x00-\x1f\x7f]/.test(t)) return null;
   return t.startsWith("/") && !t.startsWith("//") ? t : null;
 }
 

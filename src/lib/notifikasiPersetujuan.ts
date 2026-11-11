@@ -103,7 +103,12 @@ export async function beritahuPersetujuan(tx: Tx, m: MasukanBeritahuPersetujuan)
     return jumlah;
   } catch (galat) {
     console.error("[notifikasi persetujuan]", galat);
-    await tx.$executeRawUnsafe("ROLLBACK TO SAVEPOINT notifikasi_persetujuan");
+    try {
+      await tx.$executeRawUnsafe("ROLLBACK TO SAVEPOINT notifikasi_persetujuan");
+    } catch {
+      // Transaksi sudah tertutup (mis. lewat batas waktu): galat notifikasi aslinya yang dilempar, bukan galat ROLLBACK
+      throw galat;
+    }
     return 0;
   }
 }

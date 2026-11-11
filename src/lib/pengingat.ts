@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import type { Prisma } from "@/prisma-klien/client";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { kirimNotifikasi } from "@/lib/notifikasi";
 import { formatTanggal, tanggalIso } from "@/lib/waktu";
@@ -30,22 +31,27 @@ function lewatPembatas(peta: Map<string, number>, penggunaId: string, paksa: boo
   return true;
 }
 
-/** Notifikasi "Faktur jatuh tempo" untuk faktur yang diajukan pengguna, sekali per faktur. */
+/**
+ * Notifikasi "Faktur jatuh tempo" untuk faktur yang diajukan pengguna, sekali per faktur. Faktur yang sudah
+ * diingatkan disaring dengan NOT EXISTS di basis data, jadi ukuran kueri tidak tumbuh bersama riwayat notifikasi.
+ */
 async function pengingatFaktur(pengguna: PenggunaSesi, sekarang: Date): Promise<number> {
   if (!punyaHak(pengguna, "faktur.lihat")) return 0;
-  const terkirim = await db.notifikasi.findMany({ where: { penggunaId: pengguna.id, kunci: { startsWith: AWALAN_KUNCI_FAKTUR } }, select: { kunci: true } });
-  const idTerkirim = terkirim.map((n) => (n.kunci ?? "").slice(AWALAN_KUNCI_FAKTUR.length));
+  const batasAtas = new Date(sekarang.getTime() + 86_400_000);
+  const calon = await db.$queryRaw<{ id: string }[]>`
+    SELECT f."id" FROM "FakturPenjualan" f
+    WHERE f."diajukanOlehId" = ${pengguna.id}
+      AND f."statusPersetujuan" = 'DISETUJUI'
+      AND f."status" NOT IN ('LUNAS', 'DIBATALKAN')
+      AND f."jatuhTempo" <= ${batasAtas}
+      AND NOT EXISTS (SELECT 1 FROM "Notifikasi" n WHERE n."penggunaId" = ${pengguna.id} AND n."kunci" = ${AWALAN_KUNCI_FAKTUR} || f."id")
+    ORDER BY f."jatuhTempo" ASC, f."id" ASC
+    LIMIT ${BATAS_PENGINGAT}`;
+  if (calon.length === 0) return 0;
   const daftar = await db.fakturPenjualan.findMany({
-    where: {
-      diajukanOlehId: pengguna.id,
-      statusPersetujuan: "DISETUJUI",
-      status: { notIn: ["LUNAS", "DIBATALKAN"] },
-      jatuhTempo: { lte: new Date(sekarang.getTime() + 86_400_000) },
-      ...(idTerkirim.length > 0 ? { id: { notIn: idTerkirim } } : {}),
-    },
+    where: { id: { in: calon.map((c) => c.id) } },
     select: { id: true, nomor: true, jatuhTempo: true, perusahaanId: true, pelanggan: { select: { nama: true } } },
     orderBy: [{ jatuhTempo: "asc" }, { id: "asc" }],
-    take: BATAS_PENGINGAT,
   });
   const hariIni = tanggalIso(sekarang);
   let jumlah = 0;
@@ -72,28 +78,33 @@ async function pengingatFaktur(pengguna: PenggunaSesi, sekarang: Date): Promise<
 export async function periksaPengingatTindakLanjut(penggunaId: string | null | undefined, sekarang = new Date(), opsi: { paksa?: boolean } = {}): Promise<number> {
   if (!penggunaId || penggunaId === ID_SKRIP_UJI) return 0;
   if (!lewatPembatas(terakhirTindakLanjut, penggunaId, !!opsi.paksa)) return 0;
+  // Syarat yang sama dipakai saat membaca dan saat mengklaim, supaya perubahan penerima, jatuh tempo, atau arsip
+  // lead di antara keduanya tidak menghasilkan pengingat untuk keadaan lama.
+  const syarat = {
+    ditugaskanKeId: penggunaId,
+    status: "MENUNGGU",
+    diingatkanPada: null,
+    jatuhTempo: { lte: sekarang },
+    OR: [{ leadId: null }, { lead: { dihapusPada: null } }],
+  } satisfies Prisma.TindakLanjutWhereInput;
   const daftar = await db.tindakLanjut.findMany({
-    where: {
-      ditugaskanKeId: penggunaId,
-      status: "MENUNGGU",
-      diingatkanPada: null,
-      jatuhTempo: { lte: sekarang },
-      OR: [{ leadId: null }, { lead: { dihapusPada: null } }],
-    },
-    select: { id: true, judul: true, leadId: true, perusahaanId: true, lead: { select: { nama: true } } },
+    where: syarat,
+    select: { id: true, judul: true, perusahaanId: true, lead: { select: { nama: true } } },
     orderBy: [{ jatuhTempo: "asc" }, { id: "asc" }],
     take: BATAS_PENGINGAT,
   });
   let jumlah = 0;
   for (const t of daftar) {
     jumlah += await db.$transaction(async (tx) => {
-      const klaim = await tx.tindakLanjut.updateMany({ where: { id: t.id, status: "MENUNGGU", diingatkanPada: null }, data: { diingatkanPada: sekarang } });
+      const klaim = await tx.tindakLanjut.updateMany({ where: { id: t.id, ...syarat }, data: { diingatkanPada: sekarang } });
       if (klaim.count !== 1) return 0;
       return kirimNotifikasi(tx, {
         penggunaIds: [penggunaId],
         judul: "Tindak lanjut jatuh tempo",
         isi: t.lead ? `${t.judul} · ${t.lead.nama}` : t.judul,
-        tautan: t.leadId ? `/crm/lead/${t.leadId}` : "/crm/tindak-lanjut",
+        // Rute /crm baru lahir di P32; sampai itu tautan kosong sehingga notifikasi dibuka ke /notifikasi.
+        // P32 mengisinya: t.leadId ? `/crm/lead/${t.leadId}` : "/crm/tindak-lanjut" (D4 §3.14).
+        tautan: null,
         jenis: "TINDAK_LANJUT",
         perusahaanId: t.perusahaanId,
       });
@@ -117,10 +128,13 @@ export async function periksaPengingat(pengguna: PenggunaSesi, opsi: OpsiPenging
   } catch (galat) {
     console.error("[pengingat]", galat);
   }
-  try {
-    jumlah += await periksaPengingatTindakLanjut(pengguna.id, sekarang, { paksa });
-  } catch (galat) {
-    console.error("[pengingat]", galat);
+  // Tindak lanjut memuat nama lead, jadi hanya untuk pemegang lead.lihat (D4 §3.5), sama seperti faktur.lihat di atas
+  if (punyaHak(pengguna, "lead.lihat")) {
+    try {
+      jumlah += await periksaPengingatTindakLanjut(pengguna.id, sekarang, { paksa });
+    } catch (galat) {
+      console.error("[pengingat]", galat);
+    }
   }
   return jumlah;
 }
