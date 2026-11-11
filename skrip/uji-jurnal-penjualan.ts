@@ -7,7 +7,7 @@ import { D, type Desimal } from "../src/lib/uang";
 import { nilaiBaris } from "../src/lib/nilaiBaris";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { labaRugiKas } from "../src/lib/basisKas";
-import { BERKAS } from "../src/lib/persetujuan";
+import { BERKAS, type JenisPersetujuan } from "../src/lib/persetujuan";
 import { bentrokNomorCetak, simpanNomorCetak } from "../src/lib/nomorCetak";
 import {
   KUNCI_AKUN_FEE,
@@ -19,7 +19,7 @@ import {
   type BarisDokumen,
 } from "../src/lib/akuntansi";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
-import { setujuiDokumen } from "../src/lib/aksi/persetujuan";
+import { ajukanDokumen, setujuiDokumen, tolakDokumen } from "../src/lib/aksi/persetujuan";
 import { harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
 
 /*
@@ -32,8 +32,12 @@ import { harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
  *    juga lewat setujuiDokumen sungguhan; P2002 nomor cetak diterjemahkan;
  * 6. basis kas membagi kas uang muka dan pelunasan ke akun fee secara proporsional;
  * 7. hapus faktur jalur id memulihkan sisa per baris pesanan dan baris SJ; hapus pesanan dan penawaran membuang
- *    rencana termin; hak hapus dan setujui.
- * Bagian 1-6 berjalan di transaksi yang selalu dibatalkan. Data bagian 5 (alur sungguhan) dan 7 dihapus di akhir,
+ *    rencana termin; hak hapus dan setujui;
+ * 8. persetujuan bersamaan (tinjauan P21 butir 1): dua setujui atas faktur atau kas masuk yang sama menghasilkan satu
+ *    jurnal dan satu nomor cetak, setujui dan tolak bersamaan berakhir konsisten, ajukan ganda tercatat sekali;
+ * 9. basis kas memakai akun Pendapatan Penjualan untuk bagian fee bila pemetaan fee bukan akun rinci Pendapatan
+ *    (tinjauan P21 butir 3).
+ * Bagian 1-6 dan 9 berjalan di transaksi yang selalu dibatalkan. Data bagian 5 (alur sungguhan), 7, dan 8 dihapus di akhir,
  * pemetaan tambahan fee uji dipulihkan, dan periksaSinkron(db) sama dengan sebelum uji.
  */
 
@@ -85,6 +89,16 @@ async function bersihkan() {
       await db.jurnal.delete({ where: { id: f.jurnalId } });
     }
   }
+  for (const d of await db.dokumenKas.findMany({ where: { nomor: { startsWith: AWALAN } }, select: { id: true, jurnalId: true } })) {
+    await db.dokumenKas.delete({ where: { id: d.id } });
+    if (d.jurnalId) {
+      await db.barisJurnal.deleteMany({ where: { jurnalId: d.jurnalId } });
+      await db.jurnal.delete({ where: { id: d.jurnalId } });
+    }
+  }
+  // jurnal tanpa dokumen (mis. jurnal kedua dari persetujuan ganda bila bagian 8 gagal) tetap dibersihkan
+  await db.barisJurnal.deleteMany({ where: { jurnal: { keterangan: { contains: `${AWALAN}-` } } } });
+  await db.jurnal.deleteMany({ where: { keterangan: { contains: `${AWALAN}-` } } });
   await db.barisPengiriman.deleteMany({ where: { pengiriman: { nomor: { startsWith: AWALAN } } } });
   await db.pengirimanPesanan.deleteMany({ where: { nomor: { startsWith: AWALAN } } });
   await db.rencanaTermin.deleteMany({ where: { OR: [{ pesanan: { nomor: { startsWith: AWALAN } } }, { penawaran: { nomor: { startsWith: AWALAN } } }] } });
@@ -424,6 +438,109 @@ async function main() {
     await jalankan("hapus penawaran bertermin", () => hapusDokumen("penawaran", pnw.id));
     pastikan((await db.penawaranPenjualan.count({ where: { id: pnw.id } })) === 0 && (await db.rencanaTermin.count({ where: { penawaranId: pnw.id } })) === 0, "hapus penawaran membuang rencana terminnya");
     pastikan((await db.logAktivitas.count({ where: { aksi: "HAPUS", nomor: { startsWith: AWALAN } } })) === 5, "lima penghapusan tercatat di log (faktur ber-fee, dua faktur, pesanan, penawaran)");
+
+    console.log("=== 8. Persetujuan bersamaan: satu jurnal dan satu nomor cetak (tinjauan P21 butir 1) ===");
+    // kunci baris tiap jenis dokumen persetujuan berjalan (nama tabel benar); id fiktif tidak mengunci apa pun
+    for (const jenis of Object.keys(BERKAS) as JenisPersetujuan[]) {
+      const pesan = await galat(() => dalamTransaksiBatal((tx) => BERKAS[jenis].kunci(tx, "tidak-ada")));
+      pastikan(pesan === "", `kunci baris ${jenis} berjalan ${pesan}`);
+    }
+    // dua aksi dijalankan serentak oleh pengguna yang sama (UJI_PENGGUNA berlaku untuk keduanya); galat revalidatePath
+    // di luar HTTP terjadi sesudah transaksi selesai, jadi dianggap sukses seperti di jalankan()
+    const sesudahCommit = async (k: () => Promise<unknown>) => {
+      try {
+        await k();
+      } catch (e) {
+        if (!String((e as Error)?.message ?? "").includes("static generation store missing")) throw e;
+      }
+    };
+    const serentak = (nama: string, ...kerja: (() => Promise<unknown>)[]) => sebagai(nama, () => Promise.allSettled(kerja.map((k) => sesudahCommit(k))));
+    const ditolakDengan = (h: PromiseSettledResult<unknown>[]) => h.filter((x): x is PromiseRejectedResult => x.status === "rejected").map((x) => (x.reason as Error).message);
+    const jumlahJurnal = (nomor: string) => db.jurnal.count({ where: { keterangan: { contains: nomor } } });
+    await db.formatNomor.create({ data: { perusahaanId: "utama", jenis: "faktur", pola: "UJIJP-{SEQ3}/{YYYY}", kunciDeret: "ujijp-faktur", reset: "TAHUNAN" } });
+    const PUTARAN = 5;
+    for (let i = 1; i <= PUTARAN; i++) {
+      const f = await buatDraf(db, `${AWALAN}-FJ2${i}`, { diajukanOlehId: kasir.id });
+      const h = await serentak("owner", () => setujuiDokumen("faktur", f.id), () => setujuiDokumen("faktur", f.id));
+      const tolak = ditolakDengan(h);
+      const akhir = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: f.id } });
+      pastikan(tolak.length === 1 && tolak[0].includes("sudah disetujui"), `putaran ${i}: satu dari dua setujui serentak ditolak "sudah disetujui" ${JSON.stringify(tolak)}`);
+      pastikan((await jumlahJurnal(f.nomor)) === 1 && akhir.jurnalId && akhir.statusPersetujuan === "DISETUJUI", `putaran ${i}: tepat satu jurnal faktur dan jurnalId menunjuknya`);
+      pastikan(akhir.nomorCetak === `UJIJP-00${i}/${tahun}`, `putaran ${i}: nomor cetak ${akhir.nomorCetak} tidak tertimpa dan deret tanpa lubang`);
+      pastikan((await db.logAktivitas.count({ where: { aksi: "SETUJUI", nomor: f.nomor } })) === 1, `putaran ${i}: log SETUJUI satu kali`);
+    }
+    const penghitungAkhir = await db.penghitungNomor.findMany({ where: { kunciDeret: "ujijp-faktur" } });
+    pastikan(penghitungAkhir.length === 1 && penghitungAkhir[0].nilai === PUTARAN, `penghitung nomor faktur naik sekali per faktur (${penghitungAkhir[0]?.nilai})`);
+    pastikan((await periksaSinkron(db)).seimbang, "periksaSinkron seimbang sesudah persetujuan serentak");
+
+    // setujui dan tolak serentak: hasil akhirnya selalu konsisten (disetujui berjurnal, atau ditolak tanpa jurnal dan nomor)
+    for (let i = 1; i <= 3; i++) {
+      const f = await buatDraf(db, `${AWALAN}-FJ3${i}`, { diajukanOlehId: kasir.id });
+      const h = await serentak("owner", () => setujuiDokumen("faktur", f.id), () => tolakDokumen("faktur", f.id, "Uji serentak"));
+      const akhir = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: f.id } });
+      const jurnalF = await jumlahJurnal(f.nomor);
+      const konsisten =
+        akhir.statusPersetujuan === "DISETUJUI" ? jurnalF === 1 && akhir.jurnalId !== null && akhir.catatanPenolakan === null : akhir.statusPersetujuan === "DITOLAK" && jurnalF === 0 && akhir.jurnalId === null && akhir.nomorCetak === null;
+      pastikan(ditolakDengan(h).length === 1 && konsisten, `setujui dan tolak serentak ${i}: satu aksi menang, status ${akhir.statusPersetujuan} konsisten dengan jurnal (${jurnalF}) ${JSON.stringify(ditolakDengan(h))}`);
+    }
+    await db.formatNomor.deleteMany({ where: { kunciDeret: "ujijp-faktur" } });
+    await db.penghitungNomor.deleteMany({ where: { kunciDeret: "ujijp-faktur" } });
+
+    // Kas Masuk: ajukan ganda tercatat sekali, setujui ganda satu jurnal KM
+    for (let i = 1; i <= 3; i++) {
+      const nomor = `${AWALAN}-KM${i}`;
+      const km = await db.dokumenKas.create({ data: { nomor, jenis: "MASUK", akunKasId: kKas, akunLawanId: m.pendapatanPenjualanId!, jumlah: 1_000 * i, keterangan: `Kas masuk uji ${nomor}`, dibuatOleh: "kasir" } });
+      const hAju = await serentak("kasir", () => ajukanDokumen("dokumenKas", km.id), () => ajukanDokumen("dokumenKas", km.id));
+      pastikan(ditolakDengan(hAju).length === 1 && (await db.logAktivitas.count({ where: { aksi: "AJUKAN", nomor } })) === 1, `kas masuk ${i}: ajukan serentak tercatat sekali ${JSON.stringify(ditolakDengan(hAju))}`);
+      const hSetuju = await serentak("owner", () => setujuiDokumen("dokumenKas", km.id), () => setujuiDokumen("dokumenKas", km.id));
+      const akhir = await db.dokumenKas.findUniqueOrThrow({ where: { id: km.id } });
+      pastikan(
+        ditolakDengan(hSetuju).length === 1 && (await jumlahJurnal(nomor)) === 1 && akhir.jurnalId && akhir.statusPersetujuan === "DISETUJUI",
+        `kas masuk ${i}: setujui serentak menghasilkan satu jurnal KM ${JSON.stringify(ditolakDengan(hSetuju))}`,
+      );
+    }
+
+    // P2002 nomor cetak lewat updateMany bersyarat (cara posting faktur menulis nomor) tetap diterjemahkan
+    const p2002Bersyarat = await galat(() =>
+      dalamTransaksiBatal(async (tx) => {
+        await buatDraf(tx, `${AWALAN}-FJ40`, { nomorCetak: "UJIJP-GANDA" });
+        const f = await buatDraf(tx, `${AWALAN}-FJ41`);
+        await simpanNomorCetak("UJIJP-GANDA", () => tx.fakturPenjualan.updateMany({ where: { id: f.id, nomorCetak: null }, data: { nomorCetak: "UJIJP-GANDA" } }));
+      }),
+    );
+    pastikan(p2002Bersyarat === "Nomor cetak UJIJP-GANDA sudah dipakai dokumen lain.", `P2002 nomor cetak dari updateMany diterjemahkan: ${p2002Bersyarat}`);
+
+    console.log("=== 9. Basis kas: pemetaan fee yang bukan akun rinci Pendapatan memakai akun Pendapatan Penjualan ===");
+    for (const [label, akunPeta] of [["akun Kewajiban", kPpnK], ["akun kelompok Pendapatan", k4000]] as const) {
+      const hasil = await dalamTransaksiBatal(async (tx) => {
+        await tx.pemetaanAkunTambahan.create({ data: { kunci: KUNCI_AKUN_FEE, label: "Pendapatan Fee Manajemen", dibuatOleh: "uji", akunId: akunPeta } });
+        const kini = new Date();
+        const periode = { dari: new Date(kini.getFullYear(), 0, 1), sampai: new Date(kini.getFullYear(), 11, 31, 23, 59, 59, 999), dariTeks: `${kini.getFullYear()}-01-01`, sampaiTeks: `${kini.getFullYear()}-12-31` };
+        const klien = tx as unknown as typeof db;
+        const sebelum = await labaRugiKas(klien, periode);
+        // uang muka pesanan ber-fee tetap bisa dicatat walau pemetaan fee salah (jurnal UM tidak membaca akun fee)
+        const pesanan = await tx.pesananPenjualan.create({
+          data: {
+            nomor: `${AWALAN}-PSN3`,
+            pelangganId: pelanggan.id,
+            total: 66_946_000,
+            diskon: 890_000,
+            fee: 6_086_000,
+            baris: { create: [{ barangId: sound.id, jumlah: 1, harga: 2_000_000, frekuensi: 3 }, { barangId: kamar.id, jumlah: 25, harga: 650_000, frekuensi: 3 }, { barangId: jasa.id, jumlah: 1, harga: 7_000_000 }] },
+          },
+        });
+        const um = await tx.uangMukaPelanggan.create({ data: { nomor: `${AWALAN}-UM2`, pelangganId: pelanggan.id, pesananId: pesanan.id, akunId: kKas, jumlah: 20_083_800 } });
+        const jUm = await catatJurnalUangMuka(tx, um, pesanan.nomor);
+        await tx.uangMukaPelanggan.update({ where: { id: um.id }, data: { jurnalId: jUm!.id } });
+        const sesudah = await labaRugiKas(klien, periode);
+        const perAkun = (l: Awaited<ReturnType<typeof labaRugiKas>>) => new Map<string, Desimal>(l.pendapatan.filter((x) => !x.kelompok).map((x) => [x.kode, D(x.jumlah)]));
+        const a = perAkun(sebelum), b = perAkun(sesudah);
+        const selisih = (kode: string) => (b.get(kode) ?? D(0)).minus(a.get(kode) ?? D(0)).toFixed(2);
+        return { total: sesudah.totalPendapatan.minus(sebelum.totalPendapatan).toFixed(2), k4200: selisih("4-1200"), bawaan: selisih(kodePendapatan) };
+      });
+      // UM 30% dari total: seluruh 20.083.800 tetap pendapatan kas, termasuk bagian fee 1.825.800 di akun bawaan
+      pastikan(hasil.total === "20083800.00" && D(hasil.k4200).plus(hasil.bawaan).toFixed(2) === "20083800.00", `pemetaan fee ${label}: kas uang muka utuh di pendapatan (${hasil.total}, kamar ${hasil.k4200}, bawaan ${hasil.bawaan})`);
+    }
   } finally {
     await bersihkan();
     if (feeAwal) await db.pemetaanAkunTambahan.create({ data: feeAwal });

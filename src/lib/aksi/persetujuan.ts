@@ -24,6 +24,8 @@ import {
  * src/lib/aksi/hapusDokumen.ts). Perbedaan tiap jenis dokumen ada di BERKAS di src/lib/persetujuan.ts,
  * jadi logika transisi, pemisahan tugas, dan log aktivitas hanya ditulis sekali.
  * Notifikasi (D7 §3.4.4) dikirim di transaksi yang sama setelah log; galatnya tidak menggagalkan persetujuan.
+ * Setiap transisi mengunci baris dokumen (berkas.kunci) sebelum membaca statusnya, jadi transisi serentak atas dokumen
+ * yang sama berjalan berurutan dan yang kalah ditolak pastikanTransisi (tidak ada jurnal ganda).
  */
 
 /** Batas waktu transaksi persetujuan (bawaan Prisma 5 detik); notifikasi menambah beberapa kueri ke posting yang berat. */
@@ -41,6 +43,7 @@ export async function ajukanDokumen(jenis: JenisPersetujuan, id: string) {
   const pengguna = await wajibHakAksi(await hakAjukan(jenis, db, id));
 
   await db.$transaction(async (tx) => {
+    await berkas.kunci(tx, id);
     const dok = await berkas.baca(tx, id);
     if (!dok) throw new Error(`${berkas.label} tidak ditemukan (mungkin sudah dihapus)`);
     pastikanTransisi(dok, "MENUNGGU", berkas.label);
@@ -62,6 +65,7 @@ export async function setujuiDokumen(jenis: JenisPersetujuan, id: string) {
   const pengguna = await wajibHakAksi(await hakSetujui(jenis, db, id));
 
   await db.$transaction(async (tx) => {
+    await berkas.kunci(tx, id);
     const dok = await berkas.baca(tx, id);
     if (!dok) throw new Error(`${berkas.label} tidak ditemukan (mungkin sudah dihapus)`);
     pastikanTransisi(dok, "DISETUJUI", berkas.label);
@@ -88,6 +92,7 @@ export async function tolakDokumen(jenis: JenisPersetujuan, id: string, catatan:
   if (alasan.length > 500) throw new Error("Alasan penolakan maksimal 500 karakter");
 
   await db.$transaction(async (tx) => {
+    await berkas.kunci(tx, id);
     const dok = await berkas.baca(tx, id);
     if (!dok) throw new Error(`${berkas.label} tidak ditemukan (mungkin sudah dihapus)`);
     pastikanTransisi(dok, "DITOLAK", berkas.label);

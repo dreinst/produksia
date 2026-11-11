@@ -172,6 +172,13 @@ type Berkas = {
   /** Dasar hak akses: `${kode}.setujui` */
   kode: KodeDokumen;
   jalur: readonly string[];
+  /**
+   * Mengunci baris dokumen (SELECT ... FOR UPDATE) di transaksi transisi, SEBELUM statusnya dibaca. Dua transisi
+   * serentak atas dokumen yang sama (dua setujui, atau setujui dan tolak) jadi berurutan: yang kedua menunggu yang
+   * pertama selesai, lalu membaca status terbarunya dan ditolak pastikanTransisi. Tanpa kunci keduanya bisa melihat
+   * MENUNGGU dan mencatat dua jurnal (tinjauan P21 butir 1). Wajib ada di setiap berkas, termasuk jenis baru.
+   */
+  kunci: (tx: Tx, id: string) => Promise<void>;
   baca: (tx: Tx, id: string) => Promise<DokumenPersetujuan | null>;
   simpan: (tx: Tx, id: string, data: DataTransisi) => Promise<void>;
   /** Mencatat jurnal (dan efek lain yang memang menunggu persetujuan) saat dokumen disetujui. */
@@ -211,6 +218,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Faktur Penjualan",
     kode: "faktur",
     jalur: ["/penjualan/faktur", "/penjualan/pesanan", "/buku-besar/jurnal"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "FakturPenjualan" WHERE "id" = ${id} FOR UPDATE`),
     baca: (tx, id) => tx.fakturPenjualan.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.fakturPenjualan.update({ where: { id }, data })),
     posting: async (tx, id) => {
@@ -222,9 +230,14 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       const pengaturan = await ambilPengaturanPerusahaan(tx, f.perusahaanId);
       // Nomor cetak faktur dialokasikan saat jurnalnya dicatat (D2 §3.7, §8.2), jadi draf yang ditolak atau dihapus
       // tidak membuat lubang. Tanpa format faktur aktif hasilnya null dan faktur tidak disentuh. Nomor manual dipakai.
+      // Nomor hanya ditulis bila faktur belum bernomor (sabuk pengaman di samping kunci baris di setujuiDokumen), supaya
+      // nomor yang sudah ada tidak pernah tertimpa.
       if (!f.nomorCetak) {
         const nomorCetak = await alokasiNomorCetak(tx, { perusahaanId: f.perusahaanId, jenis: "faktur", tanggal: f.tanggal });
-        if (nomorCetak) await simpanNomorCetak(nomorCetak, () => tx.fakturPenjualan.update({ where: { id }, data: { nomorCetak } }));
+        if (nomorCetak) {
+          const { count } = await simpanNomorCetak(nomorCetak, () => tx.fakturPenjualan.updateMany({ where: { id, nomorCetak: null }, data: { nomorCetak } }));
+          if (count !== 1) throw new Error(`Faktur Penjualan ${f.nomor} sudah diproses orang lain. Muat ulang halaman lalu periksa statusnya`);
+        }
       }
       // Konsumsi "Barang Terkirim Belum Ditagih" sudah dihitung & disimpan saat draf dibuat
       const konsumsiTransit: KonsumsiTransit[] = f.baris
@@ -251,6 +264,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Faktur Pembelian",
     kode: "faktur-pembelian",
     jalur: ["/pembelian/faktur", "/pembelian/pesanan", "/buku-besar/jurnal"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "FakturPembelian" WHERE "id" = ${id} FOR UPDATE`),
     baca: (tx, id) => tx.fakturPembelian.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.fakturPembelian.update({ where: { id }, data })),
     posting: async (tx, id) => {
@@ -281,6 +295,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     // Hak diperiksa per jenis (kas-masuk / kas-keluar) di hakSetujui(); nilai ini hanya cadangan
     kode: "kas-keluar",
     jalur: ["/kas-bank/masuk", "/kas-bank/keluar", "/buku-besar/jurnal"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "DokumenKas" WHERE "id" = ${id} FOR UPDATE`),
     baca: (tx, id) => tx.dokumenKas.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.dokumenKas.update({ where: { id }, data })),
     posting: async (tx, id) => {
@@ -315,6 +330,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Penyesuaian Stok",
     kode: "penyesuaian",
     jalur: ["/persediaan/penyesuaian", "/persediaan", "/buku-besar/jurnal"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "PenyesuaianPersediaan" WHERE "id" = ${id} FOR UPDATE`),
     baca: (tx, id) => tx.penyesuaianPersediaan.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.penyesuaianPersediaan.update({ where: { id }, data })),
     /**
@@ -366,6 +382,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Peminjaman Barang",
     kode: "peminjaman",
     jalur: ["/persediaan/peminjaman", "/persediaan"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "PeminjamanBarang" WHERE "id" = ${id} FOR UPDATE`),
     baca: async (tx, id) => {
       const p = await tx.peminjamanBarang.findUnique({
         where: { id },
@@ -409,6 +426,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Laporan Kerusakan Barang",
     kode: "kerusakan",
     jalur: ["/persediaan/kerusakan", "/persediaan"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "LaporanKerusakanBarang" WHERE "id" = ${id} FOR UPDATE`),
     baca: async (tx, id) => {
       const k = await tx.laporanKerusakanBarang.findUnique({
         where: { id },
@@ -441,6 +459,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Aset Tetap",
     kode: "aset",
     jalur: ["/aset-tetap", "/buku-besar/jurnal"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "AsetTetap" WHERE "id" = ${id} FOR UPDATE`),
     baca: async (tx, id) => {
       const a = await tx.asetTetap.findUnique({
         where: { id },
@@ -470,6 +489,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     label: "Penggajian",
     kode: "penggajian",
     jalur: ["/sdm/penggajian", "/buku-besar/jurnal"],
+    kunci: async (tx, id) => void (await tx.$queryRaw`SELECT 1 FROM "Penggajian" WHERE "id" = ${id} FOR UPDATE`),
     baca: (tx, id) => tx.penggajian.findUnique({ where: { id }, select: pilihPersetujuan }),
     simpan: async (tx, id, data) => void (await tx.penggajian.update({ where: { id }, data })),
     posting: async (tx, id) => {
