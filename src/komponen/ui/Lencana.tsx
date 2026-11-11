@@ -16,11 +16,32 @@ const GAYA_STATUS: Record<string, { cls: string; label: string }> = {
   OPEN: { cls: "lencana-blue", label: "Berjalan" },
   // CRM (D4 §7.6): tindak lanjut MENUNGGU yang jatuh temponya sudah lewat
   TERLAMBAT: { cls: "lencana-rose", label: "Terlambat" },
+  // Status bersama (D4 §7.6, D5 §3.1, DESAIN F17): tiap kunci ditulis sekali. BERJALAN dan SELESAI dipakai tahap
+  // lead dan status proyek; MENUNGGU dipakai tindak lanjut CRM (persetujuan dokumen tetap lewat LencanaPersetujuan).
+  BERJALAN: { cls: "lencana-blue", label: "Berjalan" },
+  SELESAI: { cls: "lencana-emerald", label: "Selesai" },
+  MENUNGGU: { cls: "lencana-amber", label: "Menunggu" },
+  MENANG: { cls: "lencana-emerald", label: "Menang" },
+  KALAH: { cls: "lencana-rose", label: "Kalah" },
+  // Status proyek (D5 §3.1; DIARSIP berlabel "Diarsipkan" seperti LABEL_STATUS_PROYEK)
+  DITUNDA: { cls: "lencana-amber", label: "Ditunda" },
+  DIARSIP: { cls: "lencana-slate", label: "Diarsipkan" },
+  BATAL: { cls: "lencana-rose", label: "Batal" },
+  // Status pembayaran mitra proyek (D5 §3.13; LUNAS sudah ada di atas)
+  LEBIH_BAYAR: { cls: "lencana-rose", label: "Lebih bayar" },
+  DIBAYAR_SEBAGIAN: { cls: "lencana-blue", label: "Sebagian dibayar" },
+  PERLU_DIBAYAR: { cls: "lencana-amber", label: "Perlu dibayar" },
+  BELUM_ADA_HAK: { cls: "lencana-slate", label: "Belum ada hak" },
 };
 
 export function LencanaStatus({ status }: { status: string }) {
   const s = GAYA_STATUS[status] ?? { cls: "lencana-slate", label: status };
   return <span className={`lencana ${s.cls}`}>{s.label}</span>;
+}
+
+/** Label Indonesia status yang sama dengan LencanaStatus (kode mentah bila tidak dikenal), untuk teks opsi dan ringkasan. */
+export function labelStatus(status: string): string {
+  return GAYA_STATUS[status]?.label ?? status;
 }
 
 /** Status alur persetujuan (maker-checker); DISETUJUI = jurnalnya sudah masuk buku besar. */
@@ -59,6 +80,8 @@ const LABEL_SUMBER: Record<string, string> = {
   PRIVE: "Prive",
   PENGGAJIAN: "Penggajian",
   SELISIH_KURS: "Selisih kurs",
+  ANTAR_PERUSAHAAN: "Antar perusahaan",
+  MITRA_PROYEK: "Mitra proyek",
 };
 export function labelSumberJurnal(v: string) {
   return LABEL_SUMBER[v] ?? v;
@@ -69,6 +92,7 @@ export function labelSumberJurnal(v: string) {
  * PNW Penawaran · PSJ Pesanan Penjualan · SJ Surat Jalan · FJ Faktur Penjualan · TRM Penerimaan · RJ Retur Penjualan
  * PSB Pesanan Pembelian · TB Terima Barang · FB Faktur Pembelian · BYR Pembayaran · RB Retur Pembelian
  * JU Jurnal Umum · KM Kas Masuk · KK Kas Keluar · AT Aset Tetap
+ * AP Transaksi Antar Perusahaan · TLM Talangan Mitra · BYM Pembayaran ke Mitra
  */
 const GAYA_DOKUMEN: Record<string, string> = {
   PNW: "bg-slate-100 text-slate-700",
@@ -89,6 +113,9 @@ const GAYA_DOKUMEN: Record<string, string> = {
   UM: "bg-emerald-50 text-emerald-700",
   PB: "bg-blue-50 text-blue-700",
   PRV: "bg-amber-50 text-amber-700",
+  AP: "bg-indigo-50 text-indigo-700",
+  TLM: "bg-amber-50 text-amber-700",
+  BYM: "bg-rose-50 text-rose-700",
 };
 
 /** Nomor dokumen: lencana prefix berwarna + nomor monospace, mis. [FJ] FJ-2026-0001 */
