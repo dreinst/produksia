@@ -5,7 +5,8 @@ import { db } from "../src/lib/db";
 import { D, type Desimal } from "../src/lib/uang";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { buatPenawaran, konversiPenawaranKePesanan, buatPesanan, buatFaktur, buatPenerimaan, buatUangMuka } from "../src/lib/aksi/penjualan";
-import { ubahPenawaran, ubahStatusPenawaran, ubahTampilanDokumen, simpanPengaturanDokumenPenjualan } from "../src/lib/aksi/dokumenPenjualan";
+import { ubahPenawaran, ubahRencanaTermin, ubahStatusPenawaran, ubahTampilanDokumen, simpanPengaturanDokumenPenjualan } from "../src/lib/aksi/dokumenPenjualan";
+import { KODE_BARANG_LAIN } from "../src/lib/barangLainLain";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
 
@@ -13,6 +14,8 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  * P25: ubah setelah simpan (D2 §9.2 uji-tampilan-dokumen): daftar putih ubahTampilanDokumen dan lognya, validasi teks
  * dan kop, teks baris, nomor cetak faktur disetujui, ubahPenawaran draf (baris, total, rencana termin diselesaikan
  * ulang), status komersial dan konversi, pengaturan dokumen penjualan, hak per jenis, dan bersih-bersih.
+ * Perbaikan tinjauan P25: ganti nama baris lewat tampilan butuh harga.nego seperti buat (S1), sesi diperiksa sebelum
+ * jenis (R3), jatuh tempo tidak sebelum tanggal faktur (R4), dan penawaran perusahaan arsip tidak bisa diubah (R5).
  */
 
 const K = "UJITMP";
@@ -59,6 +62,8 @@ async function main() {
   const sinkronAwal = await periksaSinkron(db);
   const jurnalAwal = await db.jurnal.count();
   const pengaturanAwal = await db.pengaturanDokumenPenjualan.findUnique({ where: { perusahaanId: "utama" } });
+  const lainLainAwal = await db.barang.findUnique({ where: { kode: KODE_BARANG_LAIN }, select: { id: true } });
+  const hakAwal = await db.hakAksesPeran.count();
   try {
     await uji(mulaiUji);
   } finally {
@@ -69,7 +74,16 @@ async function main() {
       await db.pengaturanDokumenPenjualan.update({ where: { perusahaanId: "utama" }, data: { syaratPembayaran, tampilanEvent, daftarSeksi, teksPembukaPenawaran, teksPenutupPenawaran } });
     } else await db.pengaturanDokumenPenjualan.deleteMany({ where: { perusahaanId: "utama" } });
     await db.logAktivitas.deleteMany({ where: { waktu: { gte: mulaiUji }, penggunaNama: "Skrip Uji" } });
+    // Barang JASA-LAIN yang dibuat baris bebas suite ini dibuang lagi bila tidak dipakai dokumen lain
+    if (!lainLainAwal) {
+      const dipakai =
+        (await db.barisPenawaranPenjualan.count({ where: { barang: { kode: KODE_BARANG_LAIN } } })) +
+        (await db.barisPesananPenjualan.count({ where: { barang: { kode: KODE_BARANG_LAIN } } })) +
+        (await db.barisFakturPenjualan.count({ where: { barang: { kode: KODE_BARANG_LAIN } } }));
+      if (dipakai === 0) await db.barang.deleteMany({ where: { kode: KODE_BARANG_LAIN } });
+    }
   }
+  pastikan((await db.hakAksesPeran.count()) === hakAwal, "HakAksesPeran sama dengan sebelum uji");
   pastikan((await db.jurnal.count()) === jurnalAwal, "jumlah jurnal sama dengan sebelum uji");
   const sinkronAkhir = await periksaSinkron(db);
   pastikan(sinkronAkhir.seimbang && JSON.stringify(sinkronAkhir) === JSON.stringify(sinkronAwal), "periksaSinkron seimbang dan sama dengan sebelum uji");
@@ -105,6 +119,9 @@ async function uji(mulaiUji: Date) {
   pastikan((await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fj.id } })).jatuhTempo?.getTime() === fj.jatuhTempo?.getTime(), "jatuh tempo kosong tidak mengosongkan kolom");
   await jalankan("faktur: jatuh tempo baru", () => ubahTampilanDokumen("faktur", fj.id, formulir({ jatuhTempo: "2030-01-15" })));
   pastikan((await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fj.id } })).jatuhTempo?.getDate() === 15, "jatuh tempo faktur diubah");
+  // tinjauan P25 R4: aturan yang sama dengan buat faktur
+  await harusDitolak("faktur: jatuh tempo sebelum tanggal faktur", () => ubahTampilanDokumen("faktur", fj.id, formulir({ jatuhTempo: "2020-01-01" })), "Jatuh tempo tidak boleh sebelum tanggal faktur");
+  pastikan((await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fj.id } })).jatuhTempo?.getDate() === 15, "jatuh tempo yang ditolak tidak tersimpan");
 
   console.log("=== 2. Validasi teks dan kop ===");
   await harusDitolak("perihal 201 karakter", () => ubahTampilanDokumen("faktur", fj.id, formulir({ perihal: "p".repeat(201) })), "Perihal maksimal 200 karakter");
@@ -114,6 +131,12 @@ async function uji(mulaiUji: Date) {
   pastikan((await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fj.id } })).kopSuratId === kopUtama.id, "kop faktur diganti");
   await harusDitolak("jenis tidak dikenal", () => ubahTampilanDokumen("retur" as never, fj.id, formulir({ perihal: "x" })), "Jenis dokumen tidak dikenal");
   await harusDitolak("dokumen tidak ada", () => ubahTampilanDokumen("faktur", "tidak-ada", formulir({ perihal: "x" })), "Faktur Penjualan tidak ditemukan");
+  // tinjauan P25 R3: tanpa sesi selalu ditolak sesi lebih dulu, termasuk untuk jenis yang tidak dikenal
+  await denganEnv({ UJI_TANPA_SESI: undefined }, async () => {
+    await harusDitolak("tanpa sesi, jenis tampilan tidak dikenal", () => ubahTampilanDokumen("retur" as never, fj.id, formulir({ perihal: "x" })), "Sesi sudah berakhir");
+    await harusDitolak("tanpa sesi, rencana termin faktur", () => ubahRencanaTermin("faktur" as never, fj.id, formulir({})), "Sesi sudah berakhir");
+  });
+  await harusDitolak("rencana termin untuk faktur (dengan sesi)", () => ubahRencanaTermin("faktur" as never, fj.id, formulir({})), "Rencana termin hanya ada di penawaran dan pesanan");
 
   console.log("=== 3. Teks baris ===");
   const bf = fj.baris[0];
@@ -124,6 +147,31 @@ async function uji(mulaiUji: Date) {
   await jalankan("baris pesanan: urutan dan seksi", () => ubahTampilanDokumen("pesanan", psj.id, formulir({ baris: [{ id: psj.baris[1].id, urutan: 0 }, { id: psj.baris[0].id, urutan: 1, keterangan: "hari pertama" }] })));
   const bp = await db.barisPesananPenjualan.findMany({ where: { pesananId: psj.id }, orderBy: { urutan: "asc" } });
   pastikan(bp[0].id === psj.baris[1].id && bp[1].keterangan === "hari pertama", "urutan dan keterangan baris pesanan diubah");
+
+  console.log("=== 3b. Ganti nama baris tanpa harga.nego (tinjauan P25 S1) ===");
+  await jalankan("PSJ dengan baris bebas oleh PEMILIK", () => buatPesanan(formulir({ pelangganId: pelanggan.id, ppnPersen: 0, perihal: "Bebas", baris: [{ barangId: jasa.id, jumlah: 1, harga: 100_000 }, { nama: "Transport kru", jumlah: 1, harga: 50_000 }] })));
+  const psjBebas = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, perihal: "Bebas" }, include: { baris: { orderBy: { urutan: "asc" } } } });
+  const [bKatalog, bBebas] = psjBebas.baris;
+  const hakNegoKasirAwal = await db.hakAksesPeran.findUnique({ where: { peran_hak: { peran: "KASIR", hak: "harga.nego" } } });
+  await db.hakAksesPeran.upsert({ where: { peran_hak: { peran: "KASIR", hak: "harga.nego" } }, create: { peran: "KASIR", hak: "harga.nego", boleh: false }, update: { boleh: false } });
+  try {
+    await sebagaiPeran("KASIR", async () => {
+      await harusDitolak("KASIR tanpa nego mengganti nama baris katalog faktur", () => ubahTampilanDokumen("faktur", fj.id, formulir({ baris: [{ id: bf.id, nama: "Sound system 10 kW" }] })), "Mengganti nama barang Jasa Uji Tampilan butuh hak");
+      await harusDitolak("KASIR tanpa nego mengganti nama baris katalog pesanan", () => ubahTampilanDokumen("pesanan", psjBebas.id, formulir({ baris: [{ id: bKatalog.id, nama: "Sound system 10 kW" }] })), "Mengganti nama barang Jasa Uji Tampilan butuh hak");
+      await harusDitolak("KASIR tanpa nego mengganti nama baris bebas", () => ubahTampilanDokumen("pesanan", psjBebas.id, formulir({ baris: [{ id: bBebas.id, nama: "Sound system 10 kW" }] })), "Baris bebas (tanpa barang katalog) butuh hak");
+      await jalankan("KASIR tanpa nego mengirim nama yang sama dengan deskripsi baru", () => ubahTampilanDokumen("faktur", fj.id, formulir({ baris: [{ id: bf.id, nama: "Paket Dokumentasi", deskripsi: "oleh kasir" }] })));
+      await jalankan("KASIR tanpa nego mengembalikan nama ke nama katalog", () => ubahTampilanDokumen("pesanan", psjBebas.id, formulir({ baris: [{ id: bKatalog.id, nama: "Jasa Uji Tampilan" }, { id: bBebas.id, nama: "Transport kru", keterangan: "oleh kasir" }] })));
+    });
+  } finally {
+    if (hakNegoKasirAwal) await db.hakAksesPeran.update({ where: { peran_hak: { peran: "KASIR", hak: "harga.nego" } }, data: { boleh: hakNegoKasirAwal.boleh } });
+    else await db.hakAksesPeran.deleteMany({ where: { peran: "KASIR", hak: "harga.nego" } });
+  }
+  const bf2 = await db.barisFakturPenjualan.findUniqueOrThrow({ where: { id: bf.id } });
+  const [bKatalog2, bBebas2] = await db.barisPesananPenjualan.findMany({ where: { pesananId: psjBebas.id }, orderBy: { urutan: "asc" } });
+  pastikan(bf2.nama === "Paket Dokumentasi" && bf2.deskripsi === "oleh kasir", `nama yang tidak berubah tidak diperiksa; deskripsi tersimpan (${bf2.nama})`);
+  pastikan(bKatalog2.nama === "Jasa Uji Tampilan" && bBebas2.nama === "Transport kru" && bBebas2.keterangan === "oleh kasir", "nama katalog dan nama baris bebas yang sama diterima");
+  await sebagaiPeran("KASIR", () => jalankan("KASIR dengan nego bawaan mengganti nama baris bebas", () => ubahTampilanDokumen("pesanan", psjBebas.id, formulir({ baris: [{ id: bBebas.id, nama: "Transport kru dan alat" }] }))));
+  pastikan((await db.barisPesananPenjualan.findUniqueOrThrow({ where: { id: bBebas.id } })).nama === "Transport kru dan alat", "pemegang harga.nego tetap boleh mengganti nama");
 
   console.log("=== 4. Nomor cetak faktur yang sudah disetujui ===");
   await sebagaiPeran("KASIR", () => harusDitolak("KASIR mengubah nomor cetak faktur disetujui", () => ubahTampilanDokumen("faktur", fj.id, formulir({ nomorCetak: `${K}/INV/1` })), "hanya bisa diubah pemegang hak setujui faktur"));
@@ -157,6 +205,18 @@ async function uji(mulaiUji: Date) {
   await harusDitolak("ubah penawaran: perusahaan diganti", () => ubahPenawaran(pnw.id, formulir({ perusahaanId: "tapussa", pelangganId: pelanggan.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 100_000 }] })), "Perusahaan penawaran tidak bisa diganti");
   await harusDitolak("ubah penawaran: fee persen 101", () => ubahPenawaran(pnw.id, formulir({ pelangganId: pelanggan.id, nilaiFee: 101, baris: [{ barangId: jasa.id, jumlah: 1, harga: 100_000 }] })), "Persen management fee");
   await harusDitolak("ubah penawaran: nomor cetak milik penawaran lain", () => ubahPenawaran(pnw.id, formulir({ pelangganId: pelanggan.id, nomorCetak: `${K}/PNW/1`, baris: [{ barangId: jasa.id, jumlah: 1, harga: 100_000 }] })), "sudah dipakai dokumen lain");
+  // tinjauan P25 R5: penawaran draf milik perusahaan arsip tidak bisa diubah, seperti buat yang menolak perusahaan arsip
+  await jalankan("PNW draf tapussa", () => buatPenawaran(formulir({ perusahaanId: "tapussa", pelangganId: pelanggan.id, ppnPersen: 0, perihal: "Arsip", baris: [{ barangId: jasa.id, jumlah: 1, harga: 100_000 }] })));
+  const pnwArsip = await db.penawaranPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, perihal: "Arsip" } });
+  const tapussa = await db.perusahaan.findUniqueOrThrow({ where: { id: "tapussa" }, select: { nama: true, aktif: true } });
+  await db.perusahaan.update({ where: { id: "tapussa" }, data: { aktif: false } });
+  try {
+    await harusDitolak("ubah penawaran perusahaan arsip", () => ubahPenawaran(pnwArsip.id, formulir({ pelangganId: pelanggan.id, ppnPersen: 0, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100_000 }] })), `Perusahaan ${tapussa.nama} sudah diarsipkan; penawarannya tidak bisa diubah`);
+  } finally {
+    await db.perusahaan.update({ where: { id: "tapussa" }, data: { aktif: tapussa.aktif } });
+  }
+  pastikan(s2((await db.penawaranPenjualan.findUniqueOrThrow({ where: { id: pnwArsip.id } })).total) === "100000.00", "penawaran perusahaan arsip tetap seperti semula");
+  await jalankan("ubah penawaran sesudah perusahaan aktif lagi", () => ubahPenawaran(pnwArsip.id, formulir({ pelangganId: pelanggan.id, ppnPersen: 0, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100_000 }] })));
   await sebagaiPeran("GUDANG", () => harusDitolak("GUDANG mengubah penawaran", () => ubahPenawaran(pnw.id, formulir({ pelangganId: pelanggan.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 100_000 }] })), "tidak punya hak"));
 
   console.log("=== 6. Status komersial ===");

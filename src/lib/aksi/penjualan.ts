@@ -50,7 +50,9 @@ import {
   rapikanTeks,
   ringkasanFaktur,
   salinKolom,
+  bacaTerkirimBelumDifaktur,
   siapkanBarisFaktur,
+  siapkanBarisJalurLama,
   siapkanBarisRetur,
   subtotalBaris,
   type BarisDokumen as BarisDokumenPenjualan,
@@ -59,7 +61,7 @@ import { bacaRencanaTermin, dataButirTermin, nilaiBrutoKontrak, pastikanPembayar
 import { alokasiNomorCetak, bacaNomorCetakManual, simpanNomorCetak, type JenisNomorCetak, type KlienTransaksi } from "@/lib/nomorCetak";
 import { isiBarangLainLain, pastikanBarangLainLain } from "@/lib/barangLainLain";
 import { catatAktivitasLead, pastikanLeadUntukPenawaran, tautanLeadNotifikasi } from "@/lib/crm";
-import type { StatusKomersial } from "@/prisma-klien/enums";
+import type { ModeDokumen, StatusKomersial } from "@/prisma-klien/enums";
 
 /*
  * Aksi dokumen penjualan. Perusahaan (D1 §3.3): penawaran dan pesanan adalah dokumen akar (isian perusahaanId, kalau
@@ -440,6 +442,68 @@ export async function buatPengiriman(dataFormulir: FormData) {
 
 // ---------- Faktur Penjualan ----------
 
+/**
+ * Jalur lama di dalam transaksi (tinjauan P25 R6 dan T1): kunci semua baris pesanan urut `urutan` lalu id (urutan yang
+ * sama dengan update jumlahDifaktur jalur ID dan surat jalan), baca ulang baris dan baris SJ, lalu bagi ulang. Faktur
+ * lain yang selesai lebih dulu ikut terhitung, jadi kiriman yang masih muat di baris lain tetap lolos seperti kode lama.
+ * Subtotal di luar transaksi sudah dipakai untuk diskon, fee, dan PPN; bila pembagian baru memberi subtotal lain
+ * (pembulatan nilai per potongan), kiriman ditolak supaya angka faktur tidak bergeser diam-diam.
+ */
+async function bagiUlangJalurLama(
+  tx: KlienTransaksi,
+  pesanan: { id: string; mode: ModeDokumen },
+  masukan: Parameters<typeof siapkanBarisJalurLama>[1],
+  subtotal: Desimal,
+) {
+  await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesanan.id} ORDER BY "urutan", "id" FOR UPDATE`;
+  const baris = await tx.barisPesananPenjualan.findMany({ where: { pesananId: pesanan.id }, orderBy: [{ urutan: "asc" }, { id: "asc" }] });
+  const hasil = siapkanBarisJalurLama({ mode: pesanan.mode, baris }, masukan, await bacaTerkirimBelumDifaktur(tx, pesanan.id));
+  if (!subtotalBaris(hasil).equals(subtotal)) throw new Error("Sisa pesanan berubah saat faktur disimpan; muat ulang halaman lalu coba lagi");
+  return hasil;
+}
+
+/**
+ * Baris SJ "yatim": barang terkirim yang belum difaktur, padahal baris pesanannya sudah penuh ditagih. Ini terjadi pada
+ * data dari kode lama, yang menaikkan jumlahDifaktur di baris pesanan pertama tetapi mengonsumsi SJ per barang. Baris
+ * itu tidak akan pernah mengonsumsinya sendiri, jadi potongan faktur berbarang sama yang kekurangan SJ mengambilnya
+ * lintas baris (urut tanggal SJ), supaya HPP per barang sama dengan kode lama dan transit tidak tertahan selamanya
+ * (tinjauan P25 T1). Data yang dibuat kode baru tidak punya SJ yatim, jadi hasilnya sama dengan konsumsi per baris.
+ * Pembaliknya ada di hapusDokumen (faktur), dibatasi nilaiTransit baris faktur.
+ */
+async function konsumsiSjYatim(
+  tx: KlienTransaksi,
+  pesananId: string,
+  barisFaktur: readonly { barangId: string; barisPesananId: string | null }[],
+  kurangSj: Desimal[],
+  nilaiTransit: Desimal[],
+) {
+  if (!kurangSj.some((k) => k.gt(0))) return;
+  const penuh = new Set(
+    (await tx.barisPesananPenjualan.findMany({ where: { pesananId }, select: { id: true, jumlah: true, jumlahDifaktur: true } }))
+      .filter((b) => D(b.jumlahDifaktur).gte(D(b.jumlah)))
+      .map((b) => b.id),
+  );
+  if (penuh.size === 0) return;
+  for (const [i, l] of barisFaktur.entries()) {
+    let butuh = kurangSj[i];
+    if (butuh.lte(0)) continue;
+    const barisSj = await tx.barisPengiriman.findMany({
+      where: { barangId: l.barangId, barisPesananId: { in: [...penuh].filter((id) => id !== l.barisPesananId) }, pengiriman: { pesananId } },
+      orderBy: [{ pengiriman: { tanggal: "asc" } }, { id: "asc" }],
+    });
+    for (const sj of barisSj) {
+      if (butuh.lte(0)) break;
+      const sisa = D(sj.jumlah).minus(sj.jumlahDifaktur);
+      if (sisa.lte(0)) continue;
+      const ambil = terkecil(sisa, butuh);
+      await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { increment: ambil } } });
+      nilaiTransit[i] = nilaiTransit[i].plus(kali(ambil, D(sj.hargaPokok)));
+      butuh = butuh.minus(ambil);
+    }
+    kurangSj[i] = butuh;
+  }
+}
+
 export async function buatFaktur(dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("faktur.buat");
   const pesananId = String(dataFormulir.get("pesananId") ?? "");
@@ -463,8 +527,9 @@ export async function buatFaktur(dataFormulir: FormData) {
     const sj = await db.pengirimanPesanan.findUnique({ where: { id: pengirimanId }, select: { pesananId: true } });
     if (!sj || sj.pesananId !== pesananId) throw new Error("Surat jalan tidak ditemukan di pesanan ini");
   }
-  // harga, frekuensi, dan teks baris dari pesanan (jalur ID); jalur lama memeriksa sisa per barang seperti kode lama
-  const daftarBaris = siapkanBarisFaktur(pesanan, masukan);
+  // harga, frekuensi, dan teks baris dari pesanan (jalur ID); jalur lama memeriksa sisa per barang seperti kode lama dan
+  // mendahulukan baris pesanan yang barangnya sudah dikirim (tinjauan P25 T1)
+  const daftarBaris = siapkanBarisFaktur(pesanan, masukan, masukan.jalur === "LAMA" ? await bacaTerkirimBelumDifaktur(db, pesananId) : undefined);
   const subtotal = subtotalBaris(daftarBaris);
   const ctx = konteksProrata(pesanan, daftarBaris);
   // Diskon faktur: kontra-pendapatan; DPP PPN = subtotal − diskon + fee (UU PPN Pasal 1 angka 18), omzet PPh Final tetap bruto
@@ -503,12 +568,16 @@ export async function buatFaktur(dataFormulir: FormData) {
       ? await pastikanKopSuratDokumen(tx, kopSuratIdIsian, perusahaanId)
       : await pastikanKopSuratDokumen(tx, kopSuratIdIsian, perusahaanId).catch(() => null);
     const daftarJenis = await jenisBarang(tx, daftarBaris.map((l) => l.barangId));
+    // Jalur lama dibagi ulang dari baris pesanan yang dikunci di dalam transaksi (tinjauan P25 R6): faktur jalur lama
+    // serentak atas barang ganda tidak lagi berebut baris pertama. Urutan kunci sama dengan urutan update di bawah.
+    const barisFaktur = masukan.jalur === "LAMA" ? await bagiUlangJalurLama(tx, pesanan, masukan.baris, subtotal) : daftarBaris;
     // HPP diakui untuk barang yang sudah dikirim: konsumsi baris SJ baris pesanan ini (urut tanggal) yang belum difaktur.
     // Konsumsinya terjadi SEKARANG (saat draf) karena baris surat jalan tidak boleh dipakai dua faktur;
     // nilainya disimpan per baris faktur supaya jurnal HPP bisa dicatat belakangan saat faktur disetujui.
     // Jalur lama: jumlah per barang sudah dibagi ke baris pesanannya (siapkanBarisJalurLama), jadi selalu per id.
-    const nilaiTransit = daftarBaris.map(() => NOL);
-    for (const [i, l] of daftarBaris.entries()) {
+    const nilaiTransit = barisFaktur.map(() => NOL);
+    const kurangSj = barisFaktur.map(() => NOL);
+    for (const [i, l] of barisFaktur.entries()) {
       const barisPesananId = l.barisPesananId!;
       const bp = await tx.barisPesananPenjualan.update({ where: { id: barisPesananId }, data: { jumlahDifaktur: { increment: l.jumlah } }, select: { jumlah: true, jumlahDifaktur: true } });
       // kedua jalur: faktur lain yang dibuat bersamaan tidak boleh membuat baris pesanan tertagih melebihi jumlahnya
@@ -521,7 +590,7 @@ export async function buatFaktur(dataFormulir: FormData) {
       let butuh = l.jumlah;
       const barisSj = await tx.barisPengiriman.findMany({
         where: { barisPesananId, pengiriman: { pesananId } },
-        orderBy: { pengiriman: { tanggal: "asc" } },
+        orderBy: [{ pengiriman: { tanggal: "asc" } }, { id: "asc" }],
       });
       for (const sj of barisSj) {
         if (butuh.lte(0)) break;
@@ -532,7 +601,9 @@ export async function buatFaktur(dataFormulir: FormData) {
         nilaiTransit[i] = nilaiTransit[i].plus(kali(ambil, D(sj.hargaPokok)));
         butuh = butuh.minus(ambil);
       }
+      kurangSj[i] = butuh;
     }
+    await konsumsiSjYatim(tx, pesananId, barisFaktur, kurangSj, nilaiTransit);
 
     const faktur = await tulisBernomor(nomorCetakManual, () =>
       tx.fakturPenjualan.create({
@@ -562,7 +633,7 @@ export async function buatFaktur(dataFormulir: FormData) {
           kopSuratId,
           nomorCetak: nomorCetakManual,
           ...(perluPersetujuan ? { statusPersetujuan: "DRAFT" } : dataLangsungDisetujui(pengguna)),
-          baris: { create: dataBarisFaktur(daftarBaris, nilaiTransit) },
+          baris: { create: dataBarisFaktur(barisFaktur, nilaiTransit) },
         },
       }),
     );
@@ -597,9 +668,9 @@ export async function buatFaktur(dataFormulir: FormData) {
     const jurnal = await catatJurnalFakturPenjualan(
       tx,
       faktur,
-      daftarBaris,
+      barisFaktur,
       pengaturan.akunPpnKeluaranId,
-      daftarBaris.map((l, i) => ({ barangId: l.barangId, nilai: nilaiTransit[i] })).filter((k) => k.nilai.gt(0)),
+      barisFaktur.map((l, i) => ({ barangId: l.barangId, nilai: nilaiTransit[i] })).filter((k) => k.nilai.gt(0)),
       { asli: mataUangId ? { mataUangId, kurs } : null },
     );
     if (jurnal) await tx.fakturPenjualan.update({ where: { id: faktur.id }, data: { jurnalId: jurnal.id } });

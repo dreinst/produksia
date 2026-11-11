@@ -21,7 +21,9 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  *  lama pada pesanan bergaya lama tetap lolos dan hapusnya sama dengan cabang lama; 8b. tinjauan P23 R1-R5 (sisa
  *  kumulatif, faktur serentak, prorata retur, surat jalan rujukan, klaim konversi); 8c. perbaikan P25: konversi membaca
  *  baris penawaran di dalam transaksi sesudah klaim, jadi ubahPenawaran yang selesai tepat sebelumnya ikut tersalin;
- *  9. bersih-bersih dan sinkron.
+ *  8d. perbaikan tinjauan P25: jalur lama barang ganda mendahulukan baris yang sudah dikirim sehingga HPP diakui dan
+ *  transit habis (T1), SJ yatim dari data lama dikonsumsi lintas baris dan dibalik saat faktur dihapus, serta faktur
+ *  jalur lama dibagi ulang di dalam transaksi (R6); 9. bersih-bersih dan sinkron.
  */
 
 const K = "GND";
@@ -292,6 +294,7 @@ async function uji() {
   pastikan(cabangId.sesudahBuat === "3,3" && JSON.stringify(cabangId) === JSON.stringify(cabangLama) && cabangId.sesudahHapus === "0,0", `hapus cabang id sama dengan cabang lama (${JSON.stringify(cabangId)} vs ${JSON.stringify(cabangLama)})`);
 
   await bagianTinjauan({ pelanggan, gudang, barang });
+  await bagianTransit({ pelanggan, gudang, barang });
 
   console.log("=== 9. Bersih-bersih ===");
   const hapus = (jenis: JenisDokumen, id: string, label: string) => jalankan(`hapus ${label}`, () => hapusDokumen(jenis, id));
@@ -395,6 +398,89 @@ async function bagianTinjauan(d: { pelanggan: { id: string }; gudang: { id: stri
   await jalankan("hapus PSJ prorata", () => hapusDokumen("pesanan", psjF.id));
   await jalankan("hapus FJ serentak", () => hapusDokumen("faktur", fjR.id));
   await jalankan("hapus PSJ serentak", () => hapusDokumen("pesanan", psjR.id));
+}
+
+/** Bagian 8d: perbaikan tinjauan P25 T1 (HPP jalur lama barang ganda, SJ yatim) dan R6 (bagi ulang di transaksi). */
+async function bagianTransit(d: { pelanggan: { id: string }; gudang: { id: string }; barang: { id: string } }) {
+  console.log("=== 8d. Jalur lama barang ganda dengan surat jalan, SJ yatim, bagi ulang serentak ===");
+  const transitAwal = (await periksaSinkron(db)).barangTerkirim.bukuBesar;
+  // tiga unit tambahan untuk tiga surat jalan bagian ini, dengan harga pokok yang sama (50.000)
+  const modal = await db.akun.findUniqueOrThrow({ where: { kode: `UJI-${K}-MODAL` } });
+  const stokKini = D((await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: d.barang.id, gudangId: d.gudang.id } } })).jumlah);
+  await jalankan("PS tambah 3 @ 50.000", () => buatPenyesuaianPersediaan(formulir({ gudangId: d.gudang.id, akunLawanId: modal.id, keterangan: `${K} 8d`, baris: [{ barangId: d.barang.id, jumlahSesudah: stokKini.plus(3).toNumber(), hargaSatuan: 50_000 }] })));
+  const psTambah = await db.penyesuaianPersediaan.findFirstOrThrow({ where: { keterangan: `${K} 8d` } });
+  const pesananBaru = async (label: string, harga: [number, number]) => {
+    await jalankan(`PSJ STANDAR ${label}: A 1 @ ${harga[0]}, B 1 @ ${harga[1]}`, () => buatPesanan(formulir({ pelangganId: d.pelanggan.id, ppnPersen: 0, baris: harga.map((h) => ({ barangId: d.barang.id, jumlah: 1, harga: h })) })));
+    return db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: d.pelanggan.id, mode: "STANDAR", total: harga[0] + harga[1] }, include: { baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }] } } });
+  };
+  const kirim = async (pesananId: string, barisPesananId: string, label: string) => {
+    await jalankan(`SJ ${label} 1`, () => buatPengiriman(formulir({ pesananId, gudangId: d.gudang.id, baris: [{ barisPesananId, barangId: d.barang.id, jumlah: 1 }] })));
+    return db.pengirimanPesanan.findFirstOrThrow({ where: { pesananId, baris: { some: { barisPesananId } } }, include: { baris: true } });
+  };
+  const fakturLama = (pesananId: string, harga: number, label: string) => jalankan(label, () => buatFaktur(formulir({ pesananId, ppnPersen: 0, baris: [{ barangId: d.barang.id, jumlah: 1, harga }] })));
+  const fakturTerbaru = (pesananId: string) => db.fakturPenjualan.findFirstOrThrow({ where: { pesananId }, orderBy: { nomor: "desc" }, include: { baris: true } });
+  const belumDifaktur = async (pesananId: string) =>
+    (await db.barisPengiriman.findMany({ where: { pengiriman: { pesananId } } })).reduce((t, b) => t.plus(D(b.jumlah).minus(D(b.jumlahDifaktur))), D(0));
+  const difakturSj = async (id: string) => D((await db.barisPengiriman.findUniqueOrThrow({ where: { id } })).jumlahDifaktur);
+  const transitSinkron = async (label: string) => {
+    const s = await periksaSinkron(db);
+    pastikan(s.seimbang && s.barangTerkirim.sinkron, `${label}: periksaSinkron seimbang dan barang terkirim sinkron (buku besar ${s.barangTerkirim.bukuBesar}, dokumen ${s.barangTerkirim.dokumen})`);
+    return s.barangTerkirim.bukuBesar;
+  };
+
+  // T1: SJ hanya untuk baris B. Faktur jalur lama 1 unit wajib jatuh ke B dan mengonsumsi SJ B (kode lama: per barang)
+  const psjT = await pesananBaru("T1", [110_000, 120_000]);
+  const [tA, tB] = psjT.baris;
+  const sjTB = await kirim(psjT.id, tB.id, "baris B");
+  await fakturLama(psjT.id, 110_000, "FJ-T1 jalur lama 1 unit");
+  const fjT1 = await fakturTerbaru(psjT.id);
+  pastikan(fjT1.baris.length === 1 && fjT1.baris[0].barisPesananId === tB.id && sama(fjT1.baris[0].nilaiTransit, 50_000), `faktur pertama ke baris B yang sudah dikirim, transit 50.000 = harga pokok SJ B (${fjT1.baris[0].nilaiTransit})`);
+  pastikan((await difakturSj(sjTB.baris[0].id)).equals(1), "baris SJ B habis difaktur");
+  const sjTA = await kirim(psjT.id, tA.id, "baris A");
+  await fakturLama(psjT.id, 110_000, "FJ-T2 jalur lama 1 unit");
+  const fjT2 = await fakturTerbaru(psjT.id);
+  pastikan(fjT2.id !== fjT1.id && fjT2.baris[0].barisPesananId === tA.id && sama(fjT2.baris[0].nilaiTransit, 50_000) && (await difakturSj(sjTA.baris[0].id)).equals(1), "faktur kedua ke baris A dan mengonsumsi SJ A (transit 50.000)");
+  pastikan((await belumDifaktur(psjT.id)).isZero(), "semua baris SJ pesanan T1 sudah difaktur, tidak ada transit tertahan");
+  pastikan((await transitSinkron("sesudah T1")).equals(transitAwal), "saldo barang terkirim kembali ke saldo awal (transit pesanan T1 = 0)");
+
+  // SJ yatim: data lama menumpuk jumlahDifaktur di baris A tanpa mengonsumsi SJ A (kode lama mengonsumsi per barang)
+  const psjO = await pesananBaru("SJ yatim", [130_000, 140_000]);
+  const [oA, oB] = psjO.baris;
+  const sjOA = await kirim(psjO.id, oA.id, "baris A");
+  await db.barisPesananPenjualan.update({ where: { id: oA.id }, data: { jumlahDifaktur: 1 } });
+  await jalankan("FJ-O1 jalur ID baris B", () => buatFaktur(formulir({ pesananId: psjO.id, ppnPersen: 0, baris: [{ barisPesananId: oB.id, jumlah: 1 }] })));
+  const fjO1 = await fakturTerbaru(psjO.id);
+  pastikan(sama(fjO1.baris[0].nilaiTransit, 50_000) && (await difakturSj(sjOA.baris[0].id)).equals(1) && (await belumDifaktur(psjO.id)).isZero(), "jalur ID: SJ A yang yatim (baris A penuh) dikonsumsi faktur baris B, HPP diakui");
+  await transitSinkron("sesudah FJ-O1");
+  await jalankan("hapus FJ-O1", () => hapusDokumen("faktur", fjO1.id));
+  pastikan((await difakturSj(sjOA.baris[0].id)).isZero(), "hapus faktur mengembalikan konsumsi SJ yatim");
+  await transitSinkron("sesudah hapus FJ-O1");
+  await fakturLama(psjO.id, 140_000, "FJ-O2 jalur lama 1 unit");
+  const fjO2 = await fakturTerbaru(psjO.id);
+  pastikan(fjO2.baris[0].barisPesananId === oB.id && sama(fjO2.baris[0].nilaiTransit, 50_000) && (await belumDifaktur(psjO.id)).isZero(), "jalur lama: potongan ke baris B (A penuh) dan mengonsumsi SJ yatim A");
+  await transitSinkron("sesudah FJ-O2");
+  await jalankan("hapus FJ-O2", () => hapusDokumen("faktur", fjO2.id));
+  pastikan((await difakturSj(sjOA.baris[0].id)).isZero(), "hapus faktur jalur lama mengembalikan konsumsi SJ yatim");
+  await db.barisPesananPenjualan.update({ where: { id: oA.id }, data: { jumlahDifaktur: 0 } });
+
+  // R6: faktur lain selesai selagi faktur jalur lama menunggu; pembagian diulang dari baris yang dibaca di transaksi
+  const psjR = await pesananBaru("R6", [160_000, 170_000]);
+  const [rA, rB] = psjR.baris;
+  const hasilR = await berantre((tx) => tx.$executeRaw`UPDATE "BarisPesananPenjualan" SET "jumlahDifaktur" = 1 WHERE "id" = ${rA.id}`, [() => buatFaktur(formulir({ pesananId: psjR.id, ppnPersen: 0, baris: [{ barangId: d.barang.id, jumlah: 1, harga: 160_000 }] }))]);
+  const fjR = await fakturTerbaru(psjR.id);
+  pastikan(hasilR[0] === "ok" && fjR.baris.length === 1 && fjR.baris[0].barisPesananId === rB.id, `faktur jalur lama yang menunggu dibagi ulang ke baris B, tidak ditolak (${hasilR[0]})`);
+  pastikan(D((await db.barisPesananPenjualan.findUniqueOrThrow({ where: { id: rB.id } })).jumlahDifaktur).equals(1), "baris B difaktur 1");
+
+  await jalankan("hapus FJ-R6", () => hapusDokumen("faktur", fjR.id));
+  await db.barisPesananPenjualan.update({ where: { id: rA.id }, data: { jumlahDifaktur: 0 } });
+  await jalankan("hapus FJ-T2", () => hapusDokumen("faktur", fjT2.id));
+  await jalankan("hapus SJ T1 baris A", () => hapusDokumen("pengiriman", sjTA.id));
+  await jalankan("hapus FJ-T1", () => hapusDokumen("faktur", fjT1.id));
+  await jalankan("hapus SJ T1 baris B", () => hapusDokumen("pengiriman", sjTB.id));
+  await jalankan("hapus SJ yatim A", () => hapusDokumen("pengiriman", sjOA.id));
+  for (const p of [psjT, psjO, psjR]) await jalankan("hapus PSJ 8d", () => hapusDokumen("pesanan", p.id));
+  await jalankan("hapus PS tambah", () => hapusDokumen("penyesuaian", psTambah.id));
+  pastikan((await transitSinkron("sesudah 8d dibersihkan")).equals(transitAwal), "saldo barang terkirim kembali ke awal");
 }
 
 main()

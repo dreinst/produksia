@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
-import { pastikanHak, wajibHakAksi } from "@/lib/otentikasi";
-import { punyaHak, type Hak } from "@/lib/hakAkses";
+import { pastikanHak, wajibHakAksi, wajibMasukAksi } from "@/lib/otentikasi";
+import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, type Desimal } from "@/lib/uang";
 import { ambilPengaturanPerusahaan, bacaTarifPpn } from "@/lib/pengaturanPerusahaan";
@@ -30,6 +30,7 @@ import {
   bacaTeks,
   bacaTeksDokumen,
   barisBerbarang,
+  barisNamaDiganti,
   catatLogPenjualan,
   dataBarisDokumen,
   jenisDokumenPenjualanSah,
@@ -92,6 +93,16 @@ function hakUbah(jenis: string): Hak {
   return HAK_UBAH[jenis];
 }
 
+/**
+ * Sesi diperiksa lebih dulu, baru jenis dan hak (tinjauan P25 R3), supaya pemanggil tanpa sesi selalu mendapat
+ * penolakan sesi, bukan pesan validasi jenis.
+ */
+async function wajibHakJenisAksi(hak: (jenis: string) => Hak, jenis: string): Promise<PenggunaSesi> {
+  const pengguna = await wajibMasukAksi();
+  pastikanHak(pengguna, hak(jenis));
+  return pengguna;
+}
+
 function segarkan(...jalur: string[]) {
   for (const j of jalur) revalidatePath(j);
 }
@@ -112,6 +123,9 @@ export async function ubahPenawaran(id: string, dataFormulir: FormData) {
   const perusahaanId = lama.perusahaanId;
   const isianPerusahaan = rapikanTeks(dataFormulir.get("perusahaanId"));
   if (isianPerusahaan && isianPerusahaan !== perusahaanId) throw new Error("Perusahaan penawaran tidak bisa diganti");
+  // perusahaan arsip ditolak seperti perusahaanDokumenBaru di buat (tinjauan P25 R5)
+  const perusahaan = await db.perusahaan.findUnique({ where: { id: perusahaanId }, select: { nama: true, aktif: true } });
+  if (perusahaan && !perusahaan.aktif) throw new Error(`Perusahaan ${perusahaan.nama} sudah diarsipkan; penawarannya tidak bisa diubah`);
 
   // urutan pemeriksaan sama dengan buatPenawaran: pelanggan, baris, hak nego, barang, proyek
   const pelangganId = rapikanTeks(dataFormulir.get("pelangganId")) ?? "";
@@ -258,7 +272,7 @@ async function bacaDokumenTampilan(tx: typeof db | Tx, jenis: JenisDokumenPenjua
  * dengan posting nomor cetak.
  */
 export async function ubahTampilanDokumen(jenis: JenisDokumenPenjualan, id: string, dataFormulir: FormData) {
-  const pengguna = await wajibHakAksi(hakUbah(jenis));
+  const pengguna = await wajibHakJenisAksi(hakUbah, jenis);
   const { kolom, data } = bacaIsianTampilan(jenis, dataFormulir);
   const barisIsian = jenis === "penawaran" || jenis === "pesanan" || jenis === "faktur" ? bacaBarisTampilan(dataFormulir) : [];
   const awal = await bacaDokumenTampilan(db, jenis, id);
@@ -276,14 +290,22 @@ export async function ubahTampilanDokumen(jenis: JenisDokumenPenjualan, id: stri
     if (jenis === "faktur" && berubahNomor && lama.statusPersetujuan === "DISETUJUI" && !punyaHak(pengguna, "faktur.setujui")) {
       throw new Error("Nomor cetak faktur yang sudah disetujui hanya bisa diubah pemegang hak setujui faktur");
     }
+    // aturan jatuh tempo sama dengan buat faktur (tinjauan P25 R4)
+    if (jenis === "faktur" && data.jatuhTempo instanceof Date && "tanggal" in lama && lama.tanggal instanceof Date && tanggalIso(data.jatuhTempo) < tanggalIso(lama.tanggal)) {
+      throw new Error("Jatuh tempo tidak boleh sebelum tanggal faktur");
+    }
     if (kolom.includes("kopSuratId")) data.kopSuratId = await pastikanKopSuratDokumen(tx, (data.kopSuratId as string | null) ?? null, lama.perusahaanId);
     if (kolom.length) {
       const tulis = () => perbaruiDokumen(tx, jenis, id, data);
       await (berubahNomor && data.nomorCetak ? simpanNomorCetak(String(data.nomorCetak), tulis) : tulis());
     }
     if (barisIsian.length) {
-      const milik = new Set((await bacaIdBaris(tx, jenis, id)).map((b) => b.id));
+      const tersimpan = await bacaIdBaris(tx, jenis, id);
+      const milik = new Map(tersimpan.map((b) => [b.id, b]));
       for (const b of barisIsian) if (!milik.has(b.id)) throw new Error("Baris tidak ditemukan di dokumen ini");
+      // mengganti nama baris memakai aturan nego yang sama dengan buat (tinjauan P25 S1): nama barang katalog yang
+      // diganti dan baris bebas (JASA-LAIN) butuh harga.nego; nama yang tidak berubah tidak diperiksa
+      await periksaHakBarisBebas(tx, pengguna, barisNamaDiganti(barisIsian, milik));
       for (const b of barisIsian) if (Object.keys(b.data).length) await perbaruiBaris(tx, jenis, b.id, b.data);
     }
     if (!kolom.length && !barisIsian.length) return;
@@ -309,10 +331,11 @@ async function perbaruiDokumen(tx: Tx, jenis: JenisDokumenPenjualan, id: string,
   else await tx.uangMukaPelanggan.update({ where: { id }, data });
 }
 
-function bacaIdBaris(tx: Tx, jenis: JenisDokumenPenjualan, id: string): Promise<{ id: string }[]> {
-  if (jenis === "penawaran") return tx.barisPenawaranPenjualan.findMany({ where: { penawaranId: id }, select: { id: true } });
-  if (jenis === "pesanan") return tx.barisPesananPenjualan.findMany({ where: { pesananId: id }, select: { id: true } });
-  if (jenis === "faktur") return tx.barisFakturPenjualan.findMany({ where: { fakturId: id }, select: { id: true } });
+function bacaIdBaris(tx: Tx, jenis: JenisDokumenPenjualan, id: string): Promise<{ id: string; barangId: string; nama: string | null }[]> {
+  const select = { id: true, barangId: true, nama: true } as const;
+  if (jenis === "penawaran") return tx.barisPenawaranPenjualan.findMany({ where: { penawaranId: id }, select });
+  if (jenis === "pesanan") return tx.barisPesananPenjualan.findMany({ where: { pesananId: id }, select });
+  if (jenis === "faktur") return tx.barisFakturPenjualan.findMany({ where: { fakturId: id }, select });
   return Promise.resolve([]);
 }
 
@@ -330,8 +353,10 @@ function perbaruiBaris(tx: Tx, jenis: JenisDokumenPenjualan, id: string, data: R
  * yang berjalan bersamaan menunggu lalu melihat rencana baru.
  */
 export async function ubahRencanaTermin(jenis: "penawaran" | "pesanan", id: string, dataFormulir: FormData) {
-  if (jenis !== "penawaran" && jenis !== "pesanan") throw new Error("Rencana termin hanya ada di penawaran dan pesanan");
-  const pengguna = await wajibHakAksi(jenis === "penawaran" ? "penawaran.ubah" : "pesanan.ubah");
+  const pengguna = await wajibHakJenisAksi((j) => {
+    if (j !== "penawaran" && j !== "pesanan") throw new Error("Rencana termin hanya ada di penawaran dan pesanan");
+    return j === "penawaran" ? "penawaran.ubah" : "pesanan.ubah";
+  }, jenis);
   const masukan = bacaRencanaTermin(dataFormulir);
 
   await db.$transaction(async (tx) => {
@@ -516,8 +541,10 @@ export async function simpanFormatNomor(dataFormulir: FormData) {
   }
 
   await db.$transaction(async (tx) => {
-    // satu kunci per perusahaan supaya dua simpan format serentak tidak lolos pemeriksaan reset deret bersama
-    await tx.$queryRaw`SELECT 1 FROM "Perusahaan" WHERE "id" = ${p.id} FOR UPDATE`;
+    // kunci penasihat per (perusahaan, kunci deret) supaya dua simpan format serentak berkunci deret sama tidak lolos
+    // pemeriksaan reset deret bersama. Bukan FOR UPDATE pada Perusahaan, karena itu menahan setiap sisipan dokumen
+    // perusahaan (FOR KEY SHARE) dan bisa deadlock dengan alokasi nomor cetak (tinjauan P25 R2).
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('format-nomor'), hashtext(${p.id + "/" + f.kunciDeret}))`;
     const lain = await tx.formatNomor.findFirst({ where: { perusahaanId: p.id, kunciDeret: f.kunciDeret, NOT: { jenis: f.jenis }, reset: { not: f.reset } }, select: { jenis: true, reset: true } });
     if (lain) throw new Error(`Format ${lain.jenis} memakai kunci deret ${f.kunciDeret} dengan reset ${lain.reset}; jenis dengan kunci deret sama wajib memakai reset yang sama`);
     const lama = await tx.formatNomor.findUnique({ where: { perusahaanId_jenis: { perusahaanId: p.id, jenis: f.jenis } }, select: { pola: true } });

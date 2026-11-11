@@ -2,6 +2,7 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
+import type { Prisma } from "../src/prisma-klien/client";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { hashKataSandi } from "../src/lib/kataSandi";
 import { alokasiNomorCetak, isiPola, periodeReset } from "../src/lib/nomorCetak";
@@ -15,7 +16,9 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan, sebagai } 
  * P25: nomor cetak dokumen penjualan (D2 §9.2 uji-nomor-cetak): tanpa format, simpan format dan validasinya, nomor
  * terakhir, deret bersama penawaran dan faktur, faktur lewat persetujuan, nomor manual dan lompat bentrok, alokasi
  * serentak, reset bulanan dan tidak pernah, format nonaktif, kuitansi, per perusahaan, pencarian nomor cetak, dan
- * pembersihan FormatNomor serta PenghitungNomor uji.
+ * pembersihan FormatNomor serta PenghitungNomor uji. Perbaikan tinjauan P25 R2: simpan format memakai kunci penasihat
+ * per (perusahaan, kunci deret), jadi tidak menunggu sisipan dokumen perusahaan (FOR KEY SHARE) dan dua simpan serentak
+ * berkunci deret sama tetap berurutan.
  */
 
 const K = "UJINC";
@@ -41,6 +44,56 @@ async function denganEnv<T>(isian: Record<string, string | undefined>, fn: () =>
   }
 }
 const sebagaiPeran = <T>(peran: string, fn: () => Promise<T>) => denganEnv({ UJI_PERAN: peran, UJI_PENGGUNA: undefined }, fn);
+
+/** Menjalankan `selagi` sementara transaksi lain memegang kunci dari `pegang`; transaksi itu commit sesudahnya. */
+async function selagiTerkunci<T>(pegang: (tx: Prisma.TransactionClient) => Promise<unknown>, selagi: (pid: number) => Promise<T>): Promise<T> {
+  let lepas!: () => void;
+  let siap!: (pid: number) => void;
+  const tahan = new Promise<void>((r) => (lepas = r));
+  const terkunci = new Promise<number>((r) => (siap = r));
+  const penahan = db.$transaction(
+    async (tx) => {
+      await pegang(tx);
+      const [{ pid }] = await tx.$queryRaw<{ pid: number }[]>`SELECT pg_backend_pid() AS "pid"`;
+      siap(pid);
+      await tahan;
+    },
+    { timeout: 60_000 },
+  );
+  const pid = await Promise.race([terkunci, penahan.then(() => -1)]);
+  try {
+    return await selagi(pid);
+  } finally {
+    lepas();
+    await penahan;
+  }
+}
+
+/** Menunggu sampai n sesi terhalang penahan, langsung atau berantai. */
+async function tungguAntre(pidPenahan: number, n: number) {
+  for (let t = 0; t < 400; t++) {
+    const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`
+      WITH RECURSIVE rantai(pid) AS (
+        SELECT a.pid FROM pg_stat_activity a WHERE ${pidPenahan}::int = ANY(pg_blocking_pids(a.pid))
+        UNION
+        SELECT a.pid FROM pg_stat_activity a JOIN rantai r ON r.pid = ANY(pg_blocking_pids(a.pid))
+      )
+      SELECT count(*)::int AS "antre" FROM rantai`;
+    if (antre >= n) return;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  throw new Error(`antrean kunci tidak mencapai ${n}`);
+}
+
+/** revalidatePath di luar HTTP gagal sesudah transaksi selesai, jadi dianggap sukses (pola uji-baris-ganda). */
+const hasilAksi = (k: Promise<unknown>) =>
+  k.then(
+    () => "ok",
+    (e: unknown) => {
+      const pesan = String((e as Error)?.message ?? e);
+      return pesan.includes("static generation store missing") ? "ok" : pesan;
+    },
+  );
 
 async function bersihkan() {
   const pel = await db.pelanggan.findMany({ where: { kode: { startsWith: `PLG-${K}` } }, select: { id: true } });
@@ -139,6 +192,29 @@ async function uji(mulaiUji: Date) {
   await harusDitolak("jenis tidak dikenal", () => fmt({ jenis: "surat", pola: POLA_P }), "Jenis nomor cetak tidak dikenal");
   await harusDitolak("deret sama dengan reset berbeda (KONTRAK P28)", () => fmt({ jenis: "faktur", reset: "BULANAN", pola: "{SEQ3}/{MM}/{YYYY}" }), "wajib memakai reset yang sama");
   await harusDitolak("perusahaan tidak ada", () => simpanFormatNomor(formulir({ perusahaanId: "tidak-ada", jenis: "penawaran", pola: POLA_P })), "Perusahaan tidak ditemukan");
+
+  console.log("=== 2b. Kunci simpan format (tinjauan P25 R2) ===");
+  // sisipan dokumen perusahaan yang sedang berjalan memegang FOR KEY SHARE pada Perusahaan; simpan format tidak menunggunya
+  const hasilKeyShare = await selagiTerkunci(
+    (tx) => tx.$queryRaw`SELECT 1 FROM "Perusahaan" WHERE "id" = 'utama' FOR KEY SHARE`,
+    () => Promise.race([hasilAksi(fmt({ jenis: "penawaran", pola: POLA_P })), new Promise<string>((r) => setTimeout(() => r("menunggu"), 5000))]),
+  );
+  pastikan(hasilKeyShare === "ok", `simpan format selesai selagi Perusahaan dipegang FOR KEY SHARE (${hasilKeyShare})`);
+  // dua simpan serentak berkunci deret sama dengan reset berbeda: berurutan, jadi yang kedua ditolak aturan deret bersama
+  const deretR2 = `${DERET}-r2`;
+  const [hBulanan, hTahunan] = await selagiTerkunci(
+    (tx) => tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('format-nomor'), hashtext(${"utama/" + deretR2}))`,
+    async (pid) => {
+      const a = hasilAksi(fmt({ jenis: "kwitansi", kunciDeret: deretR2, reset: "BULANAN", pola: "KW-{YY}{MM}-{SEQ2}" }));
+      await tungguAntre(pid, 1);
+      const b = hasilAksi(fmt({ jenis: "kwitansi-dp", kunciDeret: deretR2, reset: "TAHUNAN", pola: "KDP-{YYYY}-{SEQ}" }));
+      await tungguAntre(pid, 2);
+      return [a, b];
+    },
+  ).then((x) => Promise.all(x));
+  pastikan(hBulanan === "ok" && hTahunan.includes("wajib memakai reset yang sama"), `simpan serentak berkunci deret sama berurutan: yang kedua ditolak (${hBulanan} | ${hTahunan})`);
+  pastikan((await db.formatNomor.count({ where: { perusahaanId: "utama", kunciDeret: deretR2 } })) === 1, "hanya satu format berderet sama tersimpan");
+  await db.formatNomor.deleteMany({ where: { perusahaanId: "utama", kunciDeret: deretR2 } });
 
   console.log("=== 3. Nomor terakhir ===");
   await jalankan("nomor terakhir 70", () => fmt({ jenis: "penawaran", pola: POLA_P, nomorTerakhir: 70 }));

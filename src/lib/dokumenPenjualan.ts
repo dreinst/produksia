@@ -544,6 +544,8 @@ export type BarisPesananSumber = {
   barangId: string;
   jumlah: Angka;
   jumlahDifaktur: Angka;
+  /** prioritas jalur lama bila data SJ tidak dikirim (tinjauan P25 T1); tanpa nilai dianggap 0 */
+  jumlahTerkirim?: Angka;
   harga: Angka;
   frekuensi: Angka;
   satuanFrekuensi: string | null;
@@ -631,17 +633,46 @@ export function jalurLamaBolehUntuk(pesanan: Pick<PesananSumber, "mode" | "baris
   return pesanan.baris.every((b) => D(b.frekuensi).equals(1) && !b.nama);
 }
 
+/** Barang terkirim yang belum difaktur di satu baris pesanan (satu entri per baris SJ, urut tanggal SJ). */
+export type TerkirimBelumDifaktur = { barisPesananId: string; jumlah: Angka };
+
+/**
+ * Baris SJ pesanan yang belum habis difaktur, urut tanggal SJ lalu id (urutan konsumsi transit di buatFaktur). Dipakai
+ * jalur lama untuk mendahulukan baris pesanan yang barangnya sudah dikirim (tinjauan P25 T1).
+ */
+export async function bacaTerkirimBelumDifaktur(klien: Klien, pesananId: string): Promise<TerkirimBelumDifaktur[]> {
+  const baris = await klien.barisPengiriman.findMany({
+    where: { pengiriman: { pesananId } },
+    orderBy: [{ pengiriman: { tanggal: "asc" } }, { id: "asc" }],
+    select: { barisPesananId: true, jumlah: true, jumlahDifaktur: true },
+  });
+  return baris.map((b) => ({ barisPesananId: b.barisPesananId, jumlah: D(b.jumlah).minus(D(b.jumlahDifaktur)) })).filter((b) => b.jumlah.gt(0));
+}
+
 /**
  * Jalur lama (kompatibilitas): validasi sisa per barang seperti kode lama (jumlah sisa semua baris berbarang sama,
  * pesan sama), harga dari kiriman, frekuensi 1, teks baris kosong. Jumlah tiap baris kiriman dibagi ke baris pesanan
- * berbarang sama urut `urutan` lalu id, sehingga barisPesananId terisi per potongan (tinjauan P23 S1). Kiriman yang
- * secara kumulatif melebihi sisa barang itu ditolak dengan pesan yang sama (tinjauan P23 R1).
+ * berbarang sama, sehingga barisPesananId terisi per potongan (tinjauan P23 S1). Kiriman yang secara kumulatif
+ * melebihi sisa barang itu ditolak dengan pesan yang sama (tinjauan P23 R1).
+ *
+ * Urutan pembagian (tinjauan P25 T1): lebih dulu baris pesanan yang barangnya sudah dikirim tetapi belum difaktur,
+ * menurut `terkirim` (baris SJ urut tanggal, sama dengan urutan konsumsi transit kode lama), lalu sisanya urut
+ * `urutan` dan id. Dengan begitu konsumsi SJ per baris pesanan sama banyak dengan konsumsi per barang kode lama, dan
+ * HPP diakui di faktur yang sama. Tanpa `terkirim`, prioritasnya dihitung dari `jumlahTerkirim - jumlahDifaktur`.
  */
-export function siapkanBarisJalurLama(pesanan: Pick<PesananSumber, "mode" | "baris">, masukan: readonly { barangId: string; jumlah: Desimal; harga: Desimal }[]): BarisFakturSiap[] {
+export function siapkanBarisJalurLama(
+  pesanan: Pick<PesananSumber, "mode" | "baris">,
+  masukan: readonly { barangId: string; jumlah: Desimal; harga: Desimal }[],
+  terkirim?: readonly TerkirimBelumDifaktur[],
+): BarisFakturSiap[] {
   if (!jalurLamaBolehUntuk(pesanan)) throw new Error("Faktur pesanan ini wajib dibuat dari komposer faktur (baris pesanan per id)");
   const urut = urutBarisPesanan(pesanan.baris);
   const dipakai = new Map<string, Desimal>();
   const ruang = (b: BarisPesananSumber) => D(b.jumlah).minus(D(b.jumlahDifaktur)).minus(dipakai.get(b.id) ?? NOL);
+  const antrean = (terkirim ?? urut.map((b) => ({ barisPesananId: b.id, jumlah: D(b.jumlahTerkirim ?? 0).minus(D(b.jumlahDifaktur)) }))).map((t) => ({
+    id: t.barisPesananId,
+    sisa: terbesar(D(t.jumlah), NOL),
+  }));
   const hasil: BarisFakturSiap[] = [];
   for (const l of masukan) {
     const cocok = urut.filter((b) => b.barangId === l.barangId);
@@ -651,22 +682,40 @@ export function siapkanBarisJalurLama(pesanan: Pick<PesananSumber, "mode" | "bar
     if (l.jumlah.gt(sisa) || l.jumlah.gt(sisaKumulatif)) {
       throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(terkecil(sisa, sisaKumulatif))}, diminta ${format(l.jumlah)})`);
     }
+    const petaCocok = new Map(cocok.map((b) => [b.id, b]));
+    const bagian = new Map<string, Desimal>();
     let tersisa = l.jumlah;
-    // jumlah ruang positif >= sisaKumulatif >= jumlah kiriman, jadi pembagian selalu habis
+    const ambilKe = (b: BarisPesananSumber, batas: Desimal) => {
+      const ambil = terkecil(terkecil(terbesar(ruang(b), NOL), batas), tersisa);
+      if (ambil.lte(0)) return NOL;
+      dipakai.set(b.id, (dipakai.get(b.id) ?? NOL).plus(ambil));
+      bagian.set(b.id, (bagian.get(b.id) ?? NOL).plus(ambil));
+      tersisa = tersisa.minus(ambil);
+      return ambil;
+    };
+    // 1) barang yang sudah dikirim dan belum difaktur, urut tanggal SJ
+    for (const t of antrean) {
+      if (tersisa.lte(0)) break;
+      const b = petaCocok.get(t.id);
+      if (b && t.sisa.gt(0)) t.sisa = t.sisa.minus(ambilKe(b, t.sisa));
+    }
+    // 2) sisanya urut urutan lalu id; jumlah ruang positif >= sisaKumulatif >= jumlah kiriman, jadi pembagian selalu habis
     for (const b of cocok) {
       if (tersisa.lte(0)) break;
-      const ambil = terkecil(terbesar(ruang(b), NOL), tersisa);
-      if (ambil.lte(0)) continue;
-      dipakai.set(b.id, (dipakai.get(b.id) ?? NOL).plus(ambil));
-      hasil.push({ barisPesananId: b.id, barangId: l.barangId, jumlah: ambil, harga: l.harga, frekuensi: D(1), satuanFrekuensi: null, bagian: null, urutan: hasil.length, nama: null, deskripsi: null, satuan: null, keterangan: null });
-      tersisa = tersisa.minus(ambil);
+      ambilKe(b, tersisa);
+    }
+    // satu baris faktur per baris pesanan, urut tampilan
+    for (const b of cocok) {
+      const jumlah = bagian.get(b.id);
+      if (!jumlah) continue;
+      hasil.push({ barisPesananId: b.id, barangId: l.barangId, jumlah, harga: l.harga, frekuensi: D(1), satuanFrekuensi: null, bagian: null, urutan: hasil.length, nama: null, deskripsi: null, satuan: null, keterangan: null });
     }
   }
   return hasil;
 }
 
-export function siapkanBarisFaktur(pesanan: Pick<PesananSumber, "mode" | "baris">, masukan: MasukanBarisFaktur): BarisFakturSiap[] {
-  return masukan.jalur === "ID" ? siapkanBarisJalurId(pesanan, masukan.baris) : siapkanBarisJalurLama(pesanan, masukan.baris);
+export function siapkanBarisFaktur(pesanan: Pick<PesananSumber, "mode" | "baris">, masukan: MasukanBarisFaktur, terkirim?: readonly TerkirimBelumDifaktur[]): BarisFakturSiap[] {
+  return masukan.jalur === "ID" ? siapkanBarisJalurId(pesanan, masukan.baris) : siapkanBarisJalurLama(pesanan, masukan.baris, terkirim);
 }
 
 /** Data Prisma baris faktur (nested create); nilaiTransit dihitung aksi saat konsumsi surat jalan. */
@@ -973,6 +1022,22 @@ export function bacaIsianTampilan(jenis: JenisDokumenPenjualan, dataFormulir: Fo
 }
 
 export type IsianBarisTampilan = { id: string; data: Partial<Record<(typeof KOLOM_TAMPILAN_BARIS)[number], string | number | null>> };
+
+/**
+ * Baris tampilan yang namanya benar-benar berubah dibanding tersimpan (spasi dirapikan), dalam bentuk masukan
+ * periksaHakBarisBebas: { barangId, nama baru }. Nama kosong berarti kembali ke nama katalog (tinjauan P25 S1).
+ */
+export function barisNamaDiganti(
+  isian: readonly IsianBarisTampilan[],
+  tersimpan: ReadonlyMap<string, { barangId: string; nama: string | null }>,
+): { barangId: string; nama: string | null }[] {
+  return isian.flatMap((b) => {
+    const t = tersimpan.get(b.id);
+    if (!t || !("nama" in b.data)) return [];
+    const baru = b.data.nama === null || b.data.nama === undefined ? null : String(b.data.nama);
+    return rapikanSpasi(baru ?? "") === rapikanSpasi(t.nama ?? "") ? [] : [{ barangId: t.barangId, nama: baru }];
+  });
+}
 
 /** Isian `baris` ubahTampilanDokumen (JSON [{ id, nama, ... }]); hanya kolom teks dan urutan yang kuncinya ada. */
 export function bacaBarisTampilan(dataFormulir: FormData): IsianBarisTampilan[] {

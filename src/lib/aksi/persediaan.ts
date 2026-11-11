@@ -183,7 +183,10 @@ export async function buatPindahBarang(dataFormulir: FormData) {
   await db.$transaction(async (tx) => {
     const daftarBarang = await tx.barang.findMany({ where: { id: { in: daftarBaris.map((b) => b.barangId) } }, select: { id: true, kode: true, nama: true, jenis: true } });
     const petaBarang = new Map(daftarBarang.map((b) => [b.id, b]));
-    await kunciStokUrut(tx, daftarBaris.flatMap((b) => [{ barangId: b.barangId, gudangId: gudangAsalId }, { barangId: b.barangId, gudangId: gudangTujuanId, buatKosong: true }]));
+    // baris stok tujuan hanya disisipkan untuk barang yang ada dan berjenis BARANG, supaya barang yang tidak ada atau
+    // JASA tetap ditolak dengan pesan lama di loop, bukan galat FK (tinjauan P25 R1)
+    const sahStok = (id: string) => petaBarang.get(id)?.jenis === "BARANG";
+    await kunciStokUrut(tx, daftarBaris.flatMap((b) => [{ barangId: b.barangId, gudangId: gudangAsalId }, ...(sahStok(b.barangId) ? [{ barangId: b.barangId, gudangId: gudangTujuanId, buatKosong: true }] : [])]));
     for (const b of daftarBaris) {
       const barang = petaBarang.get(b.barangId);
       if (!barang) throw new Error("Barang tidak ditemukan");

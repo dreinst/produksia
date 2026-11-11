@@ -273,6 +273,13 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (lebihBaru.length) throw new Error(`Hapus faktur yang lebih baru dulu (${daftarNomor(lebihBaru)}) agar pengakuan HPP bisa dibalik urut`);
         const sjSetelah = (d.pesanan?.pengiriman ?? []).filter((s) => s.tanggal > d.tanggal);
         if (sjSetelah.length) throw new Error(`Surat jalan ${daftarNomor(sjSetelah)} dibuat setelah ${d.nomor}; hapus itu dulu`);
+        // baris pesanan yang penuh ditagih sebelum pembalikan: SJ-nya bisa dikonsumsi lintas baris oleh faktur ini (SJ yatim
+        // di buatFaktur, tinjauan P25 T1)
+        const penuhSebelum = d.pesananId
+          ? (await tx.barisPesananPenjualan.findMany({ where: { pesananId: d.pesananId }, select: { id: true, jumlah: true, jumlahDifaktur: true } }))
+              .filter((bp) => D(bp.jumlahDifaktur).gte(D(bp.jumlah)))
+              .map((bp) => bp.id)
+          : [];
         for (const b of d.baris) {
           if (d.pesananId) {
             // Baris faktur jalur id (barisPesananId terisi) membalik tepat baris pesanan dan baris SJ-nya, sehingga barang
@@ -285,12 +292,30 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
               let sisa = D(b.jumlah);
               const whereSj = b.barisPesananId ? { barisPesananId: b.barisPesananId, pengiriman: { pesananId: d.pesananId } } : { barangId: b.barangId, pengiriman: { pesananId: d.pesananId } };
               const barisSj = await tx.barisPengiriman.findMany({ where: whereSj, orderBy: { pengiriman: { tanggal: "desc" } } });
+              let nilai = D(0);
               for (const sj of barisSj) {
                 if (sisa.lte(0)) break;
                 const bisa = terkecil(D(sj.jumlahDifaktur), sisa);
                 if (bisa.lte(0)) continue;
                 await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { decrement: bisa } } });
                 sisa = sisa.minus(bisa);
+                nilai = nilai.plus(kali(bisa, D(sj.hargaPokok)));
+              }
+              // sisa nilai transit yang belum terbalik berasal dari SJ yatim baris pesanan lain (buatFaktur, konsumsiSjYatim)
+              const yatim = penuhSebelum.filter((id) => id !== b.barisPesananId);
+              if (b.barisPesananId && sisa.gt(0) && nilai.lt(D(b.nilaiTransit)) && yatim.length > 0) {
+                const barisYatim = await tx.barisPengiriman.findMany({
+                  where: { barangId: b.barangId, barisPesananId: { in: yatim }, pengiriman: { pesananId: d.pesananId } },
+                  orderBy: [{ pengiriman: { tanggal: "desc" } }, { id: "desc" }],
+                });
+                for (const sj of barisYatim) {
+                  if (sisa.lte(0) || nilai.gte(D(b.nilaiTransit))) break;
+                  const bisa = terkecil(D(sj.jumlahDifaktur), sisa);
+                  if (bisa.lte(0)) continue;
+                  await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { decrement: bisa } } });
+                  sisa = sisa.minus(bisa);
+                  nilai = nilai.plus(kali(bisa, D(sj.hargaPokok)));
+                }
               }
             }
           }

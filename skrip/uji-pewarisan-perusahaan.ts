@@ -222,6 +222,10 @@ async function main() {
   await harusDitolak("PB ke gudang milik utama", () => buatPindahBarang(isiPb(gudangU.id, gudangUt.id, [{ barangId: barangU.id, jumlah: 1 }])), `Gudang ${KODE}-WH-UT`);
   await harusDitolak("PB barang dua pemilik", () => buatPindahBarang(isiPb(gudangB.id, gudangU.id, [{ barangId: barangU.id, jumlah: 1 }, { barangId: barangUt.id, jumlah: 1 }])), "Satu dokumen hanya untuk barang milik satu perusahaan");
   pastikan((await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangUt.id, gudangId: gudangB.id } } })).jumlah.equals(D(10)), "pindah barang yang ditolak tidak mengubah stok");
+  // tinjauan P25 R1: barang yang tidak ada atau JASA ditolak dengan pesan lama, bukan galat FK; baris stok tujuan tidak disisipkan
+  await harusDitolak("PB barang yang tidak ada", () => buatPindahBarang(isiPb(gudangU.id, gudangB.id, [{ barangId: `${KODE}-tidak-ada`, jumlah: 1 }])), "Barang tidak ditemukan");
+  await harusDitolak("PB barang JASA", () => buatPindahBarang(isiPb(gudangB.id, gudangU.id, [{ barangId: jasaB.id, jumlah: 1 }])), "adalah JASA, tidak punya stok");
+  pastikan((await db.stokBarang.count({ where: { barangId: jasaB.id } })) === 0, "PB JASA yang ditolak tidak meninggalkan baris stok");
   // tinjauan P13 butir 8: isian perusahaan yang berbeda dari pemilik barang ditolak, bukan diabaikan
   await harusDitolak("PS dengan isian perusahaan selain pemilik barang", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudangU.id, akunLawanId: modalB.id, perusahaanId: PERUSAHAAN_UTAMA, baris: [{ barangId: barangU.id, jumlahSesudah: 45, hargaSatuan: 10_000 }] })), "dokumen persediaan harus di perusahaan pemilik barang");
   await harusDitolak("PB dengan isian perusahaan selain pemilik barang", () => buatPindahBarang(formulir({ gudangAsalId: gudangB.id, gudangTujuanId: gudangU.id, perusahaanId: PERUSAHAAN_UTAMA, baris: [{ barangId: barangU.id, jumlah: 1 }] })), "dokumen persediaan harus di perusahaan pemilik barang");
