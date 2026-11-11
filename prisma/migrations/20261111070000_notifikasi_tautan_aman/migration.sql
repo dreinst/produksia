@@ -2,4 +2,7 @@
 -- dan membuang tab atau baris baru di dalam URL, sehingga "/\luar.contoh" dan "/<TAB>/luar.contoh" lolos dari
 -- Notifikasi_tautan_internal tetapi terbuka sebagai URL luar. Aplikasi juga menolaknya (tautanInternal di
 -- src/lib/notifikasi.ts); CHECK ini pengaman terakhir. Aditif: CHECK lama tetap berlaku.
+-- Baris lama yang memuat karakter itu (mis. basis data pengembangan yang pernah diisi tangan) dikosongkan lebih dulu,
+-- supaya ADD CONSTRAINT tidak menggagalkan rangkaian migrasi.
+UPDATE "Notifikasi" SET "tautan" = NULL WHERE "tautan" ~ '[\\\x01-\x1f\x7f]';
 ALTER TABLE "Notifikasi" ADD CONSTRAINT "Notifikasi_tautan_tanpa_kendali" CHECK ("tautan" IS NULL OR "tautan" !~ '[\\\x01-\x1f\x7f]');

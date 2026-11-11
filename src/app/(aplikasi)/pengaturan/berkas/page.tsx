@@ -30,7 +30,8 @@ export default async function HalamanAksesBerkas({ searchParams }: { searchParam
   const [penyimpanan, folder, hitunganFolder, semuaProyek, terbatas] = await Promise.all([
     ringkasPenyimpanan(db),
     db.folderBerkas.findMany({ orderBy: [{ urutan: "asc" }, { kode: "asc" }], select: { kode: true, nama: true, sistem: true, terbatas: true, peranBoleh: true } }),
-    db.berkas.groupBy({ by: ["folderKode"], _count: { _all: true } }),
+    // berkas yang sudah dihapus permanen tidak dihitung: tidak tampil di mana pun dan tidak menahan folder
+    db.berkas.groupBy({ by: ["folderKode"], where: { isiDihapusPada: null }, _count: { _all: true } }),
     db.proyek.findMany({ orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, status: true } }),
     db.aksesBerkasProyek.findMany({
       select: { proyekId: true, peranBoleh: true, diubahPada: true, proyek: { select: { kode: true, nama: true } }, _count: { select: { pengguna: true } } },

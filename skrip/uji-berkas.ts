@@ -62,6 +62,8 @@ import {
 import { buatPenawaran } from "../src/lib/aksi/penjualan";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import type { PeranPengguna } from "../src/prisma-klien/client";
+import { petaTautanAktif } from "../src/komponen/berkas/LampiranBerkas";
+import { readFileSync } from "node:fs";
 import { formulir, harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
 import { NextRequest } from "next/server";
 import { config as configProxy, proxy } from "../src/proxy";
@@ -249,6 +251,14 @@ async function main() {
   pastikan(JENIS_LAMPIRAN.proyek.hakLihat === "proyek.lihat" && JENIS_LAMPIRAN.proyek.hakUnggah.join() === "data-induk.tulis", "jenis proyek: lihat proyek.lihat, ubah data-induk.tulis (HAK.md §7 no. 13)");
   pastikan(JSON.stringify(JENIS_CETAK_KE_LAMPIRAN) === JSON.stringify({ penawaran: "penawaran", faktur: "faktur", kwitansi: "penerimaan", "kwitansi-dp": "uang-muka", "tagihan-termin": "rencana-termin" }), "pemetaan jenis cetak ke jenis lampiran");
   for (const k of DAFTAR_JENIS) pastikan((await JENIS_LAMPIRAN[k].baca(db, "ujib-tidak-ada")) === null, `pembaca ${k}: entitas tidak ada = null`);
+  // perbaikan tinjauan P07 butir 1 dan 5 (diperiksa dari sumber karena tidak ada uji peramban): dialog pratinjau lewat
+  // portal ke document.body, dan keempat teks sukses D7 §7.10 dipasang sebagai pesan tingkat halaman
+  const sumber = (f: string) => readFileSync(`src/${f}`, "utf8");
+  pastikan(/createPortal\(\s*<div className="fixed inset-0/.test(sumber("komponen/berkas/DialogPratinjauGambar.tsx")) && sumber("komponen/berkas/DialogPratinjauGambar.tsx").includes("document.body"), "DialogPratinjauGambar: lapisan dialog dipasang lewat createPortal ke document.body");
+  const halamanBerkas = sumber("app/(aplikasi)/berkas/page.tsx");
+  const lampiran = sumber("komponen/berkas/LampiranBerkas.tsx");
+  pastikan(["Berkas dipindah ke Sampah.", "Berkas dipulihkan.", "Berkas dihapus permanen."].every((t) => halamanBerkas.includes(`pesanSuksesHalaman="${t}"`)) && halamanBerkas.includes("<PesanSuksesHalaman />"), "halaman Berkas: teks sukses buang, pulihkan, hapus permanen, dan PesanSuksesHalaman terpasang");
+  pastikan(lampiran.includes('pesanSuksesHalaman="Berkas dipindah ke Sampah."') && lampiran.includes("<PesanSuksesHalaman />") && sumber("komponen/berkas/FormulirTautanBagi.tsx").includes('pesanSuksesHalaman="Tautan dicabut."'), "LampiranBerkas dan FormulirTautanBagi: teks sukses buang dan cabut");
 
   console.log("=== 1. Deteksi tipe ===");
   const harapanTipe: [string, Uint8Array, string, boolean][] = [
@@ -530,6 +540,23 @@ async function main() {
   pastikan(docxPindah.folderKode === "DOKUMEN" && docxPindah.proyekId === p2.id, "pindah folder dan proyek berkas umum");
   await sebagaiPeran("SOSMED", () => jalankan("lepas proyek", () => ubahBerkas(docx.id, formulir({ proyekId: "" }))));
   pastikan((await db.berkas.findUniqueOrThrow({ where: { id: docx.id } })).proyekId === null, "proyek kosong = tanpa proyek");
+  // perbaikan tinjauan P07 butir 3: nama yang tidak diubah di panel Ubah tetap persis, walau dibangun ulang akan berbeda
+  const ganda = await unggahSukses(PEMILIK, `${P}laporan.pdf.pdf`, CONTOH.pdf);
+  pastikan(ganda.namaBerkas === `${P}laporan.pdf.pdf`, `unggah ekstensi ganda tersimpan apa adanya: ${ganda.namaBerkas}`);
+  await sebagaiPeran("PEMILIK", () => jalankan("pindah folder berkas ekstensi ganda (nama tidak diubah)", () => ubahBerkas(ganda.id, formulir({ namaBerkas: `${P}laporan.pdf`, folderKode: "DOKUMEN" }))));
+  const gandaPindah = await db.berkas.findUniqueOrThrow({ where: { id: ganda.id } });
+  pastikan(gandaPindah.namaBerkas === `${P}laporan.pdf.pdf` && gandaPindah.folderKode === "DOKUMEN", `ekstensi ganda: nama tetap, folder pindah (${gandaPindah.namaBerkas})`);
+  const logGanda = await db.logAktivitas.findFirst({ where: { modul: "berkas", entitasId: ganda.id, aksi: "UBAH" }, select: { meta: true } });
+  pastikan((logGanda?.meta as Record<string, unknown> | null)?.namaLama === `${P}laporan.pdf.pdf` && (logGanda?.meta as Record<string, unknown>).folderLama === "LAINNYA", "log UBAH ekstensi ganda: namaLama sama dengan nama sekarang");
+  await db.berkas.update({ where: { id: ganda.id }, data: { namaBerkas: `${P}FOTO.PDF` } });
+  await sebagaiPeran("PEMILIK", () => jalankan("pindah folder berkas ekstensi huruf besar (nama tidak diubah)", () => ubahBerkas(ganda.id, formulir({ namaBerkas: ` ${P}FOTO `, folderKode: "LAINNYA" }))));
+  const besar = await db.berkas.findUniqueOrThrow({ where: { id: ganda.id } });
+  pastikan(besar.namaBerkas === `${P}FOTO.PDF` && besar.folderKode === "LAINNYA", `ekstensi huruf besar dari data lama tetap: ${besar.namaBerkas}`);
+  await sebagaiPeran("PEMILIK", () => jalankan("ganti nama berkas ekstensi huruf besar", () => ubahBerkas(ganda.id, formulir({ namaBerkas: `${P}foto-baru` }))));
+  pastikan((await db.berkas.findUniqueOrThrow({ where: { id: ganda.id } })).namaBerkas === `${P}foto-baru.pdf`, "nama yang memang diubah tetap dibangun ulang dengan ekstensi kecil");
+  const jumlahUbahGanda = await jumlahLog(ganda.id, "UBAH");
+  await sebagaiPeran("PEMILIK", () => jalankan("simpan tanpa perubahan", () => ubahBerkas(ganda.id, formulir({ namaBerkas: `${P}foto-baru`, folderKode: "LAINNYA" }))));
+  pastikan((await jumlahLog(ganda.id, "UBAH")) === jumlahUbahGanda, "simpan tanpa perubahan tidak menulis log UBAH");
 
   console.log("=== 11. Buang, pulihkan, hapus permanen ===");
   await sebagaiPeran("ADMIN", () => harusDitolak("ADMIN buang berkas umum", () => buangBerkas(jpg.id), "tidak punya hak membuang"));
@@ -552,11 +579,22 @@ async function main() {
   pastikan(permanen.isiDihapusPada !== null && (await db.isiBerkas.count({ where: { berkasId: lamPnw.id } })) === 0 && (await db.tautanBagiBerkas.count({ where: { berkasId: lamPnw.id } })) === 0, "hapus permanen: isi dan tautan hilang, metadata tetap");
   pastikan((await bacaUntukDikirim(db, PEMILIK, lamPnw.id, { unduh: true, ifNoneMatch: null })).status === 404 && !(await idTerlihat(PEMILIK, { sampah: true })).has(lamPnw.id), "unduh 404 dan tidak tampil di Sampah");
   pastikan((await jumlahLog(lamPnw.id, "HAPUS_PERMANEN")) === 1, "log HAPUS_PERMANEN");
+  // perbaikan tinjauan P07 butir 2: sorot di Sampah (saring id + sampah) hanya menemukan berkas yang dibuang
+  pastikan((await idTerlihat(PEMILIK, { id: jpg.id, sampah: true })).size === 0 && (await idTerlihat(PEMILIK, { id: jpg.id })).has(jpg.id), "sorot berkas aktif di Sampah: kosong; di daftar biasa: ada");
   await sebagaiPeran("PEMILIK", () => harusDitolak("hapus permanen dua kali", () => hapusPermanenBerkas(lamPnw.id), "Berkas tidak ditemukan"));
 
   console.log("=== 12. Tautan bagi ===");
   const lamPnw2 = await unggahSukses(PEMILIK, `${P}penawaran-2.pdf`, CONTOH.pdf, { jenisEntitas: "penawaran", entitasId: pnw.id });
   await sebagaiPeran("KASIR", () => harusDitolak("KASIR bagikan lampiran penawaran", () => buatTautanBagi(lamPnw2.id, formulir({ masaBerlaku: "7" })), "tidak punya hak membagikan"));
+  // perbaikan tinjauan P07 butir 6: pemegang hak hapus tanpa berkas.bagikan tetap melihat dan boleh mencabut tautan aktif
+  const lamProyekKasir = await unggahSukses(PEMILIK, `${P}lampiran-proyek.pdf`, CONTOH.pdf, { jenisEntitas: "proyek", entitasId: p2.id });
+  pastikan(bolehAksesBerkas(KASIR, lamProyekKasir, "lihat") && bolehAksesBerkas(KASIR, lamProyekKasir, "hapus") && !bolehAksesBerkas(KASIR, lamProyekKasir, "bagikan"), "KASIR: lampiran proyek boleh dilihat dan dihapus, tidak boleh dibagikan");
+  const bagiKasir = await buatTautanBagiBerkas(db, PEMILIK, lamProyekKasir.id, "7");
+  const petaKasir = await petaTautanAktif(KASIR, [lamProyekKasir]);
+  pastikan(petaKasir.get(lamProyekKasir.id)?.length === 1 && petaKasir.get(lamProyekKasir.id)![0].id === bagiKasir.tautanId && petaKasir.get(lamProyekKasir.id)![0].bolehCabut, "petaTautanAktif KASIR (hak hapus saja): tautan buatan Pemilik dimuat dan boleh dicabut");
+  pastikan((await petaTautanAktif(KASIR, [lamPnw2])).size === 0, "petaTautanAktif KASIR untuk lampiran penawaran (tanpa hak bagikan dan hapus): kosong");
+  await sebagaiPeran("KASIR", () => jalankan("KASIR cabut tautan buatan Pemilik", () => cabutTautanBagi(bagiKasir.tautanId)));
+  pastikan((await db.tautanBagiBerkas.findUniqueOrThrow({ where: { id: bagiKasir.tautanId } })).dicabutPada !== null && (await petaTautanAktif(KASIR, [lamProyekKasir])).size === 0, "tautan tercabut oleh KASIR dan hilang dari daftar aktif");
   await sebagaiPeran("SOSMED", () => jalankan("SOSMED bagikan lewat aksi", () => buatTautanBagi(docx.id, formulir({ masaBerlaku: "7" }))));
   const sebelumBagi = new Date();
   const bagi = await buatTautanBagiBerkas(db, SOSMED, docx.id, "7");
@@ -629,7 +667,19 @@ async function main() {
   await sebagaiPeran("PEMILIK", () => harusDitolak("hapus folder sistem", () => hapusFolderBerkas("LAINNYA"), "Folder sistem tidak bisa dihapus"));
   pastikan((await db.logAktivitas.count({ where: { modul: "berkas", jenis: "Folder Berkas", waktu: { gte: mulaiUji } } })) >= 4, "log BUAT/UBAH/HAPUS folder buatan");
   await sebagaiPeran("PEMILIK", () => jalankan("pindahkan berkas keluar folder buatan", () => ubahBerkas(diKontrak.id, formulir({ folderKode: "LAINNYA" }))));
-  await sebagaiPeran("PEMILIK", () => jalankan("hapus folder setelah kosong", () => hapusFolderBerkas("KONTRAK_UJIB")));
+  // perbaikan tinjauan P07 butir 4: berkas di Sampah menahan folder, berkas yang sudah dihapus permanen tidak
+  const diKontrak2 = await unggahSukses(PEMILIK, `${P}kontrak-2.pdf`, CONTOH.pdf, { folderKode: "KONTRAK_UJIB" });
+  await sebagaiPeran("PEMILIK", () => jalankan("buang berkas di folder buatan", () => buangBerkas(diKontrak2.id)));
+  await sebagaiPeran("PEMILIK", () => harusDitolak("hapus folder yang berkasnya di Sampah", () => hapusFolderBerkas("KONTRAK_UJIB"), "Folder masih berisi 1 berkas (1 di Sampah)"));
+  await sebagaiPeran("PEMILIK", () => jalankan("hapus permanen berkas folder buatan", () => hapusPermanenBerkas(diKontrak2.id)));
+  const jumlahFolderPengaturan = async () => new Map((await db.berkas.groupBy({ by: ["folderKode"], where: { isiDihapusPada: null }, _count: { _all: true } })).map((h) => [h.folderKode, h._count._all])).get("KONTRAK_UJIB") ?? 0;
+  pastikan((await jumlahFolderPengaturan()) === 0 && (await db.berkas.count({ where: { folderKode: "KONTRAK_UJIB" } })) === 1, "hitungan halaman Akses Berkas tidak memuat berkas yang dihapus permanen");
+  await sebagaiPeran("ADMIN", () => harusDitolak("ADMIN hapus folder buatan", () => hapusFolderBerkas("KONTRAK_UJIB"), "tidak punya hak"));
+  await sebagaiPeran("PEMILIK", () => jalankan("hapus folder yang tinggal berisi berkas terhapus permanen", () => hapusFolderBerkas("KONTRAK_UJIB")));
+  const kontrak2 = await db.berkas.findUniqueOrThrow({ where: { id: diKontrak2.id } });
+  pastikan((await db.folderBerkas.count({ where: { kode: "KONTRAK_UJIB" } })) === 0 && kontrak2.folderKode === "LAINNYA" && kontrak2.isiDihapusPada !== null, "folder terhapus, metadata berkas terhapus permanen pindah ke LAINNYA");
+  const logHapusFolder = await db.logAktivitas.findFirst({ where: { modul: "berkas", jenis: "Folder Berkas", aksi: "HAPUS", nomor: "KONTRAK_UJIB", waktu: { gte: mulaiUji } }, select: { meta: true } });
+  pastikan((logHapusFolder?.meta as Record<string, unknown> | null)?.berkasDihapusPermanenDipindah === 1 && (logHapusFolder?.meta as Record<string, unknown>).folder === "KONTRAK_UJIB", "log HAPUS folder mencatat jumlah berkas terhapus permanen yang dipindah");
 
   console.log("=== 14. Lampiran yatim dan pembantu domain ===");
   const lamYatim = await unggahSukses(PEMILIK, `${P}yatim.pdf`, CONTOH.pdf, { jenisEntitas: "penawaran", entitasId: pnw.id });

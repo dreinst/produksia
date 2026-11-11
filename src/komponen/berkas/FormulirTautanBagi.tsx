@@ -52,27 +52,36 @@ export default function FormulirTautanBagi({ berkasId, tautanAktif }: { berkasId
           </div>
         </div>
       )}
-      {tautanAktif.length > 0 && (
-        <div className="space-y-1">
-          <p className="teks-label">Tautan aktif</p>
-          <ul className="divide-y divide-slate-100 text-xs text-slate-600">
-            {tautanAktif.map((t) => (
-              <li key={t.id} className="flex items-center justify-between gap-2 py-1.5">
-                <span className="min-w-0">
-                  {t.dibuatOlehNama} · berlaku sampai {formatTanggalJam(t.kedaluwarsa)} · {t.jumlahUnduh.toLocaleString("id-ID")} unduhan
-                </span>
-                {t.bolehCabut && (
-                  <FormulirAksi aksi={cabutTautanBagiFormulir.bind(null, t.id)} className="shrink-0">
-                    <button type="submit" className="tombol-tautan-bahaya">
-                      <Ikon nama="link_off" className="!text-[16px] align-[-3px]" /> Cabut
-                    </button>
-                  </FormulirAksi>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <DaftarTautanAktif tautanAktif={tautanAktif} />
+    </div>
+  );
+}
+
+/**
+ * Daftar tautan aktif beserta tombol Cabut. Dipakai di dalam FormulirTautanBagi, dan sendirian untuk pemegang hak hapus
+ * berkas yang tidak punya hak bagikan (D7 §3.3.13 no. 3: mereka boleh mencabut, tetapi tidak membuat tautan).
+ */
+export function DaftarTautanAktif({ tautanAktif }: { tautanAktif: TautanAktifBerkas[] }) {
+  if (tautanAktif.length === 0) return null;
+  return (
+    <div className="space-y-1 text-left whitespace-normal">
+      <p className="teks-label">Tautan aktif</p>
+      <ul className="divide-y divide-slate-100 text-xs text-slate-600">
+        {tautanAktif.map((t) => (
+          <li key={t.id} className="flex items-center justify-between gap-2 py-1.5">
+            <span className="min-w-0">
+              {t.dibuatOlehNama} · berlaku sampai {formatTanggalJam(t.kedaluwarsa)} · {t.jumlahUnduh.toLocaleString("id-ID")} unduhan
+            </span>
+            {t.bolehCabut && (
+              <FormulirAksi aksi={cabutTautanBagiFormulir.bind(null, t.id)} className="shrink-0" pesanSuksesHalaman="Tautan dicabut.">
+                <button type="submit" className="tombol-tautan-bahaya">
+                  <Ikon nama="link_off" className="!text-[16px] align-[-3px]" /> Cabut
+                </button>
+              </FormulirAksi>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

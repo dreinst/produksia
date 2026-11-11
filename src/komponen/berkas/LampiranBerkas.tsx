@@ -6,10 +6,11 @@ import { bolehAksesBerkas, daftarBerkasTerlihat, keluargaDariMime, type JenisEnt
 import { buangBerkasFormulir } from "@/lib/aksi/berkas";
 import type { TagBerkas } from "@/prisma-klien/enums";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import PesanSuksesHalaman from "@/komponen/PesanSuksesHalaman";
 import Ikon from "@/komponen/ui/Ikon";
 import IkonBerkas, { ukuranBerkas } from "@/komponen/berkas/IkonBerkas";
 import DialogPratinjauGambar from "@/komponen/berkas/DialogPratinjauGambar";
-import FormulirTautanBagi, { type TautanAktifBerkas } from "@/komponen/berkas/FormulirTautanBagi";
+import FormulirTautanBagi, { DaftarTautanAktif, type TautanAktifBerkas } from "@/komponen/berkas/FormulirTautanBagi";
 import PemilihBerkas from "@/komponen/berkas/PemilihBerkas";
 
 /*
@@ -19,10 +20,13 @@ import PemilihBerkas from "@/komponen/berkas/PemilihBerkas";
 
 const MAKS_LAMPIRAN = 100;
 
-/** Tautan bagi aktif per berkas beserta boleh-tidaknya pengguna mencabut (pembuat, hak hapus berkas, atau akses penuh). */
+/**
+ * Tautan bagi aktif per berkas beserta boleh-tidaknya pengguna mencabut (pembuat, hak hapus berkas, atau akses penuh).
+ * Dimuat untuk berkas yang boleh dibagikan ATAU dihapus pengguna, karena pemegang hak hapus boleh mencabut tautan.
+ */
 export async function petaTautanAktif(pengguna: PenggunaSesi, berkas: readonly Pick<MetaBerkas, "id" | "jenisEntitas">[]): Promise<Map<string, TautanAktifBerkas[]>> {
   const peta = new Map<string, TautanAktifBerkas[]>();
-  const bisaBagikan = berkas.filter((b) => bolehAksesBerkas(pengguna, b, "bagikan"));
+  const bisaBagikan = berkas.filter((b) => bolehAksesBerkas(pengguna, b, "bagikan") || bolehAksesBerkas(pengguna, b, "hapus"));
   if (bisaBagikan.length === 0) return peta;
   const tautan = await db.tautanBagiBerkas.findMany({
     where: { berkasId: { in: bisaBagikan.map((b) => b.id) }, dicabutPada: null, kedaluwarsa: { gt: new Date() } },
@@ -60,6 +64,20 @@ export function NamaBerkas({ b }: { b: Pick<MetaBerkas, "id" | "namaBerkas" | "t
   );
 }
 
+/** Tautan aktif untuk pemegang hak hapus tanpa hak bagikan: hanya daftar dan tombol Cabut, tanpa formulir pembuatan. */
+export function TautanAktifSaja({ tautanAktif, className = "", lebar = "w-72 sm:w-80" }: { tautanAktif: TautanAktifBerkas[]; className?: string; lebar?: string }) {
+  return (
+    <details className={className}>
+      <summary className="tombol-tautan cursor-pointer list-none">
+        <Ikon nama="share" className="!text-[16px] align-[-3px]" /> Tautan aktif ({tautanAktif.length.toLocaleString("id-ID")})
+      </summary>
+      <div className={`mt-2 ${lebar}`}>
+        <DaftarTautanAktif tautanAktif={tautanAktif} />
+      </div>
+    </details>
+  );
+}
+
 export default async function LampiranBerkas({
   jenisEntitas,
   entitasId,
@@ -89,6 +107,7 @@ export default async function LampiranBerkas({
         <h2 className="judul-kartu">{judul}</h2>
         <span className="lencana lencana-slate">{total.toLocaleString("id-ID")}</span>
       </div>
+      <PesanSuksesHalaman />
       {baris.length === 0 ? (
         <p className="text-sm text-slate-500">{kosong}</p>
       ) : (
@@ -110,7 +129,7 @@ export default async function LampiranBerkas({
                   <a href={`/api/berkas/${b.id}?unduh=1`} className="tombol-tautan">
                     <Ikon nama="download" className="!text-[16px] align-[-3px]" /> Unduh
                   </a>
-                  {bolehAksesBerkas(pengguna, b, "bagikan") && (
+                  {bolehAksesBerkas(pengguna, b, "bagikan") ? (
                     <details>
                       <summary className="tombol-tautan cursor-pointer list-none">
                         <Ikon nama="share" className="!text-[16px] align-[-3px]" /> Bagikan
@@ -119,9 +138,11 @@ export default async function LampiranBerkas({
                         <FormulirTautanBagi berkasId={b.id} tautanAktif={aktif} />
                       </div>
                     </details>
+                  ) : (
+                    aktif.length > 0 && <TautanAktifSaja tautanAktif={aktif} />
                   )}
                   {bolehAksesBerkas(pengguna, b, "hapus") && (
-                    <FormulirAksi aksi={buangBerkasFormulir.bind(null, b.id)} pesanKonfirmasi={`Buang ${b.namaBerkas} ke Sampah?`}>
+                    <FormulirAksi aksi={buangBerkasFormulir.bind(null, b.id)} pesanKonfirmasi={`Buang ${b.namaBerkas} ke Sampah?`} pesanSuksesHalaman="Berkas dipindah ke Sampah.">
                       <button type="submit" className="tombol-tautan-bahaya">
                         <Ikon nama="delete" className="!text-[16px] align-[-3px]" /> Buang
                       </button>

@@ -351,7 +351,9 @@ async function main() {
     const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
     const atas = m.atas.map((t) => t.href);
     const atur = m.pengaturan.map((l) => l.href);
-    pastikan(atas.indexOf("/berkas") === atas.indexOf("/persetujuan") + 1 && atur.indexOf("/pengaturan/berkas") === atur.indexOf("/pengaturan/log-aktivitas") + 1, `${peran}: Berkas sesudah Persetujuan, Akses Berkas sesudah Log Aktivitas`);
+    // Akses Berkas cukup sesudah Log Aktivitas (tidak harus tepat sesudahnya): HAK.md §2.6 menaruh Pengaturan CRM dan
+    // Daftar Pilihan di antara keduanya, dan paket pemiliknya menyisip dengan setelah: "/pengaturan/log-aktivitas".
+    pastikan(atas.indexOf("/berkas") === atas.indexOf("/persetujuan") + 1 && atur.indexOf("/pengaturan/log-aktivitas") >= 0 && atur.indexOf("/pengaturan/berkas") > atur.indexOf("/pengaturan/log-aktivitas"), `${peran}: Berkas sesudah Persetujuan, Akses Berkas sesudah Log Aktivitas`);
   }
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");

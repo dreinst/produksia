@@ -19,6 +19,7 @@ import {
 } from "@/lib/berkas";
 import { buangBerkasFormulir, hapusPermanenBerkasFormulir, pulihkanBerkasFormulir, ubahBerkasFormulir } from "@/lib/aksi/berkas";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import PesanSuksesHalaman from "@/komponen/PesanSuksesHalaman";
 import Ikon from "@/komponen/ui/Ikon";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
@@ -26,7 +27,7 @@ import IkonBerkas, { ukuranBerkas } from "@/komponen/berkas/IkonBerkas";
 import DialogPratinjauGambar from "@/komponen/berkas/DialogPratinjauGambar";
 import FormulirTautanBagi, { type TautanAktifBerkas } from "@/komponen/berkas/FormulirTautanBagi";
 import PemilihBerkas from "@/komponen/berkas/PemilihBerkas";
-import { NamaBerkas, petaTautanAktif } from "@/komponen/berkas/LampiranBerkas";
+import { NamaBerkas, TautanAktifSaja, petaTautanAktif } from "@/komponen/berkas/LampiranBerkas";
 
 const UKURAN_HALAMAN_BERKAS = 20;
 
@@ -67,8 +68,9 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
   const { total, baris } = await daftarBerkasTerlihat(
     db,
     pengguna,
+    // sorot di Sampah hanya mencari berkas yang memang dibuang, supaya baris aktif tidak tampil di tabel Sampah
     sorot
-      ? { id: sorot }
+      ? { id: sorot, sampah }
       : {
           folderKode: folderAktif?.kode,
           proyekId: proyekAktif === "tanpa" ? null : proyekAktif || undefined,
@@ -79,10 +81,12 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
     { lewati: sorot ? 0 : param.lewati, ambil: param.ambil },
   );
 
-  // "Menempel di": label entitas bertaut, atau "(sudah dihapus)" untuk lampiran yatim (D7 §3.3.15)
+  // "Menempel di": label entitas bertaut, atau "(sudah dihapus)" untuk lampiran yatim (D7 §3.3.15).
+  // Tabel Sampah tidak punya kolom ini, jadi entitasnya tidak dibaca.
   const hrefMenu = new Set(semuaHrefMenu());
   const entitas = await Promise.all(
     baris.map(async (b) => {
+      if (sampah) return null;
       const j = jenisLampiran(b.jenisEntitas);
       if (!j || !b.entitasId) return null;
       const info = await j.baca(db, b.entitasId);
@@ -173,6 +177,7 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
               Berkas di Sampah tidak tampil di daftar dan lampiran. Tautan bagi berkas yang dibuang sudah dicabut.
             </p>
           )}
+          <PesanSuksesHalaman />
           <div className="kartu kartu-tabel">
             <KontrolDaftar param={param} total={total} placeholder="Cari nama berkas…" tambahan={tambahan} />
             {!sampah && !sorot && (
@@ -222,7 +227,7 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
                         </td>
                         <td className="td-lekat whitespace-nowrap space-x-3">
                           {bolehAksesBerkas(pengguna, b, "hapus") && (
-                            <FormulirAksi aksi={pulihkanBerkasFormulir.bind(null, b.id)} className="inline-block">
+                            <FormulirAksi aksi={pulihkanBerkasFormulir.bind(null, b.id)} className="inline-block" pesanSuksesHalaman="Berkas dipulihkan.">
                               <button type="submit" className="tombol-tautan">
                                 <Ikon nama="restore_from_trash" className="!text-[16px] align-[-3px]" /> Pulihkan
                               </button>
@@ -233,6 +238,7 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
                               aksi={hapusPermanenBerkasFormulir.bind(null, b.id)}
                               className="inline-block"
                               pesanKonfirmasi={`Hapus permanen ${b.namaBerkas}? Isi berkas dibuang dan tidak bisa dipulihkan.`}
+                              pesanSuksesHalaman="Berkas dihapus permanen."
                             >
                               <button type="submit" className="tombol-tautan-bahaya">
                                 <Ikon nama="delete_forever" className="!text-[16px] align-[-3px]" /> Hapus permanen
@@ -376,14 +382,14 @@ function AksiBaris({
           <Ikon nama="download" className="!text-[16px] align-[-3px]" /> Unduh
         </a>
         {bolehBuang && (
-          <FormulirAksi aksi={buangBerkasFormulir.bind(null, b.id)} className="inline-block" pesanKonfirmasi={`Buang ${b.namaBerkas} ke Sampah?`}>
+          <FormulirAksi aksi={buangBerkasFormulir.bind(null, b.id)} className="inline-block" pesanKonfirmasi={`Buang ${b.namaBerkas} ke Sampah?`} pesanSuksesHalaman="Berkas dipindah ke Sampah.">
             <button type="submit" className="tombol-tautan-bahaya">
               <Ikon nama="delete" className="!text-[16px] align-[-3px]" /> Buang
             </button>
           </FormulirAksi>
         )}
       </div>
-      {bolehBagikan && (
+      {bolehBagikan ? (
         <details className="w-full text-right">
           <summary className="tombol-tautan cursor-pointer list-none">
             <Ikon nama="share" className="!text-[16px] align-[-3px]" /> Bagikan
@@ -392,6 +398,9 @@ function AksiBaris({
             <FormulirTautanBagi berkasId={b.id} tautanAktif={tautanAktif} />
           </div>
         </details>
+      ) : (
+        // pemegang hak hapus tanpa hak bagikan tetap boleh melihat dan mencabut tautan aktif
+        tautanAktif.length > 0 && <TautanAktifSaja tautanAktif={tautanAktif} className="w-full text-right" lebar="w-80 ml-auto" />
       )}
       {bolehUbah && (
         <details className="w-full text-right">

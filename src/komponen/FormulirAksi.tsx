@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type { StatusFormulir } from "@/lib/statusFormulir";
 import type { Verifikasi } from "@/lib/verifikasi";
 import DialogVerifikasi, { type RingkasanVerifikasi } from "@/komponen/ui/DialogVerifikasi";
+import { umumkanPesanSukses } from "@/komponen/PesanSuksesHalaman";
 
 type Props = {
   aksi: (sebelumnya: StatusFormulir, dataFormulir: FormData) => Promise<StatusFormulir>;
@@ -14,6 +15,11 @@ type Props = {
   pesanKonfirmasi?: string;
   /** Pesan sukses untuk aksi yang TIDAK redirect (mis. simpan pengaturan). */
   pesanSukses?: string;
+  /**
+   * Pesan sukses untuk aksi yang ikut melenyapkan formulir ini (mis. baris terhapus sesudah revalidasi). Ditampilkan
+   * oleh <PesanSuksesHalaman /> yang dipasang halaman di luar baris.
+   */
+  pesanSuksesHalaman?: string;
   /** Kalau diisi, sebelum kirim tampil dialog ringkasan isian + peringatan (verifikasi singkat agar tidak salah input). */
   verifikasi?: Verifikasi;
 };
@@ -86,8 +92,17 @@ function susunRingkasan(form: HTMLFormElement, v: Verifikasi): RingkasanVerifika
  * - menonaktifkan semua isian saat pengiriman berjalan (cegah dobel-klik)
  * - opsional: konfirmasi sebelum kirim, atau dialog verifikasi (ringkasan isian + peringatan)
  */
-export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses, verifikasi }: Props) {
-  const [status, aksiFormulir, sedangProses] = useActionState(aksi, { galat: null });
+export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses, pesanSuksesHalaman, verifikasi }: Props) {
+  // Tanpa pesanSuksesHalaman, aksi server dipakai langsung seperti semula.
+  const aksiDipakai = pesanSuksesHalaman
+    ? async (sebelumnya: StatusFormulir, dataFormulir: FormData) => {
+        umumkanPesanSukses(null);
+        const hasil = await aksi(sebelumnya, dataFormulir);
+        if (hasil.ok && !hasil.galat) umumkanPesanSukses(pesanSuksesHalaman);
+        return hasil;
+      }
+    : aksi;
+  const [status, aksiFormulir, sedangProses] = useActionState(aksiDipakai, { galat: null });
   const [ringkasan, setRingkasan] = useState<RingkasanVerifikasi | null>(null);
   // Aksi sukses tanpa redirect: isian dipasang ulang (ganti key) supaya state komponen klien
   // (mis. pratinjau foto, editor baris) ikut kosong seperti input biasa yang direset React.

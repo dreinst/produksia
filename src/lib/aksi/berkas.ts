@@ -8,6 +8,7 @@ import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { jalankanFormulir, jalankanFormulirHasil, type StatusFormulir } from "@/lib/statusFormulir";
 import { catatAktivitas } from "@/lib/log";
 import {
+  FOLDER_BAWAAN,
   PESAN_BERKAS_TIDAK_ADA,
   ambilBerkasTerlihat,
   bacaNamaFolder,
@@ -62,7 +63,11 @@ export async function ubahBerkas(id: string, dataFormulir: FormData) {
   const ruang = await ruangTersembunyi(db, pengguna);
 
   const namaMasukan = teks(dataFormulir, "namaBerkas");
-  const namaBerkas = namaMasukan ? bersihkanNamaBerkas(namaMasukan, ekstensiNama(b.namaBerkas) || "bin") : b.namaBerkas;
+  const ekstensi = ekstensiNama(b.namaBerkas);
+  // Isian nama di panel Ubah berisi nama tanpa ekstensi. Bila tidak diubah, nama lama dipertahankan apa adanya, karena
+  // membangun ulang nama bisa mengubahnya diam-diam (ekstensi ganda "a.pdf.pdf" atau ekstensi berhuruf besar "FOTO.JPG").
+  const namaTampil = (ekstensi ? b.namaBerkas.slice(0, -(ekstensi.length + 1)) : b.namaBerkas).trim();
+  const namaBerkas = namaMasukan && namaMasukan !== namaTampil ? bersihkanNamaBerkas(namaMasukan, ekstensi || "bin") : b.namaBerkas;
 
   const folderMasukan = teks(dataFormulir, "folderKode");
   const folderKode = folderMasukan || b.folderKode;
@@ -244,11 +249,28 @@ export async function hapusFolderBerkas(kode: string) {
   const folder = await db.folderBerkas.findUnique({ where: { kode }, select: { kode: true, nama: true, sistem: true } });
   if (!folder) throw new Error("Folder tidak dikenal");
   if (folder.sistem) throw new Error("Folder sistem tidak bisa dihapus");
-  const isi = await db.berkas.count({ where: { folderKode: kode } });
-  if (isi > 0) throw new Error(`Folder masih berisi ${isi} berkas; pindahkan atau hapus permanen dulu`);
   await db.$transaction(async (tx) => {
+    // Berkas yang sudah dihapus permanen tidak bisa dipindah lagi, jadi tidak menahan folder: metadatanya dipindah ke
+    // LAINNYA. Berkas aktif dan berkas di Sampah tetap menahan folder. Unggahan serentak ke folder ini ditahan FK.
+    const aktif = await tx.berkas.count({ where: { folderKode: kode, dihapusPada: null, isiDihapusPada: null } });
+    const diSampah = await tx.berkas.count({ where: { folderKode: kode, dihapusPada: { not: null }, isiDihapusPada: null } });
+    if (aktif + diSampah > 0) {
+      throw new Error(
+        diSampah > 0
+          ? `Folder masih berisi ${aktif + diSampah} berkas (${diSampah} di Sampah); pindahkan, atau hapus permanen dulu`
+          : `Folder masih berisi ${aktif} berkas; pindahkan atau hapus permanen dulu`,
+      );
+    }
+    const pindah = await tx.berkas.updateMany({ where: { folderKode: kode, isiDihapusPada: { not: null } }, data: { folderKode: FOLDER_BAWAAN } });
     await tx.folderBerkas.delete({ where: { kode } });
-    await catatAktivitas(tx, pengguna, { aksi: "HAPUS", jenis: "Folder Berkas", nomor: kode, keterangan: folder.nama, modul: "berkas", meta: metaRuangLog(kode, null, null) });
+    await catatAktivitas(tx, pengguna, {
+      aksi: "HAPUS",
+      jenis: "Folder Berkas",
+      nomor: kode,
+      keterangan: folder.nama,
+      modul: "berkas",
+      meta: { ...(pindah.count > 0 ? { berkasDihapusPermanenDipindah: pindah.count } : {}), ...metaRuangLog(kode, null, null) },
+    });
   });
   revalidasiPengaturan();
 }
