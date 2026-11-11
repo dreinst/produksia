@@ -27,7 +27,10 @@ export type MasukanTataLetak = {
    */
   tandaTangan: boolean;
   perekam?: Perekam;
-  /** teks stempel diagonal; undefined = "DRAF" bila dok.draf, null = tanpa stempel */
+  /**
+   * Teks stempel diagonal untuk dokumen bukan draf (mis. "CONTOH" di pratinjau template); kosong = tanpa stempel.
+   * Dokumen draf selalu berstempel "DRAF" dan nilai ini diabaikan (stempel draf tidak bisa dimatikan).
+   */
   stempel?: string | null;
 };
 
@@ -44,7 +47,7 @@ export function tandaTanganDipakai(m: MasukanTataLetak): Uint8Array | null {
 export function buatKanvas(m: MasukanTataLetak, judulBerkas: string): KanvasCetak {
   const k = new KanvasCetak({ judul: `${judulBerkas} ${m.dok.nomorTampil}`, subjek: m.judul, penulis: m.identitas.namaLegal || m.identitas.nama, perekam: m.perekam });
   k.skala = SKALA_KERTAS[m.ukuran];
-  const stempel = m.stempel === undefined ? (m.dok.draf ? "DRAF" : null) : m.stempel;
+  const stempel = m.dok.draf ? "DRAF" : m.stempel?.trim() || null;
   if (stempel) k.stempelStatus(stempel);
   return k;
 }

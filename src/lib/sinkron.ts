@@ -182,7 +182,8 @@ export type KodeKonsistensi =
   | "BARANG_BARIS"
   | "STOK_GUDANG"
   | "KARYAWAN_GAJI"
-  | "BERKAS_ENTITAS";
+  | "BERKAS_ENTITAS"
+  | "KOP_DOKUMEN";
 export type HasilKonsistensi = { konsisten: boolean; total: number; rincian: { kode: KodeKonsistensi; label: string; jumlah: number }[] };
 
 /** Nama tabel atau kolom bertanda kutip. Hanya untuk konstanta di berkas ini, tidak pernah untuk masukan pengguna. */
@@ -379,12 +380,21 @@ function aturanKonsistensi(): { kode: KodeKonsistensi; label: string; hitung: Pr
         ([tabel, jenis]) => Prisma.sql`SELECT COUNT(*) FROM "Berkas" x JOIN ${nm(tabel)} e ON e."id" = x."entitasId" WHERE x."jenisEntitas" IN (${Prisma.join(jenis)}) AND x."perusahaanId" <> e."perusahaanId"`,
       ),
     },
+    {
+      // kontrak P30: kop dokumen milik perusahaan dokumen (D3 §3.1), gambar kop terlampir ke kopnya sendiri
+      kode: "KOP_DOKUMEN",
+      label: "Dokumen atau gambar kop memakai kop surat perusahaan lain",
+      hitung: [
+        ...["PenawaranPenjualan", "PesananPenjualan", "UangMukaPelanggan", "FakturPenjualan", "PenerimaanPenjualan"].map((t) => bedaInduk(t, "kopSuratId", "KopSurat")),
+        Prisma.sql`SELECT COUNT(*) FROM "AsetKopSurat" x JOIN "KopSurat" k ON k."id" = x."kopSuratId" JOIN "Berkas" b ON b."id" = x."berkasId" WHERE b."perusahaanId" <> k."perusahaanId" OR b."jenisEntitas" IS DISTINCT FROM 'kop-surat' OR b."entitasId" IS DISTINCT FROM k."id"`,
+      ],
+    },
   ];
 }
 
 /**
  * Pemeriksaan konsistensi perusahaan untuk lingkup gabungan (D1 §4.9): menghitung data yang perusahaannya tidak cocok
- * dengan jurnal, induk, akun, gudang, proyek, barang, karyawan, atau entitas lampirannya. Semua harus 0. Satu kueri
+ * dengan jurnal, induk, akun, gudang, proyek, barang, karyawan, entitas lampiran, atau kop suratnya. Semua harus 0. Satu kueri
  * berisi sub-kueri COUNT; tidak ada baris yang dimuat ke memori.
  */
 export async function periksaKonsistensiPerusahaan(klien: PrismaClient | Prisma.TransactionClient = db): Promise<HasilKonsistensi> {

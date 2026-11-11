@@ -227,7 +227,7 @@ async function main() {
   const lamaUtama = await semuaLaporan(PERUSAHAAN_UTAMA, periode);
   const sinkronUtamaAwal = await periksaSinkron(db, { perusahaanId: PERUSAHAAN_UTAMA });
   const konsistensiAwal = await periksaKonsistensiPerusahaan(db);
-  pastikan(konsistensiAwal.konsisten && konsistensiAwal.total === 0 && konsistensiAwal.rincian.length === 10, `periksaKonsistensiPerusahaan pada data bersih: 0 pelanggaran di 10 kode (${konsistensiAwal.rincian.map((r) => `${r.kode} ${r.jumlah}`).join(", ")})`);
+  pastikan(konsistensiAwal.konsisten && konsistensiAwal.total === 0 && konsistensiAwal.rincian.length === 11, `periksaKonsistensiPerusahaan pada data bersih: 0 pelanggaran di 11 kode (${konsistensiAwal.rincian.map((r) => `${r.kode} ${r.jumlah}`).join(", ")})`);
   pastikan(json(konsistensiAwal) === json(await periksaKonsistensiPerusahaan()), "periksaKonsistensiPerusahaan tanpa klien memakai db");
   const jenisTanpaTabel = DAFTAR_JENIS.filter((j) => !TABEL_ENTITAS_BERKAS[j]);
   pastikan(jenisTanpaTabel.length === 0, `setiap jenis lampiran berkas punya tabel entitas di pemeriksaan konsistensi (${jenisTanpaTabel.join(", ") || "lengkap"})`);

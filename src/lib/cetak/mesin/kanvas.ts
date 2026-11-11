@@ -548,6 +548,28 @@ export class KanvasCetak {
     if (sisi.includes("kanan")) this.garis(x + w, y, x + w, y + h, g);
   }
 
+  /** Lingkaran berisi warna (ikon sosial tata letak HKA). */
+  lingkaran(cx: number, cy: number, r: number, gaya: { isi: string }): void {
+    this.doc.save();
+    this.doc.circle(cx, cy, r).fill(gaya.isi);
+    this.doc.restore();
+  }
+
+  /**
+   * Bidang tertutup berisi warna dari deret langkah: `ke` memulai, `garis` menarik garis lurus, `kurva` menarik kurva
+   * Bezier kubik [kontrol1 x, y, kontrol2 x, y, ujung x, y]. Dipakai gelombang kaki tata letak HKA.
+   */
+  bentuk(langkah: ({ ke: [number, number] } | { garis: [number, number] } | { kurva: [number, number, number, number, number, number] })[], gaya: { isi: string }): void {
+    this.doc.save();
+    for (const l of langkah) {
+      if ("ke" in l) this.doc.moveTo(...l.ke);
+      else if ("garis" in l) this.doc.lineTo(...l.garis);
+      else this.doc.bezierCurveTo(...l.kurva);
+    }
+    this.doc.closePath().fill(gaya.isi);
+    this.doc.restore();
+  }
+
   /**
    * Gambar PNG/JPEG. Uint8Array harus lolos periksaGambar (diperiksa sekali per objek di sini juga); string harus
    * jalur di dalam src/aset-cetak. Objek yang sama ditanam sekali per PDF walau digambar di banyak halaman.
