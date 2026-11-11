@@ -181,6 +181,9 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       case "penawaran": {
         const d = await tx.penawaranPenjualan.findUniqueOrThrow({ where: { id }, include: { pesanan: true } });
         if (d.pesanan) throw new Error(`${d.nomor} sudah dikonversi menjadi ${d.pesanan.nomor}; hapus pesanan itu dulu`);
+        // rencana termin ikut terhapus (kaskade juga ada, ditulis eksplisit seperti baris; D2 §4.6). Lampiran berkas
+        // tidak dibuang (DESAIN G11)
+        await tx.rencanaTermin.deleteMany({ where: { penawaranId: id } });
         await tx.barisPenawaranPenjualan.deleteMany({ where: { penawaranId: id } });
         await tx.penawaranPenjualan.delete({ where: { id } });
         await catatLog(tx, pengguna, jenis, d.nomor, "Penawaran draf dihapus");
@@ -191,6 +194,8 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (d.pengiriman.length) throw new Error(`${d.nomor} sudah punya surat jalan ${daftarNomor(d.pengiriman)}; hapus itu dulu`);
         if (d.faktur.length) throw new Error(`${d.nomor} sudah punya faktur ${daftarNomor(d.faktur)}; hapus itu dulu`);
         if (d.uangMuka.length) throw new Error(`${d.nomor} sudah punya uang muka ${daftarNomor(d.uangMuka)}; hapus itu dulu`);
+        // penjaga uang muka di atas menjamin tidak ada UM yang menaut butir termin (FK Restrict); G11: lampiran tetap
+        await tx.rencanaTermin.deleteMany({ where: { pesananId: id } });
         await tx.barisPesananPenjualan.deleteMany({ where: { pesananId: id } });
         await tx.pesananPenjualan.delete({ where: { id } });
         if (d.penawaranId) await tx.penawaranPenjualan.update({ where: { id: d.penawaranId }, data: { status: "DRAF" } });
@@ -234,12 +239,16 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (sjSetelah.length) throw new Error(`Surat jalan ${daftarNomor(sjSetelah)} dibuat setelah ${d.nomor}; hapus itu dulu`);
         for (const b of d.baris) {
           if (d.pesananId) {
-            const bp = await tx.barisPesananPenjualan.findFirst({ where: { pesananId: d.pesananId, barangId: b.barangId } });
+            // Baris faktur jalur id (barisPesananId terisi) membalik tepat baris pesanan dan baris SJ-nya, sehingga barang
+            // yang muncul di beberapa baris pesanan tidak menumpuk di baris pertama (D2 §4.6, bug B-10 / §10.5 no. 6).
+            // Tanpa barisPesananId: kode lama persis (baris pesanan pertama dengan barang sama).
+            const bp = b.barisPesananId ? { id: b.barisPesananId } : await tx.barisPesananPenjualan.findFirst({ where: { pesananId: d.pesananId, barangId: b.barangId } });
             if (bp) await tx.barisPesananPenjualan.update({ where: { id: bp.id }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
             if (b.barang.jenis === "BARANG") {
               // kembalikan konsumsi transit ke baris SJ, terbaru lebih dulu (kebalikan urutan konsumsi)
               let sisa = D(b.jumlah);
-              const barisSj = await tx.barisPengiriman.findMany({ where: { barangId: b.barangId, pengiriman: { pesananId: d.pesananId } }, orderBy: { pengiriman: { tanggal: "desc" } } });
+              const whereSj = b.barisPesananId ? { barisPesananId: b.barisPesananId, pengiriman: { pesananId: d.pesananId } } : { barangId: b.barangId, pengiriman: { pesananId: d.pesananId } };
+              const barisSj = await tx.barisPengiriman.findMany({ where: whereSj, orderBy: { pengiriman: { tanggal: "desc" } } });
               for (const sj of barisSj) {
                 if (sisa.lte(0)) break;
                 const bisa = terkecil(D(sj.jumlahDifaktur), sisa);

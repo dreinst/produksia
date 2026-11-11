@@ -253,3 +253,27 @@ export async function alokasiNomorCetak(tx: KlienTransaksi, p: { perusahaanId: s
   }
   throw new Error(`Nomor cetak ${isi(nilai)} sampai ${isi(batas)} sudah dipakai semua. Setel Nomor terakhir di pengaturan Format Nomor supaya penomoran melanjutkan nomor yang sudah ada.`);
 }
+
+/** Benar bila galat adalah P2002 dari indeks unik [perusahaanId, nomorCetak] (nama indeks ada di meta adaptor). */
+export function bentrokNomorCetak(e: unknown): boolean {
+  const g = e as { code?: unknown; meta?: unknown } | null;
+  if (g?.code !== "P2002") return false;
+  try {
+    return JSON.stringify(g.meta ?? {}).includes("nomorCetak");
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Menjalankan penulisan nomor cetak; P2002 pada unik nomor cetak (dua transaksi bersamaan memakai nomor sama)
+ * diterjemahkan menjadi pesan ramah (KONTRAK-TAMBAHAN P21/P23/P25). Galat lain diteruskan apa adanya.
+ */
+export async function simpanNomorCetak<T>(nomor: string, kerja: () => Promise<T>): Promise<T> {
+  try {
+    return await kerja();
+  } catch (e) {
+    if (bentrokNomorCetak(e)) throw new Error(`Nomor cetak ${nomor} sudah dipakai dokumen lain.`);
+    throw e;
+  }
+}

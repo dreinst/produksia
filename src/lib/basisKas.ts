@@ -3,6 +3,9 @@ import { db } from "@/lib/db";
 import { D, jumlahkan, type Desimal } from "@/lib/uang";
 import { susunHierarki, type AkunSaldo, type BarisLaporan, type OpsiLaporan, type Periode } from "@/lib/laporan";
 import { kelasArus } from "@/lib/arusKas";
+import { akunPemetaanTambahan } from "@/lib/baganAkun";
+import { KUNCI_AKUN_FEE } from "@/lib/akuntansi";
+import { bobotBaris } from "@/lib/nilaiBaris";
 
 /*
  * Sudut pandang KAS untuk laporan manajemen (Laba Rugi basis kas & Ringkasan Pendapatan basis kas).
@@ -58,13 +61,14 @@ async function kumpulkanKas(klien: PrismaClient, dari: Date, sampai: Date, opsi:
   // PPh 23 dimuka dari pengaturan SEMUA perusahaan (aman karena jurnalnya sudah tersaring). Tanpa perusahaanId kuerinya
   // sama persis dengan sebelumnya (pengaturan baris "default" saja).
   const p = opsi.perusahaanId || null;
-  const [akunKas, pemetaan, pengaturan, daftarAkun] = await Promise.all([
+  const [akunKas, pemetaan, pengaturan, daftarAkun, akunFeeTambahan] = await Promise.all([
     klien.akun.findMany({ where: { kasBank: true, kelompok: false, ...(p ? { OR: [{ perusahaanId: p }, { perusahaanId: null }] } : {}) }, select: { id: true } }),
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     p
       ? klien.pengaturanPerusahaan.findMany({ select: { akunPph23DimukaId: true } })
       : klien.pengaturanPerusahaan.findUnique({ where: { id: "default" }, select: { akunPph23DimukaId: true } }).then((r) => (r ? [r] : [])),
     klien.akun.findMany({ select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } }),
+    akunPemetaanTambahan(klien, KUNCI_AKUN_FEE),
   ]);
   const idKas = akunKas.map((a) => a.id);
   const daftarJurnal = await klien.jurnal.findMany({
@@ -76,18 +80,31 @@ async function kumpulkanKas(klien: PrismaClient, dari: Date, sampai: Date, opsi:
       penerimaanPenjualan: {
         select: {
           pelanggan: { select: { id: true, kode: true, nama: true } },
-          faktur: { select: { dpp: true, ppn: true, baris: { select: { subtotal: true, barang: { select: { akunPendapatanId: true } } } } } },
+          faktur: { select: { dpp: true, ppn: true, diskon: true, fee: true, baris: { select: { subtotal: true, barang: { select: { akunPendapatanId: true } } } } } },
         },
       },
       uangMukaPelanggan: {
         select: {
           pelanggan: { select: { id: true, kode: true, nama: true } },
-          pesanan: { select: { baris: { select: { jumlah: true, harga: true, barang: { select: { akunPendapatanId: true } } } } } },
+          pesanan: { select: { diskon: true, fee: true, baris: { select: { jumlah: true, harga: true, frekuensi: true, barang: { select: { akunPendapatanId: true } } } } } },
         },
       },
     },
   });
   const akunPendapatanBawaan = pemetaan?.pendapatanPenjualanId ?? null;
+  // akun fee sama dengan jurnal faktur (D2 §4.4); tanpa pemetaan tambahan = akun pendapatan bawaan
+  const akunFee = akunFeeTambahan?.id ?? akunPendapatanBawaan;
+  /**
+   * Bobot alokasi satu dokumen. Tanpa fee persis seperti sebelumnya (diskon tidak menggeser bobot). Dengan fee > 0,
+   * diskon hanya mengurangi baris barang (fee dihitung sesudah diskon), lalu fee menjadi entri terakhir. Entri fee
+   * hanya ditambahkan bila fee > 0, karena entri terakhir di `alokasi` menyerap sisa pembulatan.
+   */
+  const bobotDokumen = (baris: { akunId: string | null; nilai: Desimal }[], diskon: Desimal, fee: Desimal) => {
+    if (!fee.gt(0)) return baris;
+    const sub = jumlahkan(baris.map((b) => b.nilai));
+    const faktor = sub.gt(0) ? sub.minus(diskon).div(sub) : D(0);
+    return [...baris.map((b) => ({ akunId: b.akunId, nilai: b.nilai.mul(faktor) })), { akunId: akunFee, nilai: fee }];
+  };
   const milikPelanggan = new Set([pemetaan?.piutangUsahaId, pemetaan?.uangMukaPelangganId, ...pengaturan.map((r) => r.akunPph23DimukaId)].filter((x): x is string => Boolean(x)));
   const nol = D(0);
   const catatan: CatatanKas[] = [];
@@ -128,11 +145,13 @@ async function kumpulkanKas(klien: PrismaClient, dari: Date, sampai: Date, opsi:
       const totalFaktur = D(f.dpp).plus(f.ppn);
       const bagianPpn = totalFaktur.gt(0) && D(f.ppn).gt(0) ? c.dariPelanggan.mul(f.ppn).div(totalFaktur).toDecimalPlaces(2) : nol;
       c.ppn = bagianPpn;
-      alokasi(f.baris.map((b) => ({ akunId: b.barang.akunPendapatanId, nilai: D(b.subtotal) })), c.dariPelanggan.minus(bagianPpn));
+      alokasi(bobotDokumen(f.baris.map((b) => ({ akunId: b.barang.akunPendapatanId, nilai: D(b.subtotal) })), D(f.diskon), D(f.fee)), c.dariPelanggan.minus(bagianPpn));
       c.pelanggan = j.penerimaanPenjualan.pelanggan;
       c.jenis = "PELUNASAN";
     } else if (j.uangMukaPelanggan) {
-      alokasi(j.uangMukaPelanggan.pesanan.baris.map((b) => ({ akunId: b.barang.akunPendapatanId, nilai: D(b.jumlah).mul(b.harga) })), c.dariPelanggan);
+      // bobotBaris = D(jumlah).mul(harga) bila frekuensi 1
+      const pesanan = j.uangMukaPelanggan.pesanan;
+      alokasi(bobotDokumen(pesanan.baris.map((b) => ({ akunId: b.barang.akunPendapatanId, nilai: bobotBaris(b) })), D(pesanan.diskon), D(pesanan.fee)), c.dariPelanggan);
       c.pelanggan = j.uangMukaPelanggan.pelanggan;
       c.jenis = "UANG_MUKA";
     } else {

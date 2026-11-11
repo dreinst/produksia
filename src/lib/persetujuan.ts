@@ -5,6 +5,7 @@ import { D, format, type Desimal } from "@/lib/uang";
 import { kurangiStok, labelBarang, perbaruiHargaRata } from "@/lib/stok";
 import { catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
+import { alokasiNomorCetak, simpanNomorCetak } from "@/lib/nomorCetak";
 import {
   catatJurnal,
   catatJurnalFakturPembelian,
@@ -219,6 +220,12 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       });
       // pajak dari pengaturan perusahaan faktur (utama = baris default, seperti sebelumnya)
       const pengaturan = await ambilPengaturanPerusahaan(tx, f.perusahaanId);
+      // Nomor cetak faktur dialokasikan saat jurnalnya dicatat (D2 §3.7, §8.2), jadi draf yang ditolak atau dihapus
+      // tidak membuat lubang. Tanpa format faktur aktif hasilnya null dan faktur tidak disentuh. Nomor manual dipakai.
+      if (!f.nomorCetak) {
+        const nomorCetak = await alokasiNomorCetak(tx, { perusahaanId: f.perusahaanId, jenis: "faktur", tanggal: f.tanggal });
+        if (nomorCetak) await simpanNomorCetak(nomorCetak, () => tx.fakturPenjualan.update({ where: { id }, data: { nomorCetak } }));
+      }
       // Konsumsi "Barang Terkirim Belum Ditagih" sudah dihitung & disimpan saat draf dibuat
       const konsumsiTransit: KonsumsiTransit[] = f.baris
         .filter((b) => D(b.nilaiTransit).gt(0))
@@ -226,7 +233,8 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       const jurnal = await catatJurnalFakturPenjualan(
         tx,
         f,
-        f.baris.map((b) => ({ barangId: b.barangId, jumlah: D(b.jumlah), harga: D(b.harga) })),
+        // frekuensi mode event ikut nilai pendapatan (nilaiBaris); baris lama berfrekuensi 1
+        f.baris.map((b) => ({ barangId: b.barangId, jumlah: D(b.jumlah), harga: D(b.harga), frekuensi: D(b.frekuensi) })),
         pengaturan.akunPpnKeluaranId,
         konsumsiTransit,
         { tanggal: f.tanggal, proyekId: f.pesanan?.proyekId ?? null, asli: asliDari(f) },

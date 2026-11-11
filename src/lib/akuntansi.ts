@@ -1,6 +1,8 @@
 import type { Prisma } from "@/prisma-klien/client";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
-import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
+import { akunPemetaanTambahan, pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
+import { akarDari, keturunanDari, type AkunSaldo } from "@/lib/laporan";
+import { nilaiBaris } from "@/lib/nilaiBaris";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { D, kali, uang, jumlahkan, type Desimal } from "@/lib/uang";
 import { pesanAkunPajakBelumDiatur } from "@/lib/pengaturanPerusahaan";
@@ -21,7 +23,8 @@ import { pesanAkunPajakBelumDiatur } from "@/lib/pengaturanPerusahaan";
 
 type Tx = Prisma.TransactionClient;
 type InputBarisJurnal = { akunId: string; debit: Desimal; kredit: Desimal; keterangan: string };
-export type BarisDokumen = { barangId: string; jumlah: Desimal; harga: Desimal };
+/** `frekuensi` hanya dipakai jurnal penjualan (mode event, D2 §3.2); kosong = 1. Jurnal pembelian tidak membacanya. */
+export type BarisDokumen = { barangId: string; jumlah: Desimal; harga: Desimal; frekuensi?: Desimal };
 export type SumberOtomatis =
   | "PENJUALAN"
   | "PEMBELIAN"
@@ -52,6 +55,33 @@ export type OpsiJurnalPerusahaan = OpsiJurnal & { perusahaanId: string };
 type Berperusahaan = { perusahaanId: string };
 
 const NOL = D(0);
+
+/**
+ * Kunci pemetaan akun tambahan untuk management fee (D2 §4.2). Sama persis dengan bacaKunci("Pendapatan Fee
+ * Manajemen") di halaman Pemetaan Akun, jadi pemilik cukup menambah peran itu tanpa kode UI baru. Ditaruh di sini,
+ * bukan di dokumenPenjualan.ts, supaya akuntansi.ts tidak mengimpor dokumenPenjualan.ts (DESAIN L1).
+ */
+export const KUNCI_AKUN_FEE = "pendapatan-fee-manajemen";
+
+/** Akun di kelompok Diskon Penjualan dan Pendapatan Lain-lain: himpunan yang sama dengan `bukanOmzet` di pajak.ts. */
+async function idBukanOmzet(tx: Tx, m: { diskonPenjualanId: string | null; pendapatanLainId: string | null }): Promise<Set<string>> {
+  const daftar = await tx.akun.findMany({ where: { jenis: "PENDAPATAN" }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } });
+  const dasar: AkunSaldo[] = daftar.map((a) => ({ ...a, debit: NOL, kredit: NOL, saldo: NOL }));
+  return new Set([...keturunanDari(dasar, akarDari(dasar, m.diskonPenjualanId ?? undefined)), ...keturunanDari(dasar, m.pendapatanLainId ?? null)]);
+}
+
+/**
+ * Akun pendapatan management fee (D2 §4.2): pemetaan tambahan KUNCI_AKUN_FEE, kalau tidak ada akun Pendapatan
+ * Penjualan pemetaan (faktur ber-fee tidak terblokir). Akun pemetaan wajib akun rinci jenis Pendapatan dan bukan
+ * bagian kelompok Diskon Penjualan atau Pendapatan Lain-lain, supaya fee selalu ikut omzet PPh Final.
+ */
+export async function akunFeeManajemen(tx: Tx, m: { pendapatanPenjualanId: string; diskonPenjualanId: string | null; pendapatanLainId: string | null }): Promise<string> {
+  const akun = await akunPemetaanTambahan(tx, KUNCI_AKUN_FEE);
+  if (!akun) return m.pendapatanPenjualanId;
+  if (akun.jenis !== "PENDAPATAN" || akun.kelompok) throw new Error("Akun 'Pendapatan Fee Manajemen' di Pemetaan Akun harus akun rinci jenis Pendapatan");
+  if ((await idBukanOmzet(tx, m)).has(akun.id)) throw new Error("Akun fee manajemen tidak boleh berada di kelompok Diskon Penjualan atau Pendapatan Lain-lain");
+  return akun.id;
+}
 
 export async function ambilPemetaanAkun(tx: Tx) {
   const pemetaan = await tx.pemetaanAkun.findUnique({ where: { id: "default" } });
@@ -224,13 +254,14 @@ export async function catatJurnalPengiriman(tx: Tx, pengiriman: { nomor: string 
 
 /**
  * Faktur Penjualan: Dr Piutang (total − uang muka) / Cr Pendapatan per akun (bruto, Σ baris) (+ Cr PPN Keluaran).
- * Diskon faktur: Dr Diskon Penjualan (kontra-pendapatan) sehingga pendapatan bruto tetap terlihat; total = (Σ baris − diskon) + PPN.
+ * Diskon faktur: Dr Diskon Penjualan (kontra-pendapatan) sehingga pendapatan bruto tetap terlihat; total = (Σ baris − diskon + fee) + PPN.
+ * Nilai baris = nilaiBaris (jumlah × frekuensi × harga). Management fee > 0: Cr akun fee (akunFeeManajemen), masuk DPP.
  * HPP diakui untuk barang yang sudah dikirim: Dr HPP / Cr Barang Terkirim Belum Ditagih (nilai dari baris SJ).
  * Barang yang difaktur sebelum dikirim: HPP-nya diakui nanti saat Surat Jalan.
  */
 export async function catatJurnalFakturPenjualan(
   tx: Tx,
-  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string; uangMuka?: Desimal | number | string; diskon?: Desimal | number | string } & Berperusahaan,
+  faktur: { nomor: string; total: Desimal | number | string; ppn?: Desimal | number | string; uangMuka?: Desimal | number | string; diskon?: Desimal | number | string; fee?: Desimal | number | string } & Berperusahaan,
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
   konsumsiTransit: KonsumsiTransit[] = [],
@@ -244,11 +275,15 @@ export async function catatJurnalFakturPenjualan(
   if (uangMuka.gt(0) && !m.uangMukaPelangganId) throw new Error("Pemetaan akun 'Uang Muka Pelanggan' belum diatur (Pengaturan > Pemetaan Akun)");
   const diskon = D(faktur.diskon ?? 0);
   if (diskon.gt(0) && !m.diskonPenjualanId) throw new Error("Pemetaan akun 'Diskon Penjualan' belum diatur (Pengaturan > Pemetaan Akun)");
+  // management fee (D2 §4.1): satu baris kredit akun fee bila fee > 0; fee 0 = larik baris identik dengan sebelumnya
+  const fee = D(faktur.fee ?? 0);
+  const akunFee = fee.gt(0) ? await akunFeeManajemen(tx, m) : null;
   const peta = await infoBarang(tx, [...daftarBaris.map((b) => b.barangId), ...konsumsiTransit.map((k) => k.barangId)]);
   const pendapatan = pengumpul(), hpp = pengumpul();
   for (const b of daftarBaris) {
     const info = ambilInfo(peta, b.barangId);
-    pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, kali(b.jumlah, b.harga));
+    // nilaiBaris = kali(jumlah, harga) bila frekuensi kosong atau 1
+    pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, nilaiBaris(b));
   }
   let transit = NOL;
   for (const k of konsumsiTransit) {
@@ -264,6 +299,7 @@ export async function catatJurnalFakturPenjualan(
     ...(uangMuka.gt(0) && m.uangMukaPelangganId ? [{ akunId: m.uangMukaPelangganId, debit: uangMuka, kredit: NOL, keterangan: `Uang muka dipakai ${faktur.nomor}` }] : []),
     ...(diskon.gt(0) && m.diskonPenjualanId ? [{ akunId: m.diskonPenjualanId, debit: diskon, kredit: NOL, keterangan: `Diskon ${faktur.nomor}` }] : []),
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: NOL, kredit: v, keterangan: `Pendapatan ${faktur.nomor}` })),
+    ...(fee.gt(0) && akunFee ? [{ akunId: akunFee, debit: NOL, kredit: fee, keterangan: `Management fee ${faktur.nomor}` }] : []),
     ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: NOL, kredit: ppn, keterangan: `PPN keluaran ${faktur.nomor}` }] : []),
     ...hpp.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `HPP ${faktur.nomor}` })),
     ...(transit.gt(0) && m.barangTerkirimId ? [{ akunId: m.barangTerkirimId, debit: NOL, kredit: transit, keterangan: `Barang terkirim ditagih ${faktur.nomor}` }] : []),
@@ -302,11 +338,11 @@ export async function catatJurnalUangMuka(tx: Tx, uangMuka: { nomor: string; aku
 
 /**
  * Retur Penjualan: kebalikan faktur, Dr Pendapatan per akun (bruto) / Cr Piutang; Dr Persediaan / Cr HPP untuk BARANG (nilai pokok saat ini).
- * Diskon faktur yang prorata ikut dibalik: Cr Diskon Penjualan.
+ * Diskon faktur yang prorata ikut dibalik: Cr Diskon Penjualan. Fee faktur yang prorata ikut dibalik: Dr akun fee.
  */
 export async function catatJurnalReturPenjualan(
   tx: Tx,
-  retur: { nomor: string; total: Desimal; ppn?: Desimal; diskon?: Desimal; perusahaanId?: string },
+  retur: { nomor: string; total: Desimal; ppn?: Desimal; diskon?: Desimal; fee?: Desimal; perusahaanId?: string },
   daftarBaris: BarisDokumen[],
   akunPpnKeluaranId?: string | null,
 ) {
@@ -316,17 +352,21 @@ export async function catatJurnalReturPenjualan(
   if (ppn.gt(0) && !akunPpnKeluaranId) throw await galatAkunPajak(tx, "Akun PPN Keluaran", perusahaanId);
   const diskon = retur.diskon ?? NOL;
   if (diskon.gt(0) && !m.diskonPenjualanId) throw new Error("Pemetaan akun 'Diskon Penjualan' belum diatur (Pengaturan > Pemetaan Akun)");
+  // fee faktur yang ikut dibalik prorata (D2 §4.1); akun fee yang berlaku saat retur dibuat
+  const fee = retur.fee ?? NOL;
+  const akunFee = fee.gt(0) ? await akunFeeManajemen(tx, m) : null;
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const pendapatan = pengumpul(), hpp = pengumpul(), persediaan = pengumpul();
   for (const b of daftarBaris) {
     const info = ambilInfo(peta, b.barangId);
-    pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, kali(b.jumlah, b.harga));
+    pendapatan.tambah(info.akunPendapatanId ?? m.pendapatanPenjualanId, nilaiBaris(b));
     const pokok = hargaPokokBaris(info, b.jumlah);
     persediaan.tambah(info.akunPersediaanId ?? m.persediaanId, pokok);
     hpp.tambah(info.akunHppId ?? m.hppId, pokok);
   }
   const baris: InputBarisJurnal[] = [
     ...pendapatan.daftar().map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Retur ${retur.nomor}` })),
+    ...(fee.gt(0) && akunFee ? [{ akunId: akunFee, debit: fee, kredit: NOL, keterangan: `Management fee dibalik ${retur.nomor}` }] : []),
     ...(ppn.gt(0) && akunPpnKeluaranId ? [{ akunId: akunPpnKeluaranId, debit: ppn, kredit: NOL, keterangan: `PPN keluaran dibalik ${retur.nomor}` }] : []),
     ...(diskon.gt(0) && m.diskonPenjualanId ? [{ akunId: m.diskonPenjualanId, debit: NOL, kredit: diskon, keterangan: `Diskon dibalik ${retur.nomor}` }] : []),
     { akunId: m.piutangUsahaId, debit: NOL, kredit: retur.total, keterangan: `Pengurangan piutang ${retur.nomor}` },
