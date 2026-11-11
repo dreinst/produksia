@@ -3,7 +3,8 @@ import "dotenv/config";
 process.env.UJI_TANPA_SESI = "1";
 import { readFileSync } from "node:fs";
 import { db } from "../src/lib/db";
-import { D, type Desimal } from "../src/lib/uang";
+import { D, uang, type Desimal } from "../src/lib/uang";
+import { hitungPpn } from "../src/lib/pengaturanPerusahaan";
 import { penggunaSaatIni } from "../src/lib/otentikasi";
 import * as nilaiBarisAsli from "../src/lib/nilaiBaris";
 import {
@@ -48,6 +49,7 @@ import {
   sisaReturPerBaris,
   subtotalBaris,
   subtotalDokumen,
+  subtotalFaktur,
   uraiBarisDokumen,
   type BarisPesananSumber,
   type PesananSumber,
@@ -55,7 +57,11 @@ import {
 import {
   bacaRencanaTermin,
   brutoButir,
+  brutoRencana,
   hitungProgresTermin,
+  kunciButirTermin,
+  nilaiBrutoKontrak,
+  pastikanBatalTagihanTermin,
   pastikanPembayaranTermin,
   pastikanRencanaPesananBolehDiubah,
   pastikanTagihanBolehDibatalkan,
@@ -275,11 +281,13 @@ async function main() {
   await harusDitolak("ubah rencana pesanan sesudah dibayar", async () => pastikanRencanaPesananBolehDiubah([{ label: "DP", ditagihPada: null, jumlahUangMuka: 0 }, { label: "T2", ditagihPada: null, jumlahUangMuka: 1 }]), "Termin T2 sudah ditagih atau dibayar");
   pastikanRencanaPesananBolehDiubah([{ label: "DP", ditagihPada: null, jumlahUangMuka: 0 }]);
   await harusDitolak("batalkan tagihan yang sudah dibayar", async () => pastikanTagihanBolehDibatalkan({ label: "DP", jumlahUangMuka: 1 }), "Termin DP sudah dibayar; hapus uang mukanya dulu");
-  const batas = periksaBatasTermin({ butir: { pesananId: "p1", label: "DP", jumlah: 3_000_000 }, pesananId: "p1", ppnPersen: 11, sudahDibayar: 3_000_000, jumlahBaru: 330_000 });
+  // rencana [DP 3.000.000, Pelunasan 7.000.000]: DP bukan butir terakhir, jadi bruto = 3.000.000 + PPN
+  const rencanaUji = [{ no: 1, jumlah: 3_000_000 }, { no: 2, jumlah: 7_000_000 }];
+  const batas = periksaBatasTermin({ butir: { pesananId: "p1", no: 1, label: "DP" }, rencana: rencanaUji, pesananId: "p1", ppnPersen: 11, sudahDibayar: 3_000_000, jumlahBaru: 330_000 });
   pastikan(teks(batas.bruto) === "3330000.00" && teks(batas.sisa) === "330000.00", "batas termin: sisa bruto 330.000 boleh dibayar tepat");
-  await harusDitolak("bayar melebihi nilai termin", async () => periksaBatasTermin({ butir: { pesananId: "p1", label: "DP", jumlah: 3_000_000 }, pesananId: "p1", ppnPersen: 11, sudahDibayar: 3_000_000, jumlahBaru: "330000.01" }), "Pembayaran melebihi nilai termin DP (sisa 330.000)");
-  await harusDitolak("termin milik pesanan lain", async () => periksaBatasTermin({ butir: { pesananId: "p2", label: "DP", jumlah: 1 }, pesananId: "p1", ppnPersen: 0, sudahDibayar: 0, jumlahBaru: 1 }), "Termin tidak ditemukan di pesanan ini");
-  await harusDitolak("termin penawaran (tanpa pesanan)", async () => periksaBatasTermin({ butir: { pesananId: null, label: "DP", jumlah: 1 }, pesananId: "p1", ppnPersen: 0, sudahDibayar: 0, jumlahBaru: 1 }), "Termin tidak ditemukan di pesanan ini");
+  await harusDitolak("bayar melebihi nilai termin", async () => periksaBatasTermin({ butir: { pesananId: "p1", no: 1, label: "DP" }, rencana: rencanaUji, pesananId: "p1", ppnPersen: 11, sudahDibayar: 3_000_000, jumlahBaru: "330000.01" }), "Pembayaran melebihi nilai termin DP (sisa 330.000)");
+  await harusDitolak("termin milik pesanan lain", async () => periksaBatasTermin({ butir: { pesananId: "p2", no: 1, label: "DP" }, rencana: rencanaUji, pesananId: "p1", ppnPersen: 0, sudahDibayar: 0, jumlahBaru: 1 }), "Termin tidak ditemukan di pesanan ini");
+  await harusDitolak("termin penawaran (tanpa pesanan)", async () => periksaBatasTermin({ butir: { pesananId: null, no: 1, label: "DP" }, rencana: rencanaUji, pesananId: "p1", ppnPersen: 0, sudahDibayar: 0, jumlahBaru: 1 }), "Termin tidak ditemukan di pesanan ini");
   // progres murni: termin 1 lunas, termin 2 ditagih, termin 3 lewat jatuh tempo; UM tanpa termin dan penerimaan faktur
   const hariIni = new Date("2026-11-11T05:00:00Z");
   const progres = hitungProgresTermin(
@@ -525,8 +533,8 @@ async function main() {
   pastikan((await db.pesananPenjualan.count({ where: { nomor: { startsWith: "UJINB-" } } })) === 0 && (await db.logAktivitas.count()) === jumlahLogAwal && (await db.kopSurat.count({ where: { nama: "Kop Uji Nilai Baris" } })) === 0, "transaksi uji dibatalkan: pesanan, kop, dan log tidak tertinggal");
 
   console.log("=== 15. Pratinjau klien sama dengan server ===");
-  // Angka dokumen nyata: harga rupiah bulat, jumlah bulat atau setengah, frekuensi bulat. Hasil kalinya tepat di float,
-  // jadi pratinjau sama persis dengan server. Untuk desimal panjang, pratinjau bisa beda sen; server tetap acuannya.
+  // Angka dokumen nyata: harga rupiah bulat, jumlah bulat atau setengah, frekuensi bulat. Harga bersen, frekuensi
+  // pecahan, diskon, fee, PPN, dan termin acak ada di bagian 17 (perbaikan tinjauan P20 S3).
   const rnd = acak(20_261_111);
   let beda = 0;
   for (let i = 0; i < 1000; i++) {
@@ -562,6 +570,204 @@ async function main() {
   const direktifServer = /^\s*["']use server["'];?\s*$/m;
   pastikan(["dokumenPenjualan", "rencanaTermin", "barangLainLain", "teksBerbutir", "hitungDokumenKlien"].every((n) => !direktifServer.test(readFileSync(`src/lib/${n}.ts`, "utf8"))), "pustaka P20 tanpa direktif use server (tidak menjadi endpoint publik)");
   pastikan(KOLOM_TEKS_FAKTUR.length === 15, "daftar teks faktur: 14 teks surat + judul cetak");
+
+  await bagianPerbaikanTinjauan(pelanggan!.id, kas!.id, hariIni);
+}
+
+/** Pesan galat fungsi server, atau null bila lolos. */
+function galatDari(fn: () => unknown): string | null {
+  try {
+    fn();
+    return null;
+  } catch (e) {
+    return (e as Error).message;
+  }
+}
+
+/** Angka acak dua desimal (teks) antara 0 dan maks. */
+const sen2 = (rnd: () => number, maks: number) => (Math.floor(rnd() * maks * 100) / 100).toFixed(2);
+
+/** Bagian 17: perbaikan tinjauan P20 (S1 sampai S3, R1 sampai R6). */
+async function bagianPerbaikanTinjauan(pelangganId: string, akunKasId: string, hariIni: Date) {
+  console.log("=== 17a. S1: bruto butir terakhir menutup sisa PPN ===");
+  // contoh tinjauan: basis 20.000.001, rencana 50% lalu sisa, PPN 11%
+  const rencanaS1 = selesaikanRencana([{ label: "DP", mode: "PERSEN", nilai: 50 }, { label: "Pelunasan" }], D("20000001"));
+  const brutoS1 = brutoRencana(rencanaS1, 11);
+  pastikan(teks(nilaiBrutoKontrak(D("20000001"), 11)) === "22200001.11", "nilai kontrak bruto 20.000.001 + PPN 2.200.000,11 = 22.200.001,11");
+  pastikan(teks(brutoS1[0].bruto) === "11100000.56" && teks(brutoS1[1].bruto) === "11100000.55", "butir 1 bruto 11.100.000,56 (jumlah + PPN sendiri); butir terakhir 11.100.000,55 (sisa nilai kontrak bruto)");
+  pastikan(brutoS1[0].bruto.plus(brutoS1[1].bruto).equals(nilaiBrutoKontrak(D("20000001"), 11)), "Σ bruto butir sama dengan batas uang muka per pesanan (nilaiBrutoKontrak)");
+  const rencanaS1Db = rencanaS1.map((b) => ({ no: b.no, jumlah: b.jumlah }));
+  const lolosAkhir = periksaBatasTermin({ butir: { pesananId: "p", no: 2, label: "Pelunasan" }, rencana: rencanaS1Db, pesananId: "p", ppnPersen: 11, sudahDibayar: 0, jumlahBaru: "11100000.55" });
+  pastikan(teks(lolosAkhir.bruto) === "11100000.55", "termin terakhir bisa dibayar penuh 11.100.000,55");
+  await harusDitolak("termin terakhir lebih 1 sen", async () => periksaBatasTermin({ butir: { pesananId: "p", no: 2, label: "Pelunasan" }, rencana: rencanaS1Db, pesananId: "p", ppnPersen: 11, sudahDibayar: 0, jumlahBaru: "11100000.56" }), "Pembayaran melebihi nilai termin Pelunasan");
+  await harusDitolak("nomor butir tidak ada di rencana", async () => periksaBatasTermin({ butir: { pesananId: "p", no: 3, label: "X" }, rencana: rencanaS1Db, pesananId: "p", ppnPersen: 11, sudahDibayar: 0, jumlahBaru: 1 }), "Termin tidak ditemukan di pesanan ini");
+  const progresS1 = hitungProgresTermin(
+    {
+      total: "20000001",
+      ppnPersen: 11,
+      butir: rencanaS1.map((b) => ({ id: `s${b.no}`, no: b.no, label: b.label, jumlah: b.jumlah, persen: b.persen, jatuhTempo: new Date("2026-01-01T05:00:00Z"), ditagihPada: null, nomorCetak: null })),
+      uangMuka: [{ jumlah: "11100000.56", rencanaTerminId: "s1" }, { jumlah: "11100000.55", rencanaTerminId: "s2" }],
+      penerimaan: [],
+    },
+    hariIni,
+  );
+  pastikan(progresS1.butir.every((b) => b.status === "Lunas" && !b.lewatJatuhTempo) && progresS1.belumDibayar.isZero(), "progres: kedua butir Lunas tanpa tanda lewat jatuh tempo, belum dibayar 0");
+  const kS1 = pratinjauTerminKlien([{ label: "DP", mode: "PERSEN", nilai: 50 }, { label: "Pelunasan" }], "20000001", 11);
+  pastikan(kS1.butir.map((b) => b.bruto).join() === "11100000.56,11100000.55", "pratinjau klien memakai rumus bruto yang sama");
+  let selisihKontrak = 0;
+  const rndS1 = acak(20_261_112);
+  for (let i = 0; i < 2000; i++) {
+    const n = 1 + Math.floor(rndS1() * 4);
+    const masukan = Array.from({ length: n }, () => ({ mode: "PERSEN", nilai: sen2(rndS1, 100 / n) }));
+    const basis = D(sen2(rndS1, 100_000_000)).plus("0.01");
+    const ppn = [0, 11, 12, "11.5"][Math.floor(rndS1() * 4)];
+    let r: ReturnType<typeof selesaikanRencana>;
+    try {
+      r = selesaikanRencana(masukan, basis);
+    } catch {
+      continue;
+    }
+    const jumlahBruto = brutoRencana(r, ppn).reduce((acc, x) => acc.plus(x.bruto), NOL);
+    const jumlahPersen = r.reduce((acc, x) => acc.plus(x.persen), NOL);
+    if (!jumlahBruto.equals(nilaiBrutoKontrak(basis, ppn)) || !jumlahPersen.equals(100)) selisihKontrak++;
+  }
+  pastikan(selisihKontrak === 0, `2.000 rencana acak: Σ bruto = nilai kontrak bruto dan Σ persen = 100 (beda ${selisihKontrak})`);
+
+  console.log("=== 17b. S2: subtotalDokumen untuk penawaran dan pesanan, subtotalFaktur untuk faktur ===");
+  pastikan(sama(subtotalFaktur({ dpp: 100, diskon: 0, fee: 0 }), 100) && sama(subtotalFaktur({ dpp: 66_946_000, diskon: 890_000, fee: 6_086_000 }), 61_750_000), "subtotalFaktur = dpp + diskon - fee (faktur dpp 100 PPN 11 total 111: subtotal 100)");
+  pastikan(sama(subtotalDokumen({ total: 72_050_000, diskon: 0, fee: 6_550_000 }), 65_500_000), "subtotalDokumen penawaran dan pesanan = total + diskon - fee");
+  // @ts-expect-error kepala faktur (punya dpp) tidak boleh masuk subtotalDokumen
+  subtotalDokumen({ total: 111, diskon: 0, fee: 0, dpp: 100 });
+  console.log("[ok] tipe subtotalDokumen menolak objek ber-dpp (diperiksa tsc lewat @ts-expect-error)");
+
+  console.log("=== 17c. S3: pratinjau klien sama dengan server (harga bersen, frekuensi pecahan, diskon, fee, PPN, termin) ===");
+  const rnd = acak(20_261_113);
+  let bedaBaris = 0;
+  for (let i = 0; i < 20_000; i++) {
+    const jumlah = rnd() < 0.6 ? String(1 + Math.floor(rnd() * 500)) : sen2(rnd, 500);
+    const frekuensi = rnd() < 0.5 ? String((1 + Math.floor(rnd() * 60)) / 2) : sen2(rnd, 40);
+    const harga = rnd() < 0.8 ? sen2(rnd, 10_000_000) : (Math.floor(rnd() * 1e10) / 1000).toFixed(3);
+    const server = nilaiBaris({ jumlah: uang(jumlah), harga: uang(harga), frekuensi: uang(frekuensi) }).toNumber();
+    if (nilaiBarisKlien({ jumlah, harga, frekuensi }) !== server) bedaBaris++;
+  }
+  pastikan(bedaBaris === 0, `20.000 baris acak (harga bersen, frekuensi kelipatan 0,5 dan dua desimal): klien sama dengan server (beda ${bedaBaris})`);
+  pastikan(nilaiBarisKlien({ jumlah: 7, frekuensi: 4.5, harga: "5125460.31" }) === 161_451_999.77, "contoh tinjauan 7 × 4,5 × 5.125.460,31 = 161.451.999,77");
+  let bedaRingkasan = 0;
+  for (let i = 0; i < 5000; i++) {
+    const baris = Array.from({ length: 1 + Math.floor(rnd() * 5) }, () => ({ jumlah: String(1 + Math.floor(rnd() * 30)), frekuensi: String((1 + Math.floor(rnd() * 10)) / 2), harga: sen2(rnd, 20_000_000) }));
+    const jenisDiskon = rnd() < 0.5 ? "PERSEN" : "NOMINAL";
+    const nilaiDiskon = jenisDiskon === "PERSEN" ? sen2(rnd, rnd() < 0.05 ? 120 : 80) : sen2(rnd, 5_000_000);
+    const jenisFee = rnd() < 0.7 ? "PERSEN" : "NOMINAL";
+    const nilaiFee = jenisFee === "PERSEN" ? sen2(rnd, 99) : sen2(rnd, 3_000_000);
+    const ppnPersen = [0, 11, 12][Math.floor(rnd() * 3)];
+    const k = ringkasanDokumenKlien({ baris, jenisDiskon, nilaiDiskon, jenisFee, nilaiFee, ppnPersen });
+    const barisServer = baris.map((b) => ({ jumlah: uang(b.jumlah), harga: uang(b.harga), frekuensi: uang(b.frekuensi) }));
+    let r: ReturnType<typeof ringkasanDokumen> | null = null;
+    const g = galatDari(() => (r = bacaRingkasanDokumen(formulir({ jenisDiskon, nilaiDiskon, jenisFee, nilaiFee }), barisServer, "penawaran")));
+    if (g !== null || r === null) {
+      if (k.galat !== g) bedaRingkasan++;
+      continue;
+    }
+    const rs: ReturnType<typeof ringkasanDokumen> = r;
+    const ppn = hitungPpn(rs.total, D(ppnPersen));
+    const cocok = k.galat === null && k.subtotal === rs.subtotal.toNumber() && k.diskon === rs.diskon.toNumber() && k.fee === rs.fee.toNumber() && k.total === rs.total.toNumber() && k.ppn === ppn.toNumber() && k.totalDenganPpn === rs.total.plus(ppn).toNumber();
+    if (!cocok) bedaRingkasan++;
+  }
+  pastikan(bedaRingkasan === 0, `5.000 ringkasan acak (diskon dan fee persen atau nominal, PPN): klien sama dengan server termasuk pesan galat (beda ${bedaRingkasan})`);
+  pastikan(ringkasanDokumenKlien({ baris: [{ jumlah: 1, harga: "94982807.50" }], jenisDiskon: "NOMINAL", nilaiDiskon: 0, jenisFee: "PERSEN", nilaiFee: 0, ppnPersen: 11 }).ppn === 10_448_108.83, "contoh tinjauan PPN 11% dari 94.982.807,50 = 10.448.108,83");
+  pastikan(ringkasanDokumenKlien({ baris: [{ jumlah: 1, harga: "36555805.98" }], jenisDiskon: "PERSEN", nilaiDiskon: 75, jenisFee: "PERSEN", nilaiFee: 0 }).diskon === 27_416_854.49, "contoh tinjauan 75% dari 36.555.805,98 = 27.416.854,49");
+  let bedaTermin = 0;
+  for (let i = 0; i < 5000; i++) {
+    const n = 1 + Math.floor(rnd() * 4);
+    const masukan = Array.from({ length: n }, () => {
+      const persen = rnd() < 0.7;
+      return { label: rnd() < 0.3 ? "" : "T", mode: rnd() < 0.1 ? "" : persen ? "PERSEN" : "NOMINAL", nilai: persen ? sen2(rnd, rnd() < 0.05 ? 150 : 60) : sen2(rnd, 40_000_000) };
+    });
+    const basis = sen2(rnd, 100_000_000);
+    const ppnPersen = [0, 11, 12][Math.floor(rnd() * 3)];
+    const k = pratinjauTerminKlien(masukan, basis, ppnPersen);
+    let r: ReturnType<typeof selesaikanRencana> = [];
+    const g = galatDari(() => (r = selesaikanRencana(masukan, D(basis))));
+    if (g !== null) {
+      if (k.galat !== g) bedaTermin++;
+      continue;
+    }
+    const bruto = brutoRencana(r, ppnPersen);
+    const cocok = k.galat === null && k.butir.length === r.length && r.every((b, j) => k.butir[j].label === b.label && k.butir[j].jumlah === b.jumlah.toNumber() && k.butir[j].persen === b.persen.toNumber() && k.butir[j].bruto === bruto[j].bruto.toNumber());
+    if (!cocok) bedaTermin++;
+  }
+  pastikan(bedaTermin === 0, `5.000 rencana termin acak (mode kosong, persen, nominal, PPN): klien sama dengan server termasuk pesan galat (beda ${bedaTermin})`);
+
+  console.log("=== 17d. R1: pesan dan pembacaan isian klien sama dengan server ===");
+  const ringkas = (lain: Partial<Parameters<typeof ringkasanDokumenKlien>[0]>) => ringkasanDokumenKlien({ baris: [{ jumlah: 1, harga: 1000 }], jenisDiskon: "NOMINAL", nilaiDiskon: 0, jenisFee: "PERSEN", nilaiFee: 0, ...lain });
+  pastikan(ringkas({ nilaiDiskon: "abc" }).galat === "Diskon tidak valid" && galatDari(() => bacaRingkasanDokumen(formulir({ nilaiDiskon: "abc" }), [{ jumlah: D(1), harga: D(1000) }], "penawaran")) === "Diskon tidak valid", "diskon bukan angka: klien dan server 'Diskon tidak valid'");
+  pastikan(ringkas({ nilaiFee: "1,5" }).galat === "Management fee tidak valid", "fee bukan angka: 'Management fee tidak valid'");
+  pastikan(ringkas({ jenisFee: "NOMINAL", nilaiFee: "100000000000000.01" }).galat === "Management fee terlalu besar", "fee nominal di atas 1e14: 'Management fee terlalu besar'");
+  pastikan(ringkas({ jenisDiskon: "PERSEN", nilaiDiskon: "100.004" }).galat === null && ringkas({ jenisDiskon: "PERSEN", nilaiDiskon: "100.004" }).diskon === 1000, "persen diskon 100,004 dibulatkan dulu menjadi 100 (diterima seperti server)");
+  pastikan(pratinjauTerminKlien([{ mode: "SEBAGIAN", nilai: 5 }, {}], 1000).galat === "Mode termin 1 tidak dikenal" && pratinjauTerminKlien([{ mode: "NOMINAL", nilai: "100000000000001" }, {}], 1000).galat === "Nilai termin terlalu besar" && pratinjauTerminKlien([{ nilai: "x" }, {}], 1000).galat === "Nilai termin 1 tidak valid", "galat termin klien: mode tidak dikenal, terlalu besar, tidak valid");
+  const modeKosong = pratinjauTerminKlien([{ mode: "", nilai: 30 }, {}], 1000);
+  pastikan(modeKosong.butir[0].jumlah === 300 && selesaikanRencana([{ mode: "", nilai: 30 }, {}], D(1000))[0].jumlah.equals(300), "mode kosong dibaca PERSEN di klien dan server");
+
+  console.log("=== 17e. R2: jumlah persen butir selalu 100 ===");
+  const r2 = selesaikanRencana([{ mode: "NOMINAL", nilai: 1 }, { mode: "NOMINAL", nilai: 1 }, {}], D(3));
+  pastikan(r2.map((b) => teks(b.persen)).join() === "33.33,33.33,33.34" && pratinjauTerminKlien([{ mode: "NOMINAL", nilai: 1 }, { mode: "NOMINAL", nilai: 1 }, {}], 3).butir.map((b) => b.persen).join() === "33.33,33.33,33.34", "basis 3, butir 1, 1, sisa: persen 33,33 + 33,33 + 33,34 = 100 (server dan klien)");
+
+  console.log("=== 17f. R5: diskon warisan faktur penutup dibatasi subtotal faktur ===");
+  const pesananR5 = { jenisDiskon: "NOMINAL" as const, nilaiDiskon: D(1_000_000), diskon: D(1_000_000) };
+  const ctxR5 = { subtotalPesanan: D(10_000_000), feeLain: NOL, diskonLain: NOL, menutup: true };
+  pastikan(sama(diskonWarisan(pesananR5, D(500_000), ctxR5), 500_000), "faktur penutup bersubtotal 500.000 mewarisi diskon 500.000, bukan 1.000.000");
+  pastikan(sama(bacaDiskonFaktur(formulir({}), D(500_000), pesananR5, ctxR5).diskon, 500_000), "faktur penutup tanpa isian diskon tidak ditolak 'melebihi subtotal faktur'");
+  pastikan(sama(diskonWarisan(pesananR5, D(5_000_000), { ...ctxR5, menutup: false }), 500_000), "faktur bukan penutup tetap prorata (5.000.000 dari 10.000.000 = 500.000)");
+
+  console.log("=== 17g. R6: jatuh tempo dan tampilan event kosong diabaikan ===");
+  const kosong = bacaIsianTampilan("faktur", formulir({ jatuhTempo: "", tampilanEvent: "  ", perihal: "x" }));
+  pastikan(!kosong.kolom.includes("jatuhTempo") && !kosong.kolom.includes("tampilanEvent") && !("jatuhTempo" in kosong.data) && kosong.kolom.includes("perihal"), "jatuhTempo dan tampilanEvent kosong tidak ikut diubah");
+  const terisi = bacaIsianTampilan("faktur", formulir({ jatuhTempo: "2026-12-31", tampilanEvent: "RINGKAS" }));
+  pastikan(terisi.kolom.includes("jatuhTempo") && terisi.data.tampilanEvent === "RINGKAS" && terisi.data.jatuhTempo instanceof Date, "jatuhTempo dan tampilanEvent terisi tetap diubah");
+  await harusDitolak("jatuh tempo salah tetap ditolak", async () => bacaIsianTampilan("faktur", formulir({ jatuhTempo: "2026-02-30" })), "Jatuh tempo tidak valid");
+
+  console.log("=== 17h. R3: Barang JASA-LAIN wajib bersama ===");
+  await diTransaksiBatal(async (tx) => {
+    const id = await pastikanBarangLainLain(tx);
+    await tx.barang.update({ where: { id }, data: { perusahaanId: "utama" } });
+    await harusDitolak("JASA-LAIN milik perusahaan", () => pastikanBarangLainLain(tx), "Barang JASA-LAIN harus jasa bersama (tanpa perusahaan)");
+  });
+
+  console.log("=== 17i. R4: batal tagihan termin mengunci butir ===");
+  const nomorUji = "UJINB-PSJ-KUNCI";
+  try {
+    const pesanan = await db.pesananPenjualan.create({ data: { nomor: nomorUji, pelangganId, total: 1_000_000, ppnPersen: 0 } });
+    await db.rencanaTermin.createMany({ data: selesaikanRencana([{ label: "DP", nilai: 40 }, { label: "Pelunasan" }], D(1_000_000)).map((b) => ({ ...b, perusahaanId: "utama", pesananId: pesanan.id, ditagihPada: new Date() })) });
+    const [t1, t2] = await db.rencanaTermin.findMany({ where: { pesananId: pesanan.id }, orderBy: { no: "asc" } });
+    const k = await db.$transaction((tx) => kunciButirTermin(tx, t1.id));
+    pastikan(k?.butir.id === t1.id && k.jumlahUangMuka === 0 && D(k.dibayar).isZero() && k.butir.pesanan?.rencanaTermin.length === 2, "kunciButirTermin membaca butir, rencana pesanan, dan uang muka butir");
+    pastikan((await db.$transaction((tx) => kunciButirTermin(tx, "tidak-ada"))) === null, "kunciButirTermin butir tidak ada = null");
+    // transaksi A memegang kunci butir lalu mencatat uang muka; B (batal tagihan) mulai sesudahnya dan harus menunggu A
+    let lepasA: () => void = () => {};
+    const tahanA = new Promise<void>((r) => (lepasA = r));
+    let kunciA: () => void = () => {};
+    const sudahKunci = new Promise<void>((r) => (kunciA = r));
+    const a = db.$transaction(async (tx) => {
+      await pastikanPembayaranTermin(tx, { rencanaTerminId: t1.id, pesananId: pesanan.id, jumlah: D(400_000) });
+      kunciA();
+      await tahanA;
+      await tx.uangMukaPelanggan.create({ data: { nomor: "UJINB-UM-KUNCI", pelangganId, pesananId: pesanan.id, akunId: akunKasId, jumlah: 400_000, rencanaTerminId: t1.id } });
+    }, { timeout: 20_000 });
+    await sudahKunci;
+    const b = db.$transaction((tx) => pastikanBatalTagihanTermin(tx, t1.id), { timeout: 20_000 }).then(() => null, (e: Error) => e.message);
+    await new Promise((r) => setTimeout(r, 300));
+    lepasA();
+    await a;
+    pastikan((await b) === "Termin DP sudah dibayar; hapus uang mukanya dulu", "batal tagihan yang berjalan bersamaan dengan pembayaran menunggu kunci, lalu ditolak karena butir sudah dibayar");
+    const lolos = await db.$transaction((tx) => pastikanBatalTagihanTermin(tx, t2.id));
+    pastikan(lolos.id === t2.id, "batal tagihan butir tanpa uang muka lolos");
+    await harusDitolak("batal tagihan butir tidak ada", () => db.$transaction((tx) => pastikanBatalTagihanTermin(tx, "tidak-ada")), "Termin tidak ditemukan di pesanan ini");
+  } finally {
+    await db.uangMukaPelanggan.deleteMany({ where: { nomor: "UJINB-UM-KUNCI" } });
+    await db.rencanaTermin.deleteMany({ where: { pesanan: { nomor: nomorUji } } });
+    await db.pesananPenjualan.deleteMany({ where: { nomor: nomorUji } });
+  }
+  pastikan((await db.pesananPenjualan.count({ where: { nomor: nomorUji } })) === 0 && (await db.uangMukaPelanggan.count({ where: { nomor: "UJINB-UM-KUNCI" } })) === 0, "data uji kunci termin dibersihkan");
 }
 
 main()

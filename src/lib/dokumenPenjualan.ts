@@ -430,9 +430,18 @@ export function bacaRingkasanDokumen(dataFormulir: FormData, baris: readonly Bar
   return { jenisDiskon, nilaiDiskon, jenisFee, nilaiFee, ...ringkasanDokumen({ subtotal: subtotalBaris(baris), jenisDiskon, nilaiDiskon, jenisFee, nilaiFee, dokumen }) };
 }
 
-/** Identitas kepala dokumen yang selalu benar (D2 §3.4): subtotal = total + diskon - fee. Tidak ada kolom subtotal. */
-export function subtotalDokumen(d: { total: Angka; diskon: Angka; fee: Angka }): Desimal {
+/**
+ * Subtotal PENAWARAN dan PESANAN (D2 §3.4): subtotal = total + diskon - fee, karena total kedua dokumen itu tanpa PPN.
+ * Tidak ada kolom subtotal. JANGAN dipakai untuk faktur (total faktur memuat PPN); pakai subtotalFaktur. Tipe menolak
+ * objek yang punya `dpp` (kepala faktur).
+ */
+export function subtotalDokumen(d: { total: Angka; diskon: Angka; fee: Angka; dpp?: never }): Desimal {
   return D(d.total).plus(D(d.diskon)).minus(D(d.fee));
+}
+
+/** Subtotal FAKTUR (dan dasar prorata retur): subtotal = dpp + diskon - fee, karena dpp = subtotal - diskon + fee. */
+export function subtotalFaktur(f: { dpp: Angka; diskon: Angka; fee: Angka }): Desimal {
+  return D(f.dpp).plus(D(f.diskon)).minus(D(f.fee));
 }
 
 /** Faktur: dpp = subtotal - diskon + fee, PPN dari dpp, total = dpp + PPN. */
@@ -636,10 +645,14 @@ export function feeFaktur(p: Pick<PesananSumber, "jenisFee" | "nilaiFee" | "fee"
   return bagianProrata(D(p.fee), subtotal, ctx.subtotalPesanan, ctx.feeLain, ctx.menutup);
 }
 
-/** Diskon warisan pesanan bila formulir faktur tidak mengirim diskon: PERSEN dari subtotal faktur, NOMINAL prorata. */
+/**
+ * Diskon warisan pesanan bila formulir faktur tidak mengirim diskon: PERSEN dari subtotal faktur, NOMINAL prorata.
+ * Bagian nominal dibatasi subtotal faktur ini, supaya faktur penutup yang mewarisi sisa diskon (karena faktur lain
+ * memakai diskon sendiri) tidak ditolak "melebihi subtotal faktur". Fee tidak dibatasi begitu.
+ */
 export function diskonWarisan(p: Pick<PesananSumber, "jenisDiskon" | "nilaiDiskon" | "diskon">, subtotal: Desimal, ctx: KonteksProrata): Desimal {
   if (p.jenisDiskon === "PERSEN") return hitungDiskon(subtotal, "PERSEN", D(p.nilaiDiskon));
-  return bagianProrata(D(p.diskon), subtotal, ctx.subtotalPesanan, ctx.diskonLain, ctx.menutup);
+  return terkecil(bagianProrata(D(p.diskon), subtotal, ctx.subtotalPesanan, ctx.diskonLain, ctx.menutup), terbesar(subtotal, NOL));
 }
 
 /**
@@ -774,9 +787,9 @@ export function siapkanBarisRetur(faktur: { baris: readonly BarisFakturSumber[] 
  */
 export function nilaiRetur(faktur: { dpp: Angka; diskon: Angka; fee: Angka; ppnPersen: Angka }, baris: readonly BarisNilai[]) {
   const bruto = subtotalBaris(baris);
-  const subtotalFaktur = D(faktur.dpp).plus(D(faktur.diskon)).minus(D(faktur.fee));
-  const diskon = subtotalFaktur.gt(0) ? uang(D(faktur.diskon).mul(bruto).div(subtotalFaktur)) : NOL;
-  const fee = subtotalFaktur.gt(0) ? uang(D(faktur.fee).mul(bruto).div(subtotalFaktur)) : NOL;
+  const dasar = subtotalFaktur(faktur);
+  const diskon = dasar.gt(0) ? uang(D(faktur.diskon).mul(bruto).div(dasar)) : NOL;
+  const fee = dasar.gt(0) ? uang(D(faktur.fee).mul(bruto).div(dasar)) : NOL;
   const dpp = bruto.minus(diskon).plus(fee);
   const ppn = hitungPpn(dpp, D(faktur.ppnPersen));
   return { bruto, diskon, fee, dpp, ppn, total: dpp.plus(ppn) };
@@ -835,6 +848,8 @@ export function bacaIsianTampilan(jenis: JenisDokumenPenjualan, dataFormulir: Fo
   for (const k of KOLOM_TAMPILAN[jenis] as readonly string[]) {
     if (!dataFormulir.has(k)) continue;
     const v = dataFormulir.get(k);
+    // jatuh tempo faktur dan tampilan event tidak bisa dikosongkan: isian kosong diabaikan (kolom tidak ikut diubah)
+    if ((k === "jatuhTempo" || k === "tampilanEvent") && rapikanTeks(v) === null) continue;
     if (kolomTeksSah(k)) data[k] = bacaTeks(v, k);
     else if (k === "tampilanEvent") data[k] = bacaTampilanEvent(v);
     else if (k === "nilaiAddOn") data[k] = bacaNilaiAddOn(v);

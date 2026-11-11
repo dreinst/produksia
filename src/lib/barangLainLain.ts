@@ -14,16 +14,18 @@ export const NAMA_BARANG_LAIN = "Item lain-lain";
 /**
  * id Barang JASA-LAIN, dibuat bila belum ada (perusahaan null = bersama, K3). Panggil di dalam transaksi dokumen.
  * Upsert pada kode unik aman bila dua transaksi membuatnya bersamaan. Kode yang sudah dipakai barang jenis BARANG
- * ditolak, karena baris bebas tidak boleh memotong stok.
+ * ditolak, karena baris bebas tidak boleh memotong stok. Barang JASA-LAIN yang punya perusahaan juga ditolak.
  */
 export async function pastikanBarangLainLain(tx: Klien): Promise<string> {
   const b = await tx.barang.upsert({
     where: { kode: KODE_BARANG_LAIN },
     create: { kode: KODE_BARANG_LAIN, nama: NAMA_BARANG_LAIN, jenis: "JASA", satuan: "paket", hargaBeli: 0, hargaJual: 0, perusahaanId: null },
     update: {},
-    select: { id: true, jenis: true },
+    select: { id: true, jenis: true, perusahaanId: true },
   });
   if (b.jenis !== "JASA") throw new Error(`Kode barang ${KODE_BARANG_LAIN} sudah dipakai barang jenis BARANG. Ganti kode barang itu supaya baris bebas bisa dipakai`);
+  // baris bebas semua perusahaan menunjuk barang ini, jadi barang ini wajib bersama (K3)
+  if (b.perusahaanId !== null) throw new Error(`Barang ${KODE_BARANG_LAIN} harus jasa bersama (tanpa perusahaan). Kosongkan perusahaan barang itu di Data Induk supaya baris bebas bisa dipakai`);
   return b.id;
 }
 

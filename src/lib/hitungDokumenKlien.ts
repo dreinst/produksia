@@ -1,47 +1,105 @@
 /*
  * Pratinjau angka dokumen penjualan di peramban (D2 §3.2, §3.4, §3.8): editor baris, ringkasan diskon, fee, PPN, dan
- * rencana termin. Hanya angka biasa, tanpa Prisma dan tanpa impor apa pun, jadi aman untuk komponen klien (L10).
- * Server tetap sumber kebenaran (dokumenPenjualan.ts, rencanaTermin.ts); fungsi di sini meniru rumusnya untuk tampilan
- * dan mengembalikan pesan galat yang sama sebagai `galat` alih-alih melempar.
+ * rencana termin. Tanpa Prisma dan tanpa impor apa pun, jadi aman untuk komponen klien (L10). Server tetap sumber
+ * kebenaran (dokumenPenjualan.ts, rencanaTermin.ts); fungsi di sini meniru rumusnya untuk tampilan dan mengembalikan
+ * pesan galat yang sama sebagai `galat` alih-alih melempar.
+ *
+ * Semua hitungan memakai sen bulat (BigInt) dengan pembulatan half-up menjauhi nol (sama dengan ROUND_HALF_UP
+ * Decimal), bukan float, sehingga hasilnya sama persis dengan server untuk harga bersen dan frekuensi pecahan. Isian
+ * dibaca seperti uang() di server: dibulatkan ke 2 desimal lebih dulu. Hasil dikembalikan sebagai number untuk tampilan.
  */
 
 export type AngkaKlien = number | string | null | undefined;
 export type JenisNilaiKlien = "NOMINAL" | "PERSEN";
 
-/** Pembulatan dua desimal pratinjau: Math.round((x + EPSILON) × 100) / 100. */
-export function bulat2(x: number): number {
-  return Math.round((x + Number.EPSILON) * 100) / 100;
+const NOL = BigInt(0);
+const SATU = BigInt(1);
+const DUA = BigInt(2);
+const SEPULUH = BigInt(10);
+const SERATUS = BigInt(100);
+const SEPULUH_RIBU = BigInt(10_000);
+/** Batas nilai termin dan fee nominal server (100.000.000.000.000), dalam sen. */
+const MAKS_NOMINAL_SEN = BigInt("10000000000000000");
+
+/** a / b dibulatkan half-up menjauhi nol (b > 0). */
+function bagiBulat(a: bigint, b: bigint): bigint {
+  const negatif = a < NOL;
+  const m = negatif ? -a : a;
+  const q = m / b;
+  const hasil = (m % b) * DUA >= b ? q + SATU : q;
+  return negatif ? -hasil : hasil;
 }
 
-/** Angka isian: kosong atau tidak sah = 0. */
+/**
+ * Isian ke sen (dikali 100, dibulatkan half-up 2 desimal seperti uang()). Kosong = 0. Selain angka desimal sah
+ * (boleh bertanda dan berpangkat, mis. "1e3") = null.
+ */
+function keSen(v: AngkaKlien): bigint | null {
+  if (v === null || v === undefined) return NOL;
+  if (typeof v === "number" && !Number.isFinite(v)) return null;
+  const s = String(v).trim();
+  if (s === "") return NOL;
+  const m = /^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(s);
+  if (!m || (m[2] === "" && (m[3] ?? "") === "")) return null;
+  const pecahan = m[3] ?? "";
+  const pangkat = Number(m[4] ?? 0) - pecahan.length + 2;
+  if (Math.abs(pangkat) > 60) return null;
+  const angka = BigInt((m[2] || "0") + pecahan);
+  const sen = pangkat >= 0 ? angka * SEPULUH ** BigInt(pangkat) : bagiBulat(angka, SEPULUH ** BigInt(-pangkat));
+  return m[1] === "-" ? -sen : sen;
+}
+
+/** Sen ke number tampilan (lewat teks desimal, jadi tanpa galat pembagian float). */
+function keAngka(sen: bigint): number {
+  const negatif = sen < NOL;
+  const m = negatif ? -sen : sen;
+  const n = Number(`${m / SERATUS}.${String(m % SERATUS).padStart(2, "0")}`);
+  return negatif ? -n : n;
+}
+
+/** Angka isian: kosong atau tidak sah = 0, dibulatkan 2 desimal seperti server. */
 export function angkaKlien(v: AngkaKlien): number {
-  if (v === null || v === undefined || v === "") return 0;
-  const n = typeof v === "number" ? v : Number(String(v).trim());
-  return Number.isFinite(n) ? n : 0;
+  return keAngka(keSen(v) ?? NOL);
 }
 
-const frekuensiKlien = (v: AngkaKlien) => (v === null || v === undefined || v === "" ? 1 : angkaKlien(v));
+const senAtauNol = (v: AngkaKlien) => keSen(v) ?? NOL;
+const frekuensiSen = (v: AngkaKlien) => (v === null || v === undefined || (typeof v === "string" && v.trim() === "") ? SERATUS : senAtauNol(v));
 
-/** Nilai satu baris: bulat2(jumlah × frekuensi × harga); frekuensi kosong = 1. */
-export function nilaiBarisKlien(b: { jumlah: AngkaKlien; harga: AngkaKlien; frekuensi?: AngkaKlien }): number {
-  return bulat2(angkaKlien(b.jumlah) * frekuensiKlien(b.frekuensi) * angkaKlien(b.harga));
+type BarisKlien = { jumlah: AngkaKlien; harga: AngkaKlien; frekuensi?: AngkaKlien };
+
+/** Nilai satu baris dalam sen: jumlah × frekuensi × harga, satu kali pembulatan (nilaiBaris server). */
+function nilaiBarisSen(b: BarisKlien): bigint {
+  return bagiBulat(senAtauNol(b.jumlah) * frekuensiSen(b.frekuensi) * senAtauNol(b.harga), SEPULUH_RIBU);
 }
 
-/** Jumlah nilai baris (tiap baris dibulatkan dulu), dibulatkan lagi supaya galat float tidak menumpuk. */
-export function subtotalKlien(baris: readonly { jumlah: AngkaKlien; harga: AngkaKlien; frekuensi?: AngkaKlien }[]): number {
-  return bulat2(baris.reduce((s, b) => s + nilaiBarisKlien(b), 0));
+function subtotalSen(baris: readonly BarisKlien[]): bigint {
+  return baris.reduce((s, b) => s + nilaiBarisSen(b), NOL);
 }
 
-const rupiah = (n: number) => n.toLocaleString("id-ID");
+/** nilai × persen / 100 dibulatkan ke sen (hitungDiskon, hitungFee, hitungPpn server); keduanya dalam sen. */
+const persenDari = (nilaiSen: bigint, persenSen: bigint) => bagiBulat(nilaiSen * persenSen, SEPULUH_RIBU);
+
+/** Nilai satu baris: jumlah × frekuensi × harga, satu kali pembulatan; frekuensi kosong = 1; isian tidak sah = 0. */
+export function nilaiBarisKlien(b: BarisKlien): number {
+  return keAngka(nilaiBarisSen(b));
+}
+
+/** Jumlah nilai baris (tiap baris dibulatkan dulu). */
+export function subtotalKlien(baris: readonly BarisKlien[]): number {
+  return keAngka(subtotalSen(baris));
+}
+
+const rupiah = (sen: bigint) => keAngka(sen).toLocaleString("id-ID");
 
 export type RingkasanKlien = { subtotal: number; diskon: number; fee: number; total: number; ppn: number; totalDenganPpn: number; galat: string | null };
 
 /**
  * Ringkasan penawaran dan pesanan: total = subtotal - diskon + fee (tanpa PPN), PPN hanya tampilan. `galat` berisi
- * pesan yang sama dengan server bila isian akan ditolak.
+ * pesan yang sama dengan server bila isian akan ditolak, dengan urutan pemeriksaan bacaRingkasanDokumen: isian diskon
+ * dan fee dibaca dulu, lalu diskon, lalu fee. Bila ada galat, diskon dan fee pratinjau 0.
  */
 export function ringkasanDokumenKlien(p: {
-  baris: readonly { jumlah: AngkaKlien; harga: AngkaKlien; frekuensi?: AngkaKlien }[];
+  baris: readonly BarisKlien[];
   jenisDiskon: JenisNilaiKlien;
   nilaiDiskon: AngkaKlien;
   jenisFee: JenisNilaiKlien;
@@ -49,50 +107,76 @@ export function ringkasanDokumenKlien(p: {
   ppnPersen?: AngkaKlien;
   dokumen?: "penawaran" | "pesanan";
 }): RingkasanKlien {
-  const subtotal = subtotalKlien(p.baris);
-  const nDiskon = angkaKlien(p.nilaiDiskon);
-  const nFee = angkaKlien(p.nilaiFee);
+  const subtotal = subtotalSen(p.baris);
+  const nDiskon = keSen(p.nilaiDiskon);
+  const nFee = keSen(p.nilaiFee);
   let galat: string | null = null;
-  if (nDiskon < 0) galat = "Diskon tidak boleh negatif";
-  else if (p.jenisDiskon === "PERSEN" && nDiskon > 100) galat = "Persen diskon tidak boleh lebih dari 100";
-  const diskon = galat ? 0 : bulat2(p.jenisDiskon === "PERSEN" ? (subtotal * nDiskon) / 100 : nDiskon);
-  if (!galat && diskon > subtotal) galat = `Diskon (${rupiah(diskon)}) melebihi subtotal ${p.dokumen ?? "penawaran"} (${rupiah(subtotal)})`;
-  if (!galat && nFee < 0) galat = "Management fee tidak boleh negatif";
-  else if (!galat && p.jenisFee === "PERSEN" && nFee > 100) galat = "Persen management fee tidak boleh lebih dari 100";
-  const dasarFee = bulat2(subtotal - diskon);
-  const fee = galat ? 0 : bulat2(p.jenisFee === "PERSEN" ? (dasarFee * nFee) / 100 : nFee);
-  const total = bulat2(subtotal - diskon + fee);
-  const ppn = bulat2((total * angkaKlien(p.ppnPersen)) / 100);
-  return { subtotal, diskon, fee, total, ppn, totalDenganPpn: bulat2(total + ppn), galat };
+  let diskon = NOL;
+  let fee = NOL;
+  if (nDiskon === null) galat = "Diskon tidak valid";
+  else if (nFee === null) galat = "Management fee tidak valid";
+  else if (nDiskon < NOL) galat = "Diskon tidak boleh negatif";
+  else if (p.jenisDiskon === "PERSEN" && nDiskon > SEPULUH_RIBU) galat = "Persen diskon tidak boleh lebih dari 100";
+  else {
+    diskon = p.jenisDiskon === "PERSEN" ? persenDari(subtotal, nDiskon) : nDiskon;
+    if (diskon > subtotal) galat = `Diskon (${rupiah(diskon)}) melebihi subtotal ${p.dokumen ?? "penawaran"} (${rupiah(subtotal)})`;
+    else if (nFee < NOL) galat = "Management fee tidak boleh negatif";
+    else if (p.jenisFee === "PERSEN" && nFee > SEPULUH_RIBU) galat = "Persen management fee tidak boleh lebih dari 100";
+    else if (p.jenisFee !== "PERSEN" && nFee > MAKS_NOMINAL_SEN) galat = "Management fee terlalu besar";
+    else fee = p.jenisFee === "PERSEN" ? persenDari(subtotal - diskon, nFee) : nFee;
+  }
+  if (galat) {
+    diskon = NOL;
+    fee = NOL;
+  }
+  const total = subtotal - diskon + fee;
+  const ppn = persenDari(total, senAtauNol(p.ppnPersen));
+  return { subtotal: keAngka(subtotal), diskon: keAngka(diskon), fee: keAngka(fee), total: keAngka(total), ppn: keAngka(ppn), totalDenganPpn: keAngka(total + ppn), galat };
 }
 
 export type ButirTerminKlien = { no: number; label: string; jumlah: number; persen: number; bruto: number };
 
-/** Pratinjau rencana termin (meniru selesaikanRencana): butir terakhir menutup sisa, bruto termasuk PPN. */
+/**
+ * Pratinjau rencana termin (meniru selesaikanRencana dan brutoRencana): butir terakhir menutup sisa jumlah, sisa persen
+ * (jumlah persen 100), dan sisa nilai kontrak termasuk PPN. Mode kosong = PERSEN.
+ */
 export function pratinjauTerminKlien(
-  butir: readonly { label?: string | null; mode?: JenisNilaiKlien | null; nilai?: AngkaKlien }[],
+  butir: readonly { label?: string | null; mode?: string | null; nilai?: AngkaKlien }[],
   basisMentah: AngkaKlien,
   ppnPersen: AngkaKlien = 0,
 ): { butir: ButirTerminKlien[]; galat: string | null } {
-  const basis = bulat2(angkaKlien(basisMentah));
+  const basis = senAtauNol(basisMentah);
   if (butir.length === 0) return { butir: [], galat: null };
   if (butir.length > 4) return { butir: [], galat: "Rencana termin maksimal 4 butir" };
-  if (basis <= 0) return { butir: [], galat: "Rencana termin butuh nilai kontrak di atas nol" };
-  const hasil: ButirTerminKlien[] = [];
-  let terpakai = 0;
+  if (basis <= NOL) return { butir: [], galat: "Rencana termin butuh nilai kontrak di atas nol" };
+  const ppn = senAtauNol(ppnPersen);
+  const hasil: { no: number; label: string; jumlah: bigint; persen: bigint; bruto: bigint }[] = [];
+  const keluar = (galat: string | null) => ({ butir: hasil.map((h) => ({ no: h.no, label: h.label, jumlah: keAngka(h.jumlah), persen: keAngka(h.persen), bruto: keAngka(h.bruto) })), galat });
+  let terpakai = NOL;
   for (const [i, b] of butir.entries()) {
     const n = i + 1;
     const terakhir = n === butir.length;
     const label = String(b.label ?? "").trim().replace(/\s+/g, " ");
-    if (label.length > 40) return { butir: hasil, galat: "Label termin maksimal 40 karakter" };
-    const nilai = bulat2(angkaKlien(b.nilai));
-    if (nilai < 0) return { butir: hasil, galat: `Nilai termin ${n} tidak boleh negatif` };
-    const persenMode = (b.mode ?? "PERSEN") === "PERSEN";
-    if (!terakhir && persenMode && nilai > 100) return { butir: hasil, galat: `Persen termin ${n} tidak boleh lebih dari 100` };
-    const jumlah = terakhir ? bulat2(basis - terpakai) : persenMode ? bulat2((basis * nilai) / 100) : nilai;
-    if (jumlah <= 0) return { butir: hasil, galat: terakhir ? "Termin sebelumnya sudah menutup seluruh nilai kontrak" : `Termin ${n} harus lebih dari nol` };
-    terpakai = bulat2(terpakai + jumlah);
-    hasil.push({ no: n, label: label || `Termin ${n}`, jumlah, persen: bulat2((jumlah / basis) * 100), bruto: bulat2(jumlah + bulat2((jumlah * angkaKlien(ppnPersen)) / 100)) });
+    if (label.length > 40) return keluar("Label termin maksimal 40 karakter");
+    const mode = b.mode === null || b.mode === undefined || b.mode === "" ? "PERSEN" : b.mode;
+    if (mode !== "PERSEN" && mode !== "NOMINAL") return keluar(`Mode termin ${n} tidak dikenal`);
+    const nilai = keSen(b.nilai);
+    if (nilai === null) return keluar(`Nilai termin ${n} tidak valid`);
+    if (nilai < NOL) return keluar(`Nilai termin ${n} tidak boleh negatif`);
+    if (nilai > MAKS_NOMINAL_SEN) return keluar("Nilai termin terlalu besar");
+    let jumlah: bigint;
+    if (terakhir) jumlah = basis - terpakai;
+    else if (mode === "NOMINAL") jumlah = nilai;
+    else {
+      if (nilai > SEPULUH_RIBU) return keluar(`Persen termin ${n} tidak boleh lebih dari 100`);
+      jumlah = persenDari(basis, nilai);
+    }
+    if (jumlah <= NOL) return keluar(terakhir ? "Termin sebelumnya sudah menutup seluruh nilai kontrak" : `Termin ${n} harus lebih dari nol`);
+    terpakai += jumlah;
+    const sisaPersen = SEPULUH_RIBU - hasil.reduce((s, h) => s + h.persen, NOL);
+    const persen = terakhir ? (sisaPersen > NOL ? sisaPersen : NOL) : bagiBulat(jumlah * SEPULUH_RIBU, basis);
+    const bruto = terakhir ? basis + persenDari(basis, ppn) - hasil.reduce((s, h) => s + h.bruto, NOL) : jumlah + persenDari(jumlah, ppn);
+    hasil.push({ no: n, label: label || `Termin ${n}`, jumlah, persen, bruto });
   }
-  return { butir: hasil, galat: null };
+  return keluar(null);
 }

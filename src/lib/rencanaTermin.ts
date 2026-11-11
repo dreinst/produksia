@@ -86,15 +86,45 @@ export function selesaikanRencana(butir: readonly ButirTerminMasukan[], basisMen
     }
     if (jumlah.lte(0)) throw new Error(terakhir ? "Termin sebelumnya sudah menutup seluruh nilai kontrak" : `Termin ${n} harus lebih dari nol`);
     terpakai = terpakai.plus(jumlah);
-    hasil.push({ no: n, label: label || `Termin ${n}`, mode, nilai, jumlah, persen: uang(jumlah.div(basis).mul(100)), jatuhTempo });
+    // persen butir terakhir juga menutup sisa, jadi jumlah persen yang tampil dan tercetak selalu 100
+    const persen = terakhir ? terbesar(D(100).minus(jumlahkan(hasil.map((h) => h.persen))), D(0)) : uang(jumlah.div(basis).mul(100));
+    hasil.push({ no: n, label: label || `Termin ${n}`, mode, nilai, jumlah, persen, jatuhTempo });
   });
   return hasil;
 }
 
-/** Nilai butir termasuk PPN dokumen (tampilan, cetak, dan batas pembayaran); sama dengan with_tax HKA. */
+/** Nilai satu jumlah termasuk PPN dokumen: jumlah + hitungPpn(jumlah, tarif). Dipakai untuk butir selain yang terakhir. */
 export function brutoButir(jumlah: Desimal | number | string, ppnPersen: Desimal | number | string): Desimal {
   const j = uang(jumlah);
   return j.plus(hitungPpn(j, D(ppnPersen)));
+}
+
+/**
+ * Nilai kontrak termasuk PPN: total + hitungPpn(total, pesanan.ppnPersen), satu kali pembulatan PPN. Untuk pesanan
+ * bertermin, ini juga batas Σ uang muka per pesanan (KONTRAK-TAMBAHAN P23), sehingga termin terakhir bisa dibayar penuh.
+ */
+export function nilaiBrutoKontrak(total: Desimal | number | string, ppnPersen: Desimal | number | string): Desimal {
+  return brutoButir(total, ppnPersen);
+}
+
+/**
+ * Nilai termasuk PPN setiap butir satu rencana (tampilan, cetak, batas pembayaran, dan progres memakai fungsi ini).
+ * Butir diurutkan menurut nomor. Butir selain yang terakhir = brutoButir(jumlah); butir terakhir = nilaiBrutoKontrak(Σ
+ * jumlah) dikurangi Σ bruto butir sebelumnya, jadi PPN ditutup butir terakhir seperti DPP-nya dan Σ bruto selalu sama
+ * dengan nilai kontrak termasuk PPN. Hasil sejajar dengan butir terurut.
+ */
+export function brutoRencana<T extends { no: number; jumlah: Desimal | number | string }>(
+  butir: readonly T[],
+  ppnPersen: Desimal | number | string,
+): { butir: T; bruto: Desimal }[] {
+  const urut = [...butir].sort((a, b) => a.no - b.no);
+  const kontrak = nilaiBrutoKontrak(jumlahkan(urut.map((b) => b.jumlah)), ppnPersen);
+  let sebelumnya = D(0);
+  return urut.map((b, i) => {
+    const bruto = i === urut.length - 1 ? kontrak.minus(sebelumnya) : brutoButir(b.jumlah, ppnPersen);
+    sebelumnya = sebelumnya.plus(bruto);
+    return { butir: b, bruto };
+  });
 }
 
 /** Data Prisma butir baru (nested create di penawaran atau pesanan). perusahaanId selalu milik induk (D2 §10.6 no. 7). */
@@ -129,37 +159,75 @@ export function pastikanTagihanBolehDibatalkan(butir: { label: string; jumlahUan
 
 /**
  * Batas pembayaran satu butir (murni): butir harus milik pesanan uang muka, dan Σ uang muka butir + jumlah baru tidak
- * boleh melebihi nilai butir termasuk PPN. Batas lama per pesanan tetap diperiksa aksi uang muka.
+ * boleh melebihi nilai butir termasuk PPN menurut brutoRencana (butir terakhir menutup sisa PPN). `rencana` berisi
+ * semua butir pesanan itu. Batas per pesanan tetap diperiksa aksi uang muka (lihat nilaiBrutoKontrak).
  */
 export function periksaBatasTermin(p: {
-  butir: { pesananId: string | null; label: string; jumlah: Desimal | number | string };
+  butir: { pesananId: string | null; no: number; label: string };
+  rencana: readonly { no: number; jumlah: Desimal | number | string }[];
   pesananId: string;
   ppnPersen: Desimal | number | string;
   sudahDibayar: Desimal | number | string;
   jumlahBaru: Desimal | number | string;
 }): { bruto: Desimal; sisa: Desimal } {
   if (p.butir.pesananId !== p.pesananId) throw new Error("Termin tidak ditemukan di pesanan ini");
-  const bruto = brutoButir(p.butir.jumlah, p.ppnPersen);
+  const cocok = brutoRencana(p.rencana, p.ppnPersen).find((r) => r.butir.no === p.butir.no);
+  if (!cocok) throw new Error("Termin tidak ditemukan di pesanan ini");
+  const bruto = cocok.bruto;
   const sisa = terbesar(bruto.minus(D(p.sudahDibayar)), D(0));
   if (D(p.jumlahBaru).gt(sisa)) throw new Error(`Pembayaran melebihi nilai termin ${p.butir.label} (sisa ${format(sisa)})`);
   return { bruto, sisa };
 }
 
 /**
- * Batas pembayaran butir di dalam transaksi uang muka: baris butir dikunci (FOR UPDATE) supaya dua pembayaran
- * bersamaan untuk butir yang sama tidak sama-sama lolos, lalu Σ uang muka butir dibaca ulang. PPN memakai tarif
- * pesanan. Mengembalikan butir untuk keterangan (label).
+ * Mengunci baris butir (FOR UPDATE) di dalam transaksi pemanggil, lalu membaca butir, rencana pesanannya, dan uang muka
+ * butir itu SESUDAH kunci didapat. Semua jalur yang bergantung pada "butir sudah dibayar atau belum" (bayar termin,
+ * batal tagihan) wajib lewat sini supaya tidak berlomba. null bila butir tidak ada.
+ */
+export async function kunciButirTermin(tx: Klien, rencanaTerminId: string) {
+  await tx.$queryRaw`SELECT 1 FROM "RencanaTermin" WHERE "id" = ${rencanaTerminId} FOR UPDATE`;
+  const butir = await tx.rencanaTermin.findUnique({
+    where: { id: rencanaTerminId },
+    select: {
+      id: true,
+      no: true,
+      label: true,
+      jumlah: true,
+      pesananId: true,
+      penawaranId: true,
+      ditagihPada: true,
+      nomorCetak: true,
+      pesanan: { select: { ppnPersen: true, rencanaTermin: { select: { no: true, jumlah: true } } } },
+    },
+  });
+  if (!butir) return null;
+  const um = await tx.uangMukaPelanggan.aggregate({ where: { rencanaTerminId: butir.id }, _sum: { jumlah: true }, _count: { _all: true } });
+  return { butir, jumlahUangMuka: um._count._all, dibayar: um._sum.jumlah ?? D(0) };
+}
+
+/**
+ * Batas pembayaran butir di dalam transaksi uang muka: lewat kunciButirTermin, jadi dua pembayaran bersamaan untuk butir
+ * yang sama (atau pembayaran dan batal tagihan) tidak sama-sama lolos. PPN memakai tarif pesanan. Mengembalikan butir
+ * untuk keterangan (label).
  */
 export async function pastikanPembayaranTermin(tx: Klien, p: { rencanaTerminId: string; pesananId: string; jumlah: Desimal }) {
-  await tx.$queryRaw`SELECT 1 FROM "RencanaTermin" WHERE "id" = ${p.rencanaTerminId} FOR UPDATE`;
-  const butir = await tx.rencanaTermin.findUnique({
-    where: { id: p.rencanaTerminId },
-    select: { id: true, no: true, label: true, jumlah: true, pesananId: true, pesanan: { select: { ppnPersen: true } } },
-  });
-  if (!butir || !butir.pesanan) throw new Error("Termin tidak ditemukan di pesanan ini");
-  const dibayar = await tx.uangMukaPelanggan.aggregate({ where: { rencanaTerminId: butir.id }, _sum: { jumlah: true } });
-  periksaBatasTermin({ butir, pesananId: p.pesananId, ppnPersen: butir.pesanan.ppnPersen, sudahDibayar: dibayar._sum.jumlah ?? 0, jumlahBaru: p.jumlah });
+  const k = await kunciButirTermin(tx, p.rencanaTerminId);
+  if (!k || !k.butir.pesanan) throw new Error("Termin tidak ditemukan di pesanan ini");
+  const { butir } = k;
+  periksaBatasTermin({ butir, rencana: butir.pesanan!.rencanaTermin, pesananId: p.pesananId, ppnPersen: butir.pesanan!.ppnPersen, sudahDibayar: k.dibayar, jumlahBaru: p.jumlah });
   return butir;
+}
+
+/**
+ * Pemeriksaan batalkanTagihanTermin (P25, D2 §6.2) di dalam transaksi batal tagihan: butir dikunci lalu uang mukanya
+ * dihitung ulang, sehingga tagihan tidak bisa dibatalkan bersamaan dengan pembayaran butir yang sama. Butir harus
+ * milik pesanan (bukan penawaran). Mengembalikan butir (nomorCetak lama untuk meta log).
+ */
+export async function pastikanBatalTagihanTermin(tx: Klien, rencanaTerminId: string) {
+  const k = await kunciButirTermin(tx, rencanaTerminId);
+  if (!k || !k.butir.pesananId) throw new Error("Termin tidak ditemukan di pesanan ini");
+  pastikanTagihanBolehDibatalkan({ label: k.butir.label, jumlahUangMuka: k.jumlahUangMuka });
+  return k.butir;
 }
 
 export type StatusButirTermin = "Belum ditagih" | "Ditagih" | "Dibayar sebagian" | "Lunas";
@@ -200,13 +268,10 @@ export function hitungProgresTermin(
   hariIni: Date = new Date(),
 ): ProgresTermin {
   const nol = D(0);
-  const total = D(m.total);
-  const nilaiKontrakBruto = total.plus(hitungPpn(total, D(m.ppnPersen)));
+  const nilaiKontrakBruto = nilaiBrutoKontrak(m.total, m.ppnPersen);
   const hari = tanggalIso(hariIni);
-  const butir = [...m.butir]
-    .sort((a, b) => a.no - b.no)
-    .map((b): ButirProgres => {
-      const bruto = brutoButir(b.jumlah, m.ppnPersen);
+  const butir = brutoRencana(m.butir, m.ppnPersen)
+    .map(({ butir: b, bruto }): ButirProgres => {
       const dibayar = jumlahkan(m.uangMuka.filter((u) => u.rencanaTerminId === b.id).map((u) => u.jumlah));
       const sisa = terbesar(bruto.minus(dibayar), nol);
       const status: StatusButirTermin = sisa.isZero() ? "Lunas" : dibayar.gt(0) ? "Dibayar sebagian" : b.ditagihPada ? "Ditagih" : "Belum ditagih";
