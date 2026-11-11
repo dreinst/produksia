@@ -5,13 +5,16 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { D, format } from "@/lib/uang";
-import { pastikanAkunRinci } from "@/lib/baganAkun";
-import { akhirTahun, ringkasanPenutupan } from "@/lib/tutupBuku";
+import { D, format, jumlahkan, type Desimal } from "@/lib/uang";
+import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
+import { PERUSAHAAN_UTAMA } from "@/lib/perusahaan";
+import { akhirTahun, barisJurnalPenutup, ringkasanPenutupan, ringkasanPenutupanPerPerusahaan } from "@/lib/tutupBuku";
 import { dataLangsungDisetujui } from "@/lib/persetujuan";
 
 const HALAMAN = "/buku-besar/tutup-buku";
 const NOL = D(0);
+/** Tutup buku membaca saldo semua perusahaan di satu transaksi; batas bawaan Prisma 5 detik bisa terlewati. */
+const BATAS_WAKTU = 60_000;
 
 function bacaTahun(dataFormulir: FormData): number {
   const tahun = Number(String(dataFormulir.get("tahun") ?? "").trim());
@@ -28,8 +31,11 @@ async function segarkan() {
 }
 
 /**
- * Menutup tahun buku: setiap akun pendapatan/beban rinci dinolkan ke Laba Ditahan lewat satu jurnal JU-TUTUP
- * bertanggal 31 Desember tahun itu. Bila tahun yang ditutup adalah tahun buku aktif, tahun buku maju satu tahun.
+ * Menutup tahun buku untuk SEMUA perusahaan sekaligus (D1 §4.3, K4): untuk setiap perusahaan yang punya saldo
+ * pendapatan/beban, akun-akun itu dinolkan ke Laba Ditahan lewat satu jurnal JU-TUTUP milik perusahaan itu bertanggal
+ * 31 Desember. Satu baris TutupBuku (kunci tahun global, labaBersih = Σ semua perusahaan, jurnalId = JU-TUTUP utama)
+ * dan satu baris TutupBukuPerusahaan per jurnal. Bila satu perusahaan gagal, tidak ada yang ditutup.
+ * Bila tahun yang ditutup adalah tahun buku aktif, tahun buku maju satu tahun.
  */
 export async function tutupTahun(dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("tutup-buku.buat");
@@ -39,30 +45,51 @@ export async function tutupTahun(dataFormulir: FormData) {
   const pemetaan = await db.pemetaanAkun.findUnique({ where: { id: "default" }, include: { labaDitahan: true } });
   if (!pemetaan?.labaDitahanId || !pemetaan.labaDitahan) throw new Error("Pemetaan akun 'Laba Ditahan' belum diatur (Pengaturan > Pemetaan Akun)");
   await pastikanAkunRinci(db, [pemetaan.labaDitahanId]);
+  const labaDitahanId = pemetaan.labaDitahanId;
 
   await db.$transaction(async (tx) => {
-    const ringkasan = await ringkasanPenutupan(tx, tahun);
-    const baris = [
-      // pendapatan bersaldo kredit → didebit agar nol (saldo negatif = akun kontra, dikredit)
-      ...ringkasan.pendapatan.map((b) => ({ akunId: b.akunId, debit: b.saldo.gt(0) ? b.saldo : NOL, kredit: b.saldo.lt(0) ? b.saldo.neg() : NOL, keterangan: `Tutup ${b.kode} ${b.nama} ${tahun}` })),
-      // beban bersaldo debit → dikredit agar nol
-      ...ringkasan.beban.map((b) => ({ akunId: b.akunId, debit: b.saldo.lt(0) ? b.saldo.neg() : NOL, kredit: b.saldo.gt(0) ? b.saldo : NOL, keterangan: `Tutup ${b.kode} ${b.nama} ${tahun}` })),
-    ];
-    const laba = ringkasan.labaBersih;
-    if (!laba.isZero()) {
-      baris.push({ akunId: pemetaan.labaDitahanId!, debit: laba.lt(0) ? laba.neg() : NOL, kredit: laba.gt(0) ? laba : NOL, keterangan: `${laba.gte(0) ? "Laba" : "Rugi"} bersih ${tahun} ke Laba Ditahan` });
-    }
-    let jurnalId: string | null = null;
-    if (baris.length) {
-      await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
+    let labaTotal = NOL;
+    let jumlahAkun = 0;
+    let jurnalUtamaId: string | null = null;
+    const rincian: { perusahaanId: string; labaBersih: Desimal; jurnalId: string }[] = [];
+    for (const { perusahaan: p, ringkasan } of await ringkasanPenutupanPerPerusahaan(tx, tahun)) {
+      const baris = barisJurnalPenutup(ringkasan, labaDitahanId);
+      labaTotal = labaTotal.plus(ringkasan.labaBersih);
+      jumlahAkun += ringkasan.pendapatan.length + ringkasan.beban.length;
+      if (baris.length === 0) continue; // perusahaan tanpa saldo pendapatan/beban: tanpa jurnal penutup
+      const utama = p.id === PERUSAHAAN_UTAMA;
+      try {
+        await pastikanAkunRinci(tx, baris.map((b) => b.akunId));
+        // jurnal penutup dibuat langsung (bukan catatJurnal), jadi kepemilikan akun diperiksa sendiri (kontrak P11)
+        await pastikanAkunMilik(tx, baris.map((b) => b.akunId), p.id);
+      } catch (e) {
+        // pesan utama sama dengan sebelumnya; perusahaan lain disebut supaya pemilik tahu buku mana yang bermasalah
+        throw utama ? e : new Error(`Tutup buku ${p.kode} ${p.nama}: ${(e as Error).message}`);
+      }
+      if (!jumlahkan(baris.map((b) => b.debit)).equals(jumlahkan(baris.map((b) => b.kredit)))) {
+        throw new Error(`Jurnal penutup ${p.kode} tidak seimbang. Laporkan ke pengembang`);
+      }
       const nomor = await nomorDokumenBerikutnya(tx.jurnal, "JU-TUTUP");
       const jurnal = await tx.jurnal.create({
-        data: { nomor, tanggal: akhirTahun(tahun), keterangan: `Jurnal penutup tahun buku ${tahun} (laba bersih ${format(laba)})`, sumber: "PENUTUP", baris: { create: baris } },
+        data: {
+          nomor,
+          tanggal: akhirTahun(tahun),
+          keterangan: `Jurnal penutup tahun buku ${tahun}${utama ? "" : ` ${p.kode}`} (laba bersih ${format(ringkasan.labaBersih)})`,
+          sumber: "PENUTUP",
+          perusahaanId: p.id,
+          baris: { create: baris },
+        },
       });
-      jurnalId = jurnal.id;
+      if (utama) jurnalUtamaId = jurnal.id;
+      rincian.push({ perusahaanId: p.id, labaBersih: ringkasan.labaBersih, jurnalId: jurnal.id });
     }
+    // Pengaman: setiap jurnal milik tepat satu perusahaan, jadi Σ per perusahaan harus sama dengan gabungan
+    const gabungan = await ringkasanPenutupan(tx, tahun);
+    if (!gabungan.labaBersih.equals(labaTotal)) throw new Error("Laba per perusahaan tidak sama dengan laba gabungan. Laporkan ke pengembang");
     // Tutup buku belum ikut alur persetujuan; haknya sendiri sudah dibatasi ke Pemilik/Superadmin
-    await tx.tutupBuku.create({ data: { tahun, labaBersih: laba, penggunaNama: pengguna.nama, jurnalId, ...dataLangsungDisetujui(pengguna) } });
+    await tx.tutupBuku.create({
+      data: { tahun, labaBersih: labaTotal, penggunaNama: pengguna.nama, jurnalId: jurnalUtamaId, ...dataLangsungDisetujui(pengguna), rincianPerusahaan: { create: rincian } },
+    });
 
     // Tahun buku aktif ikut maju bila yang ditutup adalah tahun yang sedang dibuka
     const pengaturan = await tx.pengaturanPerusahaan.findUnique({ where: { id: "default" } });
@@ -71,24 +98,36 @@ export async function tutupTahun(dataFormulir: FormData) {
       await tx.pengaturanPerusahaan.upsert({ where: { id: "default" }, create: { id: "default", tahunBuku: tahun + 1 }, update: { tahunBuku: tahun + 1 } });
     }
     await tx.logAktivitas.create({
-      data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "TUTUP", jenis: "Tutup Buku", nomor: `TAHUN ${tahun}`, keterangan: `Laba bersih ${format(laba)} dipindahkan ke ${pemetaan.labaDitahan!.kode} ${pemetaan.labaDitahan!.nama}; ${ringkasan.pendapatan.length + ringkasan.beban.length} akun dinolkan` },
+      data: {
+        penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id,
+        penggunaNama: pengguna.nama,
+        aksi: "TUTUP",
+        jenis: "Tutup Buku",
+        nomor: `TAHUN ${tahun}`,
+        keterangan: `Laba bersih ${format(labaTotal)} dipindahkan ke ${pemetaan.labaDitahan!.kode} ${pemetaan.labaDitahan!.nama}; ${jumlahAkun} akun dinolkan; ${rincian.length} perusahaan`,
+      },
     });
-  });
+  }, { timeout: BATAS_WAKTU });
   await segarkan();
 }
 
-/** Membuka kembali tahun yang sudah ditutup: jurnal penutupnya dihapus, transaksi tahun itu bisa dicatat lagi. */
+/**
+ * Membuka kembali tahun yang sudah ditutup: semua jurnal penutup tahun itu (satu per perusahaan) dihapus, transaksi
+ * tahun itu bisa dicatat lagi. Tutup buku lama tanpa baris rincian tetap terbuka lewat TutupBuku.jurnalId.
+ */
 export async function bukaKembaliTahun(dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("tutup-buku.buat");
   const tahun = bacaTahun(dataFormulir);
-  const tutup = await db.tutupBuku.findUnique({ where: { tahun } });
+  const tutup = await db.tutupBuku.findUnique({ where: { tahun }, include: { rincianPerusahaan: { select: { jurnalId: true } } } });
   if (!tutup) throw new Error(`Tahun buku ${tahun} tidak dalam keadaan ditutup`);
+  const jurnalIds = [...new Set([tutup.jurnalId, ...tutup.rincianPerusahaan.map((r) => r.jurnalId)].filter((id): id is string => !!id))];
 
   await db.$transaction(async (tx) => {
+    // TutupBuku dihapus lebih dulu: baris rincian ikut terhapus (onDelete Cascade) sehingga jurnalnya bebas dihapus
     await tx.tutupBuku.delete({ where: { id: tutup.id } });
-    if (tutup.jurnalId) {
-      await tx.barisJurnal.deleteMany({ where: { jurnalId: tutup.jurnalId } });
-      await tx.jurnal.delete({ where: { id: tutup.jurnalId } });
+    if (jurnalIds.length > 0) {
+      await tx.barisJurnal.deleteMany({ where: { jurnalId: { in: jurnalIds } } });
+      await tx.jurnal.deleteMany({ where: { id: { in: jurnalIds } } });
     }
     const pengaturan = await tx.pengaturanPerusahaan.findUnique({ where: { id: "default" } });
     if (pengaturan?.tahunBuku === tahun + 1) {
