@@ -204,6 +204,14 @@ async function main() {
     return (await tx.penyesuaianPersediaan.findUniqueOrThrow({ where: { id: psDraf.id }, include: { jurnal: true } })).jurnal;
   });
   pastikan(posPs?.perusahaanId === U, "PS draf disetujui: jurnal milik perusahaan dokumen");
+  // draf yang dibuat sebelum perusahaannya diarsipkan tidak bisa disetujui (tinjauan P15 butir 10A)
+  await db.perusahaan.update({ where: { id: U }, data: { aktif: false } });
+  try {
+    await harusDitolak("setujui PS draf milik perusahaan arsip", () => dalamTxBatal((tx) => BERKAS.penyesuaian.posting(tx, psDraf.id)), "PT Uji Pewarisan sudah diarsipkan; aktifkan dulu");
+  } finally {
+    await db.perusahaan.update({ where: { id: U }, data: { aktif: true } });
+  }
+  pastikan((await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangU.id, gudangId: gudangU.id } } })).jumlah.equals(D(50)), "PS draf perusahaan arsip yang ditolak tidak mengubah stok");
   nomorLog.push(psDraf.nomor);
   await jalankan("hapus PS draf", () => hapusDokumen("penyesuaian", psDraf.id));
 
@@ -480,6 +488,33 @@ async function main() {
   const kasDraf = await db.dokumenKas.create({ data: { nomor: `${KODE}-KK-DRAF`, jenis: "KELUAR", akunKasId: akunRuj.id, akunLawanId: bebanB.id, jumlah: 1_000, dibuatOleh: "Uji", perusahaanId: PERUSAHAAN_UTAMA } });
   await harusDitolak("akun dokumen kas draf utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai dokumen kas ${KODE}-KK-DRAF DPRO yang belum disetujui`);
   await db.dokumenKas.delete({ where: { id: kasDraf.id } });
+  // draf penyesuaian stok, draf penggajian, dan aset tetap aktif perusahaan lain (tinjauan P15 butir 1)
+  const psRuj = await db.penyesuaianPersediaan.create({ data: { nomor: `${KODE}-PS-DRAF`, gudangId: gudangUt.id, akunLawanId: akunRuj.id, perusahaanId: PERUSAHAAN_UTAMA } });
+  try {
+    await harusDitolak("akun lawan draf penyesuaian utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai penyesuaian stok ${KODE}-PS-DRAF DPRO yang belum disetujui`);
+  } finally {
+    await db.penyesuaianPersediaan.delete({ where: { id: psRuj.id } });
+  }
+  const gajiRuj = await db.penggajian.create({ data: { nomor: `${KODE}-GJ-DRAF`, periode: `${KODE}-2016-06`, bulan: "2016-06", akunKasId: akunRuj.id, penggunaNama: "Uji", perusahaanId: PERUSAHAAN_UTAMA } });
+  try {
+    await harusDitolak("akun kas draf penggajian utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai penggajian ${KODE}-GJ-DRAF DPRO yang belum disetujui`);
+  } finally {
+    await db.penggajian.delete({ where: { id: gajiRuj.id } });
+  }
+  // aset yang sudah disetujui tetapi belum disusutkan: akun bebannya belum ada di jurnal mana pun
+  const asetRuj = await db.asetTetap.create({
+    data: { kode: `${KODE}-AST-RUJ`, nama: "Aset Uji Rujukan", hargaPerolehan: 1_000_000, umurBulan: 12, akunAsetId: kasB.id, akunBebanPenyusutanId: akunRuj.id, akunAkumulasiPenyusutanId: kasB.id, statusPersetujuan: "DISETUJUI", perusahaanId: PERUSAHAAN_UTAMA },
+  });
+  try {
+    await harusDitolak("akun beban penyusutan aset aktif utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai aset tetap ${KODE}-AST-RUJ DPRO; tidak bisa dijadikan milik PT Uji Pewarisan`);
+    await db.asetTetap.update({ where: { id: asetRuj.id }, data: { akunBebanPenyusutanId: bebanB.id, akunPembayaranId: akunRuj.id, statusPersetujuan: "DRAFT" } });
+    await harusDitolak("akun pembayaran draf aset utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `dipakai aset tetap ${KODE}-AST-RUJ DPRO`);
+    await db.asetTetap.update({ where: { id: asetRuj.id }, data: { status: "DIJUAL" } });
+    await jalankan("aset utama yang sudah dijual tidak menghalangi ganti pemilik", () => ubahAkun(ruj, U));
+    await jalankan("akun uji rujukan kembali bersama sesudah kasus aset", () => ubahAkun(ruj, ""));
+  } finally {
+    await db.asetTetap.delete({ where: { id: asetRuj.id } });
+  }
   await jalankan("akun tanpa rujukan perusahaan lain diberi pemilik", () => ubahAkun(ruj, U));
   pastikan((await db.akun.findUniqueOrThrow({ where: { id: akunRuj.id } })).perusahaanId === U, "akun tanpa rujukan perusahaan lain boleh diberi pemilik");
   // akun khusus data induk harus milik pemiliknya atau bersama

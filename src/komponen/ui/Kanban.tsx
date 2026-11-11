@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useOptimistic, useRef, useState, useTransition, type ReactElement } from "react";
+import { useEffect, useOptimistic, useRef, useState, useTransition, type KeyboardEvent as KeyboardEventReact, type ReactElement } from "react";
 import type { StatusFormulir } from "@/lib/statusFormulir";
 import Ikon from "@/komponen/ui/Ikon";
 
 /*
  * Papan kanban generik (D4 §7.4, ditambah lencana, titik, dan dialogAlasan dari D6 §7.10; DESAIN F10). Dipakai CRM
  * (pipeline lead) dan Pemasaran (konten, tugas desain). Kartu bisa diseret ke kolom lain atau dipindah lewat pilihan
- * "Pindah ke tahap" (layar sentuh dan papan ketik). Pemindahan optimistis: kartu langsung pindah, kembali ke posisi
- * lama bila aksi `pindah` mengembalikan galat. Data segar datang dari revalidatePath di aksi.
+ * "Pindah ke tahap" lalu tombol "Pindah" (layar sentuh dan papan ketik). Memilih tujuan belum memindah kartu, supaya
+ * panah papan ketik pada pilihan yang tertutup tidak langsung memindah kartu (tinjauan P15 butir 2, WCAG 3.2.2).
+ * Pemindahan optimistis: kartu langsung pindah, kembali ke posisi lama bila aksi `pindah` mengembalikan galat. Data
+ * segar datang dari revalidatePath di aksi. Sesudah pindah lewat papan ketik atau dialog, fokus kembali ke pilihan
+ * tujuan kartu itu di kolom barunya.
  */
 
 export type NadaKanban = "blue" | "emerald" | "rose" | "amber" | "slate";
@@ -37,6 +40,8 @@ const GARIS_NADA: Record<NadaKanban, string> = {
 };
 
 type Permintaan = { kartuId: string; kolomId: string };
+/** objek baru setiap kali diminta, supaya efek fokus berjalan lagi walau kartunya sama */
+type MintaFokus = { kartuId: string };
 
 export default function Kanban({
   kolom,
@@ -45,6 +50,7 @@ export default function Kanban({
   pindah,
   dialogAlasan,
   kosong = "Belum ada kartu",
+  tampilkanJumlah = false,
 }: {
   kolom: KolomKanban[];
   kartu: KartuKanban[];
@@ -53,12 +59,25 @@ export default function Kanban({
   /** per kolomId tujuan: pemindahan ke kolom itu meminta alasan lebih dulu */
   dialogAlasan?: Record<string, DialogAlasanKanban>;
   kosong?: string;
+  /** angka jumlah kartu di kepala kolom; bawaan mati karena pemakai D4 dan D6 sudah menaruh jumlah di judul atau ringkasan */
+  tampilkanJumlah?: boolean;
 }): ReactElement {
   const [tampil, pindahOptimis] = useOptimistic(kartu, (daftar: KartuKanban[], p: Permintaan) => daftar.map((k) => (k.id === p.kartuId ? { ...k, kolomId: p.kolomId } : k)));
   const [, mulai] = useTransition();
   const [pesan, setPesan] = useState<{ galat: boolean; teks: string } | null>(null);
   const [dialog, setDialog] = useState<Permintaan | null>(null);
   const [sorot, setSorot] = useState<string | null>(null);
+  const [fokus, setFokus] = useState<MintaFokus | null>(null);
+  const pilihan = useRef(new Map<string, HTMLSelectElement>());
+
+  // Kartu yang pindah dipasang ulang di kolom lain, sehingga fokus jatuh ke body. Kembalikan ke pilihan tujuan kartu
+  // itu, juga bila kartu kembali ke kolom lama karena galat. Fokus yang sudah dipindah pengguna tidak direbut.
+  useEffect(() => {
+    if (!fokus) return;
+    const aktif = document.activeElement;
+    if (aktif && aktif !== document.body) return;
+    pilihan.current.get(fokus.kartuId)?.focus();
+  }, [fokus, tampil]);
 
   const judulKolom = (id: string) => kolom.find((k) => k.id === id)?.judul ?? id;
 
@@ -75,8 +94,9 @@ export default function Kanban({
     });
   }
 
-  function minta(kartuId: string, kolomId: string) {
+  function minta(kartuId: string, kolomId: string, dariPilihan = false) {
     if (!bolehPindah) return;
+    if (dariPilihan) setFokus({ kartuId });
     const k = tampil.find((x) => x.id === kartuId);
     if (!k || k.kolomId === kolomId || !kolom.some((x) => x.id === kolomId)) return;
     if (dialogAlasan?.[kolomId]) {
@@ -88,16 +108,15 @@ export default function Kanban({
 
   return (
     <div className="space-y-3">
-      {pesan &&
-        (pesan.galat ? (
-          <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-            {pesan.teks}
-          </p>
-        ) : (
-          <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-            {pesan.teks}
-          </p>
-        ))}
+      {pesan?.galat && (
+        <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+          {pesan.teks}
+        </p>
+      )}
+      {/* wilayah live selalu terpasang; hanya isinya yang berganti supaya pembaca layar mengumumkannya */}
+      <div role="status" aria-live="polite" className={pesan && !pesan.galat ? "rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700" : "sr-only"}>
+        {pesan && !pesan.galat ? pesan.teks : ""}
+      </div>
 
       <div className="flex gap-4 overflow-x-auto pb-2">
         {kolom.map((kol) => {
@@ -127,7 +146,7 @@ export default function Kanban({
                 <div className="flex items-center gap-2">
                   {kol.nada && <span className={`w-2 h-2 rounded-full shrink-0 ${GARIS_NADA[kol.nada]}`} aria-hidden="true" />}
                   <h3 className="font-heading text-sm font-bold text-slate-900 truncate">{kol.judul}</h3>
-                  <span className="ml-auto text-xs text-slate-500 angka">{isi.length + (kol.lebihBanyak?.jumlah ?? 0)}</span>
+                  {tampilkanJumlah && <span className="ml-auto text-xs text-slate-500 angka">{isi.length + (kol.lebihBanyak?.jumlah ?? 0)}</span>}
                 </div>
                 {kol.ringkasan && <p className="text-xs text-slate-500">{kol.ringkasan}</p>}
               </header>
@@ -177,24 +196,14 @@ export default function Kanban({
                       </div>
                     )}
                     {bolehPindah && (
-                      <select
-                        aria-label="Pindah ke tahap"
-                        value=""
-                        onChange={(e) => {
-                          const tujuan = e.target.value;
-                          if (tujuan) minta(k.id, tujuan);
+                      <PindahKartu
+                        tujuan={kolom.filter((x) => x.id !== k.kolomId)}
+                        daftarkan={(el) => {
+                          if (el) pilihan.current.set(k.id, el);
+                          else pilihan.current.delete(k.id);
                         }}
-                        className="isian isian-kecil"
-                      >
-                        <option value="">Pindah ke…</option>
-                        {kolom
-                          .filter((x) => x.id !== k.kolomId)
-                          .map((x) => (
-                            <option key={x.id} value={x.id}>
-                              {x.judul}
-                            </option>
-                          ))}
-                      </select>
+                        onPindah={(kolomId) => minta(k.id, kolomId, true)}
+                      />
                     )}
                   </li>
                 ))}
@@ -213,9 +222,13 @@ export default function Kanban({
       {dialog && dialogAlasan?.[dialog.kolomId] && (
         <DialogAlasan
           isi={dialogAlasan[dialog.kolomId]}
-          onBatal={() => setDialog(null)}
+          onBatal={() => {
+            setFokus({ kartuId: dialog.kartuId });
+            setDialog(null);
+          }}
           onKonfirmasi={(alasan) => {
             const p = dialog;
+            setFokus({ kartuId: p.kartuId });
             setDialog(null);
             jalankan(p, alasan);
           }}
@@ -225,24 +238,89 @@ export default function Kanban({
   );
 }
 
+/**
+ * Pilihan tujuan dan tombol "Pindah" per kartu. Pilihan hanya menyimpan tujuan; kartu baru dipindah saat tombol
+ * ditekan (tinjauan P15 butir 2).
+ */
+function PindahKartu({ tujuan, daftarkan, onPindah }: { tujuan: KolomKanban[]; daftarkan: (el: HTMLSelectElement | null) => void; onPindah: (kolomId: string) => void }) {
+  const [pilih, setPilih] = useState("");
+  // tujuan yang sudah tidak ada (kartu baru pindah ke kolom itu) dianggap belum dipilih
+  const nilai = tujuan.some((x) => x.id === pilih) ? pilih : "";
+  return (
+    <div className="flex items-center gap-1.5">
+      <select ref={daftarkan} aria-label="Pindah ke tahap" value={nilai} onChange={(e) => setPilih(e.target.value)} className="isian isian-kecil min-w-0 flex-1">
+        <option value="">Pindah ke…</option>
+        {tujuan.map((x) => (
+          <option key={x.id} value={x.id}>
+            {x.judul}
+          </option>
+        ))}
+      </select>
+      <button
+        type="button"
+        disabled={!nilai}
+        onClick={() => {
+          setPilih("");
+          onPindah(nilai);
+        }}
+        className="tombol tombol-garis tombol-kecil shrink-0"
+      >
+        Pindah
+      </button>
+    </div>
+  );
+}
+
 /** Dialog alasan sebelum pindah ke kolom tertentu (mis. Kalah). Pola DialogVerifikasi; isian hilang saat ditutup. */
 function DialogAlasan({ isi, onBatal, onKonfirmasi }: { isi: DialogAlasanKanban; onBatal: () => void; onKonfirmasi: (alasan: string) => void }) {
   const [alasan, setAlasan] = useState("");
   const kotak = useRef<HTMLTextAreaElement>(null);
+  const bingkai = useRef<HTMLDivElement>(null);
+  const batal = useRef(onBatal);
   const kosong = isi.wajib && alasan.trim() === "";
+
+  // onBatal dari induk berganti di setiap render; simpan yang terbaru supaya efek di bawah tidak berjalan ulang
+  // dan tidak merebut fokus kembali ke isian alasan (tinjauan P15 butir 6)
+  useEffect(() => {
+    batal.current = onBatal;
+  });
 
   useEffect(() => {
     kotak.current?.focus();
     const tutup = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onBatal();
+      if (e.key === "Escape") batal.current();
     };
     window.addEventListener("keydown", tutup);
     return () => window.removeEventListener("keydown", tutup);
-  }, [onBatal]);
+  }, []);
+
+  // Tab dan Shift+Tab berputar di dalam dialog (aria-modal)
+  function jebakFokus(e: KeyboardEventReact<HTMLDivElement>) {
+    if (e.key !== "Tab" || !bingkai.current) return;
+    const bisa = [...bingkai.current.querySelectorAll<HTMLElement>("textarea, button:not([disabled])")];
+    if (bisa.length === 0) return;
+    const awal = bisa[0];
+    const akhir = bisa[bisa.length - 1];
+    if (e.shiftKey && document.activeElement === awal) {
+      e.preventDefault();
+      akhir.focus();
+    } else if (!e.shiftKey && document.activeElement === akhir) {
+      e.preventDefault();
+      awal.focus();
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-slate-900/40" onClick={onBatal}>
-      <div role="dialog" aria-modal="true" aria-labelledby="judul-alasan-kanban" className="muncul w-full max-w-lg rounded-xl bg-white shadow-xl border border-slate-200" onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={bingkai}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="judul-alasan-kanban"
+        className="muncul w-full max-w-lg rounded-xl bg-white shadow-xl border border-slate-200"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={jebakFokus}
+      >
         <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
           <Ikon nama="edit_note" className="!text-[22px] text-blue-600" />
           <h2 id="judul-alasan-kanban" className="font-heading text-base font-bold text-slate-900">

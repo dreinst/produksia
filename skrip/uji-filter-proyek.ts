@@ -8,7 +8,7 @@ import { db } from "../src/lib/db";
 import { D } from "../src/lib/uang";
 import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, saldoAntarPerusahaan, type Lingkup } from "../src/lib/perusahaan";
 import { LABEL_STATUS_PROYEK, STATUS_PROYEK, daftarProyekAktif } from "../src/lib/proyek";
-import { bacaFilterProyek, filterProyekSah, opsiFilterProyek, proyekBawaan, whereFilterProyek } from "../src/lib/filterProyek";
+import { bacaFilterProyek, filterProyekSah, opsiFilterProyek, proyekBawaan, whereFilterProyek, whereFilterProyekLewat } from "../src/lib/filterProyek";
 import FilterProyek from "../src/komponen/proyek/FilterProyek";
 import LencanaProyek from "../src/komponen/proyek/LencanaProyek";
 import TitikWarnaProyek from "../src/komponen/proyek/TitikWarnaProyek";
@@ -95,6 +95,15 @@ async function main() {
     (await db.fakturPembelian.count({ where: { pesanan: whereFilterProyek("tanpa") } })) === (await db.fakturPembelian.count({ where: { pesanan: { proyekId: null } } })),
     "penyaring lewat relasi induk (faktur pembelian ke pesanan) sama dengan kueri langsung",
   );
+  // relasi induk opsional: faktur penjualan tanpa pesanan ikut "Tanpa proyek" (tinjauan P15 butir 10B)
+  pastikan(JSON.stringify(whereFilterProyekLewat("pesanan", "pesananId", "")) === "{}", "whereFilterProyekLewat semua = penyaring kosong");
+  pastikan(
+    JSON.stringify(whereFilterProyekLewat("pesanan", "pesananId", "tanpa")) === JSON.stringify({ OR: [{ pesananId: null }, { pesanan: { proyekId: null } }] }) &&
+      JSON.stringify(whereFilterProyekLewat("pesanan", "pesananId", "cmabc123")) === JSON.stringify({ pesanan: { proyekId: "cmabc123" } }),
+    "whereFilterProyekLewat tanpa = tanpa induk atau induk tanpa proyek; id = induk berproyek itu",
+  );
+  const fjTanpa = (await db.fakturPenjualan.count({ where: { pesananId: null } })) + (await db.fakturPenjualan.count({ where: { pesanan: { proyekId: null } } }));
+  pastikan((await db.fakturPenjualan.count({ where: whereFilterProyekLewat("pesanan", "pesananId", "tanpa") })) === fjTanpa, `faktur penjualan tanpa proyek mencakup faktur tanpa pesanan (${fjTanpa})`);
   pastikan((await filterProyekSah(db, pJalan.id)) === pJalan.id, "filterProyekSah: id proyek yang ada dipertahankan");
   pastikan((await filterProyekSah(db, "cmtidakada000")) === "", "filterProyekSah: id proyek yang tidak ada dianggap semua");
   pastikan((await filterProyekSah(db, "tanpa")) === "tanpa" && (await filterProyekSah(db, "")) === "", "filterProyekSah: semua dan tanpa tidak berubah");
@@ -152,6 +161,27 @@ async function main() {
   const jumlahPerusahaan = await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } });
   pastikan(catatan.includes(`Laporan gabungan = penjumlahan ${jumlahPerusahaan} perusahaan. Transaksi antar perusahaan belum dieliminasi.`), `CatatanGabungan menyebut ${jumlahPerusahaan} perusahaan (perusahaan arsip tanpa jurnal tidak dihitung)`);
   pastikan(catatan.includes("Piutang Antar Perusahaan Rp") && catatan.includes("selisih") && !catatan.includes("lencana-amber") && !catatan.includes("hanya dicatat di satu sisi"), "CatatanGabungan data seed: selisih nol tanpa peringatan");
+  // akun antar perusahaan bermasalah: tanpa kalimat satu sisi dan tanpa amber (tinjauan P15 butir 9)
+  // piutang antar perusahaan wajib akun Aset rinci tanpa pemilik; akun pendapatan pasti ditolak
+  const akunBerpemilik = await db.akun.findFirst({ where: { jenis: "PENDAPATAN", kelompok: false }, select: { id: true } });
+  const petaPiutang = await db.pemetaanAkunTambahan.findUnique({ where: { kunci: "piutang-antar-perusahaan" } });
+  if (akunBerpemilik) {
+    if (petaPiutang) await db.pemetaanAkunTambahan.update({ where: { id: petaPiutang.id }, data: { akunId: akunBerpemilik.id } });
+    else await db.pemetaanAkunTambahan.create({ data: { kunci: "piutang-antar-perusahaan", label: "Piutang Antar Perusahaan", akunId: akunBerpemilik.id, dibuatOleh: KODE } });
+    try {
+      const salah = await saldoAntarPerusahaan(db, sekarang);
+      const catatanSalah = html(await CatatanGabungan({ sampai: sekarang }));
+      pastikan(
+        salah.masalah.length > 0 && catatanSalah.includes("Selisih belum bisa dihitung karena akun antar perusahaan bermasalah") && !catatanSalah.includes("lencana-amber") && !catatanSalah.includes("hanya dicatat di satu sisi"),
+        "CatatanGabungan dengan akun antar perusahaan bermasalah: alasan tampil tanpa peringatan satu sisi",
+      );
+    } finally {
+      if (petaPiutang) await db.pemetaanAkunTambahan.update({ where: { id: petaPiutang.id }, data: { akunId: petaPiutang.akunId } });
+      else await db.pemetaanAkunTambahan.deleteMany({ where: { kunci: "piutang-antar-perusahaan", dibuatOleh: KODE } });
+    }
+  } else {
+    pastikan(true, "tidak ada akun pendapatan, kasus akun bermasalah dilewati");
+  }
 
   console.log("=== 7. KolomPerusahaan ===");
   const daftar = await daftarPerusahaan(true);
@@ -167,6 +197,14 @@ async function main() {
   pastikan(lingkupArsip.includes("<select") && !lingkupArsip.includes(`value="${arsip.id}"`) && lingkupArsip.includes("PT Uji Filter Arsip sudah diarsipkan"), "lingkup perusahaan arsip: pilihan wajib, perusahaan arsip tidak dikirim diam-diam");
   const namaLain = html(createElement(KolomPerusahaan, { lingkup: lingkupSatu, daftar, nama: "perusahaanPemberiId", label: "Perusahaan pemberi" }));
   pastikan(namaLain.includes('name="perusahaanPemberiId"') && namaLain.includes("Perusahaan pemberi"), "nama dan label isian bisa diganti");
+  // selaluPilih (tinjauan P15 butir 3): pilihan wajib walau lingkup satu perusahaan, bawaan perusahaan lingkup
+  const penerima = html(createElement(KolomPerusahaan, { lingkup: lingkupSatu, daftar, nama: "penerimaId", label: "Perusahaan penerima", selaluPilih: true }));
+  pastikan(
+    penerima.includes('<select id="penerimaId" name="penerimaId" required=""') && penerima.includes(`value="${pt.id}" selected=""`) && penerima.includes("Perusahaan penerima *") && !penerima.includes('type="hidden"'),
+    "selaluPilih: lingkup satu perusahaan tetap berupa pilihan wajib dengan perusahaan lingkup terpilih",
+  );
+  const penerimaGabungan = html(createElement(KolomPerusahaan, { lingkup: { perusahaanId: null, perusahaan: null, bolehGabungan: true }, daftar, nama: "penerimaId", selaluPilih: true }));
+  pastikan(penerimaGabungan.includes('value="" selected=""') && !penerimaGabungan.includes(`value="${arsip.id}"`), "selaluPilih di gabungan: belum ada yang terpilih, perusahaan arsip tidak ditawarkan");
 
   console.log("=== 8. FilterProyek, LencanaProyek, TitikWarnaProyek ===");
   const filter = html(createElement(FilterProyek, { nilai: "", daftar: daftarUji, tambahan: { q: "abc", hal: "3", proyek: "lama", kosong: undefined } }));
@@ -176,7 +214,9 @@ async function main() {
   const filterArsip = html(createElement(FilterProyek, { nilai: pArsip.id, daftar: daftarUji }));
   pastikan(filterArsip.includes(`${KODE}-ARSIP - Event ARSIP · Diarsipkan`) && filterArsip.includes(`value="${pArsip.id}" selected=""`), "FilterProyek: proyek arsip yang terpilih tetap tampil dan terpilih");
   const filterHilang = html(createElement(FilterProyek, { nilai: "cmtidakada000", daftar: daftarUji }));
-  pastikan(filterHilang.includes('value="" selected=""'), "FilterProyek: id yang tidak ada tampil sebagai semua proyek");
+  pastikan(filterHilang.includes('value="cmtidakada000" selected=""') && filterHilang.includes(">Proyek di luar lingkup<"), "FilterProyek: id di luar daftar tetap terlihat sebagai saringan aktif (tinjauan P15 butir 4)");
+  pastikan(!filter.includes("Proyek di luar lingkup") && filter.includes('value="" selected=""'), "FilterProyek tanpa saringan: tanpa pilihan di luar lingkup");
+  pastikan(filter.includes('type="submit"') && filter.includes("sr-only focus:not-sr-only") && !filter.includes("<noscript"), "FilterProyek: tombol Terapkan muncul saat fokus untuk papan ketik (tinjauan P15 butir 5)");
   const lencana = html(createElement(LencanaProyek, { proyek: { kode: pJalan.kode, nama: pJalan.nama, warna: pJalan.warna } }));
   pastikan(lencana.includes("background-color:#2563eb") && lencana.includes(">Event JALAN<") && lencana.includes(`title="${KODE}-JALAN Event JALAN"`), "LencanaProyek: titik warna proyek, nama, dan kode sebagai judul");
   pastikan(html(createElement(LencanaProyek, { proyek: null })) === "", "LencanaProyek tidak dirender untuk dokumen tanpa proyek");
@@ -236,9 +276,14 @@ async function main() {
   pastikan(papan.includes('href="/contoh/k1"') && papan.includes("PT Contoh") && papan.includes("bg-pink-500") && papan.includes("Rp 1.000.000") && papan.includes('class="lencana lencana-amber">Instagram<'), "Kanban: kartu bertaut dengan subjudul, titik, baris, dan lencana");
   pastikan((papan.match(/Belum ada lead/g) ?? []).length === 2, "Kanban: teks kolom kosong di kolom tanpa kartu");
   pastikan((papan.match(/draggable="true"/g) ?? []).length === 2 && (papan.match(/aria-label="Pindah ke tahap"/g) ?? []).length === 2 && papan.includes("drag_indicator"), "Kanban boleh pindah: kartu bisa diseret dan punya pilihan Pindah ke tahap");
+  pastikan((papan.match(/<button type="button" disabled="" class="tombol tombol-garis tombol-kecil shrink-0">Pindah<\/button>/g) ?? []).length === 2, "Kanban: tombol Pindah terpisah dan nonaktif sampai tujuan dipilih (tinjauan P15 butir 2)");
+  pastikan(papan.includes('role="status" aria-live="polite" class="sr-only"') && !papan.includes('role="alert"'), "Kanban: wilayah status selalu terpasang, alert hanya saat galat (tinjauan P15 butir 6)");
+  pastikan(!papan.includes('class="ml-auto text-xs text-slate-500 angka"'), "Kanban: angka jumlah kartu mati secara bawaan (tinjauan P15 butir 8)");
+  const papanJumlah = html(createElement(Kanban, { kolom, kartu, bolehPindah: true, pindah, tampilkanJumlah: true }));
+  pastikan(papanJumlah.includes('class="ml-auto text-xs text-slate-500 angka">2<') && papanJumlah.includes('class="ml-auto text-xs text-slate-500 angka">3<'), "Kanban tampilkanJumlah: jumlah kartu ditambah kartu lainnya");
   pastikan(papan.includes('href="/contoh?tahap=kalah"') && papan.includes("3 lainnya"), "Kanban: tautan kartu lainnya di kolom yang terpotong");
   const papanBaca = html(createElement(Kanban, { kolom, kartu, bolehPindah: false, pindah }));
-  pastikan(!papanBaca.includes('draggable="true"') && !papanBaca.includes("Pindah ke tahap") && !papanBaca.includes("drag_indicator") && papanBaca.includes("Belum ada kartu"), "Kanban tanpa hak pindah: tanpa seret dan pilihan pindah, teks kosong bawaan");
+  pastikan(!papanBaca.includes('draggable="true"') && !papanBaca.includes("Pindah ke tahap") && !papanBaca.includes(">Pindah<") && !papanBaca.includes("drag_indicator") && papanBaca.includes("Belum ada kartu"), "Kanban tanpa hak pindah: tanpa seret dan pilihan pindah, teks kosong bawaan");
 
   console.log("=== 11. Komponen klien tanpa impor server (L10) ===");
   const terlarang = /^\s*import\s+(?!type\b)[^;]*from\s+["'](@\/lib\/db|@\/prisma-klien\/client|@\/lib\/perusahaan)["']/m;

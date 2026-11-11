@@ -7,7 +7,8 @@ import type { Prisma, PrismaClient } from "@/prisma-klien/client";
  * - "tanpa"  = dokumen tanpa proyek
  * - lainnya  = id proyek
  * Model tanpa kolom proyekId sendiri (faktur, penerimaan, retur) dibungkus pemanggil lewat relasi induknya, mis.
- * `{ pesanan: whereFilterProyek(f) }`; saringan tidak dipasang sama sekali bila f === "".
+ * `{ pesanan: whereFilterProyek(f) }`; saringan tidak dipasang sama sekali bila f === "". Bila relasi induknya opsional
+ * (mis. FakturPenjualan.pesananId), pakai whereFilterProyekLewat supaya dokumen tanpa induk ikut "Tanpa proyek".
  */
 
 export type FilterProyek = "" | "tanpa" | string;
@@ -36,6 +37,25 @@ export function whereFilterProyek(f: FilterProyek): { proyekId?: string | null }
   if (f === "") return {};
   if (f === FILTER_TANPA_PROYEK) return { proyekId: null };
   return { proyekId: f };
+}
+
+/**
+ * Penyaring lewat relasi induk yang opsional (tinjauan P15 butir 10B). "Tanpa proyek" mencakup dokumen tanpa induk
+ * (`kolomFk` null) dan dokumen yang induknya tanpa proyek; satu proyek = induknya berproyek itu.
+ * Contoh: `whereFilterProyekLewat("pesanan", "pesananId", f)`.
+ */
+type WhereLewat<R extends string, K extends string> = Partial<Record<R, { proyekId: string | null }>> & {
+  OR?: (Partial<Record<K, null>> | Partial<Record<R, { proyekId: null }>>)[];
+};
+
+export function whereFilterProyekLewat<R extends string, K extends string>(
+  relasi: R,
+  kolomFk: K,
+  f: FilterProyek,
+): WhereLewat<R, K> {
+  if (f === "") return {};
+  if (f === FILTER_TANPA_PROYEK) return { OR: [{ [kolomFk]: null }, { [relasi]: { proyekId: null } }] } as WhereLewat<R, K>;
+  return { [relasi]: { proyekId: f } } as WhereLewat<R, K>;
 }
 
 /**

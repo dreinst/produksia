@@ -152,16 +152,27 @@ const KOLOM_AKUN_BARANG = ["akunPendapatanId", "akunPersediaanId", "akunHppId", 
  * pengaturan memakai akun baris "default" milik utama), akun khusus barang atau karyawan yang bukan milik `baru`
  * (termasuk jasa bersama), atau dokumen kas perusahaan lain yang belum disetujui tidak bisa diberi pemilik. Tanpa
  * pemeriksaan ini galatnya baru muncul saat perusahaan lain mencatat transaksi.
+ * Hal yang sama berlaku untuk draf penyesuaian stok dan penggajian perusahaan lain, serta aset tetap aktif (draf
+ * maupun sudah disetujui) perusahaan lain, karena akun penyusutannya baru masuk jurnal saat penyusutan berjalan
+ * (tinjauan P15 butir 1).
  */
 async function pastikanAkunTanpaRujukanLain(id: string, kode: string, baru: string): Promise<void> {
   const milik = `tidak bisa dijadikan milik ${await namaPerusahaan(db, baru)}`;
-  const [pemetaan, tambahan, pengaturan, barang, karyawan, kas] = await Promise.all([
+  const belumDisetujui = { NOT: { perusahaanId: baru }, statusPersetujuan: { not: "DISETUJUI" as const } };
+  const [pemetaan, tambahan, pengaturan, barang, karyawan, kas, penyesuaian, gaji, aset] = await Promise.all([
     db.pemetaanAkun.count({ where: { OR: KOLOM_PEMETAAN_AKUN.map((k) => ({ [k]: id })) } }),
     db.pemetaanAkunTambahan.findFirst({ where: { akunId: id }, select: { kunci: true } }),
     db.pengaturanPerusahaan.findMany({ where: { OR: KOLOM_AKUN_PAJAK.map((k) => ({ [k]: id })) }, select: { id: true, perusahaanId: true } }),
     db.barang.findFirst({ where: { AND: [{ OR: KOLOM_AKUN_BARANG.map((k) => ({ [k]: id })) }, { OR: [{ perusahaanId: null }, { perusahaanId: { not: baru } }] }] }, select: { kode: true, perusahaanId: true }, orderBy: { kode: "asc" } }),
     db.karyawan.findFirst({ where: { akunBebanId: id, NOT: { perusahaanId: baru } }, select: { kode: true, perusahaanId: true }, orderBy: { kode: "asc" } }),
     db.dokumenKas.findFirst({ where: { OR: [{ akunKasId: id }, { akunLawanId: id }], NOT: { perusahaanId: baru }, statusPersetujuan: { not: "DISETUJUI" } }, select: { nomor: true, perusahaanId: true }, orderBy: { nomor: "asc" } }),
+    db.penyesuaianPersediaan.findFirst({ where: { akunLawanId: id, ...belumDisetujui }, select: { nomor: true, perusahaanId: true }, orderBy: { nomor: "asc" } }),
+    db.penggajian.findFirst({ where: { akunKasId: id, ...belumDisetujui }, select: { nomor: true, perusahaanId: true }, orderBy: { nomor: "asc" } }),
+    db.asetTetap.findFirst({
+      where: { OR: [{ akunAsetId: id }, { akunBebanPenyusutanId: id }, { akunAkumulasiPenyusutanId: id }, { akunPembayaranId: id }], NOT: { perusahaanId: baru }, status: "AKTIF" },
+      select: { kode: true, perusahaanId: true },
+      orderBy: { kode: "asc" },
+    }),
   ]);
   if (pemetaan > 0 || tambahan) throw new Error(`Akun ${kode} dipakai pemetaan akun${tambahan ? ` tambahan ${tambahan.kunci}` : ""} yang berlaku untuk semua perusahaan; ${milik}`);
   const pajakLain = pengaturan.filter((p) => p.perusahaanId !== baru).map((p) => p.perusahaanId);
@@ -174,6 +185,9 @@ async function pastikanAkunTanpaRujukanLain(id: string, kode: string, baru: stri
   if (barang) throw new Error(`Akun ${kode} dipakai akun khusus barang ${barang.kode} ${barang.perusahaanId ? `milik ${await daftarKodePerusahaan([barang.perusahaanId])}` : "bersama"}; ${milik}`);
   if (karyawan) throw new Error(`Akun ${kode} dipakai akun beban karyawan ${karyawan.kode} di ${await daftarKodePerusahaan([karyawan.perusahaanId])}; ${milik}`);
   if (kas) throw new Error(`Akun ${kode} dipakai dokumen kas ${kas.nomor} ${await daftarKodePerusahaan([kas.perusahaanId])} yang belum disetujui; ${milik}`);
+  if (penyesuaian) throw new Error(`Akun ${kode} dipakai penyesuaian stok ${penyesuaian.nomor} ${await daftarKodePerusahaan([penyesuaian.perusahaanId])} yang belum disetujui; ${milik}`);
+  if (gaji) throw new Error(`Akun ${kode} dipakai penggajian ${gaji.nomor} ${await daftarKodePerusahaan([gaji.perusahaanId])} yang belum disetujui; ${milik}`);
+  if (aset) throw new Error(`Akun ${kode} dipakai aset tetap ${aset.kode} ${await daftarKodePerusahaan([aset.perusahaanId])}; ${milik}`);
 }
 
 /**

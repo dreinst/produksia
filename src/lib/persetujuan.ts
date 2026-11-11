@@ -318,8 +318,11 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     posting: async (tx, id) => {
       const p = await tx.penyesuaianPersediaan.findUniqueOrThrow({
         where: { id },
-        include: { baris: { include: { barang: { select: { kode: true, nama: true } } } } },
+        include: { baris: { include: { barang: { select: { kode: true, nama: true } } } }, perusahaan: { select: { nama: true, aktif: true } } },
       });
+      // sama dengan pastikanPerusahaanAktif (tinjauan P15 butir 10A): draf yang dibuat sebelum perusahaannya
+      // diarsipkan tidak boleh mengubah stok dan buku perusahaan arsip saat disetujui
+      if (!p.perusahaan.aktif) throw new Error(`Perusahaan ${p.perusahaan.nama} sudah diarsipkan; aktifkan dulu`);
       for (const b of p.baris) {
         const stok = await tx.stokBarang.findUnique({ where: { barangId_gudangId: { barangId: b.barangId, gudangId: p.gudangId } } });
         const sekarang = D(stok?.jumlah ?? 0);

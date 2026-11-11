@@ -7,6 +7,9 @@ import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
  * - Lingkup gabungan: pilihan wajib berisi perusahaan aktif.
  * - Lingkup perusahaan yang sudah diarsipkan: pilihan wajib seperti gabungan, karena dokumen baru tidak bisa dibuat
  *   untuk perusahaan arsip dan perusahaan lain tidak boleh terpilih diam-diam.
+ * - `selaluPilih`: selalu berupa pilihan wajib, dengan perusahaan lingkup (bila aktif) sebagai bawaan. Dipakai bila
+ *   satu formulir memuat dua perusahaan, mis. penerima transaksi antar perusahaan (tinjauan P15 butir 3), supaya
+ *   pengguna di lingkup satu perusahaan tetap bisa memilih perusahaan lain.
  * Server tetap memvalidasi isiannya (perusahaanDokumenBaru).
  */
 export default function KolomPerusahaan({
@@ -14,17 +17,19 @@ export default function KolomPerusahaan({
   daftar,
   nama = "perusahaanId",
   label = "Perusahaan",
+  selaluPilih = false,
 }: {
   lingkup: Lingkup;
   /** perusahaan aktif (daftarPerusahaan()) */
   daftar: RingkasPerusahaan[];
   nama?: string;
   label?: string;
+  selaluPilih?: boolean;
 }) {
   const aktif = daftar.filter((p) => p.aktif);
   const satu = lingkup.perusahaan && aktif.some((p) => p.id === lingkup.perusahaan?.id) ? lingkup.perusahaan : null;
 
-  if (satu) {
+  if (satu && !selaluPilih) {
     return (
       <div className="bidang">
         <input type="hidden" name={nama} value={satu.id} />
@@ -43,7 +48,7 @@ export default function KolomPerusahaan({
       <label className="label" htmlFor={nama}>
         {label} *
       </label>
-      <select id={nama} name={nama} required defaultValue="" className="isian">
+      <select id={nama} name={nama} required defaultValue={satu?.id ?? ""} className="isian">
         <option value="">Pilih perusahaan…</option>
         {aktif.map((p) => (
           <option key={p.id} value={p.id}>
