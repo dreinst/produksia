@@ -1,130 +1,192 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { punyaHak } from "@/lib/hakAkses";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
-import { simpanPengaturanPerusahaanFormulir } from "@/lib/aksi/pengaturan";
+import { PERUSAHAAN_UTAMA, saldoAntarPerusahaan } from "@/lib/perusahaan";
+import { simpanPengaturanUmumFormulir } from "@/lib/aksi/pengaturan";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import Ikon from "@/komponen/ui/Ikon";
 
-type OpsiAkun = { id: string; kode: string; nama: string; jenis: string };
+const LABEL_JENIS: Record<string, string> = { AGENSI: "Agensi", MEREK: "Merek", KLIEN: "Klien" };
 
-function PilihAkunPajak({ nama, label, nilai, daftar, petunjuk }: { nama: string; label: string; nilai: string; daftar: OpsiAkun[]; petunjuk: string }) {
-  return (
-    <div className="bidang">
-      <label className="label" htmlFor={nama}>{label}</label>
-      <select id={nama} name={nama} defaultValue={nilai} className="isian">
-        <option value="">Tidak dipakai</option>
-        {daftar.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.kode} - {a.nama}
-          </option>
-        ))}
-      </select>
-      <span className="petunjuk">{petunjuk}</span>
-    </div>
-  );
-}
-
+/**
+ * Perusahaan & Pajak (D1 §7.2): daftar perusahaan grup, pengaturan umum yang berlaku untuk semua perusahaan (tahun
+ * buku dan wajib persetujuan), akun antar perusahaan, dan tautan integritas. Nama, pajak, dan akun pajak tiap
+ * perusahaan (termasuk utama) diubah di /pengaturan/perusahaan/[id].
+ */
 export default async function HalamanPengaturanPerusahaan() {
-  await wajibHak("pengaturan.tulis");
-  const [pengaturan, daftarAkun, tersimpan] = await Promise.all([
+  const pengguna = await wajibHak("pengaturan.tulis");
+  const [daftar, pengaturanUtama, tersimpan, barisPengaturan, antar] = await Promise.all([
+    db.perusahaan.findMany({
+      orderBy: [{ urutan: "asc" }, { nama: "asc" }],
+      select: { id: true, kode: true, nama: true, namaLegal: true, jenis: true, npwp: true, warna: true, aktif: true },
+    }),
     ambilPengaturanPerusahaan(db),
-    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["ASET", "KEWAJIBAN", "BEBAN"] } }, orderBy: { kode: "asc" } }),
     db.pengaturanPerusahaan.findUnique({ where: { id: "default" } }),
+    db.pengaturanPerusahaan.findMany({ select: { perusahaanId: true, pkp: true, terminHari: true } }),
+    saldoAntarPerusahaan(db, new Date()),
   ]);
-  const byKode = (kode: string) => daftarAkun.find((a) => a.kode === kode)?.id ?? "";
-  // bawaan dari bagan akun standar bila belum pernah disimpan
-  const nilai = {
-    akunPpnKeluaranId: pengaturan.akunPpnKeluaranId ?? byKode("2-1330"),
-    akunPpnMasukanId: pengaturan.akunPpnMasukanId ?? byKode("1-1800"),
-    akunPph23DimukaId: pengaturan.akunPph23DimukaId ?? byKode("1-1900"),
-    akunPph23DipotongId: pengaturan.akunPph23DipotongId ?? byKode("2-1320"),
-    akunBebanPphFinalId: pengaturan.akunBebanPphFinalId ?? byKode("5-9100"),
-    akunHutangPphFinalId: pengaturan.akunHutangPphFinalId ?? byKode("2-1320"),
-  };
-  const aset = daftarAkun.filter((a) => a.jenis === "ASET");
-  const kewajiban = daftarAkun.filter((a) => a.jenis === "KEWAJIBAN");
-  const beban = daftarAkun.filter((a) => a.jenis === "BEBAN");
+  // perusahaan tanpa baris pengaturan memakai bawaan: non-PKP, termin 14 hari (D1 §3.6)
+  const pajakPer = new Map(barisPengaturan.map((b) => [b.perusahaanId, b]));
+  const pajak = (id: string) => (id === PERUSAHAAN_UTAMA ? pengaturanUtama : (pajakPer.get(id) ?? { pkp: false, terminHari: 14 }));
+  const bolehPemetaan = punyaHak(pengguna, "pemetaan.tulis");
+  const bolehIntegritas = punyaHak(pengguna, "buku-besar.lihat");
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-5xl">
       <KepalaHalaman
         jejak={[{ label: "Administrasi" }, { label: "Pengaturan" }]}
         judul="Perusahaan & Pajak"
-        subjudul="Identitas perusahaan, tahun buku, status PKP, tarif PPN, termin faktur, dan akun pajak yang dipakai jurnal otomatis."
-        lencana={<span className={`lencana ${tersimpan ? "lencana-emerald" : "lencana-amber"}`}>{tersimpan ? "Tersimpan" : "Masih bawaan"}</span>}
+        subjudul="Entitas grup D'Pro, pajak tiap perusahaan, dan pengaturan umum yang berlaku untuk semua perusahaan."
+        aksi={
+          <Link className="tombol tombol-utama" href="/pengaturan/perusahaan/baru">
+            + Perusahaan
+          </Link>
+        }
       />
 
-      <FormulirAksi aksi={simpanPengaturanPerusahaanFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4" pesanSukses="Pengaturan perusahaan tersimpan.">
-        <div className="bidang md:col-span-2">
-          <label className="label" htmlFor="nama">Nama perusahaan *</label>
-          <input id="nama" name="nama" required defaultValue={pengaturan.nama} className="isian" />
-          <span className="petunjuk">Tampil di sidebar dan dokumen</span>
+      <div className="kartu kartu-tabel">
+        <div className="kepala-kartu">
+          <div>
+            <h2 className="judul-kartu">Daftar perusahaan</h2>
+            <p className="subjudul-kartu">Nama, status PKP, tarif PPN, termin faktur, dan akun pajak tiap perusahaan diubah lewat tombol Ubah.</p>
+          </div>
         </div>
-
-        <div className="bidang">
-          <label className="label" htmlFor="terminHari">Termin jatuh tempo faktur (hari)</label>
-          <input id="terminHari" name="terminHari" type="number" min={0} max={365} defaultValue={pengaturan.terminHari} className="isian" />
-          <span className="petunjuk">TOP bawaan: tanggal faktur + termin</span>
+        <div className="bungkus-tabel">
+          <table className="tabel min-w-[44rem]">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama</th>
+                <th>Jenis</th>
+                <th>NPWP</th>
+                <th>PKP</th>
+                <th className="text-right">Termin</th>
+                <th>Status</th>
+                <th className="th-lekat" />
+              </tr>
+            </thead>
+            <tbody>
+              {daftar.map((p) => {
+                const pj = pajak(p.id);
+                // utama: nama dari baris pengaturan "default", sama dengan kartu bilah samping
+                const nama = p.id === PERUSAHAAN_UTAMA ? pengaturanUtama.nama : p.nama;
+                return (
+                  <tr key={p.id}>
+                    <td><LencanaPerusahaan kode={p.kode} warna={p.warna} nama={nama} /></td>
+                    <td>
+                      <div className="font-semibold text-slate-900">{nama}</div>
+                      {p.namaLegal && <div className="text-xs text-slate-500">{p.namaLegal}</div>}
+                    </td>
+                    <td>{LABEL_JENIS[p.jenis] ?? p.jenis}</td>
+                    <td className="mono text-slate-600">{p.npwp ?? "-"}</td>
+                    <td>{pj.pkp ? "Ya" : "Tidak"}</td>
+                    <td className="text-right angka">{pj.terminHari} hari</td>
+                    <td>
+                      <span className={`lencana ${p.aktif ? "lencana-emerald" : "lencana-slate"}`}>{p.aktif ? "Aktif" : "Diarsipkan"}</span>
+                    </td>
+                    <td className="text-right td-lekat">
+                      <Link href={`/pengaturan/perusahaan/${p.id}`} className="tombol-tautan" aria-label={`Ubah ${p.kode}`}>
+                        Ubah
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+              {daftar.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="kosong">Belum ada perusahaan</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        <div className="bidang">
-          <label className="label" htmlFor="tahunBuku">Tahun buku yang dibuka</label>
-          <input id="tahunBuku" name="tahunBuku" type="number" min={2000} max={2100} defaultValue={tersimpan?.tahunBuku ?? ""} placeholder={String(new Date().getFullYear())} className="isian" />
-          <span className="petunjuk">Bawaan periode laporan & pintasan; kosongkan untuk mengikuti tahun kalender. Bisa diganti cepat dari kartu perusahaan di sidebar</span>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <FormulirAksi aksi={simpanPengaturanUmumFormulir} className="kartu grid grid-cols-1 gap-4" pesanSukses="Pengaturan umum tersimpan.">
+          <div>
+            <h2 className="judul-kartu">Pengaturan umum (semua perusahaan)</h2>
+            <p className="subjudul-kartu">Tahun buku dan alur persetujuan berlaku sama untuk semua perusahaan.</p>
+          </div>
 
-        <div className="bidang">
-          <label className="label" htmlFor="mataUang">Mata uang</label>
-          <input id="mataUang" value="Rupiah (IDR)" readOnly className="isian bg-slate-50" />
-          <span className="petunjuk">Sistem berjalan satu mata uang</span>
-        </div>
+          <div className="bidang">
+            <label className="label" htmlFor="tahunBuku">Tahun buku yang dibuka</label>
+            <input id="tahunBuku" name="tahunBuku" type="number" min={2000} max={2100} defaultValue={tersimpan?.tahunBuku ?? ""} placeholder={String(new Date().getFullYear())} className="isian" />
+            <span className="petunjuk">Bawaan periode laporan & pintasan; kosongkan untuk mengikuti tahun kalender. Bisa diganti cepat dari kartu perusahaan di sidebar</span>
+          </div>
 
-        <div className="bidang">
-          <label className="label" htmlFor="tarifPpnPersen">Tarif PPN (%)</label>
-          <input id="tarifPpnPersen" name="tarifPpnPersen" type="number" min={0} max={100} step="0.01" defaultValue={Number(pengaturan.tarifPpnPersen)} className="isian" />
-          <span className="petunjuk">Dipakai sebagai bawaan faktur bila PKP; per faktur bisa dipilih 0%</span>
-        </div>
+          <div className="bidang">
+            <label className="label" htmlFor="mataUang">Mata uang</label>
+            <input id="mataUang" value="Rupiah (IDR)" readOnly className="isian bg-slate-50" />
+            <span className="petunjuk">Sistem berjalan satu mata uang</span>
+          </div>
 
-        <label className="md:col-span-2 flex items-start gap-3 ubin cursor-pointer">
-          <input type="checkbox" name="pkp" defaultChecked={pengaturan.pkp} className="mt-0.5 h-4 w-4 rounded border-slate-300" />
-          <span className="text-sm">
-            <span className="font-semibold text-slate-900">Pengusaha Kena Pajak (PKP)</span>
-            <span className="block text-xs text-slate-500 mt-0.5">Bila aktif, Faktur Penjualan memungut PPN (Cr PPN Keluaran) dan Faktur Pembelian mencatat PPN Masukan. Non-PKP: faktur selalu tanpa PPN.</span>
-          </span>
-        </label>
-
-        <PilihAkunPajak nama="akunPpnKeluaranId" label="Akun PPN Keluaran (kewajiban)" nilai={nilai.akunPpnKeluaranId} daftar={kewajiban} petunjuk="Dikredit saat Faktur Penjualan, didebit saat Retur Penjualan" />
-        <PilihAkunPajak nama="akunPpnMasukanId" label="Akun PPN Masukan (aset)" nilai={nilai.akunPpnMasukanId} daftar={aset} petunjuk="Didebit saat Faktur Pembelian, dikredit saat Retur Pembelian" />
-        <PilihAkunPajak nama="akunPph23DimukaId" label="Akun PPh 23 dibayar dimuka (aset)" nilai={nilai.akunPph23DimukaId} daftar={aset} petunjuk="PPh 23 yang dipotong klien saat membayar kita (isian di Penerimaan)" />
-        <PilihAkunPajak nama="akunPph23DipotongId" label="Akun Hutang PPh 23 (kewajiban)" nilai={nilai.akunPph23DipotongId} daftar={kewajiban} petunjuk="PPh 23 yang kita potong saat membayar vendor (isian di Pembayaran)" />
-
-        <div className="bidang">
-          <label className="label" htmlFor="pphFinalPersen">Tarif PPh Final UMKM (% dari omzet)</label>
-          <input id="pphFinalPersen" name="pphFinalPersen" type="number" min={0} max={100} step="0.01" defaultValue={Number(pengaturan.pphFinalPersen)} className="isian" />
-          <span className="petunjuk">PP 55/2022: 0,5% dari peredaran bruto bulanan; dihitung & dijurnal dari Buku Besar › Pajak & SPT</span>
-        </div>
-        <div className="bidang md:col-span-1" />
-        <PilihAkunPajak nama="akunBebanPphFinalId" label="Akun Beban PPh Final (beban)" nilai={nilai.akunBebanPphFinalId} daftar={beban} petunjuk="Didebit saat PPh Final bulanan dicatat" />
-        <PilihAkunPajak nama="akunHutangPphFinalId" label="Akun Hutang PPh Final (kewajiban)" nilai={nilai.akunHutangPphFinalId} daftar={kewajiban} petunjuk="Dikredit saat PPh Final dicatat; dilunasi lewat Kas Keluar saat setor ke DJP" />
-
-        <label className="md:col-span-2 flex items-start gap-3 ubin cursor-pointer">
-          <input type="checkbox" name="wajibPersetujuan" defaultChecked={tersimpan?.wajibPersetujuan ?? true} className="mt-0.5 h-4 w-4 rounded border-slate-300" />
-          <span className="text-sm">
-            <span className="font-semibold text-slate-900">Wajib persetujuan (maker-checker)</span>
-            <span className="block text-xs text-slate-500 mt-0.5">
-              Bila aktif, Faktur Penjualan, Faktur Pembelian, Kas Masuk/Keluar, Penyesuaian Stok, Aset Tetap, dan Penggajian dibuat sebagai
-              draf lebih dulu; jurnalnya baru masuk buku besar setelah diajukan dan disetujui pengguna LAIN (pembuat tidak boleh menyetujui
-              dokumennya sendiri). Mematikannya menghapus pengendalian pemisahan tugas: dokumen langsung dibukukan oleh pembuatnya.
+          <label className="flex items-start gap-3 ubin cursor-pointer">
+            <input type="checkbox" name="wajibPersetujuan" defaultChecked={tersimpan?.wajibPersetujuan ?? true} className="mt-0.5 h-4 w-4 rounded border-slate-300" />
+            <span className="text-sm">
+              <span className="font-semibold text-slate-900">Wajib persetujuan (maker-checker)</span>
+              <span className="block text-xs text-slate-500 mt-0.5">
+                Bila aktif, Faktur Penjualan, Faktur Pembelian, Kas Masuk/Keluar, Penyesuaian Stok, Aset Tetap, dan Penggajian dibuat sebagai
+                draf lebih dulu; jurnalnya baru masuk buku besar setelah diajukan dan disetujui pengguna LAIN (pembuat tidak boleh menyetujui
+                dokumennya sendiri). Mematikannya menghapus pengendalian pemisahan tugas: dokumen langsung dibukukan oleh pembuatnya.
+              </span>
             </span>
-          </span>
-        </label>
+          </label>
 
-        <div className="md:col-span-2">
-          <button type="submit" className="tombol tombol-utama">
-            Simpan Pengaturan
-          </button>
+          <div>
+            <button type="submit" className="tombol tombol-utama">
+              Simpan Pengaturan Umum
+            </button>
+          </div>
+        </FormulirAksi>
+
+        <div className="space-y-6">
+          <div className="kartu space-y-3">
+            <div>
+              <h2 className="judul-kartu">Akun antar perusahaan</h2>
+              <p className="subjudul-kartu">Dipakai jurnal transaksi antar perusahaan dan catatan laporan gabungan.</p>
+            </div>
+            <dl className="space-y-1.5 text-sm">
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="text-slate-500">Piutang Antar Perusahaan:</dt>
+                <dd className="font-semibold text-slate-900">{antar.akunPiutang ?? "belum ada"}</dd>
+              </div>
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="text-slate-500">Hutang Antar Perusahaan:</dt>
+                <dd className="font-semibold text-slate-900">{antar.akunHutang ?? "belum ada"}</dd>
+              </div>
+            </dl>
+            {antar.masalah.map((m) => (
+              <p key={m} className="flex gap-1.5 text-sm text-rose-700">
+                <Ikon nama="error" className="!text-[16px] shrink-0 mt-0.5" />
+                <span>{m}</span>
+              </p>
+            ))}
+            {bolehPemetaan && (
+              <Link href="/pengaturan/pemetaan-akun" className="tombol-tautan">
+                Atur di Pemetaan Akun
+              </Link>
+            )}
+          </div>
+
+          {bolehIntegritas && (
+            <div className="kartu space-y-3">
+              <div>
+                <h2 className="judul-kartu">Integritas</h2>
+                <p className="subjudul-kartu">Kecocokan buku besar dengan dokumen untuk tiap perusahaan, dan pemeriksaan data yang tercampur antar perusahaan.</p>
+              </div>
+              <Link href="/pengaturan/perusahaan/integritas" className="tombol tombol-garis">
+                <Ikon nama="fact_check" className="!text-[18px]" />
+                Periksa integritas per perusahaan
+              </Link>
+            </div>
+          )}
         </div>
-      </FormulirAksi>
+      </div>
     </div>
   );
 }

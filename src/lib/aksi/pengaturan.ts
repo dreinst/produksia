@@ -4,9 +4,20 @@ import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { bacaUang } from "@/lib/uang";
 import { pastikanAkunRinci, terapkanBaganAkunStandar } from "@/lib/baganAkun";
 import { terapkanDataFlagship } from "@/lib/flagshipStandar";
+
+/**
+ * Pemetaan akun (standar dan tambahan) berlaku untuk semua perusahaan, jadi hanya akun bersama yang boleh dipilih.
+ * Akun milik satu perusahaan akan ditolak catatJurnal saat dipakai dokumen perusahaan lain (KONTRAK-TAMBAHAN P19,
+ * pasangan aturan ganti pemilik akun di dataInduk.ts).
+ */
+async function pastikanAkunPemetaanBersama(daftarAkunId: string[]): Promise<void> {
+  const ids = [...new Set(daftarAkunId.filter(Boolean))];
+  if (ids.length === 0) return;
+  const milik = await db.akun.findFirst({ where: { id: { in: ids }, perusahaanId: { not: null } }, select: { kode: true, nama: true, perusahaan: { select: { nama: true } } }, orderBy: { kode: "asc" } });
+  if (milik) throw new Error(`Akun ${milik.kode} ${milik.nama} milik ${milik.perusahaan?.nama ?? "perusahaan lain"}; pemetaan akun berlaku untuk semua perusahaan, jadi pilih akun bersama (tanpa pemilik)`);
+}
 
 export async function simpanPemetaanAkun(dataFormulir: FormData) {
   await wajibHakAksi("pemetaan.tulis");
@@ -35,6 +46,7 @@ export async function simpanPemetaanAkun(dataFormulir: FormData) {
     const a = await db.akun.findUnique({ where: { id: pendapatanLainId } });
     if (!a || a.jenis !== "PENDAPATAN") throw new Error("Pendapatan Lain-lain harus akun jenis Pendapatan");
   }
+  await pastikanAkunPemetaanBersama([piutangUsahaId, persediaanId, hppId, pendapatanPenjualanId, utangUsahaId, ...Object.values(opsional).filter((v): v is string => Boolean(v)), ...(pendapatanLainId ? [pendapatanLainId] : [])]);
 
   await db.pemetaanAkun.upsert({
     where: { id: "default" },
@@ -72,7 +84,7 @@ export async function terapkanBaganAkunFormulir(): Promise<StatusFormulir> {
   });
 }
 
-// ---------- Perusahaan & pajak ----------
+// ---------- Pengaturan umum (semua perusahaan) ----------
 
 /** Kosong = mengikuti tahun kalender. */
 function bacaTahunBuku(nilai: string): number | null {
@@ -94,46 +106,28 @@ export async function gantiTahunBukuFormulir(_sebelumnya: StatusFormulir, dataFo
   return jalankanFormulir(() => gantiTahunBuku(dataFormulir));
 }
 
-export async function simpanPengaturanPerusahaan(dataFormulir: FormData) {
+/**
+ * Pengaturan umum yang berlaku untuk semua perusahaan (D1 §6.2): tahun buku dan alur persetujuan, keduanya hanya di
+ * baris "default". Menggantikan simpanPengaturanPerusahaan lama; nama, pajak, dan akun pajak tiap perusahaan
+ * (termasuk utama, baris "default") disimpan lewat ubahPerusahaan di aksi/perusahaan.ts.
+ */
+export async function simpanPengaturanUmum(dataFormulir: FormData) {
   await wajibHakAksi("pengaturan.tulis");
-  const teks = (k: string) => String(dataFormulir.get(k) ?? "").trim();
-  const nama = teks("nama");
-  if (!nama) throw new Error("Nama perusahaan wajib diisi");
-  const pkp = dataFormulir.get("pkp") === "on";
-  const tarifPpnPersen = bacaUang(dataFormulir.get("tarifPpnPersen"), "Tarif PPN", { allowZero: true });
-  if (tarifPpnPersen.gt(100)) throw new Error("Tarif PPN maksimal 100%");
-  const terminHari = Number(teks("terminHari") || "14");
-  if (!Number.isInteger(terminHari) || terminHari < 0 || terminHari > 365) throw new Error("Termin jatuh tempo harus 0–365 hari");
-  const tahunBuku = bacaTahunBuku(teks("tahunBuku"));
-  const pphFinalPersen = bacaUang(dataFormulir.get("pphFinalPersen") ?? "0.5", "Tarif PPh Final", { allowZero: true });
-  if (pphFinalPersen.gt(100)) throw new Error("Tarif PPh Final maksimal 100%");
+  const tahunBuku = bacaTahunBuku(String(dataFormulir.get("tahunBuku") ?? "").trim());
   // Alur persetujuan maker-checker: dimatikan berarti dokumen langsung dibukukan tanpa pemeriksa
   const wajibPersetujuan = dataFormulir.get("wajibPersetujuan") === "on";
-  const akun = {
-    akunPpnKeluaranId: teks("akunPpnKeluaranId") || null,
-    akunPpnMasukanId: teks("akunPpnMasukanId") || null,
-    akunPph23DimukaId: teks("akunPph23DimukaId") || null,
-    akunPph23DipotongId: teks("akunPph23DipotongId") || null,
-    akunBebanPphFinalId: teks("akunBebanPphFinalId") || null,
-    akunHutangPphFinalId: teks("akunHutangPphFinalId") || null,
-  };
-  if (pkp && (!akun.akunPpnKeluaranId || !akun.akunPpnMasukanId)) {
-    throw new Error("Status PKP membutuhkan akun PPN Keluaran dan PPN Masukan");
-  }
-  await pastikanAkunRinci(db, Object.values(akun).filter((v): v is string => Boolean(v)));
-
   await db.pengaturanPerusahaan.upsert({
     where: { id: "default" },
-    create: { id: "default", nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, wajibPersetujuan, ...akun },
-    update: { nama, pkp, tarifPpnPersen, terminHari, tahunBuku, pphFinalPersen, wajibPersetujuan, ...akun },
+    create: { id: "default", tahunBuku, wajibPersetujuan },
+    update: { tahunBuku, wajibPersetujuan },
   });
   revalidatePath("/pengaturan/perusahaan");
   revalidatePath("/persetujuan");
   revalidatePath("/", "layout");
 }
 
-export async function simpanPengaturanPerusahaanFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
-  return jalankanFormulir(() => simpanPengaturanPerusahaan(dataFormulir));
+export async function simpanPengaturanUmumFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
+  return jalankanFormulir(() => simpanPengaturanUmum(dataFormulir));
 }
 
 // ---------- Pemetaan akun tambahan (peran buatan pengguna, mis. Prive) ----------
@@ -158,6 +152,7 @@ export async function tambahPemetaanTambahan(dataFormulir: FormData) {
   const kunci = bacaKunci(label);
   if (!kunci) throw new Error("Nama peran harus memuat huruf atau angka");
   await pastikanAkunRinci(db, [akunId]);
+  await pastikanAkunPemetaanBersama([akunId]);
   if (await db.pemetaanAkunTambahan.findUnique({ where: { kunci } })) throw new Error(`Peran "${label}" sudah ada`);
   await db.pemetaanAkunTambahan.create({ data: { kunci, label, akunId, keterangan, dibuatOleh: pengguna.nama } });
   revalidatePath("/pengaturan/pemetaan-akun");
@@ -168,6 +163,7 @@ export async function ubahPemetaanTambahan(id: string, dataFormulir: FormData) {
   const akunId = String(dataFormulir.get("akunId") ?? "");
   if (!akunId) throw new Error("Akun wajib dipilih");
   await pastikanAkunRinci(db, [akunId]);
+  await pastikanAkunPemetaanBersama([akunId]);
   await db.pemetaanAkunTambahan.update({ where: { id }, data: { akunId } });
   revalidatePath("/pengaturan/pemetaan-akun");
 }
