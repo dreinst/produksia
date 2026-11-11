@@ -384,18 +384,31 @@ export async function buatPengiriman(dataFormulir: FormData) {
   const nomor = await nomorDokumenBerikutnya(db.pengirimanPesanan, "SJ");
 
   await db.$transaction(async (tx) => {
-    const [daftarLabel, daftarJenis, daftarBarang] = await Promise.all([
-      labelBarang(tx, daftarBaris.map((l) => l.barangId)),
-      jenisBarang(tx, daftarBaris.map((l) => l.barangId)),
+    const [daftarLabel, daftarJenis] = await Promise.all([labelBarang(tx, daftarBaris.map((l) => l.barangId)), jenisBarang(tx, daftarBaris.map((l) => l.barangId))]);
+
+    // Kunci dulu (stok lalu baris pesanan, urut id), baru baris pesanan dibaca ulang dan surat jalan ditulis (tinjauan
+    // perbaikan P27 S1). Faktur atau surat jalan lain atas baris yang sama yang selesai lebih dulu ikut terhitung: sisa
+    // kirim diperiksa ulang, dan porsi "sudah difaktur" dihitung dari jumlahDifaktur yang segar.
+    await kunciStokUrut(tx, daftarBaris.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
+    await kunciBarisPesananPenjualan(tx, pesananId, daftarBaris.map((l) => l.barisPesananId));
+    const [segar, daftarBarang] = await Promise.all([
+      tx.barisPesananPenjualan.findMany({ where: { pesananId, id: { in: daftarBaris.map((l) => l.barisPesananId) } }, select: { id: true, jumlah: true, jumlahTerkirim: true, jumlahDifaktur: true } }),
+      // harga pokok rata-rata dibaca sesudah kunci stok, jadi sama dengan nilai saat stok dikurangi
       tx.barang.findMany({ where: { id: { in: daftarBaris.map((l) => l.barangId) } }, select: { id: true, hargaBeli: true } }),
     ]);
     const hargaPokokBarang = new Map(daftarBarang.map((b) => [b.id, D(b.hargaBeli)]));
+    const terkirim = new Map(segar.map((b) => [b.id, D(b.jumlahTerkirim)]));
 
     // nilai barang keluar = harga pokok rata-rata saat ini; porsi yang sudah difaktur lebih dulu langsung jadi HPP
     const barisNilai = daftarBaris.map((l) => {
-      const bp = pesanan.baris.find((ol) => ol.id === l.barisPesananId)!;
+      const bp = segar.find((ol) => ol.id === l.barisPesananId);
+      if (!bp) throw new Error("Baris pesanan tidak ditemukan");
+      const sudahTerkirim = terkirim.get(bp.id)!;
+      const sisa = D(bp.jumlah).minus(sudahTerkirim);
+      if (l.jumlah.gt(sisa)) throw new Error(`Kuantitas kirim melebihi sisa pesanan (sisa ${format(terbesar(sisa, NOL))}, diminta ${format(l.jumlah)})`);
+      terkirim.set(bp.id, sudahTerkirim.plus(l.jumlah));
       const adalahBarang = daftarJenis.get(l.barangId) === "BARANG";
-      const belumTerkirimTapiDifaktur = D(bp.jumlahDifaktur).minus(bp.jumlahTerkirim);
+      const belumTerkirimTapiDifaktur = D(bp.jumlahDifaktur).minus(sudahTerkirim);
       const sudahDifaktur = adalahBarang ? terbesar(terkecil(l.jumlah, belumTerkirimTapiDifaktur), NOL) : NOL;
       return { ...l, hargaPokok: adalahBarang ? (hargaPokokBarang.get(l.barangId) ?? NOL) : NOL, sudahDifaktur };
     });
@@ -403,6 +416,9 @@ export async function buatPengiriman(dataFormulir: FormData) {
     const pengiriman = await tx.pengirimanPesanan.create({
       data: {
         nomor,
+        // tanggal diambil sesudah kunci, jadi faktur yang selesai lebih dulu selalu bertanggal lebih awal dari surat jalan
+        // ini (pemeriksaan "surat jalan sesudah faktur" di hapus faktur, tinjauan perbaikan P27 S2)
+        tanggal: new Date(),
         perusahaanId,
         pesananId,
         gudangId,
@@ -420,9 +436,6 @@ export async function buatPengiriman(dataFormulir: FormData) {
       },
     });
 
-    await kunciStokUrut(tx, barisNilai.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
-    // baris pesanan dikunci sesudah stok, urut `urutan` lalu id seperti faktur dan hapus faktur (tinjauan P27 R1)
-    await kunciBarisPesananPenjualan(tx, pesananId, barisNilai.map((l) => l.barisPesananId));
     for (const baris of barisNilai) {
       // JASA tidak punya stok: surat jalan hanya mencatat bahwa jasanya sudah diserahkan
       if (daftarJenis.get(baris.barangId) === "BARANG") {
@@ -582,7 +595,7 @@ export async function buatFaktur(dataFormulir: FormData) {
       ? await pastikanKopSuratDokumen(tx, kopSuratIdIsian, perusahaanId)
       : await pastikanKopSuratDokumen(tx, kopSuratIdIsian, perusahaanId).catch(() => null);
     const daftarJenis = await jenisBarang(tx, daftarBaris.map((l) => l.barangId));
-    // Semua baris pesanan dikunci urut `urutan` lalu id lalu dibaca ulang (tinjauan P25 R6, P27 R1 dan R2). Faktur
+    // Semua baris pesanan dikunci urut id lalu dibaca ulang (tinjauan P25 R6, P27 R1 dan R2). Faktur
     // serentak atas pesanan yang sama berjalan bergiliran, jadi pembagian jalur lama dan konteks prorata dihitung dari
     // keadaan sesudah faktur sebelumnya selesai.
     await kunciBarisPesananPenjualan(tx, pesananId);
@@ -593,14 +606,21 @@ export async function buatFaktur(dataFormulir: FormData) {
     const barisFaktur =
       masukan.jalur === "LAMA" ? bagiUlangJalurLama({ mode: pesanan.mode, baris: segar.baris }, masukan.baris, await bacaTerkirimBelumDifaktur(tx, pesananId), subtotal) : daftarBaris;
     const ctxSegar = konteksProrata(segar, barisFaktur);
+    // kedua jalur: faktur lain yang dibuat bersamaan tidak boleh membuat baris pesanan tertagih melebihi jumlahnya
+    // (tinjauan P23 R1); kiriman sah tidak pernah memicunya karena sisa sudah diperiksa sebelum transaksi. Diperiksa
+    // dari baris yang dibaca sesudah kunci SEBELUM ditulis, supaya pesan ini yang muncul, bukan pelanggaran CHECK
+    // jumlahDifaktur <= jumlah (tinjauan perbaikan P27 S2).
+    const difaktur = new Map(segar.baris.map((b) => [b.id, D(b.jumlahDifaktur)]));
     for (const l of barisFaktur) {
-      const bp = await tx.barisPesananPenjualan.update({ where: { id: l.barisPesananId! }, data: { jumlahDifaktur: { increment: l.jumlah } }, select: { jumlah: true, jumlahDifaktur: true } });
-      // kedua jalur: faktur lain yang dibuat bersamaan tidak boleh membuat baris pesanan tertagih melebihi jumlahnya
-      // (tinjauan P23 R1); kiriman sah tidak pernah memicunya karena sisa sudah diperiksa sebelum transaksi
-      if (D(bp.jumlahDifaktur).gt(bp.jumlah)) {
-        const sisa = D(bp.jumlah).minus(D(bp.jumlahDifaktur).minus(l.jumlah));
+      const bp = segar.baris.find((b) => b.id === l.barisPesananId);
+      if (!bp) throw new Error("Baris pesanan tidak ditemukan");
+      const sebelum = difaktur.get(bp.id)!;
+      if (sebelum.plus(l.jumlah).gt(bp.jumlah)) {
+        const sisa = D(bp.jumlah).minus(sebelum);
         throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(terbesar(sisa, NOL))}, diminta ${format(l.jumlah)})`);
       }
+      difaktur.set(bp.id, sebelum.plus(l.jumlah));
+      await tx.barisPesananPenjualan.update({ where: { id: bp.id }, data: { jumlahDifaktur: { increment: l.jumlah } } });
     }
     // Diskon dan fee warisan (prorata, faktur penutup mengambil sisa) dihitung ulang dari baris dan faktur yang dibaca
     // sesudah kunci. Bila berbeda dengan hitungan di luar transaksi (faktur lain selesai lebih dulu, mis. faktur ini

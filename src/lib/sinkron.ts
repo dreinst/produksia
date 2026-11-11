@@ -136,6 +136,40 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
   return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim, uangMuka };
 }
 
+// ---------- Catatan konsumsi surat jalan (tinjauan perbaikan P27 R4) ----------
+
+export type KodeKonsumsiSj = "TRANSIT_CATATAN" | "CATATAN_MELEBIHI_DIFAKTUR" | "DIFAKTUR_DI_LUAR_BATAS";
+export type HasilKonsumsiSj = { sinkron: boolean; rincian: { kode: KodeKonsumsiSj; label: string; jumlah: number }[] };
+
+/**
+ * Invarian catatan konsumsi surat jalan (KonsumsiSuratJalan). Kerusakan di sini tidak terlihat periksaSinkron, karena
+ * dokumen dan buku besar sama-sama mencatat transit. Semua harus 0:
+ * 1. baris faktur tercatat (konsumsiSjTercatat) yang nilaiTransit-nya beda dari jumlah nilai catatannya;
+ * 2. baris SJ yang jumlah catatan konsumsinya melebihi jumlahDifaktur-nya;
+ * 3. baris SJ atau baris pesanan penjualan dengan jumlahDifaktur di luar 0..jumlah (dijaga CHECK sejak migrasi
+ *    20261112100000_batas_jumlah_difaktur, tetap dihitung untuk berjaga-jaga).
+ * Dihitung di PostgreSQL dalam satu kueri, tanpa memuat baris ke memori.
+ */
+export async function periksaKonsumsiSj(klien: PrismaClient | Prisma.TransactionClient = db): Promise<HasilKonsumsiSj> {
+  const [baris] = await klien.$queryRaw<{ transit: number; melebihi: number; batas: number }[]>`
+    SELECT
+      (SELECT COUNT(*) FROM "BarisFakturPenjualan" bf
+         JOIN "FakturPenjualan" f ON f."id" = bf."fakturId"
+         LEFT JOIN (SELECT "barisFakturId", SUM("nilaiTransit") AS nilai FROM "KonsumsiSuratJalan" GROUP BY "barisFakturId") k ON k."barisFakturId" = bf."id"
+       WHERE f."konsumsiSjTercatat" AND bf."nilaiTransit" <> COALESCE(k.nilai, 0))::int AS "transit",
+      (SELECT COUNT(*) FROM "BarisPengiriman" bp
+         JOIN (SELECT "barisPengirimanId", SUM("jumlah") AS jumlah FROM "KonsumsiSuratJalan" GROUP BY "barisPengirimanId") k ON k."barisPengirimanId" = bp."id"
+       WHERE k.jumlah > bp."jumlahDifaktur")::int AS "melebihi",
+      ((SELECT COUNT(*) FROM "BarisPengiriman" WHERE "jumlahDifaktur" < 0 OR "jumlahDifaktur" > "jumlah")
+        + (SELECT COUNT(*) FROM "BarisPesananPenjualan" WHERE "jumlahDifaktur" < 0 OR "jumlahDifaktur" > "jumlah"))::int AS "batas"`;
+  const rincian: HasilKonsumsiSj["rincian"] = [
+    { kode: "TRANSIT_CATATAN", label: "Baris faktur yang nilai transitnya beda dari catatan konsumsi surat jalannya", jumlah: Number(baris?.transit ?? 0) },
+    { kode: "CATATAN_MELEBIHI_DIFAKTUR", label: "Baris surat jalan yang catatan konsumsinya melebihi jumlah yang sudah difaktur", jumlah: Number(baris?.melebihi ?? 0) },
+    { kode: "DIFAKTUR_DI_LUAR_BATAS", label: "Baris surat jalan atau pesanan dengan jumlah difaktur di bawah nol atau di atas jumlahnya", jumlah: Number(baris?.batas ?? 0) },
+  ];
+  return { sinkron: rincian.every((r) => r.jumlah === 0), rincian };
+}
+
 // ---------- Konsistensi perusahaan (D1 §4.9) ----------
 
 export type KodeKonsistensi =

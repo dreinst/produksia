@@ -241,18 +241,21 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       case "pengiriman": {
         const d = await tx.pengirimanPesanan.findUniqueOrThrow({
           where: { id },
-          include: { baris: { include: { barang: { select: { jenis: true, kode: true, nama: true } } } }, pesanan: { include: { faktur: true } }, faktur: true },
+          include: { baris: { include: { barang: { select: { jenis: true, kode: true, nama: true } } } }, pesanan: { select: { nomor: true } }, faktur: true },
         });
-        const fakturSetelah = d.pesanan.faktur.filter((f) => f.tanggal >= d.tanggal);
+        await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId, true);
+        // baris pesanan dikunci sesudah stok, urut id seperti buatPengiriman dan faktur (tinjauan P27 R1). Faktur pesanan
+        // dibaca ulang sesudah kunci: faktur yang selesai selagi hapus ini menunggu ikut diperiksa, jadi pesannya jelas,
+        // bukan galat FK mentah dari KonsumsiSuratJalan (tinjauan perbaikan P27 R1).
+        await kunciBarisPesananPenjualan(tx, d.pesananId, d.baris.map((b) => b.barisPesananId));
+        const fakturPesanan = await tx.fakturPenjualan.findMany({ where: { pesananId: d.pesananId }, select: { nomor: true, tanggal: true } });
+        const fakturSetelah = fakturPesanan.filter((f) => f.tanggal >= d.tanggal);
         if (fakturSetelah.length) {
           throw new Error(`Faktur ${daftarNomor(fakturSetelah)} dibuat setelah ${d.nomor} dan sudah mengakui HPP-nya; hapus faktur itu dulu`);
         }
         // pengaman FK Restrict KonsumsiSuratJalan: baris SJ yang masih tercatat dikonsumsi faktur tidak boleh hilang
         const pemakai = await tx.fakturPenjualan.findMany({ where: { baris: { some: { konsumsiSj: { some: { barisPengiriman: { pengirimanId: id } } } } } }, select: { nomor: true } });
         if (pemakai.length) throw new Error(`Faktur ${daftarNomor(pemakai)} sudah mengakui HPP ${d.nomor}; hapus faktur itu dulu`);
-        await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId, true);
-        // baris pesanan dikunci sesudah stok, urut `urutan` lalu id seperti buatPengiriman dan faktur (tinjauan P27 R1)
-        await kunciBarisPesananPenjualan(tx, d.pesananId, d.baris.map((b) => b.barisPesananId));
         // urut barangId supaya kunci Barang (harga rata) berurutan sama dengan kunci stok (tinjauan P22b T4)
         for (const b of urutBarang(d.baris)) {
           if (b.barang.jenis === "BARANG") {
@@ -276,51 +279,81 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
             penerimaan: true,
             retur: true,
             baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }], include: { barang: { select: { jenis: true } } } },
-            pesanan: { include: { faktur: true, pengiriman: true } },
           },
         });
         if (d.penerimaan.length) throw new Error(`${d.nomor} sudah punya penerimaan ${daftarNomor(d.penerimaan)}; hapus itu dulu`);
         if (d.retur.length) throw new Error(`${d.nomor} sudah punya retur ${daftarNomor(d.retur)}; hapus itu dulu`);
-        const lebihBaru = (d.pesanan?.faktur ?? []).filter((f) => f.id !== id && f.tanggal > d.tanggal);
-        if (lebihBaru.length) throw new Error(`Hapus faktur yang lebih baru dulu (${daftarNomor(lebihBaru)}) agar pengakuan HPP bisa dibalik urut`);
-        const sjSetelah = (d.pesanan?.pengiriman ?? []).filter((s) => s.tanggal > d.tanggal);
-        if (sjSetelah.length) throw new Error(`Surat jalan ${daftarNomor(sjSetelah)} dibuat setelah ${d.nomor}; hapus itu dulu`);
-        // Kunci baris pesanan (urut `urutan` lalu id) lalu baris SJ (urut id), urutan yang sama dengan buatFaktur
-        // (tinjauan P27 R1, S1)
+        // Kunci baris pesanan (urut id) lalu baris SJ (urut id), urutan yang sama dengan buatFaktur (tinjauan P27 R1, S1).
+        // Faktur dan surat jalan pesanan dibaca SESUDAH kunci (tinjauan perbaikan P27 S2): buatFaktur, buatPengiriman, dan
+        // hapus surat jalan memegang kunci baris pesanan sampai commit, jadi faktur atau surat jalan yang selesai selagi
+        // hapus ini menunggu ikut diperiksa.
         if (d.pesananId) await kunciBarisPesananPenjualan(tx, d.pesananId);
+        const [fakturPesanan, sjPesanan, catatan] = await Promise.all([
+          d.pesananId ? tx.fakturPenjualan.findMany({ where: { pesananId: d.pesananId }, select: { id: true, nomor: true, tanggal: true } }) : [],
+          d.pesananId ? tx.pengirimanPesanan.findMany({ where: { pesananId: d.pesananId }, select: { id: true, nomor: true, tanggal: true } }) : [],
+          tx.konsumsiSuratJalan.findMany({ where: { barisFaktur: { fakturId: id } }, orderBy: [{ barisPengirimanId: "asc" }, { id: "asc" }], include: { barisPengiriman: { select: { pengirimanId: true } } } }),
+        ]);
+        const lebihBaru = fakturPesanan.filter((f) => f.id !== id && f.tanggal > d.tanggal);
+        if (lebihBaru.length) throw new Error(`Hapus faktur yang lebih baru dulu (${daftarNomor(lebihBaru)}) agar pengakuan HPP bisa dibalik urut`);
+        // SJ yang barisnya dikonsumsi faktur ini (tercatat) bukan SJ "sesudah" faktur ini walau tanggalnya lebih baru
+        // (faktur menunggu kunci selagi SJ itu selesai); tanpa pengecualian ini faktur dan SJ saling menahan hapus
+        const sjDikonsumsi = new Set(catatan.map((c) => c.barisPengiriman.pengirimanId));
+        const sjSetelah = sjPesanan.filter((s) => s.tanggal > d.tanggal && !sjDikonsumsi.has(s.id));
+        if (sjSetelah.length) throw new Error(`Surat jalan ${daftarNomor(sjSetelah)} dibuat setelah ${d.nomor}; hapus itu dulu`);
         for (const b of d.baris) {
           if (!d.pesananId) continue;
           // Baris faktur jalur id (barisPesananId terisi) membalik tepat baris pesanannya, sehingga barang yang muncul di
           // beberapa baris pesanan tidak menumpuk di baris pertama (D2 §4.6, bug B-10 / §10.5 no. 6). Tanpa
           // barisPesananId: kode lama persis (baris pesanan pertama dengan barang sama).
           const bp = b.barisPesananId ? { id: b.barisPesananId } : await tx.barisPesananPenjualan.findFirst({ where: { pesananId: d.pesananId, barangId: b.barangId } });
-          if (bp) await tx.barisPesananPenjualan.update({ where: { id: bp.id }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
+          if (!bp) continue;
+          // bersyarat: progres faktur baris pesanan tidak pernah turun di bawah nol (CHECK jumlahDifaktur 0..jumlah)
+          const { count } = await tx.barisPesananPenjualan.updateMany({ where: { id: bp.id, jumlahDifaktur: { gte: b.jumlah } }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
+          if (count !== 1) throw new Error(`Progres faktur baris pesanan lebih kecil dari jumlah ${d.nomor}; data pesanan tidak cocok, periksa dulu sebelum menghapus`);
         }
         if (d.konsumsiSjTercatat) {
           // Konsumsi SJ dibalik persis menurut catatan KonsumsiSuratJalan (tinjauan P27 T1, S2): hanya baris SJ yang
           // benar-benar dipakai faktur ini, sebanyak yang dipakainya, termasuk SJ yatim baris pesanan lain. Catatannya
-          // ikut terhapus (kaskade) bersama baris faktur.
-          const catatan = await tx.konsumsiSuratJalan.findMany({ where: { barisFaktur: { fakturId: id } }, orderBy: [{ barisPengirimanId: "asc" }, { id: "asc" }] });
+          // ikut terhapus (kaskade) bersama baris faktur. Pembaliknya bersyarat (tinjauan perbaikan P27 S2): baris SJ yang
+          // jumlahDifaktur-nya lebih kecil dari catatan berarti data rusak, jadi hapus ditolak, tidak diturunkan sampai negatif.
           await kunciBarisSuratJalan(tx, catatan.map((c) => c.barisPengirimanId));
-          for (const c of catatan) await tx.barisPengiriman.update({ where: { id: c.barisPengirimanId }, data: { jumlahDifaktur: { decrement: c.jumlah } } });
+          for (const c of catatan) {
+            const { count } = await tx.barisPengiriman.updateMany({ where: { id: c.barisPengirimanId, jumlahDifaktur: { gte: c.jumlah } }, data: { jumlahDifaktur: { decrement: c.jumlah } } });
+            if (count !== 1) throw new Error(`Catatan konsumsi ${d.nomor} tidak cocok dengan surat jalan (jumlah difaktur baris SJ lebih kecil); periksa integritas data sebelum menghapus`);
+          }
         } else if (d.pesananId) {
           // Faktur lama tanpa catatan konsumsi: perilaku kode lama 46729a2, kembalikan konsumsi transit ke baris SJ
           // terbaru lebih dulu (kebalikan urutan konsumsi), dibatasi jumlah baris faktur. Baris dengan barisPesananId
           // (hasil isi ulang migrasi lebur, barangnya tunggal di pesanan) memakai baris SJ baris pesanan itu, yang sama
-          // dengan per barang. Batas lama tetap berlaku untuk data lama: pembalikan tidak tahu baris SJ mana yang dipakai
-          // faktur ini (bug lama S2 tinjauan P27).
+          // dengan per barang. Dua batas tambahan (tinjauan perbaikan P27 S2 dan S3):
+          // - per baris SJ hanya porsi yang tidak tercatat milik faktur lain (jumlahDifaktur dikurangi catatan konsumsi);
+          // - bila pesanan masih punya faktur lain, pembalikan berhenti begitu nilainya mencapai nilaiTransit baris faktur
+          //   (nilai yang dulu benar-benar dikonsumsinya), jadi baris bertransit 0 tidak mengembalikan SJ milik faktur lain.
+          //   Tanpa faktur lain, semua konsumsi SJ pesanan milik faktur ini, jadi aturan lama berlaku utuh.
+          // Batas yang tersisa: SJ berharga pokok 0 tidak terlihat oleh batas nilai (dampak nilainya juga 0).
           await kunciBarisSuratJalanPesanan(tx, d.pesananId);
+          const adaFakturLain = fakturPesanan.some((f) => f.id !== id);
+          const tercatat = new Map(
+            (await tx.konsumsiSuratJalan.groupBy({ by: ["barisPengirimanId"], where: { barisPengiriman: { pengiriman: { pesananId: d.pesananId } } }, _sum: { jumlah: true } })).map((g) => [g.barisPengirimanId, D(g._sum.jumlah ?? 0)]),
+          );
           for (const b of d.baris) {
             if (b.barang.jenis !== "BARANG") continue;
             let sisa = D(b.jumlah);
+            let nilai = D(0);
+            const batasNilai = D(b.nilaiTransit);
             const whereSj = b.barisPesananId ? { barisPesananId: b.barisPesananId, pengiriman: { pesananId: d.pesananId } } : { barangId: b.barangId, pengiriman: { pesananId: d.pesananId } };
-            const barisSj = await tx.barisPengiriman.findMany({ where: whereSj, orderBy: { pengiriman: { tanggal: "desc" } } });
+            const barisSj = await tx.barisPengiriman.findMany({ where: whereSj, orderBy: [{ pengiriman: { tanggal: "desc" } }, { id: "desc" }] });
             for (const sj of barisSj) {
               if (sisa.lte(0)) break;
-              const bisa = terkecil(D(sj.jumlahDifaktur), sisa);
+              if (adaFakturLain && nilai.gte(batasNilai)) break;
+              let bisa = terkecil(D(sj.jumlahDifaktur).minus(tercatat.get(sj.id) ?? 0), sisa);
+              const hargaPokok = D(sj.hargaPokok);
+              if (adaFakturLain && hargaPokok.gt(0)) bisa = terkecil(bisa, batasNilai.minus(nilai).div(hargaPokok).toDecimalPlaces(2));
               if (bisa.lte(0)) continue;
-              await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { decrement: bisa } } });
+              const { count } = await tx.barisPengiriman.updateMany({ where: { id: sj.id, jumlahDifaktur: { gte: bisa } }, data: { jumlahDifaktur: { decrement: bisa } } });
+              if (count !== 1) throw new Error(`Surat jalan pesanan ${d.nomor} berubah saat dihapus; muat ulang halaman lalu coba lagi`);
               sisa = sisa.minus(bisa);
+              nilai = nilai.plus(kali(bisa, hargaPokok));
             }
           }
         }

@@ -637,16 +637,18 @@ export function jalurLamaBolehUntuk(pesanan: Pick<PesananSumber, "mode" | "baris
 export type TerkirimBelumDifaktur = { barisPesananId: string; jumlah: Angka };
 
 /**
- * Urutan kunci baris pesanan penjualan (tinjauan P25 R6, P27 R1): jalur yang memperbarui jumlahTerkirim atau
- * jumlahDifaktur mengunci baris pesanannya lebih dulu, urut `urutan` lalu id. Kuncinya FOR NO KEY UPDATE, sama dengan
- * UPDATE biasa, jadi tidak bentrok dengan FOR KEY SHARE dari sisipan baris SJ atau faktur yang menaut baris itu.
- * Tanpa `ids`: semua baris pesanan (buatFaktur dan hapus faktur). Dengan `ids`: baris itu saja (surat jalan).
+ * Urutan kunci baris pesanan penjualan (tinjauan P25 R6, P27 R1): jalur yang memperbarui jumlahTerkirim, jumlahDifaktur,
+ * atau kolom baris pesanan mengunci baris pesanannya lebih dulu, urut id. Id tidak pernah berubah, jadi dua transaksi
+ * selalu mengunci dengan urutan yang sama walau `urutan` baris sedang ditukar (tinjauan perbaikan P27 R2). Kuncinya
+ * FOR NO KEY UPDATE, sama dengan UPDATE biasa, jadi tidak bentrok dengan FOR KEY SHARE dari sisipan baris SJ atau
+ * faktur yang menaut baris itu. Tanpa `ids`: semua baris pesanan (buatFaktur dan hapus faktur). Dengan `ids`: baris itu
+ * saja (surat jalan, hapus surat jalan, ubah tampilan pesanan).
  */
 export async function kunciBarisPesananPenjualan(tx: Prisma.TransactionClient, pesananId: string, ids?: readonly string[]) {
   if (ids === undefined) {
-    await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesananId} ORDER BY "urutan", "id" FOR NO KEY UPDATE`;
+    await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesananId} ORDER BY "id" FOR NO KEY UPDATE`;
   } else if (ids.length > 0) {
-    await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesananId} AND "id" = ANY(${[...new Set(ids)]}::text[]) ORDER BY "urutan", "id" FOR NO KEY UPDATE`;
+    await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesananId} AND "id" = ANY(${[...new Set(ids)]}::text[]) ORDER BY "id" FOR NO KEY UPDATE`;
   }
 }
 

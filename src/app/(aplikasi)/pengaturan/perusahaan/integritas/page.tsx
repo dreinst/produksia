@@ -3,7 +3,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
-import { periksaKonsistensiPerusahaan, periksaSinkron, type HasilSinkron, type Perbandingan } from "@/lib/sinkron";
+import { periksaKonsistensiPerusahaan, periksaKonsumsiSj, periksaSinkron, type HasilSinkron, type Perbandingan } from "@/lib/sinkron";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import Ikon from "@/komponen/ui/Ikon";
@@ -71,7 +71,8 @@ async function cobaPeriksa<T>(nama: string, kerja: () => Promise<T>): Promise<T 
 
 /**
  * Integritas per perusahaan (D1 §7.2, R4, R6): periksaSinkron untuk tiap perusahaan aktif dan perusahaan arsip yang
- * punya jurnal, lalu gabungan; plus periksaKonsistensiPerusahaan yang dihitung langsung (tanpa simpanan beranda).
+ * punya jurnal, lalu gabungan; plus periksaKonsistensiPerusahaan yang dihitung langsung (tanpa simpanan beranda) dan
+ * invarian catatan konsumsi surat jalan (periksaKonsumsiSj, tinjauan perbaikan P27 R4).
  * Biaya periksaSinkron dikali jumlah perusahaan, jadi hanya dijalankan di halaman ini. Pemeriksaan dijalankan satu
  * per satu (paralelisme di dalam satu periksaSinkron sudah cukup mengisi pool koneksi), dan galat satu pemeriksaan
  * hanya menandai barisnya (tinjauan P19 temuan 1).
@@ -89,6 +90,7 @@ export default async function HalamanIntegritasPerusahaan() {
   for (const p of daftar) perPerusahaan.push(await cobaPeriksa(`sinkron ${p.kode}`, () => periksaSinkron(db, { perusahaanId: p.id })));
   const gabungan = await cobaPeriksa("sinkron gabungan", () => periksaSinkron(db));
   const konsistensi = await cobaPeriksa("konsistensi perusahaan", () => periksaKonsistensiPerusahaan(db));
+  const konsumsiSj = await cobaPeriksa("catatan konsumsi surat jalan", () => periksaKonsumsiSj(db));
 
   return (
     <div className="space-y-6">
@@ -165,6 +167,28 @@ export default async function HalamanIntegritasPerusahaan() {
         {konsistensi && (
           <ul className="divide-y divide-slate-100 text-sm">
             {konsistensi.rincian.map((r) => (
+              <li key={r.kode} className="flex items-center justify-between gap-3 py-2">
+                <span className={r.jumlah > 0 ? "text-rose-700" : "text-slate-600"}>{r.label}</span>
+                <span className={`angka ${r.jumlah > 0 ? "font-semibold text-rose-700" : "text-slate-500"}`}>{r.jumlah}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="kartu space-y-3">
+        <div>
+          <h2 className="judul-kartu">Catatan konsumsi surat jalan</h2>
+          <p className="subjudul-kartu">Kecocokan faktur penjualan dengan baris surat jalan yang HPP-nya sudah diakui. Semua harus 0.</p>
+        </div>
+        {!konsumsiSj ? (
+          <p className="flex items-center gap-2 text-sm font-semibold text-rose-700">
+            <Ikon nama="error" className="!text-[18px]" />
+            Pemeriksaan catatan konsumsi gagal, lihat log server
+          </p>
+        ) : (
+          <ul className="divide-y divide-slate-100 text-sm">
+            {konsumsiSj.rincian.map((r) => (
               <li key={r.kode} className="flex items-center justify-between gap-3 py-2">
                 <span className={r.jumlah > 0 ? "text-rose-700" : "text-slate-600"}>{r.label}</span>
                 <span className={`angka ${r.jumlah > 0 ? "font-semibold text-rose-700" : "text-slate-500"}`}>{r.jumlah}</span>

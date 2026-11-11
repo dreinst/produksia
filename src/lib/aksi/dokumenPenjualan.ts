@@ -34,6 +34,7 @@ import {
   catatLogPenjualan,
   dataBarisDokumen,
   jenisDokumenPenjualanSah,
+  kunciBarisPesananPenjualan,
   pastikanKopSuratDokumen,
   periksaHakBarisBebas,
   periksaHargaNego,
@@ -284,6 +285,9 @@ export async function ubahTampilanDokumen(jenis: JenisDokumenPenjualan, id: stri
 
   await db.$transaction(async (tx) => {
     if (jenis === "faktur") await BERKAS.faktur.kunci(tx, id);
+    // baris pesanan dikunci urut id sebelum kepala dan barisnya ditulis, urutan yang sama dengan faktur dan surat jalan,
+    // jadi urutan isian formulir (atau `urutan` yang ditukar) tidak bisa membuat deadlock (tinjauan perbaikan P27 R2)
+    if (jenis === "pesanan" && barisIsian.length) await kunciBarisPesananPenjualan(tx, id, barisIsian.map((b) => b.id));
     const lama = await bacaDokumenTampilan(tx, jenis, id);
     if (!lama) throw new Error(`${LABEL_DOKUMEN_PENJUALAN[jenis]} tidak ditemukan`);
     const berubahNomor = kolom.includes("nomorCetak") && (data.nomorCetak ?? null) !== (lama.nomorCetak ?? null);

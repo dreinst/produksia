@@ -148,7 +148,7 @@ export default function PanelTermin(p: Props) {
                   )}
                 </td>
                 <td className="td-lekat">
-                  <AksiButir pesananId={p.pesananId} butir={b} bolehUbah={p.bolehUbah} bolehBayar={p.bolehBayar} />
+                  <AksiButir pesananId={p.pesananId} butir={b} bolehUbah={p.bolehUbah} bolehBayar={p.bolehBayar} lihatBayar={lihatBayar} />
                 </td>
               </tr>
             ))}
@@ -168,11 +168,16 @@ export default function PanelTermin(p: Props) {
   );
 }
 
-function AksiButir({ pesananId, butir: b, bolehUbah, bolehBayar }: { pesananId: string; butir: ProgresTermin["butir"][number]; bolehUbah: boolean; bolehBayar: boolean }) {
-  const terbit = bolehUbah && !b.ditagihPada && b.sisa.gt(0);
+/**
+ * Tombol per butir. Tanpa lihatBayar (tinjauan perbaikan P27 R5) tombol hanya mengikuti status tagih, supaya pemegang
+ * pesanan.ubah tanpa hak lihat uang muka dan penerimaan tidak bisa menyimpulkan butir mana yang sudah dibayar dari
+ * tombol yang muncul. Server tetap menolak terbitkan, batal, atau bayar yang tidak sah.
+ */
+function AksiButir({ pesananId, butir: b, bolehUbah, bolehBayar, lihatBayar }: { pesananId: string; butir: ProgresTermin["butir"][number]; bolehUbah: boolean; bolehBayar: boolean; lihatBayar: boolean }) {
+  const terbit = bolehUbah && !b.ditagihPada && (!lihatBayar || b.sisa.gt(0));
   // server menolak batal bila butir sudah punya uang muka; dibayar menghitung semua uang muka butir
-  const batal = bolehUbah && !!b.ditagihPada && b.dibayar.isZero();
-  const bayar = bolehBayar && b.sisa.gt(0);
+  const batal = bolehUbah && !!b.ditagihPada && (!lihatBayar || b.dibayar.isZero());
+  const bayar = bolehBayar && (!lihatBayar || b.sisa.gt(0));
   if (!terbit && !batal && !bayar) return null;
   return (
     <div className="flex flex-col items-start gap-2 whitespace-nowrap">
