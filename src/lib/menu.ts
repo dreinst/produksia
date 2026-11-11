@@ -138,6 +138,7 @@ export const TAUTAN_PENGATURAN: TautanBerikon[] = [
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
   { href: "/pengaturan/hak-akses", label: "Hak Akses", ikon: "shield", hak: "hak-akses.kelola" },
   { href: "/pengaturan/log-aktivitas", label: "Log Aktivitas", ikon: "history", hak: "log-aktivitas.lihat" },
+  { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" },
 ];
 
 /**
@@ -160,6 +161,7 @@ export function bolehPersetujuan(pengguna: PenggunaSesi): boolean {
 export const TAUTAN_ATAS: TautanAtas[] = [
   { href: "/", label: "Beranda", ikon: "space_dashboard", boleh: bolehBeranda },
   { href: "/persetujuan", label: "Persetujuan", ikon: "verified", boleh: bolehPersetujuan },
+  { href: "/berkas", label: "Berkas", ikon: "folder", boleh: (p) => punyaHak(p, "berkas.lihat") },
 ];
 
 /** Menyaring grup & tautan sesuai hak; grup tanpa tautan tersisa dibuang. */

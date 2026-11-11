@@ -177,6 +177,8 @@ type Tambahan =
 
 const TAMBAHAN_PER_PAKET: Tambahan[] = [
   // P03 tidak menambah entri.
+  { paket: "P07", letak: "atas", setelah: "/persetujuan", tautan: { href: "/berkas", label: "Berkas", ikon: "folder", hak: "berkas.lihat" } },
+  { paket: "P07", letak: "pengaturan", setelah: "/pengaturan/log-aktivitas", tautan: { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" } },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -338,6 +340,18 @@ async function main() {
   for (const peran of ["SOSMED", "IKLAN", "DESAINER"] as const) {
     const h = mPeran(peran);
     pastikan(h.includes("/") && !h.includes("/persetujuan") && !h.some((x) => x.startsWith("/buku-besar") || x.startsWith("/pengaturan/")), `${peran}: Beranda tampil, tanpa Persetujuan, Buku Besar, dan pengaturan`);
+  }
+  // P07 (D7 §7.8): Berkas untuk pemegang berkas.lihat, Akses Berkas hanya untuk berkas.akses-penuh
+  for (const peran of ["ADMIN", "SOSMED", "IKLAN", "DESAINER"] as const) {
+    const h = mPeran(peran);
+    pastikan(h.includes("/berkas") && !h.includes("/pengaturan/berkas"), `${peran}: Berkas tampil, Akses Berkas tidak`);
+  }
+  for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST"] as const) pastikan(!mPeran(peran).some((h) => h === "/berkas" || h === "/pengaturan/berkas"), `${peran}: tanpa Berkas dan Akses Berkas`);
+  for (const peran of ["SUPERADMIN", "PEMILIK"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    const atas = m.atas.map((t) => t.href);
+    const atur = m.pengaturan.map((l) => l.href);
+    pastikan(atas.indexOf("/berkas") === atas.indexOf("/persetujuan") + 1 && atur.indexOf("/pengaturan/berkas") === atur.indexOf("/pengaturan/log-aktivitas") + 1, `${peran}: Berkas sesudah Persetujuan, Akses Berkas sesudah Log Aktivitas`);
   }
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");
