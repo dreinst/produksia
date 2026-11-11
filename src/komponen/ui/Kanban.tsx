@@ -96,7 +96,8 @@ export default function Kanban({
 
   function minta(kartuId: string, kolomId: string, dariPilihan = false) {
     if (!bolehPindah) return;
-    if (dariPilihan) setFokus({ kartuId });
+    // permintaan fokus lama dibuang saat kartu dipindah dengan seret, supaya fokus tidak melompat ke kartu sebelumnya
+    setFokus(dariPilihan ? { kartuId } : null);
     const k = tampil.find((x) => x.id === kartuId);
     if (!k || k.kolomId === kolomId || !kolom.some((x) => x.id === kolomId)) return;
     if (dialogAlasan?.[kolomId]) {

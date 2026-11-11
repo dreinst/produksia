@@ -5,14 +5,15 @@ import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatJurnalManualFormulir } from "@/lib/aksi/jurnal";
 import EditorBarisJurnal from "@/komponen/buku-besar/EditorBarisJurnal";
 import KolomPerusahaan from "@/komponen/KolomPerusahaan";
-import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 export default async function HalamanJurnalBaru() {
   await wajibHak("jurnal.buat");
   // Dokumen akar (D1 §7.4 butir 2, §8.4): lingkup satu perusahaan = akun milik perusahaan itu atau bersama dan
   // proyeknya; gabungan = semua, yang berpemilik diberi akhiran kode perusahaan. Server tetap memvalidasi (P13).
   const lingkup = await lingkupPerusahaan();
-  const p = lingkup.perusahaanId;
+  // lingkup perusahaan arsip diperlakukan seperti gabungan (tinjauan P17 butir 4)
+  const p = perusahaanFormulir(lingkup);
   const [akun, daftarProyek, semuaPerusahaan] = await Promise.all([
     db.akun.findMany({ where: { kelompok: false, ...saringMilikAtauBersama(p) }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaanId: true } }),
     db.proyek.findMany({ where: { status: { notIn: ["BATAL", "DIARSIP"] }, ...(p ? { perusahaanId: p } : {}) }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaanId: true } }),

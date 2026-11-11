@@ -10,7 +10,8 @@ import { Rp } from "@/komponen/ui/Lencana";
  * Laba Rugi, Arus Kas, Perubahan Modal; Laba Rugi dan Arus Kas memakai periode.sampai). Jumlah perusahaan = perusahaan
  * aktif ditambah perusahaan arsip yang masih punya jurnal, karena jurnal keduanya ikut dijumlah. Akun antar perusahaan
  * yang tidak bisa dipakai tidak menggagalkan halaman; alasannya ditampilkan (kolom `masalah`). Selama ada masalah,
- * saldo akun yang bermasalah terbaca nol, jadi selisihnya tidak diberi peringatan satu sisi (tinjauan P15 butir 9).
+ * saldo akun yang bermasalah terbaca nol, jadi angka selisih tidak ditampilkan dan tidak diberi peringatan satu sisi
+ * (tinjauan P15 butir 9, tinjauan P17 butir 3).
  */
 export default async function CatatanGabungan({ sampai }: { sampai: Date }) {
   const [saldo, jumlah] = await Promise.all([
@@ -26,14 +27,20 @@ export default async function CatatanGabungan({ sampai }: { sampai: Date }) {
       <div className="space-y-1">
         <p>
           {`Laporan gabungan = penjumlahan ${jumlah} perusahaan. Transaksi antar perusahaan belum dieliminasi. Saldo per ${formatTanggal(sampai)}: `}
-          Piutang Antar Perusahaan Rp <Rp nilai={saldo.piutang} />, Hutang Antar Perusahaan Rp <Rp nilai={saldo.hutang} />, selisih{" "}
-          <span className={berselisih ? "lencana lencana-amber" : ""}>
-            Rp <Rp nilai={saldo.selisih} />
-          </span>
-          .
+          Piutang Antar Perusahaan Rp <Rp nilai={saldo.piutang} />, Hutang Antar Perusahaan Rp <Rp nilai={saldo.hutang} />,{" "}
+          {bermasalah ? (
+            "selisih belum bisa dihitung karena akun antar perusahaan bermasalah."
+          ) : (
+            <>
+              selisih{" "}
+              <span className={berselisih ? "lencana lencana-amber" : ""}>
+                Rp <Rp nilai={saldo.selisih} />
+              </span>
+              .
+            </>
+          )}
         </p>
         {berselisih && <p className="text-amber-700">Ada transaksi antar perusahaan yang hanya dicatat di satu sisi; periksa jurnal kedua akun itu.</p>}
-        {bermasalah && <p>Selisih belum bisa dihitung karena akun antar perusahaan bermasalah.</p>}
         {saldo.masalah.map((m) => (
           <p key={m} className="flex gap-1.5 text-rose-700">
             <Ikon nama="error" className="!text-[16px] shrink-0 mt-0.5" />

@@ -172,9 +172,12 @@ async function main() {
       const salah = await saldoAntarPerusahaan(db, sekarang);
       const catatanSalah = html(await CatatanGabungan({ sampai: sekarang }));
       pastikan(
-        salah.masalah.length > 0 && catatanSalah.includes("Selisih belum bisa dihitung karena akun antar perusahaan bermasalah") && !catatanSalah.includes("lencana-amber") && !catatanSalah.includes("hanya dicatat di satu sisi"),
+        salah.masalah.length > 0 && catatanSalah.includes("selisih belum bisa dihitung karena akun antar perusahaan bermasalah.") && !catatanSalah.includes("lencana-amber") && !catatanSalah.includes("hanya dicatat di satu sisi"),
         "CatatanGabungan dengan akun antar perusahaan bermasalah: alasan tampil tanpa peringatan satu sisi",
       );
+      // tinjauan P17 butir 3: angka selisih tidak ditampilkan saat kalimatnya menyatakan belum bisa dihitung
+      const jumlahAngka = (h: string) => h.split('class="angka ').length - 1;
+      pastikan(jumlahAngka(catatan) === 3 && jumlahAngka(catatanSalah) === 2, "CatatanGabungan bermasalah: hanya angka piutang dan hutang, tanpa angka selisih");
     } finally {
       if (petaPiutang) await db.pemetaanAkunTambahan.update({ where: { id: petaPiutang.id }, data: { akunId: petaPiutang.akunId } });
       else await db.pemetaanAkunTambahan.deleteMany({ where: { kunci: "piutang-antar-perusahaan", dibuatOleh: KODE } });

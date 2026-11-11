@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
@@ -22,7 +23,14 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
     ambilPengaturanPerusahaan(db),
     db.pemetaanAkun.findUnique({ where: { id: "default" }, include: { labaDitahan: true } }),
     db.tutupBuku.findMany({
-      include: { jurnal: { select: { nomor: true } }, rincianPerusahaan: { include: { jurnal: { select: { nomor: true } } } } },
+      include: {
+        jurnal: { select: { nomor: true } },
+        // urutan tetap antar muat (tinjauan P17): mengikuti urutan perusahaan, lalu kodenya
+        rincianPerusahaan: {
+          include: { jurnal: { select: { nomor: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } },
+          orderBy: [{ perusahaan: { urutan: "asc" } }, { perusahaan: { kode: "asc" } }],
+        },
+      },
       orderBy: { tahun: "desc" },
     }),
     db.jurnal.aggregate({ _min: { tanggal: true }, _max: { tanggal: true } }),
@@ -79,12 +87,33 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
               <tbody>
                 {daftarTahun.map((t) => {
                   const tutup = tutupPer.get(t);
+                  const kelas = t === tahunDipilih ? "bg-blue-50/60" : undefined;
                   return (
-                    <tr key={t} className={t === tahunDipilih ? "bg-blue-50/60" : undefined}>
-                      <td><a href={`/buku-besar/tutup-buku?tahun=${t}`} className="font-semibold text-blue-600 hover:underline">{t}</a></td>
-                      <td>{tutup ? <span className="lencana lencana-slate">Ditutup</span> : <span className="lencana lencana-emerald">Terbuka</span>}</td>
-                      <td className="text-right angka">{tutup ? rp(tutup.labaBersih) : "-"}</td>
-                    </tr>
+                    <Fragment key={t}>
+                      <tr className={kelas}>
+                        <td><a href={`/buku-besar/tutup-buku?tahun=${t}`} className="font-semibold text-blue-600 hover:underline">{t}</a></td>
+                        <td>{tutup ? <span className="lencana lencana-slate">Ditutup</span> : <span className="lencana lencana-emerald">Terbuka</span>}</td>
+                        <td className="text-right angka">{tutup ? rp(tutup.labaBersih) : "-"}</td>
+                      </tr>
+                      {/* rincian per perusahaan yang tersimpan saat ditutup (D1 §8.4): kode, laba, nomor JU-TUTUP */}
+                      {tutup && tutup.rincianPerusahaan.length > 0 && (
+                        <tr className={kelas}>
+                          <td colSpan={3} className="!pt-0">
+                            <ul className="space-y-1 text-xs text-slate-500">
+                              {tutup.rincianPerusahaan.map((r) => (
+                                <li key={r.perusahaanId} className="flex flex-wrap items-center justify-between gap-2">
+                                  <span className="flex items-center gap-1.5">
+                                    <LencanaPerusahaan kode={r.perusahaan.kode} warna={r.perusahaan.warna} nama={r.perusahaan.nama} />
+                                    {r.jurnal ? <span className="mono">{r.jurnal.nomor}</span> : null}
+                                  </span>
+                                  <span className="angka">{rp(r.labaBersih)}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   );
                 })}
               </tbody>

@@ -11,7 +11,7 @@ import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 import KolomPerusahaan from "@/komponen/KolomPerusahaan";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
-import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 export default async function HalamanPrive({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("prive.lihat");
@@ -21,11 +21,13 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
   // Lingkup perusahaan (D1 §7.4, §8.4): pola daftar dan formulir akar seperti Kas Masuk
   const lingkup = await lingkupPerusahaan();
   const lp = lingkup.perusahaanId;
+  // pilihan formulir: lingkup perusahaan arsip diperlakukan seperti gabungan (tinjauan P17 butir 4); daftar tetap memakai lp
+  const pf = perusahaanFormulir(lingkup);
   const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemilikNama: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
   const where = lp ? { AND: [cari ?? {}, { perusahaanId: lp }] } : cari;
   const [daftarAkunKas, daftarAkunModal, pemilik, total, daftar, akunPrivePemetaan, semuaPerusahaan] = await Promise.all([
-    daftarAkunKasBank(db, lp),
-    db.akun.findMany({ where: { jenis: "MODAL", kelompok: false, ...saringMilikAtauBersama(lp) }, orderBy: { kode: "asc" } }),
+    daftarAkunKasBank(db, pf),
+    db.akun.findMany({ where: { jenis: "MODAL", kelompok: false, ...saringMilikAtauBersama(pf) }, orderBy: { kode: "asc" } }),
     db.pengguna.findMany({ where: { peran: { in: ["PEMILIK", "SUPERADMIN"] }, aktif: true }, orderBy: { nama: "asc" }, select: { nama: true } }),
     db.prive.count({ where }),
     db.prive.findMany({ where, include: { akunKas: true, jurnal: { select: { nomor: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
@@ -33,7 +35,7 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
     daftarPerusahaan(true),
   ]);
   const kodePerusahaan = new Map(semuaPerusahaan.map((x) => [x.id, x.kode]));
-  const akhiran = (milik: string | null) => (!lp && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
+  const akhiran = (milik: string | null) => (!pf && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
   // akun prive: dari Pemetaan Akun (tambahan "prive") bila ada, kalau tidak cari akun modal bernama Prive
   const akunPriveBawaan = (akunPrivePemetaan && daftarAkunModal.some((a) => a.id === akunPrivePemetaan.id) ? akunPrivePemetaan.id : undefined) ?? daftarAkunModal.find((a) => /prive/i.test(a.nama))?.id ?? "";
   const hariIni = new Date().toISOString().slice(0, 10);
@@ -49,8 +51,8 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
         <FormulirAksi aksi={buatPriveFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
           {/* utama: hanya isian tersembunyi supaya formulir peran lama tetap sama (penyimpangan P17); lingkup lain dan
               gabungan: KolomPerusahaan (pilihan wajib di gabungan, supaya Pemilik bisa mencatat lagi) */}
-          {lp === PERUSAHAAN_UTAMA ? (
-            <input type="hidden" name="perusahaanId" value={lp} />
+          {pf === PERUSAHAAN_UTAMA ? (
+            <input type="hidden" name="perusahaanId" value={pf} />
           ) : (
             <>
               <KolomPerusahaan lingkup={lingkup} daftar={semuaPerusahaan.filter((x) => x.aktif)} />

@@ -374,7 +374,9 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
      * dicoba lagi setelah stok tersedia. Tidak ada jurnal; peminjaman bukan transaksi keuangan.
      */
     posting: async (tx, id) => {
-      const p = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true } });
+      const p = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, perusahaan: { select: { nama: true, aktif: true } } } });
+      // sama dengan penyesuaian (tinjauan P17 butir 2): stok perusahaan arsip tidak boleh berubah
+      if (!p.perusahaan.aktif) throw new Error(`Perusahaan ${p.perusahaan.nama} sudah diarsipkan; aktifkan dulu`);
       const label = await labelBarang(tx, p.baris.map((b) => b.barangId));
       for (const b of p.baris) {
         await kurangiStok(tx, b.barangId, p.gudangId, D(b.jumlah), label.get(b.barangId) ?? b.barangId);
@@ -414,7 +416,8 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
      * dan seluruh transaksi (termasuk perubahan status) dibatalkan. Tidak ada jurnal.
      */
     posting: async (tx, id) => {
-      const k = await tx.laporanKerusakanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true } });
+      const k = await tx.laporanKerusakanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, perusahaan: { select: { nama: true, aktif: true } } } });
+      if (!k.perusahaan.aktif) throw new Error(`Perusahaan ${k.perusahaan.nama} sudah diarsipkan; aktifkan dulu`);
       const label = await labelBarang(tx, k.baris.map((b) => b.barangId));
       for (const b of k.baris) {
         await kurangiStok(tx, b.barangId, k.gudangId, D(b.jumlah), label.get(b.barangId) ?? b.barangId);

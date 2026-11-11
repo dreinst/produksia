@@ -10,7 +10,7 @@ import DaftarDokumenKasDraf from "@/komponen/kas-bank/DaftarDokumenKasDraf";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KolomPerusahaan from "@/komponen/KolomPerusahaan";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
-import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir, saringMilikAtauBersama } from "@/lib/perusahaan";
 import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatKasKeluarFormulir } from "@/lib/aksi/jurnal";
 
@@ -23,18 +23,20 @@ export default async function HalamanKasKeluar({ searchParams }: { searchParams:
   // proyeknya; gabungan = kueri lama ditambah kolom Perusahaan, pilihan berpemilik diberi akhiran kode perusahaan.
   const lingkup = await lingkupPerusahaan();
   const p = lingkup.perusahaanId;
+  // pilihan formulir: lingkup perusahaan arsip diperlakukan seperti gabungan (tinjauan P17 butir 4); daftar tetap memakai p
+  const pf = perusahaanFormulir(lingkup);
   const cari = { sumber: "KAS_KELUAR" as const, ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}) };
   const where = p ? { AND: [cari, { perusahaanId: p }] } : cari;
   const [daftarAkunKas, daftarAkun, total, daftarJurnal, daftarProyek, semuaPerusahaan] = await Promise.all([
-    daftarAkunKasBank(db, p),
-    db.akun.findMany({ where: { kelompok: false, ...saringMilikAtauBersama(p) }, orderBy: { kode: "asc" } }),
+    daftarAkunKasBank(db, pf),
+    db.akun.findMany({ where: { kelompok: false, ...saringMilikAtauBersama(pf) }, orderBy: { kode: "asc" } }),
     db.jurnal.count({ where }),
     db.jurnal.findMany({ where, include: { baris: { include: { akun: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
-    db.proyek.findMany({ where: { status: { notIn: ["BATAL", "DIARSIP"] }, ...(p ? { perusahaanId: p } : {}) }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaanId: true } }),
+    db.proyek.findMany({ where: { status: { notIn: ["BATAL", "DIARSIP"] }, ...(pf ? { perusahaanId: pf } : {}) }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaanId: true } }),
     daftarPerusahaan(true),
   ]);
   const kodePerusahaan = new Map(semuaPerusahaan.map((x) => [x.id, x.kode]));
-  const akhiran = (milik: string | null) => (!p && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
+  const akhiran = (milik: string | null) => (!pf && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
 
   return (
     <div className="space-y-8">
@@ -44,8 +46,8 @@ export default async function HalamanKasKeluar({ searchParams }: { searchParams:
       <FormulirAksi aksi={buatKasKeluarFormulir} verifikasi={{ judul: "Periksa kas keluar", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         {/* utama: hanya isian tersembunyi supaya formulir peran lama tetap sama (penyimpangan P17); lingkup lain dan
             gabungan: KolomPerusahaan (pilihan wajib di gabungan, supaya Pemilik bisa mencatat lagi) */}
-        {p === PERUSAHAAN_UTAMA ? (
-          <input type="hidden" name="perusahaanId" value={p} />
+        {pf === PERUSAHAAN_UTAMA ? (
+          <input type="hidden" name="perusahaanId" value={pf} />
         ) : (
           <>
             <KolomPerusahaan lingkup={lingkup} daftar={semuaPerusahaan.filter((x) => x.aktif)} />

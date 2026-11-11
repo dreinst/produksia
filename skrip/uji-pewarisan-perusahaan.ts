@@ -253,6 +253,24 @@ async function main() {
   );
   const pj = await db.peminjamanBarang.findFirstOrThrow({ where: { keterangan: `${KODE} PJ` } });
   pastikan(pj.perusahaanId === U && pj.proyekId === proyekUt.id, "peminjaman milik pemilik barang; proyek perusahaan lain boleh (catatan B)");
+  // tinjauan P17 butir 2: persetujuan PJ dan BR milik perusahaan arsip ditolak, sama seperti PS (posting dijalankan di
+  // transaksi yang dibatalkan, jadi stok dokumen yang sudah tercatat tidak berubah)
+  const stokPjBr = async () => [
+    (await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangU.id, gudangId: gudangU.id } } })).jumlah,
+    (await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangU.id, gudangId: gudangB.id } } })).jumlah,
+  ];
+  const stokSebelumArsip = await stokPjBr();
+  await jalankan("posting PJ perusahaan aktif tetap jalan", () => dalamTxBatal((tx) => BERKAS.peminjaman.posting(tx, pj.id)));
+  await jalankan("posting BR perusahaan aktif tetap jalan", () => dalamTxBatal((tx) => BERKAS.kerusakan.posting(tx, br.id)));
+  await db.perusahaan.update({ where: { id: U }, data: { aktif: false } });
+  try {
+    await harusDitolak("setujui PJ milik perusahaan arsip", () => dalamTxBatal((tx) => BERKAS.peminjaman.posting(tx, pj.id)), "PT Uji Pewarisan sudah diarsipkan; aktifkan dulu");
+    await harusDitolak("setujui BR milik perusahaan arsip", () => dalamTxBatal((tx) => BERKAS.kerusakan.posting(tx, br.id)), "PT Uji Pewarisan sudah diarsipkan; aktifkan dulu");
+  } finally {
+    await db.perusahaan.update({ where: { id: U }, data: { aktif: true } });
+  }
+  const stokSesudahArsip = await stokPjBr();
+  pastikan(stokSesudahArsip.every((j, i) => j.equals(stokSebelumArsip[i])), "PJ dan BR perusahaan arsip yang ditolak tidak mengubah stok");
   // BR dan PJ dihapus lagi sebelum siklus beli: harga rata-rata pembelian berikutnya tidak menimbang barang yang
   // sedang rusak atau dipinjam (perilaku lama stok.ts), jadi sinkron persediaan di bagian 9 hanya bermakna tanpa keduanya
   nomorLog.push(br.nomor, pj.nomor);
