@@ -23,6 +23,8 @@ import {
  */
 
 const hariIni = () => new Date().toISOString().slice(0, 10);
+/** Faktur disetujui bermata uang asing milik perusahaan selain utama (sumber penilaian kembali di luar lingkup utama). */
+const FAKTUR_VALAS_LAIN = { statusPersetujuan: "DISETUJUI", mataUangId: { not: null }, perusahaanId: { not: PERUSAHAAN_UTAMA } } as const;
 
 export default async function HalamanMataUang() {
   await wajibHak("pengaturan.tulis");
@@ -33,11 +35,17 @@ export default async function HalamanMataUang() {
   ]);
   const asing = daftarMataUang.filter((m) => !m.fungsional && m.aktif);
   // Penilaian kembali mengikuti lingkup (D1 §4.4, §8.4): satu perusahaan = faktur perusahaan itu, gabungan = semua
-  // perusahaan dengan satu jurnal per perusahaan. Di lingkup utama teks lama dipertahankan.
+  // perusahaan dengan satu jurnal per perusahaan. Di lingkup utama petunjuk hanya tampil bila ada faktur mata uang asing
+  // milik perusahaan lain yang tidak ikut dinilai (tinjauan P18 S1), jadi tampilan peran lama tetap sama.
   const lingkup = await lingkupPerusahaan();
+  const valasLain =
+    lingkup.perusahaanId === PERUSAHAAN_UTAMA &&
+    (await Promise.all([db.fakturPenjualan.count({ where: FAKTUR_VALAS_LAIN }), db.fakturPembelian.count({ where: FAKTUR_VALAS_LAIN })])).some((n) => n > 0);
   const petunjukLingkup =
     lingkup.perusahaanId === PERUSAHAAN_UTAMA
-      ? null
+      ? valasLain
+        ? `Dijalankan untuk ${lingkup.perusahaan?.nama ?? "perusahaan utama"}. Faktur mata uang asing perusahaan lain dinilai dari lingkup perusahaannya atau gabungan.`
+        : null
       : lingkup.perusahaan
         ? `Dijalankan untuk ${lingkup.perusahaan.nama}`
         : "Dijalankan untuk semua perusahaan, satu jurnal per perusahaan";

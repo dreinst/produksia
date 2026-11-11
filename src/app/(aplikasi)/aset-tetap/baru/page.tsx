@@ -12,7 +12,8 @@ export default async function HalamanAsetTetapBaru() {
   const lingkup = await lingkupPerusahaan();
   const p = perusahaanFormulir(lingkup);
   const [daftarAkun, semuaPerusahaan] = await Promise.all([
-    db.akun.findMany({ where: { kelompok: false, ...saringMilikAtauBersama(p) }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
+    // gabungan dan lingkup arsip: akun milik perusahaan arsip tidak ditawarkan, karena pasti ditolak server (tinjauan P18 R3)
+    db.akun.findMany({ where: { kelompok: false, ...(p ? saringMilikAtauBersama(p) : { OR: [{ perusahaanId: null }, { perusahaan: { aktif: true } }] }) }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
     daftarPerusahaan(),
   ]);
   const akhiran = (milik: { kode: string } | null) => (!p && milik ? ` · ${milik.kode}` : "");

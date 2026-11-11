@@ -8,6 +8,7 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import EditorBarisPenggajian from "@/komponen/sdm/EditorBarisPenggajian";
 import KolomPerusahaan from "@/komponen/KolomPerusahaan";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { db } from "@/lib/db";
 import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir } from "@/lib/perusahaan";
 
@@ -54,7 +55,8 @@ export default async function HalamanPenggajianBaru({ searchParams }: { searchPa
             </select>
             <span className="petunjuk">
               {lingkup.perusahaan && !lingkup.perusahaan.aktif ? `${lingkup.perusahaan.nama} sudah diarsipkan. ` : ""}
-              Satu proses gaji untuk karyawan satu perusahaan. Karyawan, akun kas, dan event di bawah mengikuti perusahaan yang dipilih.
+              Satu proses gaji untuk karyawan satu perusahaan.{" "}
+              {dipilih ? `Formulir di bawah untuk ${dipilih.nama}. Ganti perusahaan lalu tekan Tampilkan karyawan.` : "Karyawan, akun kas, dan event di bawah mengikuti perusahaan yang dipilih."}
             </span>
           </div>
           <button type="submit" className="tombol tombol-garis">Tampilkan karyawan</button>
@@ -67,7 +69,20 @@ export default async function HalamanPenggajianBaru({ searchParams }: { searchPa
         className="kartu grid grid-cols-1 md:grid-cols-2 gap-4"
         verifikasi={{ judul: "Periksa proses gaji", peringatan: [PERINGATAN_TANPA_EVENT] }}
       >
-        {lingkup.perusahaanId === PERUSAHAAN_UTAMA || dipilih ? (
+        {dipilih ? (
+          // tinjauan P18 R2: perusahaan formulir tampil di dalam formulir, supaya tidak tertukar dengan pemilih di atas
+          <>
+            <div className="bidang">
+              <input type="hidden" name="perusahaanId" value={dipilih.id} />
+              <span className="label">Perusahaan</span>
+              <div className="isian flex items-center gap-2 bg-slate-50 text-slate-700" aria-readonly="true">
+                <LencanaPerusahaan kode={dipilih.kode} warna={dipilih.warna} />
+                <span className="truncate">{dipilih.nama}</span>
+              </div>
+            </div>
+            <div className="hidden md:block" />
+          </>
+        ) : lingkup.perusahaanId === PERUSAHAAN_UTAMA ? (
           <input type="hidden" name="perusahaanId" value={pf} />
         ) : (
           <>

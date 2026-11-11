@@ -33,12 +33,21 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
   if (!akun) {
     return <div className="kartu"><p className="redup">Belum ada akun kas/bank. Tandai akun kas atau bank di Data Induk, Bagan Akun.</p></div>;
   }
-  const [mutasi, baris, saldoBukuAgg, saldoTerakhir] = await Promise.all([
-    db.mutasiBank.findMany({ where: { akunId, tanggal: { gte: periode.dari, lte: periode.sampai } }, include: { barisJurnal: { include: { jurnal: { select: { nomor: true, tanggal: true } } } } }, orderBy: { tanggal: "asc" } }),
-    db.barisJurnal.findMany({ where: { akunId, jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai } } }, include: { jurnal: { select: { nomor: true, tanggal: true, keterangan: true } }, mutasiBank: { select: { id: true, tanggal: true, perluPerhatian: true, dikonfirmasiPada: true } } }, orderBy: { jurnal: { tanggal: "asc" } } }),
+  const [mutasi, baris, saldoBukuAgg, saldoTerakhir, jurnalLainUtama] = await Promise.all([
+    db.mutasiBank.findMany({ where: { akunId, tanggal: { gte: periode.dari, lte: periode.sampai } }, include: { barisJurnal: { include: { jurnal: { select: { nomor: true, tanggal: true, perusahaanId: true } } } } }, orderBy: { tanggal: "asc" } }),
+    db.barisJurnal.findMany({ where: { akunId, jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai } } }, include: { jurnal: { select: { nomor: true, tanggal: true, keterangan: true, perusahaanId: true } }, mutasiBank: { select: { id: true, tanggal: true, perluPerhatian: true, dikonfirmasiPada: true } } }, orderBy: { jurnal: { tanggal: "asc" } } }),
     db.barisJurnal.aggregate({ where: { akunId, jurnal: { tanggal: { lte: periode.sampai } } }, _sum: { debit: true, kredit: true } }),
     db.mutasiBank.findFirst({ where: { akunId, tanggal: { lte: periode.sampai }, saldo: { not: null } }, orderBy: [{ tanggal: "desc" }, { diimporPada: "desc" }], select: { saldo: true } }),
+    // Di lingkup utama, akun bersama baru perlu catatan bila memang ada jurnal perusahaan lain di akun ini (tinjauan P18 S1)
+    p === PERUSAHAAN_UTAMA && !akun.perusahaanId
+      ? db.barisJurnal.count({ where: { akunId, jurnal: { perusahaanId: { not: PERUSAHAAN_UTAMA } } } })
+      : Promise.resolve(0),
   ]);
+  // R-12: rekening bersama tidak bisa direkonsiliasi per perusahaan. Di lingkup utama catatan hanya tampil bila akun ini
+  // juga dipakai perusahaan lain, jadi tampilan peran lama (semua jurnal milik utama) tetap sama.
+  const dipakaiLain = !akun.perusahaanId && (p !== PERUSAHAAN_UTAMA || jurnalLainUtama > 0);
+  // Nomor jurnal milik perusahaan di luar lingkup tunggal diberi akhiran kode perusahaannya
+  const nomorJurnal = (j: { nomor: string; perusahaanId: string }) => (p && j.perusahaanId !== p ? `${j.nomor} · ${kodePerusahaan.get(j.perusahaanId) ?? j.perusahaanId}` : j.nomor);
   const saldoBuku = D(saldoBukuAgg._sum.debit ?? 0).minus(D(saldoBukuAgg._sum.kredit ?? 0));
   const mutasiBelum = mutasi.filter((m) => !m.barisJurnalId);
   const perluPerhatian = mutasi.filter((m) => m.perluPerhatian && !m.dikonfirmasiPada);
@@ -78,9 +87,7 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
         }
       />
 
-      {/* R-12: rekening bersama tidak bisa direkonsiliasi per perusahaan. Di lingkup utama tidak ditampilkan supaya
-          tampilan peran lama tetap sama (akun kas lama dipakai bersama). */}
-      {p !== PERUSAHAAN_UTAMA && !akun.perusahaanId && (
+      {dipakaiLain && (
         <div role="note" className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
           Akun dipakai bersama: saldo buku = gabungan semua perusahaan.
         </div>
@@ -136,7 +143,7 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
                             ) : (
                               <span className="lencana lencana-emerald">Cocok</span>
                             )}
-                            <span className="mono text-slate-500">{m.barisJurnal.jurnal.nomor}{bedaTanggal ? ` (${tgl(m.barisJurnal.jurnal.tanggal)})` : ""}</span>
+                            <span className="mono text-slate-500">{nomorJurnal(m.barisJurnal.jurnal)}{bedaTanggal ? ` (${tgl(m.barisJurnal.jurnal.tanggal)})` : ""}</span>
                             {bolehTulis && (
                               <FormulirAksi aksi={lepasCocokFormulir} className="inline"><input type="hidden" name="mutasiId" value={m.id} /><button type="submit" className="tombol-tautan-bahaya">lepas</button></FormulirAksi>
                             )}
@@ -146,7 +153,7 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
                             <input type="hidden" name="mutasiId" value={m.id} />
                             <select name="barisId" className="isian isian-kecil w-auto" defaultValue={kandidat[0].id} aria-label="Baris jurnal">
                               {kandidat.map((b) => (
-                                <option key={b.id} value={b.id}>{b.jurnal.nomor} ({tgl(b.jurnal.tanggal)})</option>
+                                <option key={b.id} value={b.id}>{nomorJurnal(b.jurnal)} ({tgl(b.jurnal.tanggal)})</option>
                               ))}
                             </select>
                             <button type="submit" className="tombol tombol-garis tombol-kecil">Cocokkan</button>
@@ -178,7 +185,7 @@ export default async function HalamanRekonsiliasiKasBank({ searchParams }: { sea
                 {baris.map((b) => (
                   <tr key={b.id} className={!b.mutasiBank ? "bg-amber-50/40" : undefined}>
                     <td className="whitespace-nowrap">{tgl(b.jurnal.tanggal)}</td>
-                    <td className="mono">{b.jurnal.nomor}</td>
+                    <td className="mono">{nomorJurnal(b.jurnal)}</td>
                     <td>{b.keterangan ?? b.jurnal.keterangan ?? ""}</td>
                     <td className="text-right angka text-emerald-700">{Number(b.debit) ? angka(b.debit) : ""}</td>
                     <td className="text-right angka text-blue-700">{Number(b.kredit) ? angka(b.kredit) : ""}</td>

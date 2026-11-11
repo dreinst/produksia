@@ -36,6 +36,27 @@ const BELUM_SELESAI = { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"
 const nama = (p: { nama: string } | null | undefined) => p?.nama ?? null;
 const PERUSAHAAN = { perusahaan: { select: { kode: true, nama: true, warna: true } } } as const;
 
+/**
+ * Jumlah dokumen MENUNGGU milik perusahaan di luar lingkup tunggal yang jenisnya boleh dilihat pengguna (tinjauan P18
+ * R1). Hanya angka, jadi tidak membocorkan isi dokumen; hak lihat tetap per jenis seperti daftar di halaman ini.
+ */
+async function hitungMenungguLain(lp: string, bolehLihat: (kode: string) => boolean): Promise<number> {
+  const where = { statusPersetujuan: "MENUNGGU" as const, perusahaanId: { not: lp } };
+  const nol = Promise.resolve(0);
+  const hitungan = await Promise.all([
+    bolehLihat("faktur") ? db.fakturPenjualan.count({ where }) : nol,
+    bolehLihat("faktur-pembelian") ? db.fakturPembelian.count({ where }) : nol,
+    bolehLihat("kas-masuk") ? db.dokumenKas.count({ where: { ...where, jenis: "MASUK" } }) : nol,
+    bolehLihat("kas-keluar") ? db.dokumenKas.count({ where: { ...where, jenis: "KELUAR" } }) : nol,
+    bolehLihat("penyesuaian") ? db.penyesuaianPersediaan.count({ where }) : nol,
+    bolehLihat("peminjaman") ? db.peminjamanBarang.count({ where }) : nol,
+    bolehLihat("kerusakan") ? db.laporanKerusakanBarang.count({ where }) : nol,
+    bolehLihat("aset") ? db.asetTetap.count({ where }) : nol,
+    bolehLihat("penggajian") ? db.penggajian.count({ where }) : nol,
+  ]);
+  return hitungan.reduce((a, b) => a + b, 0);
+}
+
 export default async function HalamanPersetujuan() {
   const pengguna: PenggunaSesi = await wajibMasuk();
   // Gudang murni input/output stok; kotak masuk Persetujuan di luar fokusnya (permintaan pemilik).
@@ -108,6 +129,7 @@ export default async function HalamanPersetujuan() {
     .sort((a, b) => (a.status === b.status ? b.tanggal.getTime() - a.tanggal.getTime() : a.status === "MENUNGGU" ? -1 : 1));
 
   const menunggu = daftar.filter((b) => b.status === "MENUNGGU").length;
+  const menungguLain = lp ? await hitungMenungguLain(lp, bolehLihat) : 0;
 
   return (
     <div className="space-y-6">
@@ -126,6 +148,9 @@ export default async function HalamanPersetujuan() {
         <div className="kepala-kartu">
           <h2 className="judul-kartu">{menunggu} dokumen menunggu persetujuan</h2>
           <p className="subjudul-kartu">Total {daftar.length} dokumen belum selesai (draf, menunggu, atau ditolak).</p>
+          {menungguLain > 0 && (
+            <p className="text-sm redup">Ada {menungguLain} dokumen menunggu di perusahaan lain. Ganti lingkup lewat pemilih perusahaan.</p>
+          )}
         </div>
         <div className="bungkus-tabel">
           <table className="tabel min-w-[52rem]">
