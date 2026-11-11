@@ -19,7 +19,7 @@ import { BarisTurunan, DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, 
 
 /**
  * Detail pesanan penjualan (D2 §7.3) dengan termin pembayaran. Tombol Kirim, Uang Muka, dan Fakturkan memakai syarat
- * yang sama dengan daftar pesanan. Ubah tampilan dan ubah termin (P28) serta cetak tagihan (P45) belum dipasang.
+ * yang sama dengan daftar pesanan. Ubah tampilan dan ubah termin dipasang P28; cetak tagihan milik P45.
  */
 export default async function HalamanDetailPesanan({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("pesanan.lihat");
@@ -94,6 +94,18 @@ export default async function HalamanDetailPesanan({ params }: { params: Promise
                 <Ikon nama="receipt_long" className="!text-[18px]" />
                 Fakturkan
               </Link>
+            )}
+            {boleh("pesanan.ubah") && (
+              <Link href={`/penjualan/pesanan/${p.id}/termin`} className="tombol tombol-garis">
+              <Ikon nama="payments" className="!text-[18px]" />
+              Ubah termin
+            </Link>
+            )}
+            {boleh("pesanan.ubah") && (
+              <Link href={`/penjualan/pesanan/${p.id}/tampilan`} className="tombol tombol-garis">
+              <Ikon nama="tune" className="!text-[18px]" />
+              Ubah tampilan
+            </Link>
             )}
             <TombolHapusDokumen kembaliKeDaftar jenis="pesanan" id={p.id} nomor={p.nomor} boleh={boleh("pesanan.hapus")} />
           </>

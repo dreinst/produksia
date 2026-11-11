@@ -530,7 +530,9 @@ export async function simpanFormatNomor(dataFormulir: FormData) {
     kode: dataFormulir.get("kode"),
     digit: dataFormulir.get("digit"),
     kunciDeret: dataFormulir.get("kunciDeret"),
-    reset: dataFormulir.get("reset"),
+    // "resetNomor" dipakai halaman pengaturan: isian bernama "reset" menimpa method form.reset() di peramban, sehingga
+    // reset formulir React sesudah aksi gagal. Kunci lama "reset" tetap diterima.
+    reset: dataFormulir.get("resetNomor") ?? dataFormulir.get("reset"),
   });
   const aktif = bacaCentang(dataFormulir, "aktif", true);
   const teksTerakhir = rapikanTeks(dataFormulir.get("nomorTerakhir"));

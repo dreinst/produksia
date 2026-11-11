@@ -76,6 +76,8 @@ function BidangPerusahaan({ perusahaan, tampil }: { perusahaan: RingkasPerusahaa
         </div>
         {tampil === "bacaSaja" ? (
           <span className="petunjuk">Ganti lewat pemilih perusahaan di bilah samping</span>
+        ) : tampil === "tetap" ? (
+          <span className="petunjuk">Perusahaan dokumen tidak bisa diganti</span>
         ) : tampil.gantiHref ? (
           <Link href={tampil.gantiHref} className="petunjuk text-blue-600 hover:underline">
             Ganti perusahaan penerbit
@@ -89,7 +91,8 @@ function BidangPerusahaan({ perusahaan, tampil }: { perusahaan: RingkasPerusahaa
   );
 }
 
-export type TampilPerusahaan = "tersembunyi" | "bacaSaja" | { gantiHref: string | null };
+/** "tetap" = halaman ubah: baca saja, perusahaan dokumen yang sudah tersimpan tidak bisa diganti. */
+export type TampilPerusahaan = "tersembunyi" | "bacaSaja" | "tetap" | { gantiHref: string | null };
 
 export default function FormulirDokumenPenjualan({
   jenis,
@@ -103,6 +106,8 @@ export default function FormulirDokumenPenjualan({
   nilaiAwal = {},
   labelSimpan,
   tombolLain,
+  pesanSukses,
+  alihkanKe,
 }: {
   jenis: "penawaran" | "pesanan";
   aksi: (sebelumnya: StatusFormulir, dataFormulir: FormData) => Promise<StatusFormulir>;
@@ -117,6 +122,9 @@ export default function FormulirDokumenPenjualan({
   labelSimpan?: string;
   /** tombol tambahan sesudah tombol simpan (mis. "Simpan & Buat Faktur") */
   tombolLain?: ReactNode;
+  /** pesan sukses dan tujuan sesudah berhasil untuk aksi yang tidak mengalihkan sendiri (halaman ubah) */
+  pesanSukses?: string;
+  alihkanKe?: string;
 }) {
   const pelangganAwal = lead?.pelangganId ?? nilaiAwal.pelangganId;
   const penawaran = jenis === "penawaran";
@@ -124,6 +132,8 @@ export default function FormulirDokumenPenjualan({
     <FormulirAksi
       aksi={aksi}
       verifikasi={{ judul: penawaran ? "Periksa penawaran" : "Periksa pesanan penjualan", peringatan: [PERINGATAN_TANPA_EVENT] }}
+      pesanSukses={pesanSukses}
+      alihkanKe={alihkanKe}
       className="kartu grid grid-cols-1 md:grid-cols-2 gap-4"
     >
       <BidangPerusahaan perusahaan={perusahaan} tampil={tampilPerusahaan} />

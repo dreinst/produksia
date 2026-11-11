@@ -21,7 +21,7 @@ import { DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, nomorTampil } 
 
 /**
  * Detail penawaran penjualan (D2 §7.3). Tidak mengikuti lingkup perusahaan (lingkup hanya pilihan tampilan, D1).
- * Tombol Ubah, Ubah tampilan (P28), dan cetak (P45) belum dipasang karena rutenya belum ada.
+ * Ubah (draf) dan Ubah tampilan dipasang P28; tombol cetak milik P45.
  */
 export default async function HalamanDetailPenawaran({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("penawaran.lihat");
@@ -73,6 +73,18 @@ export default async function HalamanDetailPenawaran({ params }: { params: Promi
                   Konversi ke Pesanan
                 </button>
               </FormulirAksi>
+            )}
+            {draf && boleh("penawaran.ubah") && (
+              <Link href={`/penjualan/penawaran/${p.id}/ubah`} className="tombol tombol-garis">
+              <Ikon nama="edit_note" className="!text-[18px]" />
+              Ubah
+            </Link>
+            )}
+            {boleh("penawaran.ubah") && (
+              <Link href={`/penjualan/penawaran/${p.id}/tampilan`} className="tombol tombol-garis">
+              <Ikon nama="tune" className="!text-[18px]" />
+              Ubah tampilan
+            </Link>
             )}
             <TombolHapusDokumen kembaliKeDaftar jenis="penawaran" id={p.id} nomor={p.nomor} boleh={boleh("penawaran.hapus")} />
           </>

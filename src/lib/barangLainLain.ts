@@ -12,6 +12,13 @@ export const KODE_BARANG_LAIN = "JASA-LAIN";
 export const NAMA_BARANG_LAIN = "Item lain-lain";
 
 /**
+ * Nilai pilihan "Item bebas" di editor baris penjualan (EditorBarisPenjualan.BEBAS). Ditaruh di sini (hanya impor tipe)
+ * supaya halaman server, mis. halaman ubah penawaran, bisa memakainya: ekspor berkas "use client" menjadi referensi
+ * klien bila diimpor komponen server, bukan string.
+ */
+export const PILIHAN_BEBAS = "__bebas";
+
+/**
  * id Barang JASA-LAIN, dibuat bila belum ada (perusahaan null = bersama, K3). Panggil di dalam transaksi dokumen.
  * Upsert pada kode unik aman bila dua transaksi membuatnya bersamaan. Kode yang sudah dipakai barang jenis BARANG
  * ditolak, karena baris bebas tidak boleh memotong stok. Barang JASA-LAIN yang punya perusahaan juga ditolak.

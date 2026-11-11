@@ -6,6 +6,7 @@ import { punyaHak, type Hak } from "@/lib/hakAkses";
 import { D } from "@/lib/uang";
 import { formatTanggal } from "@/lib/waktu";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import Ikon from "@/komponen/ui/Ikon";
 import { LencanaPersetujuan, Rp, labelMetodeBayar } from "@/komponen/ui/Lencana";
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import LampiranBerkas from "@/komponen/berkas/LampiranBerkas";
@@ -14,7 +15,7 @@ import { DaftarInfo, Kartu, nomorTampil } from "../../_detail/bagian";
 
 /**
  * Detail penerimaan penjualan sebagai kuitansi (D2 §7.3) dengan lampiran bukti transfer. Terima dari dan keperluan
- * kosong memakai bawaan data cetak kuitansi. Ubah tampilan (P28) dan cetak (P45) belum dipasang.
+ * kosong memakai bawaan data cetak kuitansi. Ubah tampilan dipasang P28; cetak milik P45.
  */
 export default async function HalamanDetailPenerimaan({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("penerimaan.lihat");
@@ -44,7 +45,17 @@ export default async function HalamanDetailPenerimaan({ params }: { params: Prom
         judul={`Penerimaan ${tampil}`}
         subjudul={`${r.pelanggan.nama} · ${formatTanggal(r.tanggal)} · ${r.perusahaan.nama}`}
         lencana={<LencanaPersetujuan status={r.statusPersetujuan} />}
-        aksi={<TombolHapusDokumen kembaliKeDaftar jenis="penerimaan" id={r.id} nomor={r.nomor} boleh={boleh("penerimaan.hapus")} />}
+        aksi={
+          <>
+            {boleh("penerimaan.ubah") && (
+              <Link href={`/penjualan/penerimaan/${r.id}/tampilan`} className="tombol tombol-garis">
+              <Ikon nama="tune" className="!text-[18px]" />
+              Ubah tampilan
+            </Link>
+            )}
+            <TombolHapusDokumen kembaliKeDaftar jenis="penerimaan" id={r.id} nomor={r.nomor} boleh={boleh("penerimaan.hapus")} />
+          </>
+        }
       />
 
       <Kartu judul="Informasi">

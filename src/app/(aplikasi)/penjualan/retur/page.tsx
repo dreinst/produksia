@@ -4,16 +4,21 @@ import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import { lingkupPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
 
 export default async function HalamanReturPenjualan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("retur-penjualan.lihat");
   const bolehHapus = punyaHak(pengguna, "retur-penjualan.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { faktur: { nomor: cocokTeks(param.q) } }, { faktur: { pelanggan: { nama: cocokTeks(param.q) } } }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya; gabungan = semua + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { faktur: { nomor: cocokTeks(param.q) } }, { faktur: { pelanggan: { nama: cocokTeks(param.q) } } }] } : {};
+  const where = { AND: [cari, saringPerusahaan(perusahaanId)] };
   const [total, daftarRetur] = await Promise.all([
     db.returPenjualan.count({ where }),
-    db.returPenjualan.findMany({ where, include: { faktur: { include: { pelanggan: true } }, gudang: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    db.returPenjualan.findMany({ where, include: { faktur: { include: { pelanggan: true } }, gudang: true, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
   ]);
 
   return (
@@ -30,6 +35,7 @@ export default async function HalamanReturPenjualan({ searchParams }: { searchPa
         <thead>
           <tr>
             <th>No</th>
+            {!perusahaanId && <th>Perusahaan</th>}
             <th>Tanggal</th>
             <th>Faktur</th>
             <th>Pelanggan</th>
@@ -42,6 +48,7 @@ export default async function HalamanReturPenjualan({ searchParams }: { searchPa
           {daftarRetur.map((r) => (
             <tr key={r.id}>
               <td><NomorDokumen nomor={r.nomor} /></td>
+              {!perusahaanId && <td><LencanaPerusahaan kode={r.perusahaan.kode} warna={r.perusahaan.warna} nama={r.perusahaan.nama} /></td>}
               <td className="text-slate-500 whitespace-nowrap">{r.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
               <td>{r.faktur.nomor}</td>
               <td>{r.faktur.pelanggan.nama}</td>
@@ -52,7 +59,7 @@ export default async function HalamanReturPenjualan({ searchParams }: { searchPa
           ))}
           {daftarRetur.length === 0 && (
             <tr>
-              <td colSpan={7} className="kosong">
+              <td colSpan={perusahaanId ? 7 : 8} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada retur."}
               </td>
             </tr>

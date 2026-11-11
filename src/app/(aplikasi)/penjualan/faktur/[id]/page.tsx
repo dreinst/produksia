@@ -18,7 +18,7 @@ import { BarisTurunan, DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, 
 
 /**
  * Detail faktur penjualan (D2 §7.3): persetujuan, uang muka terpakai, penerimaan, dan retur. Terima Bayar dan Retur
- * memakai syarat daftar faktur (hanya faktur DISETUJUI). Ubah tampilan (P28) dan cetak (P45) belum dipasang.
+ * memakai syarat daftar faktur (hanya faktur DISETUJUI). Ubah tampilan dipasang P28; cetak milik P45.
  */
 export default async function HalamanDetailFaktur({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("faktur.lihat");
@@ -91,6 +91,12 @@ export default async function HalamanDetailFaktur({ params }: { params: Promise<
               <Link href={`/penjualan/retur/baru?fakturId=${f.id}`} className="tombol tombol-garis">
                 Retur
               </Link>
+            )}
+            {boleh("faktur.ubah") && (
+              <Link href={`/penjualan/faktur/${f.id}/tampilan`} className="tombol tombol-garis">
+              <Ikon nama="tune" className="!text-[18px]" />
+              Ubah tampilan
+            </Link>
             )}
             <TombolHapusDokumen kembaliKeDaftar jenis="faktur" id={f.id} nomor={f.nomor} boleh={boleh("faktur.hapus")} />
           </>

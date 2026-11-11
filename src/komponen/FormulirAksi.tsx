@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import type { StatusFormulir } from "@/lib/statusFormulir";
 import type { Verifikasi } from "@/lib/verifikasi";
@@ -23,6 +24,12 @@ type Props = {
   pesanSuksesHalaman?: string;
   /** Kalau diisi, sebelum kirim tampil dialog ringkasan isian + peringatan (verifikasi singkat agar tidak salah input). */
   verifikasi?: Verifikasi;
+  /**
+   * Alamat tujuan sesudah aksi yang TIDAK redirect berhasil (mis. halaman ubah kembali ke detail). Dipakai formulir
+   * berisi <select> terkendali: React mengatur ulang formulir sesudah aksi, sehingga pilihan terkendali tampil kembali ke
+   * opsi pertama walau state-nya benar.
+   */
+  alihkanKe?: string;
 };
 
 const rupiah = (n: number) => n.toLocaleString("id-ID");
@@ -118,7 +125,7 @@ function susunRingkasan(form: HTMLFormElement, v: Verifikasi): RingkasanVerifika
  * - menonaktifkan semua isian saat pengiriman berjalan (cegah dobel-klik)
  * - opsional: konfirmasi sebelum kirim, atau dialog verifikasi (ringkasan isian + peringatan)
  */
-export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses, pesanSuksesHalaman, verifikasi }: Props) {
+export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses, pesanSuksesHalaman, verifikasi, alihkanKe }: Props) {
   // Tanpa pesanSuksesHalaman, aksi server dipakai langsung seperti semula.
   const aksiDipakai = pesanSuksesHalaman
     ? async (sebelumnya: StatusFormulir, dataFormulir: FormData) => {
@@ -139,6 +146,10 @@ export default function FormulirAksi({ aksi, children, className, pesanKonfirmas
     setStatusTerakhir(status);
     if (status.ok) setKunciIsian((k) => k + 1);
   }
+  const router = useRouter();
+  useEffect(() => {
+    if (alihkanKe && status.ok && !status.galat) router.push(alihkanKe);
+  }, [status, alihkanKe, router]);
   const formRef = useRef<HTMLFormElement>(null);
   const sudahDiverifikasi = useRef(false);
   const pengirim = useRef<HTMLElement | null>(null);

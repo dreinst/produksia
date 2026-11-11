@@ -3,6 +3,7 @@
 import { Fragment } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import { angkaKlien, nilaiBarisKlien, subtotalKlien } from "@/lib/hitungDokumenKlien";
+import { PILIHAN_BEBAS } from "@/lib/barangLainLain";
 
 /*
  * Editor baris penawaran dan pesanan penjualan (D2 §7.4). Dikendalikan PenyusunDokumenPenjualan (baris ikut ringkasan
@@ -27,7 +28,8 @@ export type BarisEditor = {
   keterangan: string;
 };
 
-export const BEBAS = "__bebas";
+/** Pilihan "Item bebas". Komponen server memakai PILIHAN_BEBAS dari barangLainLain.ts (nilainya sama). */
+export const BEBAS = PILIHAN_BEBAS;
 let urutKunci = 0;
 export const kunciBarisBaru = () => ++urutKunci;
 export const barisKosong = (): BarisEditor => ({ kunci: kunciBarisBaru(), barangId: "", nama: "", deskripsi: "", jumlah: "1", satuan: "", frekuensi: "", satuanFrekuensi: "", harga: "0", bagian: "", keterangan: "" });
