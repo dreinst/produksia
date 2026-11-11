@@ -29,11 +29,15 @@ const FIELDS = [
 export default async function HalamanPemetaanAkun() {
   await wajibHak("pemetaan.tulis");
   const [daftarAkun, pemetaan, tambahan] = await Promise.all([
-    db.akun.findMany({ orderBy: { kode: "asc" } }),
+    db.akun.findMany({ orderBy: { kode: "asc" }, include: { perusahaan: { select: { kode: true } } } }),
     db.pemetaanAkun.findUnique({ where: { id: "default" } }),
     db.pemetaanAkunTambahan.findMany({ include: { akun: true }, orderBy: { label: "asc" } }),
   ]);
-  const labelAkun = (a: { kode: string; nama: string }) => `${a.kode} - ${a.nama}`;
+  // Pemetaan berlaku untuk semua perusahaan, jadi server hanya menerima akun bersama (P19). Pilihan disaring ke akun
+  // bersama; akun berpemilik yang sedang tersimpan tetap ditampilkan (bertanda) supaya nilainya tidak hilang diam-diam
+  // dan pesan penolakan server menjelaskannya saat disimpan (tinjauan P19).
+  const labelAkun = (a: { kode: string; nama: string; perusahaan?: { kode: string } | null }) => `${a.kode} - ${a.nama}${a.perusahaan ? ` (milik ${a.perusahaan.kode}, ganti ke akun bersama)` : ""}`;
+  const pilihanAkun = (tersimpan: string | null | undefined) => daftarAkun.filter((a) => a.perusahaanId === null || a.id === tersimpan);
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -61,7 +65,7 @@ export default async function HalamanPemetaanAkun() {
               className="isian"
             >
               <option value="">-</option>
-              {daftarAkun
+              {pilihanAkun((pemetaan as unknown as Record<string, string | null> | null)?.[bidang.nama])
                 .filter((a) => a.jenis === bidang.filterType && a.kelompok === ("kelompok" in bidang && bidang.kelompok))
                 .map((a) => (
                   <option key={a.id} value={a.id}>{labelAkun(a)}</option>
@@ -105,7 +109,7 @@ export default async function HalamanPemetaanAkun() {
                     <td>
                       <FormulirAksi aksi={ubahPemetaanTambahanFormulir.bind(null, t.id)} pesanSukses="Akun diganti." className="flex items-center gap-2">
                         <select name="akunId" defaultValue={t.akunId} className="isian isian-kecil" aria-label={`Akun untuk ${t.label}`}>
-                          {daftarAkun.map((a) => (
+                          {pilihanAkun(t.akunId).map((a) => (
                             <option key={a.id} value={a.id}>{labelAkun(a)}</option>
                           ))}
                         </select>
@@ -133,7 +137,7 @@ export default async function HalamanPemetaanAkun() {
             <label className="label" htmlFor="akunIdTambahan">Akun *</label>
             <select id="akunIdTambahan" name="akunId" required className="isian" defaultValue="">
               <option value="">-</option>
-              {daftarAkun.map((a) => (
+              {pilihanAkun(null).map((a) => (
                 <option key={a.id} value={a.id}>{labelAkun(a)}</option>
               ))}
             </select>

@@ -101,12 +101,20 @@ export const ambilPengaturanPerusahaan = cache(async (klien: Klien = db, perusah
   };
 });
 
+/**
+ * Pesan akun pajak yang belum diatur. Akun pajak diatur per perusahaan di Pengaturan > Perusahaan & Pajak > {nama}
+ * (halaman /pengaturan/perusahaan/{id}), jadi pesan menyebut perusahaan dokumennya (tinjauan P19 temuan 4).
+ */
+export function pesanAkunPajakBelumDiatur(label: string, namaPerusahaan: string): string {
+  return `${label} belum diatur untuk ${namaPerusahaan} (Pengaturan > Perusahaan & Pajak > ${namaPerusahaan})`;
+}
+
 /** Membaca tarif PPN yang diminta formulir dan memastikannya sah untuk status PKP perusahaan. */
 export function bacaTarifPpn(nilai: FormDataEntryValue | null, pengaturan: PengaturanPajak): Desimal {
   const teks = typeof nilai === "string" ? nilai.trim() : "";
   const tarif = teks === "" ? (pengaturan.pkp ? pengaturan.tarifPpnPersen : D(0)) : uang(teks);
   if (tarif.isNegative() || tarif.gt(100)) throw new Error("Tarif PPN harus antara 0 dan 100 persen");
-  if (tarif.gt(0) && !pengaturan.pkp) throw new Error("Perusahaan belum PKP. Aktifkan di Pengaturan, Perusahaan & Pajak");
+  if (tarif.gt(0) && !pengaturan.pkp) throw new Error(`Perusahaan ${pengaturan.nama} belum PKP. Aktifkan di Pengaturan > Perusahaan & Pajak > ${pengaturan.nama}`);
   return tarif;
 }
 

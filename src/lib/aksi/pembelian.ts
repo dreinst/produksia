@@ -18,7 +18,7 @@ import { tandaiProyek } from "@/lib/akuntansi";
 import { bacaProyekId } from "@/lib/proyek";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 import { bacaMataUangDokumen, nilaiDalamMataUang } from "@/lib/mataUang";
-import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
+import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, pesanAkunPajakBelumDiatur, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 import {
   PERUSAHAAN_UTAMA,
   pastikanAkunMilik,
@@ -300,7 +300,7 @@ export async function buatPembayaranPembelian(dataFormulir: FormData) {
   // catatan A D1 §3.3: pengaturan perusahaan faktur dibaca di posisi lama
   const indukPerusahaan = await db.fakturPembelian.findUnique({ where: { id: fakturId }, select: { perusahaanId: true } });
   const pengaturan = await ambilPengaturanPerusahaan(db, indukPerusahaan?.perusahaanId ?? PERUSAHAAN_UTAMA);
-  if (potonganPajak.gt(0) && !pengaturan.akunPph23DipotongId) throw new Error("Akun Hutang PPh 23 belum diatur di Pengaturan > Perusahaan & Pajak");
+  if (potonganPajak.gt(0) && !pengaturan.akunPph23DipotongId) throw new Error(pesanAkunPajakBelumDiatur("Akun Hutang PPh 23", pengaturan.nama));
 
   const faktur = await db.fakturPembelian.findUniqueOrThrow({ where: { id: fakturId }, include: { pembayaran: true, retur: true, pesanan: { select: { proyekId: true } } } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");

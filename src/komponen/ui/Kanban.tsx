@@ -63,21 +63,26 @@ export default function Kanban({
   tampilkanJumlah?: boolean;
 }): ReactElement {
   const [tampil, pindahOptimis] = useOptimistic(kartu, (daftar: KartuKanban[], p: Permintaan) => daftar.map((k) => (k.id === p.kartuId ? { ...k, kolomId: p.kolomId } : k)));
-  const [, mulai] = useTransition();
+  const [sedang, mulai] = useTransition();
   const [pesan, setPesan] = useState<{ galat: boolean; teks: string } | null>(null);
   const [dialog, setDialog] = useState<Permintaan | null>(null);
   const [sorot, setSorot] = useState<string | null>(null);
   const [fokus, setFokus] = useState<MintaFokus | null>(null);
   const pilihan = useRef(new Map<string, HTMLSelectElement>());
+  /** permintaan fokus yang sudah tuntas; dibandingkan per objek karena tiap permintaan adalah objek baru */
+  const terpenuhi = useRef<MintaFokus | null>(null);
 
   // Kartu yang pindah dipasang ulang di kolom lain, sehingga fokus jatuh ke body. Kembalikan ke pilihan tujuan kartu
   // itu, juga bila kartu kembali ke kolom lama karena galat. Fokus yang sudah dipindah pengguna tidak direbut.
+  // Permintaan dianggap tuntas begitu aksi selesai dan data akhirnya sudah dirender (tidak sedang dalam transisi),
+  // supaya data segar berikutnya (revalidatePath aksi lain, router.refresh) tidak menarik fokus ke kartu ini lagi
+  // (tinjauan P19 temuan 2). Selama dialog alasan terbuka, permintaan ditahan.
   useEffect(() => {
-    if (!fokus) return;
+    if (!fokus || dialog || terpenuhi.current === fokus) return;
     const aktif = document.activeElement;
-    if (aktif && aktif !== document.body) return;
-    pilihan.current.get(fokus.kartuId)?.focus();
-  }, [fokus, tampil]);
+    if (!aktif || aktif === document.body) pilihan.current.get(fokus.kartuId)?.focus();
+    if (!sedang) terpenuhi.current = fokus;
+  }, [fokus, tampil, sedang, dialog]);
 
   const judulKolom = (id: string) => kolom.find((k) => k.id === id)?.judul ?? id;
 

@@ -90,7 +90,7 @@ export default async function HalamanPenerimaanPenjualanBaru({
             <span className="petunjuk">Bila klien memotong PPh 23 (mis. 2% dari DPP jasa), isi nominalnya: piutang berkurang sebesar bayar + potongan, potongan dicatat sebagai pajak dibayar dimuka</span>
           </div>
         ) : (
-          <p className="text-xs text-slate-500">Potongan PPh 23 oleh pelanggan bisa dicatat setelah akun pajaknya diatur di Pengaturan › Perusahaan &amp; Pajak.</p>
+          <p className="text-xs text-slate-500">Potongan PPh 23 oleh pelanggan bisa dicatat setelah akun pajaknya diatur di Pengaturan › Perusahaan &amp; Pajak › {pengaturan.nama}.</p>
         )}
 
         <div className="bidang">

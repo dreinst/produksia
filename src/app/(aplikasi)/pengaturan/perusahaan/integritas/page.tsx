@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { punyaHak } from "@/lib/hakAkses";
 import { periksaKonsistensiPerusahaan, periksaSinkron, type HasilSinkron, type Perbandingan } from "@/lib/sinkron";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
@@ -30,7 +31,15 @@ function SelPerbandingan({ hasil }: { hasil: Perbandingan }) {
   return <span className="angka font-semibold text-rose-700" title={`Buku besar ${Number(hasil.bukuBesar).toLocaleString("id-ID")}, dokumen ${Number(hasil.dokumen).toLocaleString("id-ID")}`}>Rp {Number(hasil.selisih).toLocaleString("id-ID")}</span>;
 }
 
-function BarisSinkron({ label, hasil, tebal }: { label: ReactNode; hasil: HasilSinkron; tebal?: boolean }) {
+function BarisSinkron({ label, hasil, tebal }: { label: ReactNode; hasil: HasilSinkron | null; tebal?: boolean }) {
+  if (!hasil) {
+    return (
+      <tr className={tebal ? "bg-slate-50/70 font-semibold" : undefined}>
+        <td>{label}</td>
+        <td colSpan={KOLOM.length + 1} className="text-rose-700">Gagal diperiksa, lihat log server</td>
+      </tr>
+    );
+  }
   return (
     <tr className={tebal ? "bg-slate-50/70 font-semibold" : undefined}>
       <td>{label}</td>
@@ -50,31 +59,48 @@ function BarisSinkron({ label, hasil, tebal }: { label: ReactNode; hasil: HasilS
   );
 }
 
+/** Jalankan satu pemeriksaan; galatnya dicetak ke log server dan hasilnya null, supaya baris lain tetap tampil. */
+async function cobaPeriksa<T>(nama: string, kerja: () => Promise<T>): Promise<T | null> {
+  try {
+    return await kerja();
+  } catch (e) {
+    console.error(`[integritas] pemeriksaan ${nama} gagal`, e);
+    return null;
+  }
+}
+
 /**
  * Integritas per perusahaan (D1 §7.2, R4, R6): periksaSinkron untuk tiap perusahaan aktif dan perusahaan arsip yang
  * punya jurnal, lalu gabungan; plus periksaKonsistensiPerusahaan yang dihitung langsung (tanpa simpanan beranda).
- * Biaya periksaSinkron dikali jumlah perusahaan, jadi hanya dijalankan di halaman ini.
+ * Biaya periksaSinkron dikali jumlah perusahaan, jadi hanya dijalankan di halaman ini. Pemeriksaan dijalankan satu
+ * per satu (paralelisme di dalam satu periksaSinkron sudah cukup mengisi pool koneksi), dan galat satu pemeriksaan
+ * hanya menandai barisnya (tinjauan P19 temuan 1).
  */
 export default async function HalamanIntegritasPerusahaan() {
-  await wajibHak("buku-besar.lihat");
+  const pengguna = await wajibHak("buku-besar.lihat");
+  // tautan ke Perusahaan & Pajak hanya untuk yang boleh membukanya (ADMIN punya buku-besar.lihat tanpa pengaturan.tulis)
+  const bolehPengaturan = punyaHak(pengguna, "pengaturan.tulis");
   const daftar = await db.perusahaan.findMany({
     where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] },
     orderBy: [{ urutan: "asc" }, { nama: "asc" }],
     select: { id: true, kode: true, nama: true, warna: true, aktif: true },
   });
-  const [perPerusahaan, gabungan, konsistensi] = await Promise.all([
-    Promise.all(daftar.map((p) => periksaSinkron(db, { perusahaanId: p.id }))),
-    periksaSinkron(db),
-    periksaKonsistensiPerusahaan(db),
-  ]);
+  const perPerusahaan: (HasilSinkron | null)[] = [];
+  for (const p of daftar) perPerusahaan.push(await cobaPeriksa(`sinkron ${p.kode}`, () => periksaSinkron(db, { perusahaanId: p.id })));
+  const gabungan = await cobaPeriksa("sinkron gabungan", () => periksaSinkron(db));
+  const konsistensi = await cobaPeriksa("konsistensi perusahaan", () => periksaKonsistensiPerusahaan(db));
 
   return (
     <div className="space-y-6">
       <KepalaHalaman
-        jejak={[{ label: "Pengaturan" }, { label: "Perusahaan & Pajak", href: "/pengaturan/perusahaan" }, { label: "Integritas" }]}
+        jejak={
+          bolehPengaturan
+            ? [{ label: "Pengaturan" }, { label: "Perusahaan & Pajak", href: "/pengaturan/perusahaan" }, { label: "Integritas" }]
+            : [{ label: "Beranda", href: "/" }, { label: "Integritas" }]
+        }
         judul="Integritas per Perusahaan"
         subjudul="Kecocokan buku besar dengan dokumen dan stok untuk tiap perusahaan, plus pemeriksaan bahwa setiap dokumen, jurnal, dan rujukannya berada di perusahaan yang sama."
-        aksi={<Link href="/pengaturan/perusahaan" className="tombol tombol-garis">Kembali</Link>}
+        aksi={<Link href={bolehPengaturan ? "/pengaturan/perusahaan" : "/"} className="tombol tombol-garis">Kembali</Link>}
       />
 
       <div className="kartu kartu-tabel">
@@ -120,7 +146,12 @@ export default async function HalamanIntegritasPerusahaan() {
           <h2 className="judul-kartu">Konsistensi perusahaan</h2>
           <p className="subjudul-kartu">Jumlah data yang perusahaannya tidak cocok dengan jurnal, induk, akun, gudang, proyek, barang, karyawan, atau data yang dilampirinya. Semua harus 0.</p>
         </div>
-        {konsistensi.konsisten ? (
+        {!konsistensi ? (
+          <p className="flex items-center gap-2 text-sm font-semibold text-rose-700">
+            <Ikon nama="error" className="!text-[18px]" />
+            Gagal diperiksa, lihat log server
+          </p>
+        ) : konsistensi.konsisten ? (
           <p className="flex items-center gap-2 text-sm text-emerald-700">
             <Ikon nama="check_circle" className="!text-[18px]" />
             Semua dokumen dan jurnal konsisten per perusahaan
@@ -131,14 +162,16 @@ export default async function HalamanIntegritasPerusahaan() {
             {konsistensi.total} temuan
           </p>
         )}
-        <ul className="divide-y divide-slate-100 text-sm">
-          {konsistensi.rincian.map((r) => (
-            <li key={r.kode} className="flex items-center justify-between gap-3 py-2">
-              <span className={r.jumlah > 0 ? "text-rose-700" : "text-slate-600"}>{r.label}</span>
-              <span className={`angka ${r.jumlah > 0 ? "font-semibold text-rose-700" : "text-slate-500"}`}>{r.jumlah}</span>
-            </li>
-          ))}
-        </ul>
+        {konsistensi && (
+          <ul className="divide-y divide-slate-100 text-sm">
+            {konsistensi.rincian.map((r) => (
+              <li key={r.kode} className="flex items-center justify-between gap-3 py-2">
+                <span className={r.jumlah > 0 ? "text-rose-700" : "text-slate-600"}>{r.label}</span>
+                <span className={`angka ${r.jumlah > 0 ? "font-semibold text-rose-700" : "text-slate-500"}`}>{r.jumlah}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

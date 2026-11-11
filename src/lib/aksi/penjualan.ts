@@ -15,7 +15,7 @@ import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 import { bacaMataUangDokumen, nilaiDalamMataUang } from "@/lib/mataUang";
 
 const NOL = D(0);
-import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
+import { ambilPengaturanPerusahaan, bacaTarifPpn, hitungPpn, pesanAkunPajakBelumDiatur, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
 
 type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
 
@@ -423,7 +423,7 @@ export async function buatPenerimaan(dataFormulir: FormData) {
   const potonganMentah = dataFormulir.get("potonganPajak");
   const potonganPajak = typeof potonganMentah === "string" && potonganMentah.trim() !== "" ? bacaUang(potonganMentah, "Potongan PPh 23", { allowZero: true }) : D(0);
   const pengaturan = await ambilPengaturanPerusahaan(db);
-  if (potonganPajak.gt(0) && !pengaturan.akunPph23DimukaId) throw new Error("Akun Pajak Dibayar Dimuka (PPh 23) belum diatur di Pengaturan > Perusahaan & Pajak");
+  if (potonganPajak.gt(0) && !pengaturan.akunPph23DimukaId) throw new Error(pesanAkunPajakBelumDiatur("Akun Pajak Dibayar Dimuka (PPh 23)", pengaturan.nama));
 
   const faktur = await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fakturId }, include: { penerimaan: true, retur: true, pesanan: { select: { proyekId: true } } } });
   if (faktur.status === "LUNAS") throw new Error("Faktur ini sudah lunas");

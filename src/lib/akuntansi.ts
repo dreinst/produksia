@@ -3,6 +3,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { D, kali, uang, jumlahkan, type Desimal } from "@/lib/uang";
+import { pesanAkunPajakBelumDiatur } from "@/lib/pengaturanPerusahaan";
 
 /*
  * Aturan posting jurnal otomatis. Semua fungsi dipanggil DI DALAM transaksi dokumen,
@@ -86,6 +87,12 @@ function ambilInfo(peta: Map<string, InfoBarang>, barangId: string): InfoBarang 
   const info = peta.get(barangId);
   if (!info) throw new Error("Barang tidak ditemukan");
   return info;
+}
+
+/** Galat akun pajak yang belum diatur, dengan nama perusahaan dokumen supaya pengguna tahu baris pengaturan mana yang diubah. */
+async function galatAkunPajak(tx: Tx, label: string, perusahaanId: string): Promise<Error> {
+  const p = await tx.perusahaan.findUnique({ where: { id: perusahaanId }, select: { nama: true } });
+  return new Error(pesanAkunPajakBelumDiatur(label, p?.nama ?? perusahaanId));
 }
 
 /** Penjumlahan per akun (urutan sisip dipertahankan agar jurnal mudah dibaca). */
@@ -231,7 +238,7 @@ export async function catatJurnalFakturPenjualan(
 ) {
   const m = await ambilPemetaanAkun(tx);
   const ppn = D(faktur.ppn ?? 0);
-  if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
+  if (ppn.gt(0) && !akunPpnKeluaranId) throw await galatAkunPajak(tx, "Akun PPN Keluaran", faktur.perusahaanId);
   // Uang muka pesanan yang dipakai: mengurangi piutang, membalik kewajiban Uang Muka Pelanggan
   const uangMuka = D(faktur.uangMuka ?? 0);
   if (uangMuka.gt(0) && !m.uangMukaPelangganId) throw new Error("Pemetaan akun 'Uang Muka Pelanggan' belum diatur (Pengaturan > Pemetaan Akun)");
@@ -274,7 +281,7 @@ export async function catatJurnalPenerimaanPenjualan(
   const m = await ambilPemetaanAkun(tx);
   const jumlah = D(penerimaan.jumlah);
   const potongan = D(penerimaan.potonganPajak ?? 0);
-  if (potongan.gt(0) && !akunPph23DimukaId) throw new Error("Akun Pajak Dibayar Dimuka (PPh 23) belum diatur (Pengaturan > Perusahaan & Pajak)");
+  if (potongan.gt(0) && !akunPph23DimukaId) throw await galatAkunPajak(tx, "Akun Pajak Dibayar Dimuka (PPh 23)", penerimaan.perusahaanId);
   return catatJurnal(tx, "JU-TRM", `Penerimaan ${penerimaan.nomor}${nomorFaktur ? ` untuk ${nomorFaktur}` : ""}`, "PENJUALAN", [
     { akunId: penerimaan.akunId, debit: jumlah, kredit: NOL, keterangan: `Terima ${penerimaan.nomor}` },
     ...(potongan.gt(0) && akunPph23DimukaId ? [{ akunId: akunPph23DimukaId, debit: potongan, kredit: NOL, keterangan: `PPh 23 dipotong pelanggan ${penerimaan.nomor}` }] : []),
@@ -306,7 +313,7 @@ export async function catatJurnalReturPenjualan(
   const perusahaanId = await perusahaanDokumen("JU-RJ", retur.perusahaanId, () => tx.returPenjualan.findUnique({ where: { nomor: retur.nomor }, select: { perusahaanId: true } }));
   const m = await ambilPemetaanAkun(tx);
   const ppn = retur.ppn ?? NOL;
-  if (ppn.gt(0) && !akunPpnKeluaranId) throw new Error("Akun PPN Keluaran belum diatur (Pengaturan > Perusahaan & Pajak)");
+  if (ppn.gt(0) && !akunPpnKeluaranId) throw await galatAkunPajak(tx, "Akun PPN Keluaran", perusahaanId);
   const diskon = retur.diskon ?? NOL;
   if (diskon.gt(0) && !m.diskonPenjualanId) throw new Error("Pemetaan akun 'Diskon Penjualan' belum diatur (Pengaturan > Pemetaan Akun)");
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
@@ -371,7 +378,7 @@ export async function catatJurnalFakturPembelian(
 ) {
   const m = await ambilPemetaanAkun(tx);
   const ppn = D(faktur.ppn ?? 0);
-  if (ppn.gt(0) && !akunPpnMasukanId) throw new Error("Akun PPN Masukan belum diatur (Pengaturan > Perusahaan & Pajak)");
+  if (ppn.gt(0) && !akunPpnMasukanId) throw await galatAkunPajak(tx, "Akun PPN Masukan", faktur.perusahaanId);
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const belumDitagih = pengumpul(), selisihPersediaan = pengumpul(), beban = pengumpul();
   for (const b of daftarBaris) {
@@ -415,7 +422,7 @@ export async function catatJurnalPembayaranPembelian(
   const m = await ambilPemetaanAkun(tx);
   const jumlah = D(pembayaran.jumlah);
   const potongan = D(pembayaran.potonganPajak ?? 0);
-  if (potongan.gt(0) && !akunPph23DipotongId) throw new Error("Akun Hutang PPh 23 belum diatur (Pengaturan > Perusahaan & Pajak)");
+  if (potongan.gt(0) && !akunPph23DipotongId) throw await galatAkunPajak(tx, "Akun Hutang PPh 23", pembayaran.perusahaanId);
   return catatJurnal(tx, "JU-BYR", `Pembayaran ${pembayaran.nomor}${nomorFaktur ? ` untuk ${nomorFaktur}` : ""}`, "PEMBELIAN", [
     { akunId: m.utangUsahaId, debit: jumlah.plus(potongan), kredit: NOL, keterangan: `Pelunasan hutang ${nomorFaktur ?? pembayaran.nomor}` },
     { akunId: pembayaran.akunId, debit: NOL, kredit: jumlah, keterangan: `Bayar ${pembayaran.nomor}` },
@@ -436,7 +443,7 @@ export async function catatJurnalReturPembelian(
   const perusahaanId = await perusahaanDokumen("JU-RB", retur.perusahaanId, () => tx.returPembelian.findUnique({ where: { nomor: retur.nomor }, select: { perusahaanId: true } }));
   const m = await ambilPemetaanAkun(tx);
   const ppn = retur.ppn ?? NOL;
-  if (ppn.gt(0) && !akunPpnMasukanId) throw new Error("Akun PPN Masukan belum diatur (Pengaturan > Perusahaan & Pajak)");
+  if (ppn.gt(0) && !akunPpnMasukanId) throw await galatAkunPajak(tx, "Akun PPN Masukan", perusahaanId);
   const peta = await infoBarang(tx, daftarBaris.map((b) => b.barangId));
   const persediaan = pengumpul(), beban = pengumpul();
   let selisih = NOL;

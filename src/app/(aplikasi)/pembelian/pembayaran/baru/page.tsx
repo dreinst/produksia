@@ -98,7 +98,7 @@ export default async function HalamanPembayaranPembelianBaru({
             <span className="petunjuk">Untuk jasa kena PPh 23 (mis. 2% dari DPP): hutang berkurang sebesar bayar + potongan, potongan dicatat sebagai Hutang PPh 23 untuk disetor</span>
           </div>
         ) : (
-          <p className="text-xs text-slate-500">Pemotongan PPh 23 ke vendor bisa dicatat setelah akun Hutang PPh 23 diatur di Pengaturan › Perusahaan &amp; Pajak.</p>
+          <p className="text-xs text-slate-500">Pemotongan PPh 23 ke vendor bisa dicatat setelah akun Hutang PPh 23 diatur di Pengaturan › Perusahaan &amp; Pajak › {pengaturan.nama}.</p>
         )}
 
         <div className="bidang">

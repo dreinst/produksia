@@ -16,6 +16,10 @@ import HalamanPengaturanPerusahaan from "../src/app/(aplikasi)/pengaturan/perusa
 import HalamanUbahPerusahaan from "../src/app/(aplikasi)/pengaturan/perusahaan/[id]/page";
 import HalamanPerusahaanBaru from "../src/app/(aplikasi)/pengaturan/perusahaan/baru/page";
 import HalamanIntegritasPerusahaan from "../src/app/(aplikasi)/pengaturan/perusahaan/integritas/page";
+import HalamanPemetaanAkun from "../src/app/(aplikasi)/pengaturan/pemetaan-akun/page";
+import HalamanPajak from "../src/app/(aplikasi)/buku-besar/pajak/page";
+import { catatJurnalFakturPenjualan } from "../src/lib/akuntansi";
+import { bacaTarifPpn, pesanAkunPajakBelumDiatur } from "../src/lib/pengaturanPerusahaan";
 import { formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
 
 /*
@@ -388,6 +392,100 @@ async function main() {
     const integritas = await render(await HalamanIntegritasPerusahaan());
     pastikan(integritas.teks.includes("Integritas per Perusahaan") && integritas.teks.includes("Gabungan") && integritas.teks.includes(KODE) && integritas.teks.includes("DPRO"), "halaman integritas: baris per perusahaan dan Gabungan");
     pastikan(integritas.teks.includes("Semua dokumen dan jurnal konsisten per perusahaan") && integritas.teks.includes("Jurnal berbeda perusahaan dengan dokumennya"), "halaman integritas: konsistensi dihitung langsung");
+
+    // Perbaikan tinjauan P19 (ditambahkan sesudah P19, suite milik P19): temuan 1, 3, 4, 5, dan Pemetaan Akun
+    console.log("=== 12. Perbaikan tinjauan P19 ===");
+    // temuan 5: tautan ke Perusahaan & Pajak hanya untuk pemegang pengaturan.tulis
+    pastikan(integritas.href.includes("/pengaturan/perusahaan") && !integritas.href.includes("/"), "integritas PEMILIK: Kembali dan jejak ke Perusahaan & Pajak");
+    const integritasAdmin = await dengan({ peran: "ADMIN" }, async () => render(await HalamanIntegritasPerusahaan()));
+    pastikan(integritasAdmin.teks.includes("Integritas per Perusahaan") && !integritasAdmin.href.includes("/pengaturan/perusahaan") && integritasAdmin.href.includes("/") && integritasAdmin.teks.includes("Beranda"), "integritas ADMIN: tanpa tautan ke halaman tanpa-akses, Kembali ke beranda");
+    // temuan 1: galat satu pemeriksaan hanya menandai barisnya
+    const queryRawAsli = db.$queryRaw;
+    const klienRaw = db as unknown as Record<string, unknown>;
+    const memuatId = (a: unknown[], id: string): boolean => a.some((x) => x === id || (typeof x === "object" && x !== null && "values" in x && memuatId((x as { values: unknown[] }).values, id)));
+    const gagalSebagian = await (async () => {
+      klienRaw.$queryRaw = (...a: unknown[]) => {
+        if (memuatId(a.slice(1), U.id)) return Promise.reject(new Error("galat tiruan uji integritas"));
+        return (queryRawAsli as (...x: unknown[]) => Promise<unknown>).apply(db, a);
+      };
+      const errAsli = console.error;
+      console.error = () => {};
+      try {
+        return await render(await HalamanIntegritasPerusahaan());
+      } finally {
+        klienRaw.$queryRaw = queryRawAsli;
+        console.error = errAsli;
+      }
+    })();
+    pastikan((gagalSebagian.teks.match(/Gagal diperiksa, lihat log server/g) ?? []).length === 1 && gagalSebagian.teks.includes("Gabungan") && gagalSebagian.teks.includes("Semua dokumen dan jurnal konsisten per perusahaan"), "integritas: satu perusahaan gagal, baris lain dan konsistensi tetap tampil");
+    const gagalSemua = await (async () => {
+      klienRaw.$queryRaw = () => Promise.reject(new Error("galat tiruan uji integritas"));
+      const errAsli = console.error;
+      console.error = () => {};
+      try {
+        return await render(await HalamanIntegritasPerusahaan());
+      } finally {
+        klienRaw.$queryRaw = queryRawAsli;
+        console.error = errAsli;
+      }
+    })();
+    const jumlahBarisIntegritas = (await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })) + 2;
+    pastikan((gagalSemua.teks.match(/Gagal diperiksa, lihat log server/g) ?? []).length === jumlahBarisIntegritas && !gagalSemua.teks.includes("Semua dokumen dan jurnal konsisten"), "integritas: semua pemeriksaan gagal, halaman tetap tampil dengan tanda gagal per baris dan konsistensi");
+    // temuan 3: selama ada perusahaan tanpa pengaturan, pilihan akun pajak utama hanya akun bersama dan yang tersimpan
+    const akunMilikUtama = await db.akun.create({ data: { kode: `${KODE}-UTM`, nama: "Aset Milik Utama Uji", jenis: "ASET", kelompok: false, perusahaanId: PERUSAHAAN_UTAMA } });
+    const tanpaPengaturanUji = await db.perusahaan.create({ data: { kode: "UJIPD", nama: "PT Uji Tanpa Pajak", urutan: 93 } });
+    const halUtamaTerbatas = await render(await HalamanUbahPerusahaan({ params: Promise.resolve({ id: PERUSAHAAN_UTAMA }) }));
+    pastikan(!halUtamaTerbatas.teks.includes(`${KODE}-UTM`) && halUtamaTerbatas.teks.includes("Pilihan akun pajak hanya berisi akun bersama"), "utama dengan perusahaan tanpa pengaturan: akun milik utama tidak ditawarkan dan ada petunjuk");
+    const nilaiTerbatas = (n: string) => halUtamaTerbatas.isian.find((x) => x.name === n)?.value;
+    pastikan(nilaiTerbatas("akunPpnKeluaranId") === nilai("akunPpnKeluaranId")?.value && nilaiTerbatas("akunHutangPphFinalId") === nilai("akunHutangPphFinalId")?.value, "nilai akun pajak tersimpan tetap terpilih");
+    const tanpaPengaturanLain = await db.perusahaan.findMany({ where: { id: { not: PERUSAHAAN_UTAMA }, pengaturan: { is: null } }, select: { id: true, nama: true } });
+    for (const t of tanpaPengaturanLain) await db.pengaturanPerusahaan.create({ data: { id: t.id, perusahaanId: t.id, nama: t.nama } });
+    try {
+      const halUtamaBebas = await render(await HalamanUbahPerusahaan({ params: Promise.resolve({ id: PERUSAHAAN_UTAMA }) }));
+      pastikan(halUtamaBebas.teks.includes(`${KODE}-UTM - Aset Milik Utama Uji`) && !halUtamaBebas.teks.includes("Pilihan akun pajak hanya berisi akun bersama"), "semua perusahaan punya pengaturan: akun milik utama ditawarkan tanpa petunjuk");
+    } finally {
+      await db.pengaturanPerusahaan.deleteMany({ where: { id: { in: tanpaPengaturanLain.map((t) => t.id) } } });
+    }
+    const halTapussaAkun = await render(await HalamanUbahPerusahaan({ params: Promise.resolve({ id: "tapussa" }) }));
+    pastikan(!halTapussaAkun.teks.includes("Pilihan akun pajak hanya berisi akun bersama") && !halTapussaAkun.teks.includes(`${KODE}-UTM`), "perusahaan lain: tanpa petunjuk, akun milik utama tidak ditawarkan (seperti sebelumnya)");
+    await db.perusahaan.delete({ where: { id: tanpaPengaturanUji.id } });
+    // Pemetaan Akun: pilihan hanya akun bersama
+    const halPemetaan = await render(await HalamanPemetaanAkun());
+    pastikan(halPemetaan.teks.includes(`${KODE}-BERSAMA - Akun Bersama Uji`) && !halPemetaan.teks.includes(`${KODE}-PPNK-U`) && !halPemetaan.teks.includes(`${KODE}-UTM`), "Pemetaan Akun: akun berpemilik tidak ditawarkan, akun bersama ditawarkan");
+    await db.pemetaanAkunTambahan.update({ where: { id: peta.id }, data: { akunId: akunU.id } });
+    const halPemetaanLama = await render(await HalamanPemetaanAkun());
+    pastikan(halPemetaanLama.teks.includes(`${KODE}-PPNK-U - Hutang PPN Uji U (milik ${KODE}, ganti ke akun bersama)`) && !halPemetaanLama.teks.includes(`${KODE}-PPNK-U2`), "Pemetaan Akun: akun berpemilik yang tersimpan tetap tampil dengan tanda");
+    await db.pemetaanAkunTambahan.update({ where: { id: peta.id }, data: { akunId: akunBersama.id } });
+    await db.akun.delete({ where: { id: akunMilikUtama.id } });
+    // temuan 4: pesan akun pajak dan PKP menyebut perusahaan dokumen
+    const namaU = (await db.perusahaan.findUniqueOrThrow({ where: { id: U.id } })).nama;
+    pastikan(pesanAkunPajakBelumDiatur("Akun PPN Keluaran", "TAPUSSA") === "Akun PPN Keluaran belum diatur untuk TAPUSSA (Pengaturan > Perusahaan & Pajak > TAPUSSA)", "bentuk pesan akun pajak belum diatur");
+    const galatJurnal = await db
+      .$transaction(async (tx) => {
+        await catatJurnalFakturPenjualan(tx, { nomor: "UJIPA-FJ", total: 111, ppn: 11, perusahaanId: U.id }, [], null);
+        throw new Error("transaksi uji harus gagal lebih dulu");
+      })
+      .then(
+        () => "",
+        (e: Error) => e.message,
+      );
+    pastikan(galatJurnal === pesanAkunPajakBelumDiatur("Akun PPN Keluaran", namaU), `jurnal faktur tanpa akun PPN menyebut perusahaan dokumen: ${galatJurnal}`);
+    const nonPkp = { ...(await ambilPengaturanPerusahaan(db, U.id)), pkp: false, nama: namaU };
+    let galatPkp = "";
+    try {
+      bacaTarifPpn("11", nonPkp);
+    } catch (e) {
+      galatPkp = (e as Error).message;
+    }
+    pastikan(galatPkp.includes("belum PKP") && galatPkp.includes(namaU), `pesan non-PKP menyebut perusahaan: ${galatPkp}`);
+    const barisPajakU = await db.pengaturanPerusahaan.findUniqueOrThrow({ where: { id: U.id } });
+    await db.pengaturanPerusahaan.update({ where: { id: U.id }, data: { akunBebanPphFinalId: null } });
+    try {
+      const halPajak = await dengan({ perusahaan: U.id }, async () => render(await HalamanPajak({ searchParams: Promise.resolve({}) })));
+      pastikan(halPajak.teks.includes(`Akun PPh Final ${namaU} belum diatur`) && halPajak.href.includes(`/pengaturan/perusahaan/${U.id}`), "peringatan akun PPh Final menaut ke halaman ubah perusahaan lingkup");
+    } finally {
+      await db.pengaturanPerusahaan.update({ where: { id: U.id }, data: { akunBebanPphFinalId: barisPajakU.akunBebanPphFinalId } });
+    }
   } finally {
     // kembalikan baris utama dan default seperti semula
     const { id: idUtama, dibuatPada, diubahPada, ...dataUtama } = utamaAwal;

@@ -20,9 +20,10 @@ const lencanaPajak = (p: PengaturanPajak) => (
   <span className={`lencana ${p.pkp ? "lencana-blue" : "lencana-slate"}`}>{p.pkp ? `PKP · PPN ${angka(p.tarifPpnPersen)}%` : "Non-PKP"}</span>
 );
 
-const peringatanAkun = (
+/** Tautan langsung ke isian pajak perusahaan itu, karena akun pajak sekarang diatur per perusahaan (tinjauan P19 temuan 4). */
+const peringatanAkun = (perusahaanId: string, nama: string) => (
   <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-    Akun PPh Final belum diatur. Buka <Link href="/pengaturan/perusahaan" className="font-semibold underline">Perusahaan &amp; Pajak</Link>.
+    Akun PPh Final {nama} belum diatur. Buka <Link href={`/pengaturan/perusahaan/${encodeURIComponent(perusahaanId)}`} className="font-semibold underline">Perusahaan &amp; Pajak, {nama}</Link>.
   </div>
 );
 
@@ -138,7 +139,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
         aksi={navigasiTahun}
       />
 
-      {!akunSiap && peringatanAkun}
+      {!akunSiap && peringatanAkun(perusahaanId, pengaturan.nama)}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="kartu p-5"><div className="teks-label">Omzet bruto usaha {tahun}</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(r.total.omzet)}</div><div className="text-xs text-slate-500">Faktur − retur {angka(r.total.omzetFaktur)}{r.total.omzetLain.isZero() ? "" : ` · di luar faktur ${angka(r.total.omzetLain)}`}</div></div>
@@ -195,7 +196,7 @@ async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode
             <h2 className="judul-kartu">{perusahaan.kode} · {perusahaan.nama}</h2>
             {lencanaPajak(pengaturan)}
           </div>
-          {!(pengaturan.akunBebanPphFinalId && pengaturan.akunHutangPphFinalId) && <div className="px-4 pb-3">{peringatanAkun}</div>}
+          {!(pengaturan.akunBebanPphFinalId && pengaturan.akunHutangPphFinalId) && <div className="px-4 pb-3">{peringatanAkun(perusahaan.id, perusahaan.nama)}</div>}
           <TabelMasaPajak r={ringkasan} pengaturan={pengaturan} perusahaanId={perusahaan.id} namaPerusahaan={perusahaan.nama} aktif={perusahaan.aktif} tahun={tahun} bolehTulis={p.bolehTulis} bolehHapus={p.bolehHapus} />
         </div>
       ))}

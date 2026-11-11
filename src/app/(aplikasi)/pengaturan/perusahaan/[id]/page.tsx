@@ -19,15 +19,31 @@ export default async function HalamanUbahPerusahaan({ params }: { params: Promis
   const perusahaan = await db.perusahaan.findUnique({ where: { id }, include: { pengaturan: { select: { id: true } } } });
   if (!perusahaan) notFound();
   const utama = id === PERUSAHAAN_UTAMA;
-  const [pengaturan, daftarAkun] = await Promise.all([
+  const [pengaturan, semuaAkun, tanpaPengaturan] = await Promise.all([
     ambilPengaturanPerusahaan(db, id),
     // akun pajak milik perusahaan ini atau bersama; akun perusahaan lain ditolak saat simpan
     db.akun.findMany({
       where: { kelompok: false, jenis: { in: ["ASET", "KEWAJIBAN", "BEBAN"] }, ...saringMilikAtauBersama(id) },
       orderBy: { kode: "asc" },
-      select: { id: true, kode: true, nama: true, jenis: true },
+      select: { id: true, kode: true, nama: true, jenis: true, perusahaanId: true },
     }),
+    // perusahaan lain (termasuk arsip) yang masih memakai baris "default"; aturannya sama dengan pastikanAkunPajakSah
+    utama ? db.perusahaan.count({ where: { id: { not: PERUSAHAAN_UTAMA }, pengaturan: { is: null } } }) : Promise.resolve(0),
   ]);
+  // Selama baris "default" masih dipakai perusahaan lain, server menolak akun milik utama sebagai akun pajak utama.
+  // Pilihan dibatasi ke akun bersama ditambah akun yang sedang tersimpan (tinjauan P19 temuan 3).
+  const hanyaBersama = utama && tanpaPengaturan > 0;
+  const idTersimpan = new Set<string | null>([
+    pengaturan.akunPpnKeluaranId,
+    pengaturan.akunPpnMasukanId,
+    pengaturan.akunPph23DimukaId,
+    pengaturan.akunPph23DipotongId,
+    pengaturan.akunBebanPphFinalId,
+    pengaturan.akunHutangPphFinalId,
+  ]);
+  const daftarAkun = semuaAkun
+    .filter((a) => !hanyaBersama || a.perusahaanId === null || idTersimpan.has(a.id))
+    .map((a) => ({ id: a.id, kode: a.kode, nama: a.nama, jenis: a.jenis }));
   const tersimpan = Boolean(perusahaan.pengaturan);
 
   return (
@@ -51,7 +67,16 @@ export default async function HalamanUbahPerusahaan({ params }: { params: Promis
         tombol="Simpan Perusahaan"
         utama={utama}
         daftarAkun={daftarAkun}
-        lencanaPajak={<span className={`lencana ${tersimpan ? "lencana-emerald" : "lencana-amber"}`}>{tersimpan ? "Tersimpan" : "Masih bawaan"}</span>}
+        lencanaPajak={
+          <>
+            <span className={`lencana ${tersimpan ? "lencana-emerald" : "lencana-amber"}`}>{tersimpan ? "Tersimpan" : "Masih bawaan"}</span>
+            {hanyaBersama && (
+              <p className="petunjuk mt-2">
+                Pilihan akun pajak hanya berisi akun bersama, karena {tanpaPengaturan} perusahaan lain belum punya pengaturan pajak sendiri dan masih memakai akun pajak utama. Akun milik utama bisa dipilih sesudah semua perusahaan menyimpan pengaturan pajaknya.
+              </p>
+            )}
+          </>
+        }
         nilai={{
           ...perusahaan,
           // utama: nama dari baris pengaturan "default", sama dengan kartu bilah samping dan halaman lama

@@ -8,7 +8,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format } from "@/lib/uang";
 import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
 import { perusahaanDokumenBaru } from "@/lib/perusahaan";
-import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
+import { ambilPengaturanPerusahaan, pesanAkunPajakBelumDiatur } from "@/lib/pengaturanPerusahaan";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { batasBulan, ringkasanPajak } from "@/lib/pajak";
 import { dataLangsungDisetujui } from "@/lib/persetujuan";
@@ -30,7 +30,7 @@ export async function catatPphFinal(dataFormulir: FormData) {
   if (await db.pphFinalBulanan.findUnique({ where: { perusahaanId_periode: { perusahaanId, periode } } })) throw new Error(`PPh Final periode ${periode} sudah dicatat`);
   const pengaturan = await ambilPengaturanPerusahaan(db, perusahaanId);
   if (!pengaturan.akunBebanPphFinalId || !pengaturan.akunHutangPphFinalId) {
-    throw new Error("Akun Beban PPh Final dan Hutang PPh Final belum diatur di Pengaturan > Perusahaan & Pajak");
+    throw new Error(pesanAkunPajakBelumDiatur("Akun Beban PPh Final dan Hutang PPh Final", pengaturan.nama));
   }
   await pastikanAkunRinci(db, [pengaturan.akunBebanPphFinalId, pengaturan.akunHutangPphFinalId]);
   await pastikanAkunMilik(db, [pengaturan.akunBebanPphFinalId, pengaturan.akunHutangPphFinalId], perusahaanId);
