@@ -7,6 +7,8 @@ import { daftarProyekAktif } from "@/lib/proyek";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import TabelLaporan from "@/komponen/buku-besar/TabelLaporan";
+import CatatanGabungan from "@/komponen/CatatanGabungan";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan } from "@/lib/perusahaan";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
@@ -38,7 +40,12 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
   const param = await searchParams;
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(param, pengaturan.tahunBuku);
-  const daftarProyek = await daftarProyekAktif();
+  // Lingkup perusahaan (D1 §7.4 butir 4, §8.4; R15): proyek dan jurnal perusahaan lingkup. Subjudul diawali nama
+  // perusahaan atau "Gabungan {n} perusahaan", kecuali di utama supaya tampilan peran lama tetap sama.
+  const lingkup = await lingkupPerusahaan();
+  const lp = lingkup.perusahaanId;
+  const awalan = lp === PERUSAHAAN_UTAMA ? "" : lp ? `${lingkup.perusahaan?.nama ?? lp}. ` : `Gabungan ${await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })} perusahaan. `;
+  const daftarProyek = await daftarProyekAktif(db, lp);
   const proyekParam = Array.isArray(param.proyek) ? param.proyek[param.proyek.length - 1] : param.proyek;
   const proyekId = typeof proyekParam === "string" && daftarProyek.some((p) => p.id === proyekParam) ? proyekParam : null;
   const proyek = daftarProyek.find((p) => p.id === proyekId);
@@ -52,7 +59,7 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
     <KepalaHalaman
       jejak={[{ label: "Laporan" }]}
       judul={judul}
-      subjudul={`${proyek ? `${proyek.nama}. ` : ""}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}. ${basis === "kas" ? "Uang yang benar-benar masuk dan keluar untuk operasi (sudut pandang pemilik)." : "Pendapatan saat faktur, beban saat terjadi (basis pembukuan & pajak)."}`}
+      subjudul={`${awalan}${proyek ? `${proyek.nama}. ` : ""}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}. ${basis === "kas" ? "Uang yang benar-benar masuk dan keluar untuk operasi (sudut pandang pemilik)." : "Pendapatan saat faktur, beban saat terjadi (basis pembukuan & pajak)."}`}
       lencana={
         <span className="flex items-center gap-1">
           <a href={tautan(tampilan, "kas")} className={`tombol tombol-kecil ${basis === "kas" ? "tombol-utama" : "tombol-garis"}`}>Basis kas</a>
@@ -89,12 +96,13 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
   const tautanBulan = (bulan: number) => `?dari=${tahunBulanan}-${String(bulan).padStart(2, "0")}-01&sampai=${tahunBulanan}-${String(bulan).padStart(2, "0")}-${new Date(tahunBulanan, bulan, 0).getDate()}${proyekId ? `&proyek=${proyekId}` : ""}${basis === "akrual" ? "&basis=akrual" : ""}`;
 
   if (basis === "kas") {
-    const [k, bulanan] = await Promise.all([labaRugiKas(db, periode, { proyekId }), tampilan === "bulanan" ? labaRugiKasBulanan(db, tahunBulanan, { proyekId }) : null]);
+    const [k, bulanan] = await Promise.all([labaRugiKas(db, periode, { proyekId, perusahaanId: lp }), tampilan === "bulanan" ? labaRugiKasBulanan(db, tahunBulanan, { proyekId, perusahaanId: lp }) : null]);
     const surplus = k.surplus.gte(0);
     return (
       <div className="space-y-6">
         {kepala}
         {filter}
+        {lp === null && <CatatanGabungan sampai={periode.sampai} />}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="kartu p-5"><div className="teks-label">Uang masuk dari pelanggan</div><div className="font-heading text-xl font-bold angka mt-1">{rp(k.totalDariPelanggan)}</div><div className="text-xs text-slate-500">DP, pelunasan, kas masuk langsung</div></div>
           <div className="kartu p-5"><div className="teks-label">Penerimaan operasi lain</div><div className="font-heading text-xl font-bold angka mt-1">{rp(k.totalPenerimaanLain.minus(k.ppnTitipan))}</div></div>
@@ -153,13 +161,14 @@ export default async function HalamanLabaRugi({ searchParams }: { searchParams: 
     );
   }
 
-  const [lr, bulanan] = await Promise.all([hitungLabaRugi(db, periode, { proyekId }), tampilan === "bulanan" ? hitungLabaRugiBulanan(db, tahunBulanan, { proyekId }) : null]);
+  const [lr, bulanan] = await Promise.all([hitungLabaRugi(db, periode, { proyekId, perusahaanId: lp }), tampilan === "bulanan" ? hitungLabaRugiBulanan(db, tahunBulanan, { proyekId, perusahaanId: lp }) : null]);
   const untung = lr.labaBersih.gte(0);
 
   return (
     <div className="space-y-6">
       {kepala}
       {filter}
+      {lp === null && <CatatanGabungan sampai={periode.sampai} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="kartu p-5"><div className="teks-label">Pendapatan</div><div className="font-heading text-xl font-bold angka mt-1">{rp(lr.totalPendapatan)}</div></div>

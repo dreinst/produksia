@@ -9,23 +9,33 @@ import FormulirAksi from "@/komponen/FormulirAksi";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import KolomPerusahaan from "@/komponen/KolomPerusahaan";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
 
 export default async function HalamanPrive({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("prive.lihat");
   const bolehBuat = punyaHak(pengguna, "prive.buat");
   const bolehHapus = punyaHak(pengguna, "prive.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemilikNama: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
-  const [daftarAkunKas, daftarAkunModal, pemilik, total, daftar, akunPrivePemetaan] = await Promise.all([
-    daftarAkunKasBank(),
-    db.akun.findMany({ where: { jenis: "MODAL", kelompok: false }, orderBy: { kode: "asc" } }),
+  // Lingkup perusahaan (D1 §7.4, §8.4): pola daftar dan formulir akar seperti Kas Masuk
+  const lingkup = await lingkupPerusahaan();
+  const lp = lingkup.perusahaanId;
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemilikNama: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
+  const where = lp ? { AND: [cari ?? {}, { perusahaanId: lp }] } : cari;
+  const [daftarAkunKas, daftarAkunModal, pemilik, total, daftar, akunPrivePemetaan, semuaPerusahaan] = await Promise.all([
+    daftarAkunKasBank(db, lp),
+    db.akun.findMany({ where: { jenis: "MODAL", kelompok: false, ...saringMilikAtauBersama(lp) }, orderBy: { kode: "asc" } }),
     db.pengguna.findMany({ where: { peran: { in: ["PEMILIK", "SUPERADMIN"] }, aktif: true }, orderBy: { nama: "asc" }, select: { nama: true } }),
     db.prive.count({ where }),
-    db.prive.findMany({ where, include: { akunKas: true, jurnal: { select: { nomor: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    db.prive.findMany({ where, include: { akunKas: true, jurnal: { select: { nomor: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
     akunPemetaanTambahan(db, "prive"),
+    daftarPerusahaan(true),
   ]);
+  const kodePerusahaan = new Map(semuaPerusahaan.map((x) => [x.id, x.kode]));
+  const akhiran = (milik: string | null) => (!lp && milik ? ` · ${kodePerusahaan.get(milik) ?? milik}` : "");
   // akun prive: dari Pemetaan Akun (tambahan "prive") bila ada, kalau tidak cari akun modal bernama Prive
-  const akunPriveBawaan = akunPrivePemetaan?.id ?? daftarAkunModal.find((a) => /prive/i.test(a.nama))?.id ?? "";
+  const akunPriveBawaan = (akunPrivePemetaan && daftarAkunModal.some((a) => a.id === akunPrivePemetaan.id) ? akunPrivePemetaan.id : undefined) ?? daftarAkunModal.find((a) => /prive/i.test(a.nama))?.id ?? "";
   const hariIni = new Date().toISOString().slice(0, 10);
 
   return (
@@ -37,6 +47,16 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
 
       {bolehBuat && (
         <FormulirAksi aksi={buatPriveFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
+          {/* utama: hanya isian tersembunyi supaya formulir peran lama tetap sama (penyimpangan P17); lingkup lain dan
+              gabungan: KolomPerusahaan (pilihan wajib di gabungan, supaya Pemilik bisa mencatat lagi) */}
+          {lp === PERUSAHAAN_UTAMA ? (
+            <input type="hidden" name="perusahaanId" value={lp} />
+          ) : (
+            <>
+              <KolomPerusahaan lingkup={lingkup} daftar={semuaPerusahaan.filter((x) => x.aktif)} />
+              <div className="hidden md:block" />
+            </>
+          )}
           <div className="bidang">
             <label className="label" htmlFor="pemilikNama">Pemilik *</label>
             <input id="pemilikNama" name="pemilikNama" list="daftar-pemilik" required className="isian" defaultValue={pemilik[0]?.nama ?? ""} />
@@ -50,7 +70,7 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
             <label className="label" htmlFor="akunKasId">Diambil dari *</label>
             <select id="akunKasId" name="akunKasId" required className="isian">
               {daftarAkunKas.map((a) => (
-                <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+                <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaanId)}</option>
               ))}
             </select>
           </div>
@@ -58,7 +78,7 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
             <label className="label" htmlFor="akunPriveId">Akun prive *</label>
             <select id="akunPriveId" name="akunPriveId" required defaultValue={akunPriveBawaan} className="isian">
               {daftarAkunModal.map((a) => (
-                <option key={a.id} value={a.id}>{a.kode} - {a.nama}</option>
+                <option key={a.id} value={a.id}>{a.kode} - {a.nama}{akhiran(a.perusahaanId)}</option>
               ))}
             </select>
           </div>
@@ -81,12 +101,13 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
         <div className="bungkus-tabel">
           <table className="tabel min-w-[40rem]">
             <thead>
-              <tr><th>No</th><th>Tanggal</th><th>Pemilik</th><th>Dari</th><th>Keterangan</th><th className="text-right">Jumlah</th><th>Jurnal</th><th /></tr>
+              <tr><th>No</th>{!lp && <th>Perusahaan</th>}<th>Tanggal</th><th>Pemilik</th><th>Dari</th><th>Keterangan</th><th className="text-right">Jumlah</th><th>Jurnal</th><th /></tr>
             </thead>
             <tbody>
               {daftar.map((p) => (
                 <tr key={p.id}>
                   <td><NomorDokumen nomor={p.nomor} /></td>
+                  {!lp && <td><LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} /></td>}
                   <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                   <td>{p.pemilikNama}</td>
                   <td className="text-slate-500">{p.akunKas.kode} - {p.akunKas.nama}</td>
@@ -96,7 +117,7 @@ export default async function HalamanPrive({ searchParams }: { searchParams: Pro
                   <td className="text-right"><TombolHapusDokumen jenis="prive" id={p.id} nomor={p.nomor} boleh={bolehHapus} /></td>
                 </tr>
               ))}
-              {daftar.length === 0 && <tr><td colSpan={8} className="kosong">{param.q ? "Tidak ada yang cocok." : "Belum ada prive."}</td></tr>}
+              {daftar.length === 0 && <tr><td colSpan={lp ? 8 : 9} className="kosong">{param.q ? "Tidak ada yang cocok." : "Belum ada prive."}</td></tr>}
             </tbody>
           </table>
         </div>

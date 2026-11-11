@@ -10,6 +10,8 @@ import { catatPphFinalFormulir } from "@/lib/aksi/pajak";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
+import CatatanGabungan from "@/komponen/CatatanGabungan";
+import { akhirTahun } from "@/lib/tutupBuku";
 
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
 const NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -165,6 +167,8 @@ async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode
   const tampil = g.perPerusahaan.filter((x) => x.perusahaan.id === PERUSAHAAN_UTAMA || adaAngkaPajak(x.ringkasan));
   const tarif = [...new Set(tampil.map((x) => angka(x.pengaturan.pphFinalPersen)))];
   const labelTarif = tarif.length === 1 ? `${tarif[0]}%` : "per perusahaan";
+  const sekarang = new Date();
+  const sampaiCatatan = akhirTahun(tahun) < sekarang ? akhirTahun(tahun) : sekarang;
   return (
     <div className="space-y-6">
       <KepalaHalaman
@@ -174,6 +178,9 @@ async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode
         lencana={<span className="lencana lencana-slate">Gabungan</span>}
         aksi={p.navigasiTahun}
       />
+
+      {/* saldo antar perusahaan per akhir tahun itu, atau hari ini untuk tahun berjalan (D1 §7.4, KONTRAK-TAMBAHAN P17) */}
+      <CatatanGabungan sampai={sampaiCatatan} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="kartu p-5"><div className="teks-label">Omzet bruto usaha {tahun}</div><div className="font-heading text-lg font-bold angka mt-1">Rp {angka(g.total.omzet)}</div><div className="text-xs text-slate-500">Faktur − retur {angka(g.total.omzetFaktur)}{g.total.omzetLain.isZero() ? "" : ` · di luar faktur ${angka(g.total.omzetLain)}`}</div></div>

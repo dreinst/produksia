@@ -1,6 +1,8 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
 import PilihAkun from "@/komponen/buku-besar/PilihAkun";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
 
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
 
@@ -12,13 +14,21 @@ export default async function HalamanBukuBesarMutasi({
   await wajibHak("buku-besar.lihat");
   const { akunId } = await searchParams;
 
-  const daftarAkun = await db.akun.findMany({ where: { kelompok: false }, orderBy: { kode: "asc" } });
+  // Lingkup perusahaan (D1 §8.4): akun milik perusahaan itu atau bersama, dan mutasi hanya dari jurnal perusahaan itu
+  // sehingga saldo berjalan akun bersama = saldo di buku perusahaan lingkup. Gabungan = semua jurnal.
+  const { perusahaanId: p } = await lingkupPerusahaan();
+  const [daftarAkunMentah, semuaPerusahaan] = await Promise.all([
+    db.akun.findMany({ where: { kelompok: false, ...saringMilikAtauBersama(p) }, orderBy: { kode: "asc" } }),
+    daftarPerusahaan(true),
+  ]);
+  const kodePerusahaan = new Map(semuaPerusahaan.map((x) => [x.id, x.kode]));
+  const daftarAkun = p ? daftarAkunMentah : daftarAkunMentah.map((a) => (a.perusahaanId ? { ...a, nama: `${a.nama} · ${kodePerusahaan.get(a.perusahaanId) ?? a.perusahaanId}` } : a));
   const akun = akunId ? daftarAkun.find((a) => a.id === akunId) : daftarAkun[0];
 
   const daftarBaris = akun
     ? await db.barisJurnal.findMany({
-        where: { akunId: akun.id },
-        include: { jurnal: true },
+        where: { akunId: akun.id, ...(p ? { jurnal: saringPerusahaan(p) } : {}) },
+        include: { jurnal: { include: { perusahaan: { select: { kode: true, nama: true, warna: true } } } } },
         orderBy: { jurnal: { tanggal: "asc" } },
       })
     : [];
@@ -48,6 +58,7 @@ export default async function HalamanBukuBesarMutasi({
             <tr>
               <th>Tanggal</th>
               <th>No Jurnal</th>
+              {!p && <th>Perusahaan</th>}
               <th>Keterangan</th>
               <th className="text-right angka">Debit</th>
               <th className="text-right angka">Kredit</th>
@@ -59,6 +70,7 @@ export default async function HalamanBukuBesarMutasi({
               <tr key={l.id}>
                 <td>{l.jurnal.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                 <td>{l.jurnal.nomor}</td>
+                {!p && <td><LencanaPerusahaan kode={l.jurnal.perusahaan.kode} warna={l.jurnal.perusahaan.warna} nama={l.jurnal.perusahaan.nama} /></td>}
                 <td>{l.keterangan || l.jurnal.keterangan || "-"}</td>
                 <td className="text-right angka">
                   {Number(l.debit) > 0 ? Number(l.debit).toLocaleString("id-ID") : ""}
@@ -71,7 +83,7 @@ export default async function HalamanBukuBesarMutasi({
             ))}
             {isian.length === 0 && (
               <tr>
-                <td colSpan={6} className="kosong">
+                <td colSpan={p ? 6 : 7} className="kosong">
                   Belum ada mutasi untuk akun ini.
                 </td>
               </tr>

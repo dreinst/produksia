@@ -7,6 +7,7 @@ import { labaRugiKas } from "@/lib/basisKas";
 import { jumlahkan } from "@/lib/uang";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan } from "@/lib/perusahaan";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
@@ -49,12 +50,17 @@ export default async function HalamanRingkasanPendapatan({ searchParams }: { sea
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(param, pengaturan.tahunBuku);
   const basis = param.basis === "akrual" ? "akrual" : "kas";
+  // Lingkup perusahaan (D1 §7.4 butir 4). Subjudul diawali nama perusahaan atau "Gabungan {n} perusahaan", kecuali di
+  // utama supaya tampilan peran lama tetap sama (penyimpangan P17).
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const awalan = p === PERUSAHAAN_UTAMA ? "" : p ? `${lingkup.perusahaan?.nama ?? p}. ` : `Gabungan ${await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })} perusahaan. `;
   const tautan = (b: "kas" | "akrual") => `?dari=${periode.dariTeks}&sampai=${periode.sampaiTeks}${b === "akrual" ? "&basis=akrual" : ""}`;
   const kepala = (subjudul: string) => (
     <KepalaHalaman
       jejak={[{ label: "Laporan" }]}
       judul="Ringkasan Pendapatan"
-      subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}. ${subjudul}`}
+      subjudul={`${awalan}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}. ${subjudul}`}
       lencana={
         <span className="flex items-center gap-1">
           <a href={tautan("kas")} className={`tombol tombol-kecil ${basis === "kas" ? "tombol-utama" : "tombol-garis"}`}>Basis kas (uang diterima)</a>
@@ -67,7 +73,7 @@ export default async function HalamanRingkasanPendapatan({ searchParams }: { sea
   const filter = <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} tersembunyi={{ basis: basis === "akrual" ? "akrual" : undefined }} />;
 
   if (basis === "kas") {
-    const k = await labaRugiKas(db, periode);
+    const k = await labaRugiKas(db, periode, { perusahaanId: p });
     const total = Number(k.totalDariPelanggan);
     const persen = (v: { toString(): string }) => (total ? `${((Number(v) / total) * 100).toFixed(1)}%` : "");
     const pelanggan = k.perPelanggan.filter((p) => p.id);
@@ -137,7 +143,7 @@ export default async function HalamanRingkasanPendapatan({ searchParams }: { sea
     );
   }
 
-  const r = await ringkasanPendapatan(db, periode);
+  const r = await ringkasanPendapatan(db, periode, { perusahaanId: p });
   const total = Number(r.total);
   const persen = (v: { toString(): string }) => (total ? `${((Number(v) / total) * 100).toFixed(1)}%` : "");
   const pelanggan = r.perPelanggan.filter((k) => k.id);

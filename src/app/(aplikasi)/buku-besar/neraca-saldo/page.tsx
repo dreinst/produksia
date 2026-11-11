@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { bacaPeriode } from "@/lib/laporan";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
+import CatatanGabungan from "@/komponen/CatatanGabungan";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
 
 const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
 const LABEL_JENIS: Record<string, string> = { ASET: "Aset", KEWAJIBAN: "Kewajiban", MODAL: "Ekuitas", PENDAPATAN: "Pendapatan", BEBAN: "Beban" };
@@ -23,9 +25,14 @@ export default async function HalamanNeracaSaldo({ searchParams }: { searchParam
   await wajibHak("buku-besar.lihat");
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
+  // Lingkup perusahaan (D1 §7.4 butir 4). Subjudul diawali nama perusahaan atau "Gabungan {n} perusahaan", kecuali di
+  // utama supaya tampilan peran lama tetap sama (penyimpangan P17).
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const awalan = p === PERUSAHAAN_UTAMA ? "" : p ? `${lingkup.perusahaan?.nama ?? p}. ` : `Gabungan ${await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })} perusahaan. `;
   const daftarAkun = await db.akun.findMany({
     // neraca saldo sebelum penutupan: jurnal penutup tahun (JU-TUTUP) tidak disertakan
-    include: { barisJurnal: { where: { jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai }, sumber: { not: "PENUTUP" } } }, select: { debit: true, kredit: true } } },
+    include: { barisJurnal: { where: { jurnal: { tanggal: { gte: periode.dari, lte: periode.sampai }, sumber: { not: "PENUTUP" }, ...saringPerusahaan(p) } }, select: { debit: true, kredit: true } } },
     orderBy: { kode: "asc" },
   });
 
@@ -69,9 +76,10 @@ export default async function HalamanNeracaSaldo({ searchParams }: { searchParam
     <div className="space-y-6">
       <div>
         <h1 className="judul-halaman">Neraca Saldo</h1>
-        <p className="subjudul-halaman">Mutasi {periode.dariTeks} s.d. {periode.sampaiTeks}, sebelum jurnal penutup tahun. Akun kelompok (baris tebal) menampilkan subtotal keturunannya; total bawah hanya menjumlahkan akun rinci.</p>
+        <p className="subjudul-halaman">{awalan}Mutasi {periode.dariTeks} s.d. {periode.sampaiTeks}, sebelum jurnal penutup tahun. Akun kelompok (baris tebal) menampilkan subtotal keturunannya; total bawah hanya menjumlahkan akun rinci.</p>
       </div>
       <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
+      {p === null && <CatatanGabungan sampai={periode.sampai} />}
 
       <div className="kartu kartu-tabel"><div className="bungkus-tabel">
         <table className="tabel min-w-[36rem]">

@@ -5,6 +5,8 @@ import { bacaPeriode, hitungNeraca } from "@/lib/laporan";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import TabelLaporan from "@/komponen/buku-besar/TabelLaporan";
+import CatatanGabungan from "@/komponen/CatatanGabungan";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan } from "@/lib/perusahaan";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
 const tanggal = (t: string) => new Date(`${t}T00:00:00`).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
@@ -13,17 +15,23 @@ export default async function HalamanNeraca({ searchParams }: { searchParams: Pr
   await wajibHak("buku-besar.lihat");
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
-  const n = await hitungNeraca(db, periode.sampai, periode.sampaiTeks);
+  // Lingkup perusahaan (D1 §7.4 butir 4). Subjudul diawali nama perusahaan atau "Gabungan {n} perusahaan", kecuali di
+  // utama supaya tampilan peran lama tetap sama (penyimpangan P17).
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const awalan = p === PERUSAHAAN_UTAMA ? "" : p ? `${lingkup.perusahaan?.nama ?? p}. ` : `Gabungan ${await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })} perusahaan. `;
+  const n = await hitungNeraca(db, periode.sampai, periode.sampaiTeks, { perusahaanId: p });
 
   return (
     <div className="space-y-6">
       <KepalaHalaman
         jejak={[{ label: "Buku Besar" }]}
         judul="Neraca (Posisi Keuangan)"
-        subjudul={`Per ${tanggal(periode.sampaiTeks)}.`}
+        subjudul={`${awalan}Per ${tanggal(periode.sampaiTeks)}.`}
         lencana={<span className={`lencana ${n.seimbang ? "lencana-emerald" : "lencana-rose"}`}>{n.seimbang ? "Aset = Kewajiban + Ekuitas" : "TIDAK SEIMBANG"}</span>}
       />
       <FilterPeriode sampai={periode.sampaiTeks} hanyaSampai tahunBuku={pengaturan.tahunBuku} />
+      {p === null && <CatatanGabungan sampai={periode.sampai} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="kartu p-5"><div className="teks-label">Total aset</div><div className="font-heading text-xl font-bold angka mt-1">{rp(n.totalAset)}</div></div>

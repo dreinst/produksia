@@ -5,6 +5,8 @@ import { bacaPeriode, hitungLabaRugi, hitungNeraca } from "@/lib/laporan";
 import { laporanPerubahanModal } from "@/lib/laporanRekanan";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import CatatanGabungan from "@/komponen/CatatanGabungan";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan } from "@/lib/perusahaan";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
@@ -15,12 +17,18 @@ export default async function HalamanPerubahanModal({ searchParams }: { searchPa
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
   const sebelum = new Date(periode.dari.getTime() - 1);
+  // Lingkup perusahaan (D1 §7.4 butir 4). Subjudul diawali nama perusahaan atau "Gabungan {n} perusahaan", kecuali di
+  // utama supaya tampilan peran lama tetap sama (penyimpangan P17).
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const awalan = p === PERUSAHAAN_UTAMA ? "" : p ? `${lingkup.perusahaan?.nama ?? p}. ` : `Gabungan ${await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })} perusahaan. `;
+  // perusahaan yang SAMA di keempat panggilan (D1 §4.6, S08 §3.2)
   const [lr, neracaAwal, neracaAkhir] = await Promise.all([
-    hitungLabaRugi(db, periode),
-    hitungNeraca(db, sebelum, periode.dariTeks),
-    hitungNeraca(db, periode.sampai, periode.sampaiTeks),
+    hitungLabaRugi(db, periode, { perusahaanId: p }),
+    hitungNeraca(db, sebelum, periode.dariTeks, { perusahaanId: p }),
+    hitungNeraca(db, periode.sampai, periode.sampaiTeks, { perusahaanId: p }),
   ]);
-  const pm = await laporanPerubahanModal(db, periode.dari, periode.sampai, lr.labaBersih, neracaAwal.totalEkuitas, neracaAkhir.totalEkuitas);
+  const pm = await laporanPerubahanModal(db, periode.dari, periode.sampai, lr.labaBersih, neracaAwal.totalEkuitas, neracaAkhir.totalEkuitas, p);
   const baris = [
     { label: `Ekuitas awal (per ${tanggal(periode.dariTeks)}, sebelum periode)`, nilai: pm.ekuitasAwal, tebal: false },
     { label: "+ Setoran (pengambilan) modal pemilik", nilai: pm.setoranModal, tebal: false },
@@ -35,10 +43,11 @@ export default async function HalamanPerubahanModal({ searchParams }: { searchPa
       <KepalaHalaman
         jejak={[{ label: "Laporan" }]}
         judul="Laporan Perubahan Modal"
-        subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
+        subjudul={`${awalan}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
         lencana={<span className={`lencana ${pm.cocok ? "lencana-emerald" : "lencana-rose"}`}>{pm.cocok ? "Cocok dengan ekuitas neraca" : "TIDAK COCOK dengan neraca"}</span>}
       />
       <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
+      {p === null && <CatatanGabungan sampai={periode.sampai} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="kartu kartu-tabel">

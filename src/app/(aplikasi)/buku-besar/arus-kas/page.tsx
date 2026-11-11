@@ -5,6 +5,8 @@ import { bacaPeriode } from "@/lib/laporan";
 import { hitungArusKas, type BarisArus } from "@/lib/arusKas";
 import FilterPeriode from "@/komponen/ui/FilterPeriode";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import CatatanGabungan from "@/komponen/CatatanGabungan";
+import { PERUSAHAAN_UTAMA, lingkupPerusahaan } from "@/lib/perusahaan";
 
 const rp = (v: { toString(): string }) => `Rp ${Number(v).toLocaleString("id-ID")}`;
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
@@ -45,17 +47,23 @@ export default async function HalamanArusKas({ searchParams }: { searchParams: P
   await wajibHak("buku-besar.lihat");
   const pengaturan = await ambilPengaturanPerusahaan(db);
   const periode = bacaPeriode(await searchParams, pengaturan.tahunBuku);
-  const a = await hitungArusKas(db, periode);
+  // Lingkup perusahaan (D1 §7.4 butir 4). Subjudul diawali nama perusahaan atau "Gabungan {n} perusahaan", kecuali di
+  // utama supaya tampilan peran lama tetap sama (penyimpangan P17).
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const awalan = p === PERUSAHAAN_UTAMA ? "" : p ? `${lingkup.perusahaan?.nama ?? p}. ` : `Gabungan ${await db.perusahaan.count({ where: { OR: [{ aktif: true }, { jurnal: { some: {} } }] } })} perusahaan. `;
+  const a = await hitungArusKas(db, periode, { perusahaanId: p });
 
   return (
     <div className="space-y-6">
       <KepalaHalaman
         jejak={[{ label: "Buku Besar" }]}
         judul="Laporan Arus Kas"
-        subjudul={`Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
+        subjudul={`${awalan}Periode ${tanggal(periode.dariTeks)} s.d. ${tanggal(periode.sampaiTeks)}.`}
         lencana={<span className={`lencana ${a.cocok ? "lencana-emerald" : "lencana-rose"}`}>{a.cocok ? "Kas akhir = buku besar" : "TIDAK COCOK dengan buku besar"}</span>}
       />
       <FilterPeriode dari={periode.dariTeks} sampai={periode.sampaiTeks} tahunBuku={pengaturan.tahunBuku} />
+      {p === null && <CatatanGabungan sampai={periode.sampai} />}
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="kartu p-5"><div className="teks-label">Kas & bank awal</div><div className="font-heading text-lg font-bold angka mt-1">{rp(a.kasAwal)}</div></div>

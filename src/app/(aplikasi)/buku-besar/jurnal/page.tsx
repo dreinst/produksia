@@ -6,15 +6,20 @@ import { wajibHak } from "@/lib/otentikasi";
 import Link from "next/link";
 import { labelSumberJurnal } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanJurnal({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("jurnal.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = jurnal miliknya; gabungan = kueri lama dengan lencana perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftarJurnal] = await Promise.all([
     db.jurnal.count({ where }),
-    db.jurnal.findMany({ where, include: { baris: { include: { akun: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    db.jurnal.findMany({ where, include: { baris: { include: { akun: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
   ]);
 
   return (
@@ -39,7 +44,14 @@ export default async function HalamanJurnal({ searchParams }: { searchParams: Pr
             <div key={e.id} className="kartu">
               <div className="flex justify-between text-sm mb-2">
                 <div>
-                  <span className="font-medium">{e.nomor}</span> &middot; {e.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })} &middot;{" "}
+                  <span className="font-medium">{e.nomor}</span>
+                  {!perusahaanId && (
+                    <>
+                      {" "}
+                      <LencanaPerusahaan kode={e.perusahaan.kode} warna={e.perusahaan.warna} nama={e.perusahaan.nama} />
+                    </>
+                  )}{" "}
+                  &middot; {e.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })} &middot;{" "}
                   <span className="text-slate-500">{labelSumberJurnal(e.sumber)}</span>
                 </div>
                 <div className="flex items-center gap-3">

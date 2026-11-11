@@ -1,12 +1,28 @@
 import type { LaporanUmur } from "@/lib/laporanRekanan";
 import { KERANJANG_UMUR } from "@/lib/laporanRekanan";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import type { RingkasPerusahaan } from "@/lib/perusahaan";
 
 const angka = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
 const tgl = (d: Date | null) => (d ? d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-");
 
-/** Tabel umur piutang/hutang: subtotal per rekanan + rincian faktur. */
-export default function TabelUmur({ laporan, labelRekanan, tautanFaktur }: { laporan: LaporanUmur; labelRekanan: string; tautanFaktur: string }) {
+/**
+ * Tabel umur piutang/hutang: subtotal per rekanan + rincian faktur. `perusahaan` hanya dikirim di lingkup gabungan:
+ * setiap faktur diberi lencana perusahaannya (D1 §8.4). Tanpa prop itu tampilannya sama dengan sebelumnya.
+ */
+export default function TabelUmur({
+  laporan,
+  labelRekanan,
+  tautanFaktur,
+  perusahaan,
+}: {
+  laporan: LaporanUmur;
+  labelRekanan: string;
+  tautanFaktur: string;
+  perusahaan?: RingkasPerusahaan[];
+}) {
+  const peta = perusahaan ? new Map(perusahaan.map((x) => [x.id, x])) : null;
   return (
     <div className="kartu kartu-tabel">
       <div className="bungkus-tabel">
@@ -26,7 +42,7 @@ export default function TabelUmur({ laporan, labelRekanan, tautanFaktur }: { lap
           </thead>
           <tbody>
             {laporan.kelompok.map((k) => (
-              <RekananBaris key={k.id} kelompok={k} tautanFaktur={tautanFaktur} />
+              <RekananBaris key={k.id} kelompok={k} tautanFaktur={tautanFaktur} peta={peta} />
             ))}
             {laporan.kelompok.length === 0 && (
               <tr><td colSpan={6 + KERANJANG_UMUR.length} className="kosong">Tidak ada saldo terbuka per tanggal ini.</td></tr>
@@ -47,7 +63,7 @@ export default function TabelUmur({ laporan, labelRekanan, tautanFaktur }: { lap
   );
 }
 
-function RekananBaris({ kelompok, tautanFaktur }: { kelompok: LaporanUmur["kelompok"][number]; tautanFaktur: string }) {
+function RekananBaris({ kelompok, tautanFaktur, peta }: { kelompok: LaporanUmur["kelompok"][number]; tautanFaktur: string; peta: Map<string, RingkasPerusahaan> | null }) {
   return (
     <>
       <tr className="bg-slate-50/70 font-semibold text-slate-900">
@@ -59,7 +75,10 @@ function RekananBaris({ kelompok, tautanFaktur }: { kelompok: LaporanUmur["kelom
       </tr>
       {kelompok.faktur.map((f) => (
         <tr key={f.id}>
-          <td className="pl-6"><a href={`${tautanFaktur}?q=${encodeURIComponent(f.nomor)}`} className="hover:underline"><NomorDokumen nomor={f.nomor} /></a></td>
+          <td className="pl-6">
+            <a href={`${tautanFaktur}?q=${encodeURIComponent(f.nomor)}`} className="hover:underline"><NomorDokumen nomor={f.nomor} /></a>
+            {peta && f.perusahaanId && <LencanaPerusahaanFaktur p={peta.get(f.perusahaanId)} id={f.perusahaanId} />}
+          </td>
           <td className="text-slate-500 whitespace-nowrap">{tgl(f.tanggal)}</td>
           <td className={`whitespace-nowrap ${f.umurHari > 0 ? "text-rose-700" : "text-slate-500"}`}>{tgl(f.jatuhTempo)}{f.umurHari > 0 ? ` (+${f.umurHari} hr)` : ""}</td>
           <td className="text-right angka">{angka(f.total)}</td>
@@ -70,6 +89,15 @@ function RekananBaris({ kelompok, tautanFaktur }: { kelompok: LaporanUmur["kelom
           ))}
         </tr>
       ))}
+    </>
+  );
+}
+
+function LencanaPerusahaanFaktur({ p, id }: { p: RingkasPerusahaan | undefined; id: string }) {
+  return (
+    <>
+      {" "}
+      <LencanaPerusahaan kode={p?.kode ?? id} warna={p?.warna} nama={p?.nama} />
     </>
   );
 }

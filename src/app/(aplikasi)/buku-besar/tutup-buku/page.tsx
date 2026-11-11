@@ -2,11 +2,14 @@ import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
-import { ringkasanPenutupan } from "@/lib/tutupBuku";
+import { pratinjauTutupBuku, type PenutupanPerusahaan } from "@/lib/tutupBuku";
 import { bukaKembaliTahunFormulir, tutupTahunFormulir } from "@/lib/aksi/tutupBuku";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan } from "@/lib/perusahaan";
+import { jumlahkan } from "@/lib/uang";
 
 const rp = (v: { toString(): string }) => Number(v).toLocaleString("id-ID");
 const tanggal = (d: Date) => d.toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
@@ -18,7 +21,10 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
   const [pengaturan, pemetaan, daftarTutup, batasJurnal] = await Promise.all([
     ambilPengaturanPerusahaan(db),
     db.pemetaanAkun.findUnique({ where: { id: "default" }, include: { labaDitahan: true } }),
-    db.tutupBuku.findMany({ include: { jurnal: { select: { nomor: true } } }, orderBy: { tahun: "desc" } }),
+    db.tutupBuku.findMany({
+      include: { jurnal: { select: { nomor: true } }, rincianPerusahaan: { include: { jurnal: { select: { nomor: true } } } } },
+      orderBy: { tahun: "desc" },
+    }),
     db.jurnal.aggregate({ _min: { tanggal: true }, _max: { tanggal: true } }),
   ]);
   const tahunIni = new Date().getFullYear();
@@ -28,9 +34,26 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
   for (let t = tahunAkhir; t >= tahunAwal; t--) daftarTahun.push(t);
   const tutupPer = new Map(daftarTutup.map((t) => [t.tahun, t]));
   const tahunDipilih = Number(tahunParam) >= 2000 && Number(tahunParam) <= 2100 ? Number(tahunParam) : pengaturan.tahunBuku;
-  const ringkasan = await ringkasanPenutupan(db, tahunDipilih);
+  // Tutup buku tidak mengikuti lingkup (D1 §7.4, §8.4): pratinjau per perusahaan bersaldo dari pratinjauTutupBuku,
+  // sama dengan yang dibukukan tutupTahun. Ringkasan gabungan tidak dipakai untuk baris karena akun bersama yang
+  // saldonya saling meniadakan antar perusahaan tetap dinolkan di jurnal masing-masing (tinjauan P12 R4).
+  const [pratinjau, semuaPerusahaan] = await Promise.all([pratinjauTutupBuku(db, tahunDipilih), daftarPerusahaan(true)]);
+  const warna = new Map(semuaPerusahaan.map((x) => [x.id, x.warna]));
   const tutupDipilih = tutupPer.get(tahunDipilih);
-  const untung = ringkasan.labaBersih.gte(0);
+  const totalPendapatan = jumlahkan(pratinjau.map((x) => x.ringkasan.totalPendapatan));
+  const totalBeban = jumlahkan(pratinjau.map((x) => x.ringkasan.totalBeban));
+  const labaBersih = totalPendapatan.minus(totalBeban);
+  const untung = labaBersih.gte(0);
+  const jumlahJurnal = pratinjau.reduce((n, x) => n + x.ringkasan.jumlahJurnal, 0);
+  const jumlahPendapatan = new Set(pratinjau.flatMap((x) => x.ringkasan.pendapatan.map((b) => b.akunId))).size;
+  const jumlahBeban = new Set(pratinjau.flatMap((x) => x.ringkasan.beban.map((b) => b.akunId))).size;
+  // nomor JU-TUTUP per perusahaan; tutup buku lama tanpa rincian memakai TutupBuku.jurnal (milik utama)
+  const nomorTutup = new Map<string, string>();
+  if (tutupDipilih) {
+    for (const r of tutupDipilih.rincianPerusahaan) if (r.jurnal) nomorTutup.set(r.perusahaanId, r.jurnal.nomor);
+    if (tutupDipilih.rincianPerusahaan.length === 0 && tutupDipilih.jurnal) nomorTutup.set(PERUSAHAAN_UTAMA, tutupDipilih.jurnal.nomor);
+  }
+  const daftarNomor = [...new Set([...(tutupDipilih?.jurnal ? [tutupDipilih.jurnal.nomor] : []), ...nomorTutup.values()])];
 
   return (
     <div className="space-y-6">
@@ -76,8 +99,8 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
                 <h2 className="judul-kartu">Tahun {tahunDipilih}</h2>
                 <p className="subjudul-kartu">
                   {tutupDipilih
-                    ? `Ditutup ${tanggal(tutupDipilih.tanggal)} oleh ${tutupDipilih.penggunaNama}${tutupDipilih.jurnal ? ` · jurnal ${tutupDipilih.jurnal.nomor}` : " · tanpa jurnal (tidak ada pendapatan/beban)"}`
-                    : `${ringkasan.jumlahJurnal} jurnal tercatat; ${ringkasan.pendapatan.length} akun pendapatan dan ${ringkasan.beban.length} akun beban akan dinolkan.`}
+                    ? `Ditutup ${tanggal(tutupDipilih.tanggal)} oleh ${tutupDipilih.penggunaNama}${daftarNomor.length > 0 ? ` · jurnal ${daftarNomor.join(", ")}` : " · tanpa jurnal (tidak ada pendapatan/beban)"}`
+                    : `${jumlahJurnal} jurnal tercatat; ${jumlahPendapatan} akun pendapatan dan ${jumlahBeban} akun beban akan dinolkan.`}
                 </p>
               </div>
               {bolehTulis && (tutupDipilih ? (
@@ -93,41 +116,89 @@ export default async function HalamanTutupBuku({ searchParams }: { searchParams:
               ))}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="ubin"><div className="teks-label">Pendapatan</div><div className="font-heading text-lg font-bold angka">Rp {rp(ringkasan.totalPendapatan)}</div></div>
-              <div className="ubin"><div className="teks-label">Beban</div><div className="font-heading text-lg font-bold angka">Rp {rp(ringkasan.totalBeban)}</div></div>
-              <div className="ubin"><div className="teks-label">{untung ? "Laba bersih" : "Rugi bersih"} → {pemetaan?.labaDitahan ? `${pemetaan.labaDitahan.kode} ${pemetaan.labaDitahan.nama}` : "Laba Ditahan"}</div><div className={`font-heading text-lg font-bold angka ${untung ? "text-emerald-700" : "text-rose-700"}`}>Rp {rp(ringkasan.labaBersih.abs())}</div></div>
+              <div className="ubin"><div className="teks-label">Pendapatan</div><div className="font-heading text-lg font-bold angka">Rp {rp(totalPendapatan)}</div></div>
+              <div className="ubin"><div className="teks-label">Beban</div><div className="font-heading text-lg font-bold angka">Rp {rp(totalBeban)}</div></div>
+              <div className="ubin"><div className="teks-label">{untung ? "Laba bersih" : "Rugi bersih"} → {pemetaan?.labaDitahan ? `${pemetaan.labaDitahan.kode} ${pemetaan.labaDitahan.nama}` : "Laba Ditahan"}</div><div className={`font-heading text-lg font-bold angka ${untung ? "text-emerald-700" : "text-rose-700"}`}>Rp {rp(labaBersih.abs())}</div></div>
             </div>
+            <p className="text-xs text-slate-500">Tutup buku berlaku serentak untuk semua perusahaan: satu jurnal penutup dibuat untuk setiap perusahaan yang punya pendapatan atau beban di tahun ini.</p>
           </div>
 
-          <div className="kartu kartu-tabel">
-            <div className="kepala-kartu">
-              <h2 className="judul-kartu">{tutupDipilih ? "Jurnal penutup yang dibuat" : "Pratinjau jurnal penutup"} {tahunDipilih}</h2>
-              {tutupDipilih?.jurnal && <NomorDokumen nomor={tutupDipilih.jurnal.nomor} />}
-            </div>
-            <div className="bungkus-tabel">
-              <table className="tabel">
-                <thead><tr><th>Kode</th><th>Akun</th><th className="text-right">Debit</th><th className="text-right">Kredit</th></tr></thead>
-                <tbody>
-                  {ringkasan.pendapatan.map((b) => (
-                    <tr key={b.akunId}><td className="mono">{b.kode}</td><td>{b.nama}</td><td className="text-right angka">{b.saldo.gt(0) ? rp(b.saldo) : "-"}</td><td className="text-right angka">{b.saldo.lt(0) ? rp(b.saldo.neg()) : "-"}</td></tr>
-                  ))}
-                  {ringkasan.beban.map((b) => (
-                    <tr key={b.akunId}><td className="mono">{b.kode}</td><td>{b.nama}</td><td className="text-right angka">{b.saldo.lt(0) ? rp(b.saldo.neg()) : "-"}</td><td className="text-right angka">{b.saldo.gt(0) ? rp(b.saldo) : "-"}</td></tr>
-                  ))}
-                  {!ringkasan.labaBersih.isZero() && (
-                    <tr className="bg-slate-50/70 font-semibold"><td className="mono">{pemetaan?.labaDitahan?.kode ?? "-"}</td><td>{pemetaan?.labaDitahan?.nama ?? "Laba Ditahan"}</td><td className="text-right angka">{ringkasan.labaBersih.lt(0) ? rp(ringkasan.labaBersih.neg()) : "-"}</td><td className="text-right angka">{ringkasan.labaBersih.gt(0) ? rp(ringkasan.labaBersih) : "-"}</td></tr>
-                  )}
-                  {ringkasan.pendapatan.length + ringkasan.beban.length === 0 && (
+          {pratinjau.length === 0 ? (
+            <div className="kartu kartu-tabel">
+              <div className="kepala-kartu">
+                <h2 className="judul-kartu">{tutupDipilih ? "Jurnal penutup yang dibuat" : "Pratinjau per perusahaan"} {tahunDipilih}</h2>
+                {daftarNomor.map((n) => <NomorDokumen key={n} nomor={n} />)}
+              </div>
+              <div className="bungkus-tabel">
+                <table className="tabel">
+                  <thead><tr><th>Kode</th><th>Akun</th><th className="text-right">Debit</th><th className="text-right">Kredit</th></tr></thead>
+                  <tbody>
                     <tr><td colSpan={4} className="kosong">Tidak ada pendapatan/beban pada tahun ini.</td></tr>
-                  )}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          ) : (
+            pratinjau.map((x) => (
+              <TabelPenutupan
+                key={x.perusahaan.id}
+                judul={`${tutupDipilih ? "Jurnal penutup yang dibuat" : "Pratinjau per perusahaan"} ${tahunDipilih}`}
+                data={x}
+                warna={warna.get(x.perusahaan.id) ?? null}
+                nomor={nomorTutup.get(x.perusahaan.id)}
+                labaDitahan={pemetaan?.labaDitahan ?? null}
+              />
+            ))
+          )}
           <p className="text-xs text-slate-500">
             Setelah ditutup, transaksi bertanggal tahun itu ditolak sampai tahun dibuka kembali.
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** Baris jurnal penutup satu perusahaan (pratinjau, atau yang sudah dibuat bila `nomor` ada). */
+function TabelPenutupan({
+  judul,
+  data,
+  warna,
+  nomor,
+  labaDitahan,
+}: {
+  judul: string;
+  data: PenutupanPerusahaan;
+  warna: string | null;
+  nomor?: string;
+  labaDitahan: { kode: string; nama: string } | null;
+}) {
+  const { perusahaan, ringkasan } = data;
+  return (
+    <div className="kartu kartu-tabel">
+      <div className="kepala-kartu">
+        <h2 className="judul-kartu flex flex-wrap items-center gap-2">
+          {judul}
+          <LencanaPerusahaan kode={perusahaan.kode} warna={warna} nama={perusahaan.nama} />
+          <span className="text-sm font-normal text-slate-500">{perusahaan.nama}</span>
+        </h2>
+        {nomor && <NomorDokumen nomor={nomor} />}
+      </div>
+      <div className="bungkus-tabel">
+        <table className="tabel">
+          <thead><tr><th>Kode</th><th>Akun</th><th className="text-right">Debit</th><th className="text-right">Kredit</th></tr></thead>
+          <tbody>
+            {ringkasan.pendapatan.map((b) => (
+              <tr key={b.akunId}><td className="mono">{b.kode}</td><td>{b.nama}</td><td className="text-right angka">{b.saldo.gt(0) ? rp(b.saldo) : "-"}</td><td className="text-right angka">{b.saldo.lt(0) ? rp(b.saldo.neg()) : "-"}</td></tr>
+            ))}
+            {ringkasan.beban.map((b) => (
+              <tr key={b.akunId}><td className="mono">{b.kode}</td><td>{b.nama}</td><td className="text-right angka">{b.saldo.lt(0) ? rp(b.saldo.neg()) : "-"}</td><td className="text-right angka">{b.saldo.gt(0) ? rp(b.saldo) : "-"}</td></tr>
+            ))}
+            {!ringkasan.labaBersih.isZero() && (
+              <tr className="bg-slate-50/70 font-semibold"><td className="mono">{labaDitahan?.kode ?? "-"}</td><td>{labaDitahan?.nama ?? "Laba Ditahan"}</td><td className="text-right angka">{ringkasan.labaBersih.lt(0) ? rp(ringkasan.labaBersih.neg()) : "-"}</td><td className="text-right angka">{ringkasan.labaBersih.gt(0) ? rp(ringkasan.labaBersih) : "-"}</td></tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

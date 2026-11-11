@@ -23,9 +23,9 @@ export default async function PanelTren({ tahun, perusahaanId = null }: { tahun:
             <div className="flex items-center gap-4 text-xs text-slate-600">
               <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-navy-terang" /> Kas masuk {rp(Number(tren.total.diterima))}</span>
               <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-oranye" /> Kas keluar {rp(Number(tren.total.dikeluarkan))}</span>
-              {/* halaman Laba Rugi belum membaca lingkup perusahaan, jadi di lingkup satu perusahaan tombolnya diberi keterangan */}
+              {/* halaman Laba Rugi membaca lingkup perusahaan yang sama (P17, R15) */}
               <Link href={`/buku-besar/laba-rugi?dari=${tahun}-01-01&sampai=${tahun}-12-31&tampilan=bulanan`} className="tombol tombol-lembut tombol-kecil">
-                {perusahaanId ? "Laba Rugi per bulan (semua perusahaan)" : "Laba Rugi per bulan"}
+                Laba Rugi per bulan
               </Link>
             </div>
           </div>

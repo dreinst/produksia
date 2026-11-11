@@ -72,10 +72,16 @@ function sqlState(e: unknown): string | null {
 export async function pastikanTahunTerbuka(klien: Klien, tanggal: Date) {
   const tahun = tanggal.getFullYear();
   await kunciTahunBuku(klien, tahun, false);
-  const tutup = await klien.tutupBuku.findUnique({ where: { tahun }, include: { jurnal: { select: { nomor: true } } } });
+  const tutup = await klien.tutupBuku.findUnique({
+    where: { tahun },
+    include: { jurnal: { select: { nomor: true } }, rincianPerusahaan: { select: { jurnal: { select: { nomor: true } } } } },
+  });
   if (tutup) {
+    // JU-TUTUP utama bila ada (pesan lama); bila utama tidak bersaldo, sebut jurnal penutup perusahaan lain (P17)
+    const lain = tutup.rincianPerusahaan.map((r) => r.jurnal?.nomor).filter((n): n is string => !!n).sort();
+    const nomor = tutup.jurnal ? tutup.jurnal.nomor : lain.join(", ");
     throw new Error(
-      `Tahun buku ${tahun} sudah ditutup${tutup.jurnal ? ` (jurnal penutup ${tutup.jurnal.nomor})` : ""}; buka kembali di Buku Besar › Tutup Buku sebelum mencatat atau menghapus transaksi bertanggal ${tahun}`,
+      `Tahun buku ${tahun} sudah ditutup${nomor ? ` (jurnal penutup ${nomor})` : ""}; buka kembali di Buku Besar › Tutup Buku sebelum mencatat atau menghapus transaksi bertanggal ${tahun}`,
     );
   }
 }
