@@ -44,6 +44,20 @@ export function tentukanLingkup(masukan: { pilihan: string | null; bolehGabungan
   return adaIds.values().next().value ?? PERUSAHAAN_UTAMA;
 }
 
+/**
+ * Perusahaan penyaring pilihan di formulir dokumen baru (tinjauan P16 S1). Lingkup perusahaan arsip diperlakukan seperti
+ * gabungan (null), karena KolomPerusahaan di lingkup itu meminta pilihan perusahaan aktif sehingga pilihan milik
+ * perusahaan arsip pasti ditolak server.
+ */
+export function perusahaanFormulir(lingkup: Lingkup): string | null {
+  return lingkup.perusahaan?.aktif ? lingkup.perusahaanId : null;
+}
+
+/** Lingkup menunjuk perusahaan yang sudah diarsipkan (dokumen persediaan baru tidak bisa dibuat untuknya). */
+export function lingkupArsip(lingkup: Lingkup): RingkasPerusahaan | null {
+  return lingkup.perusahaan && !lingkup.perusahaan.aktif ? lingkup.perusahaan : null;
+}
+
 /** Pilihan lingkup di luar permintaan HTTP (skrip uji, seed, skrip produksi). UJI_PERUSAHAAN dibaca saat dipanggil. */
 function pilihanDiLuarPermintaan(): string | null {
   const gerbangUji = process.env.NODE_ENV !== "production" && process.env.UJI_TANPA_SESI === "1";

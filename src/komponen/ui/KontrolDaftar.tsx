@@ -11,18 +11,25 @@ export default function KontrolDaftar({
   total,
   placeholder = "Cari…",
   tambahan,
+  adaSaringan,
 }: {
   param: ParamDaftar;
   total: number;
   placeholder?: string;
   /** Parameter query lain yang harus dipertahankan (mis. filter akun). */
   tambahan?: Record<string, string | undefined>;
+  /**
+   * Apakah ada saringan data yang aktif (untuk pesan "Tidak ada hasil" saat daftar kosong). Bawaannya: ada isian
+   * `tambahan` yang terisi. Kirim `false` bila `tambahan` hanya parameter yang dipertahankan, bukan saringan daftar.
+   */
+  adaSaringan?: boolean;
 }) {
   const { q, hal, ambil, lewati } = param;
   const jumlahHalaman = Math.max(1, Math.ceil(total / ambil));
   const dari = total === 0 ? 0 : lewati + 1;
   const sampai = Math.min(lewati + ambil, total);
   const ekstra = Object.entries(tambahan ?? {}).filter((pasangan): pasangan is [string, string] => Boolean(pasangan[1]));
+  const disaring = adaSaringan ?? ekstra.length > 0;
 
   const tautanHal = (n: number) => {
     const sp = new URLSearchParams();
@@ -55,7 +62,7 @@ export default function KontrolDaftar({
           {total === 0 ? (
             q ? (
               <>Tidak ada hasil untuk “{q}”</>
-            ) : ekstra.length > 0 ? (
+            ) : disaring ? (
               // saringan tambahan aktif tanpa kata kunci (temuan P04 butir 3): datanya ada, hanya tidak cocok
               "Tidak ada hasil"
             ) : (

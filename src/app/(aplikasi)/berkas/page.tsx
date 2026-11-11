@@ -179,7 +179,7 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
           )}
           <PesanSuksesHalaman />
           <div className="kartu kartu-tabel">
-            <KontrolDaftar param={param} total={total} placeholder="Cari nama berkas…" tambahan={tambahan} />
+            <KontrolDaftar param={param} total={total} placeholder="Cari nama berkas…" tambahan={tambahan} adaSaringan={!!folderAktif || !!proyekAktif} />
             {!sampah && !sorot && (
               <form method="get" className="flex flex-wrap items-center gap-2 px-5 md:px-6 py-3 border-b border-slate-100">
                 {folderAktif && <input type="hidden" name="folder" value={folderAktif.kode} />}

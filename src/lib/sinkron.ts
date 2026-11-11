@@ -362,13 +362,15 @@ export async function periksaKonsistensiPerusahaan(klien: PrismaClient | Prisma.
 
 /** Umur simpanan hasil konsistensi untuk beranda (tinjauan P14 S1). */
 const UMUR_SIMPANAN_KONSISTENSI = 60_000;
+/** Umur simpanan hasil yang gagal, supaya kueri berat yang gagal tidak diulang di setiap muat (tinjauan P16 R5). */
+const UMUR_SIMPANAN_GAGAL = 20_000;
 let simpananKonsistensi: { sampai: number; hasil: Promise<HasilKonsistensi> } | null = null;
 
 /**
  * periksaKonsistensiPerusahaan dengan simpanan memori per proses selama 60 detik, untuk kartu Integritas beranda
  * gabungan (tinjauan P14 S1). Kueri ini memindai banyak tabel penuh, jadi tidak dijalankan di setiap muat beranda.
- * Permintaan yang datang bersamaan berbagi satu kueri. Hasil gagal tidak disimpan. Halaman integritas (P19) tetap
- * memanggil periksaKonsistensiPerusahaan langsung.
+ * Permintaan yang datang bersamaan berbagi satu kueri. Hasil gagal disimpan 20 detik saja, lalu dicoba lagi. Halaman
+ * integritas (P19) tetap memanggil periksaKonsistensiPerusahaan langsung.
  */
 export function periksaKonsistensiTersimpan(): Promise<HasilKonsistensi> {
   const kini = Date.now();
@@ -377,7 +379,7 @@ export function periksaKonsistensiTersimpan(): Promise<HasilKonsistensi> {
   const isi = { sampai: kini + UMUR_SIMPANAN_KONSISTENSI, hasil };
   simpananKonsistensi = isi;
   hasil.catch(() => {
-    if (simpananKonsistensi === isi) simpananKonsistensi = null;
+    if (simpananKonsistensi === isi) isi.sampai = Math.min(isi.sampai, Date.now() + UMUR_SIMPANAN_GAGAL);
   });
   return hasil;
 }

@@ -7,6 +7,8 @@ import { buatFakturPembelianFormulir } from "@/lib/aksi/pembelian";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
 import { opsiMataUangDokumen } from "@/lib/mataUang";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanFakturPembelianBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string }> }) {
   await wajibHak("faktur-pembelian.buat");
@@ -15,7 +17,7 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
   const pesanan = pesananId
     ? await db.pesananPembelian.findUnique({
         where: { id: pesananId },
-        include: { pemasok: true, baris: { include: { barang: true } }, penerimaanBarang: { orderBy: { tanggal: "asc" } } },
+        include: { pemasok: true, baris: { include: { barang: true } }, penerimaanBarang: { orderBy: { tanggal: "asc" } }, perusahaan: { select: { kode: true, nama: true, warna: true } } },
       })
     : null;
 
@@ -34,7 +36,8 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
     );
   }
 
-  const [pemetaan, nomorBerikut] = await Promise.all([
+  const [lingkup, pemetaan, nomorBerikut] = await Promise.all([
+    lingkupPerusahaan(),
     db.pemetaanAkun.findUnique({ where: { id: "default" }, include: { utangUsaha: true, persediaan: true } }),
     nomorDokumenBerikutnya(db.fakturPembelian, "FB"),
   ]);
@@ -51,7 +54,7 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const label = (a: { kode: string; nama: string }) => `${a.kode} • ${a.nama}`;
 
-  return (
+  const penyusun = (
     <PenyusunFaktur
       mode="pembelian"
       aksi={buatFakturPembelianFormulir}
@@ -87,5 +90,16 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
       terminHari={pengaturan.terminHari}
       mataUang={{ daftar: opsiMataUang, bawaanId: pesanan.pemasok.mataUangId }}
     />
+  );
+  // Perusahaan pesanan ditampilkan bila berbeda dari lingkup (mis. gabungan), karena PPN, termin, dan akun pajak di
+  // formulir ini milik perusahaan itu (tinjauan P16 R4). PenyusunFaktur milik P26, jadi keterangannya di luar komponen.
+  if (lingkup.perusahaanId === pesanan.perusahaanId) return penyusun;
+  return (
+    <div className="space-y-4">
+      <p className="redup">
+        Pesanan {pesanan.nomor} milik perusahaan <LencanaPerusahaan kode={pesanan.perusahaan.kode} warna={pesanan.perusahaan.warna} nama={pesanan.perusahaan.nama} />. PPN, termin, dan akun pajak memakai pengaturan perusahaan ini.
+      </p>
+      {penyusun}
+    </div>
   );
 }

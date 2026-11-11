@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
-import { lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
+import { lingkupArsip, lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
+import PesanLingkupArsip from "@/komponen/PesanLingkupArsip";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -107,7 +108,9 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
   // Lingkup perusahaan (D1 §7.4, §8.4): dokumen milik perusahaan lingkup; pilihan gudang dan barang tersaring, yang
   // berpemilik diberi akhiran kode di gabungan. Proyek tidak disaring: peminjaman dan kerusakan boleh melayani event
   // perusahaan lain (catatan B D1 §3.3).
-  const { perusahaanId } = await lingkupPerusahaan();
+  const lingkup = await lingkupPerusahaan();
+  const { perusahaanId } = lingkup;
+  const arsip = lingkupArsip(lingkup);
   const milik = saringPerusahaan(perusahaanId);
   const akhiran = (p: { kode: string } | null) => (!perusahaanId && p ? ` · ${p.kode}` : "");
   const whereRiwayat = {
@@ -145,7 +148,9 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
           <div className="kepala-kartu">
             <h2 className="judul-kartu">Lapor barang rusak</h2>
           </div>
-          {daftarGudang.length === 0 ? (
+          {arsip ? (
+            <PesanLingkupArsip perusahaan={arsip} />
+          ) : daftarGudang.length === 0 ? (
             <p className="redup">Belum ada gudang. Tambahkan gudang di Data Induk terlebih dulu.</p>
           ) : (
             <FormulirAksi aksi={buatLaporanKerusakanFormulir} pesanSukses="Dicatat sebagai draf. Klik “Ajukan” di bawah untuk mengirimnya ke Gudang." className="space-y-4">
@@ -238,7 +243,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
         <div className="kepala-kartu">
           <h2 className="judul-kartu">Riwayat</h2>
         </div>
-        <KontrolDaftar param={param} total={totalRiwayat} placeholder="Cari nomor / pelapor / keterangan…" tambahan={{ gudang: gudangDipilih }} />
+        <KontrolDaftar param={param} total={totalRiwayat} placeholder="Cari nomor / pelapor / keterangan…" tambahan={{ gudang: gudangDipilih }} adaSaringan={false} />
 
         {/* Mobile (< md): kartu per dokumen */}
         <div className="md:hidden divide-y divide-slate-100">

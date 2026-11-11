@@ -25,8 +25,8 @@ export function ButirKonsistensiMemuat() {
 
 /**
  * Butir konsistensi perusahaan di beranda gabungan (D1 §8.4). Komponen server async di dalam <Suspense> supaya kartu
- * lain tidak menunggu kuerinya, memakai hasil yang disimpan 60 detik, dan galatnya tidak menjatuhkan beranda
- * (tinjauan P14 S1). `periksa` hanya diganti oleh uji.
+ * lain tidak menunggu kuerinya, memakai hasil yang disimpan 60 detik (hasil gagal 20 detik), dan galatnya tidak
+ * menjatuhkan beranda (tinjauan P14 S1, P16 R5). `periksa` hanya diganti oleh uji.
  */
 export default async function ButirKonsistensi({ periksa = periksaKonsistensiTersimpan }: { periksa?: () => Promise<HasilKonsistensi> }) {
   let hasil: HasilKonsistensi;
@@ -34,7 +34,7 @@ export default async function ButirKonsistensi({ periksa = periksaKonsistensiTer
     hasil = await periksa();
   } catch (e) {
     console.error("[beranda] pemeriksaan konsistensi perusahaan gagal", e);
-    return <ButirIntegritas t={JUDUL_KONSISTENSI} ok={null} d="Pemeriksaan gagal. Muat ulang halaman beberapa saat lagi." />;
+    return <ButirIntegritas t={JUDUL_KONSISTENSI} ok={null} d="Pemeriksaan gagal. Rinciannya ada di log server; pemeriksaan dicoba lagi sesudah 20 detik." />;
   }
   return (
     <ButirIntegritas

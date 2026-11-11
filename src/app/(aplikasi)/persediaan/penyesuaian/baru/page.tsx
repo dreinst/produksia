@@ -1,24 +1,28 @@
 import { db } from "@/lib/db";
-import { lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
+import { lingkupArsip, lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
 import { wajibHak } from "@/lib/otentikasi";
 import { buatPenyesuaianPersediaanFormulir } from "@/lib/aksi/persediaan";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import EditorBarisPenyesuaian from "@/komponen/persediaan/EditorBarisPenyesuaian";
+import PesanLingkupArsip from "@/komponen/PesanLingkupArsip";
 
 export default async function HalamanPenyesuaianBaru({ searchParams }: { searchParams: Promise<{ gudangId?: string }> }) {
   await wajibHak("penyesuaian.buat");
   const { gudangId } = await searchParams;
   // Dokumen persediaan milik pemilik barang (P13): lingkup satu perusahaan = barang, gudang, dan akun lawan miliknya atau
   // bersama; gabungan = semua, yang berpemilik diberi akhiran kode. Barang perusahaan arsip tidak ditawarkan (ditolak server).
-  const { perusahaanId: p } = await lingkupPerusahaan();
-  const [daftarGudang, daftarBarang, daftarStok, daftarAkun, pemetaan] = await Promise.all([
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const arsip = lingkupArsip(lingkup);
+  const [daftarGudang, daftarBarang, daftarAkun, pemetaan] = await Promise.all([
     db.gudang.findMany({ where: saringMilikAtauBersama(p), include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
     db.barang.findMany({ where: { jenis: "BARANG", ...(p ? { perusahaanId: p } : {}), perusahaan: { aktif: true } }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
-    db.stokBarang.findMany(),
     db.akun.findMany({ where: { kelompok: false, jenis: { in: ["MODAL", "BEBAN", "PENDAPATAN"] }, ...saringMilikAtauBersama(p) }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
     db.pemetaanAkun.findUnique({ where: { id: "default" } }),
   ]);
+  // stok hanya untuk gudang dan barang yang ditawarkan, supaya angka perusahaan lain tidak ikut terkirim (tinjauan P16 R3)
+  const daftarStok = await db.stokBarang.findMany({ where: { gudangId: { in: daftarGudang.map((g) => g.id) }, barangId: { in: daftarBarang.map((b) => b.id) } } });
   const akhiran = (milik: { kode: string } | null) => (!p && milik ? ` · ${milik.kode}` : "");
   const gudangTerpilih = daftarGudang.find((g) => g.id === gudangId) ?? daftarGudang[0];
   const petaStok: Record<string, Record<string, number>> = {};
@@ -34,7 +38,11 @@ export default async function HalamanPenyesuaianBaru({ searchParams }: { searchP
         subjudul="Isi jumlah sesudah penyesuaian; selisihnya dinilai dengan harga pokok dan dijurnal ke akun lawan."
       />
 
-      {!gudangTerpilih ? (
+      {arsip ? (
+        <div className="kartu">
+          <PesanLingkupArsip perusahaan={arsip} />
+        </div>
+      ) : !gudangTerpilih ? (
         <div className="kartu">
           <p className="redup">Belum ada gudang. Buat gudang dulu di Data Induk → Gudang.</p>
         </div>

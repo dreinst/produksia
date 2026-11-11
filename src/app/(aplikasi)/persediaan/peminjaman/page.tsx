@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
-import { lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
+import { lingkupArsip, lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
+import PesanLingkupArsip from "@/komponen/PesanLingkupArsip";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -129,7 +130,9 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
   // Lingkup perusahaan (D1 §7.4, §8.4): dokumen milik perusahaan lingkup; pilihan gudang dan barang tersaring, yang
   // berpemilik diberi akhiran kode di gabungan. Proyek tidak disaring: peminjaman dan kerusakan boleh melayani event
   // perusahaan lain (catatan B D1 §3.3).
-  const { perusahaanId } = await lingkupPerusahaan();
+  const lingkup = await lingkupPerusahaan();
+  const { perusahaanId } = lingkup;
+  const arsip = lingkupArsip(lingkup);
   const milik = saringPerusahaan(perusahaanId);
   const akhiran = (p: { kode: string } | null) => (!perusahaanId && p ? ` · ${p.kode}` : "");
   const whereRiwayat = {
@@ -144,7 +147,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
     // barang perusahaan arsip ditolak server (P13), jadi tidak ditawarkan
     db.barang.findMany({ where: { jenis: "BARANG", ...milik, perusahaan: { aktif: true } }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true, perusahaan: { select: { kode: true } } } }),
     db.stokBarang.findMany({ select: { gudangId: true, barangId: true, jumlah: true } }),
-    db.peminjamanBarang.findMany({ select: { namaPengambil: true }, orderBy: { waktuKeluar: "desc" }, take: 50 }),
+    db.peminjamanBarang.findMany({ where: milik, select: { namaPengambil: true }, orderBy: { waktuKeluar: "desc" }, take: 50 }),
     db.peminjamanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] }, ...milik }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
     db.peminjamanBarang.findMany({ where: { statusPersetujuan: "DISETUJUI", ditutupPada: null, ...milik }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
     db.peminjamanBarang.count({ where: whereRiwayat }),
@@ -172,7 +175,9 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
           <div className="kepala-kartu">
             <h2 className="judul-kartu">Ajukan pinjam</h2>
           </div>
-          {daftarGudang.length === 0 ? (
+          {arsip ? (
+            <PesanLingkupArsip perusahaan={arsip} />
+          ) : daftarGudang.length === 0 ? (
             <p className="redup">Belum ada gudang. Tambahkan gudang di Data Induk terlebih dulu.</p>
           ) : (
             <FormulirAksi aksi={buatPeminjamanBarangFormulir} pesanSukses="Dicatat sebagai draf. Klik “Ajukan” di bawah untuk mengirimnya ke Gudang." className="space-y-4">
@@ -379,7 +384,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
         <div className="kepala-kartu">
           <h2 className="judul-kartu">Riwayat</h2>
         </div>
-        <KontrolDaftar param={param} total={totalRiwayat} placeholder="Cari nomor / pengambil / keterangan…" tambahan={{ gudang: gudangDipilih }} />
+        <KontrolDaftar param={param} total={totalRiwayat} placeholder="Cari nomor / pengambil / keterangan…" tambahan={{ gudang: gudangDipilih }} adaSaringan={false} />
 
         {/* Mobile (< md): kartu per dokumen */}
         <div className="md:hidden divide-y divide-slate-100">
