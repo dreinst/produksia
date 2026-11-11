@@ -33,8 +33,9 @@ export function nilaiBaris(b: BarisNilai): Desimal {
 
 /** Bobot alokasi basis kas TANPA pembulatan; dengan frekuensi 1 sama persis dengan D(jumlah).mul(harga) lama. */
 export function bobotBaris(b: BarisNilai): Desimal {
-  // ?? 1 wajib: D(null) bernilai 0, jadi frekuensi kosong tidak boleh sampai ke D()
-  return D(b.jumlah).mul(D(b.frekuensi ?? 1)).mul(D(b.harga));
+  // frekuensi kosong (null, undefined, atau "" dari isian formulir) = 1; D() sendiri memberi 0 untuk nilai kosong
+  const frekuensi = b.frekuensi === null || b.frekuensi === undefined || b.frekuensi === "" ? 1 : b.frekuensi;
+  return D(b.jumlah).mul(D(frekuensi)).mul(D(b.harga));
 }
 
 /** Jumlah nilaiBaris semua baris (tiap baris dibulatkan dulu, lalu dijumlahkan). */

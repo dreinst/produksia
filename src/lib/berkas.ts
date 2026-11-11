@@ -523,8 +523,9 @@ export function bolehUnggahSesuatu(pengguna: PenggunaSesi): boolean {
 /**
  * Membaca badan multipart paling banyak `batas` byte. Pengurai formulir berhenti begitu jumlah byte melewati batas,
  * jadi formulir dari badan yang lebih besar dari batas tidak pernah dirakit. 413 bila melewati batas, 400 bila
- * formulirnya tidak valid. Aliran sumber sengaja tidak dibatalkan (cancel): aliran badan Next mengisi antrean dari
- * event 'data' Node tanpa memeriksa status, sehingga pembatalan membuat event berikutnya melempar galat tak tertangkap.
+ * formulirnya tidak valid. Cabang "melewati batas" hanya lapis kedua: rute sudah memeriksa Content-Length dan parser
+ * HTTP Node berhenti di Content-Length. Aliran sumber sengaja tidak dibatalkan (cancel): di route handler cancel
+ * menghancurkan IncomingMessage beserta soketnya, sehingga jawaban 413 bisa tidak sampai ke klien.
  */
 export async function bacaFormulirTerbatas(request: Request, batas: number): Promise<FormData | 400 | 413> {
   if (!request.body) return 400;
@@ -771,7 +772,10 @@ export async function buatTautanBagiBerkas(klien: KlienDb, pengguna: PenggunaSes
   const kedaluwarsa = new Date(sekarang.getTime() + hari * 24 * 60 * 60 * 1000);
   const tautanId = await dalamTransaksi(klien, async (tx) => {
     // baris berkas dikunci supaya permintaan serentak dihitung bergantian dan batas 10 tautan aktif tidak terlewati
-    await tx.$queryRaw`SELECT "id" FROM "Berkas" WHERE "id" = ${b.id} FOR UPDATE`;
+    // syarat dihapusPada/isiDihapusPada diulang di bawah kunci: berkas yang dibuang sesudah pemeriksaan awal tidak
+    // boleh mendapat tautan baru, karena tautan itu akan hidup lagi saat berkas dipulihkan
+    const terkunci = await tx.$queryRaw<{ id: string }[]>`SELECT "id" FROM "Berkas" WHERE "id" = ${b.id} AND "dihapusPada" IS NULL AND "isiDihapusPada" IS NULL FOR UPDATE`;
+    if (terkunci.length === 0) throw new Error(PESAN_BERKAS_TIDAK_ADA);
     const aktif = await tx.tautanBagiBerkas.count({ where: { berkasId: b.id, dicabutPada: null, kedaluwarsa: { gt: sekarang } } });
     if (aktif >= MAKS_TAUTAN_AKTIF) throw new Error(`Berkas ini sudah punya ${MAKS_TAUTAN_AKTIF} tautan aktif; cabut salah satu dulu`);
     const t = await tx.tautanBagiBerkas.create({ data: { berkasId: b.id, tokenHash: hashTokenBagi(token), kedaluwarsa, dibuatOlehId: idTersimpan(pengguna), dibuatOlehNama: pengguna.nama }, select: { id: true } });

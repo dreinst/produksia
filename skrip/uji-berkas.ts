@@ -637,7 +637,20 @@ async function main() {
   await db.tautanBagiBerkas.update({ where: { id: bagiAkhir.id }, data: { dicabutPada: new Date() } });
   const tokenAkhir = (await buatTautanBagiBerkas(db, PEMILIK, docx.id, "7")).token;
   pastikan((await bacaTautanPublik(db, tokenAkhir)).status === 200, "setelah satu dicabut, tautan baru bisa dibuat");
-  await db.$transaction((tx) => buangSatuBerkas(tx, docx.id, PEMILIK));
+  // perbaikan tinjauan P08 butir 4: buang dikomit selagi pembuatan tautan menunggu kunci baris; tautan tidak boleh
+  // terbuat, karena tautan itu akan hidup lagi saat berkas dipulihkan
+  let balapan: Promise<string> | undefined;
+  await db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT "id" FROM "Berkas" WHERE "id" = ${docx.id} FOR UPDATE`;
+    balapan = buatTautanBagiBerkas(db, PEMILIK, docx.id, "7").then(
+      () => "lolos",
+      (e: unknown) => String(e),
+    );
+    await new Promise((r) => setTimeout(r, 300));
+    await buangSatuBerkas(tx, docx.id, PEMILIK);
+  });
+  const hasilBalapan = await balapan!;
+  pastikan(hasilBalapan.includes("Berkas tidak ditemukan"), `tautan yang menunggu kunci saat berkas dibuang ditolak (${hasilBalapan})`);
   pastikan((await bacaTautanPublik(db, tokenAkhir)).status === 404 && (await db.tautanBagiBerkas.count({ where: { berkasId: docx.id, dicabutPada: null } })) === 0, "berkas dibuang: semua tautan 404 dan tercabut");
   pastikan(!(await db.$transaction((tx) => buangSatuBerkas(tx, docx.id, PEMILIK))), "buangSatuBerkas pada berkas yang sudah dibuang: false, tanpa log baru");
   pastikan((await jumlahLog(docx.id, "BUANG")) === 1, "buangSatuBerkas menulis satu log BUANG");

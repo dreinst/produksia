@@ -1,12 +1,13 @@
 import type { JenisDokumenCetak, ResetNomor } from "@/prisma-klien/enums";
+import type { Prisma } from "@/prisma-klien/client";
 import type { KlienDb } from "@/lib/log";
 import { tanggalIso } from "@/lib/waktu";
 
 /*
  * Nomor cetak dokumen penjualan (D2 §3.7): nomor tampil per perusahaan menurut FormatNomor bertoken, terpisah dari
  * nomor internal (PNW-, FJ-, dst.) yang tetap unik global. Penghitung dinaikkan atomik lewat
- * INSERT ... ON CONFLICT ... RETURNING di transaksi dokumen pemanggil. Bukan "use server"; semua fungsi menerima
- * klien (db atau tx) dari pemanggil.
+ * INSERT ... ON CONFLICT ... RETURNING di transaksi dokumen pemanggil. Bukan "use server"; fungsi menerima klien
+ * dari pemanggil (alokasiNomorCetak hanya menerima klien transaksi).
  */
 
 export const JENIS_NOMOR_CETAK = ["penawaran", "faktur", "kwitansi", "kwitansi-dp", "tagihan-termin"] as const;
@@ -142,20 +143,32 @@ export async function setelNomorTerakhir(
 
 /** Benar bila nomor cetak sudah dipakai dokumen lain berjenis sama di perusahaan itu (kecualiId = dokumen yang diubah). */
 export async function nomorCetakTerpakai(klien: KlienDb, jenis: JenisNomorCetak, perusahaanId: string, nomor: string, kecualiId?: string): Promise<boolean> {
-  const where = { perusahaanId, nomorCetak: nomor, ...(kecualiId ? { NOT: { id: kecualiId } } : {}) };
-  const select = { id: true } as const;
+  return (await daftarNomorCetakTerpakai(klien, jenis, perusahaanId, [nomor], kecualiId)).size > 0;
+}
+
+/** Bagian dari `daftar` yang sudah dipakai dokumen berjenis sama di perusahaan itu (satu kueri berindeks). */
+async function daftarNomorCetakTerpakai(klien: KlienDb, jenis: JenisNomorCetak, perusahaanId: string, daftar: string[], kecualiId?: string): Promise<Set<string>> {
+  const where = { perusahaanId, nomorCetak: { in: daftar }, ...(kecualiId ? { NOT: { id: kecualiId } } : {}) };
+  const select = { nomorCetak: true } as const;
+  let baris: { nomorCetak: string | null }[];
   switch (jenis) {
     case "penawaran":
-      return !!(await klien.penawaranPenjualan.findFirst({ where, select }));
+      baris = await klien.penawaranPenjualan.findMany({ where, select });
+      break;
     case "faktur":
-      return !!(await klien.fakturPenjualan.findFirst({ where, select }));
+      baris = await klien.fakturPenjualan.findMany({ where, select });
+      break;
     case "kwitansi":
-      return !!(await klien.penerimaanPenjualan.findFirst({ where, select }));
+      baris = await klien.penerimaanPenjualan.findMany({ where, select });
+      break;
     case "kwitansi-dp":
-      return !!(await klien.uangMukaPelanggan.findFirst({ where, select }));
+      baris = await klien.uangMukaPelanggan.findMany({ where, select });
+      break;
     case "tagihan-termin":
-      return !!(await klien.rencanaTermin.findFirst({ where, select }));
+      baris = await klien.rencanaTermin.findMany({ where, select });
+      break;
   }
+  return new Set(baris.flatMap((b) => (b.nomorCetak === null ? [] : [b.nomorCetak])));
 }
 
 export const PANJANG_NOMOR_CETAK = 60;
@@ -168,37 +181,61 @@ export async function bacaNomorCetakManual(
   klien: KlienDb,
   p: { jenis: JenisNomorCetak; perusahaanId: string; isian: unknown; kecualiId?: string },
 ): Promise<string | null> {
-  const nomor = typeof p.isian === "string" ? p.isian.trim() : "";
+  // NFC supaya nomor yang tampak sama juga sama bagi indeks unik
+  const nomor = typeof p.isian === "string" ? p.isian.normalize("NFC").trim() : "";
   if (!nomor) return null;
   if (nomor.length > PANJANG_NOMOR_CETAK) throw new Error(`Nomor cetak paling panjang ${PANJANG_NOMOR_CETAK} karakter`);
-  if (/[\u0000-\u001f\u007f]/.test(nomor)) throw new Error("Nomor cetak memuat karakter yang tidak diizinkan");
+  // kendali C0/C1, karakter format (arah teks, lebar nol, BOM), dan pemisah baris/paragraf Unicode
+  if (/[\p{Cc}\p{Cf}\u2028\u2029]/u.test(nomor)) throw new Error("Nomor cetak memuat karakter yang tidak diizinkan");
   if (await nomorCetakTerpakai(klien, p.jenis, p.perusahaanId, nomor, p.kecualiId)) throw new Error(`Nomor cetak ${nomor} sudah dipakai dokumen lain`);
   return nomor;
 }
 
-export const MAKS_COBA_NOMOR_CETAK = 5;
+/**
+ * Klien transaksi saja. Prisma.TransactionClient sendiri masih menerima `db` (PrismaClient memuat semua kuncinya),
+ * jadi $connect (yang tidak ada di klien transaksi) dilarang supaya TypeScript menolak `db` biasa.
+ */
+export type KlienTransaksi = Prisma.TransactionClient & { $connect?: never };
+
+/** Paling banyak sekian nomor di atas penghitung yang diperiksa sebelum alokasi menyerah. */
+export const MAKS_LOMPAT_NOMOR_CETAK = 10_000;
+const UKURAN_BLOK_LOMPAT = 500;
+const NILAI_PENGHITUNG_MAKS = 2_147_483_647;
 
 /**
  * Alokasi nomor cetak di dalam transaksi dokumen yang sama. null bila perusahaan belum punya format untuk jenis itu
  * atau formatnya nonaktif. ON CONFLICT ... RETURNING mengunci baris penghitung, jadi transaksi bersamaan tidak
- * mendapat angka sama; nomor yang ternyata sudah dipakai (mis. nomor manual) dilompati, paling banyak 5 kali.
- * Indeks unik [perusahaanId, nomorCetak] tetap penjaga terakhir.
+ * mendapat angka sama. Bila nomor hasil penghitung sudah dipakai (mis. nomor manual di depan penghitung), dipakai
+ * nomor bebas terkecil di atasnya (diperiksa per blok, paling jauh MAKS_LOMPAT_NOMOR_CETAK) dan penghitung dinaikkan
+ * ke nomor itu, supaya percobaan berikutnya tidak menabrak nomor yang sama lagi. Indeks unik
+ * [perusahaanId, nomorCetak] tetap penjaga terakhir.
  */
-export async function alokasiNomorCetak(tx: KlienDb, p: { perusahaanId: string; jenis: JenisNomorCetak; tanggal: Date }): Promise<string | null> {
+export async function alokasiNomorCetak(tx: KlienTransaksi, p: { perusahaanId: string; jenis: JenisNomorCetak; tanggal: Date }): Promise<string | null> {
   const f = await tx.formatNomor.findUnique({
     where: { perusahaanId_jenis: { perusahaanId: p.perusahaanId, jenis: p.jenis } },
     include: { perusahaan: { select: { kode: true } } },
   });
   if (!f || !f.aktif) return null;
   const periode = periodeReset(f.reset, p.tanggal);
-  for (let coba = 0; coba < MAKS_COBA_NOMOR_CETAK; coba++) {
-    const [{ nilai }] = await tx.$queryRaw<{ nilai: number }[]>`
-      INSERT INTO "PenghitungNomor" ("perusahaanId", "kunciDeret", "periode", "nilai")
-      VALUES (${p.perusahaanId}, ${f.kunciDeret}, ${periode}, 1)
-      ON CONFLICT ("perusahaanId", "kunciDeret", "periode") DO UPDATE SET "nilai" = "PenghitungNomor"."nilai" + 1
-      RETURNING "nilai"`;
-    const nomor = isiPola(f.pola, { nilai, tanggal: p.tanggal, prefiks: f.prefiks, kode: f.kode || f.perusahaan.kode, digit: f.digit });
-    if (!(await nomorCetakTerpakai(tx, p.jenis, p.perusahaanId, nomor))) return nomor;
+  const [{ nilai }] = await tx.$queryRaw<{ nilai: number }[]>`
+    INSERT INTO "PenghitungNomor" ("perusahaanId", "kunciDeret", "periode", "nilai")
+    VALUES (${p.perusahaanId}, ${f.kunciDeret}, ${periode}, 1)
+    ON CONFLICT ("perusahaanId", "kunciDeret", "periode") DO UPDATE SET "nilai" = "PenghitungNomor"."nilai" + 1
+    RETURNING "nilai"`;
+  const isi = (n: number) => isiPola(f.pola, { nilai: n, tanggal: p.tanggal, prefiks: f.prefiks, kode: f.kode || f.perusahaan.kode, digit: f.digit });
+  const batas = Math.min(nilai + MAKS_LOMPAT_NOMOR_CETAK - 1, NILAI_PENGHITUNG_MAKS);
+  // blok pertama hanya nomor hasil penghitung (jalur biasa satu kueri), blok berikutnya UKURAN_BLOK_LOMPAT nomor
+  for (let awal = nilai, ukuran = 1; awal <= batas; awal += ukuran, ukuran = UKURAN_BLOK_LOMPAT) {
+    const calon = Array.from({ length: Math.min(ukuran, batas - awal + 1) }, (_, i) => awal + i);
+    const terpakai = await daftarNomorCetakTerpakai(tx, p.jenis, p.perusahaanId, calon.map(isi));
+    const bebas = calon.find((n) => !terpakai.has(isi(n)));
+    if (bebas === undefined) continue;
+    if (bebas !== nilai) {
+      await tx.$executeRaw`
+        UPDATE "PenghitungNomor" SET "nilai" = ${bebas}
+        WHERE "perusahaanId" = ${p.perusahaanId} AND "kunciDeret" = ${f.kunciDeret} AND "periode" = ${periode}`;
+    }
+    return isi(bebas);
   }
-  throw new Error("Nomor cetak tidak bisa dialokasikan, coba lagi");
+  throw new Error(`Nomor cetak ${isi(nilai)} sampai ${isi(batas)} sudah dipakai semua. Setel Nomor terakhir di pengaturan Format Nomor supaya penomoran melanjutkan nomor yang sudah ada.`);
 }

@@ -46,7 +46,8 @@ export async function petaTautanAktif(pengguna: PenggunaSesi, berkas: readonly P
 
 /**
  * Nama berkas sebagai pemicu: gambar membuka pratinjau, PDF membuka tab baru, jenis lain teks biasa. Nama selalu di
- * <bdi> supaya karakter arah teks (mis. U+202E pada nama lama) tidak menyamarkan ekstensi di tampilan.
+ * <bdi> supaya karakter arah teks di nama tidak memengaruhi teks di sekitarnya. Penyamaran ekstensi di dalam nama
+ * itu sendiri (mis. U+202E) dicegah bersihkanNamaBerkas saat nama disimpan, bukan oleh <bdi>.
  */
 export function NamaBerkas({ b }: { b: Pick<MetaBerkas, "id" | "namaBerkas" | "tipeMime"> }) {
   const keluarga = keluargaDariMime(b.tipeMime);

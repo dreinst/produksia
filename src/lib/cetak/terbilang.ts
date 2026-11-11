@@ -40,10 +40,17 @@ const hurufJudul = (s: string) => s.replace(/(^|\s)(\S)/g, (_, spasi: string, hu
  * (kwitansi D'Pro). Nilai dari 10^15 ke atas ditulis angka ("1000000000000000 RUPIAH", perilaku HKA). Negatif ditolak.
  */
 export function terbilangRupiah(nilai: Desimal | number | string, gaya: GayaTerbilang = "KAPITAL"): string {
-  const d = new Prisma.Decimal(nilai);
+  let d: Desimal;
+  try {
+    d = new Prisma.Decimal(nilai);
+  } catch {
+    throw new Error(`Angka tidak valid: ${String(nilai)}`);
+  }
   if (!d.isFinite()) throw new Error(`Angka tidak valid: ${String(nilai)}`);
-  if (d.isNegative() && !d.isZero()) throw new Error("Terbilang tidak menerima nilai negatif");
-  const [bagianBulat, bagianSen] = d.toFixed(2, Prisma.Decimal.ROUND_HALF_UP).split(".");
+  // tanda diperiksa setelah pembulatan: -0,001 tercetak 0, jadi diterima sebagai nol
+  const bulat = d.toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
+  if (bulat.isNegative() && !bulat.isZero()) throw new Error("Terbilang tidak menerima nilai negatif");
+  const [bagianBulat, bagianSen] = bulat.abs().toFixed(2).split(".");
   const rupiah = B(bagianBulat);
   const sen = Number(bagianSen);
   let teks: string;

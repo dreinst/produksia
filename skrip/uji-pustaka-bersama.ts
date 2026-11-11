@@ -11,6 +11,7 @@ import { bobotBaris, nilaiBaris, subtotalBaris } from "../src/lib/nilaiBaris";
 import {
   JENIS_CETAK_KE_NOMOR,
   JENIS_NOMOR_CETAK,
+  MAKS_LOMPAT_NOMOR_CETAK,
   alokasiNomorCetak,
   bacaFormatNomor,
   bacaNomorCetakManual,
@@ -100,6 +101,7 @@ async function main() {
   pastikan(nilaiBaris({ jumlah: "0.33", frekuensi: "0.33", harga: 1 }).toFixed(2) === "0.11", "nilaiBaris 0,33 x 0,33 x 1 = 0,11 (satu kali pembulatan)");
   pastikan(bobotBaris({ jumlah: "0.33", frekuensi: "0.33", harga: 1 }).toString() === "0.1089", "bobotBaris tanpa pembulatan = 0,1089");
   pastikan(nilaiBaris({ jumlah: 2, frekuensi: 3, harga: "100000" }).toFixed(2) === "600000.00", "frekuensi ikut dikalikan: 2 x 3 x 100.000 = 600.000");
+  pastikan(nilaiBaris({ jumlah: 2, frekuensi: "", harga: "100000" }).toFixed(2) === "200000.00" && bobotBaris({ jumlah: 2, frekuensi: "", harga: 5 }).toString() === "10", "frekuensi string kosong (isian formulir) = 1 (perbaikan tinjauan P08 butir 11)");
   pastikan(nilaiBaris({ jumlah: "0.005", harga: 1 }).toFixed(2) === "0.01" && nilaiBaris({ jumlah: "-0.005", harga: 1 }).toFixed(2) === "-0.01", "pembulatan half-up sama dengan uang() (0,005 jadi 0,01)");
   pastikan(nilaiBaris({ jumlah: null, harga: 5 }).isZero() && subtotalBaris([]).isZero(), "jumlah kosong = 0, subtotal daftar kosong = 0");
   let galatAngka = "";
@@ -256,11 +258,30 @@ async function main() {
   const pnw2 = await db.penawaranPenjualan.create({ data: { nomor: `${KODE_PLG}-PNW-2`, pelangganId: plg.id, perusahaanId: pt.id, nomorCetak: `${String(berikut + 1).padStart(3, "0")}/${KODE_PT}/P1/IX/2026` } });
   const lompatDua = await alokasi("penawaran", sep2026);
   pastikan(lompatDua === `${String(berikut + 2).padStart(3, "0")}/${KODE_PT}/P1/IX/2026`, `dua nomor berurutan terpakai: dilompati dua kali (${lompatDua})`);
-  // lima kali bentrok berturut-turut: galat
-  await db.penghitungNomor.update({ where: { perusahaanId_kunciDeret_periode: { perusahaanId: pt.id, kunciDeret: "surat-ujpb", periode: "2026" } }, data: { nilai: 900 } });
-  for (let n = 901; n <= 905; n++) await db.penawaranPenjualan.create({ data: { nomor: `${KODE_PLG}-PNW-${n}`, pelangganId: plg.id, perusahaanId: pt.id, nomorCetak: `${n}/${KODE_PT}/P1/IX/2026` } });
-  await harusDitolak("lima nomor berikutnya terpakai", () => alokasi("penawaran", sep2026), "Nomor cetak tidak bisa dialokasikan, coba lagi");
-  pastikan((await nilaiPenghitung("surat-ujpb", "2026")) === 900, "alokasi gagal: transaksi batal, penghitung kembali 900");
+  // perbaikan tinjauan P08 butir 1: 20 nomor manual berurutan di atas penghitung dilompati sekaligus, penghitung ikut naik
+  const kunciSurat = { perusahaanId_kunciDeret_periode: { perusahaanId: pt.id, kunciDeret: "surat-ujpb", periode: "2026" } };
+  await db.penghitungNomor.update({ where: kunciSurat, data: { nilai: 900 } });
+  for (let n = 901; n <= 920; n++) await db.penawaranPenjualan.create({ data: { nomor: `${KODE_PLG}-PNW-${n}`, pelangganId: plg.id, perusahaanId: pt.id, nomorCetak: `${n}/${KODE_PT}/P1/IX/2026` } });
+  const lewatiDuaPuluh = await alokasi("penawaran", sep2026);
+  pastikan(lewatiDuaPuluh === `921/${KODE_PT}/P1/IX/2026` && (await nilaiPenghitung("surat-ujpb", "2026")) === 921, `20 nomor manual terpakai: alokasi otomatis 921 dan penghitung 921 (${lewatiDuaPuluh})`);
+  pastikan((await alokasi("penawaran", sep2026)) === `922/${KODE_PT}/P1/IX/2026`, "alokasi berikutnya langsung 922 tanpa menabrak nomor manual lagi");
+  // blok kedua lompatan: 600 nomor terpakai di atas penghitung (lebih dari satu blok 500)
+  await db.penghitungNomor.update({ where: kunciSurat, data: { nilai: 1000 } });
+  await db.penawaranPenjualan.createMany({ data: Array.from({ length: 600 }, (_, i) => ({ nomor: `${KODE_PLG}-PNW-${1001 + i}`, pelangganId: plg.id, perusahaanId: pt.id, nomorCetak: `${1001 + i}/${KODE_PT}/P1/IX/2026` })) });
+  pastikan((await alokasi("penawaran", sep2026)) === `1601/${KODE_PT}/P1/IX/2026` && (await nilaiPenghitung("surat-ujpb", "2026")) === 1601, "600 nomor terpakai: alokasi 1601 dan penghitung 1601");
+  // tidak ada nomor bebas dalam batas (di sini batas nilai kolom penghitung): galat menyebut nomor bentrok, penghitung tetap
+  const nilaiMaks = 2_147_483_647;
+  await db.penghitungNomor.update({ where: kunciSurat, data: { nilai: nilaiMaks - 1 } });
+  await db.penawaranPenjualan.create({ data: { nomor: `${KODE_PLG}-PNW-MAKS`, pelangganId: plg.id, perusahaanId: pt.id, nomorCetak: `${nilaiMaks}/${KODE_PT}/P1/IX/2026` } });
+  await harusDitolak("semua nomor dalam batas terpakai", () => alokasi("penawaran", sep2026), `Nomor cetak ${nilaiMaks}/${KODE_PT}/P1/IX/2026 sampai ${nilaiMaks}/${KODE_PT}/P1/IX/2026 sudah dipakai semua. Setel Nomor terakhir`);
+  pastikan((await nilaiPenghitung("surat-ujpb", "2026")) === nilaiMaks - 1, "alokasi gagal: transaksi batal, penghitung kembali ke nilai semula");
+  pastikan(MAKS_LOMPAT_NOMOR_CETAK === 10_000, "batas lompatan 10.000 nomor");
+  // perbaikan tinjauan P08 butir 9: TypeScript menolak db biasa (tsc di CI gagal bila baris berikut tidak lagi galat)
+  const alokasiDenganDbBiasa = () =>
+    // @ts-expect-error alokasiNomorCetak hanya menerima klien transaksi, bukan db biasa
+    alokasiNomorCetak(db, { perusahaanId: pt.id, jenis: "penawaran", tanggal: sep2026 });
+  pastikan(typeof alokasiDenganDbBiasa === "function", "alokasiNomorCetak bertipe klien transaksi");
+  await db.penghitungNomor.update({ where: kunciSurat, data: { nilai: 900 } });
   pastikan((await bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: "   " })) === null && (await bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: null })) === null, "nomor manual kosong: null (pakai alokasi otomatis)");
   pastikan((await bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: "  064/DPRO/P1/VIII/2026 " })) === "064/DPRO/P1/VIII/2026", "nomor manual baru dipangkas dan diterima");
   pastikan((await nilaiPenghitung("surat-ujpb", "2026")) === 900, "nomor manual tidak menaikkan penghitung");
@@ -268,6 +289,14 @@ async function main() {
   pastikan((await bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: nomorBentrok, kecualiId: pnw.id })) === nomorBentrok, "nomor manual milik dokumen sendiri (ubah) diterima");
   await harusDitolak("nomor manual 61 karakter", () => bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: "N".repeat(61) }), "Nomor cetak paling panjang 60 karakter");
   await harusDitolak("nomor manual berkarakter kendali", () => bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: "A\nB" }), "karakter yang tidak diizinkan");
+  // perbaikan tinjauan P08 butir 7: karakter format dan kendali C1 ditolak, nomor dinormalkan NFC
+  for (const [label, isian] of [["lebar nol", "071/DPRO\u200B"], ["RLO", "071/\u202EORPD"], ["BOM di tengah (BOM di tepi dipangkas trim)", "07\uFEFF1"], ["kendali C1", "071\u0085"], ["pemisah baris Unicode", "071\u2028A"]] as const) {
+    await harusDitolak(`nomor manual dengan ${label}`, () => bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian }), "karakter yang tidak diizinkan");
+  }
+  const nomorNfc = "N\u00e9-071/2026";
+  pastikan((await bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: "Ne\u0301-071/2026" })) === nomorNfc, "nomor manual NFD disimpan sebagai NFC");
+  await db.penawaranPenjualan.create({ data: { nomor: `${KODE_PLG}-PNW-NFC`, pelangganId: plg.id, perusahaanId: pt.id, nomorCetak: nomorNfc } });
+  await harusDitolak("nomor manual NFD yang sama dengan nomor NFC terpakai", () => bacaNomorCetakManual(db, { jenis: "penawaran", perusahaanId: pt.id, isian: "Ne\u0301-071/2026" }), `Nomor cetak ${nomorNfc} sudah dipakai dokumen lain`);
   pastikan(pnw2.nomorCetak !== null, "penawaran uji kedua tersimpan");
 
   console.log("=== 8. Format angka dan tanggal (D3 §3.4) ===");
@@ -335,6 +364,11 @@ async function main() {
   for (const [nilai, harapan] of harapanJudul) pastikan(terbilangRupiah(nilai, "JUDUL") === harapan, `terbilang JUDUL ${nilai}: ${harapan}`);
   pastikan(terbilangRupiah(D("80483260.00")) === harapanTerbilang[0][1], "terbilang menerima Decimal server");
   await harusDitolak("terbilang negatif", async () => terbilangRupiah(-1), "tidak menerima nilai negatif");
+  // perbaikan tinjauan P08 butir 14: masukan tidak sah memakai pesan yang sama dengan D(); tanda diperiksa setelah pembulatan
+  await harusDitolak("terbilang bukan angka", async () => terbilangRupiah("abc"), "Angka tidak valid: abc");
+  await harusDitolak("terbilang string kosong", async () => terbilangRupiah(""), "Angka tidak valid: ");
+  await harusDitolak("terbilang -0,005 (dibulatkan -0,01)", async () => terbilangRupiah("-0.005"), "tidak menerima nilai negatif");
+  pastikan(terbilangRupiah("-0.001") === "NOL RUPIAH" && terbilangRupiah(-0.004, "JUDUL") === "Nol Rupiah", "negatif yang dibulatkan menjadi nol: NOL RUPIAH");
 
   console.log("=== 10. Nama berkas, teks, dan Content-Disposition ===");
   pastikan(namaBerkasAman("Invoice", "071/DPRO-INV2/IX/2026", false) === "Invoice 071-DPRO-INV2-IX-2026.pdf", "namaBerkasAman contoh D3");
@@ -352,11 +386,42 @@ async function main() {
   pastikan(kepalaDisposisi === kepalaDisposisiBerkas && kepalaDisposisi("attachment", "Invoice 071.pdf") === "attachment; filename=\"Invoice 071.pdf\"; filename*=UTF-8''Invoice%20071.pdf", "kepalaDisposisi cetak = fungsi berkas yang sama (F6)");
 
   console.log("=== 11. Aman untuk komponen klien ===");
+  // perbaikan tinjauan P08 butir 12: impor dibaca dari isi berkas utuh (termasuk impor bertingkat baris), lalu impor
+  // nilai ke @/lib/* ditelusuri rekursif supaya impor tidak langsung juga diperiksa
   const berkasKlien = ["src/lib/nilaiBaris.ts", "src/lib/cetak/tipe.ts", "src/lib/cetak/format.ts", "src/lib/cetak/terbilang.ts"];
-  for (const berkas of berkasKlien) {
-    const impor = readFileSync(berkas, "utf8").split("\n").filter((b) => /^\s*(import|export)\b.*\bfrom\b/.test(b));
-    const terlarang = impor.filter((b) => /@\/lib\/db\b|prisma-klien\/client|@\/lib\/otentikasi|@\/lib\/berkas\b|@\/lib\/log\b|node:/.test(b) || (/@\/lib\/uang\b/.test(b) && !/^\s*import type\b/.test(b)));
-    pastikan(terlarang.length === 0, `${berkas}: tanpa impor db, klien Prisma server, atau nilai uang.ts (${terlarang.join(" | ")})`);
+  const polaTerlarang = /^(?:@\/lib\/db|@\/prisma-klien\/client|@\/lib\/otentikasi|@\/lib\/berkas|@\/lib\/log|node:.*|fs|path|crypto)$/;
+  const imporBerkas = (isi: string) =>
+    [...isi.matchAll(/\b(import|export)\s+(type\s+)?(?:[^"';]*?\bfrom\s+)?["']([^"']+)["']/g)].map((m) => ({ jenisTipe: !!m[2], sumber: m[3] }));
+  const keBerkas = (sumber: string) => {
+    if (!sumber.startsWith("@/lib/")) return null;
+    const dasar = `src/${sumber.slice(2)}`;
+    for (const calon of [`${dasar}.ts`, `${dasar}.tsx`, `${dasar}/index.ts`]) {
+      try {
+        readFileSync(calon);
+        return calon;
+      } catch {
+        // coba calon berikutnya
+      }
+    }
+    return null;
+  };
+  pastikan(imporBerkas('import {\n  a,\n  b,\n} from "@/lib/db";').some((i) => i.sumber === "@/lib/db"), "penjaga impor menangkap impor bertingkat baris");
+  for (const awal of berkasKlien) {
+    const dikunjungi = new Set<string>();
+    const antre = [awal];
+    const terlarang: string[] = [];
+    while (antre.length > 0) {
+      const berkas = antre.pop()!;
+      if (dikunjungi.has(berkas)) continue;
+      dikunjungi.add(berkas);
+      for (const { jenisTipe, sumber } of imporBerkas(readFileSync(berkas, "utf8"))) {
+        if (jenisTipe) continue; // impor tipe dihapus saat kompilasi
+        if (polaTerlarang.test(sumber) || sumber === "@/lib/uang") terlarang.push(`${berkas}: ${sumber}`);
+        const lanjut = keBerkas(sumber);
+        if (lanjut) antre.push(lanjut);
+      }
+    }
+    pastikan(terlarang.length === 0, `${awal}: tanpa impor db, klien Prisma server, atau nilai uang.ts, langsung maupun tidak langsung (${terlarang.join(" | ")}; ditelusuri ${dikunjungi.size} berkas)`);
   }
 
   console.log("=== 12. Bersih-bersih ===");
