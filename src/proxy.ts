@@ -1,17 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { NAMA_COOKIE_SESI } from "@/lib/hakAkses";
+import { NAMA_COOKIE_SESI, jalurPublik } from "@/lib/hakAkses";
 
 /*
  * Pemeriksaan optimistis di tepi: permintaan tanpa cookie sesi langsung dialihkan ke /masuk
  * (termasuk prefetch), tanpa menyentuh basis data. Pemeriksaan sesungguhnya, apakah token
  * masih berlaku dan peran berhak, tetap dilakukan di layout, halaman, dan aksi server
- * (lihat src/lib/otentikasi.ts).
+ * (lihat src/lib/otentikasi.ts). Daftar jalur tanpa sesi ada di JALUR_PUBLIK (src/lib/hakAkses.ts).
  */
-const JALUR_PUBLIK = ["/masuk", "/lupa-kata-sandi", "/atur-ulang", "/api/sehat"];
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  if (JALUR_PUBLIK.some((j) => pathname === j || pathname.startsWith(`${j}/`))) return NextResponse.next();
+  if (jalurPublik(pathname)) return NextResponse.next();
 
   if (!request.cookies.has(NAMA_COOKIE_SESI)) {
     if (pathname.startsWith("/api/")) return NextResponse.json({ ok: false, galat: "Belum masuk" }, { status: 401 });

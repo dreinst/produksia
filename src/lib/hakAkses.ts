@@ -14,6 +14,16 @@ import type { PeranPengguna } from "@/prisma-klien/enums";
 /** Nama cookie sesi, didefinisikan di sini agar proxy.ts bisa memakainya tanpa menyeret modul basis data. */
 export const NAMA_COOKIE_SESI = "sesi_ac";
 
+/**
+ * Jalur yang terbuka tanpa cookie sesi (dipakai proxy.ts). "/b" = tautan bagi berkas publik; pencocokan hanya
+ * jalur itu sendiri atau berawalan "/b/", jadi /buku-besar dan /berkas tetap tertutup.
+ */
+export const JALUR_PUBLIK: readonly string[] = ["/masuk", "/lupa-kata-sandi", "/atur-ulang", "/api/sehat", "/b"];
+
+export function jalurPublik(pathname: string): boolean {
+  return JALUR_PUBLIK.some((j) => pathname === j || pathname.startsWith(`${j}/`));
+}
+
 export type ModulDokumen = "penjualan" | "pembelian" | "kas-bank" | "buku-besar" | "persediaan" | "aset-tetap" | "sdm" | "crm" | "pemasaran" | "proyek" | "berkas";
 export type AksiDokumen = "lihat" | "buat" | "ubah" | "setujui" | "hapus";
 

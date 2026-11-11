@@ -20,6 +20,7 @@ import {
   syaratSaringanLog,
 } from "@/lib/log";
 import { punyaHak } from "@/lib/hakAkses";
+import { ruangTersembunyi } from "@/lib/berkas";
 import type { Prisma } from "@/prisma-klien/client";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
@@ -45,8 +46,9 @@ export default async function HalamanLogAktivitas({ searchParams }: { searchPara
   // modul yang tidak boleh dilihat tidak punya pilihan di formulir; jangan biarkan ia menyaring diam-diam dari URL
   if (saringan.modul && saringan.modul !== NILAI_MODUL_UMUM && !modulBoleh.includes(saringan.modul)) saringan.modul = null;
 
-  // ruang berkas tersembunyi disambungkan di paket berkas (P06); sampai saat itu null
-  const dasar: Prisma.LogAktivitasWhereInput = { AND: [syaratLogTerlihat(pengguna, null), saringLogLingkup(lingkup.perusahaanId)] };
+  // log berkas di folder atau proyek yang tersembunyi bagi pengguna ikut tersembunyi (D7 §3.7.4)
+  const ruang = await ruangTersembunyi(db, pengguna);
+  const dasar: Prisma.LogAktivitasWhereInput = { AND: [syaratLogTerlihat(pengguna, ruang), saringLogLingkup(lingkup.perusahaanId)] };
   const cari: Prisma.LogAktivitasWhereInput = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { jenis: cocokTeks(param.q) }, { penggunaNama: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {};
   const where: Prisma.LogAktivitasWhereInput = { AND: [dasar, syaratSaringanLog(saringan), cari] };
   const [total, daftar, kelompokAksi, daftarPengguna, perusahaan] = await Promise.all([

@@ -4,6 +4,7 @@ import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { daftarPerusahaan } from "@/lib/perusahaan";
 import { formatWaktu } from "@/lib/waktu";
 import { gayaAksiLog, saringLogLingkup, syaratLogTerlihat } from "@/lib/log";
+import { ruangTersembunyi } from "@/lib/berkas";
 import type { Prisma } from "@/prisma-klien/client";
 import KartuKpi from "@/komponen/ui/KartuKpi";
 
@@ -21,13 +22,14 @@ export function kelasLencanaAksiLog(aksi: string): string {
  * Log dalam lingkup (saringLogLingkup): satu perusahaan = log perusahaan itu ditambah log tingkat sistem
  * (perusahaanId null). Pencatat lama tidak mengisi perusahaanId (DESAIN G13), jadi catatan tanpa perusahaan bisa
  * berasal dari perusahaan lain; karena itu panel menandainya di subjudul.
- * Daftar terbaru memuat catatan yang boleh dilihat pengguna (syaratLogTerlihat, D7 §3.7.4). Tanpa penglihat, hanya
+ * Daftar terbaru memuat catatan yang boleh dilihat pengguna (syaratLogTerlihat dengan ruang berkas tersembunyinya,
+ * D7 §3.7.4). Tanpa penglihat, hanya
  * catatan tanpa modul yang dimuat (terbuka bagi semua pemegang log-aktivitas.lihat).
  */
 export async function muatRingkasanSistem(perusahaanId: string | null, sekarang: Date = new Date(), penglihat: PenggunaSesi | null = null) {
   const sejak = new Date(sekarang.getTime() - TUJUH_HARI_MS);
   const lingkup = saringLogLingkup(perusahaanId);
-  const terlihat: Prisma.LogAktivitasWhereInput = penglihat ? syaratLogTerlihat(penglihat, null) : { modul: null };
+  const terlihat: Prisma.LogAktivitasWhereInput = penglihat ? syaratLogTerlihat(penglihat, await ruangTersembunyi(db, penglihat)) : { modul: null };
   const [perusahaan, pengguna, penggunaAktif, logAuth, masuk7Hari, aktivitas7Hari, terbaru] = await Promise.all([
     daftarPerusahaan(false, db),
     db.pengguna.count(),

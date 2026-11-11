@@ -17,9 +17,14 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // `next build` juga menghasilkan .next/standalone (server.js + dependensi minimum) untuk Docker/VPS
   output: "standalone",
-  // Formulir Peminjaman Barang mengirim sampai 3 foto HP yang sudah dikompresi di klien (maks 1 MB per foto);
-  // bawaan 1 MB terlalu kecil.
-  experimental: { serverActions: { bodySizeLimit: "3mb" } },
+  experimental: {
+    // Formulir Peminjaman Barang mengirim sampai 3 foto HP yang sudah dikompresi di klien (maks 1 MB per foto);
+    // bawaan 1 MB terlalu kecil.
+    serverActions: { bodySizeLimit: "3mb" },
+    // Unggah berkas lewat POST /api/berkas sampai 25 MB + kepala multipart. Tanpa ini proxy menyangga badan hanya
+    // 10 MB lalu meneruskannya terpotong tanpa galat. Berlaku untuk semua rute yang melewati proxy.
+    proxyClientMaxBodySize: "26mb",
+  },
   async headers() {
     return [{ source: "/:path*", headers: headerKeamanan }];
   },
