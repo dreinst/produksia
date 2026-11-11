@@ -200,7 +200,58 @@ async function main() {
   await jalankan(`buka kembali ${TAHUN_LAMA}`, () => bukaKembaliTahun(formulir({ tahun: TAHUN_LAMA })));
   pastikan((await db.tutupBuku.count({ where: { tahun: TAHUN_LAMA } })) === 0 && (await db.jurnal.count({ where: { id: jurnalTutupLama.id } })) === 0, "tutup buku lama: jurnal penutupnya ikut terhapus");
 
-  console.log("=== 8. Bersih-bersih ===");
+  console.log("=== 8. Kunci tahun: klik ganda dan balapan dengan jurnal baru (tinjauan P12 R3) ===");
+  const jumlahPenutupTahun = () => db.jurnal.count({ where: { sumber: "PENUTUP", tanggal: { gte: awalTahun(tahunLalu), lte: akhirTahun(tahunLalu) } } });
+  // revalidatePath hanya berjalan di dalam permintaan HTTP; galat itu berarti aksi sudah selesai (pola jalankan di bantuan.ts)
+  const hasil = (p: Promise<unknown>) => p.then(() => null, (e: unknown) => ((e as Error)?.message?.includes("static generation store missing") ? null : (e as Error)));
+  const [tutupA, tutupB] = await Promise.all([hasil(tutupTahun(formulir({ tahun: tahunLalu }))), hasil(tutupTahun(formulir({ tahun: tahunLalu })))]);
+  const galatTutup = [tutupA, tutupB].filter((g): g is Error => g !== null);
+  pastikan(galatTutup.length === 1 && galatTutup[0].message === `Tahun buku ${tahunLalu} sudah ditutup`, `klik ganda Tutup: satu berhasil, satu ditolak "sudah ditutup" (${galatTutup.map((g) => g.message).join(" | ")})`);
+  const tutupGanda = await db.tutupBuku.findUniqueOrThrow({ where: { tahun: tahunLalu }, include: { rincianPerusahaan: true } });
+  pastikan((await jumlahPenutupTahun()) === tutupGanda.rincianPerusahaan.length && tutupGanda.rincianPerusahaan.length === pratinjau.length, "klik ganda Tutup: JU-TUTUP tidak dobel");
+  const [bukaA, bukaB] = await Promise.all([hasil(bukaKembaliTahun(formulir({ tahun: tahunLalu }))), hasil(bukaKembaliTahun(formulir({ tahun: tahunLalu })))]);
+  const galatBuka = [bukaA, bukaB].filter((g): g is Error => g !== null);
+  pastikan(galatBuka.length === 1 && galatBuka[0].message === `Tahun buku ${tahunLalu} tidak dalam keadaan ditutup`, `klik ganda Buka kembali: satu berhasil, satu ditolak "tidak dalam keadaan ditutup" (${galatBuka.map((g) => g.message).join(" | ")})`);
+  pastikan((await db.tutupBuku.count({ where: { tahun: tahunLalu } })) === 0 && (await jumlahPenutupTahun()) === 0, "klik ganda Buka kembali: tahun terbuka tanpa JU-TUTUP tersisa");
+
+  // Balapan: transaksi jurnal T1 sudah lolos pastikanTahunTerbuka tetapi belum commit saat tutup buku dimulai. Tutup buku
+  // harus menunggu T1 dan ikut menolkan jurnalnya. Jurnal T2 yang datang saat tutup buku menunggu harus ditolak sesudahnya.
+  const tungguPenunggu = async (n: number) => {
+    for (let i = 0; i < 200; i++) {
+      const [{ jumlah }] = await db.$queryRaw<{ jumlah: number }[]>`SELECT count(*)::int AS jumlah FROM pg_locks WHERE locktype = 'advisory' AND NOT granted AND objid = ${tahunLalu}::int::oid AND objsubid = 2`;
+      if (jumlah >= n) return;
+      await new Promise((r) => setTimeout(r, 50));
+    }
+    throw new Error(`Tidak ada ${n} transaksi yang menunggu kunci tahun ${tahunLalu}; tutup buku tidak menunggu jurnal yang sedang berjalan`);
+  };
+  let lepasT1!: () => void;
+  const gerbangT1 = new Promise<void>((r) => (lepasT1 = r));
+  let t1Siap!: () => void;
+  const sinyalT1 = new Promise<void>((r) => (t1Siap = r));
+  const jurnalBalapan = (tx: Parameters<typeof catatJurnal>[0], perusahaanId: string, kas: string) =>
+    catatJurnal(tx, "JU", "Uji balapan tutup buku", "PENJUALAN", [{ akunId: kas, debit: D(50), kredit: D(0), keterangan: "Uji" }, { akunId: pend.id, debit: D(0), kredit: D(50), keterangan: "Uji" }], { perusahaanId, tanggal: new Date(`${tahunLalu}-09-02T10:00:00`) });
+  const t1 = hasil(db.$transaction(async (tx) => { await jurnalBalapan(tx, u1.id, kas1.id); t1Siap(); await gerbangT1; }, { timeout: 30_000 }));
+  let hTutup: Promise<Error | null> = Promise.resolve(null), hT2: Promise<Error | null> = Promise.resolve(null);
+  try {
+    await sinyalT1;
+    hTutup = hasil(tutupTahun(formulir({ tahun: tahunLalu })));
+    await tungguPenunggu(1);
+    hT2 = hasil(db.$transaction((tx) => jurnalBalapan(tx, u2.id, kas2.id)));
+    await tungguPenunggu(2);
+  } finally {
+    lepasT1();
+  }
+  const [gT1, gTutup, gT2] = await Promise.all([t1, hTutup, hT2]);
+  pastikan(gT1 === null && gTutup === null, `jurnal T1 dan tutup buku sama-sama berhasil (${gT1?.message ?? ""} ${gTutup?.message ?? ""})`);
+  pastikan(gT2?.message.startsWith(`Tahun buku ${tahunLalu} sudah ditutup`), `jurnal T2 yang menunggu tutup buku ditolak "sudah ditutup" (${gT2?.message ?? "lolos"})`);
+  const tutupBalapan = await db.tutupBuku.findUniqueOrThrow({ where: { tahun: tahunLalu }, include: { rincianPerusahaan: true } });
+  pastikan(sama(tutupBalapan.rincianPerusahaan.find((r) => r.perusahaanId === u1.id)?.labaBersih, 1050), "tutup buku menunggu T1: laba perusahaan laba 1.050 (jurnal T1 ikut ditutup)");
+  pastikan(sama(tutupBalapan.rincianPerusahaan.find((r) => r.perusahaanId === u2.id)?.labaBersih, -200), "jurnal T2 tidak masuk buku perusahaan rugi");
+  const saldoBalapan = await saldoAkunPeriode(db, awalTahun(tahunLalu), akhirTahun(tahunLalu), false, { perusahaanId: u1.id });
+  pastikan(saldoBalapan.filter((a) => !a.kelompok && (a.jenis === "PENDAPATAN" || a.jenis === "BEBAN")).every((a) => a.saldo.isZero()), "sesudah balapan, pendapatan dan beban perusahaan laba nol (laba berjalan 0)");
+  await jalankan(`buka kembali ${tahunLalu} sesudah uji balapan`, () => bukaKembaliTahun(formulir({ tahun: tahunLalu })));
+
+  console.log("=== 9. Bersih-bersih ===");
   if (pengaturanAwal) await db.pengaturanPerusahaan.update({ where: { id: "default" }, data: { tahunBuku: pengaturanAwal.tahunBuku } });
   await bersihkanData();
   pastikan((await db.perusahaan.count({ where: { kode: { startsWith: KODE } } })) === 0 && (await db.akun.count({ where: { kode: { startsWith: `${KODE}-` } } })) === 0, "perusahaan dan akun uji terhapus");

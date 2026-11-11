@@ -8,7 +8,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, jumlahkan, type Desimal } from "@/lib/uang";
 import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
 import { PERUSAHAAN_UTAMA } from "@/lib/perusahaan";
-import { akhirTahun, barisJurnalPenutup, ringkasanPenutupan, ringkasanPenutupanPerPerusahaan } from "@/lib/tutupBuku";
+import { akhirTahun, barisJurnalPenutup, kunciTahunBuku, ringkasanPenutupan, ringkasanPenutupanPerPerusahaan } from "@/lib/tutupBuku";
 import { dataLangsungDisetujui } from "@/lib/persetujuan";
 
 const HALAMAN = "/buku-besar/tutup-buku";
@@ -48,6 +48,10 @@ export async function tutupTahun(dataFormulir: FormData) {
   const labaDitahanId = pemetaan.labaDitahanId;
 
   await db.$transaction(async (tx) => {
+    // Kunci eksklusif tahun (tinjauan P12 R3): menunggu transaksi jurnal tahun ini yang sedang berjalan, lalu memeriksa
+    // ulang di dalam transaksi supaya klik ganda berakhir dengan pesan "sudah ditutup", bukan galat unik.
+    await kunciTahunBuku(tx, tahun, true);
+    if (await tx.tutupBuku.findUnique({ where: { tahun }, select: { id: true } })) throw new Error(`Tahun buku ${tahun} sudah ditutup`);
     let labaTotal = NOL;
     let jumlahAkun = 0;
     let jurnalUtamaId: string | null = null;
@@ -118,11 +122,15 @@ export async function tutupTahun(dataFormulir: FormData) {
 export async function bukaKembaliTahun(dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("tutup-buku.buat");
   const tahun = bacaTahun(dataFormulir);
-  const tutup = await db.tutupBuku.findUnique({ where: { tahun }, include: { rincianPerusahaan: { select: { jurnalId: true } } } });
-  if (!tutup) throw new Error(`Tahun buku ${tahun} tidak dalam keadaan ditutup`);
-  const jurnalIds = [...new Set([tutup.jurnalId, ...tutup.rincianPerusahaan.map((r) => r.jurnalId)].filter((id): id is string => !!id))];
+  const sebelum = await db.tutupBuku.findUnique({ where: { tahun }, select: { id: true } });
+  if (!sebelum) throw new Error(`Tahun buku ${tahun} tidak dalam keadaan ditutup`);
 
   await db.$transaction(async (tx) => {
+    // Kunci yang sama dengan tutupTahun; dibaca ulang di dalam transaksi supaya klik ganda memberi pesan yang sama
+    await kunciTahunBuku(tx, tahun, true);
+    const tutup = await tx.tutupBuku.findUnique({ where: { tahun }, include: { rincianPerusahaan: { select: { jurnalId: true } } } });
+    if (!tutup) throw new Error(`Tahun buku ${tahun} tidak dalam keadaan ditutup`);
+    const jurnalIds = [...new Set([tutup.jurnalId, ...tutup.rincianPerusahaan.map((r) => r.jurnalId)].filter((id): id is string => !!id))];
     // TutupBuku dihapus lebih dulu: baris rincian ikut terhapus (onDelete Cascade) sehingga jurnalnya bebas dihapus
     await tx.tutupBuku.delete({ where: { id: tutup.id } });
     if (jurnalIds.length > 0) {

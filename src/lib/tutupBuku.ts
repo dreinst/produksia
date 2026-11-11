@@ -20,9 +20,28 @@ export function awalTahun(tahun: number): Date {
   return new Date(tahun, 0, 1, 0, 0, 0, 0);
 }
 
-/** Menolak pencatatan/penghapusan jurnal bertanggal di tahun yang sudah ditutup. */
+/**
+ * Kunci tahun buku (tinjauan P12 R3), kunci advisory PostgreSQL yang lepas sendiri saat transaksi selesai. tutupTahun
+ * dan bukaKembaliTahun memegang kunci eksklusif, sedangkan pencatat dan penghapus jurnal (pastikanTahunTerbuka)
+ * memegang kunci bersama. Akibatnya tutup buku menunggu semua transaksi jurnal tahun itu yang sedang berjalan selesai
+ * sebelum membaca saldo, dan transaksi jurnal yang datang sesudahnya menunggu tutup buku selesai lalu membaca
+ * TutupBuku yang sudah tersimpan. Pencatat jurnal tidak saling menunggu. Kunci bertingkat transaksi aman dipakai
+ * lewat PgBouncer mode transaksi. Di luar transaksi kunci langsung lepas sesudah perintahnya, jadi hanya berarti
+ * menunggu tutup buku yang sedang berjalan selesai; pencatat jurnal wajib memanggilnya di transaksi yang sama.
+ */
+export async function kunciTahunBuku(klien: Klien, tahun: number, eksklusif: boolean) {
+  if (eksklusif) await klien.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('tutup-buku'), ${tahun}::int)`;
+  else await klien.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext('tutup-buku'), ${tahun}::int)`;
+}
+
+/**
+ * Menolak pencatatan/penghapusan jurnal bertanggal di tahun yang sudah ditutup. Di dalam transaksi, kunci bersama
+ * tahun itu dipegang sampai transaksi selesai (lihat kunciTahunBuku), jadi pemeriksaan ini tidak bisa disalip
+ * tutup buku yang sedang berjalan.
+ */
 export async function pastikanTahunTerbuka(klien: Klien, tanggal: Date) {
   const tahun = tanggal.getFullYear();
+  await kunciTahunBuku(klien, tahun, false);
   const tutup = await klien.tutupBuku.findUnique({ where: { tahun }, include: { jurnal: { select: { nomor: true } } } });
   if (tutup) {
     throw new Error(
@@ -97,7 +116,8 @@ export type PenutupanPerusahaan = { perusahaan: PerusahaanPenutupan; ringkasan: 
 export async function ringkasanPenutupanPerPerusahaan(klien: Klien, tahun: number): Promise<PenutupanPerusahaan[]> {
   const daftar = await klien.perusahaan.findMany({ select: { id: true, kode: true, nama: true, aktif: true }, orderBy: [{ urutan: "asc" }, { nama: "asc" }] });
   const hasil: PenutupanPerusahaan[] = [];
-  // berurutan, bukan Promise.all: klien bisa berupa transaksi, dan satu koneksi transaksi menjalankan kueri satu per satu
+  // berurutan antar perusahaan supaya jumlah kueri serentak di satu koneksi transaksi tetap kecil (ringkasanPenutupan
+  // sendiri masih memakai Promise.all untuk dua kuerinya)
   for (const perusahaan of daftar) hasil.push({ perusahaan, ringkasan: await ringkasanPenutupan(klien, tahun, perusahaan.id) });
   return hasil;
 }

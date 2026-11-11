@@ -134,7 +134,7 @@ export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal:
   };
 }
 
-export type PajakPerusahaan = { perusahaan: { id: string; kode: string; nama: string }; pengaturan: PengaturanPajak; ringkasan: RingkasanPajak };
+export type PajakPerusahaan = { perusahaan: { id: string; kode: string; nama: string; aktif: boolean }; pengaturan: PengaturanPajak; ringkasan: RingkasanPajak };
 export type RingkasanPajakGabungan = {
   tahun: number;
   /** semua perusahaan (termasuk yang diarsipkan), urut menurut urutan lalu nama */
@@ -151,7 +151,7 @@ export type RingkasanPajakGabungan = {
  * omzet gabungan: omzet negatif (retur) satu perusahaan tidak mengurangi PPh Final perusahaan lain.
  */
 export async function ringkasanPajakGabungan(klien: Klien, tahun: number): Promise<RingkasanPajakGabungan> {
-  const daftar = await klien.perusahaan.findMany({ select: { id: true, kode: true, nama: true }, orderBy: [{ urutan: "asc" }, { nama: "asc" }] });
+  const daftar = await klien.perusahaan.findMany({ select: { id: true, kode: true, nama: true, aktif: true }, orderBy: [{ urutan: "asc" }, { nama: "asc" }] });
   const perPerusahaan = await Promise.all(
     daftar.map(async (perusahaan) => {
       const pengaturan = await ambilPengaturanPerusahaan(klien, perusahaan.id);
@@ -167,8 +167,15 @@ export async function ringkasanPajakGabungan(klien: Klien, tahun: number): Promi
   };
 }
 
-/** Benar bila ringkasan setahun punya angka atau catatan PPh Final (dipakai halaman Pajak gabungan untuk memilih perusahaan). */
+/**
+ * Benar bila ringkasan setahun punya angka atau catatan PPh Final (dipakai halaman Pajak gabungan untuk memilih
+ * perusahaan). Angka per bulan ikut diperiksa: omzet +X di satu bulan dan -X di bulan lain membuat total setahun nol,
+ * tetapi PPh Final bulan positif tetap ada dan ikut dijumlah di kartu gabungan.
+ */
 export function adaAngkaPajak(r: RingkasanPajak): boolean {
   const t = r.total;
-  return [t.omzet, t.omzetFaktur, t.ppnKeluaran, t.ppnMasukan, t.pph23DipotongKlien, t.pph23KitaPotong].some((v) => !v.isZero()) || r.bulan.some((b) => b.tercatat !== null);
+  return (
+    [t.omzet, t.omzetFaktur, t.ppnKeluaran, t.ppnMasukan, t.pph23DipotongKlien, t.pph23KitaPotong, t.pphFinal].some((v) => !v.isZero()) ||
+    r.bulan.some((b) => b.tercatat !== null || [b.omzet, b.omzetFaktur, b.omzetLain, b.ppnKeluaran, b.ppnMasukan, b.pph23DipotongKlien, b.pph23KitaPotong, b.pphFinal].some((v) => !v.isZero()))
+  );
 }

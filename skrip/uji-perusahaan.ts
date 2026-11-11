@@ -330,6 +330,18 @@ async function main() {
   const pphLain = jumlahkan(gab2.perPerusahaan.filter((x) => x.perusahaan.id !== U).map((x) => x.ringkasan.total.pphFinal));
   pastikan(sama(entriU2.ringkasan.bulan[bulan - 1].omzet, -3_000_000) && entriU2.ringkasan.total.pphFinal.isZero() && sama(gab2.total.pphFinal, pphLain), "omzet perusahaan uji negatif: PPh Final-nya 0 dan PPh Final gabungan = PPh Final perusahaan lain");
   await hapusJurnalLangsung([jurnalOmzet.id, jurnalRetur.id]);
+  // tinjauan P12 R1: omzet +1.000.000 di Januari dan -1.000.000 di Februari membuat total setahun nol, tetapi PPh Final
+  // Januari tetap 5.000, jadi perusahaan itu harus tampil di Pajak gabungan (kartu gabungan ikut menjumlahnya)
+  const tahunR1 = tahun - 1;
+  const jurnalR1a = await db.jurnal.create({ data: { nomor: `${KODE}-JU-R1A`, tanggal: new Date(tahunR1, 0, 15, 10), keterangan: "Omzet uji R1", sumber: "MANUAL", perusahaanId: U, baris: { create: [{ akunId: kasU.id, debit: 1_000_000, kredit: 0 }, { akunId: akunPendapatan.id, debit: 0, kredit: 1_000_000 }] } } });
+  const jurnalR1b = await db.jurnal.create({ data: { nomor: `${KODE}-JU-R1B`, tanggal: new Date(tahunR1, 1, 15, 10), keterangan: "Koreksi uji R1", sumber: "MANUAL", perusahaanId: U, baris: { create: [{ akunId: akunPendapatan.id, debit: 1_000_000, kredit: 0 }, { akunId: kasU.id, debit: 0, kredit: 1_000_000 }] } } });
+  const gabR1 = await ringkasanPajakGabungan(db, tahunR1);
+  const entriR1 = gabR1.perPerusahaan.find((x) => x.perusahaan.id === U)!;
+  pastikan(entriR1.ringkasan.total.omzet.isZero() && entriR1.ringkasan.total.omzetLain.isZero() && sama(entriR1.ringkasan.bulan[0].pphFinal, 5_000), "R1: omzet setahun nol tetapi PPh Final Januari 5.000");
+  pastikan(adaAngkaPajak(entriR1.ringkasan) && entriR1.perusahaan.aktif === true, "R1: adaAngkaPajak memeriksa angka per bulan, jadi perusahaan itu tampil di Pajak gabungan");
+  const kosongR1: RingkasanPajak = { ...entriR1.ringkasan, bulan: entriR1.ringkasan.bulan.map((b) => ({ ...b, omzet: D(0), omzetLain: D(0), pphFinal: D(0) })), total: { ...entriR1.ringkasan.total, pphFinal: D(0) } };
+  pastikan(!adaAngkaPajak(kosongR1), "R1: ringkasan tanpa angka di bulan mana pun tetap tidak tampil");
+  await hapusJurnalLangsung([jurnalR1a.id, jurnalR1b.id]);
 
   console.log("=== 10. Akun dan saldo antar perusahaan (D1 §3.1, §4.6) ===");
   const peta = await db.pemetaanAkunTambahan.findMany({ where: { kunci: { in: ["piutang-antar-perusahaan", "hutang-antar-perusahaan"] } } });

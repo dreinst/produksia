@@ -27,9 +27,10 @@ const peringatanAkun = (
 /**
  * Tabel per masa pajak SATU perusahaan. Tombol Catat mengirim perusahaanId tersembunyi, jadi angka di konfirmasi
  * sama dengan yang dibukukan catatPphFinal (pengaturan, omzet, dan tarif perusahaan itu). `namaPerusahaan` hanya
- * diisi di gabungan, untuk membedakan konfirmasi antar perusahaan.
+ * diisi di gabungan, untuk membedakan konfirmasi antar perusahaan. Perusahaan yang diarsipkan (`aktif` false) tidak
+ * mendapat tombol Catat karena catatPphFinal menolaknya; Hapus tetap ada.
  */
-function TabelMasaPajak(p: { r: RingkasanPajak; pengaturan: PengaturanPajak; perusahaanId: string; namaPerusahaan?: string; tahun: number; bolehTulis: boolean; bolehHapus: boolean }) {
+function TabelMasaPajak(p: { r: RingkasanPajak; pengaturan: PengaturanPajak; perusahaanId: string; namaPerusahaan?: string; aktif: boolean; tahun: number; bolehTulis: boolean; bolehHapus: boolean }) {
   const { r, pengaturan, tahun } = p;
   const sekarang = new Date();
   const akunSiap = !!pengaturan.akunBebanPphFinalId && !!pengaturan.akunHutangPphFinalId;
@@ -70,14 +71,14 @@ function TabelMasaPajak(p: { r: RingkasanPajak; pengaturan: PengaturanPajak; per
                     <span className="mono text-xs text-slate-500">{b.tercatat.nomorJurnal ?? "-"}</span>
                     <TombolHapusDokumen jenis="pphFinal" id={b.tercatat.id} nomor={b.tercatat.nomorJurnal ?? b.periode} boleh={p.bolehHapus} />
                   </span>
-                ) : b.omzet.gt(0) && bulanBerjalan(b.bulan) && p.bolehTulis ? (
+                ) : b.omzet.gt(0) && bulanBerjalan(b.bulan) && p.bolehTulis && p.aktif ? (
                   <FormulirAksi aksi={catatPphFinalFormulir} pesanKonfirmasi={`Catat PPh Final ${b.periode}${p.namaPerusahaan ? ` ${p.namaPerusahaan}` : ""} sebesar Rp ${angka(b.pphFinal)} (Dr Beban PPh Final / Cr Hutang PPh Final)?`}>
                     <input type="hidden" name="periode" value={b.periode} />
                     <input type="hidden" name="perusahaanId" value={p.perusahaanId} />
                     <button type="submit" className="tombol tombol-garis tombol-kecil" disabled={!akunSiap}>Catat</button>
                   </FormulirAksi>
                 ) : (
-                  <span className="text-xs text-slate-400">{b.omzet.gt(0) ? "-" : "tanpa omzet"}</span>
+                  <span className="text-xs text-slate-400">{!b.omzet.gt(0) ? "tanpa omzet" : !p.aktif && p.bolehTulis && bulanBerjalan(b.bulan) ? "perusahaan diarsipkan" : "-"}</span>
                 )}
               </td>
             </tr>
@@ -146,7 +147,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
 
       <div className="kartu kartu-tabel">
         <div className="kepala-kartu"><h2 className="judul-kartu">Per masa pajak</h2></div>
-        <TabelMasaPajak r={r} pengaturan={pengaturan} perusahaanId={perusahaanId} tahun={tahun} bolehTulis={bolehTulis} bolehHapus={bolehHapus} />
+        <TabelMasaPajak r={r} pengaturan={pengaturan} perusahaanId={perusahaanId} aktif={lingkup.perusahaan?.aktif ?? true} tahun={tahun} bolehTulis={bolehTulis} bolehHapus={bolehHapus} />
       </div>
 
       <CatatanPajak pphFinalPersen={angka(pengaturan.pphFinalPersen)} />
@@ -188,7 +189,7 @@ async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode
             {lencanaPajak(pengaturan)}
           </div>
           {!(pengaturan.akunBebanPphFinalId && pengaturan.akunHutangPphFinalId) && <div className="px-4 pb-3">{peringatanAkun}</div>}
-          <TabelMasaPajak r={ringkasan} pengaturan={pengaturan} perusahaanId={perusahaan.id} namaPerusahaan={perusahaan.nama} tahun={tahun} bolehTulis={p.bolehTulis} bolehHapus={p.bolehHapus} />
+          <TabelMasaPajak r={ringkasan} pengaturan={pengaturan} perusahaanId={perusahaan.id} namaPerusahaan={perusahaan.nama} aktif={perusahaan.aktif} tahun={tahun} bolehTulis={p.bolehTulis} bolehHapus={p.bolehHapus} />
         </div>
       ))}
 

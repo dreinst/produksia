@@ -55,31 +55,34 @@ async function buatJurnalSeimbang(keterangan: string, daftarBaris: InputBarisJur
   if (totalDebit.isZero()) throw new Error("Jumlah jurnal tidak boleh nol");
   await pastikanAkunRinci(db, daftarBaris.map((l) => l.akunId));
   await pastikanAkunMilik(db, daftarBaris.map((l) => l.akunId), perusahaanId);
-  await pastikanTahunTerbuka(db, new Date());
+  // Pemeriksaan tahun dan pencatatan di satu transaksi supaya kunci tahun (tinjauan P12 R3) dipegang sampai jurnal tersimpan
+  return db.$transaction(async (tx) => {
+    await pastikanTahunTerbuka(tx, new Date());
 
-  const nomor = await nomorDokumenBerikutnya(db.jurnal, prefix);
+    const nomor = await nomorDokumenBerikutnya(tx.jurnal, prefix);
 
-  await db.jurnal.create({
-    data: {
-      nomor,
-      keterangan,
-      sumber,
-      perusahaanId,
-      proyekId,
-      // Satu baris Jurnal = sudah masuk buku besar, jadi statusnya selalu DISETUJUI (lihat schema.prisma)
-      statusPersetujuan: "DISETUJUI",
-      baris: {
-        create: daftarBaris.map((l) => ({
-          akunId: l.akunId,
-          debit: l.debit,
-          kredit: l.kredit,
-          keterangan: l.keterangan || null,
-        })),
+    await tx.jurnal.create({
+      data: {
+        nomor,
+        keterangan,
+        sumber,
+        perusahaanId,
+        proyekId,
+        // Satu baris Jurnal = sudah masuk buku besar, jadi statusnya selalu DISETUJUI (lihat schema.prisma)
+        statusPersetujuan: "DISETUJUI",
+        baris: {
+          create: daftarBaris.map((l) => ({
+            akunId: l.akunId,
+            debit: l.debit,
+            kredit: l.kredit,
+            keterangan: l.keterangan || null,
+          })),
+        },
       },
-    },
-  });
+    });
 
-  return nomor;
+    return nomor;
+  });
 }
 
 // ---------- Jurnal Umum (manual) ----------
