@@ -2,6 +2,7 @@ import "dotenv/config";
 // Skrip ini memanggil pustaka di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { readFileSync } from "node:fs";
+import { posix } from "node:path";
 import { db } from "../src/lib/db";
 import { D, jumlahkan, kali, uang } from "../src/lib/uang";
 import { SEMUA_HAK } from "../src/lib/hakAkses";
@@ -20,6 +21,7 @@ import {
   periksaPola,
   periodeReset,
   setelNomorTerakhir,
+  NOMOR_TERAKHIR_MAKS,
 } from "../src/lib/nomorCetak";
 import { HAK_CETAK_PENJUALAN, JENIS_CETAK_PENJUALAN, jenisCetakPenjualanSah } from "../src/lib/cetak/tipe";
 import {
@@ -276,6 +278,16 @@ async function main() {
   await harusDitolak("semua nomor dalam batas terpakai", () => alokasi("penawaran", sep2026), `Nomor cetak ${nilaiMaks}/${KODE_PT}/P1/IX/2026 sampai ${nilaiMaks}/${KODE_PT}/P1/IX/2026 sudah dipakai semua. Setel Nomor terakhir`);
   pastikan((await nilaiPenghitung("surat-ujpb", "2026")) === nilaiMaks - 1, "alokasi gagal: transaksi batal, penghitung kembali ke nilai semula");
   pastikan(MAKS_LOMPAT_NOMOR_CETAK === 10_000, "batas lompatan 10.000 nomor");
+  // perbaikan tinjauan P10 butir 8: penghitung tepat di batas kolom int memberi pesan, bukan galat Postgres mentah,
+  // dan setelNomorTerakhir menolak nilai di atas NOMOR_TERAKHIR_MAKS
+  await db.penghitungNomor.update({ where: kunciSurat, data: { nilai: nilaiMaks } });
+  await harusDitolak("penghitung di batas kolom int", () => alokasi("penawaran", sep2026), "Penghitung nomor cetak sudah mencapai batas tertinggi. Ganti kunci deret");
+  pastikan((await nilaiPenghitung("surat-ujpb", "2026")) === nilaiMaks, "penghitung di batas tidak berubah");
+  await db.penghitungNomor.update({ where: kunciSurat, data: { nilai: 900 } });
+  pastikan(NOMOR_TERAKHIR_MAKS === 999_999_999, "NOMOR_TERAKHIR_MAKS 999.999.999");
+  await harusDitolak("nomor terakhir di atas batas", () => setelNomorTerakhir(db, { perusahaanId: pt.id, kunciDeret: "surat-ujpb", reset: "TAHUNAN", nilai: NOMOR_TERAKHIR_MAKS + 1, tanggal: sep2026 }), "Nomor terakhir paling besar 999.999.999");
+  await setelNomorTerakhir(db, { perusahaanId: pt.id, kunciDeret: "surat-ujpb", reset: "TAHUNAN", nilai: NOMOR_TERAKHIR_MAKS, tanggal: sep2026 });
+  pastikan((await nilaiPenghitung("surat-ujpb", "2026")) === NOMOR_TERAKHIR_MAKS, "nomor terakhir tepat di batas diterima");
   // perbaikan tinjauan P08 butir 9: TypeScript menolak db biasa (tsc di CI gagal bila baris berikut tidak lagi galat)
   const alokasiDenganDbBiasa = () =>
     // @ts-expect-error alokasiNomorCetak hanya menerima klien transaksi, bukan db biasa
@@ -389,9 +401,14 @@ async function main() {
   // perbaikan tinjauan P08 butir 12: impor dibaca dari isi berkas utuh (termasuk impor bertingkat baris), lalu impor
   // nilai ke @/lib/* ditelusuri rekursif supaya impor tidak langsung juga diperiksa
   const berkasKlien = ["src/lib/nilaiBaris.ts", "src/lib/cetak/tipe.ts", "src/lib/cetak/format.ts", "src/lib/cetak/terbilang.ts"];
-  const polaTerlarang = /^(?:@\/lib\/db|@\/prisma-klien\/client|@\/lib\/otentikasi|@\/lib\/berkas|@\/lib\/log|node:.*|fs|path|crypto)$/;
-  const imporBerkas = (isi: string) =>
-    [...isi.matchAll(/\b(import|export)\s+(type\s+)?(?:[^"';]*?\bfrom\s+)?["']([^"']+)["']/g)].map((m) => ({ jenisTipe: !!m[2], sumber: m[3] }));
+  // perbaikan tinjauan P10 butir 5: modul bawaan Node lain, impor relatif (dinormalkan ke alias @/), import() dinamis,
+  // dan require() ikut diperiksa
+  const polaTerlarang = /^(?:@\/lib\/db|@\/prisma-klien\/client|@\/lib\/otentikasi|@\/lib\/berkas|@\/lib\/log|node:.*|fs|fs\/promises|path|crypto|os|child_process|stream|net|http|https|zlib|worker_threads)$/;
+  const keAlias = (berkas: string, sumber: string) => (sumber.startsWith(".") ? `@/${posix.relative("src", posix.join(posix.dirname(berkas), sumber))}` : sumber);
+  const imporBerkas = (isi: string, berkas = "src/lib/x.ts") => [
+    ...[...isi.matchAll(/\b(import|export)\s+(type\s+)?(?:[^"';]*?\bfrom\s+)?["']([^"']+)["']/g)].map((m) => ({ jenisTipe: !!m[2], sumber: keAlias(berkas, m[3]) })),
+    ...[...isi.matchAll(/\b(?:import|require)\s*\(\s*["']([^"']+)["']/g)].map((m) => ({ jenisTipe: false, sumber: keAlias(berkas, m[1]) })),
+  ];
   const keBerkas = (sumber: string) => {
     if (!sumber.startsWith("@/lib/")) return null;
     const dasar = `src/${sumber.slice(2)}`;
@@ -406,6 +423,9 @@ async function main() {
     return null;
   };
   pastikan(imporBerkas('import {\n  a,\n  b,\n} from "@/lib/db";').some((i) => i.sumber === "@/lib/db"), "penjaga impor menangkap impor bertingkat baris");
+  pastikan(imporBerkas('import { db } from "../db";', "src/lib/cetak/format.ts").some((i) => polaTerlarang.test(i.sumber)) && imporBerkas('export * from "./uang";', "src/lib/nilaiBaris.ts")[0]?.sumber === "@/lib/uang", "penjaga impor menormalkan impor relatif ke alias");
+  pastikan(imporBerkas('const m = await import("@/lib/db");').some((i) => i.sumber === "@/lib/db" && !i.jenisTipe) && imporBerkas('const fs = require("fs");').some((i) => polaTerlarang.test(i.sumber)), "penjaga impor menangkap import() dinamis dan require()");
+  pastikan(["os", "child_process", "stream", "node:os"].every((m) => polaTerlarang.test(m)), "penjaga impor menolak modul bawaan Node lain");
   for (const awal of berkasKlien) {
     const dikunjungi = new Set<string>();
     const antre = [awal];
@@ -414,7 +434,7 @@ async function main() {
       const berkas = antre.pop()!;
       if (dikunjungi.has(berkas)) continue;
       dikunjungi.add(berkas);
-      for (const { jenisTipe, sumber } of imporBerkas(readFileSync(berkas, "utf8"))) {
+      for (const { jenisTipe, sumber } of imporBerkas(readFileSync(berkas, "utf8"), berkas)) {
         if (jenisTipe) continue; // impor tipe dihapus saat kompilasi
         if (polaTerlarang.test(sumber) || sumber === "@/lib/uang") terlarang.push(`${berkas}: ${sumber}`);
         const lanjut = keBerkas(sumber);

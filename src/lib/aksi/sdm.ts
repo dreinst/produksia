@@ -55,7 +55,7 @@ async function perusahaanPenggajian(dataFormulir: FormData, karyawanIds: string[
   if (isian || (await lingkupPerusahaan()).perusahaanId) return perusahaanDokumenBaru(dataFormulir);
   const pemilik = await db.karyawan.findMany({ where: { id: { in: karyawanIds } }, distinct: ["perusahaanId"], select: { perusahaanId: true, perusahaan: { select: { kode: true } } }, orderBy: { perusahaanId: "asc" } });
   if (pemilik.length > 1) throw new Error(`Satu penggajian hanya untuk karyawan satu perusahaan (${pemilik.map((p) => p.perusahaan.kode).join(", ")})`);
-  if (pemilik.length === 0) return perusahaanDokumenBaru(dataFormulir); // karyawan tidak ada: galat "Pilih perusahaan"
+  if (pemilik.length === 0) throw new Error("Karyawan tidak ditemukan"); // pesan sama dengan lingkup satu perusahaan
   const dariKaryawan = new FormData();
   dariKaryawan.set("perusahaanId", pemilik[0].perusahaanId);
   return perusahaanDokumenBaru(dariKaryawan); // memeriksa perusahaan ada dan aktif
@@ -116,6 +116,17 @@ export async function buatPenggajian(dataFormulir: FormData) {
     totalDibayar = totalDibayar.plus(diterima);
     barisTersimpan.push({ karyawanId: b.karyawanId, gajiPokok: b.gajiPokok, tunjangan: b.tunjangan, potongan: b.potongan, keteranganPotongan: b.keteranganPotongan, diterima });
   }
+  // D1 §3.4: semua akun jurnal GJ (beban per karyawan, tunjangan, potongan, kas) milik perusahaan penggajian atau
+  // bersama, diperiksa sebelum dokumen dibuat supaya draf tidak lolos lalu gagal saat disetujui. Akunnya sama dengan
+  // yang dipakai catatJurnalPenggajian.
+  const akunJurnal = new Set<string>([akunKasId]);
+  for (const b of daftarBaris) {
+    const akunKaryawan = petaKaryawan.get(b.karyawanId)!.akunBebanId ?? gaji.bebanGaji.id;
+    if (b.gajiPokok.gt(0)) akunJurnal.add(akunKaryawan);
+    if (b.tunjangan.gt(0)) akunJurnal.add(gaji.bebanTunjangan?.id ?? akunKaryawan);
+  }
+  if (totalPotongan.gt(0)) akunJurnal.add(gaji.hutangPotongan!.id);
+  await pastikanAkunMilik(db, [...akunJurnal], perusahaanId);
 
   // Alur persetujuan: dokumen gaji dibuat sebagai DRAFT, jurnalnya (beban gaji & kas keluar)
   // baru dicatat saat disetujui pengguna lain — kontrol paling penting di siklus penggajian.

@@ -2,7 +2,7 @@ import "dotenv/config";
 // Skrip ini memanggil pustaka dan aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
-import { D } from "../src/lib/uang";
+import { D, jumlahkan } from "../src/lib/uang";
 import {
   PERUSAHAAN_UTAMA,
   akunAntarPerusahaan,
@@ -26,13 +26,14 @@ import {
   ringkasanProyek,
   validasiProyek,
 } from "../src/lib/proyek";
-import { ringkasanPajak, type RingkasanPajak } from "../src/lib/pajak";
+import { adaAngkaPajak, ringkasanPajak, ringkasanPajakGabungan, type RingkasanPajak } from "../src/lib/pajak";
 import { muatMasukanKeuangan } from "../src/lib/keuanganProyek";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { buatPenggajian } from "../src/lib/aksi/sdm";
 import { catatPphFinal } from "../src/lib/aksi/pajak";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
-import { formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
+import { ajukanDokumen, setujuiDokumen } from "../src/lib/aksi/persetujuan";
+import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
 
 /*
  * Uji pustaka perusahaan lanjutan (P10): D1 §9.1 kasus 1, 2, 3, 10, 11, kepemilikan akun (pastikanAkunMilik),
@@ -243,6 +244,28 @@ async function main() {
   pastikan(gajiGabungan.perusahaanId === U && gajiGabungan.jurnal?.perusahaanId === U && (await db.penggajian.count({ where: { bulan: periodeLain } })) === 1, "penggajian gabungan masuk perusahaan karyawan, jurnalnya juga");
   await dengan({ perusahaan: "semua" }, () => harusDitolak("gabungan dengan isian perusahaan: aturan biasa", () => buatPenggajian(formulir({ periode: periodeLain, perusahaanId: U, akunKasId: kasU.id, baris: barisGaji(karyawanU, 100) })), "sudah diproses"));
   await jalankan("hapus penggajian gabungan", () => hapusDokumen("penggajian", gajiGabungan.id));
+  // perbaikan tinjauan P10 butir 9: gabungan dengan karyawan yang tidak ada memberi pesan yang sama dengan lingkup lain
+  await dengan({ perusahaan: "semua" }, () => harusDitolak("gabungan dengan karyawan tidak dikenal", () => buatPenggajian(formulir({ periode: periodeLain, akunKasId: kasBersama.id, baris: barisGaji({ id: "tidak-ada" }, 100) })), "Karyawan tidak ditemukan"));
+  // butir 2 dan 10: saat persetujuan menyala, akun beban karyawan milik perusahaan lain ditolak sebelum draf dibuat,
+  // dan draf yang lolos berjurnal di perusahaan penggajian saat disetujui lewat setujuiDokumen
+  const karyawanUBebanUt = await db.karyawan.create({ data: { kode: `${KODE}-KRY-U2`, nama: "Karyawan Uji Beban Utama", gajiPokok: 1_000_000, perusahaanId: U, akunBebanId: bebanUt.id } });
+  aturPersetujuan(true);
+  try {
+    await dengan({ perusahaan: U }, () => harusDitolak("draf gaji dengan akun beban karyawan milik utama", () => buatPenggajian(formulir({ periode: periodeLain, akunKasId: kasU.id, baris: barisGaji(karyawanUBebanUt, 100_000) })), `Akun ${KODE}-BEBAN-UT Beban Uji Utama milik ${namaUtama}, tidak bisa dipakai di pembukuan ${pt.nama}`));
+    pastikan((await db.penggajian.count({ where: { perusahaanId: U, bulan: periodeLain } })) === 0, "draf gaji yang ditolak tidak tersimpan");
+    await dengan({ perusahaan: U }, () => jalankan("draf gaji perusahaan uji", () => buatPenggajian(formulir({ periode: periodeLain, akunKasId: kasU.id, baris: barisGaji(karyawanU, 100_000) }))));
+  } finally {
+    aturPersetujuan(false);
+  }
+  const drafGaji = await db.penggajian.findUniqueOrThrow({ where: { perusahaanId_bulan: { perusahaanId: U, bulan: periodeLain } } });
+  nomorLog.push(drafGaji.nomor);
+  pastikan(drafGaji.statusPersetujuan === "DRAFT" && drafGaji.jurnalId === null, "draf gaji belum berjurnal");
+  await jalankan("ajukan draf gaji perusahaan uji", () => ajukanDokumen("penggajian", drafGaji.id));
+  await jalankan("setujui draf gaji perusahaan uji", () => setujuiDokumen("penggajian", drafGaji.id));
+  const gajiDisetujui = await db.penggajian.findUniqueOrThrow({ where: { id: drafGaji.id }, include: { jurnal: true } });
+  pastikan(gajiDisetujui.statusPersetujuan === "DISETUJUI" && gajiDisetujui.jurnal?.perusahaanId === U && gajiDisetujui.jurnal.nomor.startsWith("GJ"), "draf gaji disetujui: jurnal GJ milik perusahaan penggajian");
+  await jalankan("hapus penggajian yang disetujui", () => hapusDokumen("penggajian", drafGaji.id));
+  await db.notifikasi.deleteMany({ where: { jenis: { in: ["PERSETUJUAN", "HASIL_PERSETUJUAN"] }, judul: { contains: drafGaji.nomor }, dibuatPada: { gte: awalUji } } });
 
   console.log("=== 9. PPh Final per perusahaan (D1 §9.1 kasus 11) ===");
   const omzetU = 2_000_000;
@@ -282,6 +305,13 @@ async function main() {
       : bulanGab.tercatat?.jumlahCatatan === 1 && bulanGab.tercatat.nomorJurnal === pphU.jurnal!.nomor,
     `gabungan: catatan PPh Final per periode dijumlah (${bulanGab.tercatat?.jumlahCatatan} catatan)`,
   );
+  // perbaikan tinjauan P10 butir 1, 3, dan 4: ringkasan gabungan per perusahaan (halaman Pajak di lingkup gabungan)
+  const gab1 = await ringkasanPajakGabungan(db, tahun);
+  const entriU = gab1.perPerusahaan.find((x) => x.perusahaan.id === U);
+  pastikan(entriU !== undefined && gab1.perPerusahaan.some((x) => x.perusahaan.id === PERUSAHAAN_UTAMA) && entriU.pengaturan.perusahaanId === U && adaAngkaPajak(entriU.ringkasan), "ringkasanPajakGabungan memuat utama dan perusahaan uji dengan pengaturannya sendiri");
+  pastikan(sama(entriU!.ringkasan.bulan[bulan - 1].pphFinal, 10_000) && entriU!.ringkasan.bulan[bulan - 1].tercatat?.id === pphU.id && entriU!.ringkasan.bulan[bulan - 1].tercatat?.jumlahCatatan === 1, "gabungan per perusahaan: PPh Final dan catatan perusahaan uji sendiri (tombol hapus memakai id catatannya)");
+  pastikan(sama(gab1.total.omzet, gabungan.total.omzet) && sama(gab1.total.ppnKurangBayar, gabungan.total.ppnKurangBayar) && sama(gab1.totalPphFinalTercatat, gabungan.totalPphFinalTercatat), "gabungan per perusahaan: omzet, PPN, dan PPh Final tercatat sama dengan penjumlahan biasa");
+  pastikan(sama(gab1.total.pphFinal, jumlahkan(gab1.perPerusahaan.map((x) => x.ringkasan.total.pphFinal))), "PPh Final gabungan = jumlah PPh Final per perusahaan");
   await dengan({ perusahaan: U }, () => harusDitolak("PPh Final ganda di perusahaan uji", () => catatPphFinal(formulir({ periode: bulanIni })), `PPh Final periode ${bulanIni} sudah dicatat`));
   await dengan({ perusahaan: "semua" }, () => harusDitolak("PPh Final gabungan dengan isian perusahaan uji", () => catatPphFinal(formulir({ periode: bulanIni, perusahaanId: U })), "sudah dicatat"));
   pastikan(!(await db.pphFinalBulanan.findMany({ where: { periode: bulanIni } })).some((p) => p.perusahaanId !== U && p.perusahaanId !== "utama"), "tidak ada catatan PPh Final di perusahaan lain");
@@ -292,7 +322,14 @@ async function main() {
   await dengan({ perusahaan: U }, () => harusDitolak("akun beban PPh Final milik utama", () => catatPphFinal(formulir({ periode: periodeLalu })), `Akun ${KODE}-BEBAN-UT Beban Uji Utama milik ${namaUtama}`));
   await db.pengaturanPerusahaan.update({ where: { id: idPengaturan(U) }, data: { akunBebanPphFinalId: barisDefault.akunBebanPphFinalId } });
   await jalankan("hapus PPh Final perusahaan uji", () => hapusDokumen("pphFinal", pphU.id));
-  await hapusJurnalLangsung([jurnalOmzet.id]);
+  // butir 4: omzet negatif (retur) perusahaan uji tidak mengurangi PPh Final perusahaan lain
+  const akunPendapatan = await db.akun.findUniqueOrThrow({ where: { kode: "4-1100" } });
+  const jurnalRetur = await db.jurnal.create({ data: { nomor: `${KODE}-JU-RETUR`, tanggal: sekarang, keterangan: "Retur uji perusahaan", sumber: "MANUAL", perusahaanId: U, baris: { create: [{ akunId: akunPendapatan.id, debit: 5_000_000, kredit: 0 }, { akunId: kasU.id, debit: 0, kredit: 5_000_000 }] } } });
+  const gab2 = await ringkasanPajakGabungan(db, tahun);
+  const entriU2 = gab2.perPerusahaan.find((x) => x.perusahaan.id === U)!;
+  const pphLain = jumlahkan(gab2.perPerusahaan.filter((x) => x.perusahaan.id !== U).map((x) => x.ringkasan.total.pphFinal));
+  pastikan(sama(entriU2.ringkasan.bulan[bulan - 1].omzet, -3_000_000) && entriU2.ringkasan.total.pphFinal.isZero() && sama(gab2.total.pphFinal, pphLain), "omzet perusahaan uji negatif: PPh Final-nya 0 dan PPh Final gabungan = PPh Final perusahaan lain");
+  await hapusJurnalLangsung([jurnalOmzet.id, jurnalRetur.id]);
 
   console.log("=== 10. Akun dan saldo antar perusahaan (D1 §3.1, §4.6) ===");
   const peta = await db.pemetaanAkunTambahan.findMany({ where: { kunci: { in: ["piutang-antar-perusahaan", "hutang-antar-perusahaan"] } } });

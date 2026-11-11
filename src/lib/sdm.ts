@@ -4,8 +4,17 @@ import { akunPemetaanTambahan } from "@/lib/baganAkun";
 import { catatJurnal, type OpsiJurnal } from "@/lib/akuntansi";
 import { D, format, jumlahkan, type Desimal } from "@/lib/uang";
 
-/** Kunci unik Penggajian.periode per perusahaan (D1 §2.4.3); didefinisikan di perusahaan.ts. */
-export { kunciPeriodeGaji } from "@/lib/perusahaan";
+/** Sama dengan PERUSAHAAN_UTAMA di perusahaan.ts; disalin supaya berkas ini tidak memuat modul sesi (D1 §3.1). */
+const UTAMA = "utama";
+
+/**
+ * Kunci unik Penggajian.periode (D1 §2.4.3, §8.2, F20): perusahaan utama = "YYYY-MM" (sama dengan bulan, perilaku
+ * lama), perusahaan lain = "YYYY-MM@<perusahaanId>". Kode baru membaca kolom `bulan`, bukan kunci ini. Diekspor ulang
+ * dari perusahaan.ts.
+ */
+export function kunciPeriodeGaji(perusahaanId: string, bulan: string): string {
+  return perusahaanId === UTAMA ? bulan : `${bulan}@${perusahaanId}`;
+}
 
 type Klien = PrismaClient | Prisma.TransactionClient;
 type Tx = Prisma.TransactionClient;

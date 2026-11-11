@@ -177,13 +177,8 @@ export async function pastikanKaryawanMilik(klien: Klien, karyawanIds: string[],
 /** Kontrak D1 §3.1: pastikanAkunMilik tinggal di baganAkun.ts (bebas sesi) dan diekspor ulang dari sini. */
 export { pastikanAkunMilik };
 
-/**
- * Kunci unik Penggajian.periode (D1 §2.4.3, F20): perusahaan utama = "YYYY-MM" (sama dengan bulan, perilaku lama),
- * perusahaan lain = "YYYY-MM@<perusahaanId>". Kode baru membaca kolom `bulan`, bukan kunci ini.
- */
-export function kunciPeriodeGaji(perusahaanId: string, bulan: string): string {
-  return perusahaanId === PERUSAHAAN_UTAMA ? bulan : `${bulan}@${perusahaanId}`;
-}
+/** Kunci unik Penggajian.periode (D1 §2.4.3): didefinisikan di sdm.ts yang bebas sesi, diekspor ulang dari sini. */
+export { kunciPeriodeGaji } from "@/lib/sdm";
 
 type AkunRingkas = { id: string; kode: string; nama: string };
 

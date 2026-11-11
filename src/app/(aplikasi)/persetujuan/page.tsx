@@ -93,7 +93,7 @@ export default async function HalamanPersetujuan() {
     })),
     ...penggajian.map((g) => ({
       jenis: "penggajian" as const, kode: "penggajian", label: "Penggajian", id: g.id, nomor: g.nomor, tanggal: g.tanggal,
-      keterangan: `Periode ${g.periode}, ${g.baris.length} karyawan`, nilai: Number(g.totalDibayar), status: g.statusPersetujuan,
+      keterangan: `Periode ${g.bulan}, ${g.baris.length} karyawan`, nilai: Number(g.totalDibayar), status: g.statusPersetujuan,
       diajukanOlehId: g.diajukanOlehId, diajukanOleh: nama(g.diajukanOleh), catatanPenolakan: g.catatanPenolakan,
     })),
   ]

@@ -16,13 +16,14 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
   const bolehBuat = punyaHak(pengguna, "penggajian.buat");
   const bolehHapus = punyaHak(pengguna, "penggajian.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { periode: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
+  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { bulan: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : undefined;
   const [total, daftar] = await Promise.all([
     db.penggajian.count({ where }),
     db.penggajian.findMany({
       where,
       include: { akunKas: true, proyek: { select: { kode: true } }, jurnal: { select: { nomor: true } }, baris: { select: { id: true } } },
-      orderBy: { periode: "desc" },
+      // bulan, bukan kunci periode (perusahaan selain utama berakhiran @id); periode hanya pemecah seri
+      orderBy: [{ bulan: "desc" }, { periode: "desc" }],
       skip: param.lewati,
       take: param.ambil,
     }),
@@ -66,7 +67,7 @@ export default async function HalamanPenggajian({ searchParams }: { searchParams
               {daftar.map((p) => (
                 <tr key={p.id}>
                   <td><NomorDokumen nomor={p.nomor} /></td>
-                  <td className="mono">{p.periode}</td>
+                  <td className="mono">{p.bulan}</td>
                   <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                   <td className="text-right angka">{p.baris.length}</td>
                   <td className="text-right angka">{rp(p.totalGajiPokok)}</td>

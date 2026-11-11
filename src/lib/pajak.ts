@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { D, jumlahkan, uang, type Desimal } from "@/lib/uang";
 import { ZONA_WAKTU, akarDari, keturunanDari, type AkunSaldo } from "@/lib/laporan";
+import { ambilPengaturanPerusahaan, type PengaturanPajak } from "@/lib/pengaturanPerusahaan";
 
 /*
  * Ringkasan pajak per bulan. Omzet usaha (dasar PPh Final 0,5%, PP 55/2022 Pasal 60: "sebelum dikurangi potongan penjualan")
@@ -131,4 +132,43 @@ export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal:
     total: { omzet: total("omzet"), omzetFaktur: total("omzetFaktur"), omzetLain: total("omzetLain"), ppnKeluaran: total("ppnKeluaran"), ppnMasukan: total("ppnMasukan"), ppnKurangBayar: total("ppnKurangBayar"), pph23DipotongKlien: total("pph23DipotongKlien"), pph23KitaPotong: total("pph23KitaPotong"), pphFinal: total("pphFinal") },
     totalPphFinalTercatat: jumlahkan(bulan.map((x) => x.tercatat?.jumlah ?? nol)),
   };
+}
+
+export type PajakPerusahaan = { perusahaan: { id: string; kode: string; nama: string }; pengaturan: PengaturanPajak; ringkasan: RingkasanPajak };
+export type RingkasanPajakGabungan = {
+  tahun: number;
+  /** semua perusahaan (termasuk yang diarsipkan), urut menurut urutan lalu nama */
+  perPerusahaan: PajakPerusahaan[];
+  /** penjumlahan per perusahaan; pphFinal = Σ PPh Final tiap perusahaan */
+  total: RingkasanPajak["total"];
+  totalPphFinalTercatat: Desimal;
+};
+
+/**
+ * Ringkasan pajak gabungan (D1 §4.7, perbaikan tinjauan P10 butir 4). Tiap perusahaan wajib pajak sendiri, jadi
+ * ringkasannya dihitung per perusahaan dengan pengaturan dan tarif PPh Final perusahaan itu. Omzet, PPN, dan PPh 23
+ * gabungan sama dengan penjumlahan biasa, tetapi PPh Final gabungan = jumlah PPh Final per perusahaan, bukan tarif x
+ * omzet gabungan: omzet negatif (retur) satu perusahaan tidak mengurangi PPh Final perusahaan lain.
+ */
+export async function ringkasanPajakGabungan(klien: Klien, tahun: number): Promise<RingkasanPajakGabungan> {
+  const daftar = await klien.perusahaan.findMany({ select: { id: true, kode: true, nama: true }, orderBy: [{ urutan: "asc" }, { nama: "asc" }] });
+  const perPerusahaan = await Promise.all(
+    daftar.map(async (perusahaan) => {
+      const pengaturan = await ambilPengaturanPerusahaan(klien, perusahaan.id);
+      return { perusahaan, pengaturan, ringkasan: await ringkasanPajak(klien, tahun, pengaturan.pphFinalPersen, perusahaan.id) };
+    }),
+  );
+  const jumlah = (k: keyof RingkasanPajak["total"]) => jumlahkan(perPerusahaan.map((x) => x.ringkasan.total[k]));
+  return {
+    tahun,
+    perPerusahaan,
+    total: { omzet: jumlah("omzet"), omzetFaktur: jumlah("omzetFaktur"), omzetLain: jumlah("omzetLain"), ppnKeluaran: jumlah("ppnKeluaran"), ppnMasukan: jumlah("ppnMasukan"), ppnKurangBayar: jumlah("ppnKurangBayar"), pph23DipotongKlien: jumlah("pph23DipotongKlien"), pph23KitaPotong: jumlah("pph23KitaPotong"), pphFinal: jumlah("pphFinal") },
+    totalPphFinalTercatat: jumlahkan(perPerusahaan.map((x) => x.ringkasan.totalPphFinalTercatat)),
+  };
+}
+
+/** Benar bila ringkasan setahun punya angka atau catatan PPh Final (dipakai halaman Pajak gabungan untuk memilih perusahaan). */
+export function adaAngkaPajak(r: RingkasanPajak): boolean {
+  const t = r.total;
+  return [t.omzet, t.omzetFaktur, t.ppnKeluaran, t.ppnMasukan, t.pph23DipotongKlien, t.pph23KitaPotong].some((v) => !v.isZero()) || r.bulan.some((b) => b.tercatat !== null);
 }

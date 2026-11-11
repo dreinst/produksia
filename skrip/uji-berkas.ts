@@ -640,15 +640,25 @@ async function main() {
   // perbaikan tinjauan P08 butir 4: buang dikomit selagi pembuatan tautan menunggu kunci baris; tautan tidak boleh
   // terbuat, karena tautan itu akan hidup lagi saat berkas dipulihkan
   let balapan: Promise<string> | undefined;
+  let sudahMenunggu = false;
   await db.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT "id" FROM "Berkas" WHERE "id" = ${docx.id} FOR UPDATE`;
     balapan = buatTautanBagiBerkas(db, PEMILIK, docx.id, "7").then(
       () => "lolos",
       (e: unknown) => String(e),
     );
-    await new Promise((r) => setTimeout(r, 300));
+    // perbaikan tinjauan P10 butir 10: tunggu sampai sesi lain benar-benar menunggu kunci baris ini (bukan jeda tetap),
+    // supaya jalur "dibuang selagi menunggu kunci" yang teruji, bukan pemeriksaan awal
+    for (let i = 0; i < 500 && !sudahMenunggu; i++) {
+      const [{ n }] = await tx.$queryRaw<{ n: number }[]>`
+        SELECT count(*)::int AS n FROM pg_locks l JOIN pg_stat_activity a ON a.pid = l.pid
+        WHERE NOT l.granted AND a.datname = current_database() AND l.pid <> pg_backend_pid()`;
+      sudahMenunggu = n > 0;
+      if (!sudahMenunggu) await new Promise((r) => setTimeout(r, 20));
+    }
     await buangSatuBerkas(tx, docx.id, PEMILIK);
-  });
+  }, { timeout: 30_000 });
+  pastikan(sudahMenunggu, "pembuatan tautan sempat menunggu kunci baris berkas sebelum berkas dibuang");
   const hasilBalapan = await balapan!;
   pastikan(hasilBalapan.includes("Berkas tidak ditemukan"), `tautan yang menunggu kunci saat berkas dibuang ditolak (${hasilBalapan})`);
   pastikan((await bacaTautanPublik(db, tokenAkhir)).status === 404 && (await db.tautanBagiBerkas.count({ where: { berkasId: docx.id, dicabutPada: null } })) === 0, "berkas dibuang: semua tautan 404 dan tercabut");

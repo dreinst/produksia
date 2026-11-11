@@ -118,6 +118,9 @@ export function bacaFormatNomor(isian: { jenis: unknown; pola: unknown; prefiks?
 
 // ---------- Penghitung ----------
 
+/** Nilai tertinggi yang boleh disetel lewat setelNomorTerakhir. */
+export const NOMOR_TERAKHIR_MAKS = 999_999_999;
+
 /**
  * Menyetel penghitung periode berjalan (periode dari `tanggal`, bawaan hari ini) untuk melanjutkan nomor manual lama
  * (mis. D'Pro sudah sampai 080). Tidak boleh lebih kecil dari penghitung sekarang; pembandingan dan penulisan dalam
@@ -127,7 +130,9 @@ export async function setelNomorTerakhir(
   klien: KlienDb,
   p: { perusahaanId: string; kunciDeret: string; reset: ResetNomor; nilai: number; tanggal?: Date },
 ): Promise<void> {
-  if (!Number.isInteger(p.nilai) || p.nilai < 0 || p.nilai > 2_147_483_647) throw new Error("Nomor terakhir harus bilangan bulat 0 atau lebih");
+  if (!Number.isInteger(p.nilai) || p.nilai < 0) throw new Error("Nomor terakhir harus bilangan bulat 0 atau lebih");
+  // jauh di bawah batas kolom int supaya penghitung masih bisa naik dan melompati nomor terpakai
+  if (p.nilai > NOMOR_TERAKHIR_MAKS) throw new Error(`Nomor terakhir paling besar ${NOMOR_TERAKHIR_MAKS.toLocaleString("id-ID")}`);
   const periode = periodeReset(p.reset, p.tanggal ?? new Date());
   const hasil = await klien.$queryRaw<{ nilai: number }[]>`
     INSERT INTO "PenghitungNomor" ("perusahaanId", "kunciDeret", "periode", "nilai")
@@ -217,11 +222,20 @@ export async function alokasiNomorCetak(tx: KlienTransaksi, p: { perusahaanId: s
   });
   if (!f || !f.aktif) return null;
   const periode = periodeReset(f.reset, p.tanggal);
-  const [{ nilai }] = await tx.$queryRaw<{ nilai: number }[]>`
-    INSERT INTO "PenghitungNomor" ("perusahaanId", "kunciDeret", "periode", "nilai")
-    VALUES (${p.perusahaanId}, ${f.kunciDeret}, ${periode}, 1)
-    ON CONFLICT ("perusahaanId", "kunciDeret", "periode") DO UPDATE SET "nilai" = "PenghitungNomor"."nilai" + 1
-    RETURNING "nilai"`;
+  let nilai: number;
+  try {
+    [{ nilai }] = await tx.$queryRaw<{ nilai: number }[]>`
+      INSERT INTO "PenghitungNomor" ("perusahaanId", "kunciDeret", "periode", "nilai")
+      VALUES (${p.perusahaanId}, ${f.kunciDeret}, ${periode}, 1)
+      ON CONFLICT ("perusahaanId", "kunciDeret", "periode") DO UPDATE SET "nilai" = "PenghitungNomor"."nilai" + 1
+      RETURNING "nilai"`;
+  } catch (e) {
+    // 22003 integer out of range: penghitung sudah di batas kolom int (perbaikan tinjauan P10 butir 8)
+    if (/22003|out of range/i.test(String((e as Error)?.message ?? e))) {
+      throw new Error("Penghitung nomor cetak sudah mencapai batas tertinggi. Ganti kunci deret di pengaturan Format Nomor supaya penomoran memakai deret baru.");
+    }
+    throw e;
+  }
   const isi = (n: number) => isiPola(f.pola, { nilai: n, tanggal: p.tanggal, prefiks: f.prefiks, kode: f.kode || f.perusahaan.kode, digit: f.digit });
   const batas = Math.min(nilai + MAKS_LOMPAT_NOMOR_CETAK - 1, NILAI_PENGHITUNG_MAKS);
   // blok pertama hanya nomor hasil penghitung (jalur biasa satu kueri), blok berikutnya UKURAN_BLOK_LOMPAT nomor
