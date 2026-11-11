@@ -6,16 +6,21 @@ import { wajibHak } from "@/lib/otentikasi";
 import Link from "next/link";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanPesananPembelian({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("pesanan-pembelian.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const bolehHapus = boleh("pesanan-pembelian.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftarPesanan] = await Promise.all([
     db.pesananPembelian.count({ where }),
-    db.pesananPembelian.findMany({ where, include: { pemasok: true, baris: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    db.pesananPembelian.findMany({ where, include: { pemasok: true, baris: true, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
   ]);
 
   return (
@@ -36,6 +41,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
         <thead>
           <tr>
             <th>No</th>
+            {!perusahaanId && <th>Perusahaan</th>}
             <th>Tanggal</th>
             <th>Pemasok</th>
             <th className="text-right">Total</th>
@@ -50,6 +56,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
             return (
               <tr key={o.id}>
                 <td><NomorDokumen nomor={o.nomor} /></td>
+                {!perusahaanId && <td><LencanaPerusahaan kode={o.perusahaan.kode} warna={o.perusahaan.warna} nama={o.perusahaan.nama} /></td>}
                 <td className="text-slate-500 whitespace-nowrap">{o.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                 <td>{o.pemasok.nama}</td>
                 <td className="text-right angka">{Number(o.total).toLocaleString("id-ID")}</td>
@@ -78,7 +85,7 @@ export default async function HalamanPesananPembelian({ searchParams }: { search
           })}
           {daftarPesanan.length === 0 && (
             <tr>
-              <td colSpan={6} className="kosong">
+              <td colSpan={perusahaanId ? 6 : 7} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada pesanan pembelian."}
               </td>
             </tr>

@@ -7,16 +7,21 @@ import Link from "next/link";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanFakturPembelian({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("faktur-pembelian.lihat");
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
   const bolehHapus = boleh("faktur-pembelian.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftarFaktur] = await Promise.all([
     db.fakturPembelian.count({ where }),
-    db.fakturPembelian.findMany({ where, include: { pemasok: true, pembayaran: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    db.fakturPembelian.findMany({ where, include: { perusahaan: { select: { kode: true, nama: true, warna: true } }, pemasok: true, pembayaran: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
   ]);
 
   return (
@@ -34,6 +39,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
         <thead>
           <tr>
             <th>No</th>
+            {!perusahaanId && <th>Perusahaan</th>}
             <th>Tanggal</th>
             <th>Pemasok</th>
             <th className="text-right">Total</th>
@@ -49,6 +55,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
             return (
               <tr key={inv.id}>
                 <td><NomorDokumen nomor={inv.nomor} /></td>
+                {!perusahaanId && <td><LencanaPerusahaan kode={inv.perusahaan.kode} warna={inv.perusahaan.warna} nama={inv.perusahaan.nama} /></td>}
                 <td className="text-slate-500 whitespace-nowrap">{inv.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                 <td>{inv.pemasok.nama}</td>
                 <td className="text-right angka">{Number(inv.total).toLocaleString("id-ID")}</td>
@@ -90,7 +97,7 @@ export default async function HalamanFakturPembelian({ searchParams }: { searchP
           })}
           {daftarFaktur.length === 0 && (
             <tr>
-              <td colSpan={8} className="kosong">
+              <td colSpan={perusahaanId ? 8 : 9} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada faktur pembelian."}
               </td>
             </tr>

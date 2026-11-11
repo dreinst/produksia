@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -26,6 +28,7 @@ const SERTAKAN = {
   foto: { select: { id: true }, orderBy: { dibuatPada: "asc" as const } },
   proyek: { select: { nama: true } },
   diajukanOleh: { select: { peran: true } },
+  perusahaan: { select: { kode: true, nama: true, warna: true } },
 };
 
 function TombolWhatsApp({ peranPengaju, pesan }: { peranPengaju: string | null | undefined; pesan: string }) {
@@ -101,24 +104,33 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
   const paramGudang = (await searchParams).gudang;
   const gudangDipilih = Array.isArray(paramGudang) ? paramGudang[0] : paramGudang;
 
+  // Lingkup perusahaan (D1 §7.4, §8.4): dokumen milik perusahaan lingkup; pilihan gudang dan barang tersaring, yang
+  // berpemilik diberi akhiran kode di gabungan. Proyek tidak disaring: peminjaman dan kerusakan boleh melayani event
+  // perusahaan lain (catatan B D1 §3.3).
+  const { perusahaanId } = await lingkupPerusahaan();
+  const milik = saringPerusahaan(perusahaanId);
+  const akhiran = (p: { kode: string } | null) => (!perusahaanId && p ? ` · ${p.kode}` : "");
   const whereRiwayat = {
+    ...milik,
     statusPersetujuan: "DISETUJUI" as const,
     ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { namaPelapor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}),
   };
   const [daftarGudang, daftarProyek, daftarBarang, daftarStok, diajukan, totalRiwayat, riwayat, daftarPs] = await Promise.all([
-    db.gudang.findMany({ orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true } }),
+    db.gudang.findMany({ where: saringMilikAtauBersama(perusahaanId), orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaan: { select: { kode: true } } } }),
     daftarProyekAktif(),
-    db.barang.findMany({ where: { jenis: "BARANG" }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true } }),
+    // barang perusahaan arsip ditolak server (P13), jadi tidak ditawarkan
+    db.barang.findMany({ where: { jenis: "BARANG", ...milik, perusahaan: { aktif: true } }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true, perusahaan: { select: { kode: true } } } }),
     db.stokBarang.findMany({ select: { gudangId: true, barangId: true, jumlah: true } }),
-    db.laporanKerusakanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] } }, include: SERTAKAN, orderBy: { waktuLapor: "desc" } }),
+    db.laporanKerusakanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] }, ...milik }, include: SERTAKAN, orderBy: { waktuLapor: "desc" } }),
     db.laporanKerusakanBarang.count({ where: whereRiwayat }),
     db.laporanKerusakanBarang.findMany({ where: whereRiwayat, include: SERTAKAN, orderBy: { waktuLapor: "desc" }, skip: param.lewati, take: param.ambil }),
-    bolehTautkan ? db.penyesuaianPersediaan.findMany({ where: { statusPersetujuan: "DISETUJUI" }, select: { id: true, nomor: true, gudangId: true, keterangan: true }, orderBy: { nomor: "desc" } }) : Promise.resolve([]),
+    bolehTautkan ? db.penyesuaianPersediaan.findMany({ where: { statusPersetujuan: "DISETUJUI", ...milik }, select: { id: true, nomor: true, gudangId: true, keterangan: true, perusahaanId: true }, orderBy: { nomor: "desc" } }) : Promise.resolve([]),
   ]);
 
   const gudangId = daftarGudang.find((g) => g.id === gudangDipilih)?.id ?? daftarGudang[0]?.id ?? "";
   const stokGudang = new Map(daftarStok.filter((s) => s.gudangId === gudangId).map((s) => [s.barangId, Number(s.jumlah)]));
-  const barangEditor = daftarBarang.map((b) => ({ ...b, tersedia: stokGudang.get(b.id) ?? 0 }));
+  const barangEditor = daftarBarang.map(({ perusahaan, ...b }) => ({ ...b, nama: `${b.nama}${akhiran(perusahaan)}`, tersedia: stokGudang.get(b.id) ?? 0 }));
+  const gudangPilihan = daftarGudang.map(({ perusahaan, ...g }) => ({ ...g, nama: `${g.nama}${akhiran(perusahaan)}` }));
 
   return (
     <div className="space-y-6">
@@ -141,7 +153,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
                 {daftarGudang.length > 1 ? (
                   <div className="bidang">
                     <label className="label" htmlFor="gudangId">Gudang *</label>
-                    <PemilihGudang daftarGudang={daftarGudang} gudangId={gudangId} />
+                    <PemilihGudang daftarGudang={gudangPilihan} gudangId={gudangId} />
                   </div>
                 ) : (
                   <input type="hidden" name="gudangId" value={gudangId} />
@@ -182,6 +194,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <NomorDokumen nomor={k.nomor} />
+                    {!perusahaanId && <LencanaPerusahaan kode={k.perusahaan.kode} warna={k.perusahaan.warna} nama={k.perusahaan.nama} />}
                     <span className="text-slate-600">
                       <span className="font-medium text-slate-900">{k.namaPelapor}</span>
                       {k.proyek && <> · {k.proyek.nama}</>}
@@ -233,6 +246,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
             <div key={k.id} className="p-4 space-y-2 text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <NomorDokumen nomor={k.nomor} />
+                {!perusahaanId && <LencanaPerusahaan kode={k.perusahaan.kode} warna={k.perusahaan.warna} nama={k.perusahaan.nama} />}
                 {k.penyesuaianId && <span className="lencana lencana-slate">Ditautkan</span>}
               </div>
               <div className="text-slate-600">
@@ -260,6 +274,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
             <thead>
               <tr>
                 <th>No</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Dilaporkan</th>
                 <th>Pelapor</th>
                 <th>Event</th>
@@ -273,6 +288,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
               {riwayat.map((k) => (
                 <tr key={k.id}>
                   <td><NomorDokumen nomor={k.nomor} /></td>
+                  {!perusahaanId && <td><LencanaPerusahaan kode={k.perusahaan.kode} warna={k.perusahaan.warna} nama={k.perusahaan.nama} /></td>}
                   <td className="text-slate-500 whitespace-nowrap">{formatWaktu(k.waktuLapor)}</td>
                   <td>
                     <div className="font-medium text-slate-900">{k.namaPelapor}</div>
@@ -295,7 +311,7 @@ export default async function HalamanKerusakanBarang({ searchParams }: { searchP
               ))}
               {riwayat.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="kosong">{param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada riwayat."}</td>
+                  <td colSpan={perusahaanId ? 8 : 9} className="kosong">{param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada riwayat."}</td>
                 </tr>
               )}
             </tbody>
@@ -313,8 +329,8 @@ function AksiRiwayat({
   bolehTautkan,
   bolehHapus,
 }: {
-  k: { id: string; nomor: string; gudangId: string; penyesuaianId: string | null; foto: Foto[] };
-  daftarPs: { id: string; nomor: string; gudangId: string; keterangan: string | null }[];
+  k: { id: string; nomor: string; gudangId: string; perusahaanId: string; penyesuaianId: string | null; foto: Foto[] };
+  daftarPs: { id: string; nomor: string; gudangId: string; keterangan: string | null; perusahaanId: string }[];
   bolehTautkan: boolean;
   bolehHapus: boolean;
 }) {
@@ -324,7 +340,7 @@ function AksiRiwayat({
         <FormulirAksi aksi={tautkanPenyesuaianKerusakanFormulir.bind(null, k.id)} pesanSukses="Penyesuaian ditautkan." className="flex items-center gap-2">
           <select name="penyesuaianId" required className="isian isian-kecil min-h-11 md:min-h-0" aria-label="Penyesuaian stok yang disetujui">
             <option value="">Pilih PS</option>
-            {daftarPs.filter((ps) => ps.gudangId === k.gudangId).map((ps) => (
+            {daftarPs.filter((ps) => ps.gudangId === k.gudangId && ps.perusahaanId === k.perusahaanId).map((ps) => (
               <option key={ps.id} value={ps.id}>{ps.nomor}{ps.keterangan ? ` (${ps.keterangan})` : ""}</option>
             ))}
           </select>

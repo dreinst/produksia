@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
 import { wajibHak } from "@/lib/otentikasi";
 import { buatPenyesuaianPersediaanFormulir } from "@/lib/aksi/persediaan";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -8,13 +9,17 @@ import EditorBarisPenyesuaian from "@/komponen/persediaan/EditorBarisPenyesuaian
 export default async function HalamanPenyesuaianBaru({ searchParams }: { searchParams: Promise<{ gudangId?: string }> }) {
   await wajibHak("penyesuaian.buat");
   const { gudangId } = await searchParams;
+  // Dokumen persediaan milik pemilik barang (P13): lingkup satu perusahaan = barang, gudang, dan akun lawan miliknya atau
+  // bersama; gabungan = semua, yang berpemilik diberi akhiran kode. Barang perusahaan arsip tidak ditawarkan (ditolak server).
+  const { perusahaanId: p } = await lingkupPerusahaan();
   const [daftarGudang, daftarBarang, daftarStok, daftarAkun, pemetaan] = await Promise.all([
-    db.gudang.findMany({ orderBy: { kode: "asc" } }),
-    db.barang.findMany({ where: { jenis: "BARANG" }, orderBy: { kode: "asc" } }),
+    db.gudang.findMany({ where: saringMilikAtauBersama(p), include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
+    db.barang.findMany({ where: { jenis: "BARANG", ...(p ? { perusahaanId: p } : {}), perusahaan: { aktif: true } }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
     db.stokBarang.findMany(),
-    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["MODAL", "BEBAN", "PENDAPATAN"] } }, orderBy: { kode: "asc" } }),
+    db.akun.findMany({ where: { kelompok: false, jenis: { in: ["MODAL", "BEBAN", "PENDAPATAN"] }, ...saringMilikAtauBersama(p) }, include: { perusahaan: { select: { kode: true } } }, orderBy: { kode: "asc" } }),
     db.pemetaanAkun.findUnique({ where: { id: "default" } }),
   ]);
+  const akhiran = (milik: { kode: string } | null) => (!p && milik ? ` · ${milik.kode}` : "");
   const gudangTerpilih = daftarGudang.find((g) => g.id === gudangId) ?? daftarGudang[0];
   const petaStok: Record<string, Record<string, number>> = {};
   for (const s of daftarStok) (petaStok[s.gudangId] ??= {})[s.barangId] = Number(s.jumlah);
@@ -42,6 +47,7 @@ export default async function HalamanPenyesuaianBaru({ searchParams }: { searchP
               {daftarGudang.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.kode} - {g.nama}
+                  {akhiran(g.perusahaan)}
                 </option>
               ))}
             </select>
@@ -65,6 +71,7 @@ export default async function HalamanPenyesuaianBaru({ searchParams }: { searchP
               {daftarAkun.map((a) => (
                 <option key={a.id} value={a.id}>
                   {a.kode} - {a.nama}
+                  {akhiran(a.perusahaan)}
                 </option>
               ))}
             </select>
@@ -79,7 +86,7 @@ export default async function HalamanPenyesuaianBaru({ searchParams }: { searchP
           <EditorBarisPenyesuaian
             gudangId={gudangTerpilih.id}
             petaStok={petaStok}
-            daftarBarang={daftarBarang.map((b) => ({ id: b.id, kode: b.kode, nama: b.nama, satuan: b.satuan, hargaBeli: Number(b.hargaBeli) }))}
+            daftarBarang={daftarBarang.map((b) => ({ id: b.id, kode: b.kode, nama: `${b.nama}${akhiran(b.perusahaan)}`, satuan: b.satuan, hargaBeli: Number(b.hargaBeli) }))}
           />
 
           <div className="md:col-span-2">

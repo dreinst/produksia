@@ -1,4 +1,6 @@
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -29,6 +31,7 @@ const SERTAKAN = {
   foto: { select: { id: true, tahap: true }, orderBy: { dibuatPada: "asc" as const } },
   proyek: { select: { nama: true } },
   diajukanOleh: { select: { peran: true } },
+  perusahaan: { select: { kode: true, nama: true, warna: true } },
 };
 
 function TombolWhatsApp({ peranPengaju, pesan }: { peranPengaju: string | null | undefined; pesan: string }) {
@@ -123,28 +126,37 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
   const paramGudang = (await searchParams).gudang;
   const gudangDipilih = Array.isArray(paramGudang) ? paramGudang[0] : paramGudang;
 
+  // Lingkup perusahaan (D1 §7.4, §8.4): dokumen milik perusahaan lingkup; pilihan gudang dan barang tersaring, yang
+  // berpemilik diberi akhiran kode di gabungan. Proyek tidak disaring: peminjaman dan kerusakan boleh melayani event
+  // perusahaan lain (catatan B D1 §3.3).
+  const { perusahaanId } = await lingkupPerusahaan();
+  const milik = saringPerusahaan(perusahaanId);
+  const akhiran = (p: { kode: string } | null) => (!perusahaanId && p ? ` · ${p.kode}` : "");
   const whereRiwayat = {
+    ...milik,
     ditutupPada: { not: null },
     ...(param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { namaPengambil: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }] } : {}),
   };
   const [daftarGudang, daftarProyek, daftarBarang, daftarStok, saranNama, diajukan, terbuka, totalRiwayat, riwayat, daftarPs] = await Promise.all([
-    db.gudang.findMany({ orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true } }),
+    db.gudang.findMany({ where: saringMilikAtauBersama(perusahaanId), orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaan: { select: { kode: true } } } }),
     // Tanpa cek hak data-induk: GUDANG tidak punya hak Proyek, tetapi kru perlu menandai event yang dilayani.
     daftarProyekAktif(),
-    db.barang.findMany({ where: { jenis: "BARANG" }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true } }),
+    // barang perusahaan arsip ditolak server (P13), jadi tidak ditawarkan
+    db.barang.findMany({ where: { jenis: "BARANG", ...milik, perusahaan: { aktif: true } }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true, perusahaan: { select: { kode: true } } } }),
     db.stokBarang.findMany({ select: { gudangId: true, barangId: true, jumlah: true } }),
     db.peminjamanBarang.findMany({ select: { namaPengambil: true }, orderBy: { waktuKeluar: "desc" }, take: 50 }),
-    db.peminjamanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] } }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
-    db.peminjamanBarang.findMany({ where: { statusPersetujuan: "DISETUJUI", ditutupPada: null }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
+    db.peminjamanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] }, ...milik }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
+    db.peminjamanBarang.findMany({ where: { statusPersetujuan: "DISETUJUI", ditutupPada: null, ...milik }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
     db.peminjamanBarang.count({ where: whereRiwayat }),
     db.peminjamanBarang.findMany({ where: whereRiwayat, include: SERTAKAN, orderBy: { waktuKeluar: "desc" }, skip: param.lewati, take: param.ambil }),
-    bolehTautkan ? db.penyesuaianPersediaan.findMany({ where: { statusPersetujuan: "DISETUJUI" }, select: { id: true, nomor: true, gudangId: true, keterangan: true }, orderBy: { nomor: "desc" } }) : Promise.resolve([]),
+    bolehTautkan ? db.penyesuaianPersediaan.findMany({ where: { statusPersetujuan: "DISETUJUI", ...milik }, select: { id: true, nomor: true, gudangId: true, keterangan: true, perusahaanId: true }, orderBy: { nomor: "desc" } }) : Promise.resolve([]),
   ]);
 
   const gudangId = daftarGudang.find((g) => g.id === gudangDipilih)?.id ?? daftarGudang[0]?.id ?? "";
   const stokGudang = new Map(daftarStok.filter((s) => s.gudangId === gudangId).map((s) => [s.barangId, Number(s.jumlah)]));
   // Tersedia = StokBarang.jumlah langsung; peminjaman yang sudah disetujui sudah mengurangi angka ini sendiri.
-  const barangEditor = daftarBarang.map((b) => ({ ...b, tersedia: stokGudang.get(b.id) ?? 0 }));
+  const barangEditor = daftarBarang.map(({ perusahaan, ...b }) => ({ ...b, nama: `${b.nama}${akhiran(perusahaan)}`, tersedia: stokGudang.get(b.id) ?? 0 }));
+  const gudangPilihan = daftarGudang.map(({ perusahaan, ...g }) => ({ ...g, nama: `${g.nama}${akhiran(perusahaan)}` }));
   const namaUnik = [...new Set(saranNama.map((s) => s.namaPengambil))];
 
   return (
@@ -173,7 +185,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                 {daftarGudang.length > 1 ? (
                   <div className="bidang">
                     <label className="label" htmlFor="gudangId">Gudang *</label>
-                    <PemilihGudang daftarGudang={daftarGudang} gudangId={gudangId} />
+                    <PemilihGudang daftarGudang={gudangPilihan} gudangId={gudangId} />
                   </div>
                 ) : (
                   <input type="hidden" name="gudangId" value={gudangId} />
@@ -222,6 +234,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <NomorDokumen nomor={p.nomor} />
+                    {!perusahaanId && <LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} />}
                     <span className="text-slate-600">
                       <span className="font-medium text-slate-900">{p.namaPengambil}</span>
                       {p.proyek && <> · {p.proyek.nama}</>}
@@ -286,6 +299,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                   <div className="space-y-2 text-sm">
                     <div className="flex flex-wrap items-center gap-2">
                       <NomorDokumen nomor={p.nomor} />
+                      {!perusahaanId && <LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} />}
                       {terlambat(p) && <span className="lencana lencana-rose">Terlambat</span>}
                     </div>
                     <div className="text-slate-600">
@@ -375,6 +389,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
               <div key={p.id} className="p-4 space-y-2 text-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <NomorDokumen nomor={p.nomor} />
+                  {!perusahaanId && <LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} />}
                   <span className={`lencana ${LABEL_STATUS_PEMINJAMAN[status].kelas}`}>{LABEL_STATUS_PEMINJAMAN[status].label}</span>
                 </div>
                 <div className="text-slate-600">
@@ -404,6 +419,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
             <thead>
               <tr>
                 <th>No</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Keluar</th>
                 <th>Pengambil</th>
                 <th>Event</th>
@@ -419,6 +435,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                 return (
                   <tr key={p.id}>
                     <td><NomorDokumen nomor={p.nomor} /></td>
+                    {!perusahaanId && <td><LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} /></td>}
                     <td className="text-slate-500 whitespace-nowrap">{formatWaktu(p.waktuKeluar)}</td>
                     <td>
                       <div className="font-medium text-slate-900">{p.namaPengambil}</div>
@@ -443,7 +460,7 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
               })}
               {riwayat.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="kosong">{param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada riwayat."}</td>
+                  <td colSpan={perusahaanId ? 8 : 9} className="kosong">{param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada riwayat."}</td>
                 </tr>
               )}
             </tbody>
@@ -463,9 +480,9 @@ function AksiRiwayat({
   bolehTautkan,
   bolehHapus,
 }: {
-  p: { id: string; nomor: string; gudangId: string; foto: Foto[] };
+  p: { id: string; nomor: string; gudangId: string; perusahaanId: string; foto: Foto[] };
   status: keyof typeof LABEL_STATUS_PEMINJAMAN;
-  daftarPs: { id: string; nomor: string; gudangId: string; keterangan: string | null }[];
+  daftarPs: { id: string; nomor: string; gudangId: string; keterangan: string | null; perusahaanId: string }[];
   bolehTautkan: boolean;
   bolehHapus: boolean;
 }) {
@@ -476,7 +493,7 @@ function AksiRiwayat({
           <select name="penyesuaianId" required className="isian isian-kecil min-h-11 md:min-h-0" aria-label="Penyesuaian stok yang disetujui">
             <option value="">Pilih PS</option>
             {/* Hanya PS gudang dokumen ini; PS gudang lain tidak mengurangi stok gudang yang kehilangan barang */}
-            {daftarPs.filter((ps) => ps.gudangId === p.gudangId).map((ps) => (
+            {daftarPs.filter((ps) => ps.gudangId === p.gudangId && ps.perusahaanId === p.perusahaanId).map((ps) => (
               <option key={ps.id} value={ps.id}>{ps.nomor}{ps.keterangan ? ` (${ps.keterangan})` : ""}</option>
             ))}
           </select>

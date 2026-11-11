@@ -7,18 +7,24 @@ import { periksaSinkron } from "@/lib/sinkron";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import Ikon from "@/komponen/ui/Ikon";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanPersediaan({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("persediaan.lihat");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q
+  // Lingkup perusahaan (D1 §7.4, §8.4): stok menurut pemilik barang; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const milik = perusahaanId ? { barang: { perusahaanId } } : undefined;
+  const cari = param.q
     ? { barang: { OR: [{ kode: cocokTeks(param.q) }, { nama: cocokTeks(param.q) }] } }
     : undefined;
+  const where = milik ? { AND: [cari ?? {}, milik] } : cari;
   const [total, daftarStok, semuaStok, sinkron] = await Promise.all([
     db.stokBarang.count({ where }),
-    db.stokBarang.findMany({ where, include: { barang: true, gudang: true }, orderBy: [{ barang: { kode: "asc" } }, { gudang: { kode: "asc" } }], skip: param.lewati, take: param.ambil }),
-    db.stokBarang.findMany({ include: { barang: { select: { hargaBeli: true, jenis: true } } } }),
-    periksaSinkron(db),
+    db.stokBarang.findMany({ where, include: { barang: { include: { perusahaan: { select: { kode: true, nama: true, warna: true } } } }, gudang: true }, orderBy: [{ barang: { kode: "asc" } }, { gudang: { kode: "asc" } }], skip: param.lewati, take: param.ambil }),
+    db.stokBarang.findMany({ where: milik, include: { barang: { select: { hargaBeli: true, jenis: true } } } }),
+    perusahaanId ? periksaSinkron(db, { perusahaanId }) : periksaSinkron(db),
   ]);
   const nilaiSeluruh = semuaStok.filter((s) => s.barang.jenis === "BARANG").reduce((t, s) => t + Number(s.jumlah) * Number(s.barang.hargaBeli), 0);
 
@@ -72,6 +78,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
             <thead>
               <tr>
                 <th>Kode</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Barang</th>
                 <th>Gudang</th>
                 <th className="text-right">Jumlah</th>
@@ -96,6 +103,9 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
                 return (
                   <tr key={`${s.barangId}-${s.gudangId}`}>
                     <td className="mono">{s.barang.kode}</td>
+                    {!perusahaanId && (
+                      <td>{s.barang.perusahaan ? <LencanaPerusahaan kode={s.barang.perusahaan.kode} warna={s.barang.perusahaan.warna} nama={s.barang.perusahaan.nama} /> : <span className="redup">Bersama</span>}</td>
+                    )}
                     <td className="font-medium text-slate-900">{s.barang.nama}</td>
                     <td className="text-slate-500">{s.gudang.nama}</td>
                     <td className="text-right angka font-semibold">{jumlah.toLocaleString("id-ID")}</td>
@@ -124,7 +134,7 @@ export default async function HalamanPersediaan({ searchParams }: { searchParams
               })}
               {daftarStok.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="kosong">
+                  <td colSpan={perusahaanId ? 10 : 11} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada stok. Isi saldo awal lewat Penyesuaian Stok."}
                   </td>
                 </tr>

@@ -1,5 +1,7 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan, saringMilikAtauBersama } from "@/lib/perusahaan";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatReturPembelianFormulir } from "@/lib/aksi/pembelian";
 import PemilihBarisRetur from "@/komponen/penjualan/PemilihBarisRetur";
@@ -12,14 +14,14 @@ export default async function HalamanReturPembelianBaru({
   await wajibHak("retur-pembelian.buat");
   const { fakturId } = await searchParams;
 
-  const [faktur, daftarGudang] = await Promise.all([
+  const [faktur, lingkup] = await Promise.all([
     fakturId
       ? db.fakturPembelian.findUnique({
           where: { id: fakturId },
-          include: { pemasok: true, baris: { include: { barang: true } } },
+          include: { pemasok: true, baris: { include: { barang: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } },
         })
       : null,
-    db.gudang.findMany({ orderBy: { nama: "asc" } }),
+    lingkupPerusahaan(),
   ]);
 
   if (!fakturId || !faktur) {
@@ -37,6 +39,9 @@ export default async function HalamanReturPembelianBaru({
     );
   }
 
+  // Gudang milik perusahaan dokumen induk atau bersama (D1 §7.4 butir 3); server tetap menolak gudang perusahaan lain (P13)
+  const daftarGudang = await db.gudang.findMany({ where: saringMilikAtauBersama(faktur.perusahaanId), orderBy: { nama: "asc" } });
+
   const barisUntukPemilih = faktur.baris.map((l) => ({
     barangId: l.barangId,
     labelBarang: `${l.barang.kode} - ${l.barang.nama}`,
@@ -46,7 +51,15 @@ export default async function HalamanReturPembelianBaru({
   return (
     <div className="space-y-6 max-w-3xl">
       <h1 className="judul-halaman">Retur untuk Faktur {faktur.nomor}</h1>
-      <p className="redup">Pemasok: {faktur.pemasok.nama}</p>
+      <p className="redup">
+        Pemasok: {faktur.pemasok.nama}
+        {/* perusahaan dokumen tampil bila berbeda dari lingkup (mis. gabungan); lingkup yang sama tetap seperti dulu */}
+        {lingkup.perusahaanId !== faktur.perusahaanId && (
+          <>
+            {" "}&middot; Perusahaan <LencanaPerusahaan kode={faktur.perusahaan.kode} warna={faktur.perusahaan.warna} nama={faktur.perusahaan.nama} />
+          </>
+        )}
+      </p>
 
       <FormulirAksi aksi={buatReturPembelianFormulir} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="hidden" name="fakturId" value={faktur.id} />

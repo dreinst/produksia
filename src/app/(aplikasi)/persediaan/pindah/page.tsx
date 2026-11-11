@@ -1,6 +1,8 @@
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -12,14 +14,17 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
   const pengguna = await wajibHak("pindah-barang.lihat");
   const bolehHapus = punyaHak(pengguna, "pindah-barang.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q
     ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }, { gudangAsal: { nama: cocokTeks(param.q) } }, { gudangTujuan: { nama: cocokTeks(param.q) } }] }
     : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftar] = await Promise.all([
     db.pindahBarang.count({ where }),
     db.pindahBarang.findMany({
       where,
-      include: { gudangAsal: true, gudangTujuan: true, baris: { include: { barang: { select: { kode: true, satuan: true } } } } },
+      include: { perusahaan: { select: { kode: true, nama: true, warna: true } }, gudangAsal: true, gudangTujuan: true, baris: { include: { barang: { select: { kode: true, satuan: true } } } } },
       orderBy: { tanggal: "desc" },
       skip: param.lewati,
       take: param.ambil,
@@ -48,6 +53,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
             <thead>
               <tr>
                 <th>No</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Tanggal</th>
                 <th>Dari</th>
                 <th>Ke</th>
@@ -60,6 +66,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
               {daftar.map((p) => (
                 <tr key={p.id}>
                   <td><NomorDokumen nomor={p.nomor} /></td>
+                  {!perusahaanId && <td><LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} /></td>}
                   <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                   <td>{p.gudangAsal.nama}</td>
                   <td>{p.gudangTujuan.nama}</td>
@@ -76,7 +83,7 @@ export default async function HalamanPindahBarang({ searchParams }: { searchPara
               ))}
               {daftar.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="kosong">
+                  <td colSpan={perusahaanId ? 7 : 8} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada pindah barang."}
                   </td>
                 </tr>

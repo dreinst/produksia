@@ -1,6 +1,8 @@
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
@@ -13,12 +15,15 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
   const pengguna = await wajibHak("penyesuaian.lihat");
   const bolehHapus = punyaHak(pengguna, "penyesuaian.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }, { gudang: { nama: cocokTeks(param.q) } }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { keterangan: cocokTeks(param.q) }, { gudang: { nama: cocokTeks(param.q) } }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftar] = await Promise.all([
     db.penyesuaianPersediaan.count({ where }),
     db.penyesuaianPersediaan.findMany({
       where,
-      include: { gudang: true, akunLawan: true, jurnal: { select: { nomor: true } }, baris: true },
+      include: { perusahaan: { select: { kode: true, nama: true, warna: true } }, gudang: true, akunLawan: true, jurnal: { select: { nomor: true } }, baris: true },
       orderBy: { tanggal: "desc" },
       skip: param.lewati,
       take: param.ambil,
@@ -47,6 +52,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
             <thead>
               <tr>
                 <th>No</th>
+                {!perusahaanId && <th>Perusahaan</th>}
                 <th>Tanggal</th>
                 <th>Gudang</th>
                 <th>Keterangan</th>
@@ -64,6 +70,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
                 return (
                   <tr key={p.id}>
                     <td><NomorDokumen nomor={p.nomor} /></td>
+                    {!perusahaanId && <td><LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} /></td>}
                     <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
                     <td>{p.gudang.nama}</td>
                     <td className="text-slate-600">{p.keterangan ?? "-"}</td>
@@ -89,7 +96,7 @@ export default async function HalamanPenyesuaianPersediaan({ searchParams }: { s
               })}
               {daftar.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="kosong">
+                  <td colSpan={perusahaanId ? 10 : 11} className="kosong">
                     {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada penyesuaian."}
                   </td>
                 </tr>

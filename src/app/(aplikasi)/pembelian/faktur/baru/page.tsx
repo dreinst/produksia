@@ -39,7 +39,8 @@ export default async function HalamanFakturPembelianBaru({ searchParams }: { sea
     nomorDokumenBerikutnya(db.fakturPembelian, "FB"),
   ]);
 
-  const pengaturan = await ambilPengaturanPerusahaan(db);
+  // PPN, termin, dan akun pajak dari perusahaan pesanan, sama dengan yang dipakai aksi (D1 §7.4 butir 3, P13)
+  const pengaturan = await ambilPengaturanPerusahaan(db, pesanan.perusahaanId);
   const [akunPpn, akunBelumDitagih] = await Promise.all([
     pengaturan.akunPpnMasukanId ? db.akun.findUnique({ where: { id: pengaturan.akunPpnMasukanId } }) : null,
     pemetaan?.barangBelumDitagihId ? db.akun.findUnique({ where: { id: pemetaan.barangBelumDitagihId } }) : null,

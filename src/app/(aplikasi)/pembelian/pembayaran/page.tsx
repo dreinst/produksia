@@ -4,16 +4,21 @@ import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { NomorDokumen, labelMetodeBayar } from "@/komponen/ui/Lencana";
 
 export default async function HalamanPembayaranPembelian({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("pembayaran.lihat");
   const bolehHapus = punyaHak(pengguna, "pembayaran.hapus");
   const param = await bacaParamDaftar(searchParams);
-  const where = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { faktur: { nomor: cocokTeks(param.q) } }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
+  // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya saja; gabungan = kueri lama + kolom Perusahaan
+  const { perusahaanId } = await lingkupPerusahaan();
+  const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { faktur: { nomor: cocokTeks(param.q) } }, { pemasok: { nama: cocokTeks(param.q) } }] } : undefined;
+  const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
   const [total, daftarPembayaran] = await Promise.all([
     db.pembayaranPembelian.count({ where }),
-    db.pembayaranPembelian.findMany({ where, include: { pemasok: true, faktur: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    db.pembayaranPembelian.findMany({ where, include: { perusahaan: { select: { kode: true, nama: true, warna: true } }, pemasok: true, faktur: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
   ]);
 
   return (
@@ -30,6 +35,7 @@ export default async function HalamanPembayaranPembelian({ searchParams }: { sea
         <thead>
           <tr>
             <th>No</th>
+            {!perusahaanId && <th>Perusahaan</th>}
             <th>Tanggal</th>
             <th>Faktur</th>
             <th>Pemasok</th>
@@ -42,6 +48,7 @@ export default async function HalamanPembayaranPembelian({ searchParams }: { sea
           {daftarPembayaran.map((p) => (
             <tr key={p.id}>
               <td><NomorDokumen nomor={p.nomor} /></td>
+              {!perusahaanId && <td><LencanaPerusahaan kode={p.perusahaan.kode} warna={p.perusahaan.warna} nama={p.perusahaan.nama} /></td>}
               <td className="text-slate-500 whitespace-nowrap">{p.tanggal.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</td>
               <td>{p.faktur.nomor}</td>
               <td>{p.pemasok.nama}</td>
@@ -52,7 +59,7 @@ export default async function HalamanPembayaranPembelian({ searchParams }: { sea
           ))}
           {daftarPembayaran.length === 0 && (
             <tr>
-              <td colSpan={7} className="kosong">
+              <td colSpan={perusahaanId ? 7 : 8} className="kosong">
                 {param.q ? "Tidak ada yang cocok dengan pencarian." : "Belum ada pembayaran."}
               </td>
             </tr>

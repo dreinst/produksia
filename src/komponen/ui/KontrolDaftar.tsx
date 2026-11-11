@@ -55,6 +55,9 @@ export default function KontrolDaftar({
           {total === 0 ? (
             q ? (
               <>Tidak ada hasil untuk “{q}”</>
+            ) : ekstra.length > 0 ? (
+              // saringan tambahan aktif tanpa kata kunci (temuan P04 butir 3): datanya ada, hanya tidak cocok
+              "Tidak ada hasil"
             ) : (
               "Belum ada data"
             )

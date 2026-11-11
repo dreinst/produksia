@@ -1,5 +1,7 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -13,15 +15,14 @@ export default async function HalamanPembayaranPembelianBaru({
   await wajibHak("pembayaran.buat");
   const { fakturId } = await searchParams;
 
-  const [faktur, daftarAkun, pengaturan] = await Promise.all([
+  const [faktur, lingkup] = await Promise.all([
     fakturId
       ? db.fakturPembelian.findUnique({
           where: { id: fakturId },
-          include: { pemasok: true, pembayaran: true, retur: { select: { total: true } } },
+          include: { pemasok: true, pembayaran: true, retur: { select: { total: true } }, perusahaan: { select: { kode: true, nama: true, warna: true } } },
         })
       : null,
-    daftarAkunKasBank(),
-    ambilPengaturanPerusahaan(db),
+    lingkupPerusahaan(),
   ]);
 
   if (!fakturId || !faktur) {
@@ -39,6 +40,9 @@ export default async function HalamanPembayaranPembelianBaru({
     );
   }
 
+  // Akun kas dan pengaturan pajak dari perusahaan faktur (D1 §7.4 butir 3), sama dengan yang dipakai aksi (P13)
+  const [daftarAkun, pengaturan] = await Promise.all([daftarAkunKasBank(db, faktur.perusahaanId), ambilPengaturanPerusahaan(db, faktur.perusahaanId)]);
+
   const paid = faktur.pembayaran.reduce((s, p) => s + Number(p.jumlah) + Number(p.potonganPajak), 0);
   const diretur = faktur.retur.reduce((s, r) => s + Number(r.total), 0);
   const sisa = Number(faktur.total) - paid - diretur;
@@ -50,6 +54,12 @@ export default async function HalamanPembayaranPembelianBaru({
         Pemasok: {faktur.pemasok.nama} &middot; Total {Number(faktur.total).toLocaleString("id-ID")}
         {Number(faktur.ppn) > 0 && <> (termasuk PPN {Number(faktur.ppn).toLocaleString("id-ID")})</>}
         {diretur > 0 && <> &middot; retur {diretur.toLocaleString("id-ID")}</>} &middot; Sisa hutang: <strong>{sisa.toLocaleString("id-ID")}</strong>
+        {/* perusahaan dokumen tampil bila berbeda dari lingkup (mis. gabungan); lingkup yang sama tetap seperti dulu */}
+        {lingkup.perusahaanId !== faktur.perusahaanId && (
+          <>
+            {" "}&middot; Perusahaan <LencanaPerusahaan kode={faktur.perusahaan.kode} warna={faktur.perusahaan.warna} nama={faktur.perusahaan.nama} />
+          </>
+        )}
       </p>
 
       <FormulirAksi aksi={buatPembayaranPembelianFormulir} className="kartu flex flex-col gap-4">

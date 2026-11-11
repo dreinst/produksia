@@ -1,23 +1,31 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { db } from "@/lib/db";
-import { daftarProyekAktif } from "@/lib/proyek";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatPesananPembelianFormulir } from "@/lib/aksi/pembelian";
 import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
+import KolomPerusahaan from "@/komponen/KolomPerusahaan";
+import { daftarPerusahaan, lingkupPerusahaan, saringMilikAtauBersama, saringPerusahaan } from "@/lib/perusahaan";
 
 export default async function HalamanPesananPembelianBaru() {
   await wajibHak("pesanan-pembelian.buat");
-  const [daftarPemasok, daftarBarang, daftarProyek] = await Promise.all([
+  // Dokumen akar (D1 §7.4 butir 2): lingkup satu perusahaan = barang milik perusahaan itu atau bersama dan proyeknya;
+  // gabungan = semua pilihan, yang berpemilik diberi akhiran kode perusahaan. Server tetap memvalidasi (P13).
+  const lingkup = await lingkupPerusahaan();
+  const p = lingkup.perusahaanId;
+  const [daftarPemasok, daftarBarang, daftarProyek, perusahaanAktif] = await Promise.all([
     db.pemasok.findMany({ orderBy: { nama: "asc" } }),
-    db.barang.findMany({ orderBy: { nama: "asc" } }),
-    daftarProyekAktif(),
+    db.barang.findMany({ where: saringMilikAtauBersama(p), include: { perusahaan: { select: { kode: true } } }, orderBy: { nama: "asc" } }),
+    // sama dengan daftarProyekAktif(db, p), ditambah kode perusahaan untuk akhiran di gabungan
+    db.proyek.findMany({ where: { status: { notIn: ["BATAL", "DIARSIP"] }, ...saringPerusahaan(p) }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, perusahaan: { select: { kode: true } } } }),
+    daftarPerusahaan(),
   ]);
+  const akhiran = (milik: { kode: string } | null | undefined) => (!p && milik ? ` · ${milik.kode}` : "");
 
   const opsiBarang = daftarBarang.map((i) => ({
     id: i.id,
     kode: i.kode,
-    nama: i.nama,
+    nama: `${i.nama}${akhiran(i.perusahaan)}`,
     hargaBawaan: Number(i.hargaBeli),
   }));
 
@@ -26,6 +34,8 @@ export default async function HalamanPesananPembelianBaru() {
       <h1 className="judul-halaman">Pesanan Pembelian Baru</h1>
 
       <FormulirAksi aksi={buatPesananPembelianFormulir} verifikasi={{ judul: "Periksa pesanan pembelian", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+        <KolomPerusahaan lingkup={lingkup} daftar={perusahaanAktif} />
+        <div className="hidden md:block" />
         <div className="bidang">
           <label className="label" htmlFor="pemasokId">Pemasok *</label>
           <select id="pemasokId" name="pemasokId" required className="isian">
@@ -41,9 +51,10 @@ export default async function HalamanPesananPembelianBaru() {
           <label className="label" htmlFor="proyekId">Proyek / Event</label>
           <select id="proyekId" name="proyekId" className="isian" defaultValue="">
             <option value="">Tanpa event</option>
-            {daftarProyek.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.kode} - {p.nama}
+            {daftarProyek.map((pr) => (
+              <option key={pr.id} value={pr.id}>
+                {pr.kode} - {pr.nama}
+                {akhiran(pr.perusahaan)}
               </option>
             ))}
           </select>
