@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
+import { beritahuPersetujuan } from "@/lib/notifikasiPersetujuan";
 import {
   BERKAS,
   catatLogPersetujuan,
@@ -22,6 +23,7 @@ import {
  * Aksi server alur persetujuan, satu berkas untuk semua jenis dokumen (pola yang sama dengan
  * src/lib/aksi/hapusDokumen.ts). Perbedaan tiap jenis dokumen ada di BERKAS di src/lib/persetujuan.ts,
  * jadi logika transisi, pemisahan tugas, dan log aktivitas hanya ditulis sekali.
+ * Notifikasi (D7 §3.4.4) dikirim di transaksi yang sama setelah log; galatnya tidak menggagalkan persetujuan.
  */
 
 async function segarkan(jenis: JenisPersetujuan) {
@@ -42,6 +44,7 @@ export async function ajukanDokumen(jenis: JenisPersetujuan, id: string) {
     await berkas.simpan(tx, id, dataAjukan(pengguna));
     const rinci = berkas.ringkas ? await berkas.ringkas(tx, id) : "";
     await catatLogPersetujuan(tx, pengguna, "AJUKAN", berkas.label, dok.nomor, `Diajukan untuk persetujuan${rinci ? `; ${rinci}` : ""}`);
+    await beritahuPersetujuan(tx, { aksi: "AJUKAN", jenis, id, pelaku: pengguna, nomor: dok.nomor, pengajuId: dok.diajukanOlehId });
   });
 
   await segarkan(jenis);
@@ -67,6 +70,7 @@ export async function setujuiDokumen(jenis: JenisPersetujuan, id: string) {
     await berkas.simpan(tx, id, dataSetujui(pengguna));
     const rinci = berkas.ringkas ? await berkas.ringkas(tx, id) : "";
     await catatLogPersetujuan(tx, pengguna, "SETUJUI", berkas.label, dok.nomor, `Disetujui, jurnal dicatat${rinci ? `; ${rinci}` : ""}`);
+    await beritahuPersetujuan(tx, { aksi: "SETUJUI", jenis, id, pelaku: pengguna, nomor: dok.nomor, pengajuId: dok.diajukanOlehId });
   });
 
   await segarkan(jenis);
@@ -87,6 +91,7 @@ export async function tolakDokumen(jenis: JenisPersetujuan, id: string, catatan:
     pastikanBukanPengaju(dok, pengguna, berkas.label);
     await berkas.simpan(tx, id, dataTolak(pengguna, alasan));
     await catatLogPersetujuan(tx, pengguna, "TOLAK", berkas.label, dok.nomor, `Ditolak: ${alasan}`);
+    await beritahuPersetujuan(tx, { aksi: "TOLAK", jenis, id, pelaku: pengguna, nomor: dok.nomor, pengajuId: dok.diajukanOlehId, catatan: alasan });
   });
 
   await segarkan(jenis);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
+import LoncengNotifikasi from "@/komponen/notifikasi/LoncengNotifikasi";
 import { keluar } from "@/lib/aksi/otentikasi";
 import { inisialNama, labelPeranPengguna, punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 
@@ -121,6 +122,8 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
             </div>
           </div>
         )}
+
+        <LoncengNotifikasi />
 
         <div className="hidden md:block h-6 w-px bg-slate-200" />
 

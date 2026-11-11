@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
-import { diLuarPermintaan, penggunaSaatIni, pastikanHak, sesiSaatIni } from "@/lib/otentikasi";
+import { diLuarPermintaan, penggunaSaatIni, pastikanHak, sesiSaatIni, wajibMasukAksi } from "@/lib/otentikasi";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 
 /*
@@ -82,6 +82,23 @@ export async function simpanLingkupSesi(klien: Klien, sesiId: string, pilihan: s
   }
   await klien.sesi.update({ where: { id: sesiId }, data: { perusahaanAktifId } });
   return perusahaanAktifId;
+}
+
+/**
+ * Mengganti lingkup sesi peramban yang sedang masuk tanpa redirect (D7 §3.4.6, dipakai bukaNotifikasi dan
+ * pencarian). null = gabungan. Aturannya sama dengan simpanLingkupSesi: gabungan butuh perusahaan-gabungan.lihat,
+ * perusahaan harus ada dan aktif. Mengembalikan false tanpa mengubah apa pun bila tidak ada sesi peramban
+ * (skrip, seed). `opsi.sesiId` hanya untuk skrip uji yang membuat baris Sesi sendiri.
+ */
+export async function aturPerusahaanAktif(perusahaanId: string | null, opsi: { sesiId?: string; klien?: Klien } = {}): Promise<boolean> {
+  const pengguna = await wajibMasukAksi();
+  const klien = opsi.klien ?? db;
+  const sesiId = opsi.sesiId ?? (await sesiSaatIni())?.id;
+  if (!sesiId) return false;
+  // sesi titipan harus milik pengguna ini, supaya lingkup sesi orang lain tidak bisa diganti
+  if (opsi.sesiId && !(await klien.sesi.findFirst({ where: { id: opsi.sesiId, penggunaId: pengguna.id }, select: { id: true } }))) throw new Error("Sesi tidak ditemukan");
+  await simpanLingkupSesi(klien, sesiId, perusahaanId ?? NILAI_GABUNGAN, pengguna);
+  return true;
 }
 
 /** Perusahaan untuk DOKUMEN AKAR baru: isian formulir "perusahaanId", kalau kosong lingkup aktif, kalau gabungan → galat. */
