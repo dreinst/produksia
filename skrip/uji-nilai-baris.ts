@@ -422,7 +422,10 @@ async function main() {
   pastikan(lama.length === 1 && lama[0].barisPesananId === "p1" && sama(lama[0].harga, 900) && sama(lama[0].frekuensi, 1) && lama[0].nama === null, "jalur lama: harga dari kiriman, frekuensi 1, barisPesananId baris satu-satunya");
   await harusDitolak("jalur lama melebihi sisa", async () => siapkanBarisFaktur(pesananLama, { jalur: "LAMA", baris: [{ barangId: "brg-1", jumlah: D(4), harga: D(1) }] }), "Kuantitas faktur melebihi sisa yang belum ditagih (sisa 3, diminta 4)");
   await harusDitolak("jalur lama barang tidak ada", async () => siapkanBarisFaktur(pesananLama, { jalur: "LAMA", baris: [{ barangId: "brg-x", jumlah: D(1), harga: D(1) }] }), "Barang tidak ada di pesanan ini");
-  await harusDitolak("jalur lama pesanan barang ganda", async () => siapkanBarisFaktur({ ...pesananLama, baris: [barisPesanan("p1", "brg-1", 1, 1), barisPesanan("p2", "brg-1", 1, 1)] }, { jalur: "LAMA", baris: [{ barangId: "brg-1", jumlah: D(1), harga: D(1) }] }), "wajib dibuat dari komposer faktur");
+  // perbaikan tinjauan P23 S1: pesanan STANDAR berbarang ganda lewat jalur lama dibagi ke baris berbarang sama urut urutan lalu id
+  const ganda = siapkanBarisFaktur({ ...pesananLama, baris: [barisPesanan("p1", "brg-1", 1, 1), barisPesanan("p2", "brg-1", 2, 1)] }, { jalur: "LAMA", baris: [{ barangId: "brg-1", jumlah: D(2), harga: D(1) }] });
+  pastikan(ganda.map((b) => `${b.barisPesananId}:${b.jumlah.toNumber()}`).join() === "p1:1,p2:1", "jalur lama pesanan barang ganda: jumlah dibagi ke baris berbarang sama");
+  await harusDitolak("jalur lama pesanan barang ganda melebihi sisa barang", async () => siapkanBarisFaktur({ ...pesananLama, baris: [barisPesanan("p1", "brg-1", 1, 1), barisPesanan("p2", "brg-1", 1, 1)] }, { jalur: "LAMA", baris: [{ barangId: "brg-1", jumlah: D(3), harga: D(1) }] }), "sisa 2, diminta 3");
   await harusDitolak("jalur lama baris berfrekuensi", async () => siapkanBarisFaktur({ ...pesananLama, baris: [barisPesanan("p1", "brg-1", 1, 1, { frekuensi: 2 })] }, { jalur: "LAMA", baris: [{ barangId: "brg-1", jumlah: D(1), harga: D(1) }] }), "wajib dibuat dari komposer faktur");
   await harusDitolak("jalur lama harga negatif", async () => bacaBarisFaktur(formulir({ baris: [{ barangId: "brg-1", jumlah: 1, harga: -1 }] })), "Harga tidak boleh negatif");
   await harusDitolak("faktur tanpa baris berjumlah", async () => bacaBarisFaktur(formulir({ baris: [{ barisPesananId: "pA", jumlah: 0 }] })), "Minimal 1 baris barang dengan jumlah > 0 wajib diisi");
@@ -441,7 +444,9 @@ async function main() {
   await harusDitolak("retur id baris faktur lain", async () => siapkanBarisRetur(fakturRetur, [], { jalur: "ID", baris: [{ barisFakturId: "lain", jumlah: D(1) }] }), "Baris faktur tidak ditemukan di faktur ini");
   await harusDitolak("retur campuran", async () => bacaBarisRetur(formulir({ baris: [{ barisFakturId: "f1", jumlah: 1 }, { barangId: "brg-g", jumlah: 1 }] })), "Baris retur harus semuanya memakai baris faktur atau semuanya tidak");
   await harusDitolak("retur tanpa baris", async () => bacaBarisRetur(formulir({ baris: [] })), "Minimal 1 baris barang wajib diretur");
-  await harusDitolak("retur jalur lama barang ganda", async () => siapkanBarisRetur(fakturRetur, [], { jalur: "LAMA", baris: [{ barangId: "brg-g", jumlah: D(1) }] }), "pilih baris faktur yang diretur");
+  // perbaikan tinjauan P23 S1/R2: retur jalur lama barang ganda dijumlahkan per barang lalu dibagi ke baris faktur urut id
+  const returGanda = siapkanBarisRetur(fakturRetur, [], { jalur: "LAMA", baris: [{ barangId: "brg-g", jumlah: D(1) }, { barangId: "brg-g", jumlah: D(2) }] });
+  pastikan(returGanda.map((b) => `${b.barisFakturId}:${b.jumlah.toNumber()}:${b.harga.toNumber()}`).join() === "f1:2:100000,f2:1:200000", "retur jalur lama barang ganda: f1 penuh lalu f2 dengan harga barisnya");
   const returTunggal = siapkanBarisRetur(fakturRetur, [{ barisFakturId: "f3", barangId: "brg-t", jumlah: 1 }], bacaBarisRetur(formulir({ baris: [{ barangId: "brg-t", jumlah: 3 }] })));
   pastikan(returTunggal[0].barisFakturId === "f3" && sama(returTunggal[0].jumlah, 3), "retur jalur lama barang tunggal: barisFakturId terisi");
   await harusDitolak("retur jalur lama melebihi", async () => siapkanBarisRetur(fakturRetur, [{ barisFakturId: "f3", barangId: "brg-t", jumlah: 1 }], { jalur: "LAMA", baris: [{ barangId: "brg-t", jumlah: D(4) }] }), "Kuantitas retur melebihi yang bisa diretur (maks 3, diminta 4)");
