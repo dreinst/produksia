@@ -7,7 +7,8 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, jumlahkan, type Desimal } from "@/lib/uang";
-import { pastikanAkunRinci } from "@/lib/baganAkun";
+import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
+import { kunciPeriodeGaji, lingkupPerusahaan, pastikanKaryawanMilik, perusahaanDokumenBaru } from "@/lib/perusahaan";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { bacaProyekId } from "@/lib/proyek";
 import { akunGajiBawaan, catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
@@ -45,7 +46,23 @@ function bacaBaris(dataFormulir: FormData): BarisInput[] {
 }
 
 /**
- * Proses Gaji: satu dokumen per periode (bulan) mencakup semua karyawan yang diikutkan.
+ * Perusahaan penggajian: isian perusahaanId, kalau kosong lingkup aktif. Di lingkup gabungan tanpa isian, perusahaan
+ * diambil dari karyawan yang diikutkan (semuanya harus satu perusahaan), supaya formulir lama yang belum mengirim
+ * perusahaan tetap bisa dipakai pemegang lingkup gabungan.
+ */
+async function perusahaanPenggajian(dataFormulir: FormData, karyawanIds: string[]): Promise<string> {
+  const isian = String(dataFormulir.get("perusahaanId") ?? "").trim();
+  if (isian || (await lingkupPerusahaan()).perusahaanId) return perusahaanDokumenBaru(dataFormulir);
+  const pemilik = await db.karyawan.findMany({ where: { id: { in: karyawanIds } }, distinct: ["perusahaanId"], select: { perusahaanId: true, perusahaan: { select: { kode: true } } }, orderBy: { perusahaanId: "asc" } });
+  if (pemilik.length > 1) throw new Error(`Satu penggajian hanya untuk karyawan satu perusahaan (${pemilik.map((p) => p.perusahaan.kode).join(", ")})`);
+  if (pemilik.length === 0) return perusahaanDokumenBaru(dataFormulir); // karyawan tidak ada: galat "Pilih perusahaan"
+  const dariKaryawan = new FormData();
+  dariKaryawan.set("perusahaanId", pemilik[0].perusahaanId);
+  return perusahaanDokumenBaru(dariKaryawan); // memeriksa perusahaan ada dan aktif
+}
+
+/**
+ * Proses Gaji: satu dokumen per periode (bulan) per perusahaan, mencakup semua karyawan yang diikutkan.
  * Jurnal GJ: Dr Beban Gaji Pokok (per akun, karyawan bisa punya akun sendiri, mis. Upah Harian/Honor Volunteer)
  * + Dr Beban Tunjangan (per akun) / Cr Hutang Potongan Gaji (bila ada potongan) / Cr Kas-Bank (gaji bersih).
  * Koreksi = hapus lalu proses ulang periode itu (sama seperti PPh Final Bulanan).
@@ -65,10 +82,15 @@ export async function buatPenggajian(dataFormulir: FormData) {
   if (tanggal > akhirHariIni) throw new Error("Tanggal tidak boleh di masa depan");
   const proyekId = await bacaProyekId(dataFormulir);
   const daftarBaris = bacaBaris(dataFormulir);
+  const perusahaanId = await perusahaanPenggajian(dataFormulir, daftarBaris.map((b) => b.karyawanId));
+  // urutan galat lama dipertahankan: keberadaan proyek dicek di atas, kepemilikannya sesudah perusahaan diketahui
+  if (proyekId) await bacaProyekId(dataFormulir, db, perusahaanId);
 
-  if (await db.penggajian.findUnique({ where: { periode } })) throw new Error(`Penggajian periode ${periode} sudah diproses. Hapus dulu bila ingin mengoreksi`);
+  // D1 §2.4.3: satu penggajian per (perusahaan, bulan); pesan lama tetap
+  if (await db.penggajian.findUnique({ where: { perusahaanId_bulan: { perusahaanId, bulan: periode } } })) throw new Error(`Penggajian periode ${periode} sudah diproses. Hapus dulu bila ingin mengoreksi`);
   const akunKas = await db.akun.findUnique({ where: { id: akunKasId } });
   if (!akunKas?.kasBank) throw new Error("Akun kas/bank tidak valid");
+  await pastikanAkunMilik(db, [akunKasId], perusahaanId);
   const gaji = await akunGajiBawaan(db);
   if (!gaji.bebanGaji) throw new Error('Akun Beban Gaji belum ada. Terapkan Bagan Akun Standar (5-2100) atau atur Pemetaan Akun > Pemetaan tambahan "bebanGaji"');
   const totalPotonganDicek = jumlahkan(daftarBaris.map((b) => b.potongan));
@@ -79,6 +101,7 @@ export async function buatPenggajian(dataFormulir: FormData) {
 
   const daftarKaryawan = await db.karyawan.findMany({ where: { id: { in: daftarBaris.map((b) => b.karyawanId) } }, select: { id: true, kode: true, nama: true, akunBebanId: true } });
   const petaKaryawan = new Map(daftarKaryawan.map((k) => [k.id, k]));
+  await pastikanKaryawanMilik(db, daftarKaryawan.map((k) => k.id), perusahaanId);
 
   let totalGajiPokok = NOL, totalTunjangan = NOL, totalPotongan = NOL, totalDibayar = NOL;
   const barisTersimpan: { karyawanId: string; gajiPokok: Desimal; tunjangan: Desimal; potongan: Desimal; keteranganPotongan: string | null; diterima: Desimal }[] = [];
@@ -105,8 +128,9 @@ export async function buatPenggajian(dataFormulir: FormData) {
       data: {
         nomor,
         // D1 §2.4.3: periode = kunci unik (utama: sama dengan bulan), bulan = bulan gaji untuk semua perusahaan
-        periode,
+        periode: kunciPeriodeGaji(perusahaanId, periode),
         bulan: periode,
+        perusahaanId,
         tanggal,
         akunKasId,
         proyekId,

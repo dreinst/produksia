@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from "@/prisma-klien/client";
+import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { D, jumlahkan, uang, type Desimal } from "@/lib/uang";
 import { ZONA_WAKTU, akarDari, keturunanDari, type AkunSaldo } from "@/lib/laporan";
 
@@ -27,7 +27,11 @@ export type PajakBulan = {
   pph23DipotongKlien: Desimal;
   pph23KitaPotong: Desimal;
   pphFinal: Desimal;
-  tercatat: { id: string; jumlah: Desimal; omzet: Desimal; tarifPersen: Desimal; nomorJurnal: string | null } | null;
+  /**
+   * PPh Final yang sudah dicatat untuk periode itu. Tanpa perusahaan (gabungan) satu periode bisa punya catatan di
+   * beberapa perusahaan: jumlah dan omzet dijumlah, id = catatan pertama, nomorJurnal hanya bila catatannya tunggal.
+   */
+  tercatat: { id: string; jumlah: Desimal; omzet: Desimal; tarifPersen: Desimal; nomorJurnal: string | null; jumlahCatatan: number } | null;
 };
 export type RingkasanPajak = {
   tahun: number;
@@ -45,9 +49,14 @@ export function hitungPphFinal(omzet: Desimal, tarifPersen: Desimal): Desimal {
   return omzet.lte(0) ? D(0) : uang(omzet.mul(tarifPersen).div(100));
 }
 
-export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal: Desimal): Promise<RingkasanPajak> {
+/**
+ * `perusahaanId` diisi: dokumen, catatan PPh Final, dan omzet buku besar hanya milik perusahaan itu (D1 §4.7).
+ * Kosong: semua perusahaan (perilaku lama).
+ */
+export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal: Desimal, perusahaanId?: string | null): Promise<RingkasanPajak> {
   const dari = new Date(tahun, 0, 1), sampai = new Date(tahun, 11, 31, 23, 59, 59, 999);
-  const rentang = { tanggal: { gte: dari, lte: sampai } };
+  const milik = perusahaanId ? { perusahaanId } : {};
+  const rentang = { tanggal: { gte: dari, lte: sampai }, ...milik };
   // Faktur yang belum disetujui belum menjadi penyerahan di buku besar, jadi PPN & DPP-nya belum dihitung
   const rentangDisetujui = { ...rentang, statusPersetujuan: "DISETUJUI" as const };
   const [fj, rj, fb, rb, trm, byr, tercatat, pemetaan, daftarAkun, agregat] = await Promise.all([
@@ -57,7 +66,7 @@ export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal:
     klien.returPembelian.findMany({ where: rentang, select: { tanggal: true, ppn: true } }),
     klien.penerimaanPenjualan.findMany({ where: rentang, select: { tanggal: true, potonganPajak: true } }),
     klien.pembayaranPembelian.findMany({ where: rentang, select: { tanggal: true, potonganPajak: true } }),
-    klien.pphFinalBulanan.findMany({ where: { periode: { startsWith: `${tahun}-` } }, include: { jurnal: { select: { nomor: true } } } }),
+    klien.pphFinalBulanan.findMany({ where: { periode: { startsWith: `${tahun}-` }, ...milik }, include: { jurnal: { select: { nomor: true } } }, orderBy: { id: "asc" } }),
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     klien.akun.findMany({ where: { jenis: "PENDAPATAN" }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, indukId: true } }),
     // Σ per akun pendapatan per bulan (zona waktu usaha), tanpa jurnal penutup
@@ -69,6 +78,7 @@ export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal:
       JOIN "Jurnal" j ON j."id" = bj."jurnalId"
       JOIN "Akun" a ON a."id" = bj."akunId"
       WHERE j."tanggal" >= ${dari} AND j."tanggal" <= ${sampai} AND j."sumber" <> 'PENUTUP' AND a."jenis" = 'PENDAPATAN'
+        ${perusahaanId ? Prisma.sql`AND j."perusahaanId" = ${perusahaanId}` : Prisma.empty}
       GROUP BY 1, 2`,
   ]);
   const nol = D(0);
@@ -79,14 +89,16 @@ export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal:
   ]);
   const perBulan = <T extends { tanggal: Date }>(daftar: T[], bulan: number) => daftar.filter((d) => d.tanggal.getMonth() + 1 === bulan);
   const brutoDok = (x: { dpp: Desimal; diskon: Desimal }) => D(x.dpp).plus(x.diskon);
-  const petaTercatat = new Map(tercatat.map((t) => [t.periode, t]));
+  const petaTercatat = new Map<string, (typeof tercatat)[number][]>();
+  for (const t of tercatat) petaTercatat.set(t.periode, [...(petaTercatat.get(t.periode) ?? []), t]);
   const bulan: PajakBulan[] = [];
   for (let b = 1; b <= 12; b++) {
     const omzet = jumlahkan(agregat.filter((x) => x.bulan === b && !bukanOmzet.has(x.akunId)).map((x) => D(x.kredit).minus(x.debit)));
     const omzetFaktur = jumlahkan(perBulan(fj, b).map(brutoDok)).minus(jumlahkan(perBulan(rj, b).map(brutoDok)));
     const ppnKeluaran = jumlahkan(perBulan(fj, b).map((x) => x.ppn)).minus(jumlahkan(perBulan(rj, b).map((x) => x.ppn)));
     const ppnMasukan = jumlahkan(perBulan(fb, b).map((x) => x.ppn)).minus(jumlahkan(perBulan(rb, b).map((x) => x.ppn)));
-    const t = petaTercatat.get(periodeBulan(tahun, b));
+    const daftarTercatat = petaTercatat.get(periodeBulan(tahun, b)) ?? [];
+    const t = daftarTercatat[0];
     bulan.push({
       periode: periodeBulan(tahun, b),
       bulan: b,
@@ -99,7 +111,16 @@ export async function ringkasanPajak(klien: Klien, tahun: number, tarifPphFinal:
       pph23DipotongKlien: jumlahkan(perBulan(trm, b).map((x) => x.potonganPajak)),
       pph23KitaPotong: jumlahkan(perBulan(byr, b).map((x) => x.potonganPajak)),
       pphFinal: hitungPphFinal(omzet, tarifPphFinal),
-      tercatat: t ? { id: t.id, jumlah: D(t.jumlah), omzet: D(t.omzet), tarifPersen: D(t.tarifPersen), nomorJurnal: t.jurnal?.nomor ?? null } : null,
+      tercatat: t
+        ? {
+            id: t.id,
+            jumlah: jumlahkan(daftarTercatat.map((x) => x.jumlah)),
+            omzet: jumlahkan(daftarTercatat.map((x) => x.omzet)),
+            tarifPersen: D(t.tarifPersen),
+            nomorJurnal: daftarTercatat.length === 1 ? (t.jurnal?.nomor ?? null) : null,
+            jumlahCatatan: daftarTercatat.length,
+          }
+        : null,
     });
   }
   const total = (k: keyof PajakBulan) => jumlahkan(bulan.map((x) => x[k] as Desimal));

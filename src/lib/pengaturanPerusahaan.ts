@@ -6,6 +6,8 @@ import { D, uang, type Desimal } from "@/lib/uang";
 type Klien = PrismaClient | Prisma.TransactionClient;
 
 export type PengaturanPajak = {
+  /** Perusahaan pemilik pengaturan ini (D1 §3.6) */
+  perusahaanId: string;
   nama: string;
   pkp: boolean;
   tarifPpnPersen: Desimal;
@@ -22,7 +24,11 @@ export type PengaturanPajak = {
   akunHutangPphFinalId: string | null;
 };
 
+/** id perusahaan utama; sama dengan PERUSAHAAN_UTAMA di perusahaan.ts (tidak diimpor supaya berkas ini tidak memuat sesi) */
+const UTAMA = "utama";
+
 export const PENGATURAN_BAWAAN: PengaturanPajak = {
+  perusahaanId: UTAMA,
   nama: "Produksia",
   pkp: false,
   tarifPpnPersen: D(11),
@@ -37,17 +43,54 @@ export const PENGATURAN_BAWAAN: PengaturanPajak = {
   akunHutangPphFinalId: null,
 };
 
-/** Pengaturan perusahaan (singleton); bila belum pernah disimpan, kembalikan bawaan (non-PKP). */
+/**
+ * id baris PengaturanPerusahaan milik perusahaan: utama selalu "default" (kompatibel dengan kode dan uji lama yang
+ * memakai where: { id: "default" }), perusahaan lain ber-id sama dengan perusahaanId. Semua tulisan baru memakai
+ * upsert({ where: { id: idPengaturan(p) }, create: { id: idPengaturan(p), perusahaanId: p, ... } }).
+ */
+export function idPengaturan(perusahaanId: string): string {
+  return perusahaanId === UTAMA ? "default" : perusahaanId;
+}
+
+/**
+ * Pengaturan pajak satu perusahaan (D1 §3.6), bawaan perusahaan utama (baris "default").
+ * - Utama tanpa baris: PENGATURAN_BAWAAN (perilaku lama).
+ * - Perusahaan lain tanpa baris: bawaan non-PKP dengan nama perusahaan, dan enam akun pajak milik baris "default".
+ * - tahunBuku selalu dari baris "default" (global).
+ */
 // React cache(): layout dan halaman yang sama-sama memanggilnya dalam satu permintaan cukup satu kueri
-export const ambilPengaturanPerusahaan = cache(async (klien: Klien = db): Promise<PengaturanPajak> => {
-  const p = await klien.pengaturanPerusahaan.findUnique({ where: { id: "default" } });
-  if (!p) return PENGATURAN_BAWAAN;
+export const ambilPengaturanPerusahaan = cache(async (klien: Klien = db, perusahaanId: string = UTAMA): Promise<PengaturanPajak> => {
+  const utama = perusahaanId === UTAMA;
+  const [p, global] = await Promise.all([
+    // utama dibaca lewat id "default" persis seperti sebelumnya
+    klien.pengaturanPerusahaan.findUnique({ where: utama ? { id: "default" } : { perusahaanId } }),
+    utama ? null : klien.pengaturanPerusahaan.findUnique({ where: { id: "default" } }),
+  ]);
+  const tahunGlobal = (utama ? p : global)?.tahunBuku ?? new Date().getFullYear();
+  if (!p) {
+    if (utama) return PENGATURAN_BAWAAN;
+    const perusahaan = await klien.perusahaan.findUnique({ where: { id: perusahaanId }, select: { nama: true } });
+    if (!perusahaan) throw new Error("Perusahaan tidak ditemukan");
+    return {
+      ...PENGATURAN_BAWAAN,
+      perusahaanId,
+      nama: perusahaan.nama,
+      tahunBuku: tahunGlobal,
+      akunPpnKeluaranId: global?.akunPpnKeluaranId ?? null,
+      akunPpnMasukanId: global?.akunPpnMasukanId ?? null,
+      akunPph23DimukaId: global?.akunPph23DimukaId ?? null,
+      akunPph23DipotongId: global?.akunPph23DipotongId ?? null,
+      akunBebanPphFinalId: global?.akunBebanPphFinalId ?? null,
+      akunHutangPphFinalId: global?.akunHutangPphFinalId ?? null,
+    };
+  }
   return {
+    perusahaanId,
     nama: p.nama,
     pkp: p.pkp,
     tarifPpnPersen: D(p.tarifPpnPersen),
     terminHari: p.terminHari,
-    tahunBuku: p.tahunBuku ?? new Date().getFullYear(),
+    tahunBuku: tahunGlobal,
     akunPpnKeluaranId: p.akunPpnKeluaranId,
     akunPpnMasukanId: p.akunPpnMasukanId,
     akunPph23DimukaId: p.akunPph23DimukaId,

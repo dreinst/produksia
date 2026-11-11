@@ -10,18 +10,32 @@ import { D, jumlahkan, type Desimal } from "@/lib/uang";
  */
 type Klien = PrismaClient | Prisma.TransactionClient;
 
-/** Membaca proyekId opsional dari formulir dan memastikan proyeknya ada. */
-export async function bacaProyekId(dataFormulir: FormData, klien: Klien = db): Promise<string | null> {
+/**
+ * Membaca proyekId opsional dari formulir dan memastikan proyeknya ada. `perusahaanId` diisi (dokumen akar
+ * berperusahaan): proyek harus milik perusahaan itu (D1 §3.4). Tanpa argumen ketiga = perilaku lama (dipakai PJ/BR).
+ */
+export async function bacaProyekId(dataFormulir: FormData, klien: Klien = db, perusahaanId?: string): Promise<string | null> {
   const proyekId = String(dataFormulir.get("proyekId") ?? "").trim();
   if (!proyekId) return null;
-  const ada = await klien.proyek.findUnique({ where: { id: proyekId }, select: { id: true } });
+  const ada = await klien.proyek.findUnique({ where: { id: proyekId }, select: { id: true, kode: true, perusahaanId: true } });
   if (!ada) throw new Error("Proyek/event tidak ditemukan");
+  if (perusahaanId && ada.perusahaanId !== perusahaanId) {
+    const nama = new Map((await klien.perusahaan.findMany({ where: { id: { in: [ada.perusahaanId, perusahaanId] } }, select: { id: true, nama: true } })).map((p) => [p.id, p.nama]));
+    throw new Error(`Proyek ${ada.kode} milik ${nama.get(ada.perusahaanId) ?? ada.perusahaanId}; pilih proyek ${nama.get(perusahaanId) ?? perusahaanId}`);
+  }
   return proyekId;
 }
 
-/** Daftar proyek untuk pilihan formulir (yang batal disembunyikan). */
-export async function daftarProyekAktif(klien: Klien = db) {
-  return klien.proyek.findMany({ where: { status: { not: "BATAL" } }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, status: true } });
+/**
+ * Daftar proyek untuk pilihan formulir: yang batal dan diarsipkan disembunyikan (D5 §3.1). `perusahaanId` diisi:
+ * hanya proyek perusahaan itu. Kosong: semua perusahaan (perilaku lama).
+ */
+export async function daftarProyekAktif(klien: Klien = db, perusahaanId?: string | null) {
+  return klien.proyek.findMany({
+    where: { status: { notIn: ["BATAL", "DIARSIP"] }, ...(perusahaanId ? { perusahaanId } : {}) },
+    orderBy: { kode: "asc" },
+    select: { id: true, kode: true, nama: true, status: true },
+  });
 }
 
 export type RingkasanProyek = {
@@ -48,6 +62,12 @@ export type RingkasanProyek = {
   labaRugi: { pendapatan: { kode: string; nama: string; jumlah: Desimal }[]; beban: { kode: string; nama: string; jumlah: Desimal }[]; totalPendapatan: Desimal; totalBeban: Desimal; laba: Desimal };
   kas: { masuk: Desimal; keluar: Desimal; bersih: Desimal; jumlahJurnal: number };
 };
+
+/**
+ * Sumber jurnal yang bebannya tampil sebagai "beban lain" di LPJ: jurnal manual dan kas, ditambah biaya event yang
+ * ditagihkan perusahaan lain (ANTAR_PERUSAHAAN, D1 §8.2) dan jurnal dokumen mitra (MITRA_PROYEK, D5 §8 no. 9).
+ */
+const SUMBER_BEBAN_LAIN: readonly string[] = ["MANUAL", "KAS_KELUAR", "KAS_MASUK", "ANTAR_PERUSAHAAN", "MITRA_PROYEK"];
 
 /** Semua angka LPJ satu proyek, langsung dari dokumen & jurnal yang bertanda proyek itu. */
 export async function ringkasanProyek(klien: Klien, proyekId: string): Promise<RingkasanProyek | null> {
@@ -99,7 +119,7 @@ export async function ringkasanProyek(klien: Klien, proyekId: string): Promise<R
         const nilai = b.akun.jenis === "PENDAPATAN" ? D(b.kredit).minus(b.debit) : D(b.debit).minus(b.kredit);
         const ada = kumpul.get(b.akun.kode) ?? { kode: b.akun.kode, nama: b.akun.nama, jenis: b.akun.jenis, jumlah: nol };
         kumpul.set(b.akun.kode, { ...ada, jumlah: ada.jumlah.plus(nilai) });
-        if (b.akun.jenis === "BEBAN" && ["MANUAL", "KAS_KELUAR", "KAS_MASUK"].includes(j.sumber)) bebanJurnalIni = bebanJurnalIni.plus(nilai);
+        if (b.akun.jenis === "BEBAN" && SUMBER_BEBAN_LAIN.includes(j.sumber)) bebanJurnalIni = bebanJurnalIni.plus(nilai);
       }
     }
     if (!bebanJurnalIni.isZero()) bebanLain.push({ id: j.id, nomor: j.nomor, tanggal: j.tanggal, keterangan: j.keterangan, sumber: j.sumber, jumlah: bebanJurnalIni });
@@ -134,9 +154,9 @@ export async function ringkasanProyek(klien: Klien, proyekId: string): Promise<R
   };
 }
 
-/** Ringkasan singkat semua proyek untuk daftar LPJ. */
-export async function daftarRingkasanProyek(klien: Klien = db) {
-  const daftar = await klien.proyek.findMany({ orderBy: { kode: "asc" }, include: { pelanggan: { select: { nama: true } }, pesanan: { select: { total: true } }, jurnal: { where: { sumber: { not: "PENUTUP" } }, include: { baris: { include: { akun: { select: { jenis: true } } } } } } } });
+/** Ringkasan singkat semua proyek untuk daftar LPJ. `perusahaanId` diisi: hanya proyek perusahaan itu. */
+export async function daftarRingkasanProyek(klien: Klien = db, perusahaanId?: string | null) {
+  const daftar = await klien.proyek.findMany({ where: perusahaanId ? { perusahaanId } : {}, orderBy: { kode: "asc" }, include: { pelanggan: { select: { nama: true } }, pesanan: { select: { total: true } }, jurnal: { where: { sumber: { not: "PENUTUP" } }, include: { baris: { include: { akun: { select: { jenis: true } } } } } } } });
   return daftar.map((p) => {
     let pendapatan = D(0), beban = D(0);
     for (const j of p.jurnal) for (const b of j.baris) {
@@ -145,4 +165,42 @@ export async function daftarRingkasanProyek(klien: Klien = db) {
     }
     return { id: p.id, kode: p.kode, nama: p.nama, status: p.status, pelanggan: p.pelanggan?.nama ?? null, nilaiKontrak: p.nilaiKontrak ? D(p.nilaiKontrak) : null, anggaranBiaya: p.anggaranBiaya ? D(p.anggaranBiaya) : null, totalPesanan: jumlahkan(p.pesanan.map((x) => x.total)), pendapatan, beban, laba: pendapatan.minus(beban) };
   });
+}
+
+// ---------- Status dan tampilan proyek (D5 §3.1) ----------
+
+export const STATUS_PROYEK = ["BERJALAN", "DITUNDA", "SELESAI", "DIARSIP", "BATAL"] as const;
+export type StatusProyek = (typeof STATUS_PROYEK)[number];
+
+export const LABEL_STATUS_PROYEK: Record<StatusProyek, string> = {
+  BERJALAN: "Berjalan",
+  DITUNDA: "Ditunda",
+  SELESAI: "Selesai",
+  DIARSIP: "Diarsipkan",
+  BATAL: "Batal",
+};
+
+/** Delapan warna proyek HKA (PROJECT_COLORS); kosong = abu-abu bawaan #71717a. */
+export const WARNA_PROYEK = ["#18181b", "#2563eb", "#0891b2", "#059669", "#d97706", "#dc2626", "#db2777", "#7c3aed"] as const;
+
+export const PANJANG_NAMA_KLIEN_PROYEK = 160;
+
+export function statusProyekSah(nilai: unknown): nilai is StatusProyek {
+  return typeof nilai === "string" && (STATUS_PROYEK as readonly string[]).includes(nilai);
+}
+
+/**
+ * Validasi khusus proyek untuk data hasil bacaData data induk (D5 §3.1). Bidang yang tidak ada (undefined) tidak
+ * diperiksa, jadi pembuatan tanpa status tetap memakai bawaan skema BERJALAN.
+ */
+export function validasiProyek(data: Record<string, unknown>): void {
+  if (data.status !== undefined && data.status !== null && !statusProyekSah(data.status)) throw new Error("Status proyek tidak dikenal");
+  const mulai = data.tanggalMulai, selesai = data.tanggalSelesai;
+  if (mulai instanceof Date && selesai instanceof Date && selesai.getTime() < mulai.getTime()) throw new Error("Tanggal selesai tidak boleh sebelum tanggal mulai");
+  if (typeof data.namaKlien === "string" && data.namaKlien.length > PANJANG_NAMA_KLIEN_PROYEK) throw new Error(`Nama klien maksimal ${PANJANG_NAMA_KLIEN_PROYEK} karakter`);
+}
+
+/** Klien yang ditampilkan: pelanggan terdaftar, kalau tidak ada nama klien bebas proyek. */
+export function labelKlienProyek(p: { pelanggan?: { nama: string } | null; namaKlien: string | null }): string | null {
+  return p.pelanggan?.nama ?? p.namaKlien ?? null;
 }

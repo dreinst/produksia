@@ -6,7 +6,8 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format } from "@/lib/uang";
-import { pastikanAkunRinci } from "@/lib/baganAkun";
+import { pastikanAkunMilik, pastikanAkunRinci } from "@/lib/baganAkun";
+import { perusahaanDokumenBaru } from "@/lib/perusahaan";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { batasBulan, ringkasanPajak } from "@/lib/pajak";
@@ -24,17 +25,19 @@ export async function catatPphFinal(dataFormulir: FormData) {
   if (bulan < 1 || bulan > 12 || tahun < 2000 || tahun > 2100) throw new Error("Periode tidak valid");
   const { dari, sampai } = batasBulan(tahun, bulan);
   if (dari > new Date()) throw new Error(`Periode ${periode} belum berjalan`);
-  // PPh Final unik per perusahaan (D1 §2.4.4). Sementara "utama"; paket fondasi memakai perusahaan lingkup halaman Pajak.
-  const perusahaanId = "utama";
+  // PPh Final unik per perusahaan (D1 §2.4.4, §4.7): isian perusahaanId, kalau kosong lingkup aktif; ditolak di gabungan
+  const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
   if (await db.pphFinalBulanan.findUnique({ where: { perusahaanId_periode: { perusahaanId, periode } } })) throw new Error(`PPh Final periode ${periode} sudah dicatat`);
-  const pengaturan = await ambilPengaturanPerusahaan(db);
+  const pengaturan = await ambilPengaturanPerusahaan(db, perusahaanId);
   if (!pengaturan.akunBebanPphFinalId || !pengaturan.akunHutangPphFinalId) {
     throw new Error("Akun Beban PPh Final dan Hutang PPh Final belum diatur di Pengaturan > Perusahaan & Pajak");
   }
   await pastikanAkunRinci(db, [pengaturan.akunBebanPphFinalId, pengaturan.akunHutangPphFinalId]);
+  await pastikanAkunMilik(db, [pengaturan.akunBebanPphFinalId, pengaturan.akunHutangPphFinalId], perusahaanId);
 
   await db.$transaction(async (tx) => {
-    const ringkasan = await ringkasanPajak(tx, tahun, pengaturan.pphFinalPersen);
+    // omzet dan batas dihitung per perusahaan (tiap perusahaan wajib pajak sendiri)
+    const ringkasan = await ringkasanPajak(tx, tahun, pengaturan.pphFinalPersen, perusahaanId);
     const data = ringkasan.bulan[bulan - 1];
     if (data.omzet.lte(0)) throw new Error(`Tidak ada omzet pada periode ${periode} (omzet bruto usaha di buku besar = ${format(data.omzet)})`);
     if (data.pphFinal.lte(0)) throw new Error(`PPh Final periode ${periode} nol (tarif ${format(pengaturan.pphFinalPersen)}%)`);
@@ -47,6 +50,7 @@ export async function catatPphFinal(dataFormulir: FormData) {
         tanggal,
         keterangan: `PPh Final UMKM ${format(pengaturan.pphFinalPersen)}% periode ${periode} atas omzet ${format(data.omzet)}`,
         sumber: "PAJAK",
+        perusahaanId,
         baris: {
           create: [
             { akunId: pengaturan.akunBebanPphFinalId!, debit: data.pphFinal, kredit: D(0), keterangan: `Beban PPh Final ${periode}` },
@@ -56,7 +60,7 @@ export async function catatPphFinal(dataFormulir: FormData) {
       },
     });
     // PPh Final bulanan belum ikut alur persetujuan; jurnalnya langsung dicatat
-    await tx.pphFinalBulanan.create({ data: { periode, omzet: data.omzet, tarifPersen: pengaturan.pphFinalPersen, jumlah: data.pphFinal, jurnalId: jurnal.id, ...dataLangsungDisetujui(pengguna) } });
+    await tx.pphFinalBulanan.create({ data: { periode, perusahaanId, omzet: data.omzet, tarifPersen: pengaturan.pphFinalPersen, jumlah: data.pphFinal, jurnalId: jurnal.id, ...dataLangsungDisetujui(pengguna) } });
     await tx.logAktivitas.create({
       data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "CATAT", jenis: "PPh Final Bulanan", nomor: jurnal.nomor, keterangan: `Periode ${periode}: omzet ${format(data.omzet)} × ${format(pengaturan.pphFinalPersen)}% = ${format(data.pphFinal)}` },
     });

@@ -89,11 +89,37 @@ export async function pastikanAkunRinci(klien: Klien, daftarAkunId: string[]): P
   }
 }
 
-/** Pilihan akun Kas/Bank: yang ditandai kasBank; bila belum ada yang ditandai, semua akun aset rinci. */
-export async function daftarAkunKasBank(klien: Klien = db) {
-  const ditandai = await klien.akun.findMany({ where: { kasBank: true, kelompok: false }, orderBy: { kode: "asc" } });
+/**
+ * Menolak akun milik perusahaan lain di pembukuan `perusahaanId` (D1 §3.4). Akun bersama (perusahaanId null) selalu
+ * lolos. Diletakkan di sini, bukan di perusahaan.ts, supaya akuntansi.ts tidak mengimpor modul yang menyentuh sesi;
+ * perusahaan.ts mengekspor ulang.
+ */
+export async function pastikanAkunMilik(klien: Klien, akunIds: string[], perusahaanId: string): Promise<void> {
+  const unik = [...new Set(akunIds.filter(Boolean))];
+  if (unik.length === 0) return;
+  const lain = await klien.akun.findFirst({
+    where: { id: { in: unik }, perusahaanId: { not: null }, NOT: { perusahaanId } },
+    select: { kode: true, nama: true, perusahaanId: true },
+    orderBy: { kode: "asc" },
+  });
+  if (!lain) return;
+  const nama = new Map((await klien.perusahaan.findMany({ where: { id: { in: [lain.perusahaanId!, perusahaanId] } }, select: { id: true, nama: true } })).map((p) => [p.id, p.nama]));
+  throw new Error(`Akun ${lain.kode} ${lain.nama} milik ${nama.get(lain.perusahaanId!) ?? lain.perusahaanId}, tidak bisa dipakai di pembukuan ${nama.get(perusahaanId) ?? perusahaanId}`);
+}
+
+/**
+ * Pilihan akun Kas/Bank: yang ditandai kasBank; bila belum ada yang ditandai, semua akun aset rinci.
+ * `perusahaanId` diisi: hanya akun milik perusahaan itu atau akun bersama. Kosong: semua (perilaku lama).
+ */
+export async function daftarAkunKasBank(klien: Klien = db, perusahaanId?: string | null) {
+  // sama dengan saringMilikAtauBersama di perusahaan.ts (tidak diimpor supaya berkas ini bebas sesi)
+  const milik = perusahaanId ? { OR: [{ perusahaanId }, { perusahaanId: null }] } : {};
+  const ditandai = await klien.akun.findMany({ where: { kasBank: true, kelompok: false, ...milik }, orderBy: { kode: "asc" } });
   if (ditandai.length > 0) return ditandai;
-  return klien.akun.findMany({ where: { jenis: "ASET", kelompok: false }, orderBy: { kode: "asc" } });
+  // cadangan "semua akun aset" hanya bila belum ada satu pun akun bertanda kasBank, supaya perusahaan yang belum
+  // punya rekening sendiri tidak ditawari akun aset biasa sebagai kas
+  if (perusahaanId && (await klien.akun.count({ where: { kasBank: true, kelompok: false } })) > 0) return ditandai;
+  return klien.akun.findMany({ where: { jenis: "ASET", kelompok: false, ...milik }, orderBy: { kode: "asc" } });
 }
 
 /** Akun dari pemetaan tambahan (Pengaturan, Pemetaan Akun) menurut kuncinya, mis. "prive". */

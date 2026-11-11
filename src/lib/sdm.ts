@@ -4,6 +4,9 @@ import { akunPemetaanTambahan } from "@/lib/baganAkun";
 import { catatJurnal, type OpsiJurnal } from "@/lib/akuntansi";
 import { D, format, jumlahkan, type Desimal } from "@/lib/uang";
 
+/** Kunci unik Penggajian.periode per perusahaan (D1 §2.4.3); didefinisikan di perusahaan.ts. */
+export { kunciPeriodeGaji } from "@/lib/perusahaan";
+
 type Klien = PrismaClient | Prisma.TransactionClient;
 type Tx = Prisma.TransactionClient;
 
@@ -70,20 +73,25 @@ export async function catatJurnalPenggajian(tx: Tx, penggajianId: string, opsi: 
   }
   const NOL = D(0);
   const baris = [
-    ...[...pokok].map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Beban gaji pokok ${g.periode}` })),
-    ...[...tunjangan].map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Beban tunjangan ${g.periode}` })),
-    ...(totalPotongan.gt(0) ? [{ akunId: gaji.hutangPotongan!.id, debit: NOL, kredit: totalPotongan, keterangan: `Potongan gaji ${g.periode}` }] : []),
-    { akunId: g.akunKasId, debit: NOL, kredit: D(g.totalDibayar), keterangan: `Pembayaran gaji ${g.periode}` },
+    ...[...pokok].map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Beban gaji pokok ${g.bulan}` })),
+    ...[...tunjangan].map(([akunId, v]) => ({ akunId, debit: v, kredit: NOL, keterangan: `Beban tunjangan ${g.bulan}` })),
+    ...(totalPotongan.gt(0) ? [{ akunId: gaji.hutangPotongan!.id, debit: NOL, kredit: totalPotongan, keterangan: `Potongan gaji ${g.bulan}` }] : []),
+    { akunId: g.akunKasId, debit: NOL, kredit: D(g.totalDibayar), keterangan: `Pembayaran gaji ${g.bulan}` },
   ];
   const jurnal = await catatJurnal(
     tx,
     "GJ",
-    `Penggajian ${g.periode}${g.keterangan ? `: ${g.keterangan}` : ""}`,
+    `Penggajian ${g.bulan}${g.keterangan ? `: ${g.keterangan}` : ""}`,
     "PENGGAJIAN",
     baris,
     { tanggal: g.tanggal, proyekId: g.proyekId, ...opsi },
   );
-  if (jurnal) await tx.penggajian.update({ where: { id: g.id }, data: { jurnalId: jurnal.id } });
+  if (jurnal) {
+    // Jurnal gaji milik perusahaan penggajian. catatJurnal belum menerima perusahaanId (P11), jadi kolomnya diisi
+    // sesudah dibuat di transaksi yang sama; untuk utama tidak ada yang berubah.
+    if (g.perusahaanId !== jurnal.perusahaanId) await tx.jurnal.update({ where: { id: jurnal.id }, data: { perusahaanId: g.perusahaanId } });
+    await tx.penggajian.update({ where: { id: g.id }, data: { jurnalId: jurnal.id } });
+  }
   return jurnal;
 }
 
@@ -99,10 +107,13 @@ export function ringkasanPenggajian(g: {
   return `Periode ${g.periode}: ${g.baris.length} karyawan, gaji pokok ${format(g.totalGajiPokok)}, tunjangan ${format(g.totalTunjangan)}, potongan ${format(g.totalPotongan)}, dibayar ${format(g.totalDibayar)}`;
 }
 
-/** Karyawan aktif untuk formulir Proses Gaji, dengan komponen gaji bawaan dari data induk. */
-export async function daftarKaryawanAktif(klien: Klien = db) {
+/**
+ * Karyawan aktif untuk formulir Proses Gaji, dengan komponen gaji bawaan dari data induk. `perusahaanId` diisi: hanya
+ * karyawan perusahaan itu. Kosong: semua (perilaku lama).
+ */
+export async function daftarKaryawanAktif(klien: Klien = db, perusahaanId?: string | null) {
   return klien.karyawan.findMany({
-    where: { status: "AKTIF" },
+    where: { status: "AKTIF", ...(perusahaanId ? { perusahaanId } : {}) },
     orderBy: { nama: "asc" },
     select: { id: true, kode: true, nama: true, jabatan: true, gajiPokok: true, tunjangan: true, departemen: { select: { nama: true } } },
   });

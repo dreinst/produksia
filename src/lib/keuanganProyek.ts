@@ -1,5 +1,6 @@
 import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { saringPerusahaan } from "@/lib/perusahaan";
+import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { D, terbesar, uang, type Desimal } from "@/lib/uang";
 
 /*
@@ -280,9 +281,9 @@ export async function muatMasukanKeuangan(klien: Klien, proyekIds: string[]): Pr
     akunKeuanganProyek(klien),
   ]);
   const perusahaanIds = [...new Set(proyek.map((p) => p.perusahaanId))];
-  const pengaturan = await klien.pengaturanPerusahaan.findMany({ where: { perusahaanId: { in: perusahaanIds } }, select: { perusahaanId: true, pkp: true, tarifPpnPersen: true } });
-  // perusahaan tanpa baris pengaturan = bawaan non-PKP
-  const faktorDpp = new Map(pengaturan.map((p) => [p.perusahaanId, p.pkp ? D(100).div(D(100).plus(D(p.tarifPpnPersen))) : D(1)]));
+  // pengaturan pajak per perusahaan proyek (D1 §3.6); perusahaan tanpa baris pengaturan = bawaan non-PKP
+  const pengaturan = await Promise.all(perusahaanIds.map((id) => ambilPengaturanPerusahaan(klien, id)));
+  const faktorDpp = new Map(pengaturan.map((p) => [p.perusahaanId, p.pkp ? D(100).div(D(100).plus(p.tarifPpnPersen)) : D(1)]));
   const proyekPesanan = new Map(pesanan.map((p) => [p.id, p.proyekId]));
 
   for (const p of proyek) {

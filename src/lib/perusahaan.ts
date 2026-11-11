@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { diLuarPermintaan, penggunaSaatIni, pastikanHak, sesiSaatIni, wajibMasukAksi } from "@/lib/otentikasi";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
+import { akunPemetaanTambahan, pastikanAkunMilik } from "@/lib/baganAkun";
+import { D, type Desimal } from "@/lib/uang";
 
 /*
  * Dimensi perusahaan (D1 §3.1-§3.2). Berkas ini TIDAK "use server": boleh diimpor halaman, aksi, dan
@@ -170,4 +172,55 @@ export async function pastikanKaryawanMilik(klien: Klien, karyawanIds: string[],
   if (ids.length === 0) return;
   const lain = await klien.karyawan.findFirst({ where: { id: { in: ids }, NOT: { perusahaanId } }, select: { kode: true, nama: true, perusahaanId: true } });
   if (lain) throw new Error(`Karyawan ${lain.kode} - ${lain.nama} terdaftar di ${await namaPerusahaan(klien, lain.perusahaanId)}, bukan ${await namaPerusahaan(klien, perusahaanId)}`);
+}
+
+/** Kontrak D1 §3.1: pastikanAkunMilik tinggal di baganAkun.ts (bebas sesi) dan diekspor ulang dari sini. */
+export { pastikanAkunMilik };
+
+/**
+ * Kunci unik Penggajian.periode (D1 §2.4.3, F20): perusahaan utama = "YYYY-MM" (sama dengan bulan, perilaku lama),
+ * perusahaan lain = "YYYY-MM@<perusahaanId>". Kode baru membaca kolom `bulan`, bukan kunci ini.
+ */
+export function kunciPeriodeGaji(perusahaanId: string, bulan: string): string {
+  return perusahaanId === PERUSAHAAN_UTAMA ? bulan : `${bulan}@${perusahaanId}`;
+}
+
+type AkunRingkas = { id: string; kode: string; nama: string };
+
+/**
+ * Akun Piutang/Hutang Antar Perusahaan: pemetaan tambahan "piutang-antar-perusahaan"/"hutang-antar-perusahaan",
+ * kalau kosong akun standar 1-1750/2-1550 (D1 §4.5). null bila keduanya tidak ada.
+ */
+export async function akunAntarPerusahaan(klien: Klien): Promise<{ piutang: AkunRingkas | null; hutang: AkunRingkas | null }> {
+  const pilih = { id: true, kode: true, nama: true } as const;
+  const [petaPiutang, petaHutang, standarPiutang, standarHutang] = await Promise.all([
+    akunPemetaanTambahan(klien, "piutang-antar-perusahaan"),
+    akunPemetaanTambahan(klien, "hutang-antar-perusahaan"),
+    klien.akun.findUnique({ where: { kode: "1-1750" }, select: pilih }),
+    klien.akun.findUnique({ where: { kode: "2-1550" }, select: pilih }),
+  ]);
+  const ringkas = (a: AkunRingkas | null) => (a ? { id: a.id, kode: a.kode, nama: a.nama } : null);
+  return { piutang: ringkas(petaPiutang ?? standarPiutang), hutang: ringkas(petaHutang ?? standarHutang) };
+}
+
+/**
+ * Saldo gabungan (semua perusahaan) kedua akun antar perusahaan sampai tanggal itu, untuk catatan laporan gabungan
+ * (D1 §4.6). piutang = debit - kredit, hutang = kredit - debit, selisih = piutang - hutang (0 bila semua transaksi
+ * antar perusahaan tercatat di kedua sisi). akunPiutang/akunHutang berisi "kode nama", null bila akunnya tidak ada.
+ */
+export async function saldoAntarPerusahaan(
+  klien: Klien,
+  sampai: Date,
+): Promise<{ piutang: Desimal; hutang: Desimal; selisih: Desimal; akunPiutang: string | null; akunHutang: string | null }> {
+  const akun = await akunAntarPerusahaan(klien);
+  const jumlah = async (a: AkunRingkas | null) => {
+    if (!a) return { debit: D(0), kredit: D(0) };
+    const r = await klien.barisJurnal.aggregate({ where: { akunId: a.id, jurnal: { tanggal: { lte: sampai } } }, _sum: { debit: true, kredit: true } });
+    return { debit: D(r._sum.debit ?? 0), kredit: D(r._sum.kredit ?? 0) };
+  };
+  const [p, h] = await Promise.all([jumlah(akun.piutang), jumlah(akun.hutang)]);
+  const piutang = p.debit.minus(p.kredit);
+  const hutang = h.kredit.minus(h.debit);
+  const label = (a: AkunRingkas | null) => (a ? `${a.kode} ${a.nama}` : null);
+  return { piutang, hutang, selisih: piutang.minus(hutang), akunPiutang: label(akun.piutang), akunHutang: label(akun.hutang) };
 }
