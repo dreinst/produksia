@@ -410,7 +410,11 @@ async function main() {
   const psj2 = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, NOT: { id: psj.id } }, include: { baris: true } });
   await jalankan("SJ 3 dari 5, belum difaktur", () => buatPengiriman(formulir({ pesananId: psj2.id, gudangId: gudang.id, baris: [{ barisPesananId: psj2.baris[0].id, barangId: barang.id, jumlah: 3 }] })));
   const sj = await db.pengirimanPesanan.findFirstOrThrow({ where: { pesananId: psj2.id }, include: { baris: true } });
+  // Sejak P11 catatJurnal menolak akun milik perusahaan lain, sedangkan buatUangMuka lama masih mencatat di utama (P23).
+  // Seperti pindah() di atas, kas satu dibuat bersama sementara selama UM dicatat, lalu dikembalikan ke perusahaan satu.
+  await db.akun.update({ where: { id: kas1.id }, data: { perusahaanId: null } });
   await jalankan("UM 25.000 ke kas perusahaan satu", () => buatUangMuka(formulir({ pesananId: psj2.id, akunId: kas1.id, jumlah: 25000 })));
+  await db.akun.update({ where: { id: kas1.id }, data: { perusahaanId: p1.id } });
   const um = await db.uangMukaPelanggan.findFirstOrThrow({ where: { pesananId: psj2.id } });
   const jurnalLain = (await db.jurnal.findMany({ select: { id: true, nomor: true } })).filter((j) => !idJurnalSebelumLain.has(j.id));
   pastikan(jurnalLain.length === 4, `TB, FB, SJ, dan UM masing-masing satu jurnal (${jurnalLain.length})`);
