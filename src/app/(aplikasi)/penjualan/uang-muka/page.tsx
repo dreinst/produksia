@@ -54,7 +54,7 @@ export default async function HalamanUangMuka({ searchParams }: { searchParams: 
       </p>
 
       <div className="kartu kartu-tabel">
-        <KontrolDaftar param={param} total={total} placeholder="Cari nomor / pesanan / pelanggan…" />
+        <KontrolDaftar param={param} total={total} placeholder="Cari nomor / nomor kuitansi / pesanan / pelanggan…" />
         <div className="bungkus-tabel">
         <table className="tabel min-w-[48rem]">
         <thead>

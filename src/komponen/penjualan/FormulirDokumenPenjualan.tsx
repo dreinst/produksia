@@ -108,6 +108,7 @@ export default function FormulirDokumenPenjualan({
   tombolLain,
   pesanSukses,
   alihkanKe,
+  petunjukNomor,
 }: {
   jenis: "penawaran" | "pesanan";
   aksi: (sebelumnya: StatusFormulir, dataFormulir: FormData) => Promise<StatusFormulir>;
@@ -125,6 +126,8 @@ export default function FormulirDokumenPenjualan({
   /** pesan sukses dan tujuan sesudah berhasil untuk aksi yang tidak mengalihkan sendiri (halaman ubah) */
   pesanSukses?: string;
   alihkanKe?: string;
+  /** petunjuk isian nomor cetak khusus (halaman ubah: isian kosong tidak mengubah nomor) */
+  petunjukNomor?: string;
 }) {
   const pelangganAwal = lead?.pelangganId ?? nilaiAwal.pelangganId;
   const penawaran = jenis === "penawaran";
@@ -192,7 +195,7 @@ export default function FormulirDokumenPenjualan({
       <details className="md:col-span-2 ubin">
         <summary className="cursor-pointer font-semibold text-sm">Detail surat &amp; cetak</summary>
         <div className="mt-3">
-          <IsianTeksDokumen jenis={jenis} nilai={{ ...opsi.teksAwal, ...nilaiAwal.teks }} daftarKop={opsi.daftarKop} nomorOtomatis={opsi.nomorOtomatis} />
+          <IsianTeksDokumen jenis={jenis} nilai={{ ...opsi.teksAwal, ...nilaiAwal.teks }} daftarKop={opsi.daftarKop} nomorOtomatis={opsi.nomorOtomatis} petunjukNomor={petunjukNomor} />
         </div>
       </details>
 

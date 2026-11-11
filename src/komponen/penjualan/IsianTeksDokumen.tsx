@@ -83,6 +83,7 @@ export default function IsianTeksDokumen({
   daftarKop,
   tampilkanJudulNomor = jenis !== "pesanan",
   nomorOtomatis = false,
+  petunjukNomor,
   awalan = "teks",
 }: {
   jenis: JenisIsianTeks;
@@ -93,6 +94,8 @@ export default function IsianTeksDokumen({
   tampilkanJudulNomor?: boolean;
   /** format nomor cetak aktif untuk jenis ini: nomor kosong diisi otomatis */
   nomorOtomatis?: boolean;
+  /** petunjuk isian nomor cetak yang menimpa petunjuk bawaan (mis. halaman ubah: kosong berarti tidak berubah) */
+  petunjukNomor?: string;
   /** awalan id isian, supaya dua isian di satu halaman tidak bentrok */
   awalan?: string;
 }) {
@@ -107,7 +110,7 @@ export default function IsianTeksDokumen({
               Nomor cetak
             </label>
             <input id={`${awalan}-nomorCetak`} name="nomorCetak" type="text" maxLength={60} defaultValue={v("nomorCetak")} className="isian mono" />
-            <span className="petunjuk">{nomorOtomatis ? "Kosongkan untuk nomor otomatis" : "Kosong = nomor internal dokumen"}</span>
+            <span className="petunjuk">{petunjukNomor ?? (nomorOtomatis ? "Kosongkan untuk nomor otomatis" : "Kosong = nomor internal dokumen")}</span>
           </div>
         </>
       )}

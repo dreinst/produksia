@@ -129,6 +129,8 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
         teks: { nilai: teksWarisan, daftarKop },
         nomorOtomatis: !!formatNomor?.aktif,
         ppnAwal: ppnAwalPesanan,
+        // pesanan baru yang sengaja 0% tidak bisa dibedakan dari pesanan lama (bawaan 0): cukup diberi peringatan
+        ppnPesananNol: ppnAwalPesanan === undefined,
       }}
       dokumenSebelumnya={pesanan.pengiriman.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal.toISOString() }))}
       pemetaan={

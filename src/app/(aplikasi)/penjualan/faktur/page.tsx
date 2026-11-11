@@ -20,6 +20,7 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
   const param = await bacaParamDaftar(searchParams);
   // Lingkup perusahaan (D1 §7.4); saringan proyek lewat pesanan (faktur tanpa pesanan = tanpa proyek, D5 §7.3);
   // pencarian juga mencocokkan nomor cetak (D2 §7.1)
+  const lihatProyek = punyaHak(pengguna, "proyek.lihat");
   const [{ perusahaanId }, f] = await Promise.all([lingkupPerusahaan(), searchParams.then((sp) => filterProyekSah(db, bacaFilterProyek(sp)))]);
   const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { nomorCetak: cocokTeks(param.q) }, { pelanggan: { nama: cocokTeks(param.q) } }] } : {};
   const where = { AND: [cari, saringPerusahaan(perusahaanId), whereFilterProyekLewat("pesanan", "pesananId", f)] };
@@ -46,7 +47,8 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
       skip: param.lewati,
       take: param.ambil,
     }),
-    db.proyek.findMany({ where: saringPerusahaan(perusahaanId), orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, status: true } }),
+    // pilihan saringan proyek hanya untuk pemegang proyek.lihat; ?proyek= tetap menyaring tanpa hak itu
+    lihatProyek ? db.proyek.findMany({ where: saringPerusahaan(perusahaanId), orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, status: true } }) : Promise.resolve([]),
   ]);
   const gabungan = !perusahaanId;
 
@@ -59,9 +61,11 @@ export default async function HalamanFakturPenjualan({ searchParams }: { searchP
       </p>
 
       <div className="kartu kartu-tabel">
-        <div className="px-5 md:px-6 pt-3">
-          <FilterProyek nilai={f} daftar={daftarProyek} tambahan={{ q: param.q || undefined }} />
-        </div>
+        {lihatProyek && (
+          <div className="px-5 md:px-6 pt-3">
+            <FilterProyek nilai={f} daftar={daftarProyek} tambahan={{ q: param.q || undefined }} />
+          </div>
+        )}
         <KontrolDaftar param={param} total={total} placeholder="Cari nomor / nomor cetak / pelanggan…" tambahan={{ proyek: f || undefined }} />
         <div className="bungkus-tabel">
         <table className="tabel min-w-[36rem]">

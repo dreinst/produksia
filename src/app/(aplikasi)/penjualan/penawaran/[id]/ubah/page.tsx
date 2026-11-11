@@ -142,6 +142,7 @@ export default async function HalamanUbahPenawaran({ params }: { params: Promise
           penyusun,
         }}
         labelSimpan="Simpan Perubahan"
+        petunjukNomor="Kosong = nomor tidak berubah. Kosongkan nomor lewat Ubah tampilan"
         pesanSukses="Penawaran tersimpan. Membuka halaman penawaran…"
         alihkanKe={`/penjualan/penawaran/${p.id}`}
       />

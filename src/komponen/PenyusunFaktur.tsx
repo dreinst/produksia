@@ -41,6 +41,8 @@ export type PenjualanPenyusun = {
   nomorOtomatis: boolean;
   /** PPN awal komposer dari pesanan (D2 §3.9); undefined = tarif perusahaan seperti semula */
   ppnAwal?: number;
+  /** pesanan tanpa termin ber-PPN 0%: komposer tetap mulai dari tarif perusahaan, tetapi memberi peringatan */
+  ppnPesananNol?: boolean;
 };
 
 export type PropsPenyusun = {
@@ -522,6 +524,11 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                     <span className="angka text-slate-400">non-PKP</span>
                   )}
                 </div>
+                {p.pajak.pkp && pj?.ppnPesananNol && ppnPersen !== 0 && (
+                  <p className="text-[12px] text-amber-700" role="note">
+                    PPN pesanan ini tercatat 0%. Pesanan lama juga bernilai 0%, jadi tarif di atas mulai dari tarif perusahaan. Pilih 0% bila pesanan memang tanpa PPN.
+                  </p>
+                )}
                 {daftarMataUang.length > 0 && (
                   <div className="mt-2 p-3 rounded-lg bg-slate-50 border border-slate-200 flex flex-col gap-2">
                     <div className="flex justify-between items-center gap-2">
