@@ -1,73 +1,48 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak, PERAN_TERTINGGI } from "@/lib/hakAkses";
-import { db } from "@/lib/db";
-import { daftarProyekAktif } from "@/lib/proyek";
-import { KODE_BARANG_LAIN } from "@/lib/barangLainLain";
-import FormulirAksi from "@/komponen/FormulirAksi";
-import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir } from "@/lib/perusahaan";
 import { buatPesananFormulir } from "@/lib/aksi/penjualan";
-import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
+import FormulirDokumenPenjualan, { PilihPerusahaanPenerbit, muatOpsiDokumenPenjualan } from "@/komponen/penjualan/FormulirDokumenPenjualan";
 
-export default async function HalamanPesananPenjualanBaru() {
+export default async function HalamanPesananPenjualanBaru({ searchParams }: { searchParams: Promise<{ perusahaan?: string }> }) {
   const pengguna = await wajibHak("pesanan.buat");
-  const [daftarPelanggan, daftarBarang, daftarProyek] = await Promise.all([
-    db.pelanggan.findMany({ orderBy: { nama: "asc" } }),
-    // Barang JASA-LAIN hanya untuk baris bebas (butuh harga.nego), jadi tidak ditawarkan sebagai barang katalog
-    db.barang.findMany({ where: { kode: { not: KODE_BARANG_LAIN } }, orderBy: { nama: "asc" } }),
-    daftarProyekAktif(),
-  ]);
+  const { perusahaan: pilihan } = await searchParams;
+  const [lingkup, perusahaanAktif] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan()]);
+  // lingkup satu perusahaan aktif = perusahaan itu; gabungan dan lingkup arsip memilih perusahaan penerbit (D2 §7.1)
+  const p = perusahaanFormulir(lingkup);
+  const terpilih = perusahaanAktif.find((x) => x.id === (p ?? pilihan)) ?? null;
 
-  const opsiBarang = daftarBarang.map((i) => ({
-    id: i.id,
-    kode: i.kode,
-    nama: i.nama,
-    hargaBawaan: Number(i.hargaJual),
-    hargaMinimum: Number(i.hargaMinimum),
-  }));
+  if (!terpilih) {
+    return (
+      <div className="space-y-6">
+        <h1 className="judul-halaman">Pesanan Penjualan Baru</h1>
+        <PilihPerusahaanPenerbit daftar={perusahaanAktif} href={(id) => `/penjualan/pesanan/baru?perusahaan=${encodeURIComponent(id)}`} />
+      </div>
+    );
+  }
 
+  const opsi = await muatOpsiDokumenPenjualan(terpilih.id, "pesanan");
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-6xl">
       <h1 className="judul-halaman">Pesanan Penjualan Baru</h1>
-
-      <FormulirAksi aksi={buatPesananFormulir} verifikasi={{ judul: "Periksa pesanan penjualan", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bidang">
-          <label className="label" htmlFor="pelangganId">Pelanggan *</label>
-          <select id="pelangganId" name="pelangganId" required className="isian">
-            <option value="">-</option>
-            {daftarPelanggan.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.kode} - {c.nama}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="bidang">
-          <label className="label" htmlFor="proyekId">Proyek / Event</label>
-          <select id="proyekId" name="proyekId" className="isian" defaultValue="">
-            <option value="">Tanpa event</option>
-            {daftarProyek.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.kode} - {p.nama}
-              </option>
-            ))}
-          </select>
-          <span className="petunjuk">Dipakai untuk Laba Rugi per event dan LPJ. Ikut ke semua dokumen turunannya.</span>
-        </div>
-
-        <div />
-
-        <EditorBarisBarang daftarBarang={opsiBarang} bolehNego={punyaHak(pengguna, "harga.nego")} bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)} />
-
-        <div className="md:col-span-2 flex flex-wrap items-center gap-2">
-          <button type="submit" className="tombol tombol-utama">
-            Simpan Pesanan
-          </button>
-          <button type="submit" name="lanjut" value="faktur" className="tombol tombol-garis">
-            Simpan &amp; Buat Faktur
-          </button>
-          <span className="petunjuk">Untuk jasa yang sudah selesai dikerjakan: pesanan tercatat, lalu langsung ke faktur (SJ hanya perlu bila ada barang fisik).</span>
-        </div>
-      </FormulirAksi>
+      <FormulirDokumenPenjualan
+        jenis="pesanan"
+        aksi={buatPesananFormulir}
+        perusahaan={terpilih}
+        // pola formulir akar halaman lama (KONTRAK-TAMBAHAN): utama hanya isian tersembunyi
+        tampilPerusahaan={p === PERUSAHAAN_UTAMA ? "tersembunyi" : p ? "bacaSaja" : { gantiHref: "/penjualan/pesanan/baru" }}
+        opsi={opsi}
+        bolehNego={punyaHak(pengguna, "harga.nego")}
+        bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)}
+        tombolLain={
+          <>
+            <button type="submit" name="lanjut" value="faktur" className="tombol tombol-garis">
+              Simpan &amp; Buat Faktur
+            </button>
+            <span className="petunjuk">Untuk jasa yang sudah selesai dikerjakan: pesanan tercatat, lalu langsung ke faktur (SJ hanya perlu bila ada barang fisik).</span>
+          </>
+        }
+      />
     </div>
   );
 }

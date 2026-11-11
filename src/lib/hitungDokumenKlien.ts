@@ -183,3 +183,67 @@ export function pratinjauTerminKlien(
   if (kecil) return keluar(`Termin ${kecil.no} terlalu kecil setelah PPN dibulatkan`);
   return keluar(null);
 }
+
+export type RingkasanFakturKlien = { subtotal: number; diskon: number; fee: number; dpp: number; ppn: number; total: number; galat: string | null };
+
+/** bagianProrata server: nilai pesanan dibagi menurut subtotal, faktur penutup mengambil sisa, tidak melebihi sisa. */
+function prorataSen(nilaiPesanan: bigint, subtotalFaktur: bigint, subtotalPesanan: bigint, sudahLain: bigint, menutup: boolean): bigint {
+  const sisa = nilaiPesanan - sudahLain > NOL ? nilaiPesanan - sudahLain : NOL;
+  if (nilaiPesanan === NOL || subtotalPesanan <= NOL) return NOL;
+  if (menutup) return sisa;
+  const bagian = bagiBulat(nilaiPesanan * subtotalFaktur, subtotalPesanan);
+  return bagian < sisa ? bagian : sisa;
+}
+
+/**
+ * Pratinjau faktur penjualan dari pesanan (meniru bacaDiskonFaktur, diskonWarisan, feeFaktur, dan ringkasanFaktur):
+ * - `diskonIsian` null = warisan pesanan (jalur c): PERSEN dari subtotal faktur, NOMINAL prorata dibatasi subtotal.
+ *   Diisi = jalur a (jenis + nilai dari komposer).
+ * - Fee selalu dari pesanan: PERSEN dari subtotal faktur setelah diskon, NOMINAL prorata.
+ * - `menutup` = sesudah faktur ini semua baris pesanan tertagih penuh; `subtotalPesanan` = Σ nilai semua baris pesanan;
+ *   `diskonLain` dan `feeLain` = Σ faktur lain pesanan ini.
+ * DPP = subtotal - diskon + fee, PPN dari DPP, total = DPP + PPN. Bila ada galat, diskon dan fee pratinjau 0.
+ */
+export function ringkasanFakturKlien(p: {
+  baris: readonly BarisKlien[];
+  menutup: boolean;
+  subtotalPesanan: AngkaKlien;
+  pesanan: { jenisDiskon: JenisNilaiKlien; nilaiDiskon: AngkaKlien; diskon: AngkaKlien; jenisFee: JenisNilaiKlien; nilaiFee: AngkaKlien; fee: AngkaKlien };
+  diskonLain: AngkaKlien;
+  feeLain: AngkaKlien;
+  diskonIsian: { jenis: JenisNilaiKlien; nilai: AngkaKlien } | null;
+  ppnPersen: AngkaKlien;
+}): RingkasanFakturKlien {
+  const subtotal = subtotalSen(p.baris);
+  const subtotalPesanan = senAtauNol(p.subtotalPesanan);
+  let galat: string | null = null;
+  let diskon = NOL;
+  if (p.diskonIsian) {
+    const n = keSen(p.diskonIsian.nilai);
+    if (n === null) galat = "Diskon tidak valid";
+    else if (n < NOL) galat = "Diskon tidak boleh negatif";
+    else if (p.diskonIsian.jenis === "PERSEN" && n > SEPULUH_RIBU) galat = "Persen diskon tidak boleh lebih dari 100";
+    else diskon = p.diskonIsian.jenis === "PERSEN" ? persenDari(subtotal, n) : n;
+  } else if (p.pesanan.jenisDiskon === "PERSEN") {
+    diskon = persenDari(subtotal, senAtauNol(p.pesanan.nilaiDiskon));
+  } else {
+    const bagian = prorataSen(senAtauNol(p.pesanan.diskon), subtotal, subtotalPesanan, senAtauNol(p.diskonLain), p.menutup);
+    const batas = subtotal > NOL ? subtotal : NOL;
+    diskon = bagian < batas ? bagian : batas;
+  }
+  if (!galat && diskon > subtotal) galat = `Diskon (${rupiah(diskon)}) melebihi subtotal faktur (${rupiah(subtotal)})`;
+  let fee = NOL;
+  if (!galat) {
+    fee =
+      p.pesanan.jenisFee === "PERSEN"
+        ? persenDari(subtotal - diskon, senAtauNol(p.pesanan.nilaiFee))
+        : prorataSen(senAtauNol(p.pesanan.fee), subtotal, subtotalPesanan, senAtauNol(p.feeLain), p.menutup);
+  }
+  if (galat) {
+    diskon = NOL;
+    fee = NOL;
+  }
+  const dpp = subtotal - diskon + fee;
+  const ppn = persenDari(dpp, senAtauNol(p.ppnPersen));
+  return { subtotal: keAngka(subtotal), diskon: keAngka(diskon), fee: keAngka(fee), dpp: keAngka(dpp), ppn: keAngka(ppn), total: keAngka(dpp + ppn), galat };
+}

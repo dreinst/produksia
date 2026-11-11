@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useMemo, useState } from "react";
+import { Fragment, useActionState, useMemo, useState } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import type { StatusFormulir } from "@/lib/statusFormulir";
+import { nilaiBarisKlien, ringkasanFakturKlien, type JenisNilaiKlien } from "@/lib/hitungDokumenKlien";
+import IsianTeksDokumen, { type KopPilihan, type NilaiTeksDokumen } from "@/komponen/penjualan/IsianTeksDokumen";
 
 export type BarisPenyusun = {
   id: string;
@@ -16,6 +18,27 @@ export type BarisPenyusun = {
   sisa: number;
   harga: number;
   hargaBeli: number;
+  /** penjualan (D2 §7.4): frekuensi mode event, satuan frekuensi, seksi, dan deskripsi baris pesanan */
+  frekuensi?: number;
+  satuanFrekuensi?: string | null;
+  bagian?: string | null;
+  deskripsi?: string | null;
+};
+
+/**
+ * Props tambahan cabang penjualan (D2 §7.4). Tanpa prop ini komposer berperilaku lama (pembelian tidak pernah
+ * mengirimnya). Diskon awal = warisan pesanan (jalur c, tidak dikirim); diubah = jenisDiskon + nilaiDiskon (jalur a).
+ * Fee dihitung seperti feeFaktur server dan hanya ditampilkan.
+ */
+export type PenjualanPenyusun = {
+  mode: "STANDAR" | "EVENT";
+  diskon: { jenis: JenisNilaiKlien; nilai: number; diskonPesanan: number; diskonLain: number };
+  fee: { jenis: JenisNilaiKlien; nilai: number; feePesanan: number; feeLain: number };
+  /** Σ nilai semua baris pesanan (dasar prorata) */
+  subtotalPesanan: number;
+  akunFee: string | null;
+  teks: { nilai: NilaiTeksDokumen; daftarKop: KopPilihan[] };
+  nomorOtomatis: boolean;
 };
 
 export type PropsPenyusun = {
@@ -54,6 +77,7 @@ export type PropsPenyusun = {
    * tagihan dalam mata uang transaksinya (nilaiAsli) dan untuk penilaian kembali piutang/hutang.
    */
   mataUang?: { daftar: { id: string; kode: string; nama: string; kursTerakhir: number | null }[]; bawaanId: string | null };
+  penjualan?: PenjualanPenyusun;
 };
 
 const format = (n: number) => n.toLocaleString("id-ID");
@@ -61,6 +85,10 @@ const tanggalId = (iso: string) => new Date(iso).toLocaleDateString("id-ID", { d
 
 export default function PenyusunFaktur(p: PropsPenyusun) {
   const adalahPenjualan = p.mode === "penjualan";
+  const pj = adalahPenjualan ? p.penjualan : undefined;
+  const event = pj?.mode === "EVENT";
+  // diskon cabang penjualan baru: null = warisan pesanan (tidak dikirim, server jalur c)
+  const [diskonIsian, setDiskonIsian] = useState<{ jenis: JenisNilaiKlien; nilai: string } | null>(null);
   const [status, aksiFormulir, sedangProses] = useActionState(p.aksi, { galat: null });
   const [isian, setIsian] = useState(p.daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.sisa, harga: b.harga })));
   const [ppnPersen, setPpnPersen] = useState(p.pajak.pkp ? p.pajak.tarif : 0);
@@ -73,6 +101,24 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
   const [kursInput, setKursInput] = useState(mataUangDipilih?.kursTerakhir ?? 0);
 
   const hitung = useMemo(() => {
+    if (pj) {
+      // angka sama dengan server: sen bulat, diskon dan fee prorata pesanan (hitungDokumenKlien.ts)
+      const r = ringkasanFakturKlien({
+        baris: isian.map((x, i) => ({ jumlah: x.jumlah, harga: x.harga, frekuensi: p.daftarBaris[i].frekuensi })),
+        menutup: isian.every((x, i) => x.jumlah >= p.daftarBaris[i].sisa),
+        subtotalPesanan: pj.subtotalPesanan,
+        pesanan: { jenisDiskon: pj.diskon.jenis, nilaiDiskon: pj.diskon.nilai, diskon: pj.diskon.diskonPesanan, jenisFee: pj.fee.jenis, nilaiFee: pj.fee.nilai, fee: pj.fee.feePesanan },
+        diskonLain: pj.diskon.diskonLain,
+        feeLain: pj.fee.feeLain,
+        diskonIsian,
+        ppnPersen,
+      });
+      const hargaPokok = isian.reduce((s, r, i) => s + r.jumlah * p.daftarBaris[i].hargaBeli, 0);
+      const jumlahValid = isian.every((r, i) => r.jumlah >= 0 && r.jumlah <= p.daftarBaris[i].sisa) && isian.some((r) => r.jumlah > 0);
+      const uangMuka = Math.max(0, Math.min(uangMukaInput, uangMukaTersedia, r.total));
+      const piutang = Math.round((r.total - uangMuka) * 100) / 100;
+      return { ...r, hargaPokok, uangMuka, piutang, jumlahValid, banyakBaris: isian.filter((x) => x.jumlah > 0).length };
+    }
     const subtotal = isian.reduce((s, r) => s + r.jumlah * r.harga, 0);
     const hargaPokok = isian.reduce((s, r, i) => s + r.jumlah * p.daftarBaris[i].hargaBeli, 0);
     const jumlahValid = isian.every((r, i) => r.jumlah >= 0 && r.jumlah <= p.daftarBaris[i].sisa) && isian.some((r) => r.jumlah > 0);
@@ -82,8 +128,10 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     const ppn = Math.round(dpp * ppnPersen) / 100;
     const total = dpp + ppn;
     const uangMuka = Math.max(0, Math.min(uangMukaInput, uangMukaTersedia, total));
-    return { subtotal, diskon, dpp, hargaPokok, ppn, total, uangMuka, piutang: total - uangMuka, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length };
-  }, [isian, ppnPersen, p.daftarBaris, uangMukaInput, uangMukaTersedia, diskonInput, adalahPenjualan]);
+    return { subtotal, diskon, fee: 0, dpp, hargaPokok, ppn, total, uangMuka, piutang: total - uangMuka, jumlahValid, banyakBaris: isian.filter((r) => r.jumlah > 0).length, galat: null as string | null };
+  }, [isian, ppnPersen, p.daftarBaris, uangMukaInput, uangMukaTersedia, diskonInput, adalahPenjualan, pj, diskonIsian]);
+  const labelFee = pj ? (pj.fee.jenis === "PERSEN" ? `Management fee ${pj.fee.nilai.toLocaleString("id-ID")}%` : "Management fee") : "";
+  const akunFee = pj ? (pj.akunFee ?? p.pemetaan?.pendapatanAtauPersediaan ?? "Pendapatan Penjualan") : "";
 
   const ubahJumlah = (i: number, jumlah: number) => setIsian((sebelumnya) => sebelumnya.map((r, k) => (k === i ? { ...r, jumlah } : r)));
 
@@ -98,6 +146,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
         { akun: p.pemetaan?.diskon ?? "Diskon Penjualan", catatan: "Potongan harga di faktur (kontra-pendapatan; pendapatan tetap bruto)", debit: hitung.diskon, kredit: 0 },
         { akun: p.pemetaan?.hpp ?? "HPP", catatan: "Harga pokok barang yang sudah dikirim (dari surat jalan; perkiraan)", debit: hitung.hargaPokok, kredit: 0 },
         { akun: p.pemetaan?.pendapatanAtauPersediaan ?? "Pendapatan Penjualan", catatan: "Pendapatan diakui (akun per barang bila diatur)", debit: 0, kredit: hitung.subtotal },
+        ...(pj ? [{ akun: akunFee, catatan: "Pendapatan fee manajemen (masuk DPP)", debit: 0, kredit: hitung.fee }] : []),
         { akun: p.pemetaan?.ppn ?? "PPN Keluaran", catatan: `PPN dipungut ${ppnPersen}%`, debit: 0, kredit: hitung.ppn },
         { akun: p.pemetaan?.barangTerkirim ?? "Barang Terkirim Belum Ditagih", catatan: "Menutup nilai barang yang sudah keluar di SJ (persediaan sudah dikredit saat kirim)", debit: 0, kredit: hitung.hargaPokok },
       ].filter((r) => r.debit > 0 || r.kredit > 0 || hitung.subtotal === 0)
@@ -108,6 +157,8 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
       ].filter((r) => r.debit > 0 || r.kredit > 0 || hitung.subtotal === 0);
   const totalDebit = barisJurnalPratinjau.reduce((s, r) => s + r.debit, 0);
   const totalKredit = barisJurnalPratinjau.reduce((s, r) => s + r.kredit, 0);
+  // penjualan baru: dibandingkan per sen supaya sisa pembulatan float tidak memberi tanda "Tidak seimbang"
+  const seimbang = pj ? Math.round(totalDebit * 100) === Math.round(totalKredit * 100) : totalDebit === totalKredit;
 
   const pengaman = [
     { ok: hitung.jumlahValid, teks: "Semua kuantitas valid (≤ sisa pesanan, minimal 1 baris > 0)" },
@@ -117,7 +168,15 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
     ...(adalahPenjualan
       ? [
           { ok: true, teks: uangMukaTersedia > 0 ? `Uang muka Rp ${format(uangMukaTersedia)}, dipakai Rp ${format(hitung.uangMuka)}, sisa piutang Rp ${format(hitung.piutang)}` : "Tidak ada uang muka" },
-          { ok: diskonInput <= hitung.subtotal, teks: hitung.diskon > 0 ? `Diskon Rp ${format(hitung.diskon)}: DPP PPN setelah diskon, omzet PPh Final tetap bruto` : "Tanpa diskon" },
+          pj
+            ? { ok: !hitung.galat, teks: hitung.galat ?? (hitung.diskon > 0 ? `Diskon Rp ${format(hitung.diskon)}: DPP PPN setelah diskon, omzet PPh Final tetap bruto` : "Tanpa diskon") }
+            : { ok: diskonInput <= hitung.subtotal, teks: hitung.diskon > 0 ? `Diskon Rp ${format(hitung.diskon)}: DPP PPN setelah diskon, omzet PPh Final tetap bruto` : "Tanpa diskon" },
+          ...(pj
+            ? [
+                { ok: true, teks: hitung.fee > 0 ? `${labelFee} Rp ${format(hitung.fee)}: masuk DPP, dicatat ke ${akunFee}` : "Tanpa management fee" },
+                ...(event ? [{ ok: true, teks: "Mode event: frekuensi mengikuti pesanan; stok dan HPP tetap per kuantitas fisik" }] : []),
+              ]
+            : []),
           {
             ok: !p.event || p.event.selesai,
             teks: !p.event
@@ -129,7 +188,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
         ]
       : []),
   ];
-  const bisaKirim = hitung.jumlahValid && !!p.pemetaan && !sedangProses;
+  const bisaKirim = hitung.jumlahValid && !!p.pemetaan && !sedangProses && !hitung.galat;
 
   return (
     <form
@@ -142,10 +201,13 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
       }}
     >
       <input type="hidden" name="pesananId" value={p.pesanan.id} />
-      <input type="hidden" name="baris" value={JSON.stringify(isian)} />
+      {/* penjualan baru: baris per id baris pesanan (jalur ID); tanpa prop penjualan JSON lama */}
+      <input type="hidden" name="baris" value={JSON.stringify(pj ? isian.map((r, i) => ({ barisPesananId: p.daftarBaris[i].id, barangId: r.barangId, jumlah: r.jumlah })) : isian)} />
       <input type="hidden" name="ppnPersen" value={ppnPersen} />
       {adalahPenjualan && <input type="hidden" name="uangMuka" value={hitung.uangMuka} />}
-      {adalahPenjualan && <input type="hidden" name="diskon" value={hitung.diskon} />}
+      {adalahPenjualan && !pj && <input type="hidden" name="diskon" value={hitung.diskon} />}
+      {pj && diskonIsian && <input type="hidden" name="jenisDiskon" value={diskonIsian.jenis} />}
+      {pj && diskonIsian && <input type="hidden" name="nilaiDiskon" value={diskonIsian.nilai} />}
       <input type="hidden" name="mataUangId" value={mataUangId} />
       {mataUangDipilih && <input type="hidden" name="kurs" value={kursInput} />}
 
@@ -212,8 +274,12 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                   <input readOnly type="date" value={p.tanggal} className="isian isian-kecil" />
                 </div>
                 <div className="bidang">
-                  <label className="label"><span>Jatuh Tempo</span><span className="petunjuk">{p.terminHari} hari</span></label>
-                  <input readOnly type="date" value={p.jatuhTempo} className="isian isian-kecil" />
+                  <label className="label" htmlFor={pj ? "jatuhTempo" : undefined}><span>Jatuh Tempo</span><span className="petunjuk">{p.terminHari} hari</span></label>
+                  {pj ? (
+                    <input id="jatuhTempo" type="date" name="jatuhTempo" defaultValue={p.jatuhTempo} min={p.tanggal} className="isian isian-kecil" />
+                  ) : (
+                    <input readOnly type="date" value={p.jatuhTempo} className="isian isian-kecil" />
+                  )}
                 </div>
                 <div className="bidang sm:col-span-2">
                   <label className="label">
@@ -256,6 +322,7 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                       <th className="text-right">Sisa / Pesanan</th>
                       <th className="text-right w-24">Kuantitas Faktur</th>
                       <th className="text-center w-14">Satuan</th>
+                      {event && <th className="text-right w-20">Frek</th>}
                       <th className="text-right w-24">Harga</th>
                       <th className="text-right w-28">Total (Rp)</th>
                     </tr>
@@ -264,8 +331,16 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                     {p.daftarBaris.map((b, i) => {
                       const r = isian[i];
                       const salah = r.jumlah < 0 || r.jumlah > b.sisa;
+                      // mode event: judul seksi disisipkan saat seksi berganti (D2 §7.4)
+                      const judulSeksi = event && b.bagian && b.bagian !== p.daftarBaris[i - 1]?.bagian ? b.bagian : null;
                       return (
-                        <tr key={b.id}>
+                        <Fragment key={b.id}>
+                        {judulSeksi && (
+                          <tr>
+                            <td colSpan={8} className="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-600">{judulSeksi}</td>
+                          </tr>
+                        )}
+                        <tr>
                           <td className="text-center mono text-slate-400">{i + 1}</td>
                           <td>
                             <div className="text-[13px] font-semibold text-slate-900">{b.nama}</div>
@@ -287,15 +362,22 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                             />
                           </td>
                           <td className="text-center mono text-slate-500">{b.satuan}</td>
+                          {event && (
+                            <td className="text-right angka whitespace-nowrap">
+                              {format(b.frekuensi ?? 1)}
+                              {b.satuanFrekuensi && <span className="text-slate-400"> {b.satuanFrekuensi}</span>}
+                            </td>
+                          )}
                           <td className="text-right angka">{format(b.harga)}</td>
-                          <td className="text-right angka font-semibold text-slate-900">{format(r.jumlah * r.harga)}</td>
+                          <td className="text-right angka font-semibold text-slate-900">{format(pj ? nilaiBarisKlien({ jumlah: r.jumlah, harga: r.harga, frekuensi: b.frekuensi }) : r.jumlah * r.harga)}</td>
                         </tr>
+                        </Fragment>
                       );
                     })}
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={6} className="text-right text-xs uppercase tracking-wider text-slate-500">Subtotal</td>
+                      <td colSpan={event ? 7 : 6} className="text-right text-xs uppercase tracking-wider text-slate-500">Subtotal</td>
                       <td className="text-right angka">{format(hitung.subtotal)}</td>
                     </tr>
                   </tfoot>
@@ -336,6 +418,14 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                 </div>
               </div>
             </section>
+
+            {pj && (
+              <details className="kartu">
+                <summary className="cursor-pointer text-[13px] font-semibold text-slate-900">Tampilan cetak (opsional)</summary>
+                <p className="petunjuk mt-2 mb-3">Terisi dari pesanan. Ubah bila faktur perlu teks atau kop lain.</p>
+                <IsianTeksDokumen jenis="faktur" nilai={pj.teks.nilai} daftarKop={pj.teks.daftarKop} nomorOtomatis={pj.nomorOtomatis} awalan="faktur" />
+              </details>
+            )}
           </div>
 
           {/* Kanan */}
@@ -352,7 +442,29 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                 <div className="flex justify-between text-slate-500"><span>Subtotal ({hitung.banyakBaris} baris)</span><span className="angka text-slate-900">Rp {format(hitung.subtotal)}</span></div>
                 <div className="flex justify-between items-center text-slate-500">
                   <label htmlFor="diskonFaktur">Diskon</label>
-                  {adalahPenjualan ? (
+                  {pj ? (
+                    <span className="flex items-center gap-1">
+                      <select
+                        value={diskonIsian?.jenis ?? pj.diskon.jenis}
+                        onChange={(e) => setDiskonIsian({ jenis: e.target.value as JenisNilaiKlien, nilai: diskonIsian?.nilai ?? "0" })}
+                        className="isian isian-kecil w-auto"
+                        aria-label="Jenis diskon"
+                      >
+                        <option value="NOMINAL">Rp</option>
+                        <option value="PERSEN">%</option>
+                      </select>
+                      <input
+                        id="diskonFaktur"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={diskonIsian ? diskonIsian.nilai : pj.diskon.jenis === "PERSEN" ? pj.diskon.nilai : hitung.diskon}
+                        onChange={(e) => setDiskonIsian({ jenis: diskonIsian?.jenis ?? pj.diskon.jenis, nilai: e.target.value })}
+                        className="isian isian-kecil w-28 text-right"
+                        aria-label="Diskon faktur"
+                      />
+                    </span>
+                  ) : adalahPenjualan ? (
                     <input
                       id="diskonFaktur"
                       type="number"
@@ -368,6 +480,19 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                     <span className="angka text-slate-400">-</span>
                   )}
                 </div>
+                {pj && (
+                  <div className="flex justify-between text-slate-500">
+                    <span>{diskonIsian ? (
+                      <button type="button" onClick={() => setDiskonIsian(null)} className="tombol-tautan text-xs">Pakai diskon pesanan</button>
+                    ) : (
+                      <span className="text-xs">{hitung.diskon > 0 ? "Diskon mengikuti pesanan" : ""}</span>
+                    )}</span>
+                    <span className="angka text-slate-900">{hitung.diskon > 0 ? `- Rp ${format(hitung.diskon)}` : ""}</span>
+                  </div>
+                )}
+                {pj && (
+                  <div className="flex justify-between text-slate-500"><span>{labelFee}</span><span className="angka text-slate-900">{hitung.fee > 0 ? `Rp ${format(hitung.fee)}` : "-"}</span></div>
+                )}
                 <div className="flex justify-between text-slate-500 pt-1 border-t border-dashed border-slate-200"><span className="font-semibold text-slate-900">Dasar Pengenaan Pajak</span><span className="angka font-semibold text-slate-900">Rp {format(hitung.dpp)}</span></div>
                 <div className="flex justify-between items-center text-slate-500">
                   <span>PPN</span>
@@ -467,8 +592,8 @@ export default function PenyusunFaktur(p: PropsPenyusun) {
                   </div>
                   <span className="petunjuk">Dicatat bersama faktur dalam 1 transaksi</span>
                 </div>
-                <span className={`lencana ${totalDebit === totalKredit ? "lencana-emerald" : "lencana-rose"}`}>
-                  <Ikon nama="done_all" className="!text-[14px]" /> {totalDebit === totalKredit ? "Seimbang" : "Tidak seimbang"}
+                <span className={`lencana ${seimbang ? "lencana-emerald" : "lencana-rose"}`}>
+                  <Ikon nama="done_all" className="!text-[14px]" /> {seimbang ? "Seimbang" : "Tidak seimbang"}
                 </span>
               </div>
               <div className="rounded border border-slate-200 overflow-hidden">

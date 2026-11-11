@@ -4,6 +4,8 @@ import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatPenerimaanFormulir } from "@/lib/aksi/penjualan";
+import IsianKwitansi from "@/komponen/penjualan/IsianKwitansi";
+import { PERUSAHAAN_UTAMA } from "@/lib/perusahaan";
 
 export default async function HalamanPenerimaanPenjualanBaru({
   searchParams,
@@ -13,15 +15,19 @@ export default async function HalamanPenerimaanPenjualanBaru({
   await wajibHak("penerimaan.buat");
   const { fakturId } = await searchParams;
 
-  const [faktur, daftarAkun, pengaturan] = await Promise.all([
-    fakturId
-      ? db.fakturPenjualan.findUnique({
-          where: { id: fakturId },
-          include: { pelanggan: true, penerimaan: true, retur: { select: { total: true } } },
-        })
-      : null,
-    daftarAkunKasBank(),
-    ambilPengaturanPerusahaan(db),
+  const faktur = fakturId
+    ? await db.fakturPenjualan.findUnique({
+        where: { id: fakturId },
+        include: { pelanggan: true, penerimaan: true, retur: { select: { total: true } } },
+      })
+    : null;
+  // dokumen anak (D1 §8.4): kas milik perusahaan faktur atau bersama, akun PPh 23 dan kop dari perusahaan faktur
+  const perusahaanId = faktur?.perusahaanId ?? PERUSAHAAN_UTAMA;
+  const [daftarAkun, pengaturan, daftarKop, formatNomor] = await Promise.all([
+    daftarAkunKasBank(db, faktur?.perusahaanId),
+    ambilPengaturanPerusahaan(db, perusahaanId),
+    db.kopSurat.findMany({ where: { perusahaanId, dihapusPada: null }, orderBy: [{ bawaan: "desc" }, { nama: "asc" }], select: { id: true, nama: true, bawaan: true } }),
+    db.formatNomor.findUnique({ where: { perusahaanId_jenis: { perusahaanId, jenis: "kwitansi" } }, select: { aktif: true } }),
   ]);
 
   if (!fakturId || !faktur) {
@@ -101,6 +107,13 @@ export default async function HalamanPenerimaanPenjualanBaru({
             <option value="KARTU">Kartu</option>
           </select>
         </div>
+
+        <details className="ubin">
+          <summary className="cursor-pointer font-semibold text-sm">Detail kuitansi</summary>
+          <div className="mt-3">
+            <IsianKwitansi daftarKop={daftarKop} nomorOtomatis={!!formatNomor?.aktif} namaPelanggan={faktur.pelanggan.nama} denganCatatan />
+          </div>
+        </details>
 
         <button type="submit" className="tombol tombol-utama">
           Catat Penerimaan

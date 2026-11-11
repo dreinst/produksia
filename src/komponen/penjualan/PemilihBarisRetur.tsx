@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 
-type BarisFakturOpsi = { barangId: string; labelBarang: string; jumlah: number };
+/**
+ * `id` (opsional, retur penjualan): id baris faktur. Bila ada, JSON memakai `barisFakturId` dan `sisa` menjadi batas
+ * isian; tanpa `id` (retur pembelian) perilaku lama per barangId.
+ */
+type BarisFakturOpsi = { id?: string; barangId: string; labelBarang: string; jumlah: number; sisa?: number };
 
 export default function PemilihBarisRetur({ daftarBaris }: { daftarBaris: BarisFakturOpsi[] }) {
-  const [isian, setIsian] = useState(daftarBaris.map((l) => ({ barangId: l.barangId, jumlah: 0 })));
+  const [isian, setIsian] = useState(daftarBaris.map((l) => (l.id ? { barisFakturId: l.id, jumlah: 0 } : { barangId: l.barangId, jumlah: 0 })));
+  const adaSisa = daftarBaris.some((l) => l.sisa !== undefined);
 
   function ubahJumlah(index: number, jumlah: number) {
     setIsian((sebelumnya) => sebelumnya.map((r, i) => (i === index ? { ...r, jumlah } : r)));
@@ -20,19 +25,21 @@ export default function PemilihBarisRetur({ daftarBaris }: { daftarBaris: BarisF
           <tr>
             <th>Barang</th>
             <th className="w-24">Kuantitas Dibeli</th>
+            {adaSisa && <th className="w-24">Sisa Bisa Diretur</th>}
             <th className="w-28">Kuantitas Retur</th>
           </tr>
         </thead>
         <tbody>
           {daftarBaris.map((l, i) => (
-            <tr key={l.barangId}>
+            <tr key={l.id ?? l.barangId}>
               <td>{l.labelBarang}</td>
               <td>{l.jumlah}</td>
+              {adaSisa && <td>{l.sisa ?? "-"}</td>}
               <td>
                 <input
                   type="number"
                   min={0}
-                  max={l.jumlah}
+                  max={l.sisa ?? l.jumlah}
                   step="0.01"
                   className="isian isian-kecil"
                   value={isian[i].jumlah}

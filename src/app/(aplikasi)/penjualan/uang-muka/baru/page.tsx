@@ -7,14 +7,24 @@ import { D } from "@/lib/uang";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatUangMukaFormulir } from "@/lib/aksi/penjualan";
 import { NomorDokumen } from "@/komponen/ui/Lencana";
+import IsianKwitansi from "@/komponen/penjualan/IsianKwitansi";
+import { PERUSAHAAN_UTAMA } from "@/lib/perusahaan";
+import { nilaiBrutoKontrak, progresTermin } from "@/lib/rencanaTermin";
 
-export default async function HalamanUangMukaBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string }> }) {
+export default async function HalamanUangMukaBaru({ searchParams }: { searchParams: Promise<{ pesananId?: string; rencanaTerminId?: string }> }) {
   await wajibHak("uang-muka.buat");
-  const { pesananId } = await searchParams;
-  const [pesanan, daftarAkun, pengaturan] = await Promise.all([
-    pesananId ? db.pesananPenjualan.findUnique({ where: { id: pesananId }, include: { pelanggan: true, baris: true, uangMuka: { orderBy: { tanggal: "asc" } } } }) : null,
-    daftarAkunKasBank(),
-    ambilPengaturanPerusahaan(db),
+  const { pesananId, rencanaTerminId } = await searchParams;
+  const pesanan = pesananId
+    ? await db.pesananPenjualan.findUnique({ where: { id: pesananId }, include: { pelanggan: true, baris: true, uangMuka: { orderBy: { tanggal: "asc" } }, rencanaTermin: { select: { id: true } } } })
+    : null;
+  // dokumen anak (D1 §8.4): kas milik perusahaan pesanan atau bersama, pajak dan kop dari perusahaan pesanan
+  const perusahaanId = pesanan?.perusahaanId ?? PERUSAHAAN_UTAMA;
+  const [daftarAkun, pengaturan, daftarKop, formatNomor, progres] = await Promise.all([
+    daftarAkunKasBank(db, pesanan?.perusahaanId),
+    ambilPengaturanPerusahaan(db, perusahaanId),
+    db.kopSurat.findMany({ where: { perusahaanId, dihapusPada: null }, orderBy: [{ bawaan: "desc" }, { nama: "asc" }], select: { id: true, nama: true, bawaan: true } }),
+    db.formatNomor.findUnique({ where: { perusahaanId_jenis: { perusahaanId, jenis: "kwitansi-dp" } }, select: { aktif: true } }),
+    pesanan?.rencanaTermin.length ? progresTermin(db, pesanan.id) : null,
   ]);
 
   if (!pesananId || !pesanan) {
@@ -31,10 +41,16 @@ export default async function HalamanUangMukaBaru({ searchParams }: { searchPara
   }
 
   const rp = (n: number) => n.toLocaleString("id-ID");
-  const nilaiBruto = Number(pesanan.total) + (pengaturan.pkp ? Number(hitungPpn(D(pesanan.total), pengaturan.tarifPpnPersen)) : 0);
+  // batas sama dengan buatUangMuka: pesanan bertermin memakai PPN pesanan dan nilai kontrak termin, tanpa termin rumus lama
+  const nilaiBruto = progres
+    ? Number(nilaiBrutoKontrak(pesanan.total, pesanan.ppnPersen))
+    : Number(pesanan.total) + (pengaturan.pkp ? Number(hitungPpn(D(pesanan.total), pengaturan.tarifPpnPersen)) : 0);
   const sudahDp = pesanan.uangMuka.reduce((s, u) => s + Number(u.jumlah), 0);
   const dipakai = pesanan.uangMuka.reduce((s, u) => s + Number(u.jumlahDipakai), 0);
-  const maks = Math.max(nilaiBruto - sudahDp, 0);
+  const batas = Math.max(Math.round((nilaiBruto - sudahDp) * 100) / 100, 0);
+  // butir termin terpilih (?rencanaTerminId): jumlah bawaan = sisa butir, dibatasi batas pesanan
+  const butirTerpilih = progres?.butir.find((b) => b.id === rencanaTerminId) ?? null;
+  const maks = butirTerpilih ? Math.min(Number(butirTerpilih.sisa), batas) : batas;
   const difakturSemua = pesanan.baris.every((b) => Number(b.jumlahDifaktur) >= Number(b.jumlah));
 
   return (
@@ -43,7 +59,11 @@ export default async function HalamanUangMukaBaru({ searchParams }: { searchPara
         <h1 className="judul-halaman">Uang Muka untuk Pesanan {pesanan.nomor}</h1>
         <p className="redup">
           Pelanggan: {pesanan.pelanggan.nama} &middot; Nilai pesanan {rp(Number(pesanan.total))}
-          {pengaturan.pkp && <> (+ PPN {pengaturan.tarifPpnPersen.toString()}% = {rp(nilaiBruto)})</>}
+          {progres ? (
+            Number(pesanan.ppnPersen) > 0 && <> (+ PPN {Number(pesanan.ppnPersen).toLocaleString("id-ID")}% = {rp(nilaiBruto)})</>
+          ) : (
+            pengaturan.pkp && <> (+ PPN {pengaturan.tarifPpnPersen.toString()}% = {rp(nilaiBruto)})</>
+          )}
           {sudahDp > 0 && <> &middot; DP sudah diterima {rp(sudahDp)} (dipakai faktur {rp(dipakai)})</>}
         </p>
       </div>
@@ -67,6 +87,20 @@ export default async function HalamanUangMukaBaru({ searchParams }: { searchPara
       ) : (
         <FormulirAksi aksi={buatUangMukaFormulir} className="kartu flex flex-col gap-4">
           <input type="hidden" name="pesananId" value={pesanan.id} />
+          {progres && (
+            <div className="bidang">
+              <label className="label" htmlFor="rencanaTerminId">Untuk termin</label>
+              <select id="rencanaTerminId" name="rencanaTerminId" defaultValue={butirTerpilih?.id ?? ""} className="isian">
+                <option value="">Tanpa termin</option>
+                {progres.butir.map((b) => (
+                  <option key={b.id} value={b.id} disabled={b.sisa.lte(0)}>
+                    {b.label} · sisa Rp {rp(Number(b.sisa))}
+                  </option>
+                ))}
+              </select>
+              <span className="petunjuk">Pembayaran termin dibatasi nilai termin itu termasuk PPN.</span>
+            </div>
+          )}
           <div className="bidang">
             <label className="label" htmlFor="akunId">Akun Kas/Bank Penerima *</label>
             <select id="akunId" name="akunId" required className="isian">
@@ -95,6 +129,12 @@ export default async function HalamanUangMukaBaru({ searchParams }: { searchPara
             <label className="label" htmlFor="keterangan">Keterangan</label>
             <input id="keterangan" name="keterangan" placeholder="mis. DP 30% sesuai kontrak" className="isian" />
           </div>
+          <details className="ubin">
+            <summary className="cursor-pointer font-semibold text-sm">Detail kuitansi</summary>
+            <div className="mt-3">
+              <IsianKwitansi daftarKop={daftarKop} nomorOtomatis={!!formatNomor?.aktif} namaPelanggan={pesanan.pelanggan.nama} />
+            </div>
+          </details>
           <button type="submit" className="tombol tombol-utama">
             Catat Uang Muka
           </button>

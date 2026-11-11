@@ -3,6 +3,9 @@ import { db } from "@/lib/db";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { buatReturFormulir } from "@/lib/aksi/penjualan";
 import PemilihBarisRetur from "@/komponen/penjualan/PemilihBarisRetur";
+import { saringMilikAtauBersama } from "@/lib/perusahaan";
+import { sisaReturPerBaris } from "@/lib/dokumenPenjualan";
+import { D } from "@/lib/uang";
 
 export default async function HalamanReturPenjualanBaru({
   searchParams,
@@ -12,15 +15,18 @@ export default async function HalamanReturPenjualanBaru({
   await wajibHak("retur-penjualan.buat");
   const { fakturId } = await searchParams;
 
-  const [faktur, daftarGudang] = await Promise.all([
-    fakturId
-      ? db.fakturPenjualan.findUnique({
-          where: { id: fakturId },
-          include: { pelanggan: true, baris: { include: { barang: true } } },
-        })
-      : null,
-    db.gudang.findMany({ orderBy: { nama: "asc" } }),
-  ]);
+  const faktur = fakturId
+    ? await db.fakturPenjualan.findUnique({
+        where: { id: fakturId },
+        include: {
+          pelanggan: true,
+          baris: { include: { barang: true }, orderBy: [{ urutan: "asc" }, { id: "asc" }] },
+          retur: { select: { baris: { select: { barisFakturId: true, barangId: true, jumlah: true } } } },
+        },
+      })
+    : null;
+  // dokumen anak (D1 §8.4): gudang milik perusahaan faktur atau bersama
+  const daftarGudang = await db.gudang.findMany({ where: saringMilikAtauBersama(faktur?.perusahaanId), orderBy: { nama: "asc" } });
 
   if (!fakturId || !faktur) {
     return (
@@ -37,11 +43,19 @@ export default async function HalamanReturPenjualanBaru({
     );
   }
 
-  const barisUntukPemilih = faktur.baris.map((l) => ({
-    barangId: l.barangId,
-    labelBarang: `${l.barang.kode} - ${l.barang.nama}`,
-    jumlah: Number(l.jumlah),
-  }));
+  // per baris faktur (D2 §7.6): retur menunjuk barisFakturId, sisa sudah dikurangi retur sebelumnya
+  const sisa = sisaReturPerBaris(faktur.baris, faktur.retur.flatMap((r) => r.baris));
+  const barisUntukPemilih = faktur.baris.map((l) => {
+    const frekuensi = D(l.frekuensi);
+    const frek = frekuensi.equals(1) ? "" : ` · ${Number(l.jumlah).toLocaleString("id-ID")} × ${frekuensi.toNumber().toLocaleString("id-ID")}${l.satuanFrekuensi ? ` ${l.satuanFrekuensi}` : ""}`;
+    return {
+      id: l.id,
+      barangId: l.barangId,
+      labelBarang: `${l.barang.kode} - ${l.nama ?? l.barang.nama}${l.bagian ? ` · ${l.bagian}` : ""}${frek}`,
+      jumlah: Number(l.jumlah),
+      sisa: Math.max(Number(sisa.get(l.id) ?? 0), 0),
+    };
+  });
 
   return (
     <div className="space-y-6 max-w-3xl">

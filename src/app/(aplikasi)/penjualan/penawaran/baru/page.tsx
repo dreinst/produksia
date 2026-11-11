@@ -1,69 +1,59 @@
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak, PERAN_TERTINGGI } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
-import { daftarProyekAktif } from "@/lib/proyek";
-import { KODE_BARANG_LAIN } from "@/lib/barangLainLain";
-import FormulirAksi from "@/komponen/FormulirAksi";
-import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
+import { PERUSAHAAN_UTAMA, daftarPerusahaan, lingkupPerusahaan, perusahaanFormulir } from "@/lib/perusahaan";
 import { buatPenawaranFormulir } from "@/lib/aksi/penjualan";
-import EditorBarisBarang from "@/komponen/penjualan/EditorBarisBarang";
+import FormulirDokumenPenjualan, { PilihPerusahaanPenerbit, muatOpsiDokumenPenjualan } from "@/komponen/penjualan/FormulirDokumenPenjualan";
 
-export default async function HalamanPenawaranBaru() {
+export default async function HalamanPenawaranBaru({ searchParams }: { searchParams: Promise<{ perusahaan?: string; leadId?: string }> }) {
   const pengguna = await wajibHak("penawaran.buat");
-  const [daftarPelanggan, daftarBarang, daftarProyek] = await Promise.all([
-    db.pelanggan.findMany({ orderBy: { nama: "asc" } }),
-    // Barang JASA-LAIN hanya untuk baris bebas (butuh harga.nego), jadi tidak ditawarkan sebagai barang katalog
-    db.barang.findMany({ where: { kode: { not: KODE_BARANG_LAIN } }, orderBy: { nama: "asc" } }),
-    daftarProyekAktif(),
-  ]);
+  const { perusahaan: pilihan, leadId } = await searchParams;
+  const [lingkup, perusahaanAktif] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan()]);
+  // lingkup satu perusahaan aktif = perusahaan itu; gabungan dan lingkup arsip memilih perusahaan penerbit (D2 §7.1)
+  const p = perusahaanFormulir(lingkup);
 
-  const opsiBarang = daftarBarang.map((i) => ({
-    id: i.id,
-    kode: i.kode,
-    nama: i.nama,
-    hargaBawaan: Number(i.hargaJual),
-    hargaMinimum: Number(i.hargaMinimum),
-  }));
+  // prapengisian dari lead CRM (D4 §8 no. 16): lead aktif yang sudah berpelanggan, milik perusahaan lingkup bila satu
+  // perusahaan; di gabungan perusahaan penerbit = perusahaan lead
+  const lead =
+    leadId && punyaHak(pengguna, "lead.lihat")
+      ? await db.lead.findFirst({
+          where: { id: leadId, dihapusPada: null, pelangganId: { not: null }, perusahaan: { aktif: true }, ...(p ? { perusahaanId: p } : {}) },
+          select: { id: true, nama: true, namaUsaha: true, pelangganId: true, perusahaanId: true },
+        })
+      : null;
+  const leadTidakSah = !!leadId && punyaHak(pengguna, "lead.lihat") && !lead;
+  const terpilih = perusahaanAktif.find((x) => x.id === (lead?.perusahaanId ?? p ?? pilihan)) ?? null;
 
+  const peringatanLead = leadTidakSah && (
+    <div className="max-w-xl rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">Lead tidak ditemukan, sudah diarsipkan, atau belum menjadi pelanggan</div>
+  );
+
+  if (!terpilih) {
+    return (
+      <div className="space-y-6">
+        <h1 className="judul-halaman">Penawaran Penjualan Baru</h1>
+        {peringatanLead}
+        <PilihPerusahaanPenerbit daftar={perusahaanAktif} href={(id) => `/penjualan/penawaran/baru?perusahaan=${encodeURIComponent(id)}`} />
+      </div>
+    );
+  }
+
+  const opsi = await muatOpsiDokumenPenjualan(terpilih.id, "penawaran");
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-6xl">
       <h1 className="judul-halaman">Penawaran Penjualan Baru</h1>
-
-      <FormulirAksi aksi={buatPenawaranFormulir} verifikasi={{ judul: "Periksa penawaran", peringatan: [PERINGATAN_TANPA_EVENT] }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bidang">
-          <label className="label" htmlFor="pelangganId">Pelanggan *</label>
-          <select id="pelangganId" name="pelangganId" required className="isian">
-            <option value="">-</option>
-            {daftarPelanggan.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.kode} - {c.nama}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="bidang">
-          <label className="label" htmlFor="proyekId">Proyek / Event</label>
-          <select id="proyekId" name="proyekId" className="isian" defaultValue="">
-            <option value="">Tanpa event</option>
-            {daftarProyek.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.kode} - {p.nama}
-              </option>
-            ))}
-          </select>
-          <span className="petunjuk">Dipakai untuk Laba Rugi per event dan LPJ. Ikut ke semua dokumen turunannya.</span>
-        </div>
-
-        <div />
-
-        <EditorBarisBarang daftarBarang={opsiBarang} bolehNego={punyaHak(pengguna, "harga.nego")} bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)} />
-
-        <div className="md:col-span-2">
-          <button type="submit" className="tombol tombol-utama">
-            Simpan Penawaran
-          </button>
-        </div>
-      </FormulirAksi>
+      {peringatanLead}
+      <FormulirDokumenPenjualan
+        jenis="penawaran"
+        aksi={buatPenawaranFormulir}
+        perusahaan={terpilih}
+        // pola formulir akar halaman lama (KONTRAK-TAMBAHAN): utama hanya isian tersembunyi
+        tampilPerusahaan={p === PERUSAHAAN_UTAMA ? "tersembunyi" : p ? "bacaSaja" : { gantiHref: lead ? null : "/penjualan/penawaran/baru" }}
+        opsi={opsi}
+        bolehNego={punyaHak(pengguna, "harga.nego")}
+        bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)}
+        lead={lead ? { id: lead.id, nama: lead.nama, namaUsaha: lead.namaUsaha, pelangganId: lead.pelangganId! } : null}
+      />
     </div>
   );
 }

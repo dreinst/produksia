@@ -7,6 +7,10 @@ import { buatFakturFormulir } from "@/lib/aksi/penjualan";
 import PenyusunFaktur from "@/komponen/PenyusunFaktur";
 import { opsiMataUangDokumen } from "@/lib/mataUang";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import { tanggalIso } from "@/lib/waktu";
+import { KOLOM_TEKS_FAKTUR, subtotalBaris } from "@/lib/dokumenPenjualan";
+import { KUNCI_AKUN_FEE } from "@/lib/akuntansi";
+import { akunPemetaanTambahan } from "@/lib/baganAkun";
 
 /** Pendapatan diakui setelah acara (PSAK 72): event tanpa tanggal selesai dianggap boleh difaktur. */
 function eventSudahSelesai(tanggalSelesai: Date | null) {
@@ -20,7 +24,14 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
   const pesanan = pesananId
     ? await db.pesananPenjualan.findUnique({
         where: { id: pesananId },
-        include: { pelanggan: true, baris: { include: { barang: true } }, pengiriman: { orderBy: { tanggal: "asc" } }, uangMuka: true, proyek: { select: { kode: true, nama: true, tanggalSelesai: true } } },
+        include: {
+          pelanggan: true,
+          baris: { include: { barang: true }, orderBy: [{ urutan: "asc" }, { id: "asc" }] },
+          pengiriman: { orderBy: { tanggal: "asc" } },
+          uangMuka: true,
+          proyek: { select: { kode: true, nama: true, tanggalSelesai: true } },
+          faktur: { select: { fee: true, diskon: true } },
+        },
       })
     : null;
 
@@ -47,12 +58,25 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
     nomorDokumenBerikutnya(db.fakturPenjualan, "FJ"),
   ]);
 
-  const pengaturan = await ambilPengaturanPerusahaan(db);
+  // dokumen anak (D1 §8.4): pajak, termin, kop, dan nomor cetak dari perusahaan pesanan
+  const perusahaanId = pesanan.perusahaanId;
+  const [pengaturan, daftarKop, pengaturanDokumen, formatNomor, akunFee] = await Promise.all([
+    ambilPengaturanPerusahaan(db, perusahaanId),
+    db.kopSurat.findMany({ where: { perusahaanId, dihapusPada: null }, orderBy: [{ bawaan: "desc" }, { nama: "asc" }], select: { id: true, nama: true, bawaan: true } }),
+    db.pengaturanDokumenPenjualan.findUnique({ where: { perusahaanId }, select: { syaratPembayaran: true } }),
+    db.formatNomor.findUnique({ where: { perusahaanId_jenis: { perusahaanId, jenis: "faktur" } }, select: { aktif: true } }),
+    akunPemetaanTambahan(db, KUNCI_AKUN_FEE),
+  ]);
   const akunPpn = pengaturan.akunPpnKeluaranId ? await db.akun.findUnique({ where: { id: pengaturan.akunPpnKeluaranId } }) : null;
   const opsiMataUang = await opsiMataUangDokumen(db);
   const hariIni = new Date();
   const tempo = tanggalJatuhTempo(pengaturan.terminHari, hariIni);
-  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  // tanggal kalender lokal (B-11): toISOString memberi tanggal UTC yang salah antara 00.00 dan 07.00 WIB
+  const iso = (d: Date) => tanggalIso(d);
+  // teks surat warisan pesanan; syarat pembayaran kosong memakai bawaan perusahaan (sama dengan bacaTeksDokumen server)
+  const teksWarisan: Record<string, string | null> = { kopSuratId: pesanan.kopSuratId };
+  for (const k of KOLOM_TEKS_FAKTUR) teksWarisan[k] = k === "judulCetak" ? null : pesanan[k];
+  teksWarisan.syaratPembayaran = pesanan.syaratPembayaran?.trim() ? pesanan.syaratPembayaran : (pengaturanDokumen?.syaratPembayaran ?? null);
   const label = (a: { kode: string; nama: string }) => `${a.kode} • ${a.nama}`;
 
   return (
@@ -80,13 +104,26 @@ export default async function HalamanFakturPenjualanBaru({ searchParams }: { sea
         id: l.id,
         barangId: l.barangId,
         kode: l.barang.kode,
-        nama: l.barang.nama,
-        satuan: l.barang.satuan,
+        nama: l.nama ?? l.barang.nama,
+        satuan: l.satuan ?? l.barang.satuan,
         jumlahDipesan: Number(l.jumlah),
         sisa: Math.max(Number(l.jumlah) - Number(l.jumlahDifaktur), 0),
         harga: Number(l.harga),
         hargaBeli: Number(l.barang.hargaBeli),
+        frekuensi: Number(l.frekuensi),
+        satuanFrekuensi: l.satuanFrekuensi,
+        bagian: l.bagian,
+        deskripsi: l.deskripsi,
       }))}
+      penjualan={{
+        mode: pesanan.mode,
+        diskon: { jenis: pesanan.jenisDiskon, nilai: Number(pesanan.nilaiDiskon), diskonPesanan: Number(pesanan.diskon), diskonLain: pesanan.faktur.reduce((t, f) => t + Number(f.diskon), 0) },
+        fee: { jenis: pesanan.jenisFee, nilai: Number(pesanan.nilaiFee), feePesanan: Number(pesanan.fee), feeLain: pesanan.faktur.reduce((t, f) => t + Number(f.fee), 0) },
+        subtotalPesanan: Number(subtotalBaris(pesanan.baris)),
+        akunFee: akunFee ? label(akunFee) : null,
+        teks: { nilai: teksWarisan, daftarKop },
+        nomorOtomatis: !!formatNomor?.aktif,
+      }}
       dokumenSebelumnya={pesanan.pengiriman.map((d) => ({ nomor: d.nomor, tanggal: d.tanggal.toISOString() }))}
       pemetaan={
         pemetaan

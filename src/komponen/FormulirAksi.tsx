@@ -36,11 +36,20 @@ function ringkasBaris(form: HTMLFormElement, mentah: string): string {
   }
   if (!Array.isArray(daftar)) return "-";
   const teksOpsi = (id: unknown) => form.querySelector<HTMLOptionElement>(`option[value="${CSS.escape(String(id))}"]`)?.textContent?.trim() ?? String(id);
-  const terisi = daftar.filter((b) => b.barangId || b.akunId || b.karyawanId);
+  // baris bebas penjualan (barangId kosong, bernama) ikut diringkas; JSON lama tidak punya `nama` sehingga hasilnya sama
+  const terisi = daftar.filter((b) => b.barangId || b.akunId || b.karyawanId || b.nama);
   if (terisi.length === 0) return "-";
   if (terisi[0].barangId !== undefined) {
-    const total = terisi.reduce((s, b) => s + Number(b.jumlah ?? 0) * Number(b.harga ?? 0), 0);
-    const rinci = terisi.map((b) => `${rupiah(Number(b.jumlah ?? 0))} × ${teksOpsi(b.barangId)}${b.harga !== undefined ? ` @ ${rupiah(Number(b.harga))}` : ""}`);
+    // frekuensi (mode event penjualan) ikut dikalikan; tanpa frekuensi = ×1 seperti semula
+    // baris penjualan baru (berkunci frekuensi atau nama) dibulatkan per baris ke sen seperti server; baris lama tetap
+    const nilai = (b: Record<string, unknown>) => {
+      const v = Number(b.jumlah ?? 0) * Number(b.frekuensi || 1) * Number(b.harga ?? 0);
+      return b.frekuensi !== undefined || b.nama !== undefined ? Math.round(v * 100) / 100 : v;
+    };
+    const total = terisi.reduce((s, b) => s + nilai(b), 0);
+    const nama = (b: Record<string, unknown>) => (b.barangId ? teksOpsi(b.barangId) : String(b.nama));
+    const frek = (b: Record<string, unknown>) => (b.frekuensi ? ` × ${b.frekuensi}${b.satuanFrekuensi ? ` ${b.satuanFrekuensi}` : ""}` : "");
+    const rinci = terisi.map((b) => `${rupiah(Number(b.jumlah ?? 0))} × ${nama(b)}${frek(b)}${b.harga !== undefined ? ` @ ${rupiah(Number(b.harga))}` : ""}`);
     return `${rinci.join("\n")}${terisi.some((b) => b.harga !== undefined) ? `\nTotal Rp ${rupiah(total)}` : ""}`;
   }
   if (terisi[0].karyawanId !== undefined) {
@@ -54,6 +63,16 @@ function ringkasBaris(form: HTMLFormElement, mentah: string): string {
   return `${terisi.length} baris · Debit Rp ${rupiah(debit)} · Kredit Rp ${rupiah(kredit)}`;
 }
 
+/** Ringkasan hidden "rencanaTermin" (JSON editor termin penjualan): jumlah butir. */
+function ringkasTermin(mentah: string): string {
+  try {
+    const daftar = JSON.parse(mentah);
+    return Array.isArray(daftar) ? `Rencana termin: ${daftar.length} butir` : "-";
+  } catch {
+    return "-";
+  }
+}
+
 /** Membaca isian formulir menjadi ringkasan label → nilai, plus peringatan menurut aturan. */
 function susunRingkasan(form: HTMLFormElement, v: Verifikasi): RingkasanVerifikasi {
   const baris: { label: string; nilai: string }[] = [];
@@ -62,6 +81,7 @@ function susunRingkasan(form: HTMLFormElement, v: Verifikasi): RingkasanVerifika
     if (!el.name || el.disabled) continue;
     if (el instanceof HTMLInputElement && el.type === "hidden") {
       if (el.name === "baris") baris.push({ label: "Baris", nilai: ringkasBaris(form, el.value) });
+      else if (el.name === "rencanaTermin" && el.value) baris.push({ label: "Termin", nilai: ringkasTermin(el.value) });
       continue;
     }
     if (el instanceof HTMLInputElement && ["submit", "button", "checkbox", "radio"].includes(el.type)) continue;
