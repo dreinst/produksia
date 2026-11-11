@@ -271,7 +271,7 @@ async function main() {
   const kasBersama = await db.akun.findFirstOrThrow({ where: { kasBank: true, kelompok: false, perusahaanId: null, NOT: { kode: { startsWith: "UJL" } } }, orderBy: { kode: "asc" } });
 
   await jalankan("PS saldo awal 10 @ 5.000", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudang.id, akunLawanId: modal.id, baris: [{ barangId: barang.id, jumlahSesudah: 10, hargaSatuan: 5000 }] })));
-  await jalankan("PSJ jasa 1.000.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 1000000 }] })));
+  await jalankan("PSJ jasa 1.000.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, perusahaanId: p1.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 1000000 }] })));
   const psj = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id }, include: { baris: true } });
   await jalankan("FJ jasa 1.000.000", () => buatFaktur(formulir({ pesananId: psj.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 1000000 }] })));
   const fj = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psj.id } });
@@ -408,18 +408,19 @@ async function main() {
   const tb = await db.penerimaanBarang.findFirstOrThrow({ where: { pesananId: psb.id } });
   await jalankan("FB 2 dari 4 yang diterima", () => buatFakturPembelian(formulir({ pesananId: psb.id, baris: [{ barangId: barang.id, jumlah: 2, harga: 6000 }] })));
   const fb = await db.fakturPembelian.findFirstOrThrow({ where: { pesananId: psb.id } });
-  await jalankan("PSJ barang 5 @ 9.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: barang.id, jumlah: 5, harga: 9000 }] })));
+  await jalankan("PSJ barang 5 @ 9.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, perusahaanId: p1.id, baris: [{ barangId: barang.id, jumlah: 5, harga: 9000 }] })));
   const psj2 = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, NOT: { id: psj.id } }, include: { baris: true } });
   await jalankan("SJ 3 dari 5, belum difaktur", () => buatPengiriman(formulir({ pesananId: psj2.id, gudangId: gudang.id, baris: [{ barisPesananId: psj2.baris[0].id, barangId: barang.id, jumlah: 3 }] })));
   const sj = await db.pengirimanPesanan.findFirstOrThrow({ where: { pesananId: psj2.id }, include: { baris: true } });
-  // Sejak P11 catatJurnal menolak akun milik perusahaan lain, sedangkan buatUangMuka lama masih mencatat di utama (P23).
-  // Seperti pindah() di atas, kas satu dibuat bersama sementara selama UM dicatat, lalu dikembalikan ke perusahaan satu.
-  await db.akun.update({ where: { id: kas1.id }, data: { perusahaanId: null } });
   await jalankan("UM 25.000 ke kas perusahaan satu", () => buatUangMuka(formulir({ pesananId: psj2.id, akunId: kas1.id, jumlah: 25000 })));
-  await db.akun.update({ where: { id: kas1.id }, data: { perusahaanId: p1.id } });
   const um = await db.uangMukaPelanggan.findFirstOrThrow({ where: { pesananId: psj2.id } });
-  const jurnalLain = (await db.jurnal.findMany({ select: { id: true, nomor: true } })).filter((j) => !idJurnalSebelumLain.has(j.id));
+  const jurnalLain = (await db.jurnal.findMany({ select: { id: true, nomor: true, perusahaanId: true } })).filter((j) => !idJurnalSebelumLain.has(j.id));
   pastikan(jurnalLain.length === 4, `TB, FB, SJ, dan UM masing-masing satu jurnal (${jurnalLain.length})`);
+  // Sejak P23 pesanan dibuat untuk perusahaan satu, SJ dan UM mewarisinya, dan UM memakai kas1 milik perusahaan satu
+  // langsung; dokumen dan jurnalnya sudah milik perusahaan satu sebelum pindahLain (yang di sini tidak mengubah apa pun).
+  const jurnalUm = jurnalLain.find((j) => j.id === um.jurnalId);
+  pastikan(um.perusahaanId === p1.id && jurnalUm?.perusahaanId === p1.id && um.akunId === kas1.id, `UM langsung ke kas perusahaan satu: UM ${um.perusahaanId} dan jurnalnya ${jurnalUm?.perusahaanId} milik perusahaan satu`);
+  pastikan(sj.perusahaanId === p1.id && jurnalLain.every((j) => j.perusahaanId === p1.id), `SJ dan keempat jurnal (TB, FB, SJ, UM) milik perusahaan satu tanpa dipindah (${jurnalLain.map((j) => j.perusahaanId).join(", ")})`);
   const pindahLain = async (ke: string) =>
     db.$transaction(async (tx) => {
       await tx.pesananPembelian.update({ where: { id: psb.id }, data: { perusahaanId: ke } });

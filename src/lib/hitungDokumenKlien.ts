@@ -178,5 +178,8 @@ export function pratinjauTerminKlien(
     const bruto = terakhir ? basis + persenDari(basis, ppn) - hasil.reduce((s, h) => s + h.bruto, NOL) : jumlah + persenDari(jumlah, ppn);
     hasil.push({ no: n, label: label || `Termin ${n}`, jumlah, persen, bruto });
   }
+  // sama dengan periksaBrutoRencana di server: butir bernilai termasuk PPN 0 atau kurang ditolak
+  const kecil = hasil.find((h) => h.bruto <= NOL);
+  if (kecil) return keluar(`Termin ${kecil.no} terlalu kecil setelah PPN dibulatkan`);
   return keluar(null);
 }

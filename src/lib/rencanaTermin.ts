@@ -127,6 +127,17 @@ export function brutoRencana<T extends { no: number; jumlah: Desimal | number | 
   });
 }
 
+/**
+ * Butir yang nilainya termasuk PPN 0 atau kurang ditolak saat rencana disimpan (tinjauan P22 R2): butir terakhir =
+ * kontrak bruto dikurangi bruto butir sebelumnya, yang bisa 0 bila butir sebelumnya dibulatkan ke atas pada nominal sen.
+ * Butir seperti itu akan langsung "Lunas" tanpa dibayar. Pesan sama dengan pratinjauTerminKlien.
+ */
+export function periksaBrutoRencana<T extends { no: number; jumlah: Desimal | number | string }>(butir: readonly T[], ppnPersen: Desimal | number | string) {
+  for (const { butir: b, bruto } of brutoRencana(butir, ppnPersen)) {
+    if (bruto.lte(0)) throw new Error(`Termin ${b.no} terlalu kecil setelah PPN dibulatkan`);
+  }
+}
+
 /** Data Prisma butir baru (nested create di penawaran atau pesanan). perusahaanId selalu milik induk (D2 §10.6 no. 7). */
 export function dataButirTermin(butir: readonly ButirTermin[], perusahaanId: string) {
   return butir.map((b) => ({ perusahaanId, no: b.no, label: b.label, mode: b.mode, nilai: b.nilai, jumlah: b.jumlah, persen: b.persen, jatuhTempo: b.jatuhTempo }));
