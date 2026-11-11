@@ -7,7 +7,7 @@ import { PERUSAHAAN_UTAMA } from "../src/lib/perusahaan";
 import { catatJurnal } from "../src/lib/akuntansi";
 import { saldoAkunPeriode } from "../src/lib/laporan";
 import { periksaSinkron } from "../src/lib/sinkron";
-import { akhirTahun, awalTahun, barisJurnalPenutup, pratinjauTutupBuku, ringkasanPenutupan, ringkasanPenutupanPerPerusahaan } from "../src/lib/tutupBuku";
+import { akhirTahun, awalTahun, barisJurnalPenutup, kunciTahunBuku, pastikanTahunTerbuka, pratinjauTutupBuku, ringkasanPenutupan, ringkasanPenutupanPerPerusahaan } from "../src/lib/tutupBuku";
 import { bukaKembaliTahun, tutupTahun } from "../src/lib/aksi/tutupBuku";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
@@ -250,6 +250,59 @@ async function main() {
   const saldoBalapan = await saldoAkunPeriode(db, awalTahun(tahunLalu), akhirTahun(tahunLalu), false, { perusahaanId: u1.id });
   pastikan(saldoBalapan.filter((a) => !a.kelompok && (a.jenis === "PENDAPATAN" || a.jenis === "BEBAN")).every((a) => a.saldo.isZero()), "sesudah balapan, pendapatan dan beban perusahaan laba nol (laba berjalan 0)");
   await jalankan(`buka kembali ${tahunLalu} sesudah uji balapan`, () => bukaKembaliTahun(formulir({ tahun: tahunLalu })));
+
+  console.log("=== 8b. Batas tunggu kunci tahun dan kunci global tutup buku (tinjauan P14 R1, R2) ===");
+  // Pemegang kunci eksklusif tiruan: transaksi yang memegang kunci tutup buku tahun `tahun` sampai dilepas
+  const pegangEksklusif = async (tahun: number) => {
+    let lepas!: () => void;
+    const gerbang = new Promise<void>((r) => (lepas = r));
+    let siap!: () => void;
+    const sinyal = new Promise<void>((r) => (siap = r));
+    const selesai = db.$transaction(async (tx) => { await kunciTahunBuku(tx, tahun, true); siap(); await gerbang; }, { timeout: 30_000 });
+    await sinyal;
+    return { lepas: async () => { lepas(); await selesai; } };
+  };
+  const pemegang = await pegangEksklusif(tahunLalu);
+  let gTunggu: Error | null = null;
+  const mulai = Date.now();
+  try {
+    gTunggu = await hasil(db.$transaction((tx) => pastikanTahunTerbuka(tx, new Date(`${tahunLalu}-09-03T10:00:00`))));
+  } finally {
+    await pemegang.lepas();
+  }
+  const lama = Date.now() - mulai;
+  pastikan(gTunggu?.message === `Tutup buku tahun ${tahunLalu} sedang berjalan. Coba lagi sebentar lagi.`, `pencatat jurnal yang menunggu tutup buku lebih dari 3 detik mendapat pesan ramah (${gTunggu?.message ?? "lolos"})`);
+  pastikan(lama >= 2_500 && lama < 5_000, `batas tunggu kunci sekitar 3 detik, di bawah batas transaksi Prisma 5 detik (${lama} ms)`);
+  pastikan((await hasil(db.$transaction((tx) => pastikanTahunTerbuka(tx, new Date(`${tahunLalu}-09-03T10:00:00`))))) === null, "sesudah kunci dilepas, pencatat jurnal lolos tanpa menunggu");
+  // menunggu sebentar lalu dapat: lock_timeout kembali ke bawaan untuk sisa transaksi pencatat
+  const pemegangSingkat = await pegangEksklusif(tahunLalu);
+  const batasSesudah = db.$transaction(async (tx) => {
+    await pastikanTahunTerbuka(tx, new Date(`${tahunLalu}-09-03T10:00:00`));
+    const [{ batas }] = await tx.$queryRaw<{ batas: string }[]>`SELECT current_setting('lock_timeout') AS "batas"`;
+    return batas;
+  });
+  await new Promise((r) => setTimeout(r, 500));
+  await pemegangSingkat.lepas();
+  const batas = await batasSesudah;
+  pastikan(batas === "0", `pencatat yang menunggu kurang dari 3 detik lolos dan lock_timeout transaksinya kembali ke bawaan (${batas})`);
+  // R2: tutup atau buka tahun lain menunggu kunci global 0, jadi nomor JU-TUTUP tidak bentrok
+  const pemegangLain = await pegangEksklusif(tahunLalu - 1);
+  let tahunLainSelesai = false;
+  const tahunLain = db.$transaction(async (tx) => { await kunciTahunBuku(tx, tahunLalu, true); tahunLainSelesai = true; }, { timeout: 30_000 });
+  let penungguGlobal = 0;
+  let selesaiSaatDitahan = true;
+  try {
+    for (let i = 0; i < 100 && penungguGlobal === 0; i++) {
+      await new Promise((r) => setTimeout(r, 50));
+      [{ jumlah: penungguGlobal }] = await db.$queryRaw<{ jumlah: number }[]>`SELECT count(*)::int AS jumlah FROM pg_locks WHERE locktype = 'advisory' AND NOT granted AND objid = 0 AND objsubid = 2`;
+    }
+    selesaiSaatDitahan = tahunLainSelesai;
+  } finally {
+    await pemegangLain.lepas();
+  }
+  await tahunLain;
+  pastikan(penungguGlobal === 1 && !selesaiSaatDitahan, `kunci eksklusif ${tahunLalu} menunggu tutup buku ${tahunLalu - 1} lewat kunci global (${penungguGlobal} penunggu)`);
+  pastikan(tahunLainSelesai, "sesudah tutup buku tahun lain selesai, kunci tahun berikutnya didapat");
 
   console.log("=== 9. Bersih-bersih ===");
   if (pengaturanAwal) await db.pengaturanPerusahaan.update({ where: { id: "default" }, data: { tahunBuku: pengaturanAwal.tahunBuku } });

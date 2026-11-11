@@ -3,6 +3,7 @@
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
+import { Prisma } from "@/prisma-klien/client";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, jumlahkan, type Desimal } from "@/lib/uang";
@@ -15,6 +16,12 @@ const HALAMAN = "/buku-besar/tutup-buku";
 const NOL = D(0);
 /** Tutup buku membaca saldo semua perusahaan di satu transaksi; batas bawaan Prisma 5 detik bisa terlewati. */
 const BATAS_WAKTU = 60_000;
+/**
+ * Opsi kedua transaksi tutup buku. Batas waktu yang sama karena buka kembali bisa menunggu tutup buku yang sedang
+ * berjalan (tinjauan P14 R1). Isolasi READ COMMITTED ditulis eksplisit karena pola "kunci dulu, baru baca" di
+ * kunciTahunBuku salah di REPEATABLE READ (tinjauan P14 R3).
+ */
+const OPSI_TRANSAKSI = { timeout: BATAS_WAKTU, isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted };
 
 function bacaTahun(dataFormulir: FormData): number {
   const tahun = Number(String(dataFormulir.get("tahun") ?? "").trim());
@@ -111,7 +118,7 @@ export async function tutupTahun(dataFormulir: FormData) {
         keterangan: `Laba bersih ${format(labaTotal)} dipindahkan ke ${pemetaan.labaDitahan!.kode} ${pemetaan.labaDitahan!.nama}; ${jumlahAkun} akun dinolkan; ${rincian.length} perusahaan`,
       },
     });
-  }, { timeout: BATAS_WAKTU });
+  }, OPSI_TRANSAKSI);
   await segarkan();
 }
 
@@ -144,7 +151,7 @@ export async function bukaKembaliTahun(dataFormulir: FormData) {
     await tx.logAktivitas.create({
       data: { penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id, penggunaNama: pengguna.nama, aksi: "BUKA", jenis: "Tutup Buku", nomor: `TAHUN ${tahun}`, keterangan: "Jurnal penutup dihapus; tahun buku dibuka kembali" },
     });
-  });
+  }, OPSI_TRANSAKSI);
   await segarkan();
 }
 

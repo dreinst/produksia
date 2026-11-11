@@ -56,6 +56,11 @@ const NORMAL_DEBIT = new Set(["ASET", "BEBAN"]);
  * hasilnya sama persis dengan sebelum ada isian itu. perusahaanId menyaring jurnal menurut Jurnal.perusahaanId.
  */
 export type OpsiLaporan = { proyekId?: string | null; perusahaanId?: string | null };
+/**
+ * Opsi laporan yang hanya bisa disaring perusahaan (neraca, arus kas, ringkasan pendapatan). `proyekId?: never` membuat
+ * tsc menolak OpsiLaporan yang membawa proyekId, supaya saringan proyek tidak diabaikan diam-diam (tinjauan P14 R5).
+ */
+export type OpsiPerusahaan = { perusahaanId?: string | null; proyekId?: never };
 
 export async function saldoAkunPeriode(klien: PrismaClient, dari: Date | null, sampai: Date, tanpaPenutup = false, opsi: OpsiLaporan = {}): Promise<AkunSaldo[]> {
   const [daftarAkun, agregat] = await Promise.all([
@@ -178,7 +183,7 @@ export type Neraca = {
  * `opsi.perusahaanId` diisi: hanya jurnal perusahaan itu (D1 §4.6). Setiap jurnal seimbang dan milik satu perusahaan,
  * jadi Neraca tiap perusahaan seimbang sendiri. Kosong: semua perusahaan, sama persis dengan sebelumnya.
  */
-export async function hitungNeraca(klien: PrismaClient = db, sampai: Date, sampaiTeks: string, opsi: Pick<OpsiLaporan, "perusahaanId"> = {}): Promise<Neraca> {
+export async function hitungNeraca(klien: PrismaClient = db, sampai: Date, sampaiTeks: string, opsi: OpsiPerusahaan = {}): Promise<Neraca> {
   const awalTahun = new Date(sampai.getFullYear(), 0, 1);
   const milik: OpsiLaporan = opsi.perusahaanId ? { perusahaanId: opsi.perusahaanId } : {};
   const [kumulatif, sebelumTahunIni] = await Promise.all([

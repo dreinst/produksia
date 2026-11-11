@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@/prisma-klien/client";
 import { D, type Desimal } from "@/lib/uang";
-import { saldoAkunPeriode, susunHierarki, type BarisLaporan, type OpsiLaporan, type Periode } from "@/lib/laporan";
+import { saldoAkunPeriode, susunHierarki, type BarisLaporan, type OpsiPerusahaan, type Periode } from "@/lib/laporan";
 
 /*
  * Ringkasan Pendapatan periode, dibaca dari buku besar (akun jenis PENDAPATAN, tanpa jurnal penutup)
@@ -33,7 +33,7 @@ export const TANPA_PELANGGAN = "Tanpa pelanggan (kas masuk, jurnal umum, lainnya
  * `opsi.perusahaanId` diisi (D1 §4.6): baris jurnal dan saldo layanan hanya dari jurnal perusahaan itu. Kosong: semua
  * perusahaan, sama persis dengan sebelumnya.
  */
-export async function ringkasanPendapatan(klien: PrismaClient, periode: Periode, opsi: Pick<OpsiLaporan, "perusahaanId"> = {}): Promise<RingkasanPendapatan> {
+export async function ringkasanPendapatan(klien: PrismaClient, periode: Periode, opsi: OpsiPerusahaan = {}): Promise<RingkasanPendapatan> {
   const rentang = { gte: periode.dari, lte: periode.sampai };
   const p = opsi.perusahaanId || null;
   const [baris, daftarAkun] = await Promise.all([

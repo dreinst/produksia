@@ -142,6 +142,7 @@ export type KodeKonsistensi =
   | "JURNAL_DOKUMEN"
   | "ANAK_INDUK"
   | "AKUN_JURNAL"
+  | "AKUN_DOKUMEN"
   | "GUDANG_DOKUMEN"
   | "PROYEK_DOKUMEN"
   | "BARANG_BARIS"
@@ -191,6 +192,17 @@ const ANAK_INDUK: [string, string, string][] = [
   // kerja tim (D6 §3.0 butir 5): tugas desain mewarisi konten atau kampanyenya
   ["TugasDesain", "kontenId", "Konten"],
   ["TugasDesain", "kampanyeId", "Kampanye"],
+];
+
+/**
+ * Akun di kepala dokumen [tabel, kolom akun] (tinjauan P14 R4). Dokumen berjurnal sudah tertangkap AKUN_JURNAL, tetapi
+ * draf yang belum disetujui belum punya jurnal. Akun bersama (perusahaanId null) selalu boleh.
+ */
+const AKUN_KEPALA: [string, string][] = [
+  ["DokumenKas", "akunKasId"], ["DokumenKas", "akunLawanId"], ["Prive", "akunKasId"], ["Prive", "akunPriveId"], ["UangMukaPelanggan", "akunId"],
+  ["PenerimaanPenjualan", "akunId"], ["PembayaranPembelian", "akunId"], ["Penggajian", "akunKasId"], ["PenyesuaianPersediaan", "akunLawanId"],
+  ["TalanganMitra", "akunBebanId"], ["PembayaranMitra", "akunKasId"], ["AsetTetap", "akunAsetId"], ["AsetTetap", "akunBebanPenyusutanId"],
+  ["AsetTetap", "akunAkumulasiPenyusutanId"], ["AsetTetap", "akunPembayaranId"],
 ];
 
 /** Dokumen bergudang [tabel, kolom gudang]. */
@@ -281,6 +293,19 @@ function aturanKonsistensi(): { kode: KodeKonsistensi; label: string; hitung: Pr
       hitung: [Prisma.sql`SELECT COUNT(*) FROM "BarisJurnal" bj JOIN "Jurnal" j ON j."id" = bj."jurnalId" JOIN "Akun" a ON a."id" = bj."akunId" WHERE a."perusahaanId" IS NOT NULL AND a."perusahaanId" <> j."perusahaanId"`],
     },
     {
+      kode: "AKUN_DOKUMEN",
+      label: "Dokumen memakai akun milik perusahaan lain",
+      hitung: [
+        ...AKUN_KEPALA.map(([t, kolom]) => Prisma.sql`SELECT COUNT(*) FROM ${nm(t)} d JOIN "Akun" a ON a."id" = d.${nm(kolom)} WHERE a."perusahaanId" IS NOT NULL AND a."perusahaanId" <> d."perusahaanId"`),
+        ...["akunPenerimaanId", "akunLabaRugiId"].map(
+          (kolom) => Prisma.sql`SELECT COUNT(*) FROM "PelepasanAset" x JOIN "AsetTetap" t ON t."id" = x."asetId" JOIN "Akun" a ON a."id" = x.${nm(kolom)} WHERE a."perusahaanId" IS NOT NULL AND a."perusahaanId" <> t."perusahaanId"`,
+        ),
+        ...[["akunPemberiId", "pemberiId"], ["akunPenerimaId", "penerimaId"]].map(
+          ([kolom, pihak]) => Prisma.sql`SELECT COUNT(*) FROM "TransaksiAntarPerusahaan" d JOIN "Akun" a ON a."id" = d.${nm(kolom)} WHERE a."perusahaanId" IS NOT NULL AND a."perusahaanId" <> d.${nm(pihak)}`,
+        ),
+      ],
+    },
+    {
       kode: "GUDANG_DOKUMEN",
       label: "Dokumen memakai gudang milik perusahaan lain",
       hitung: DOKUMEN_BERGUDANG.map(([t, kolom]) => Prisma.sql`SELECT COUNT(*) FROM ${nm(t)} d JOIN "Gudang" g ON g."id" = d.${nm(kolom)} WHERE g."perusahaanId" IS NOT NULL AND g."perusahaanId" <> d."perusahaanId"`),
@@ -333,4 +358,31 @@ export async function periksaKonsistensiPerusahaan(klien: PrismaClient | Prisma.
   const rincian = aturan.map((a, i) => ({ kode: a.kode, label: a.label, jumlah: Number(baris?.[`k${i}`] ?? 0) }));
   const total = rincian.reduce((s, r) => s + r.jumlah, 0);
   return { konsisten: total === 0, total, rincian };
+}
+
+/** Umur simpanan hasil konsistensi untuk beranda (tinjauan P14 S1). */
+const UMUR_SIMPANAN_KONSISTENSI = 60_000;
+let simpananKonsistensi: { sampai: number; hasil: Promise<HasilKonsistensi> } | null = null;
+
+/**
+ * periksaKonsistensiPerusahaan dengan simpanan memori per proses selama 60 detik, untuk kartu Integritas beranda
+ * gabungan (tinjauan P14 S1). Kueri ini memindai banyak tabel penuh, jadi tidak dijalankan di setiap muat beranda.
+ * Permintaan yang datang bersamaan berbagi satu kueri. Hasil gagal tidak disimpan. Halaman integritas (P19) tetap
+ * memanggil periksaKonsistensiPerusahaan langsung.
+ */
+export function periksaKonsistensiTersimpan(): Promise<HasilKonsistensi> {
+  const kini = Date.now();
+  if (simpananKonsistensi && simpananKonsistensi.sampai > kini) return simpananKonsistensi.hasil;
+  const hasil = periksaKonsistensiPerusahaan(db);
+  const isi = { sampai: kini + UMUR_SIMPANAN_KONSISTENSI, hasil };
+  simpananKonsistensi = isi;
+  hasil.catch(() => {
+    if (simpananKonsistensi === isi) simpananKonsistensi = null;
+  });
+  return hasil;
+}
+
+/** Mengosongkan simpanan periksaKonsistensiTersimpan (dipakai uji). */
+export function lupakanKonsistensiTersimpan() {
+  simpananKonsistensi = null;
 }

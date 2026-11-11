@@ -28,10 +28,40 @@ export function awalTahun(tahun: number): Date {
  * TutupBuku yang sudah tersimpan. Pencatat jurnal tidak saling menunggu. Kunci bertingkat transaksi aman dipakai
  * lewat PgBouncer mode transaksi. Di luar transaksi kunci langsung lepas sesudah perintahnya, jadi hanya berarti
  * menunggu tutup buku yang sedang berjalan selesai; pencatat jurnal wajib memanggilnya di transaksi yang sama.
+ * Pola ini hanya benar di isolasi READ COMMITTED (setiap perintah sesudah kunci memakai snapshot baru), jadi transaksi
+ * tutup buku memakai isolationLevel ReadCommitted secara eksplisit (tinjauan P14 R3).
  */
 export async function kunciTahunBuku(klien: Klien, tahun: number, eksklusif: boolean) {
-  if (eksklusif) await klien.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('tutup-buku'), ${tahun}::int)`;
-  else await klien.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext('tutup-buku'), ${tahun}::int)`;
+  if (eksklusif) {
+    // Kunci 0 (tinjauan P14 R2): tutup buku dan buka kembali tahun berbeda juga berjalan bergiliran, karena nomor
+    // JU-TUTUP dan PengaturanPerusahaan.tahunBuku dipakai bersama. Pencatat jurnal tidak pernah meminta kunci 0, dan
+    // bacaTahun hanya menerima 2000 sampai 2100, jadi kunci ini tidak bentrok dengan kunci tahun.
+    await klien.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('tutup-buku'), 0)`;
+    await klien.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('tutup-buku'), ${tahun}::int)`;
+    return;
+  }
+  // Jalur biasa: kunci bersama langsung didapat (tidak ada tutup buku yang berjalan atau menunggu), satu perintah saja
+  const [coba] = await klien.$queryRaw<{ dapat: boolean }[]>`SELECT pg_try_advisory_xact_lock_shared(hashtext('tutup-buku'), ${tahun}::int) AS "dapat"`;
+  if (coba?.dapat) return;
+  // Tutup buku tahun ini sedang berjalan (tinjauan P14 R1): tunggu paling lama 3 detik, di bawah batas transaksi
+  // Prisma 5 detik, supaya koneksi pool tidak tertahan dan pengguna mendapat pesan yang jelas.
+  await klien.$executeRaw`SET LOCAL lock_timeout = '3s'`;
+  try {
+    await klien.$executeRaw`SELECT pg_advisory_xact_lock_shared(hashtext('tutup-buku'), ${tahun}::int)`;
+  } catch (e) {
+    if (sqlState(e) === "55P03") throw new Error(`Tutup buku tahun ${tahun} sedang berjalan. Coba lagi sebentar lagi.`);
+    throw e;
+  }
+  await klien.$executeRaw`SET LOCAL lock_timeout = DEFAULT`;
+}
+
+/** SQLSTATE di balik galat Prisma lewat adapter pg (pola yang sama dengan statusFormulir.ts). */
+function sqlState(e: unknown): string | null {
+  const x = e as { code?: unknown; meta?: { code?: unknown; driverAdapterError?: { cause?: { originalCode?: unknown } } } } | null;
+  for (const k of [x?.meta?.driverAdapterError?.cause?.originalCode, x?.meta?.code, x?.code]) {
+    if (typeof k === "string" && /^[0-9A-Z]{5}$/.test(k)) return k;
+  }
+  return null;
 }
 
 /**

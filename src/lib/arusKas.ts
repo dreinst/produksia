@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { D, jumlahkan, type Desimal } from "@/lib/uang";
-import type { OpsiLaporan, Periode } from "@/lib/laporan";
+import type { OpsiPerusahaan, Periode } from "@/lib/laporan";
 
 /*
  * Laporan arus kas metode langsung, langsung dari jurnal: setiap jurnal yang menyentuh akun kas/bank
@@ -41,7 +41,7 @@ export function kelasArus(akun: { jenis: string; kode: string }): KelasArus {
  * untuk saldo maupun arus. Karena tiap jurnal seimbang dan milik satu perusahaan, `cocok` tetap berlaku per perusahaan.
  * Kosong: semua perusahaan, kuerinya sama persis dengan sebelumnya.
  */
-export async function hitungArusKas(klien: PrismaClient = db, periode: Periode, opsi: Pick<OpsiLaporan, "perusahaanId"> = {}): Promise<ArusKas> {
+export async function hitungArusKas(klien: PrismaClient = db, periode: Periode, opsi: OpsiPerusahaan = {}): Promise<ArusKas> {
   const p = opsi.perusahaanId || null;
   const akunKas = await klien.akun.findMany({ where: { kasBank: true, kelompok: false, ...(p ? { OR: [{ perusahaanId: p }, { perusahaanId: null }] } : {}) }, orderBy: { kode: "asc" } });
   const idKas = akunKas.map((a) => a.id);

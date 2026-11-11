@@ -13,7 +13,7 @@ import { labaRugiKas } from "../src/lib/basisKas";
 import { ringkasanPendapatan } from "../src/lib/laporanPendapatan";
 import { hitungLaporanPrive } from "../src/lib/laporanPrive";
 import { laporanHutang, laporanPerubahanModal, laporanPiutang, type LaporanUmur } from "../src/lib/laporanRekanan";
-import { periksaKonsistensiPerusahaan, periksaSinkron, TABEL_ENTITAS_BERKAS, type HasilKonsistensi, type HasilSinkron, type KodeKonsistensi } from "../src/lib/sinkron";
+import { lupakanKonsistensiTersimpan, periksaKonsistensiPerusahaan, periksaSinkron, TABEL_ENTITAS_BERKAS, type HasilKonsistensi, type HasilSinkron, type KodeKonsistensi } from "../src/lib/sinkron";
 import { DAFTAR_JENIS } from "../src/lib/berkas";
 import { buatPesananPembelian, buatPenerimaanBarang, buatFakturPembelian, buatPembayaranPembelian } from "../src/lib/aksi/pembelian";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
@@ -23,6 +23,7 @@ import { buatFaktur, buatPesanan } from "../src/lib/aksi/penjualan";
 import { hapusDokumen, type JenisDokumen } from "../src/lib/aksi/hapusDokumen";
 import Beranda from "../src/app/(aplikasi)/page";
 import AngkaBergerak from "../src/komponen/ui/AngkaBergerak";
+import ButirKonsistensi from "../src/komponen/beranda/ButirIntegritas";
 import { aturPersetujuan, formulir, jalankan, pastikan } from "./bantuan";
 
 /*
@@ -226,7 +227,7 @@ async function main() {
   const lamaUtama = await semuaLaporan(PERUSAHAAN_UTAMA, periode);
   const sinkronUtamaAwal = await periksaSinkron(db, { perusahaanId: PERUSAHAAN_UTAMA });
   const konsistensiAwal = await periksaKonsistensiPerusahaan(db);
-  pastikan(konsistensiAwal.konsisten && konsistensiAwal.total === 0 && konsistensiAwal.rincian.length === 9, `periksaKonsistensiPerusahaan pada data bersih: 0 pelanggaran di 9 kode (${konsistensiAwal.rincian.map((r) => `${r.kode} ${r.jumlah}`).join(", ")})`);
+  pastikan(konsistensiAwal.konsisten && konsistensiAwal.total === 0 && konsistensiAwal.rincian.length === 10, `periksaKonsistensiPerusahaan pada data bersih: 0 pelanggaran di 10 kode (${konsistensiAwal.rincian.map((r) => `${r.kode} ${r.jumlah}`).join(", ")})`);
   pastikan(json(konsistensiAwal) === json(await periksaKonsistensiPerusahaan()), "periksaKonsistensiPerusahaan tanpa klien memakai db");
   const jenisTanpaTabel = DAFTAR_JENIS.filter((j) => !TABEL_ENTITAS_BERKAS[j]);
   pastikan(jenisTanpaTabel.length === 0, `setiap jenis lampiran berkas punya tabel entitas di pemeriksaan konsistensi (${jenisTanpaTabel.join(", ") || "lengkap"})`);
@@ -353,6 +354,15 @@ async function main() {
     const km = await tx.jurnal.findFirstOrThrow({ where: { keterangan: `${KODE} KM` }, include: { baris: true } });
     await tx.barisJurnal.update({ where: { id: km.baris.find((b) => b.akunId === pendapatanB.id)!.id }, data: { akunId: akunUt.id } });
   });
+  // tinjauan P14 R4: akun di kepala dokumen, termasuk draf yang belum berjurnal
+  await cekPelanggaran("draf KM perusahaan uji dengan akun lawan milik utama", { AKUN_DOKUMEN: 1 }, async (tx) => {
+    const akunUt = await tx.akun.create({ data: { kode: `${KODE}-PDPT-UT`, nama: "Pendapatan Uji Laporan Utama", jenis: "PENDAPATAN", perusahaanId: PERUSAHAAN_UTAMA } });
+    await tx.dokumenKas.create({ data: { nomor: `${KODE}-KM-DRAF`, jenis: "MASUK", akunKasId: kasU.id, akunLawanId: akunUt.id, jumlah: 1, dibuatOleh: "Uji", perusahaanId: U } });
+  });
+  await cekPelanggaran("prive perusahaan uji memakai kas milik utama", { AKUN_DOKUMEN: 1 }, async (tx) => {
+    const kasUt = await tx.akun.create({ data: { kode: `${KODE}-KAS-UT`, nama: "Kas Uji Laporan Utama", jenis: "ASET", kasBank: true, perusahaanId: PERUSAHAAN_UTAMA } });
+    await tx.prive.updateMany({ where: { perusahaanId: U }, data: { akunKasId: kasUt.id } });
+  });
   await cekPelanggaran("gudang perusahaan uji menjadi milik utama", { GUDANG_DOKUMEN: 2, STOK_GUDANG: 1 }, (tx) => tx.gudang.update({ where: { id: gudangU.id }, data: { perusahaanId: PERUSAHAAN_UTAMA } }));
   await cekPelanggaran("barang perusahaan uji menjadi milik utama", { BARANG_BARIS: 4, STOK_GUDANG: 1 }, (tx) => tx.barang.update({ where: { id: barangU.id }, data: { perusahaanId: PERUSAHAAN_UTAMA } }));
   await cekPelanggaran("jurnal manual memakai proyek utama", { PROYEK_DOKUMEN: 1 }, async (tx) => {
@@ -373,6 +383,7 @@ async function main() {
 
   console.log("=== 8. Kartu Integritas beranda ===");
   const BUTIR_KONSISTENSI = "Data tiap perusahaan tidak tercampur";
+  lupakanKonsistensiTersimpan();
   const intGab = await integritas("PEMILIK", "semua");
   pastikan(intGab.includes(BUTIR_KONSISTENSI) && intGab.includes("(0 pelanggaran)"), "PEMILIK gabungan: butir konsistensi dengan 0 pelanggaran");
   pastikan(intGab.includes("Jurnal seimbang") && intGab.includes("Uang muka pelanggan = DP belum dipakai"), "PEMILIK gabungan: butir sinkron lama tetap ada");
@@ -382,13 +393,27 @@ async function main() {
   pastikan(intKasir.includes("Jurnal seimbang") && !intKasir.includes(BUTIR_KONSISTENSI), "KASIR yang meminta gabungan tetap berlingkup utama: tanpa butir konsistensi");
   await db.jurnal.update({ where: { id: fb.jurnalId! }, data: { perusahaanId: PERUSAHAAN_UTAMA } });
   let intSalah = "";
+  let intTersimpan = "";
   try {
+    // tinjauan P14 S1: hasil disimpan 60 detik, jadi pelanggaran baru tampil sesudah simpanan kedaluwarsa
+    intTersimpan = await integritas("PEMILIK", "semua");
+    lupakanKonsistensiTersimpan();
     intSalah = await integritas("PEMILIK", "semua");
   } finally {
     await db.jurnal.update({ where: { id: fb.jurnalId! }, data: { perusahaanId: U } });
+    lupakanKonsistensiTersimpan();
   }
+  pastikan(intTersimpan.includes("(0 pelanggaran)"), "beranda gabungan memakai hasil konsistensi yang disimpan (kueri tidak diulang di setiap muat)");
   pastikan(intSalah.includes(BUTIR_KONSISTENSI) && intSalah.includes("Jurnal berbeda perusahaan dengan dokumennya: 1") && !intSalah.includes("(0 pelanggaran)"), "gabungan dengan jurnal FB di perusahaan lain: butir konsistensi menyebut pelanggarannya");
   pastikan((await periksaKonsistensiPerusahaan(db)).konsisten, "jurnal FB dikembalikan: konsisten lagi");
+  const butirGagal = await render(
+    await ButirKonsistensi({
+      periksa: async () => {
+        throw new Error("kolom tidak ada");
+      },
+    }),
+  );
+  pastikan(butirGagal.includes(BUTIR_KONSISTENSI) && butirGagal.includes("Pemeriksaan gagal") && !butirGagal.includes("kolom tidak ada"), "galat kueri konsistensi tidak menjatuhkan beranda: butir menampilkan pemeriksaan gagal tanpa pesan galat");
 
   console.log("=== 9. Bersih-bersih ===");
   await bersihkanData();

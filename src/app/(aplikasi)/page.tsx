@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { wajibMasuk } from "@/lib/otentikasi";
 import { punyaHak, type Hak } from "@/lib/hakAkses";
-import { periksaKonsistensiPerusahaan, periksaSinkron } from "@/lib/sinkron";
+import { periksaSinkron } from "@/lib/sinkron";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import Link from "next/link";
 import { db } from "@/lib/db";
@@ -9,6 +9,7 @@ import Ikon from "@/komponen/ui/Ikon";
 import AngkaBergerak from "@/komponen/ui/AngkaBergerak";
 import { Suspense } from "react";
 import PanelTren, { KerangkaTren } from "@/komponen/beranda/PanelTren";
+import ButirKonsistensi, { ButirIntegritas, ButirKonsistensiMemuat } from "@/komponen/beranda/ButirIntegritas";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { daftarPerusahaan, lingkupPerusahaan } from "@/lib/perusahaan";
@@ -73,11 +74,9 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
     pembayaranTerbaru,
   } = await muatDataBerandaKeuangan(lingkupId, now);
 
-  const [sinkron, konsistensi, pengaturan, permintaanLupa, perusahaanAktif] = await Promise.all([
+  const [sinkron, pengaturan, permintaanLupa, perusahaanAktif] = await Promise.all([
     // Integritas per lingkup (D1 §4.9): gabungan memanggil periksaSinkron persis seperti sebelumnya
     gabungan ? periksaSinkron(db) : periksaSinkron(db, { perusahaanId: lingkupId }),
-    // gabungan juga memeriksa bahwa jurnal, dokumen, dan rujukannya tidak tercampur antar perusahaan (D1 §8.4)
-    gabungan ? periksaKonsistensiPerusahaan(db) : Promise.resolve(null),
     ambilPengaturanPerusahaan(db),
     boleh("pengguna.kelola") ? db.permintaanAturUlang.count({ where: { status: { in: ["MENUNGGU", "TAUTAN"] } } }) : Promise.resolve(0),
     // hanya untuk kalimat Integritas: instalasi satu perusahaan memakai kalimat lama
@@ -532,27 +531,17 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                 { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
                 { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
                 { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
-                ...(konsistensi
-                  ? [
-                      {
-                        t: "Data tiap perusahaan tidak tercampur",
-                        ok: konsistensi.konsisten,
-                        d: konsistensi.konsisten
-                          ? "Jurnal, dokumen turunan, akun, gudang, proyek, barang, gaji, dan lampiran memakai perusahaan yang sama (0 pelanggaran)"
-                          : konsistensi.rincian.filter((r) => r.jumlah > 0).map((r) => `${r.label}: ${r.jumlah}`).join(" · "),
-                      },
-                    ]
-                  : []),
-                { t: "DB constraint CHECK (jumlah ≥ 0)", ok: true, d: "PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." },
               ].map(({ t, ok, d }) => (
-                <div key={t} className="flex items-start gap-2.5">
-                  <Ikon nama={ok ? "check_circle" : "error"} className={`!text-[18px] mt-0.5 ${ok ? "text-emerald-400" : "text-rose-400"}`} />
-                  <div>
-                    <span className={`font-semibold ${ok ? "text-white" : "text-rose-300"}`}>{t}</span>
-                    <p className="text-slate-400 text-[11px] mt-0.5">{d}</p>
-                  </div>
-                </div>
+                <ButirIntegritas key={t} t={t} ok={ok} d={d} />
               ))}
+              {/* gabungan juga memeriksa bahwa jurnal, dokumen, dan rujukannya tidak tercampur antar perusahaan (D1 §8.4);
+                  kuerinya berat, jadi dimuat terpisah dan disimpan 60 detik (tinjauan P14 S1) */}
+              {gabungan && (
+                <Suspense fallback={<ButirKonsistensiMemuat />}>
+                  <ButirKonsistensi />
+                </Suspense>
+              )}
+              <ButirIntegritas t="DB constraint CHECK (jumlah ≥ 0)" ok d="PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." />
             </div>
             <div className="pt-3 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-400 font-mono">
               <span>PostgreSQL 18 • Prisma 7</span>
