@@ -71,7 +71,11 @@ export const KERTAS: Record<UkuranKertas, Kertas> = {
 export const SKALA_KERTAS: Record<UkuranKertas, number> = { A4: 1, A5: 1748 / 2480, A5_LANDSCAPE: 1 };
 
 type Lapisan = { belakang?: (k: KanvasCetak) => void; depan?: (k: KanvasCetak, ke: number, dari: number) => void };
-type GayaGaris = { warna: string; tebal: number; gaya?: "penuh" | "putus" | "titik" };
+/**
+ * Garis. `pola` = [panjang garis, jarak] dalam pt, mengalahkan pola bawaan `gaya` yang sebanding tebal (dipakai bila
+ * desain menetapkan pola tetap, mis. titik 0,5/1,5 pt dan putus 3/1,5 pt di kwitansi D3 §3.7).
+ */
+export type GayaGaris = { warna: string; tebal: number; gaya?: "penuh" | "putus" | "titik"; pola?: [number, number] };
 
 /** Potongan teks satu font di dalam satu baris. */
 type Potongan = { teks: string; font: Font };
@@ -508,7 +512,8 @@ export class KanvasCetak {
   // ---------- Garis, kotak, gambar ----------
 
   private gayaDash(g: GayaGaris): void {
-    if (g.gaya === "putus") this.doc.dash(g.tebal * 3, { space: g.tebal * 2 });
+    if (g.pola && (g.gaya ?? "penuh") !== "penuh") this.doc.dash(g.pola[0], { space: g.pola[1] });
+    else if (g.gaya === "putus") this.doc.dash(g.tebal * 3, { space: g.tebal * 2 });
     else if (g.gaya === "titik") this.doc.dash(g.tebal, { space: g.tebal * 1.5 });
     else this.doc.undash();
   }
@@ -555,12 +560,7 @@ export class KanvasCetak {
     slot?: string,
   ): { w: number; h: number } {
     const data = typeof isi === "string" ? this.bacaAset(isi) : isi;
-    let gbr = this.gambarTerbuka.get(data);
-    if (!gbr) {
-      periksaGambar(data);
-      gbr = this.doc.openImage(Buffer.from(data.buffer, data.byteOffset, data.byteLength));
-      this.gambarTerbuka.set(data, gbr);
-    }
+    const gbr = this.bukaGambar(data);
     const putar = (gbr.orientation ?? 1) > 4;
     const lebarAsli = putar ? gbr.height : gbr.width;
     const tinggiAsli = putar ? gbr.width : gbr.height;
@@ -594,6 +594,27 @@ export class KanvasCetak {
     this.doc.restore();
     this.perekam?.gambar.push({ halaman: this.halamanKe, slot: slot ?? null, x, y, w, h });
     return { w, h };
+  }
+
+  /** Gambar terbuka (periksaGambar sekali per objek), dipakai ulang di setiap halaman. */
+  private bukaGambar(data: Uint8Array): GambarTerbuka {
+    let gbr = this.gambarTerbuka.get(data);
+    if (!gbr) {
+      periksaGambar(data);
+      gbr = this.doc.openImage(Buffer.from(data.buffer, data.byteOffset, data.byteLength));
+      this.gambarTerbuka.set(data, gbr);
+    }
+    return gbr;
+  }
+
+  /**
+   * Lebar dan tinggi piksel gambar seperti yang akan digambar `gambar` (sisi ditukar bila orientasi EXIF JPEG lebih
+   * dari 4), tanpa menggambar. Dipakai tata letak untuk menyisakan ruang yang sama persis dengan gambarnya.
+   */
+  ukuranGambar(isi: Uint8Array | string): { lebar: number; tinggi: number } {
+    const gbr = this.bukaGambar(typeof isi === "string" ? this.bacaAset(isi) : isi);
+    const putar = (gbr.orientation ?? 1) > 4;
+    return { lebar: putar ? gbr.height : gbr.width, tinggi: putar ? gbr.width : gbr.height };
   }
 
   private bacaAset(jalur: string): Uint8Array {

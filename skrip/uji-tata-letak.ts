@@ -1,10 +1,11 @@
 import { readFileSync } from "node:fs";
+import { inflateSync } from "node:zlib";
 import type { GayaAngka, GayaEntitas, UkuranKertas } from "../src/prisma-klien/enums";
 import { asetBawaan } from "../src/lib/cetak/aset";
 import { DATA_CONTOH, IDENTITAS_CONTOH, KWITANSI_CONTOH, WARNA_CONTOH, dokumenContoh, type NamaContoh } from "../src/lib/cetak/contoh";
 import { dariDataPenjualan } from "../src/lib/cetak/dariDataPenjualan";
-import { GalatIsiTerlaluTinggi, KERTAS, buatPerekam, type Perekam } from "../src/lib/cetak/mesin/kanvas";
-import { petaAsetBawaan, tandaTanganDipakai, type MasukanTataLetak } from "../src/lib/cetak/tataLetak/blok";
+import { GalatIsiTerlaluTinggi, KERTAS, KanvasCetak, buatPerekam, type Perekam } from "../src/lib/cetak/mesin/kanvas";
+import { isiSlotBaris, pecahBaris, petaAsetBawaan, tandaTanganDipakai, tinggiGambarSlot, type MasukanTataLetak } from "../src/lib/cetak/tataLetak/blok";
 import { renderDproInvoice } from "../src/lib/cetak/tataLetak/dproInvoice";
 import { renderDproProposal } from "../src/lib/cetak/tataLetak/dproProposal";
 import { PARAMETER_KWITANSI, renderKwitansiEntitas } from "../src/lib/cetak/tataLetak/kwitansiEntitas";
@@ -84,6 +85,30 @@ async function ditolakGalatTinggi(label: string, fn: () => Promise<unknown>) {
 
 const TERBILANG_INVOICE = "DELAPAN PULUH JUTA EMPAT RATUS DELAPAN PULUH TIGA RIBU DUA RATUS ENAM PULUH RUPIAH";
 const ttdUji = () => new Uint8Array(asetBawaan("BONANOVA", "LOGO")!); // gambar sah pengganti tanda tangan (bukan TTD asli)
+
+/** Isi semua aliran (stream) PDF yang bisa di-inflate, untuk memeriksa operator gambar seperti pola garis. */
+function isiAliran(b: Uint8Array): string {
+  const teks = latin1(b);
+  const hasil: string[] = [];
+  for (const m of teks.matchAll(/stream\r?\n/g)) {
+    const awal = m.index! + m[0].length;
+    const akhir = teks.indexOf("endstream", awal);
+    try {
+      hasil.push(inflateSync(Buffer.from(b.subarray(awal, akhir))).toString("latin1"));
+    } catch {
+      // aliran tanpa kompresi atau gambar
+    }
+  }
+  return hasil.join("\n");
+}
+
+/** JPEG minimal 64 x 16 piksel ber-EXIF orientasi 6 (diputar 90 derajat): tergambar 16 x 64. */
+function jpegBerputar(): Uint8Array {
+  const exif = Buffer.from([0x45, 0x78, 0x69, 0x66, 0, 0, 0x4d, 0x4d, 0, 0x2a, 0, 0, 0, 8, 0, 1, 0x01, 0x12, 0, 3, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 0]);
+  const app1 = Buffer.concat([Buffer.from([0xff, 0xe1, 0, exif.length + 2]), exif]);
+  const sof = Buffer.from([0xff, 0xc0, 0, 17, 8, 0, 16, 0, 64, 3, 1, 0x11, 0, 2, 0x11, 1, 3, 0x11, 1]);
+  return new Uint8Array(Buffer.concat([Buffer.from([0xff, 0xd8]), app1, sof, Buffer.from([0xff, 0xd9])]));
+}
 
 async function main() {
   console.log("=== 1. Data contoh dan dariDataPenjualan ===");
@@ -362,6 +387,100 @@ async function main() {
     pastikan(/import type \{[^}]*DokumenCetakPenjualan[^}]*\} from "@\/lib\/cetak\/tipe"/.test(murni[0]) && !/import \{[^}]*\} from "@\/lib\/uang"/.test(murni[0]), "dariDataPenjualan: kontrak D2 dan Desimal hanya import type");
     const tataLetak = ["blok", "dproInvoice", "dproProposal", "kwitansiEntitas", "kwitansiPolos"].map((f) => readFileSync(`src/lib/cetak/tataLetak/${f}.ts`, "utf8"));
     pastikan(tataLetak.every((s) => !s.includes("@/lib/db") && !s.includes("@/prisma-klien/client") && !s.includes('"use client"') && !s.includes("@/lib/dataCetakPenjualan")), "tata letak tidak membaca basis data dan bukan komponen klien");
+  }
+
+  console.log("=== 13. Perbaikan tinjauan P29 ===");
+  {
+    // T1: invoice tulisan 500 baris x 200 karakter tanpa perihal tidak boleh membuat render macet
+    const nama200 = (i: number) => `Item ${i} ${"sewa perlengkapan panggung dan tata suara ".repeat(5)}`.slice(0, 200);
+    const besar = masukan("invoiceTulisanDpro", "DPRO", {
+      ukuran: "A5_LANDSCAPE",
+      ubah: (d) => {
+        d.surat.perihal = null;
+        d.baris = Array.from({ length: 500 }, (_, i) => ({ ...d.baris[0], no: i + 1, nama: nama200(i + 1) }));
+      },
+    });
+    let t0 = performance.now();
+    const isiBesar = await renderKwitansiEntitas(besar, "DPRO");
+    const ms = performance.now() - t0;
+    const rb = besar.perekam!;
+    const baris = rb.teks.filter((t) => t.x > pxKePt(744) - 1 && t.y > pxKePt(800) && t.y < pxKePt(1030));
+    pastikan(pdfSah(isiBesar) && ms < 2000, `invoice tulisan 500 baris x 200 karakter tanpa perihal: selesai ${Math.round(ms)} ms (< 2 detik)`);
+    pastikan(baris.length === 3 && baris[0].teks.startsWith("Item 1 ") && !ada(rb, "Item 2 ") && dalamArea(rb, "A5_LANDSCAPE", pxKePt(150)), "nama baris pertama yang sendirian lebih dari 2 baris dipakai sendiri, diatur slot isian");
+    const pendek = masukan("invoiceTulisanDpro", "DPRO", { ukuran: "A5_LANDSCAPE", ubah: (d) => ((d.surat.perihal = null), (d.baris = Array.from({ length: 500 }, (_, i) => ({ ...d.baris[0], no: i + 1, nama: `Sewa alat ${i + 1}` })))) });
+    await renderKwitansiEntitas(pendek, "DPRO");
+    const bp = pendek.perekam!.teks.filter((t) => t.x > pxKePt(744) - 1 && t.y > pxKePt(800) && t.y < pxKePt(1030));
+    pastikan(bp.length === 2 && pendek.perekam!.peringatan.length === 0 && bp[1].teks.endsWith("; dll.") && bp[0].teks.startsWith("Sewa alat 1; Sewa alat 2;"), `500 nama baris pendek: keperluan paling banyak 2 baris, ditutup "; dll." tanpa peringatan (${bp.length} baris)`);
+    const tanpaSpasi = masukan("invoiceTulisanDpro", "TAPUSSA", { ukuran: "A5_LANDSCAPE", ubah: (d) => ((d.surat.perihal = null), (d.baris = Array.from({ length: 500 }, (_, i) => ({ ...d.baris[0], no: i + 1, nama: "X".repeat(200) })))) });
+    t0 = performance.now();
+    await renderKwitansiEntitas(tanpaSpasi, "TAPUSSA");
+    pastikan(performance.now() - t0 < 2000 && dalamArea(tanpaSpasi.perekam!, "A5_LANDSCAPE", pxKePt(150)), "nama baris tanpa spasi 500 x 200: dipotong per huruf dengan pencarian biner, cepat dan di dalam area");
+    const kwPanjang = masukan("kwitansiDpro", "DPRO", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI", ubah: (d) => (d.kwitansi = { ...d.kwitansi!, keperluan: "pelunasan acara ".repeat(6000) }) });
+    t0 = performance.now();
+    await renderKwitansiEntitas(kwPanjang, "DPRO");
+    pastikan(performance.now() - t0 < 2000 && kwPanjang.perekam!.peringatan.some((p) => p.startsWith("teks terpotong")), "keperluan kwitansi 96.000 karakter: dipotong dengan peringatan di bawah 2 detik");
+
+    // T7: kolom lebih sempit dari satu huruf tetap selesai dan maju per titik kode
+    const k = new KanvasCetak({ judul: "uji", subjek: "uji", penulis: "uji", perekam: buatPerekam() });
+    k.halamanBaru(KERTAS.A4);
+    const sempit = pecahBaris(k, "WW😀ab", { lebar: 1, ukuran: 10 });
+    pastikan(sempit.join("") === "WW?ab".replace("?", "😀") && sempit.length === 5 && sempit.every((x) => Array.from(x).length === 1), `kolom 1 pt: satu huruf per baris tanpa memecah emoji (${JSON.stringify(sempit)})`);
+    pastikan(pecahBaris(k, "a b c d e f g h", { lebar: 1e3, ukuran: 10 }, 0).length === 1 && pecahBaris(k, Array(50).fill("kata").join("\n"), { lebar: 100, ukuran: 10 }, 3).length === 4, "pecahBaris berhenti sesudah batas + 1 baris");
+    const slot = isiSlotBaris(k, "satu dua tiga empat lima enam tujuh delapan sembilan sepuluh", (u) => Math.floor(24 / u), { lebar: 40, ukuran: 12, ukuranMin: 6 });
+    pastikan(slot.baris.length <= Math.floor(24 / slot.ukuran) && slot.ukuran >= 6, `isiSlotBaris dengan slot per ukuran huruf: ${slot.baris.length} baris di ${slot.ukuran} pt`);
+
+    // T2: gambar tanda tangan kwitansi di tengah kolom tanda tangan, kelima gaya
+    for (const gaya of Object.keys(PARAMETER_KWITANSI) as GayaEntitas[]) {
+      const m = masukan(KWITANSI_CONTOH[gaya], gaya, { ukuran: "A5_LANDSCAPE", judul: "KWITANSI", tandaTangan: true, aset: { ...petaAsetBawaan(gaya), TANDA_TANGAN: ttdUji() } });
+      await renderKwitansiEntitas(m, gaya);
+      const g = m.perekam!.gambar.find((x) => x.slot === "TANDA_TANGAN")!;
+      const bt = PARAMETER_KWITANSI[gaya].bawah;
+      const sumbu = pxKePt(bt.ttdX + bt.ttdW / 2);
+      pastikan(!!g && Math.abs(g.x + g.w / 2 - sumbu) < 0.05, `${gaya}: titik tengah tanda tangan di sumbu kolom (${g ? (g.x + g.w / 2).toFixed(2) : "-"} vs ${sumbu.toFixed(2)} pt)`);
+    }
+
+    // T3: info bank 12 baris di DPRO A5L tidak tertutup kaki; tab Bonanova tidak hilang
+    const info12 = masukan("kwitansiDpro", "DPRO", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI", ubah: (d) => (d.surat.infoBank = Array.from({ length: 12 }, (_, i) => `Rekening ${i + 1} Bank Contoh 123-456-${i}`).join("\n")) });
+    await renderKwitansiEntitas(info12, "DPRO");
+    const ri = info12.perekam!;
+    const kiri = ri.teks.filter((t) => t.x < pxKePt(1700) && t.y >= pxKePt(1210) - 0.5);
+    pastikan(kiri.length > 0 && kiri.every((t) => t.y + t.tinggi <= pxKePt(1748 - 242) + 0.5) && ri.peringatan.some((p) => p.startsWith("teks terpotong")) && kiri[kiri.length - 1].teks.endsWith("…"), `info bank 12 baris DPRO A5L: ${kiri.length} baris di atas kaki, terpotong dengan peringatan`);
+    const info5 = masukan("kwitansiDpro", "DPRO", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI", ubah: (d) => (d.surat.infoBank = Array.from({ length: 5 }, (_, i) => `Rekening ${i + 1}`).join("\n")) });
+    await renderKwitansiEntitas(info5, "DPRO");
+    pastikan(info5.perekam!.peringatan.length === 0 && ada(info5.perekam!, "Rekening 5"), "info bank 5 baris DPRO A5L: utuh tanpa peringatan");
+    const tab = masukan("kwitansiBonanova", "BONANOVA", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI", ubah: (d) => (d.surat.infoBank = "Bank\tBCA\tCabang\tMalang") });
+    await renderKwitansiEntitas(tab, "BONANOVA");
+    pastikan(ada(tab.perekam!, "Bank BCA Cabang Malang"), "info bank Bonanova dengan banyak tab: semua bagian tercetak (tab jadi spasi)");
+
+    // T4: pola garis isian sesuai D3 §3.7 (titik 0,5/1,5 pt, putus 3/1,5 pt)
+    const titik = await renderKwitansiEntitas(masukan("kwitansiDpro", "DPRO", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI" }), "DPRO");
+    const putus = await renderKwitansiEntitas(masukan("kwitansiTapussa", "TAPUSSA", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI" }), "TAPUSSA");
+    pastikan(isiAliran(titik).includes("[0.5 1.5] 0 d") && isiAliran(putus).includes("[3 1.5] 0 d") && !isiAliran(putus).includes("[1.5 1] 0 d"), "pola garis isian: DPRO titik [0.5 1.5], Tapussa putus [3 1.5]");
+
+    // T5: kotak nominal selalu bergaya TITIK
+    const koma = masukan("kwitansiDpro", "DPRO", { ukuran: "A5_LANDSCAPE", judul: "KWITANSI", gayaAngka: "KOMA" });
+    await renderKwitansiEntitas(koma, "DPRO");
+    pastikan(ada(koma.perekam!, "Rp 44.340.000") && !ada(koma.perekam!, "44,340,000"), "template KOMA: kotak nominal kwitansi tetap Rp 44.340.000");
+
+    // T6: kolom satu baris dirapikan
+    const nl = "PT Contoh\n\n\n\nSejahtera";
+    const inv = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", ubah: (d) => (d.kepada.nama = nl) });
+    await renderDproInvoice(inv);
+    const prop = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN", ubah: (d) => ((d.kepada.nama = nl), (d.event.namaEvent = "Fest\n\n\nRaya"), (d.event.tanggalEvent = "1\n\n2 Mei")) });
+    await renderDproProposal(prop);
+    pastikan(ada(inv.perekam!, "PT Contoh Sejahtera") && ada(prop.perekam!, "PT Contoh Sejahtera") && ada(prop.perekam!, ": Fest Raya") && ada(prop.perekam!, ": 1 2 Mei") && inv.perekam!.peringatan.length === 0, "nama pelanggan, event, dan tanggal event berbaris baru dicetak satu baris");
+
+    // T8: tinggi gambar label mengikuti orientasi EXIF, sama dengan yang digambar
+    const jpeg = jpegBerputar();
+    const ber = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", aset: { ...petaAsetBawaan("DPRO"), LABEL_SALAM: jpeg } });
+    await renderDproInvoice(ber);
+    const gs = ber.perekam!.gambar.find((x) => x.slot === "LABEL_SALAM")!;
+    const kk = new KanvasCetak({ judul: "uji", subjek: "uji", penulis: "uji" });
+    const hRuang = tinggiGambarSlot(kk, ber, "LABEL_SALAM", gs.w);
+    pastikan(Math.abs(gs.h - 4 * gs.w) < 0.01 && hRuang !== null && Math.abs(hRuang - gs.h) < 0.01, `JPEG berorientasi 6: ruang ${hRuang?.toFixed(1)} pt = tinggi tergambar ${gs.h.toFixed(1)} pt (tegak)`);
+    const propJ = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN", aset: { ...petaAsetBawaan("DPRO"), LABEL_SALAM: jpeg } });
+    await renderDproProposal(propJ);
+    pastikan(propJ.perekam!.gambar.some((x) => x.slot === "LABEL_SALAM") && !ada(propJ.perekam!, "Hormat kami,", 2), "proposal: label salam JPEG digambar sebagai gambar, bukan teks");
   }
 
   console.log("=== DONE, all tata-letak checks passed ===");

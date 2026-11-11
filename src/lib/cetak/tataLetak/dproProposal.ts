@@ -20,6 +20,7 @@ import {
   ruangUtuh,
   syaratDicetak,
   tandaTanganDipakai,
+  satuBaris,
   tinggiGambarSlot,
   type MasukanTataLetak,
 } from "@/lib/cetak/tataLetak/blok";
@@ -85,14 +86,14 @@ export async function renderDproProposal(m: MasukanTataLetak): Promise<Uint8Arra
   jarak(k, pt(46));
   k.teks("Kepada Yth :", { x: x0, lebar, ukuran: B, font: "B", warna: utama });
   jarak(k, 4);
-  k.teks(dok.kepada.nama, { x: x0, lebar, ukuran: pt(40), font: "B", warna: tinta });
+  k.teks(satuBaris(dok.kepada.nama), { x: x0, lebar, ukuran: pt(40), font: "B", warna: tinta });
   jarak(k, 4);
   k.teks("di tempat", { x: x0, lebar, ukuran: B, warna: tinta });
   jarak(k, pt(46));
   const tab = px(P.tabEvent);
   for (const [label, nilai] of [
-    ["Event", dok.event.namaEvent ?? dok.surat.perihal ?? ""],
-    ["Tanggal", dok.event.tanggalEvent ?? ""],
+    ["Event", satuBaris(dok.event.namaEvent ?? dok.surat.perihal)],
+    ["Tanggal", satuBaris(dok.event.tanggalEvent)],
   ] as const) {
     const y = k.y;
     k.teks(label, { x: x0, y, lebar: tab, ukuran: B, warna: tinta });
@@ -179,11 +180,12 @@ export async function renderDproProposal(m: MasukanTataLetak): Promise<Uint8Arra
     const ruang = pt(P.ruangTtdPenutup);
     const nama = { x, lebar: w, ukuran: pt(42), font: "B" as const, warna: utama, rata: "tengah" as const, garisBawah: true };
     const salam = { x, lebar: w, ukuran: pt(45), font: "B" as const, warna: utama, rata: "tengah" as const };
-    const hSalam = tinggiGambarSlot(m, "LABEL_SALAM", lebarSalam) ?? k.ukur(identitas.teksSalam, salam).tinggi;
+    const hGambarSalam = tinggiGambarSlot(k, m, "LABEL_SALAM", lebarSalam);
+    const hSalam = hGambarSalam ?? k.ukur(identitas.teksSalam, salam).tinggi;
     const ttd = tandaTanganDipakai(m);
     ruangUtuh(k, hSalam + ruang + (identitas.penandaTangan ? k.ukur(identitas.penandaTangan, nama).tinggi : 0));
     let y = k.y;
-    if (m.tema.aset.LABEL_SALAM) gambarSlot(k, m, "LABEL_SALAM", { x: x + (w - lebarSalam) / 2, y, w: lebarSalam });
+    if (hGambarSalam !== null) gambarSlot(k, m, "LABEL_SALAM", { x: x + (w - lebarSalam) / 2, y, w: lebarSalam });
     else k.teks(identitas.teksSalam, { ...salam, y });
     y += hSalam;
     // tanda tangan setinggi paling banyak ruang ini, rasio dijaga

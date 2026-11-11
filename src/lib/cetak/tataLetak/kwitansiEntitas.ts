@@ -12,12 +12,12 @@ import {
   buatKanvas,
   isiSlotBaris,
   isiTokenRekening,
+  pecahBaris,
   judulSama,
   kotaTanggal,
   rupiah,
   tandaTanganDipakai,
   teksKotak,
-  ukuranPng,
   type MasukanTataLetak,
 } from "@/lib/cetak/tataLetak/blok";
 
@@ -283,6 +283,10 @@ const BAWAH_PX = 150;
 /** Lebar gambar judul Nawasena yang lebarnya mengikuti rasio, bila gambarnya tidak ada (judul teks). */
 const LEBAR_JUDUL_TEKS = 500;
 const UKURAN_MIN_ISIAN = 6;
+/** Pola garis isian D3 §3.7 dalam pt (panjang, jarak), tidak bergantung tebal garis. */
+const POLA_GARIS = { titik: [0.5, 1.5], putus: [3, 1.5] } as const satisfies Record<string, [number, number]>;
+/** Gabungan nama baris untuk keperluan invoice tulisan paling banyak sekian baris di ukuran isian (D3 §3.7). */
+const BARIS_KEPERLUAN_INVOICE = 2;
 
 /** Mode invoice tulisan untuk faktur dan tagihan termin (D3 §3.7). */
 export const modeInvoiceTulisan = (m: MasukanTataLetak) => m.dok.jenis === "faktur" || m.dok.jenis === "tagihan-termin";
@@ -292,14 +296,28 @@ export function jumlahKwitansi(m: MasukanTataLetak): Desimal {
   return !modeInvoiceTulisan(m) && m.dok.kwitansi ? m.dok.kwitansi.jumlah : m.dok.ringkasan.total;
 }
 
-/** Keperluan invoice tulisan: perihal, nama baris digabung "; ", atau "Tagihan {nomor}". */
-function keperluan(m: MasukanTataLetak): string {
+/**
+ * Keperluan invoice tulisan: perihal, nama baris digabung "; ", atau "Tagihan {nomor}". Nama baris ditambahkan satu
+ * per satu selama gabungannya paling banyak dua baris di ukuran isian; bila ada yang tidak muat, ditutup "; dll."
+ * (D3 §3.7 "≤ 2 baris"). Satu nama yang sendirian lebih dari dua baris tetap dipakai dan diatur isiSlotBaris.
+ */
+function keperluan(m: MasukanTataLetak, k: KanvasCetak, opsi: { lebar: number; ukuran: number }): string {
   if (!modeInvoiceTulisan(m)) return m.dok.kwitansi?.keperluan ?? "";
+  const perihal = m.dok.surat.perihal?.trim();
+  if (perihal) return perihal;
   const nama = barisDicetak(m)
     .map((b) => b.nama.trim())
-    .filter(Boolean)
-    .join("; ");
-  return m.dok.surat.perihal?.trim() || nama || `Tagihan ${m.dok.nomorTampil}`;
+    .filter(Boolean);
+  if (!nama.length) return `Tagihan ${m.dok.nomorTampil}`;
+  const muat = (s: string) => pecahBaris(k, s, { ...opsi, font: "B" }, BARIS_KEPERLUAN_INVOICE).length <= BARIS_KEPERLUAN_INVOICE;
+  let hasil = nama[0];
+  for (let i = 1; i < nama.length; i++) {
+    const coba = `${hasil}; ${nama[i]}`;
+    const tutup = i < nama.length - 1 ? "; dll." : "";
+    if (!muat(coba + tutup)) return muat(`${hasil}; dll.`) ? `${hasil}; dll.` : hasil;
+    hasil = coba;
+  }
+  return hasil;
 }
 
 /** Posisi gambar per ukuran; pengecualian watermark Bonanova A4 (D3 §3.7). */
@@ -332,8 +350,8 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
       if (g.slot === "JUDUL_KWITANSI") {
         if (pakaiGambarJudul) {
           const isi = m.tema.aset[slotJudul]!;
-          const ukuranAsli = ukuranPng(isi);
-          const w = pos.w ?? (ukuranAsli ? (pos.h * ukuranAsli.lebar) / ukuranAsli.tinggi : pos.h * 4);
+          const ukuranAsli = kk.ukuranGambar(isi);
+          const w = pos.w ?? (pos.h * ukuranAsli.lebar) / ukuranAsli.tinggi;
           kk.gambar(isi, { x: px(pos.x), y: px(pos.y), w: px(w), h: px(pos.h) }, slotJudul);
         } else {
           teksKotak(kk, m.judul, { x: px(pos.x), y: px(pos.y), w: px(pos.w ?? LEBAR_JUDUL_TEKS), h: px(pos.h) }, { ukuran: pt(60), ukuranMin: UKURAN_MIN_ISIAN, font: "B", warna: m.tema.warnaUtama, rata: "tengah", jarakHuruf: 1 });
@@ -379,13 +397,13 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
 
   // ---------- Baris isian bergaris ----------
   const rw = P.baris;
+  const lebarNilai = px(rw.akhir - rw.nilaiX);
+  const ukuranBaris = pt(rw.ukuran);
   const nilaiIsi: Record<Exclude<Isi, null>, string> = {
     TERIMA_DARI: invoice ? dok.kepada.nama : (dok.kwitansi?.terimaDari ?? dok.kepada.nama),
     TERBILANG: `# ${terbilangRupiah(jumlah, "JUDUL")} #`,
-    KEPERLUAN: keperluan(m),
+    KEPERLUAN: keperluan(m, k, { lebar: lebarNilai, ukuran: ukuranBaris }),
   };
-  const lebarNilai = px(rw.akhir - rw.nilaiX);
-  const ukuranBaris = pt(rw.ukuran);
   rw.daftar.forEach((b, i) => {
     const yBawah = px(b.y);
     const teksLabel = b.isi === "TERIMA_DARI" && invoice ? "Kepada" : b.label;
@@ -394,7 +412,7 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
       k.teks(teksLabel, { x: px(rw.labelX), y: yAtas, lebar: px(rw.titikDuaX - rw.labelX), ukuran: ukuranBaris, font: "B", warna: label });
       k.teks(":", { x: px(rw.titikDuaX), y: yAtas, lebar: px(rw.nilaiX - rw.titikDuaX), ukuran: ukuranBaris, font: "B", warna: label });
     }
-    if (rw.garis) k.garis(px(rw.nilaiX), yBawah, px(rw.akhir), yBawah, rw.garis);
+    if (rw.garis) k.garis(px(rw.nilaiX), yBawah, px(rw.akhir), yBawah, rw.garis.gaya === "penuh" ? rw.garis : { ...rw.garis, pola: [...POLA_GARIS[rw.garis.gaya]] });
     if (!b.isi) return;
     // baris lanjutan (isi null) sesudah baris ini menampung sisa teksnya
     let slot = 1;
@@ -409,7 +427,8 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
   const nm = P.nominal;
   const kotakNominal = { x: px(nm.x), y: px(nm.y), w: px(nm.w), h: px(nm.ukuran * 1.6) };
   k.kotak(kotakNominal.x, kotakNominal.y, kotakNominal.w, kotakNominal.h, { isi: nm.latar });
-  teksKotak(k, rupiah(m, jumlah, nm.akhiran), kotakNominal, { ukuran: pt(nm.ukuran), ukuranMin: UKURAN_MIN_ISIAN, font: "B", warna: PUTIH, rata: "tengah" });
+  // nominal selalu bergaya TITIK seperti generator (DG:kwitansi.py), apa pun gaya angka template (D3 §3.7)
+  teksKotak(k, formatRupiah(jumlah, "TITIK", m.tema.desimal, { akhiran: nm.akhiran }), kotakNominal, { ukuran: pt(nm.ukuran), ukuranMin: UKURAN_MIN_ISIAN, font: "B", warna: PUTIH, rata: "tengah" });
   const potongan = !invoice ? dok.kwitansi?.potonganPajak : null;
   if (bukanNol(potongan)) {
     k.teks(`Termasuk PPh 23 dipotong pelanggan: ${rupiah(m, potongan!)}`, { x: kotakNominal.x, y: kotakNominal.y + kotakNominal.h + px(8), lebar: px(P.bawah.ttdX - nm.x), ukuran: pt(28), warna: tinta });
@@ -418,7 +437,19 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
   // ---------- Blok bawah: pembayaran (kiri) | tanda tangan (kanan) ----------
   const bt = P.bawah;
   const infoBank = dok.surat.infoBank?.trim() || null;
-  const kiri = infoBank ? [{ ...bt.kiri[0], teks: infoBank }] : bt.kiri.map((t) => ({ ...t, teks: isiTokenRekening(t.teks, identitas) }));
+  // batas bawah kolom kiri: margin bawah atau tepi atas kaki gaya ini (kaki digambar di lapisan depan)
+  const kaki = m.tema.aset.KAKI ? P.gambar.find((g) => g.slot === "KAKI") : undefined;
+  const batasKiri = px(Math.min(H - BAWAH_PX, kaki ? kaki.y(H) : Infinity));
+  if (infoBank) {
+    // info rekening dokumen: tab jadi spasi, turun ukuran sampai 6 pt, lalu dipotong dengan peringatan
+    const t = bt.kiri[0];
+    const y0 = px(t.y);
+    const lebarKiri = px(bt.ttdX - t.x);
+    const font = t.tebal ? ("B" as const) : ("R" as const);
+    const { baris, ukuran } = isiSlotBaris(k, infoBank.replace(/\t/g, " "), (u) => Math.floor((batasKiri - y0 + 0.01) / (1.25 * u)), { lebar: lebarKiri, ukuran: pt(t.ukuran), font, ukuranMin: UKURAN_MIN_ISIAN });
+    baris.forEach((isi, j) => k.teks(isi, { x: px(t.x), y: y0 + j * 1.25 * ukuran, lebar: lebarKiri, ukuran, font, warna: label, tinggiBaris: { pasti: 1.25 * ukuran } }));
+  }
+  const kiri = infoBank ? [] : bt.kiri.map((t) => ({ ...t, teks: isiTokenRekening(t.teks, identitas) }));
   for (const t of kiri) {
     const u = pt(t.ukuran);
     const lebarKiri = px(bt.ttdX - t.x);
@@ -427,7 +458,7 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
     if (sesudahTab !== undefined && bt.tab) {
       k.teks(sebelumTab, { ...opsi, lebar: px(bt.tab - t.x) });
       k.teks(sesudahTab, { ...opsi, x: px(bt.tab), lebar: px(bt.ttdX - bt.tab) });
-    } else k.teks(infoBank ? t.teks : t.teks.replace(/\t/g, " "), opsi);
+    } else k.teks(t.teks.replace(/\t/g, " "), opsi);
   }
 
   const xTtd = px(bt.ttdX);
@@ -439,7 +470,11 @@ export async function renderKwitansiEntitas(m: MasukanTataLetak, gaya: GayaEntit
     if (b.jenis === "ttd") {
       const h = px(b.ukuran);
       // rasio gambar tanda tangan 1000:560; tanpa gambar ruangnya tetap disisakan
-      if (ttd) k.gambar(ttd, { x: xTtd, y, muat: [Math.min(wTtd, (h * 1000) / 560), h], rata: "tengah" }, "TANDA_TANGAN");
+      if (ttd) {
+        // kotak 1000:560 di tengah kolom tanda tangan (sumbu sama dengan kota, salam, dan nama)
+        const lebarTtd = Math.min(wTtd, (h * 1000) / 560);
+        k.gambar(ttd, { x: xTtd + (wTtd - lebarTtd) / 2, y, muat: [lebarTtd, h] }, "TANDA_TANGAN");
+      }
       bawahKanan = Math.max(bawahKanan, y + h);
       continue;
     }

@@ -21,6 +21,7 @@ import {
   syaratDicetak,
   tandaTanganDipakai,
   teksUangMukaDipotong,
+  satuBaris,
   tinggiGambarSlot,
   type MasukanTataLetak,
 } from "@/lib/cetak/tataLetak/blok";
@@ -100,7 +101,7 @@ export function lapisanDpro(m: MasukanTataLetak, watermark: { x: number; y: numb
 function judulInvoice(k: KanvasCetak, m: MasukanTataLetak, x: number, y: number, lebar: number, ukurSaja = false): number {
   const w = k.px(DPRO_INVOICE.judulLebar);
   if (judulSama(m.judul, "INVOICE") && m.tema.aset.JUDUL_INVOICE) {
-    if (ukurSaja) return tinggiGambarSlot(m, "JUDUL_INVOICE", w) ?? 0;
+    if (ukurSaja) return tinggiGambarSlot(k, m, "JUDUL_INVOICE", w) ?? 0;
     return gambarSlot(k, m, "JUDUL_INVOICE", { x: x + (lebar - w) / 2, y, w })?.h ?? 0;
   }
   const opsi = { x, y, lebar, ukuran: 18 * k.skala, font: "B" as const, warna: m.tema.warnaUtama, rata: "tengah" as const, jarakHuruf: 1 };
@@ -136,7 +137,7 @@ export async function renderDproInvoice(m: MasukanTataLetak): Promise<Uint8Array
     const kolom = (LS ? DPRO_INVOICE.kolomAtasLS : DPRO_INVOICE.kolomAtas).map(px);
     const y = k.y;
     const hLabel = k.teks("ISSUED TO:", { x: x0, y, lebar: kolom[0], ukuran: pt(37), font: "B", warna: utama });
-    const hKiri = hLabel + 2 + k.teks(dok.kepada.nama, { x: x0, y: y + hLabel + 2, lebar: kolom[0], ukuran: pt(45), font: "B", warna: tinta });
+    const hKiri = hLabel + 2 + k.teks(satuBaris(dok.kepada.nama), { x: x0, y: y + hLabel + 2, lebar: kolom[0], ukuran: pt(45), font: "B", warna: tinta });
     const xKanan = x0 + kolom.slice(0, -1).reduce((a, b) => a + b, 0);
     const lebarKanan = kolom[kolom.length - 1];
     const hNomor = k.teks(`${labelNomorInvoice(m.judul)} ${dok.nomorTampil}`, { x: xKanan, y, lebar: lebarKanan, ukuran: pt(37), warna: tinta, rata: "kanan" });
@@ -220,10 +221,10 @@ export async function renderDproInvoice(m: MasukanTataLetak): Promise<Uint8Array
     const ruang = ttd ? Math.max(pt(p.ruangTtd), tinggiTtd) : pt(p.ruangTtd);
 
     const lebarLabelBayar = px(DPRO_INVOICE.labelBayarLebar);
-    const hLabelBayar = tinggiGambarSlot(m, "LABEL_PEMBAYARAN", lebarLabelBayar);
+    const hLabelBayar = tinggiGambarSlot(k, m, "LABEL_PEMBAYARAN", lebarLabelBayar);
     const teksLabelBayar = { x: xKiri, lebar: lebarKiri, ukuran: pt(45), font: "B" as const, warna: utama };
     const lebarSalam = px(DPRO_INVOICE.labelSalamLebar);
-    const hSalam = tinggiGambarSlot(m, "LABEL_SALAM", lebarSalam);
+    const hSalam = tinggiGambarSlot(k, m, "LABEL_SALAM", lebarSalam);
     const teksSalam = { x: xKanan, lebar: lebarKanan, ukuran: pt(45), font: "B" as const, warna: utama, rata: "tengah" as const };
     const infoBank = dok.surat.infoBank?.trim() || null;
     const rek = [

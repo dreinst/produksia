@@ -66,29 +66,15 @@ export function gambarSlot(k: KanvasCetak, m: MasukanTataLetak, slot: JenisAsetK
   return isi ? k.gambar(isi, kotak, slot) : null;
 }
 
-/** Ukuran gambar slot bila digambar selebar w (rasio asli), tanpa menggambar. */
-export function tinggiGambarSlot(m: MasukanTataLetak, slot: JenisAsetKop, w: number): number | null {
+/**
+ * Tinggi gambar slot bila digambar selebar w (rasio asli, orientasi EXIF sama dengan `gambar`), tanpa menggambar.
+ * null bila slot tanpa gambar; pemanggil memilih gambar atau teks dengan syarat yang sama (hasil !== null).
+ */
+export function tinggiGambarSlot(k: KanvasCetak, m: MasukanTataLetak, slot: JenisAsetKop, w: number): number | null {
   const isi = m.tema.aset[slot];
   if (!isi) return null;
-  const ukuran = ukuranPng(isi);
-  return ukuran ? (w * ukuran.tinggi) / ukuran.lebar : null;
-}
-
-/** Lebar/tinggi piksel dari kepala PNG atau JPEG (sudah lolos periksaGambar saat digambar). */
-export function ukuranPng(isi: Uint8Array): { lebar: number; tinggi: number } | null {
-  const b = Buffer.from(isi.buffer, isi.byteOffset, isi.byteLength);
-  if (b.length >= 24 && b[0] === 0x89 && b.toString("latin1", 12, 16) === "IHDR") return { lebar: b.readUInt32BE(16), tinggi: b.readUInt32BE(20) };
-  if (b.length >= 4 && b[0] === 0xff && b[1] === 0xd8) {
-    let i = 2;
-    while (i + 9 < b.length) {
-      if (b[i] !== 0xff) return null;
-      const penanda = b[i + 1];
-      const panjang = b.readUInt16BE(i + 2);
-      if (penanda >= 0xc0 && penanda <= 0xcf && penanda !== 0xc4 && penanda !== 0xc8 && penanda !== 0xcc) return { lebar: b.readUInt16BE(i + 7), tinggi: b.readUInt16BE(i + 5) };
-      i += 2 + panjang;
-    }
-  }
-  return null;
+  const u = k.ukuranGambar(isi);
+  return (w * u.tinggi) / u.lebar;
 }
 
 // ---------- Angka dan teks ----------
@@ -104,6 +90,12 @@ export const hurufJudul = (s: string) => s.toLocaleLowerCase("id-ID").replace(/(
 
 /** Judul sama dengan judul bawaan gambar (tanpa beda huruf besar), D3 §3.1 "Judul gambar". */
 export const judulSama = (judul: string, ...bawaan: string[]) => bawaan.some((b) => judul.trim().toLocaleUpperCase("id-ID") === b);
+
+/**
+ * Kolom satu baris di cetak (nama pelanggan, event, tanggal event): baris baru dan spasi di sekitarnya dirapikan
+ * menjadi satu spasi, supaya data dari luar formulir tidak mendorong blok atas melewati tabel dan kaki.
+ */
+export const satuBaris = (s: string | null | undefined) => (s ?? "").replace(/\s*\n\s*/g, " ").trim();
 
 /** "{kota}, {tanggal panjang}", tanpa kota bila kosong. */
 export const kotaTanggal = (m: MasukanTataLetak, d: Date) => (m.identitas.kota ? `${m.identitas.kota}, ${formatTanggalPanjang(d)}` : formatTanggalPanjang(d));
@@ -227,34 +219,55 @@ export function alirBerbutir(k: KanvasCetak, daftar: BarisTeksCetak[], opsi: Omi
   }
 }
 
+type OpsiPecah = Pick<OpsiTeks, "lebar" | "ukuran" | "font" | "jarakHuruf">;
+
+/** Prefiks terpanjang (dalam titik kode) yang lolos `muat`; paling sedikit `minimal` titik kode. Pencarian biner. */
+function prefiksTerpanjang(huruf: string[], muat: (s: string) => boolean, minimal = 0): number {
+  let lo = minimal;
+  let hi = huruf.length;
+  while (lo < hi) {
+    const tengah = Math.ceil((lo + hi) / 2);
+    if (muat(huruf.slice(0, tengah).join(""))) lo = tengah;
+    else hi = tengah - 1;
+  }
+  return lo;
+}
+
 /**
  * Pecah teks menjadi baris selebar `lebar` dengan pengukur kanvas (kata utuh; kata yang lebih lebar dari baris
- * dipotong per huruf). "\n" memaksa baris baru. Dipakai isian kwitansi yang barisnya punya posisi tetap.
+ * dipotong per huruf dengan pencarian biner). "\n" memaksa baris baru. Dipakai isian kwitansi yang barisnya punya
+ * posisi tetap. `batas` menghentikan pemecahan begitu baris melebihi jumlah itu (hasil berisi batas + 1 baris), jadi
+ * teks sangat panjang tidak diukur seluruhnya. Satu huruf yang lebih lebar dari kolom tetap dijadikan satu baris
+ * (selalu maju), dengan peringatan.
  */
-export function pecahBaris(k: KanvasCetak, teks: string, opsi: Pick<OpsiTeks, "lebar" | "ukuran" | "font" | "jarakHuruf">): string[] {
+export function pecahBaris(k: KanvasCetak, teks: string, opsi: OpsiPecah, batas = Infinity): string[] {
   // diukur sebagai satu baris (lebar tak terbatas), lalu dibandingkan dengan lebar kolom
   const muat = (s: string) => k.ukur(s, { x: 0, ...opsi, lebar: 1e6 }).lebar <= opsi.lebar + 0.01;
   const hasil: string[] = [];
+  const penuh = () => hasil.length > batas;
   for (const paragraf of teks.split("\n")) {
     const kata = paragraf.split(/ +/).filter(Boolean);
     let baris = "";
-    for (let w of kata) {
-      const coba = baris ? `${baris} ${w}` : w;
+    for (const kataIni of kata) {
+      if (penuh()) break;
+      const coba = baris ? `${baris} ${kataIni}` : kataIni;
       if (muat(coba)) {
         baris = coba;
         continue;
       }
       if (baris) hasil.push(baris);
       baris = "";
-      // kata yang lebih lebar dari satu baris dipotong per huruf
-      while (!muat(w)) {
-        let n = w.length - 1;
-        while (n > 1 && !muat(w.slice(0, n))) n--;
-        hasil.push(w.slice(0, n));
-        w = w.slice(n);
+      // kata yang lebih lebar dari satu baris dipotong per huruf (titik kode, jadi pasangan surrogate tidak terbelah)
+      let huruf = Array.from(kataIni);
+      while (huruf.length && !muat(huruf.join("")) && !penuh()) {
+        const n = prefiksTerpanjang(huruf, muat, 1);
+        if (n === 1 && !muat(huruf[0])) k.peringatan(`huruf lebih lebar dari kolom: ${huruf[0]}`);
+        hasil.push(huruf.slice(0, n).join(""));
+        huruf = huruf.slice(n);
       }
-      baris = w;
+      baris = huruf.join("");
     }
+    if (penuh()) break;
     if (baris || !kata.length) hasil.push(baris);
   }
   // paragraf kosong di ujung tidak menambah baris
@@ -264,22 +277,25 @@ export function pecahBaris(k: KanvasCetak, teks: string, opsi: Pick<OpsiTeks, "l
 
 /**
  * Isi teks ke sejumlah slot baris berposisi tetap: ukuran turun 0,5 pt sampai `ukuranMin`; bila tetap lebih banyak
- * dari slot, baris terakhir dipotong dengan "…" dan peringatan "teks terpotong" dicatat (D3 §3.7).
+ * dari slot, baris terakhir dipotong dengan "…" dan peringatan "teks terpotong" dicatat (D3 §3.7). `slot` boleh
+ * fungsi ukuran huruf (jumlah baris yang muat di tinggi tertentu). Pemotongan mulai dari baris slot terakhir (yang
+ * sudah muat) ditambah baris sesudahnya, jadi kerjanya tidak bergantung pada panjang teks.
  */
-export function isiSlotBaris(k: KanvasCetak, teks: string, slot: number, opsi: Pick<OpsiTeks, "lebar" | "ukuran" | "font" | "jarakHuruf"> & { ukuranMin: number }): { baris: string[]; ukuran: number } {
+export function isiSlotBaris(k: KanvasCetak, teks: string, slot: number | ((ukuran: number) => number), opsi: OpsiPecah & { ukuranMin: number }): { baris: string[]; ukuran: number } {
+  const jumlahSlot = (u: number) => Math.max(1, typeof slot === "number" ? slot : slot(u));
   let ukuran = opsi.ukuran;
-  let baris = pecahBaris(k, teks, { ...opsi, ukuran });
-  while (baris.length > slot && ukuran - 0.5 >= opsi.ukuranMin) {
+  let baris = pecahBaris(k, teks, { ...opsi, ukuran }, jumlahSlot(ukuran));
+  while (baris.length > jumlahSlot(ukuran) && ukuran - 0.5 >= opsi.ukuranMin) {
     ukuran -= 0.5;
-    baris = pecahBaris(k, teks, { ...opsi, ukuran });
+    baris = pecahBaris(k, teks, { ...opsi, ukuran }, jumlahSlot(ukuran));
   }
-  if (baris.length > slot) {
+  const n = jumlahSlot(ukuran);
+  if (baris.length > n) {
     k.peringatan(`teks terpotong: ${teks.slice(0, 60)}`);
-    const awal = baris.slice(0, slot - 1);
-    let akhir = baris.slice(slot - 1).join(" ");
-    const muat = (s: string) => k.ukur(s, { x: 0, ...opsi, ukuran, lebar: 1e6 }).lebar <= opsi.lebar + 0.01;
-    while (akhir && !muat(`${akhir}…`)) akhir = akhir.slice(0, -1).trimEnd();
-    baris = [...awal, `${akhir}…`];
+    const muat = (s: string) => k.ukur(`${s.trimEnd()}…`, { x: 0, ...opsi, ukuran, lebar: 1e6 }).lebar <= opsi.lebar + 0.01;
+    const huruf = Array.from(`${baris[n - 1]} ${baris[n]}`);
+    const akhir = huruf.slice(0, prefiksTerpanjang(huruf, muat)).join("").trimEnd();
+    baris = [...baris.slice(0, n - 1), `${akhir}…`];
   }
   return { baris, ukuran };
 }
