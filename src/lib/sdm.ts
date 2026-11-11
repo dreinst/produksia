@@ -84,12 +84,10 @@ export async function catatJurnalPenggajian(tx: Tx, penggajianId: string, opsi: 
     `Penggajian ${g.bulan}${g.keterangan ? `: ${g.keterangan}` : ""}`,
     "PENGGAJIAN",
     baris,
-    { tanggal: g.tanggal, proyekId: g.proyekId, ...opsi },
+    // jurnal gaji selalu milik perusahaan penggajian (D1 §4.1), apa pun isi opsi
+    { tanggal: g.tanggal, proyekId: g.proyekId, ...opsi, perusahaanId: g.perusahaanId },
   );
   if (jurnal) {
-    // Jurnal gaji milik perusahaan penggajian. catatJurnal belum menerima perusahaanId (P11), jadi kolomnya diisi
-    // sesudah dibuat di transaksi yang sama; untuk utama tidak ada yang berubah.
-    if (g.perusahaanId !== jurnal.perusahaanId) await tx.jurnal.update({ where: { id: jurnal.id }, data: { perusahaanId: g.perusahaanId } });
     await tx.penggajian.update({ where: { id: g.id }, data: { jurnalId: jurnal.id } });
   }
   return jurnal;

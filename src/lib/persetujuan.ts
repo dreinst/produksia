@@ -217,7 +217,8 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
         where: { id },
         include: { baris: true, pesanan: { select: { proyekId: true } } },
       });
-      const pengaturan = await ambilPengaturanPerusahaan(tx);
+      // pajak dari pengaturan perusahaan faktur (utama = baris default, seperti sebelumnya)
+      const pengaturan = await ambilPengaturanPerusahaan(tx, f.perusahaanId);
       // Konsumsi "Barang Terkirim Belum Ditagih" sudah dihitung & disimpan saat draf dibuat
       const konsumsiTransit: KonsumsiTransit[] = f.baris
         .filter((b) => D(b.nilaiTransit).gt(0))
@@ -249,7 +250,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
         where: { id },
         include: { baris: true, pesanan: { include: { baris: true } } },
       });
-      const pengaturan = await ambilPengaturanPerusahaan(tx);
+      const pengaturan = await ambilPengaturanPerusahaan(tx, f.perusahaanId);
       const hargaPesanan = new Map((f.pesanan?.baris ?? []).map((ol) => [ol.barangId, D(ol.harga)]));
       const jurnal = await catatJurnalFakturPembelian(
         tx,
@@ -292,6 +293,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       const jurnal = await catatJurnal(tx, d.jenis === "MASUK" ? "KM" : "KK", ket, d.jenis === "MASUK" ? "KAS_MASUK" : "KAS_KELUAR", baris, {
         tanggal: d.tanggal,
         proyekId: d.proyekId,
+        perusahaanId: d.perusahaanId,
       });
       if (jurnal) await tx.dokumenKas.update({ where: { id }, data: { jurnalId: jurnal.id } });
     },
@@ -439,7 +441,7 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       if (!a.akunPembayaranId) return;
       const jurnal = await catatJurnalPerolehanAset(
         tx,
-        { kode: a.kode, nama: a.nama, hargaPerolehan: D(a.hargaPerolehan), akunAsetId: a.akunAsetId, akunPembayaranId: a.akunPembayaranId },
+        { kode: a.kode, nama: a.nama, hargaPerolehan: D(a.hargaPerolehan), akunAsetId: a.akunAsetId, akunPembayaranId: a.akunPembayaranId, perusahaanId: a.perusahaanId },
         { tanggal: a.tanggalPerolehan },
       );
       if (jurnal) await tx.asetTetap.update({ where: { id }, data: { jurnalPerolehanId: jurnal.id } });
@@ -461,7 +463,8 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     },
     ringkas: async (tx, id) => {
       const g = await tx.penggajian.findUniqueOrThrow({ where: { id }, include: { baris: true } });
-      return ringkasanPenggajian({ ...g, totalGajiPokok: D(g.totalGajiPokok), totalTunjangan: D(g.totalTunjangan), totalPotongan: D(g.totalPotongan), totalDibayar: D(g.totalDibayar) });
+      // bulan, bukan periode: periode perusahaan selain utama berisi kunci internal YYYY-MM@id (utama identik)
+      return ringkasanPenggajian({ ...g, periode: g.bulan, totalGajiPokok: D(g.totalGajiPokok), totalTunjangan: D(g.totalTunjangan), totalPotongan: D(g.totalPotongan), totalDibayar: D(g.totalDibayar) });
     },
   },
 };

@@ -6,6 +6,7 @@ import { wajibHakAksi } from "@/lib/otentikasi";
 import { jalankanFormulir, jalankanFormulirHasil, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format } from "@/lib/uang";
 import { jalankanRevaluasi } from "@/lib/selisihKurs";
+import { lingkupPerusahaan, PERUSAHAAN_UTAMA } from "@/lib/perusahaan";
 
 /*
  * Pengaturan › Mata Uang & Kurs: daftar mata uang transaksi dan riwayat kursnya terhadap rupiah,
@@ -118,7 +119,8 @@ export async function hapusKurs(id: string) {
 
 /**
  * Penilaian kembali piutang/hutang mata uang asing per tanggal tertentu (biasanya akhir bulan/tahun).
- * Menghasilkan satu jurnal JU-SK yang seimbang, lalu dicatat di log aktivitas.
+ * Menghasilkan satu jurnal JU-SK yang seimbang per perusahaan (D1 §4.4): lingkup satu perusahaan hanya menilai faktur
+ * perusahaan itu, lingkup gabungan menilai semua perusahaan. Setiap jurnal dicatat di log aktivitas.
  */
 export async function jalankanPenilaianKurs(dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("pengaturan.tulis");
@@ -130,17 +132,21 @@ export async function jalankanPenilaianKurs(dataFormulir: FormData) {
   akhirHariIni.setHours(23, 59, 59, 999);
   if (tanggal > akhirHariIni) throw new Error("Tanggal penilaian tidak boleh di masa depan");
 
+  const lingkup = await lingkupPerusahaan();
   const hasil = await db.$transaction(async (tx) => {
-    const { ringkasan, nomorJurnal } = await jalankanRevaluasi(tx, tanggal);
-    if (nomorJurnal) {
+    const { ringkasan, nomorJurnal, jurnalPerPerusahaan } = await jalankanRevaluasi(tx, tanggal, lingkup.perusahaanId);
+    for (const j of jurnalPerPerusahaan) {
+      const r = j.ringkasan;
       await tx.logAktivitas.create({
         data: {
           penggunaId: pengguna.id === "skrip-uji" ? null : pengguna.id,
           penggunaNama: pengguna.nama,
           aksi: "REVALUASI",
           jenis: "Selisih Kurs",
-          nomor: nomorJurnal,
-          keterangan: `${ringkasan.baris.length} faktur dinilai ulang per ${tanggalTeks}; ${ringkasan.labaRugi.gte(0) ? "laba" : "rugi"} kurs ${format(ringkasan.labaRugi.abs())}`,
+          nomor: j.nomor,
+          perusahaanId: j.perusahaanId,
+          // teks utama sama dengan sebelum multi perusahaan; perusahaan lain diawali kodenya
+          keterangan: `${j.perusahaanId === PERUSAHAAN_UTAMA ? "" : `${j.kode}: `}${r.baris.length} faktur dinilai ulang per ${tanggalTeks}; ${r.labaRugi.gte(0) ? "laba" : "rugi"} kurs ${format(r.labaRugi.abs())}`,
         },
       });
     }

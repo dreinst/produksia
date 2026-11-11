@@ -45,6 +45,7 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "1-1600", nama: "Persediaan", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Barang produksi & merchandise yang dijual (dipakai otomatis oleh modul stok)" },
   { kode: "1-1650", nama: "Barang Terkirim Belum Ditagih", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Aset sementara antara Surat Jalan (SJ) dan Faktur Penjualan (FJ); dipakai otomatis oleh sistem" },
   { kode: "1-1700", nama: "Piutang Lain-lain", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Kasbon karyawan/crew, piutang non-usaha" },
+  { kode: "1-1750", nama: "Piutang Antar Perusahaan", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "Tagihan ke perusahaan lain dalam grup D'Pro; dipakai otomatis oleh Transaksi Antar Perusahaan" },
   { kode: "1-1800", nama: "PPN Masukan", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "PPN yang dibayar ke vendor (hanya bila PKP); dipakai otomatis oleh Faktur Pembelian" },
   { kode: "1-1900", nama: "Pajak Dibayar Dimuka (PPh 23)", jenis: A, induk: "1-1000", asal: "USUL", keterangan: "PPh 23 yang dipotong klien dari pembayaran; dipakai otomatis oleh Penerimaan" },
 
@@ -74,7 +75,9 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "2-1330", nama: "Hutang PPN (Keluaran)", jenis: K, induk: "2-1300", asal: "USUL", keterangan: "PPN yang dipungut dari klien (hanya bila PKP); dipakai otomatis oleh Faktur Penjualan" },
   { kode: "2-1400", nama: "Beban yang Masih Harus Dibayar", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "Gaji/listrik/vendor yang sudah jadi beban tapi belum ditagih" },
   { kode: "2-1500", nama: "Hutang Lain-lain", jenis: K, induk: "2-1000", asal: "USUL" },
+  { kode: "2-1550", nama: "Hutang Antar Perusahaan", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "Kewajiban ke perusahaan lain dalam grup D'Pro; dipakai otomatis oleh Transaksi Antar Perusahaan" },
   { kode: "2-1600", nama: "Barang Diterima Belum Ditagih", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "Kewajiban sementara antara Terima Barang (TB) dan Faktur Pembelian (FB); dipakai otomatis oleh sistem" },
+  { kode: "2-1700", nama: "Hutang Mitra Proyek", jenis: K, induk: "2-1000", asal: "USUL", keterangan: "Dana talangan mitra proyek yang belum dikembalikan; dikredit saat Talangan Mitra disetujui, didebit saat modal dikembalikan" },
 
   { kode: "2-2000", nama: "Kewajiban Jangka Panjang", jenis: K, kelompok: true, asal: "USUL" },
   { kode: "2-2100", nama: "Hutang Bank", jenis: K, induk: "2-2000", asal: "USUL" },
@@ -112,6 +115,9 @@ export const BAGAN_AKUN_STANDAR: readonly AkunStandar[] = [
   { kode: "5-1200", nama: "Biaya Langsung Event", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Vendor, crew lepas, sewa venue per event" },
   { kode: "5-1300", nama: "Biaya Langsung Produksi", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Bahan dekor, cetak, jasa dokumentasi per pesanan" },
   { kode: "5-1400", nama: "Selisih Persediaan", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Selisih opname/koreksi stok dan beda harga retur pembelian; dipakai otomatis oleh sistem" },
+  { kode: "5-1500", nama: "Biaya Talent / Artis", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Honor talent, artis, dan pengisi acara per event; akun bawaan kategori anggaran Talent / Artis" },
+  { kode: "5-1600", nama: "Sewa Venue Event", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Sewa tempat acara per event; akun bawaan kategori anggaran Venue" },
+  { kode: "5-1700", nama: "Bagi Hasil Mitra Proyek", jenis: B, induk: "5-1000", asal: "USUL", keterangan: "Bagian laba proyek yang dibayarkan ke mitra; tidak dihitung sebagai biaya aktual proyek" },
 
   { kode: "5-2000", nama: "Beban Gaji & Honor", jenis: B, kelompok: true, asal: "ASLI" },
   { kode: "5-2100", nama: "Gaji Pokok", jenis: B, induk: "5-2000", asal: "ASLI" },

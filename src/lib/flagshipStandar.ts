@@ -34,7 +34,8 @@ export async function terapkanDataFlagship(klien: Klien = db): Promise<HasilFlag
     if (await klien.barang.findUnique({ where: { kode: j.kode } })) continue;
     const akun = await klien.akun.findUnique({ where: { kode: j.akunPendapatan } });
     if (!akun) continue; // bagan akun standar belum diterapkan
-    await klien.barang.create({ data: { kode: j.kode, nama: j.nama, jenis: "JASA", satuan: j.satuan, hargaBeli: 0, hargaJual: 0, kelompokId: kelompok.id, akunPendapatanId: akun.id } });
+    // jasa flagship generik dipakai bersama semua perusahaan (perusahaanId null, D1 §8.2 dan DESAIN.md M-6)
+    await klien.barang.create({ data: { kode: j.kode, nama: j.nama, jenis: "JASA", satuan: j.satuan, hargaBeli: 0, hargaJual: 0, kelompokId: kelompok.id, akunPendapatanId: akun.id, perusahaanId: null } });
     hasil.jasaDibuat++;
   }
   return hasil;

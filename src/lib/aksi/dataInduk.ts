@@ -149,7 +149,8 @@ async function buatBarangDenganJumlahAwal(pengguna: PenggunaSesi, data: Record<s
       },
     });
     if (perluPersetujuan) return;
-    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId: akunLawanAwalId, keterangan }, [{ barangId: barang.id, selisih: jumlahAwal, hargaSatuan }]);
+    // jurnal stok awal milik pemilik barang (P11); BARANG selalu punya pemilik (CHECK basis data)
+    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId: akunLawanAwalId, keterangan, perusahaanId: barang.perusahaanId ?? undefined }, [{ barangId: barang.id, selisih: jumlahAwal, hargaSatuan }]);
     if (jurnal) await tx.penyesuaianPersediaan.update({ where: { id: penyesuaian.id }, data: { jurnalId: jurnal.id } });
   });
 
@@ -222,7 +223,7 @@ export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
   if (!gudangId) throw new Error("Gudang wajib dipilih");
   const stokBaru = bacaUang(String(dataFormulir.get("stok") ?? ""), "Stok", { allowZero: true });
 
-  const barang = await db.barang.findUnique({ where: { id: barangId }, select: { kode: true, jenis: true, hargaBeli: true } });
+  const barang = await db.barang.findUnique({ where: { id: barangId }, select: { kode: true, jenis: true, hargaBeli: true, perusahaanId: true } });
   if (!barang) throw new Error("Barang tidak ditemukan");
   if (barang.jenis !== "BARANG") throw new Error("Jasa tidak punya stok");
 
@@ -262,7 +263,8 @@ export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
       },
     });
     if (perluPersetujuan) return;
-    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId, keterangan }, [{ barangId, selisih, hargaSatuan }]);
+    // jurnal koreksi stok milik pemilik barang (P11)
+    const jurnal = await catatJurnalPenyesuaianPersediaan(tx, { nomor, akunLawanId, keterangan, perusahaanId: barang.perusahaanId ?? undefined }, [{ barangId, selisih, hargaSatuan }]);
     if (jurnal) await tx.penyesuaianPersediaan.update({ where: { id: penyesuaian.id }, data: { jurnalId: jurnal.id } });
   });
 

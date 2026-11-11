@@ -43,7 +43,8 @@ export type JenisDokumen =
   | "aset"
   | "penyusutan"
   | "pelepasanAset"
-  | "penggajian";
+  | "penggajian"
+  | "antarPerusahaan";
 
 const LABEL: Record<JenisDokumen, string> = {
   penawaran: "Penawaran Penjualan",
@@ -70,6 +71,7 @@ const LABEL: Record<JenisDokumen, string> = {
   penyusutan: "Penyusutan",
   pelepasanAset: "Pelepasan Aset",
   penggajian: "Penggajian",
+  antarPerusahaan: "Transaksi Antar Perusahaan",
 };
 
 const JALUR: Record<JenisDokumen, string[]> = {
@@ -97,6 +99,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   penyusutan: ["/aset-tetap/penyusutan", "/aset-tetap"],
   pelepasanAset: ["/aset-tetap", "/buku-besar/jurnal"],
   penggajian: ["/sdm/penggajian", "/buku-besar/jurnal"],
+  antarPerusahaan: ["/buku-besar/antar-perusahaan", "/buku-besar/jurnal"],
 };
 
 function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" | "SEBAGIAN" | "LUNAS" {
@@ -164,6 +167,7 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal" | "dokumenKas">, Hak> = {
   penyusutan: "penyusutan.hapus",
   pelepasanAset: "pelepasan-aset.hapus",
   penggajian: "penggajian.hapus",
+  antarPerusahaan: "antar-perusahaan.hapus",
 };
 
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
@@ -362,6 +366,15 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await catatLog(tx, pengguna, jenis, d.nomor, "Barang retur dikembalikan ke gudang, jurnal retur dihapus, status faktur dihitung ulang");
         return;
       }
+      case "antarPerusahaan": {
+        // D1 §4.5: kedua jurnal (pemberi dan penerima) dibalik bersama dokumennya
+        const d = await tx.transaksiAntarPerusahaan.findUniqueOrThrow({ where: { id } });
+        await tx.transaksiAntarPerusahaan.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalPemberiId);
+        await hapusJurnal(tx, d.jurnalPenerimaId);
+        await catatLog(tx, pengguna, jenis, d.nomor, "Transaksi antar perusahaan dihapus; dua jurnal dibalik");
+        return;
+      }
       case "jurnal": {
         const d = await tx.jurnal.findUniqueOrThrow({ where: { id } });
         pastikanHak(pengguna, d.sumber === "KAS_MASUK" ? "kas-masuk.hapus" : d.sumber === "KAS_KELUAR" ? "kas-keluar.hapus" : "jurnal.hapus");
@@ -471,7 +484,8 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await tx.barisPenggajian.deleteMany({ where: { penggajianId: id } });
         await tx.penggajian.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalId);
-        await catatLog(tx, pengguna, jenis, d.nomor, `Penggajian periode ${d.periode} dibatalkan (${d.totalDibayar} dibayar); beban dan kas dibalik`);
+        // bulan, bukan periode: periode perusahaan selain utama berisi kunci internal YYYY-MM@id (utama identik)
+        await catatLog(tx, pengguna, jenis, d.nomor, `Penggajian periode ${d.bulan} dibatalkan (${d.totalDibayar} dibayar); beban dan kas dibalik`);
         return;
       }
       case "aset": {
