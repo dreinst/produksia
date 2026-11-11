@@ -38,6 +38,12 @@ export default async function HalamanLogAktivitas({ searchParams }: { searchPara
   const saringan = bacaSaringanLog(await searchParams);
   // di lingkup satu perusahaan, saringan perusahaan tidak ditampilkan, jadi tidak boleh ikut menyaring diam-diam
   if (lingkup.perusahaanId) saringan.perusahaan = null;
+  const modulBoleh = DAFTAR_MODUL_LOG.filter((m) => {
+    const h = MODUL_LOG[m].hakLihat;
+    return !h || punyaHak(pengguna, h);
+  });
+  // modul yang tidak boleh dilihat tidak punya pilihan di formulir; jangan biarkan ia menyaring diam-diam dari URL
+  if (saringan.modul && saringan.modul !== NILAI_MODUL_UMUM && !modulBoleh.includes(saringan.modul)) saringan.modul = null;
 
   // ruang berkas tersembunyi disambungkan di paket berkas (P06); sampai saat itu null
   const dasar: Prisma.LogAktivitasWhereInput = { AND: [syaratLogTerlihat(pengguna, null), saringLogLingkup(lingkup.perusahaanId)] };
@@ -51,10 +57,6 @@ export default async function HalamanLogAktivitas({ searchParams }: { searchPara
     lingkup.perusahaanId ? Promise.resolve([]) : daftarPerusahaan(true),
   ]);
 
-  const modulBoleh = DAFTAR_MODUL_LOG.filter((m) => {
-    const h = MODUL_LOG[m].hakLihat;
-    return !h || punyaHak(pengguna, h);
-  });
   const daftarAksi = kelompokAksi.map((k) => k.aksi);
   if (saringan.aksi && !daftarAksi.includes(saringan.aksi)) daftarAksi.push(saringan.aksi);
   const disaring = adaSaringanLog(saringan);

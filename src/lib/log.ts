@@ -97,7 +97,7 @@ export async function catatAktivitas(klien: KlienDb, pelaku: PelakuLog, data: Da
 }
 
 /**
- * Catatan masuk berhasil (D7 §3.7.3), dipanggil aksi `masuk` setelah sesi dibuat. Galat pencatatan tidak
+ * Catatan masuk berhasil (D7 §3.7.3), dipanggil aksi `masuk` dan `pakaiTautanAturUlang` setelah sesi dibuat. Galat pencatatan tidak
  * pernah menggagalkan masuk: ditangkap, dicetak ke log server, lalu fungsi mengembalikan false.
  */
 export async function catatMasuk(klien: KlienDb, pengguna: { id: string; nama: string; namaPengguna: string }): Promise<boolean> {
@@ -246,7 +246,9 @@ export function syaratSaringanLog(s: SaringanLog): Prisma.LogAktivitasWhereInput
     // batas atas = awal hari berikutnya (eksklusif), supaya seluruh hari "sampai" ikut
     const [th, bl, tg] = s.sampai.split("-").map(Number);
     const besok = new Date(Date.UTC(th, bl - 1, tg + 1)).toISOString().slice(0, 10);
-    syarat.push({ waktu: { lt: bacaWaktuLokal(`${besok}T00:00`)! } });
+    // tanggal paling ujung (mis. 9999-12-31) tidak punya hari berikutnya yang bisa dibaca: saringan sampai diabaikan
+    const batas = bacaWaktuLokal(`${besok}T00:00`);
+    if (batas) syarat.push({ waktu: { lt: batas } });
   }
   return syarat.length ? { AND: syarat } : {};
 }

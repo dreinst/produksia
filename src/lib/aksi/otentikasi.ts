@@ -209,6 +209,8 @@ export async function pakaiTautanAturUlang(token: string, dataFormulir: FormData
     db.logAktivitas.create({ data: { penggunaId: p.penggunaId, penggunaNama: p.pengguna.nama, aksi: "ATUR ULANG", jenis: "Kata Sandi", nomor: p.pengguna.namaPengguna, keterangan: "Kata sandi diganti lewat tautan atur ulang; semua sesi lama dicabut" } }),
   ]);
   await buatSesi(p.penggunaId);
+  // sesi dari tautan atur ulang juga masuk sungguhan, jadi ikut dicatat sebagai MASUK modul auth
+  await catatMasuk(db, p.pengguna);
   redirect("/");
 }
 

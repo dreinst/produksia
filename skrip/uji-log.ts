@@ -186,7 +186,9 @@ async function main() {
   const sumberOtentikasi = readFileSync("src/lib/aksi/otentikasi.ts", "utf8");
   const blokMasuk = sumberOtentikasi.slice(sumberOtentikasi.indexOf("export async function masuk("), sumberOtentikasi.indexOf("export async function masukFormulir"));
   pastikan(/await buatSesi\(pengguna\.id\);\s*(\/\/[^\n]*\n\s*)?await catatMasuk\(db, pengguna\);\s*redirect\(/.test(blokMasuk), "aksi masuk memanggil catatMasuk tepat setelah buatSesi dan sebelum redirect");
-  pastikan((sumberOtentikasi.match(/catatMasuk\(/g) ?? []).length === 1 && (blokMasuk.match(/catatMasuk\(/g) ?? []).length === 1, "catatMasuk hanya dipanggil sekali, di aksi masuk setelah sukses (gagal masuk tidak dicatat)");
+  const blokTautan = sumberOtentikasi.slice(sumberOtentikasi.indexOf("export async function pakaiTautanAturUlang("), sumberOtentikasi.indexOf("export async function pakaiTautanAturUlangFormulir"));
+  pastikan(/await buatSesi\(p\.penggunaId\);\s*(\/\/[^\n]*\n\s*)?await catatMasuk\(db, p\.pengguna\);\s*redirect\(/.test(blokTautan), "pakaiTautanAturUlang memanggil catatMasuk tepat setelah buatSesi dan sebelum redirect (sesi itu masuk sungguhan)");
+  pastikan((sumberOtentikasi.match(/catatMasuk\(/g) ?? []).length === 2 && (blokMasuk.match(/catatMasuk\(/g) ?? []).length === 1 && (blokTautan.match(/catatMasuk\(/g) ?? []).length === 1, "catatMasuk hanya dipanggil di masuk dan pakaiTautanAturUlang, masing-masing sekali setelah sukses (gagal masuk tidak dicatat)");
 
   console.log("=== 4. syaratLogTerlihat ===");
   await db.logAktivitas.createMany({
@@ -272,6 +274,9 @@ async function main() {
   pastikan((await hitungUji({ aksi: "TANGGAL", sampai: "2026-01-15" })) === 2, "sampai: seluruh hari terakhir ikut (zona waktu usaha), hari berikutnya tidak");
   pastikan((await hitungUji({ aksi: "TANGGAL", dari: "2026-01-16" })) === 1 && (await hitungUji({ aksi: "TANGGAL", dari: "2026-01-15", sampai: "2026-01-15" })) === 2, "dari: mulai pukul 00.00 hari itu");
   pastikan((await hitungUji({ aksi: "TANGGAL", dari: "2026-01-17" })) === 0, "periode tanpa catatan: kosong");
+  const tanggalUjung = bacaSaringanLog({ aksi: "TANGGAL", sampai: "9999-12-31" });
+  pastikan(tanggalUjung.sampai === "9999-12-31" && JSON.stringify(syaratSaringanLog(tanggalUjung)) === JSON.stringify({ AND: [{ aksi: "TANGGAL" }] }), "sampai 9999-12-31: batas atas tidak terbaca, saringan sampai diabaikan (tidak ada lt null)");
+  pastikan((await hitungUji({ aksi: "TANGGAL", sampai: "9999-12-31" })) === 3 && (await hitungUji({ aksi: "TANGGAL", dari: "2026-01-16", sampai: "9999-12-31" })) === 1, "sampai 9999-12-31 tidak melempar galat dan tidak menyaring");
 
   console.log("=== 7. Halaman Log Aktivitas ===");
   const semuaSekarang = await db.logAktivitas.count();
@@ -289,7 +294,39 @@ async function main() {
   const hPengguna = await bukaHalaman("PEMILIK", "semua", { q: AWALAN, pengguna: "ujilog-pelaku" });
   pastikan(hPengguna.total === 1, "saringan pengguna di halaman");
   const hPengguna2 = await bukaHalaman("ADMIN", "semua", { q: AWALAN, modul: "pengguna" });
-  pastikan(hPengguna2.total === 0, "ADMIN memilih modul pengguna lewat URL tetap tidak melihat catatannya");
+  const harapanAdminUji = await db.logAktivitas.count({ where: { AND: [syaratLogTerlihat(admin, null), { nomor: { startsWith: AWALAN } }] } });
+  pastikan(hPengguna2.total === harapanAdminUji && hPengguna2.tambahan.modul === undefined, "ADMIN memilih modul pengguna lewat URL: saringan modul dinolkan (pilihan Semua sesuai isi daftar)");
+  pastikan(!teksDangkal(hPengguna2.pohon).includes(nomorModul("pengguna")) && !teksDangkal(hPengguna2.pohon).includes("Hapus saringan"), "ADMIN dengan modul pengguna lewat URL tetap tidak melihat catatannya dan tidak dianggap sedang menyaring");
+  const hUmumAdmin = await bukaHalaman("ADMIN", "semua", { q: AWALAN, modul: "umum" });
+  pastikan(hUmumAdmin.total === (await db.logAktivitas.count({ where: { modul: null, nomor: { startsWith: AWALAN } } })) && hUmumAdmin.total < hPengguna2.total && hUmumAdmin.tambahan.modul === "umum", "modul umum tetap berlaku bagi ADMIN");
+
+  // baris lama (modul null) dirender sama: lencana rose, tanpa lencana modul, tanpa rincian meta
+  const barisHalaman = (pohon: ReactNode, nomor: string) => {
+    const tr = cariDangkal(pohon, "tr").filter((el) => teksDangkal(el).includes(nomor));
+    pastikan(tr.length === 1, `baris ${nomor} ada tepat satu di halaman`);
+    return cariDangkal(tr[0], "td");
+  };
+  const kelas = (el: ReactNode) => cariDangkal(el, "span").map((x) => String(x.props.className ?? ""));
+  const selNull = barisHalaman((await bukaHalaman("ADMIN", "semua", { q: `${AWALAN}NULL` })).pohon, `${AWALAN}NULL`);
+  pastikan(selNull.length === 5 && kelas(selNull[2])[0] === "lencana lencana-rose", "baris modul null: sel Aksi memakai lencana lencana-rose");
+  pastikan(kelas(selNull[3]).every((k) => !k.includes("lencana")) && kelas(selNull[3]).join("|") === "text-slate-500|mono font-semibold", "baris modul null: sel Dokumen tanpa lencana modul");
+  pastikan(cariDangkal(selNull[4], "details").length === 0, "baris modul null: sel Keterangan tanpa rincian meta");
+  const selCrm = barisHalaman((await bukaHalaman("ADMIN", "semua", { q: nomorModul("crm") })).pohon, nomorModul("crm"));
+  pastikan(kelas(selCrm[2])[0] === gayaAksiLog("UBAH", "crm"), "baris bermodul: sel Aksi memakai gayaAksiLog");
+  const lencanaModul = cariDangkal(selCrm[3], "span")[0];
+  pastikan(lencanaModul.props.className === "lencana lencana-slate mr-1.5" && teksDangkal(lencanaModul) === labelModulLog("crm"), "baris bermodul: sel Dokumen memuat lencana-slate label modul");
+
+  // opsi Aksi (groupBy) tidak memuat aksi dari modul yang tidak boleh dilihat
+  await db.logAktivitas.create({ data: { penggunaNama: "Skrip Uji", aksi: `${AWALAN}RAHASIA`, jenis: "Uji", nomor: `${AWALAN}RAHASIA`, modul: "pengguna" } });
+  const opsiAksi = (pohon: ReactNode) => {
+    const pilih = cariDangkal(pohon, "select").filter((el) => el.props.name === "aksi");
+    pastikan(pilih.length === 1, "halaman memuat satu pilihan aksi");
+    return cariDangkal(pilih[0], "option").map((o) => String(o.props.value));
+  };
+  pastikan(!opsiAksi((await bukaHalaman("ADMIN", "semua")).pohon).includes(`${AWALAN}RAHASIA`), "ADMIN: aksi dari modul pengguna tidak muncul di pilihan Aksi");
+  pastikan(opsiAksi((await bukaHalaman("PEMILIK", "semua")).pohon).includes(`${AWALAN}RAHASIA`), "PEMILIK: aksi dari modul pengguna muncul di pilihan Aksi");
+  const hUjung = await bukaHalaman("PEMILIK", "semua", { q: AWALAN, sampai: "9999-12-31" });
+  pastikan(hUjung.total === (await bukaHalaman("PEMILIK", "semua", { q: AWALAN })).total && hUjung.tambahan.sampai === "9999-12-31", "halaman dengan sampai 9999-12-31 tidak galat dan tidak menyaring");
   const hUtama = await bukaHalaman("PEMILIK", "utama", { q: AWALAN, perusahaan: "tapussa" });
   const harapanUtama = await db.logAktivitas.count({ where: { AND: [saringLogLingkup("utama"), { nomor: { startsWith: AWALAN } }] } });
   pastikan(hUtama.total === harapanUtama && hUtama.tambahan.perusahaan === undefined, "lingkup satu perusahaan: saringan perusahaan dari URL diabaikan, catatan tanpa perusahaan ikut");
