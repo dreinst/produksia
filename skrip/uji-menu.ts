@@ -179,6 +179,7 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
   // P03 tidak menambah entri.
   { paket: "P07", letak: "atas", setelah: "/persetujuan", tautan: { href: "/berkas", label: "Berkas", ikon: "folder", hak: "berkas.lihat" } },
   { paket: "P07", letak: "pengaturan", setelah: "/pengaturan/log-aktivitas", tautan: { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" } },
+  { paket: "P24", letak: "grup", grup: "Buku Besar", setelah: "/buku-besar/jurnal", tautan: { href: "/buku-besar/antar-perusahaan", label: "Transaksi Antar Perusahaan", kode: "AP", hak: "antar-perusahaan.lihat" } },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -347,6 +348,12 @@ async function main() {
     pastikan(h.includes("/berkas") && !h.includes("/pengaturan/berkas"), `${peran}: Berkas tampil, Akses Berkas tidak`);
   }
   for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST"] as const) pastikan(!mPeran(peran).some((h) => h === "/berkas" || h === "/pengaturan/berkas"), `${peran}: tanpa Berkas dan Akses Berkas`);
+  // P24 (D1 §7.3): Transaksi Antar Perusahaan di grup Buku Besar sesudah Jurnal Umum, hanya untuk antar-perusahaan.lihat
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN"] as const) {
+    const h = mPeran(peran);
+    pastikan(h.indexOf("/buku-besar/antar-perusahaan") === h.indexOf("/buku-besar/jurnal") + 1, `${peran}: Transaksi Antar Perusahaan tepat sesudah Jurnal Umum`);
+  }
+  for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST", "SOSMED", "IKLAN", "DESAINER"] as const) pastikan(!mPeran(peran).includes("/buku-besar/antar-perusahaan"), `${peran}: tanpa Transaksi Antar Perusahaan`);
   for (const peran of ["SUPERADMIN", "PEMILIK"] as const) {
     const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
     const atas = m.atas.map((t) => t.href);
