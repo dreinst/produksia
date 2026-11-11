@@ -66,7 +66,9 @@ export async function buatTransaksiAntarPerusahaan(dataFormulir: FormData) {
   const tanggalTeks = bacaTeks(dataFormulir, "tanggal");
   if (!POLA_TANGGAL.test(tanggalTeks)) throw new Error("Tanggal wajib diisi dengan format YYYY-MM-DD");
   const tanggal = new Date(`${tanggalTeks}T12:00:00`);
-  if (Number.isNaN(tanggal.getTime())) throw new Error("Tanggal tidak valid");
+  // tanggal seperti 2026-02-31 digulirkan Date ke 3 Maret, jadi tahun, bulan, dan hari dibandingkan ulang (tinjauan P24 T6)
+  const [th, bl, hr] = tanggalTeks.split("-").map(Number);
+  if (Number.isNaN(tanggal.getTime()) || tanggal.getFullYear() !== th || tanggal.getMonth() + 1 !== bl || tanggal.getDate() !== hr) throw new Error("Tanggal tidak valid");
   const akhirHariIni = new Date();
   akhirHariIni.setHours(23, 59, 59, 999);
   if (tanggal > akhirHariIni) throw new Error("Tanggal tidak boleh di masa depan");

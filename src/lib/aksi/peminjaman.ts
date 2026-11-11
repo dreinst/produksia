@@ -228,7 +228,7 @@ export async function konfirmasiKembaliPeminjamanBarang(peminjamanId: string, da
     if (dokumen.ditutupPada) throw new Error(`${dokumen.nomor} sudah ditutup`);
     const petaBaris = new Map(dokumen.baris.map((b) => [b.barangId, b]));
     const sisaSetelah = new Map(dokumen.baris.map((b) => [b.barangId, D(sisaBaris(b))]));
-    await kunciStokUrut(tx, daftarKonfirmasi.filter((k) => k.jumlahKembali.gt(0) && petaBaris.has(k.barangId)).map((k) => ({ barangId: k.barangId, gudangId: dokumen.gudangId })));
+    await kunciStokUrut(tx, daftarKonfirmasi.filter((k) => k.jumlahKembali.gt(0) && petaBaris.has(k.barangId)).map((k) => ({ barangId: k.barangId, gudangId: dokumen.gudangId, buatKosong: true })));
     for (const k of daftarKonfirmasi) {
       const baris = petaBaris.get(k.barangId);
       if (!baris) throw new Error("Barang tidak ada di dokumen ini");

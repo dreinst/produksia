@@ -33,14 +33,32 @@ export function bandingId(a: string, b: string): number {
  * urut barangId lalu gudangId, sebelum mutasi pertama (tinjauan perbaikan P22 butir 3). Dua dokumen berbaris banyak
  * yang menyentuh barang yang sama dengan urutan baris berbeda lalu saling menunggu di baris stok yang sama, bukan
  * saling mengunci (40P01). Semua jalur stok berbaris banyak (SJ, terima barang, pindah barang, penyesuaian,
- * peminjaman, kerusakan, retur, hapus) memanggilnya. Baris yang belum ada tidak terkunci; tambahStok membuatnya
- * lewat upsert seperti sebelumnya. Batas: kunci lain yang diambil sesudahnya dengan urutan baris dokumen (harga
- * rata di Barang, baris pesanan) tetap mengikuti urutan dokumen.
+ * peminjaman, kerusakan, retur, hapus) memanggilnya.
+ *
+ * Pasangan bertanda `buatKosong` (jalur yang MENAMBAH stok atau menulis stok absolut) dibuat dulu sebagai baris nol
+ * bila belum ada, pada urutan yang sama, lalu dikunci. Tanpa itu baris baru dibuat tambahStok (upsert) atau createMany
+ * menurut urutan baris dokumen, dan dua dokumen yang sama-sama membuat baris stok baru dengan urutan terbalik saling
+ * menunggu sisipan yang belum di-commit (tinjauan P22b T2, T3). Baris nol ikut dibatalkan bila transaksi gagal.
+ * Batas: kunci lain yang diambil sesudahnya (harga rata di Barang, baris pesanan) mengikuti urutan mutasi pemanggil.
  */
-export async function kunciStokUrut(tx: Tx, pasangan: { barangId: string; gudangId: string }[]) {
-  const unik = new Map(pasangan.map((p) => [`${p.barangId}\u0000${p.gudangId}`, p]));
+export async function kunciStokUrut(tx: Tx, pasangan: { barangId: string; gudangId: string; buatKosong?: boolean }[]) {
+  const unik = new Map<string, { barangId: string; gudangId: string; buatKosong: boolean }>();
+  for (const p of pasangan) {
+    const k = `${p.barangId}\u0000${p.gudangId}`;
+    unik.set(k, { barangId: p.barangId, gudangId: p.gudangId, buatKosong: !!p.buatKosong || !!unik.get(k)?.buatKosong });
+  }
   const urut = [...unik.values()].sort((x, y) => bandingId(x.barangId, y.barangId) || bandingId(x.gudangId, y.gudangId));
-  for (const p of urut) await tx.$queryRaw`SELECT 1 FROM "StokBarang" WHERE "barangId" = ${p.barangId} AND "gudangId" = ${p.gudangId} FOR UPDATE`;
+  for (const p of urut) {
+    if (p.buatKosong) {
+      await tx.$executeRaw`INSERT INTO "StokBarang" ("barangId", "gudangId", "jumlah") VALUES (${p.barangId}, ${p.gudangId}, 0) ON CONFLICT ("barangId", "gudangId") DO NOTHING`;
+    }
+    await tx.$queryRaw`SELECT 1 FROM "StokBarang" WHERE "barangId" = ${p.barangId} AND "gudangId" = ${p.gudangId} FOR UPDATE`;
+  }
+}
+
+/** Urutan mutasi yang sama dengan urutan kunci stok (barangId), untuk loop yang juga mengunci Barang (harga rata). */
+export function urutBarang<T extends { barangId: string }>(baris: readonly T[]): T[] {
+  return [...baris].sort((x, y) => bandingId(x.barangId, y.barangId));
 }
 
 export async function tambahStok(tx: Tx, barangId: string, gudangId: string, jumlah: Desimal) {

@@ -728,7 +728,7 @@ export async function buatRetur(dataFormulir: FormData) {
       },
     });
 
-    await kunciStokUrut(tx, barisRetur.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
+    await kunciStokUrut(tx, barisRetur.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId, buatKosong: true })));
     for (const l of barisRetur) {
       if (daftarJenis.get(l.barangId) === "BARANG") await tambahStok(tx, l.barangId, gudangId, l.jumlah);
     }

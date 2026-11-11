@@ -276,14 +276,23 @@ async function main() {
     await harusDitolak("tolak KM2 lagi", () => sebagai("owner", () => tolakDokumen("dokumenKas", km.id, "Uji tolak")), `${AWALAN}-KM2 sudah berstatus "Ditolak". Muat ulang halaman`);
     await sebagai("kasir", () => jalankan("ajukan ulang KM2 sesudah ditolak", () => ajukanDokumen("dokumenKas", km.id)));
     await sebagai("owner", () => jalankan("setujui KM2", () => setujuiDokumen("dokumenKas", km.id)));
-    // jurnal KM hasil persetujuan hanya boleh dihapus lewat dokumen kasnya (tinjauan perbaikan P22, catatan)
     const jurnalKm2 = (await db.dokumenKas.findUniqueOrThrow({ where: { id: km.id } })).jurnalId!;
-    await harusDitolak("hapus jurnal KM2 lewat menu jurnal", () => sebagai("owner", () => hapusDokumen("jurnal", jurnalKm2)), "hapus lewat dokumen kasnya");
-    pastikan((await db.jurnal.count({ where: { id: jurnalKm2 } })) === 1 && (await db.dokumenKas.findUniqueOrThrow({ where: { id: km.id } })).jurnalId === jurnalKm2, "jurnal KM2 dan dokumen kasnya tetap utuh");
     await harusDitolak("setujui KM2 lagi (pesan lama)", () => sebagai("owner", () => setujuiDokumen("dokumenKas", km.id)), "sudah disetujui dan jurnalnya sudah masuk buku besar");
     await harusDitolak("ajukan KM2 yang sudah disetujui (pesan lama)", () => sebagai("kasir", () => ajukanDokumen("dokumenKas", km.id)), "sudah disetujui dan jurnalnya sudah masuk buku besar");
-    await sebagai("owner", () => jalankan("hapus KM2", () => hapusDokumen("dokumenKas", km.id)));
-    pastikan((await db.jurnal.count({ where: { id: jurnalKm2 } })) === 0, "hapus lewat dokumen kas membuang jurnal KM2");
+    // tombol hapus di halaman Kas dan Jurnal mengirim jenis "jurnal": dokumen kas yang disetujui ikut dihapus bersama
+    // jurnalnya (tinjauan P22b T1), dengan hak kas-masuk.hapus
+    await harusDitolak("KASIR tanpa kas-masuk.hapus menghapus jurnal KM2", () => sebagai("kasir", () => hapusDokumen("jurnal", jurnalKm2)), "tidak punya hak");
+    pastikan((await db.jurnal.count({ where: { id: jurnalKm2 } })) === 1 && (await db.dokumenKas.findUniqueOrThrow({ where: { id: km.id } })).jurnalId === jurnalKm2, "jurnal KM2 dan dokumen kasnya tetap utuh sesudah penolakan hak");
+    await sebagai("owner", () => jalankan("hapus jurnal KM2 lewat menu jurnal (jenis jurnal)", () => hapusDokumen("jurnal", jurnalKm2)));
+    pastikan((await db.jurnal.count({ where: { id: jurnalKm2 } })) === 0 && (await db.dokumenKas.count({ where: { id: km.id } })) === 0, "hapus lewat jenis jurnal membuang jurnal KM2 dan dokumen kasnya");
+    pastikan((await db.logAktivitas.count({ where: { aksi: "HAPUS", jenis: "Kas Masuk / Kas Keluar", nomor: `${AWALAN}-KM2` } })) === 1, "log HAPUS dokumen kas KM2 tercatat");
+    // kontrol: dokumen kas kedua dihapus lewat jenis dokumenKas (jalur lama)
+    const km3 = await db.dokumenKas.create({ data: { nomor: `${AWALAN}-KM3`, jenis: "MASUK", akunKasId: kKas, akunLawanId: m.pendapatanPenjualanId!, jumlah: 1000, keterangan: `Kas masuk ${AWALAN}-KM3`, dibuatOleh: "kasir" } });
+    await sebagai("kasir", () => jalankan("ajukan KM3", () => ajukanDokumen("dokumenKas", km3.id)));
+    await sebagai("owner", () => jalankan("setujui KM3", () => setujuiDokumen("dokumenKas", km3.id)));
+    const jurnalKm3 = (await db.dokumenKas.findUniqueOrThrow({ where: { id: km3.id } })).jurnalId!;
+    await sebagai("owner", () => jalankan("hapus KM3 lewat dokumen kas", () => hapusDokumen("dokumenKas", km3.id)));
+    pastikan((await db.jurnal.count({ where: { id: jurnalKm3 } })) === 0, "hapus lewat dokumen kas membuang jurnal KM3");
 
     console.log("=== 4. Penyesuaian dua baris berurutan terbalik dan baris stok baru (tinjauan perbaikan P22 butir 3 dan 5) ===");
     // A < B menurut urutan id. Penahan memegang baris stok B. X (baris B lalu A) mengunci A lalu menunggu B; Y (baris A
@@ -331,6 +340,52 @@ async function main() {
     pastikan((await stokDari(bC.id)) === "5.00", "baris stok C dibuat dengan 5");
     await sebagai("owner", () => jalankan("hapus penyesuaian C", () => hapusDokumen("penyesuaian", z2.id)));
     pastikan((await stokDari(bC.id)) === "0.00", "hapus penyesuaian C mengembalikan stok 0");
+
+    // Dua penyesuaian dengan dua barang yang belum punya baris stok, urutan baris terbalik (tinjauan P22b T2). Penahan
+    // menyisipkan baris D tanpa commit lalu dibatalkan, sehingga keduanya berebut menyisipkan D. Dengan sisipan baris
+    // nol menurut urutan dokumen, yang mendapat D lebih dulu bisa memegang E dan menunggu D, lawan yang memegang D dan
+    // menunggu E (40P01). kunciStokUrut menyisipkan dan mengunci urut barangId, jadi tepat satu disetujui.
+    for (let i = 1; i <= 3; i++) {
+      const [bD, bE] = (
+        await Promise.all([1, 2].map((j) => db.barang.create({ data: { kode: `${AWALAN}-BRN${i}${j}`, nama: `Barang Baru Uji ${i}.${j}`, jenis: "BARANG" } })))
+      ).sort((p1, p2) => (p1.id < p2.id ? -1 : 1));
+      const u = await buatPsBaris(`${AWALAN}-PSN${i}1`, [
+        { barangId: bE.id, jumlahSebelum: 0, jumlahSesudah: 4 },
+        { barangId: bD.id, jumlahSebelum: 0, jumlahSesudah: 5 },
+      ]);
+      const v = await buatPsBaris(`${AWALAN}-PSN${i}2`, [
+        { barangId: bD.id, jumlahSebelum: 0, jumlahSesudah: 2 },
+        { barangId: bE.id, jumlahSebelum: 0, jumlahSesudah: 3 },
+      ]);
+      let lepas!: () => void;
+      let siap!: (pid: number) => void;
+      const tahan = new Promise<void>((r) => (lepas = r));
+      const terkunci = new Promise<number>((r) => (siap = r));
+      const penahan = db
+        .$transaction(async (tx) => {
+          await tx.stokBarang.create({ data: { barangId: bD.id, gudangId: gudang.id, jumlah: 0 } });
+          const [{ pid }] = await tx.$queryRaw<{ pid: number }[]>`SELECT pg_backend_pid() AS "pid"`;
+          siap(pid);
+          await tahan;
+          throw new Error("batal penahan");
+        })
+        .catch(() => undefined);
+      const pid = await terkunci;
+      // V (D lalu E) masuk antrean lebih dulu tanpa memegang apa pun, lalu U (E lalu D) yang dengan sisipan menurut
+      // urutan dokumen sudah memegang E. Sesudah penahan batal, V yang lebih dulu menunggu mendapat D lalu menunggu E.
+      const janjiV = aksi(() => sebagai("owner", () => setujuiDokumen("penyesuaian", v.id)));
+      await tungguAntre(pid, 1);
+      const janjiU = aksi(() => sebagai("owner", () => setujuiDokumen("penyesuaian", u.id)));
+      await tungguAntre(pid, 2);
+      lepas();
+      await penahan;
+      const [hu, hv] = await Promise.all([janjiU, janjiV]);
+      const lolos = [hu, hv].filter((h) => h === "ok").length;
+      pastikan(lolos === 1 && [hu, hv].some((h) => h.includes("sudah berubah sejak")) && !/deadlock|40P01/i.test(hu + hv), `putaran ${i}: dua barang baru urutan terbalik, tepat satu disetujui tanpa deadlock (${hu} | ${hv})`);
+      const pemenang = hu === "ok" ? u : v;
+      await sebagai("owner", () => jalankan(`hapus ${pemenang.nomor}`, () => hapusDokumen("penyesuaian", pemenang.id)));
+      pastikan((await stokDari(bD.id)) === "0.00" && (await stokDari(bE.id)) === "0.00", `putaran ${i}: hapus pemenang mengembalikan stok D dan E ke 0`);
+    }
 
     console.log("=== 5. Hapus peminjaman melawan setujui dan konfirmasi kembali (tinjauan perbaikan P22 butir 2 dan 5) ===");
     const bP = await db.barang.create({ data: { kode: `${AWALAN}-BRG4`, nama: "Barang Uji Pinjam", jenis: "BARANG" } });

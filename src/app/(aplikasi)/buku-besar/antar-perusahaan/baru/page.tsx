@@ -114,7 +114,7 @@ export default async function HalamanAntarPerusahaanBaru() {
 
         <KolomPerusahaan lingkup={lingkup} daftar={aktif} nama="pemberiId" label="Perusahaan pemberi" />
         {/* penerima tanpa bawaan (lingkup dikosongkan) supaya tidak otomatis sama dengan pemberi */}
-        <KolomPerusahaan lingkup={{ perusahaanId: null, perusahaan: null, bolehGabungan: lingkup.bolehGabungan }} daftar={aktif} nama="penerimaId" label="Perusahaan penerima" selaluPilih />
+        <KolomPerusahaan lingkup={{ perusahaanId: null, perusahaan: null, bolehGabungan: lingkup.bolehGabungan }} daftar={pf ? aktif.filter((p) => p.id !== pf) : aktif} nama="penerimaId" label="Perusahaan penerima" selaluPilih />
 
         <div className="bidang">
           <label className="label" htmlFor="tanggal">

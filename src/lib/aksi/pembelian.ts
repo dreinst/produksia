@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, kali, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
-import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, jenisBarang, perbaruiHargaRata, sesuaikanHargaRata } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, jenisBarang, perbaruiHargaRata, sesuaikanHargaRata, urutBarang } from "@/lib/stok";
 import {
   catatJurnalPenerimaanBarang,
   catatJurnalFakturPembelian,
@@ -168,8 +168,9 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
       },
     });
 
-    await kunciStokUrut(tx, barisNilai.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
-    for (const baris of barisNilai) {
+    await kunciStokUrut(tx, barisNilai.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId, buatKosong: true })));
+    // urut barangId seperti kunci stok, supaya kunci Barang (harga rata) juga berurutan (tinjauan P22b T4)
+    for (const baris of urutBarang(barisNilai)) {
       if (daftarJenis.get(baris.barangId) === "BARANG") {
         await tambahStok(tx, baris.barangId, gudangId, baris.jumlah);
         await perbaruiHargaRata(tx, baris.barangId, baris.jumlah, baris.harga, true);
@@ -260,7 +261,8 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
       },
     });
 
-    for (const l of daftarBaris) {
+    // urut barangId supaya kunci Barang (harga rata) berurutan sama di semua jalur (tinjauan P22b T4)
+    for (const l of urutBarang(daftarBaris)) {
       const barisPesanan = await tx.barisPesananPembelian.findFirst({ where: { pesananId, barangId: l.barangId } });
       if (barisPesanan) {
         await tx.barisPesananPembelian.update({ where: { id: barisPesanan.id }, data: { jumlahDifaktur: { increment: l.jumlah } } });

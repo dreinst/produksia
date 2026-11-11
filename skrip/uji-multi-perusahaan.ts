@@ -339,6 +339,7 @@ async function main() {
   await harusDitolak("akun lawan 2-1550", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, akunPenerimaId: hutangAp.id })), "tidak boleh akun antar perusahaan");
   await harusDitolak("jenis tidak sah", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, jenis: "PINJAM" })), "harus Tagih atau Lunas");
   await harusDitolak("tanggal di masa depan", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, tanggal: `${tahun + 1}-01-01` })), "tidak boleh di masa depan");
+  await harusDitolak("tanggal 31 Februari (tinjauan P24 T6)", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, tanggal: `${tahun - 1}-02-31` })), "Tanggal tidak valid");
   await harusDitolak("keterangan kurang dari 3 karakter", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, keterangan: "ab" })), "3 sampai 300 karakter");
   await harusDitolak("jumlah nol", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, jumlah: 0 })), "Jumlah harus lebih dari 0");
   await harusDitolak("proyek pemberi milik perusahaan penerima", () => buatTransaksiAntarPerusahaan(formulir({ ...isianSah, proyekPemberiId: proyekU.id })), `Proyek PRJ-${KODE} milik`);
@@ -356,6 +357,8 @@ async function main() {
     "dokumen TAGIH dan kedua jurnalnya terhapus",
   );
   pastikan((await db.logAktivitas.count({ where: { aksi: "HAPUS", nomor: tagih.nomor, waktu: { gte: awalUji } } })) === 1, "log HAPUS tercatat satu kali");
+  const logHapus = await db.logAktivitas.findFirstOrThrow({ where: { aksi: "HAPUS", nomor: tagih.nomor, waktu: { gte: awalUji } } });
+  pastikan(logHapus.modul === "antar-perusahaan" && logHapus.entitasId === tagih.id && JSON.stringify(logHapus.meta) === JSON.stringify({ pemberiId: tagih.pemberiId, penerimaId: tagih.penerimaId }), "log HAPUS bermodul antar-perusahaan dengan entitasId dan meta pemberi dan penerima (tinjauan P24 T5)");
   const sesudahHapusTagih = await saldoAntarPerusahaan(db, akhirHari);
   pastikan(sama(saldoApAwal.piutang.minus(sesudahHapusTagih.piutang), 300_000) && sesudahHapusTagih.selisih.isZero(), "tinggal LUNAS: piutang 300.000 di bawah awal, selisih tetap nol (kedua sisi dibalik bersama)");
   await hapus("antarPerusahaan", lunas.id, `LUNAS ${lunas.nomor}`);

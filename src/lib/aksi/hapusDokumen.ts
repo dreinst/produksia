@@ -5,11 +5,12 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
-import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata, urutBarang } from "@/lib/stok";
 import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma } from "@/prisma-klien/client";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { BERKAS, type JenisPersetujuan } from "@/lib/persetujuan";
+import { catatAktivitas } from "@/lib/log";
 
 /*
  * Menghapus dokumen transaksi = MEMBALIK seluruh efeknya dalam satu transaksi: stok fisik & harga pokok,
@@ -88,7 +89,7 @@ const JALUR: Record<JenisDokumen, string[]> = {
   fakturPembelian: ["/pembelian/faktur", "/pembelian/pesanan"],
   pembayaran: ["/pembelian/pembayaran", "/pembelian/faktur"],
   returPembelian: ["/pembelian/retur", "/pembelian/faktur", "/persediaan"],
-  jurnal: ["/buku-besar/jurnal", "/kas-bank/masuk", "/kas-bank/keluar"],
+  jurnal: ["/buku-besar/jurnal", "/kas-bank/masuk", "/kas-bank/keluar", "/persetujuan"],
   dokumenKas: ["/kas-bank/masuk", "/kas-bank/keluar", "/buku-besar/jurnal", "/persetujuan"],
   penyesuaian: ["/persediaan/penyesuaian", "/persediaan"],
   pindahBarang: ["/persediaan/pindah", "/persediaan"],
@@ -196,7 +197,7 @@ const PERSETUJUAN_DARI_HAPUS = new Map(Object.entries(HAPUS_BERPERSETUJUAN).map(
 const BATAS_WAKTU_HAPUS = 15_000;
 
 /** Kunci stok untuk baris dokumen yang mutasinya akan dibalik (satu gudang). */
-const kunciStokBaris = (tx: Tx, baris: { barangId: string }[], gudangId: string) => kunciStokUrut(tx, baris.map((b) => ({ barangId: b.barangId, gudangId })));
+const kunciStokBaris = (tx: Tx, baris: { barangId: string }[], gudangId: string, buatKosong = false) => kunciStokUrut(tx, baris.map((b) => ({ barangId: b.barangId, gudangId, buatKosong })));
 
 export async function hapusDokumen(jenis: JenisDokumen, id: string) {
   // Jurnal & dokumen kas haknya ditentukan setelah datanya dibaca (menurut sumber jurnal / jenis kas)
@@ -244,8 +245,9 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (fakturSetelah.length) {
           throw new Error(`Faktur ${daftarNomor(fakturSetelah)} dibuat setelah ${d.nomor} dan sudah mengakui HPP-nya; hapus faktur itu dulu`);
         }
-        await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId);
-        for (const b of d.baris) {
+        await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId, true);
+        // urut barangId supaya kunci Barang (harga rata) berurutan sama dengan kunci stok (tinjauan P22b T4)
+        for (const b of urutBarang(d.baris)) {
           if (b.barang.jenis === "BARANG") {
             await tambahStok(tx, b.barangId, d.gudangId, D(b.jumlah));
             await ubahNilaiStok(tx, b.barangId, D(b.jumlah), kali(b.jumlah, b.hargaPokok));
@@ -373,7 +375,7 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         });
         if (d.pembayaran.length) throw new Error(`${d.nomor} sudah punya pembayaran ${daftarNomor(d.pembayaran)}; hapus itu dulu`);
         if (d.retur.length) throw new Error(`${d.nomor} sudah punya retur ${daftarNomor(d.retur)}; hapus itu dulu`);
-        for (const b of d.baris) {
+        for (const b of urutBarang(d.baris)) {
           if (d.pesananId) {
             const bp = d.pesanan?.baris.find((ol) => ol.barangId === b.barangId);
             if (bp) {
@@ -398,8 +400,8 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       }
       case "returPembelian": {
         const d = await tx.returPembelian.findUniqueOrThrow({ where: { id }, include: { baris: { include: { barang: { select: { jenis: true } } } } } });
-        await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId);
-        for (const b of d.baris) {
+        await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId, true);
+        for (const b of urutBarang(d.baris)) {
           if (b.barang.jenis === "BARANG") {
             await tambahStok(tx, b.barangId, d.gudangId, D(b.jumlah));
             await ubahNilaiStok(tx, b.barangId, D(b.jumlah), kali(b.jumlah, b.hargaPokok));
@@ -418,7 +420,16 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         await tx.transaksiAntarPerusahaan.delete({ where: { id } });
         await hapusJurnal(tx, d.jurnalPemberiId);
         await hapusJurnal(tx, d.jurnalPenerimaId);
-        await catatLog(tx, pengguna, jenis, d.nomor, "Transaksi antar perusahaan dihapus; dua jurnal dibalik");
+        // modul sama dengan log CATAT supaya visibilitas dan saringan modulnya konsisten (tinjauan P24 T5)
+        await catatAktivitas(tx, pengguna, {
+          aksi: "HAPUS",
+          jenis: LABEL[jenis],
+          nomor: d.nomor,
+          keterangan: "Transaksi antar perusahaan dihapus; dua jurnal dibalik",
+          modul: "antar-perusahaan",
+          entitasId: id,
+          meta: { pemberiId: d.pemberiId, penerimaId: d.penerimaId },
+        });
         return;
       }
       case "jurnal": {
@@ -428,11 +439,21 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (!["MANUAL", "KAS_MASUK", "KAS_KELUAR"].includes(d.sumber)) {
           throw new Error(`${d.nomor} adalah jurnal otomatis; hapus lewat dokumen sumbernya`);
         }
-        // Jurnal KM/KK hasil persetujuan milik DokumenKas yang disetujui. Menghapusnya di sini akan meninggalkan dokumen
-        // berstatus Disetujui tanpa jurnal (tinjauan perbaikan P22). Jurnal KM/KK mode langsung tidak punya dokumen kas.
+        // Jurnal KM/KK hasil persetujuan milik DokumenKas yang disetujui. Tombol hapus di halaman Kas dan Jurnal mengirim
+        // jenis "jurnal", jadi dokumen kasnya ikut dihapus bersama jurnalnya (tinjauan P22b T1), tidak hanya jurnalnya
+        // (dokumen Disetujui tanpa jurnal). Jurnal KM/KK mode langsung tidak punya dokumen kas.
         if (d.sumber !== "MANUAL") {
-          const dokKas = await tx.dokumenKas.findUnique({ where: { jurnalId: id }, select: { nomor: true } });
-          if (dokKas) throw new Error(`${d.nomor} adalah jurnal dokumen kas ${dokKas.nomor} yang sudah disetujui; hapus lewat dokumen kasnya`);
+          const dokKas = await tx.dokumenKas.findUnique({ where: { jurnalId: id }, select: { id: true } });
+          if (dokKas) {
+            await BERKAS.dokumenKas.kunci(tx, dokKas.id, "hapus");
+            const dk = await tx.dokumenKas.findUniqueOrThrow({ where: { id: dokKas.id } });
+            pastikanHak(pengguna, dk.jenis === "MASUK" ? "kas-masuk.hapus" : "kas-keluar.hapus");
+            if (dk.jurnalId !== id) throw new Error(`${d.nomor} sudah tidak menjadi jurnal dokumen kas ${dk.nomor}. Muat ulang halaman`);
+            await tx.dokumenKas.delete({ where: { id: dk.id } });
+            await hapusJurnal(tx, id);
+            await catatLog(tx, pengguna, "dokumenKas", dk.nomor, `Dokumen kas dan jurnalnya (${d.nomor}) dihapus lewat menu jurnal`);
+            return;
+          }
         }
         await hapusJurnal(tx, id);
         await catatLog(tx, pengguna, jenis, d.nomor, `Jurnal ${d.sumber.toLowerCase().replace("_", " ")} dihapus${d.keterangan ? ` (${d.keterangan})` : ""}`);
@@ -462,7 +483,8 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
           return;
         }
         const label = await labelBarang(tx, d.baris.map((b) => b.barangId));
-        await kunciStokBaris(tx, d.baris.filter((b) => !D(b.jumlahSesudah).equals(D(b.jumlahSebelum))), d.gudangId);
+        // baris yang stoknya ditambah kembali (penyesuaian turun) dibuat nol bila belum ada (tinjauan P22b T3)
+        await kunciStokUrut(tx, d.baris.filter((b) => !D(b.jumlahSesudah).equals(D(b.jumlahSebelum))).map((b) => ({ barangId: b.barangId, gudangId: d.gudangId, buatKosong: D(b.jumlahSesudah).lt(D(b.jumlahSebelum)) })));
         for (const b of d.baris) {
           const selisih = D(b.jumlahSesudah).minus(b.jumlahSebelum);
           if (selisih.gt(0)) await kurangiStok(tx, b.barangId, d.gudangId, selisih, label.get(b.barangId) ?? b.barangId);
@@ -478,7 +500,7 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       case "pindahBarang": {
         const d = await tx.pindahBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, gudangTujuan: true } });
         const label = await labelBarang(tx, d.baris.map((b) => b.barangId));
-        await kunciStokUrut(tx, d.baris.flatMap((b) => [{ barangId: b.barangId, gudangId: d.gudangTujuanId }, { barangId: b.barangId, gudangId: d.gudangAsalId }]));
+        await kunciStokUrut(tx, d.baris.flatMap((b) => [{ barangId: b.barangId, gudangId: d.gudangTujuanId }, { barangId: b.barangId, gudangId: d.gudangAsalId, buatKosong: true }]));
         for (const b of d.baris) {
           // stok harus masih ada di gudang tujuan; bila sudah terpakai, kurangiStok menolak dengan pesan jelas
           await kurangiStok(tx, b.barangId, d.gudangTujuanId, D(b.jumlah), `${label.get(b.barangId) ?? b.barangId} (gudang ${d.gudangTujuan.nama})`);
@@ -496,7 +518,7 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         const d = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: { include: { barang: { select: { kode: true } } } }, penyesuaian: { select: { nomor: true } } } });
         if (d.penyesuaian) throw new Error(`${d.nomor} sudah ditautkan ke ${d.penyesuaian.nomor}; hapus penyesuaian itu dulu bila memang salah`);
         if (d.statusPersetujuan === "DISETUJUI") {
-          await kunciStokBaris(tx, d.baris.filter((b) => D(b.jumlah).gt(D(b.jumlahKembali))), d.gudangId);
+          await kunciStokBaris(tx, d.baris.filter((b) => D(b.jumlah).gt(D(b.jumlahKembali))), d.gudangId, true);
           for (const b of d.baris) {
             const sisa = D(b.jumlah).minus(D(b.jumlahKembali));
             if (sisa.gt(0)) await tambahStok(tx, b.barangId, d.gudangId, sisa);
@@ -513,7 +535,7 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         const d = await tx.laporanKerusakanBarang.findUniqueOrThrow({ where: { id }, include: { baris: { include: { barang: { select: { kode: true } } } }, penyesuaian: { select: { nomor: true } } } });
         if (d.penyesuaian) throw new Error(`${d.nomor} sudah ditautkan ke ${d.penyesuaian.nomor}; hapus penyesuaian itu dulu bila memang salah`);
         if (d.statusPersetujuan === "DISETUJUI") {
-          await kunciStokBaris(tx, d.baris, d.gudangId);
+          await kunciStokBaris(tx, d.baris, d.gudangId, true);
           for (const b of d.baris) await tambahStok(tx, b.barangId, d.gudangId, D(b.jumlah));
         }
         await tx.laporanKerusakanBarang.delete({ where: { id } });

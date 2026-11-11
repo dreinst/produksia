@@ -367,11 +367,9 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       if (!p.perusahaan.aktif) throw new Error(`Perusahaan ${p.perusahaan.nama} sudah diarsipkan; aktifkan dulu`);
       // Baris stok dikunci FOR UPDATE lewat kunciStokUrut sebelum dibandingkan, supaya mutasi stok lain (SJ, terima
       // barang, penyesuaian lain) tidak bisa masuk di antara pemeriksaan dan penulisan nilai absolut di bawah (tinjauan
-      // perbaikan P21 butir 2). Baris stok yang belum ada untuk barang yang berubah dibuat nol lebih dulu supaya ikut
-      // terkunci. Urutan kuncinya sama dengan semua jalur stok berbaris banyak (lihat kunciStokUrut).
-      const berubah = p.baris.filter((b) => !D(b.jumlahSesudah).equals(D(b.jumlahSebelum)));
-      if (berubah.length) await tx.stokBarang.createMany({ data: berubah.map((b) => ({ barangId: b.barangId, gudangId: p.gudangId, jumlah: 0 })), skipDuplicates: true });
-      await kunciStokUrut(tx, p.baris.map((b) => ({ barangId: b.barangId, gudangId: p.gudangId })));
+      // perbaikan P21 butir 2). Baris stok yang belum ada untuk barang yang berubah dibuat nol oleh kunciStokUrut pada
+      // urutan kunci yang sama dengan semua jalur stok berbaris banyak (tinjauan P22b T2).
+      await kunciStokUrut(tx, p.baris.map((b) => ({ barangId: b.barangId, gudangId: p.gudangId, buatKosong: !D(b.jumlahSesudah).equals(D(b.jumlahSebelum)) })));
       // pemeriksaan dan penulisan tetap urut barangId seperti sebelumnya (pesan galat baris pertama yang berubah sama)
       for (const b of [...p.baris].sort((x, y) => bandingId(x.barangId, y.barangId))) {
         const stok = await tx.stokBarang.findUnique({ where: { barangId_gudangId: { barangId: b.barangId, gudangId: p.gudangId } } });
