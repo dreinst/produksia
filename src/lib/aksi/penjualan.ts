@@ -1,7 +1,7 @@
 "use server";
 
 import { pastikanHak, wajibHakAksi } from "@/lib/otentikasi";
-import { punyaHak, PERAN_TERTINGGI, type PenggunaSesi } from "@/lib/hakAkses";
+import type { PenggunaSesi } from "@/lib/hakAkses";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -42,8 +42,11 @@ import {
   feeFaktur,
   konteksProrata,
   nilaiRetur,
-  pastikanHakBarisBebas,
+  barisBerbarang,
+  periksaHakBarisBebas,
+  periksaHargaNego,
   pastikanKopSuratDokumen,
+  returMenutup,
   rapikanTeks,
   ringkasanFaktur,
   salinKolom,
@@ -69,8 +72,6 @@ import type { StatusKomersial } from "@/prisma-klien/enums";
 
 const NOL = D(0);
 
-type BarisInput = { barangId: string; jumlah: Desimal; harga: Desimal };
-
 const LABEL_STATUS_KOMERSIAL: Record<StatusKomersial, string> = {
   DRAF: "Draf",
   TERKIRIM: "Terkirim",
@@ -78,33 +79,6 @@ const LABEL_STATUS_KOMERSIAL: Record<StatusKomersial, string> = {
   DITOLAK: "Ditolak",
   KEDALUWARSA: "Kedaluwarsa",
 };
-
-/**
- * Aturan harga jual di penawaran/pesanan:
- * - di bawah harga jual barang → hanya pemegang hak "harga.nego" (nego dengan klien)
- * - di bawah harga minimum barang (bila diisi) → hanya Pemilik/Superadmin
- */
-async function periksaHargaNego(pengguna: PenggunaSesi, daftarBaris: BarisInput[]) {
-  const daftarBarang = await db.barang.findMany({
-    where: { id: { in: daftarBaris.map((l) => l.barangId) } },
-    select: { id: true, nama: true, hargaJual: true, hargaMinimum: true },
-  });
-  const peta = new Map(daftarBarang.map((b) => [b.id, b]));
-  const bolehNego = punyaHak(pengguna, "harga.nego");
-  const bolehBawahMinimum = PERAN_TERTINGGI.includes(pengguna.peran);
-  for (const l of daftarBaris) {
-    const b = peta.get(l.barangId);
-    if (!b) continue;
-    const hargaJual = D(b.hargaJual);
-    const minimum = D(b.hargaMinimum);
-    if (l.harga.lt(hargaJual) && !bolehNego) {
-      throw new Error(`Harga ${b.nama} di bawah harga jual (${format(hargaJual)}). Nego harga perlu hak "Harga jual · boleh nego".`);
-    }
-    if (minimum.gt(0) && l.harga.lt(minimum) && !bolehBawahMinimum) {
-      throw new Error(`Harga ${b.nama} di bawah harga minimum (${format(minimum)}). Hanya Pemilik atau Superadmin yang boleh.`);
-    }
-  }
-}
 
 function bacaJson(raw: FormDataEntryValue | null, pesanKosong: string): unknown[] {
   if (typeof raw !== "string" || !raw) throw new Error(pesanKosong);
@@ -163,11 +137,6 @@ function kopIsian(dataFormulir: FormData): string | null {
   return bacaKopSuratId(dataFormulir);
 }
 
-/** Baris berbarang (bukan baris bebas) untuk periksaHargaNego dan pastikanBarangMilik. */
-function barisBerbarang(baris: readonly BarisDokumenPenjualan[]): BarisInput[] {
-  return baris.flatMap((b) => (b.barangId ? [{ barangId: b.barangId, jumlah: b.jumlah, harga: b.harga }] : []));
-}
-
 /**
  * Isian bersama penawaran dan pesanan (D2 §3.1-§3.4, §3.8). Urutan pemeriksaan lama tetap: pelanggan, baris, harga,
  * proyek; perusahaan (akar) dan kepemilikan barang di antaranya (D1 §8.3). PPN hanya untuk tampilan dan nilai termin.
@@ -177,9 +146,10 @@ async function bacaDokumenAkar(pengguna: PenggunaSesi, dataFormulir: FormData, d
   if (!pelangganId) throw new Error("Pelanggan wajib dipilih");
   const mode = bacaModeDokumen(dataFormulir.get("mode"));
   const daftarBaris = bacaBarisDokumen(dataFormulir, { mode });
-  pastikanHakBarisBebas(pengguna, daftarBaris);
+  // baris bebas, baris JASA-LAIN, dan nama barang katalog yang diganti butuh harga.nego (tinjauan P23 S2)
+  await periksaHakBarisBebas(db, pengguna, daftarBaris);
   const berbarang = barisBerbarang(daftarBaris);
-  await periksaHargaNego(pengguna, berbarang);
+  await periksaHargaNego(db, pengguna, berbarang);
   // dokumen akar (D1 §3.3): perusahaan dari isian atau lingkup; barang dan proyek harus milik perusahaan itu
   const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
   await pastikanBarangMilik(db, berbarang.map((l) => l.barangId), perusahaanId);
@@ -306,12 +276,19 @@ export async function konversiPenawaranKePesanan(penawaranId: string) {
   const nomor = await nomorDokumenBerikutnya(db.pesananPenjualan, "PSJ");
 
   await db.$transaction(async (tx) => {
-    // klaim penawaran lebih dulu, supaya dua konversi bersamaan tidak sama-sama lolos
+    // klaim penawaran lebih dulu, supaya dua konversi bersamaan tidak sama-sama lolos; status komersial ikut disyaratkan
+    // supaya penawaran yang baru saja ditolak atau kedaluwarsa tidak ikut dikonversi (tinjauan P23 R5)
     const { count } = await tx.penawaranPenjualan.updateMany({
-      where: { id: penawaran.id, status: { not: "DIKONVERSI" } },
+      where: { id: penawaran.id, status: { not: "DIKONVERSI" }, statusKomersial: { notIn: ["DITOLAK", "KEDALUWARSA"] } },
       data: { status: "DIKONVERSI", statusKomersial: "DITERIMA", statusKomersialPada: new Date() },
     });
-    if (count !== 1) throw new Error("Penawaran sudah dikonversi");
+    if (count !== 1) {
+      const kini = await tx.penawaranPenjualan.findUnique({ where: { id: penawaran.id }, select: { status: true, statusKomersial: true } });
+      if (kini && kini.status !== "DIKONVERSI" && (kini.statusKomersial === "DITOLAK" || kini.statusKomersial === "KEDALUWARSA")) {
+        throw new Error(`Penawaran ${penawaran.nomor} berstatus ${LABEL_STATUS_KOMERSIAL[kini.statusKomersial]}; ubah statusnya dulu bila klien jadi setuju`);
+      }
+      throw new Error("Penawaran sudah dikonversi");
+    }
     // pesanan mewarisi perusahaan penawaran (dokumen anak, D1 §3.3), juga bila perusahaannya sudah diarsipkan
     await tx.pesananPenjualan.create({
       data: {
@@ -473,6 +450,11 @@ export async function buatFaktur(dataFormulir: FormData) {
     include: { baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }] }, uangMuka: true, faktur: { select: { fee: true, diskon: true } } },
   });
   const perusahaanId = perusahaanDariInduk(pesanan, dataFormulir);
+  // surat jalan rujukan (opsional) harus milik pesanan ini, jadi otomatis milik perusahaan yang sama (tinjauan P23 R4)
+  if (pengirimanId) {
+    const sj = await db.pengirimanPesanan.findUnique({ where: { id: pengirimanId }, select: { pesananId: true } });
+    if (!sj || sj.pesananId !== pesananId) throw new Error("Surat jalan tidak ditemukan di pesanan ini");
+  }
   // harga, frekuensi, dan teks baris dari pesanan (jalur ID); jalur lama memeriksa sisa per barang seperti kode lama
   const daftarBaris = siapkanBarisFaktur(pesanan, masukan);
   const subtotal = subtotalBaris(daftarBaris);
@@ -516,13 +498,14 @@ export async function buatFaktur(dataFormulir: FormData) {
     // HPP diakui untuk barang yang sudah dikirim: konsumsi baris SJ baris pesanan ini (urut tanggal) yang belum difaktur.
     // Konsumsinya terjadi SEKARANG (saat draf) karena baris surat jalan tidak boleh dipakai dua faktur;
     // nilainya disimpan per baris faktur supaya jurnal HPP bisa dicatat belakangan saat faktur disetujui.
-    // Jalur lama: barang tunggal di pesanan (syarat jalurLamaBolehUntuk), jadi per id sama dengan per barang kode lama.
+    // Jalur lama: jumlah per barang sudah dibagi ke baris pesanannya (siapkanBarisJalurLama), jadi selalu per id.
     const nilaiTransit = daftarBaris.map(() => NOL);
     for (const [i, l] of daftarBaris.entries()) {
       const barisPesananId = l.barisPesananId!;
       const bp = await tx.barisPesananPenjualan.update({ where: { id: barisPesananId }, data: { jumlahDifaktur: { increment: l.jumlah } }, select: { jumlah: true, jumlahDifaktur: true } });
-      // jalur ID: faktur lain yang dibuat bersamaan tidak boleh membuat baris pesanan tertagih melebihi jumlahnya
-      if (masukan.jalur === "ID" && D(bp.jumlahDifaktur).gt(bp.jumlah)) {
+      // kedua jalur: faktur lain yang dibuat bersamaan tidak boleh membuat baris pesanan tertagih melebihi jumlahnya
+      // (tinjauan P23 R1); kiriman sah tidak pernah memicunya karena sisa sudah diperiksa sebelum transaksi
+      if (D(bp.jumlahDifaktur).gt(bp.jumlah)) {
         const sisa = D(bp.jumlah).minus(D(bp.jumlahDifaktur).minus(l.jumlah));
         throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(terbesar(sisa, NOL))}, diminta ${format(l.jumlah)})`);
       }
@@ -693,7 +676,7 @@ export async function buatRetur(dataFormulir: FormData) {
 
   const faktur = await db.fakturPenjualan.findUniqueOrThrow({
     where: { id: fakturId },
-    include: { baris: { orderBy: { id: "asc" } }, retur: { include: { baris: true } }, penerimaan: true, pesanan: { select: { proyekId: true } } },
+    include: { baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }] }, retur: { include: { baris: true } }, penerimaan: true, pesanan: { select: { proyekId: true } } },
   });
   // dokumen anak mewarisi perusahaan faktur; gudang harus milik perusahaan itu atau bersama
   const perusahaanId = perusahaanDariInduk(faktur, dataFormulir);
@@ -701,9 +684,11 @@ export async function buatRetur(dataFormulir: FormData) {
 
   // tidak boleh meretur lebih dari jumlah yang pernah difakturkan (dikurangi retur sebelumnya); harga dan frekuensi
   // dari baris faktur yang dicocokkan
-  const barisRetur = siapkanBarisRetur(faktur, faktur.retur.flatMap((r) => r.baris), masukan);
-  // diskon dan management fee faktur ikut dibalik prorata nilai baris yang diretur
-  const { diskon, fee, dpp, ppn, total } = nilaiRetur(faktur, barisRetur);
+  const returSebelumnya = faktur.retur.flatMap((r) => r.baris);
+  const barisRetur = siapkanBarisRetur(faktur, returSebelumnya, masukan);
+  // diskon dan management fee faktur ikut dibalik prorata nilai baris yang diretur, dibatasi sisa sesudah retur
+  // sebelumnya; retur yang menutup semua baris mengambil sisanya (tinjauan P23 R3)
+  const { diskon, fee, dpp, ppn, total } = nilaiRetur(faktur, barisRetur, { sebelumnya: faktur.retur, menutup: returMenutup(faktur, returSebelumnya, barisRetur) });
   pastikanFeeTidakNegatif(fee);
   const pengaturan = await ambilPengaturanPerusahaan(db, perusahaanId);
   const sudahDibayar = jumlahkan(faktur.penerimaan.map((r) => D(r.jumlah).plus(r.potonganPajak)));

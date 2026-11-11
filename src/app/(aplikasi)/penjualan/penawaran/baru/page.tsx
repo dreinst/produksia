@@ -2,6 +2,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak, PERAN_TERTINGGI } from "@/lib/hakAkses";
 import { db } from "@/lib/db";
 import { daftarProyekAktif } from "@/lib/proyek";
+import { KODE_BARANG_LAIN } from "@/lib/barangLainLain";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { PERINGATAN_TANPA_EVENT } from "@/lib/verifikasi";
 import { buatPenawaranFormulir } from "@/lib/aksi/penjualan";
@@ -11,7 +12,8 @@ export default async function HalamanPenawaranBaru() {
   const pengguna = await wajibHak("penawaran.buat");
   const [daftarPelanggan, daftarBarang, daftarProyek] = await Promise.all([
     db.pelanggan.findMany({ orderBy: { nama: "asc" } }),
-    db.barang.findMany({ orderBy: { nama: "asc" } }),
+    // Barang JASA-LAIN hanya untuk baris bebas (butuh harga.nego), jadi tidak ditawarkan sebagai barang katalog
+    db.barang.findMany({ where: { kode: { not: KODE_BARANG_LAIN } }, orderBy: { nama: "asc" } }),
     daftarProyekAktif(),
   ]);
 

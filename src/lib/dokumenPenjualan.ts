@@ -3,9 +3,10 @@ import type { JenisNilai, ModeDokumen, TampilanEvent } from "@/prisma-klien/enum
 import { D, bacaUang, format, jumlahkan, terbesar, terkecil, uang, type Desimal } from "@/lib/uang";
 import { bobotBaris, nilaiBaris, subtotalBaris, type BarisNilai } from "@/lib/nilaiBaris";
 import { hitungPpn, tanggalJatuhTempo } from "@/lib/pengaturanPerusahaan";
-import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
+import { PERAN_TERTINGGI, punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { catatAktivitas, type DataLog, type KlienDb, type PelakuLog } from "@/lib/log";
 import { tanggalIso } from "@/lib/waktu";
+import { KODE_BARANG_LAIN } from "@/lib/barangLainLain";
 
 /*
  * Pustaka dokumen penjualan gaya HKA dan D'Pro (D2 §3). Pembantu murni dan berbasis transaksi untuk aksi penjualan
@@ -352,11 +353,71 @@ export function adaBarisBebas(baris: readonly { barangId: string | null }[]): bo
   return baris.some((b) => !b.barangId);
 }
 
-/** Baris bebas tidak punya harga katalog, jadi harganya harga nego: wajib hak harga.nego (D2 §3.3). */
-export function pastikanHakBarisBebas(pengguna: PenggunaSesi, baris: readonly { barangId: string | null }[]) {
-  if (adaBarisBebas(baris) && !punyaHak(pengguna, "harga.nego")) {
+/** Katalog untuk pastikanHakBarisBebas: id Barang JASA-LAIN (bila sudah ada) dan nama asli barang katalog per id. */
+export type KatalogBarisBebas = { idBarangLain: string | null; namaBarang: ReadonlyMap<string, string> };
+
+/**
+ * Baris bebas tidak punya harga katalog, jadi harganya harga nego: wajib hak harga.nego (D2 §3.3). Baris yang
+ * barangId-nya Barang JASA-LAIN juga baris bebas, dan baris barang katalog yang namanya diganti (isian `nama` berbeda
+ * dari nama barang) juga butuh hak itu, supaya pengendalian nego tidak bisa dilewati (tinjauan P23 S2).
+ */
+export function pastikanHakBarisBebas(pengguna: PenggunaSesi, baris: readonly { barangId: string | null; nama?: string | null }[], katalog?: KatalogBarisBebas) {
+  if (punyaHak(pengguna, "harga.nego")) return;
+  const idLain = katalog?.idBarangLain ?? null;
+  if (adaBarisBebas(baris) || (idLain && baris.some((b) => b.barangId === idLain))) {
     throw new Error('Baris bebas (tanpa barang katalog) butuh hak "Harga jual · boleh nego"');
   }
+  for (const b of baris) {
+    if (!b.barangId || !b.nama) continue;
+    const asli = katalog?.namaBarang.get(b.barangId);
+    // barang yang tidak ada ditolak pemeriksaan kepemilikan barang sesudahnya
+    if (asli !== undefined && rapikanSpasi(b.nama) !== rapikanSpasi(asli)) {
+      throw new Error(`Mengganti nama barang ${asli} butuh hak "Harga jual · boleh nego"`);
+    }
+  }
+}
+
+/** Membaca katalog (JASA-LAIN dan nama barang baris) lalu pastikanHakBarisBebas; tanpa kueri bila pengguna boleh nego. */
+export async function periksaHakBarisBebas(klien: Klien, pengguna: PenggunaSesi, baris: readonly { barangId: string | null; nama?: string | null }[]) {
+  if (punyaHak(pengguna, "harga.nego")) return;
+  const ids = [...new Set(baris.flatMap((b) => (b.barangId ? [b.barangId] : [])))];
+  const daftar = await klien.barang.findMany({ where: { OR: [{ id: { in: ids } }, { kode: KODE_BARANG_LAIN }] }, select: { id: true, kode: true, nama: true } });
+  pastikanHakBarisBebas(pengguna, baris, {
+    idBarangLain: daftar.find((b) => b.kode === KODE_BARANG_LAIN)?.id ?? null,
+    namaBarang: new Map(daftar.map((b) => [b.id, b.nama])),
+  });
+}
+
+/**
+ * Aturan harga jual di penawaran dan pesanan (dipindah dari aksi/penjualan.ts supaya buat dan ubah memakai satu aturan):
+ * di bawah harga jual barang hanya pemegang hak "harga.nego"; di bawah harga minimum barang (bila diisi) hanya Pemilik
+ * atau Superadmin.
+ */
+export async function periksaHargaNego(klien: Klien, pengguna: PenggunaSesi, daftarBaris: readonly { barangId: string; harga: Desimal }[]) {
+  const daftarBarang = await klien.barang.findMany({
+    where: { id: { in: daftarBaris.map((l) => l.barangId) } },
+    select: { id: true, nama: true, hargaJual: true, hargaMinimum: true },
+  });
+  const peta = new Map(daftarBarang.map((b) => [b.id, b]));
+  const bolehNego = punyaHak(pengguna, "harga.nego");
+  const bolehBawahMinimum = PERAN_TERTINGGI.includes(pengguna.peran);
+  for (const l of daftarBaris) {
+    const b = peta.get(l.barangId);
+    if (!b) continue;
+    const hargaJual = D(b.hargaJual);
+    const minimum = D(b.hargaMinimum);
+    if (l.harga.lt(hargaJual) && !bolehNego) {
+      throw new Error(`Harga ${b.nama} di bawah harga jual (${format(hargaJual)}). Nego harga perlu hak "Harga jual · boleh nego".`);
+    }
+    if (minimum.gt(0) && l.harga.lt(minimum) && !bolehBawahMinimum) {
+      throw new Error(`Harga ${b.nama} di bawah harga minimum (${format(minimum)}). Hanya Pemilik atau Superadmin yang boleh.`);
+    }
+  }
+}
+
+/** Baris berbarang (bukan baris bebas) untuk periksaHargaNego dan pastikanBarangMilik. */
+export function barisBerbarang(baris: readonly BarisDokumen[]): { barangId: string; jumlah: Desimal; harga: Desimal }[] {
+  return baris.flatMap((b) => (b.barangId ? [{ barangId: b.barangId, jumlah: b.jumlah, harga: b.harga }] : []));
 }
 
 /** Data Prisma baris penawaran atau pesanan (nested create); subtotal = nilaiBaris. barangId sudah diselesaikan. */
@@ -561,31 +622,47 @@ export function siapkanBarisJalurId(pesanan: Pick<PesananSumber, "baris">, masuk
   return hasil;
 }
 
-/** Jalur lama hanya untuk pesanan STANDAR bergaya lama: frekuensi 1, tanpa baris bernama, tanpa barang ganda. */
+/**
+ * Jalur lama hanya untuk pesanan STANDAR bergaya lama: frekuensi 1 dan tanpa baris bernama. Barang yang sama di
+ * beberapa baris tetap boleh (perilaku lama, tinjauan P23 S1): jumlahnya dibagi ke baris-baris itu.
+ */
 export function jalurLamaBolehUntuk(pesanan: Pick<PesananSumber, "mode" | "baris">): boolean {
   if (pesanan.mode !== "STANDAR") return false;
-  const barang = new Set<string>();
-  for (const b of pesanan.baris) {
-    if (!D(b.frekuensi).equals(1) || b.nama || barang.has(b.barangId)) return false;
-    barang.add(b.barangId);
-  }
-  return true;
+  return pesanan.baris.every((b) => D(b.frekuensi).equals(1) && !b.nama);
 }
 
 /**
- * Jalur lama (kompatibilitas): validasi sisa per baris kiriman seperti kode lama (tidak kumulatif, pesan sama),
- * harga dari kiriman, frekuensi 1, teks baris kosong, dan barisPesananId diisi baris pesanan satu-satunya dengan
- * barang itu.
+ * Jalur lama (kompatibilitas): validasi sisa per barang seperti kode lama (jumlah sisa semua baris berbarang sama,
+ * pesan sama), harga dari kiriman, frekuensi 1, teks baris kosong. Jumlah tiap baris kiriman dibagi ke baris pesanan
+ * berbarang sama urut `urutan` lalu id, sehingga barisPesananId terisi per potongan (tinjauan P23 S1). Kiriman yang
+ * secara kumulatif melebihi sisa barang itu ditolak dengan pesan yang sama (tinjauan P23 R1).
  */
 export function siapkanBarisJalurLama(pesanan: Pick<PesananSumber, "mode" | "baris">, masukan: readonly { barangId: string; jumlah: Desimal; harga: Desimal }[]): BarisFakturSiap[] {
   if (!jalurLamaBolehUntuk(pesanan)) throw new Error("Faktur pesanan ini wajib dibuat dari komposer faktur (baris pesanan per id)");
-  return masukan.map((l, i) => {
-    const b = pesanan.baris.find((x) => x.barangId === l.barangId);
-    if (!b) throw new Error("Barang tidak ada di pesanan ini");
-    const sisa = D(b.jumlah).minus(D(b.jumlahDifaktur));
-    if (l.jumlah.gt(sisa)) throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(sisa)}, diminta ${format(l.jumlah)})`);
-    return { barisPesananId: b.id, barangId: l.barangId, jumlah: l.jumlah, harga: l.harga, frekuensi: D(1), satuanFrekuensi: null, bagian: null, urutan: i, nama: null, deskripsi: null, satuan: null, keterangan: null };
-  });
+  const urut = urutBarisPesanan(pesanan.baris);
+  const dipakai = new Map<string, Desimal>();
+  const ruang = (b: BarisPesananSumber) => D(b.jumlah).minus(D(b.jumlahDifaktur)).minus(dipakai.get(b.id) ?? NOL);
+  const hasil: BarisFakturSiap[] = [];
+  for (const l of masukan) {
+    const cocok = urut.filter((b) => b.barangId === l.barangId);
+    if (cocok.length === 0) throw new Error("Barang tidak ada di pesanan ini");
+    const sisa = jumlahkan(cocok.map((b) => D(b.jumlah).minus(D(b.jumlahDifaktur))));
+    const sisaKumulatif = jumlahkan(cocok.map(ruang));
+    if (l.jumlah.gt(sisa) || l.jumlah.gt(sisaKumulatif)) {
+      throw new Error(`Kuantitas faktur melebihi sisa yang belum ditagih (sisa ${format(terkecil(sisa, sisaKumulatif))}, diminta ${format(l.jumlah)})`);
+    }
+    let tersisa = l.jumlah;
+    // jumlah ruang positif >= sisaKumulatif >= jumlah kiriman, jadi pembagian selalu habis
+    for (const b of cocok) {
+      if (tersisa.lte(0)) break;
+      const ambil = terkecil(terbesar(ruang(b), NOL), tersisa);
+      if (ambil.lte(0)) continue;
+      dipakai.set(b.id, (dipakai.get(b.id) ?? NOL).plus(ambil));
+      hasil.push({ barisPesananId: b.id, barangId: l.barangId, jumlah: ambil, harga: l.harga, frekuensi: D(1), satuanFrekuensi: null, bagian: null, urutan: hasil.length, nama: null, deskripsi: null, satuan: null, keterangan: null });
+      tersisa = tersisa.minus(ambil);
+    }
+  }
+  return hasil;
 }
 
 export function siapkanBarisFaktur(pesanan: Pick<PesananSumber, "mode" | "baris">, masukan: MasukanBarisFaktur): BarisFakturSiap[] {
@@ -704,7 +781,7 @@ export function bacaBarisRetur(dataFormulir: FormData, pesanKosong = "Minimal 1 
   return { jalur: "LAMA", baris };
 }
 
-export type BarisFakturSumber = { id: string; barangId: string; jumlah: Angka; harga: Angka; frekuensi: Angka };
+export type BarisFakturSumber = { id: string; barangId: string; jumlah: Angka; harga: Angka; frekuensi: Angka; urutan?: number };
 export type BarisReturSebelumnya = { barisFakturId: string | null; barangId: string; jumlah: Angka };
 export type BarisReturSiap = { barisFakturId: string; barangId: string; jumlah: Desimal; harga: Desimal; frekuensi: Desimal };
 
@@ -757,24 +834,36 @@ export function siapkanReturJalurId(
 }
 
 /**
- * Jalur lama: hanya bila tiap barang yang diretur tunggal di faktur. Batas per baris kiriman seperti kode lama
- * (difaktur - semua retur barang itu, tidak kumulatif, pesan sama); harga dan frekuensi dari baris faktur itu.
+ * Jalur lama: kiriman dijumlahkan per barang lebih dulu (tinjauan P23 R2), lalu dibatasi seperti kode lama (difaktur
+ * dikurangi semua retur barang itu, pesan sama). Jumlahnya dibagi ke baris faktur berbarang sama urut `urutan` lalu id
+ * menurut sisaReturPerBaris (tinjauan P23 S1); harga dan frekuensi dari baris faktur yang menerima potongan itu.
  */
 export function siapkanReturJalurLama(
   faktur: { baris: readonly BarisFakturSumber[] },
   returSebelumnya: readonly BarisReturSebelumnya[],
   masukan: readonly { barangId: string; jumlah: Desimal }[],
 ): BarisReturSiap[] {
-  return masukan.map((l) => {
-    const cocok = faktur.baris.filter((b) => b.barangId === l.barangId);
+  const diminta = new Map<string, Desimal>();
+  for (const l of masukan) diminta.set(l.barangId, (diminta.get(l.barangId) ?? NOL).plus(l.jumlah));
+  const sisa = sisaReturPerBaris(faktur.baris, returSebelumnya);
+  const urut = [...faktur.baris].sort((a, b) => (a.urutan ?? 0) - (b.urutan ?? 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const hasil: BarisReturSiap[] = [];
+  for (const [barangId, jumlah] of diminta) {
+    const cocok = urut.filter((b) => b.barangId === barangId);
     if (cocok.length === 0) throw new Error("Barang tidak ada di faktur ini");
-    if (cocok.length > 1) throw new Error("Faktur ini punya barang yang sama di beberapa baris; pilih baris faktur yang diretur");
-    const b = cocok[0];
-    const diretur = jumlahkan(returSebelumnya.filter((r) => r.barangId === l.barangId).map((r) => r.jumlah));
-    const sisa = D(b.jumlah).minus(diretur);
-    if (l.jumlah.gt(sisa)) throw new Error(`Kuantitas retur melebihi yang bisa diretur (maks ${format(sisa)}, diminta ${format(l.jumlah)})`);
-    return { barisFakturId: b.id, barangId: l.barangId, jumlah: l.jumlah, harga: D(b.harga), frekuensi: D(b.frekuensi) };
-  });
+    const diretur = jumlahkan(returSebelumnya.filter((r) => r.barangId === barangId).map((r) => r.jumlah));
+    const maks = terkecil(jumlahkan(cocok.map((b) => b.jumlah)).minus(diretur), jumlahkan(cocok.map((b) => terbesar(sisa.get(b.id) ?? NOL, NOL))));
+    if (jumlah.gt(maks)) throw new Error(`Kuantitas retur melebihi yang bisa diretur (maks ${format(maks)}, diminta ${format(jumlah)})`);
+    let tersisa = jumlah;
+    for (const b of cocok) {
+      if (tersisa.lte(0)) break;
+      const ambil = terkecil(terbesar(sisa.get(b.id) ?? NOL, NOL), tersisa);
+      if (ambil.lte(0)) continue;
+      hasil.push({ barisFakturId: b.id, barangId, jumlah: ambil, harga: D(b.harga), frekuensi: D(b.frekuensi) });
+      tersisa = tersisa.minus(ambil);
+    }
+  }
+  return hasil;
 }
 
 export function siapkanBarisRetur(faktur: { baris: readonly BarisFakturSumber[] }, returSebelumnya: readonly BarisReturSebelumnya[], masukan: MasukanBarisRetur): BarisReturSiap[] {
@@ -782,14 +871,36 @@ export function siapkanBarisRetur(faktur: { baris: readonly BarisFakturSumber[] 
 }
 
 /**
- * Nilai retur (D2 §3.6): bruto dari nilaiBaris baris faktur yang dicocokkan; diskon dan fee faktur dibalik prorata
- * terhadap subtotal faktur (= dpp + diskon - fee, sama dengan bruto lama bila tanpa fee); PPN dari dpp retur.
+ * Benar bila sesudah retur ini setiap baris faktur sudah diretur penuh, sehingga retur ini mengambil sisa diskon dan
+ * fee faktur (pola bagianProrata).
  */
-export function nilaiRetur(faktur: { dpp: Angka; diskon: Angka; fee: Angka; ppnPersen: Angka }, baris: readonly BarisNilai[]) {
+export function returMenutup(faktur: { baris: readonly BarisFakturSumber[] }, returSebelumnya: readonly BarisReturSebelumnya[], baris: readonly Pick<BarisReturSiap, "barisFakturId" | "jumlah">[]): boolean {
+  const sisa = sisaReturPerBaris(faktur.baris, returSebelumnya);
+  for (const l of baris) sisa.set(l.barisFakturId, (sisa.get(l.barisFakturId) ?? NOL).minus(l.jumlah));
+  return faktur.baris.every((b) => (sisa.get(b.id) ?? NOL).lte(0));
+}
+
+/**
+ * Nilai retur (D2 §3.6): bruto dari nilaiBaris baris faktur yang dicocokkan; diskon dan fee faktur dibalik prorata
+ * terhadap subtotal faktur (= dpp + diskon - fee, sama dengan bruto lama bila tanpa fee); PPN dari dpp retur. Bila
+ * `sebelumnya` diberikan, diskon dan fee dibatasi sisa faktur sesudah retur sebelumnya, dan retur yang `menutup`
+ * mengambil seluruh sisanya, supaya Σ retur tidak melebihi diskon atau fee faktur karena pembulatan (tinjauan P23 R3).
+ */
+export function nilaiRetur(
+  faktur: { dpp: Angka; diskon: Angka; fee: Angka; ppnPersen: Angka },
+  baris: readonly BarisNilai[],
+  konteks?: { sebelumnya: readonly { diskon: Angka; fee: Angka }[]; menutup: boolean },
+) {
   const bruto = subtotalBaris(baris);
   const dasar = subtotalFaktur(faktur);
-  const diskon = dasar.gt(0) ? uang(D(faktur.diskon).mul(bruto).div(dasar)) : NOL;
-  const fee = dasar.gt(0) ? uang(D(faktur.fee).mul(bruto).div(dasar)) : NOL;
+  let diskon = dasar.gt(0) ? uang(D(faktur.diskon).mul(bruto).div(dasar)) : NOL;
+  let fee = dasar.gt(0) ? uang(D(faktur.fee).mul(bruto).div(dasar)) : NOL;
+  if (konteks) {
+    const sisaDiskon = terbesar(D(faktur.diskon).minus(jumlahkan(konteks.sebelumnya.map((r) => r.diskon))), NOL);
+    const sisaFee = terbesar(D(faktur.fee).minus(jumlahkan(konteks.sebelumnya.map((r) => r.fee))), NOL);
+    diskon = konteks.menutup ? sisaDiskon : terkecil(diskon, sisaDiskon);
+    fee = konteks.menutup ? sisaFee : terkecil(fee, sisaFee);
+  }
   const dpp = bruto.minus(diskon).plus(fee);
   const ppn = hitungPpn(dpp, D(faktur.ppnPersen));
   return { bruto, diskon, fee, dpp, ppn, total: dpp.plus(ppn) };

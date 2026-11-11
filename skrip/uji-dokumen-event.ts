@@ -419,6 +419,18 @@ async function uji(mulaiUji: Date, tahun: number) {
   const sebelumKasir = await jumlahPenawaran();
   await sebagaiPeran("KASIR", () => jalankan("KASIR membuat penawaran", () => buatPenawaran(formulir(pnwKecil))));
   pastikan((await jumlahPenawaran()) === sebelumKasir + 1, "penawaran KASIR tersimpan");
+  // tinjauan P23 S2: JASA-LAIN dan nama barang katalog yang diganti juga butuh harga.nego
+  const lainLain = await db.barang.findUniqueOrThrow({ where: { kode: KODE_BARANG_LAIN } });
+  await db.hakAksesPeran.upsert({ where: { peran_hak: { peran: "KASIR", hak: "harga.nego" } }, create: { peran: "KASIR", hak: "harga.nego", boleh: false }, update: { boleh: false } });
+  await sebagaiPeran("KASIR", async () => {
+    await harusDitolak("KASIR tanpa harga.nego memakai barangId JASA-LAIN", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: lainLain.id, nama: "Sound system 10 kW", jumlah: 1, harga: 1 }] })), "Baris bebas (tanpa barang katalog) butuh hak");
+    await harusDitolak("KASIR tanpa harga.nego mengganti nama barang katalog", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: kamar.id, nama: "Sound system 10 kW", jumlah: 1, harga: 650_000 }] })), "Mengganti nama barang Kamar Twin Uji butuh hak");
+    await jalankan("KASIR tanpa harga.nego memakai nama katalog yang sama", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: kamar.id, nama: " Kamar  Twin Uji ", jumlah: 1, harga: 650_000 }] })));
+  });
+  await db.hakAksesPeran.delete({ where: { peran_hak: { peran: "KASIR", hak: "harga.nego" } } });
+  pastikan((await jumlahPenawaran()) === sebelumKasir + 2, "hanya penawaran dengan nama katalog yang sama yang tersimpan");
+  await sebagaiPeran("KASIR", () => jalankan("KASIR dengan harga.nego bawaan mengganti nama barang katalog", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: kamar.id, nama: "Kamar Twin Deluxe", jumlah: 1, harga: 650_000 }] }))));
+  pastikan((await jumlahPenawaran()) === sebelumKasir + 3, "pemegang harga.nego boleh mengganti nama barang katalog");
   pastikan(hitungHak("KASIR").includes("faktur.ubah") && !hitungHak("GUDANG").includes("pesanan.ubah") && !hitungHak("KRU").includes("penawaran.lihat"), "KASIR punya faktur.ubah; GUDANG tanpa pesanan.ubah; KRU tanpa penawaran.lihat");
   const dokJual = /^(penawaran|pesanan|faktur|penerimaan|uang-muka)\./;
   pastikan((["SOSMED", "IKLAN", "DESAINER"] as const).every((p) => !hitungHak(p).some((h) => dokJual.test(h))), "SOSMED, IKLAN, DESAINER tanpa kunci dokumen penjualan");

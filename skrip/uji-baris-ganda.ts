@@ -2,10 +2,11 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { db } from "../src/lib/db";
+import type { Prisma } from "../src/prisma-klien/client";
 import { D, type Desimal } from "../src/lib/uang";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { KODE_BARANG_LAIN } from "../src/lib/barangLainLain";
-import { buatPesanan, buatPengiriman, buatFaktur, buatRetur } from "../src/lib/aksi/penjualan";
+import { buatPenawaran, buatPesanan, buatPengiriman, buatFaktur, buatRetur, konversiPenawaranKePesanan } from "../src/lib/aksi/penjualan";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import { hapusDokumen, type JenisDokumen } from "../src/lib/aksi/hapusDokumen";
 import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
@@ -14,9 +15,10 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  * P23: barang yang sama di beberapa baris dokumen penjualan (D2 §9.2 uji-baris-ganda, perbaikan pencocokan per id):
  *  1. pesanan EVENT dengan barang sama di dua seksi dan dua baris bebas; 2. SJ per baris; 3. faktur jalur ID hanya
  *  menyentuh baris pesanan dan baris SJ-nya; 4. kiriman rakitan ditolak; 5. faktur kedua menutup semua baris;
- *  6. retur jalur ID memakai harga baris faktur itu, jalur lama hanya bila barang tunggal di faktur; 7. hapus faktur
- *  jalur ID hanya membalik barisnya; 8. jalur lama pada pesanan bergaya lama tetap lolos dan hapusnya sama dengan
- *  cabang lama; 9. bersih-bersih dan sinkron.
+ *  6. retur jalur ID memakai harga baris faktur itu; jalur lama faktur dan retur pada pesanan STANDAR berbarang ganda
+ *  membagi jumlah ke baris berbarang sama (tinjauan P23 S1); 7. hapus faktur jalur ID hanya membalik barisnya; 8. jalur
+ *  lama pada pesanan bergaya lama tetap lolos dan hapusnya sama dengan cabang lama; 8b. tinjauan P23 R1-R5 (sisa
+ *  kumulatif, faktur serentak, prorata retur, surat jalan rujukan, klaim konversi); 9. bersih-bersih dan sinkron.
  */
 
 const K = "GND";
@@ -42,6 +44,10 @@ async function bersihkan() {
     await db.rencanaTermin.deleteMany({ where: { pesananId: { in: pesanan.map((p) => p.id) } } });
     await db.barisPesananPenjualan.deleteMany({ where: { pesananId: { in: pesanan.map((p) => p.id) } } });
     await db.pesananPenjualan.deleteMany({ where: { id: { in: pesanan.map((p) => p.id) } } });
+    const pnw = await db.penawaranPenjualan.findMany({ where: { pelangganId: { in: pel } }, select: { id: true } });
+    await db.rencanaTermin.deleteMany({ where: { penawaranId: { in: pnw.map((p) => p.id) } } });
+    await db.barisPenawaranPenjualan.deleteMany({ where: { penawaranId: { in: pnw.map((p) => p.id) } } });
+    await db.penawaranPenjualan.deleteMany({ where: { id: { in: pnw.map((p) => p.id) } } });
   }
   const barang = await db.barang.findMany({ where: { kode: { startsWith: `BRG-${K}` } }, select: { id: true } });
   const ps = await db.penyesuaianPersediaan.findMany({ where: { baris: { some: { barangId: { in: barang.map((b) => b.id) } } } }, select: { id: true, jurnalId: true } });
@@ -55,6 +61,71 @@ async function bersihkan() {
   await db.gudang.deleteMany({ where: { kode: `WH-${K}` } });
   await db.akun.deleteMany({ where: { kode: { startsWith: `UJI-${K}` } } });
   await db.pelanggan.deleteMany({ where: { kode: { startsWith: `PLG-${K}` } } });
+}
+
+/** Penahan memegang kunci di transaksi sendiri sampai `selagi` selesai (pola uji-kunci-persetujuan). */
+async function selagiTerkunci<T>(pegang: (tx: Prisma.TransactionClient) => Promise<unknown>, selagi: (pid: number) => Promise<T>): Promise<T> {
+  let lepas!: () => void;
+  let siap!: (pid: number) => void;
+  const tahan = new Promise<void>((r) => (lepas = r));
+  const terkunci = new Promise<number>((r) => (siap = r));
+  const penahan = db.$transaction(
+    async (tx) => {
+      await pegang(tx);
+      const [{ pid }] = await tx.$queryRaw<{ pid: number }[]>`SELECT pg_backend_pid() AS "pid"`;
+      siap(pid);
+      await tahan;
+    },
+    { timeout: 60_000 },
+  );
+  const pid = await Promise.race([terkunci, penahan.then(() => -1)]);
+  try {
+    return await selagi(pid);
+  } finally {
+    lepas();
+    await penahan;
+  }
+}
+
+/** Menunggu sampai n sesi terhalang penahan, langsung atau lewat sesi lain yang juga menunggu. */
+async function tungguAntre(pidPenahan: number, n: number) {
+  for (let t = 0; t < 400; t++) {
+    const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`
+      WITH RECURSIVE rantai(pid) AS (
+        SELECT a.pid FROM pg_stat_activity a WHERE ${pidPenahan}::int = ANY(pg_blocking_pids(a.pid))
+        UNION
+        SELECT a.pid FROM pg_stat_activity a JOIN rantai r ON r.pid = ANY(pg_blocking_pids(a.pid))
+      )
+      SELECT count(*)::int AS "antre" FROM rantai`;
+    if (antre >= n) return;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  throw new Error(`antrean kunci tidak mencapai ${n}`);
+}
+
+/** Galat redirect atau revalidatePath di luar HTTP terjadi sesudah transaksi selesai, jadi dianggap sukses. */
+async function aksi(k: () => Promise<unknown>): Promise<string> {
+  try {
+    await k();
+    return "ok";
+  } catch (e) {
+    const digest = (e as { digest?: string })?.digest ?? "";
+    const pesan = String((e as Error)?.message ?? e);
+    return digest.startsWith("NEXT_REDIRECT") || pesan.includes("static generation store missing") ? "ok" : pesan;
+  }
+}
+
+/** Kerja dijalankan berurutan masuk antrean di belakang penahan, lalu penahan dilepas. Hasil "ok" atau pesan galat. */
+async function berantre(pegang: (tx: Prisma.TransactionClient) => Promise<unknown>, kerja: (() => Promise<unknown>)[]): Promise<string[]> {
+  const { janji } = await selagiTerkunci(pegang, async (pid) => {
+    const janji: Promise<string>[] = [];
+    for (const [i, k] of kerja.entries()) {
+      janji.push(aksi(k));
+      await tungguAntre(pid, i + 1);
+    }
+    return { janji };
+  });
+  return Promise.all(janji);
 }
 
 async function main() {
@@ -160,14 +231,36 @@ async function uji() {
   const rj2 = await db.returPenjualan.findFirstOrThrow({ where: { fakturId: fj2.id, NOT: { id: rj1.id } }, include: { baris: true } });
   pastikan(sama(rj2.total, 200_000) && rj2.baris[0].barisFakturId === fbB.id, "retur jalur lama mengisi barisFakturId baris B dan memakai harganya");
   pastikan((await stok()).equals(7), "dua retur barang menambah stok 5 → 7");
-  // pesanan lama yang rusak (barang ganda di STANDAR): jalur lama ditolak, jalur ID lolos; retur jalur lama atas faktur gabungan ditolak
+  // pesanan STANDAR berbarang ganda lewat komposer lama (tinjauan P23 S1): jalur lama membagi jumlah per barang ke
+  // baris berbarang sama urut urutan lalu id; sisa diperiksa per barang dan kumulatif
   await jalankan("PSJ STANDAR barang ganda 1 @ 100.000 + 1 @ 150.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: barang.id, jumlah: 1, harga: 100_000 }, { barangId: barang.id, jumlah: 1, harga: 150_000 }] })));
   const psj3 = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, mode: "STANDAR", total: 250_000 }, include: { baris: { orderBy: { urutan: "asc" } } } });
-  await harusDitolak("jalur lama pada pesanan STANDAR berbarang ganda", () => buatFaktur(formulir({ pesananId: psj3.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 1, harga: 100_000 }] })), "wajib dibuat dari komposer faktur");
-  await jalankan("FJ3 gabungan A' dan B' jalur ID", () => buatFaktur(formulir({ pesananId: psj3.id, ppnPersen: 0, baris: psj3.baris.map((b) => ({ barisPesananId: b.id, jumlah: 1 })) })));
-  const fj3 = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psj3.id } });
-  pastikan(sama(fj3.total, 250_000), "faktur gabungan 250.000");
-  await harusDitolak("retur jalur lama atas faktur gabungan", () => buatRetur(formulir({ fakturId: fj3.id, gudangId: gudang.id, baris: [{ barangId: barang.id, jumlah: 1 }] })), "pilih baris faktur yang diretur");
+  const [bA3, bB3] = psj3.baris;
+  await harusDitolak("jalur lama 3 unit (sisa barang 2)", () => buatFaktur(formulir({ pesananId: psj3.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 3, harga: 100_000 }] })), "melebihi sisa yang belum ditagih (sisa 2, diminta 3)");
+  await harusDitolak("jalur lama 2 + 1 unit (kumulatif 3, tinjauan P23 R1)", () => buatFaktur(formulir({ pesananId: psj3.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 2, harga: 100_000 }, { barangId: barang.id, jumlah: 1, harga: 150_000 }] })), "melebihi sisa yang belum ditagih (sisa 0, diminta 1)");
+  await harusDitolak("surat jalan pesanan lain sebagai rujukan (tinjauan P23 R4)", () => buatFaktur(formulir({ pesananId: psj3.id, pengirimanId: sj.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 1, harga: 100_000 }, { barangId: barang.id, jumlah: 1, harga: 150_000 }] })), "Surat jalan tidak ditemukan di pesanan ini");
+  pastikan((await db.fakturPenjualan.count({ where: { pesananId: psj3.id } })) === 0, "kiriman yang ditolak tidak menyimpan faktur");
+  await jalankan("FJ3 jalur lama komposer lama: barang sama dua baris 1 @ 100.000 dan 1 @ 150.000", () => buatFaktur(formulir({ pesananId: psj3.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 1, harga: 100_000 }, { barangId: barang.id, jumlah: 1, harga: 150_000 }] })));
+  const fj3 = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psj3.id }, include: { baris: { orderBy: { urutan: "asc" } } } });
+  pastikan(sama(fj3.total, 250_000) && fj3.baris.length === 2 && fj3.baris[0].barisPesananId === bA3.id && fj3.baris[1].barisPesananId === bB3.id && sama(fj3.baris[0].harga, 100_000) && sama(fj3.baris[1].harga, 150_000), "faktur 250.000, baris pertama ke baris pesanan pertama, baris kedua ke baris pesanan kedua");
+  pastikan((await difakturBp(bA3.id)).equals(1) && (await difakturBp(bB3.id)).equals(1), "kedua baris pesanan berbarang sama difaktur 1");
+  // pesanan berbarang ganda lain: satu baris kiriman 2 unit dibagi ke dua baris pesanan
+  await jalankan("PSJ STANDAR barang ganda kedua 1 @ 100.000 + 2 @ 100.000", () => buatPesanan(formulir({ pelangganId: pelanggan.id, baris: [{ barangId: barang.id, jumlah: 1, harga: 100_000 }, { barangId: barang.id, jumlah: 2, harga: 100_000 }] })));
+  const psj4 = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: pelanggan.id, mode: "STANDAR", total: 300_000 }, include: { baris: { orderBy: { urutan: "asc" } } } });
+  await jalankan("FJ4 jalur lama satu baris kiriman 2 unit", () => buatFaktur(formulir({ pesananId: psj4.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 2, harga: 100_000 }] })));
+  const fj4 = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psj4.id }, include: { baris: { orderBy: { urutan: "asc" } } } });
+  pastikan(fj4.baris.map((b) => `${b.barisPesananId === psj4.baris[0].id ? "A" : "B"}:${D(b.jumlah)}`).join() === "A:1,B:1" && sama(fj4.total, 200_000), "kiriman 2 unit dibagi: 1 ke baris pertama (penuh), 1 ke baris kedua");
+  // retur jalur lama atas faktur berbarang ganda: dijumlahkan per barang lalu dibagi ke baris faktur urut urutan
+  await harusDitolak("retur jalur lama 1 + 2 unit atas faktur gabungan (kumulatif 3, tinjauan P23 R2)", () => buatRetur(formulir({ fakturId: fj3.id, gudangId: gudang.id, baris: [{ barangId: barang.id, jumlah: 1 }, { barangId: barang.id, jumlah: 2 }] })), "melebihi yang bisa diretur (maks 2, diminta 3)");
+  await jalankan("RJ3 jalur lama 1 unit atas faktur gabungan", () => buatRetur(formulir({ fakturId: fj3.id, gudangId: gudang.id, baris: [{ barangId: barang.id, jumlah: 1 }] })));
+  const rj3 = await db.returPenjualan.findFirstOrThrow({ where: { fakturId: fj3.id }, include: { baris: true } });
+  pastikan(sama(rj3.total, 100_000) && rj3.baris.length === 1 && rj3.baris[0].barisFakturId === fj3.baris[0].id, "retur jalur lama mengambil baris faktur pertama dengan harganya (100.000)");
+  await harusDitolak("retur jalur lama 1 + 1 unit sesudah RJ3 (maks 1)", () => buatRetur(formulir({ fakturId: fj3.id, gudangId: gudang.id, baris: [{ barangId: barang.id, jumlah: 1 }, { barangId: barang.id, jumlah: 1 }] })), "melebihi yang bisa diretur (maks 1, diminta 2)");
+  await jalankan("RJ4 jalur lama 1 unit sisa", () => buatRetur(formulir({ fakturId: fj3.id, gudangId: gudang.id, baris: [{ barangId: barang.id, jumlah: 1 }] })));
+  const rj4 = await db.returPenjualan.findFirstOrThrow({ where: { fakturId: fj3.id, NOT: { id: rj3.id } }, include: { baris: true } });
+  pastikan(sama(rj4.total, 150_000) && rj4.baris[0].barisFakturId === fj3.baris[1].id, "retur berikutnya mengambil baris faktur kedua dengan harganya (150.000)");
+  await jalankan("hapus RJ4", () => hapusDokumen("returPenjualan", rj4.id));
+  await jalankan("hapus RJ3", () => hapusDokumen("returPenjualan", rj3.id));
 
   console.log("=== 7. Hapus faktur 2 hanya membalik baris B, C, D ===");
   await jalankan("hapus RJ2", () => hapusDokumen("returPenjualan", rj2.id));
@@ -182,9 +275,9 @@ async function uji() {
   await jalankan("SJ pesanan lama 4", () => buatPengiriman(formulir({ pesananId: psjLama.id, gudangId: gudang.id, baris: [{ barisPesananId: bpLama.id, barangId: barang.id, jumlah: 4 }] })));
   const sjLama = await db.pengirimanPesanan.findFirstOrThrow({ where: { pesananId: psjLama.id }, include: { baris: true } });
   const putaran = async (cabangLama: boolean) => {
-    await jalankan(`FJ jalur lama 3 @ 100.000 (${cabangLama ? "lalu dihapus lewat cabang lama" : "lalu dihapus lewat cabang id"})`, () => buatFaktur(formulir({ pesananId: psjLama.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 3, harga: 100_000 }] })));
+    await jalankan(`FJ jalur lama 3 @ 100.000 dengan surat jalan pesanan sendiri (${cabangLama ? "lalu dihapus lewat cabang lama" : "lalu dihapus lewat cabang id"})`, () => buatFaktur(formulir({ pesananId: psjLama.id, pengirimanId: sjLama.id, ppnPersen: 0, baris: [{ barangId: barang.id, jumlah: 3, harga: 100_000 }] })));
     const f = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psjLama.id }, include: { baris: true } });
-    pastikan(f.baris[0].barisPesananId === bpLama.id && sama(f.baris[0].frekuensi, 1) && sama(f.baris[0].nilaiTransit, 150_000), "jalur lama mengisi barisPesananId, frekuensi 1, transit 3 × 50.000");
+    pastikan(f.baris[0].barisPesananId === bpLama.id && sama(f.baris[0].frekuensi, 1) && sama(f.baris[0].nilaiTransit, 150_000) && f.pengirimanId === sjLama.id, "jalur lama mengisi barisPesananId, frekuensi 1, transit 3 × 50.000, surat jalan rujukan tersimpan");
     const sesudahBuat = [await difakturBp(bpLama.id), await difakturSj(sjLama.baris[0].id)].map(String).join();
     // baris faktur lama (sebelum migrasi) tidak punya barisPesananId: hapus memakai kode lama per barangId
     if (cabangLama) await db.barisFakturPenjualan.updateMany({ where: { fakturId: f.id }, data: { barisPesananId: null } });
@@ -195,8 +288,12 @@ async function uji() {
   const cabangLama = await putaran(true);
   pastikan(cabangId.sesudahBuat === "3,3" && JSON.stringify(cabangId) === JSON.stringify(cabangLama) && cabangId.sesudahHapus === "0,0", `hapus cabang id sama dengan cabang lama (${JSON.stringify(cabangId)} vs ${JSON.stringify(cabangLama)})`);
 
+  await bagianTinjauan({ pelanggan, gudang, barang });
+
   console.log("=== 9. Bersih-bersih ===");
   const hapus = (jenis: JenisDokumen, id: string, label: string) => jalankan(`hapus ${label}`, () => hapusDokumen(jenis, id));
+  await hapus("faktur", fj4.id, "FJ4");
+  await hapus("pesanan", psj4.id, "pesanan barang ganda kedua");
   await hapus("faktur", fj3.id, "FJ3");
   await hapus("faktur", fj1.id, "FJ1");
   await hapus("pengiriman", sj.id, "SJ pesanan EVENT");
@@ -208,6 +305,53 @@ async function uji() {
   await hapus("penyesuaian", ps.id, "PS saldo awal");
   const s = await periksaSinkron(db);
   pastikan(s.seimbang && s.persediaan.sinkron && s.piutang.sinkron && s.barangTerkirim.sinkron, "periksaSinkron sinkron sesudah dokumen uji dihapus");
+}
+
+/** Bagian 8b: tinjauan P23 R1 (faktur serentak jalur lama), R3 (prorata fee dan diskon retur), R5 (klaim konversi). */
+async function bagianTinjauan(d: { pelanggan: { id: string }; gudang: { id: string }; barang: { id: string } }) {
+  console.log("=== 8b. Faktur serentak, prorata retur, klaim konversi ===");
+  const jasa = await db.barang.create({ data: { kode: `BRG-${K}-JASA`, nama: "Jasa Uji Baris Ganda", jenis: "JASA", satuan: "paket", hargaBeli: 0, hargaJual: 100 } });
+
+  // R1: dua faktur jalur lama serentak atas sisa yang sama; yang kedua ditolak di dalam transaksi
+  await jalankan("PSJ jasa 2 @ 100", () => buatPesanan(formulir({ pelangganId: d.pelanggan.id, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100 }] })));
+  const psjR = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: d.pelanggan.id, total: 200 }, include: { baris: true } });
+  const kirimR = () => buatFaktur(formulir({ pesananId: psjR.id, ppnPersen: 0, baris: [{ barangId: jasa.id, jumlah: 2, harga: 100 }] }));
+  const hasilR = await berantre((tx) => tx.$queryRaw`SELECT 1 FROM "BarisPesananPenjualan" WHERE "id" = ${psjR.baris[0].id} FOR UPDATE`, [kirimR, kirimR]);
+  pastikan(hasilR[0] === "ok" && hasilR[1].includes("melebihi sisa yang belum ditagih (sisa 0, diminta 2)"), `faktur jalur lama serentak: yang pertama lolos, yang kedua ditolak (${hasilR.join(" | ")})`);
+  pastikan((await db.fakturPenjualan.count({ where: { pesananId: psjR.id } })) === 1 && D((await db.barisPesananPenjualan.findUniqueOrThrow({ where: { id: psjR.baris[0].id } })).jumlahDifaktur).equals(2), "hanya satu faktur tersimpan; baris pesanan difaktur 2, tidak 4");
+  const fjR = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psjR.id } });
+
+  // R3: faktur tiga baris @ 100 dengan fee dan diskon nominal 5; tiga retur satu baris tidak melebihi 5
+  await jalankan("PSJ jasa tiga baris @ 100, diskon 5, fee nominal 5", () =>
+    buatPesanan(formulir({ pelangganId: d.pelanggan.id, mode: "EVENT", ppnPersen: 0, nilaiDiskon: 5, jenisFee: "NOMINAL", nilaiFee: 5, baris: [1, 2, 3].map((n) => ({ barangId: jasa.id, jumlah: 1, harga: 100, bagian: `Hari ${n}` })) })),
+  );
+  const psjF = await db.pesananPenjualan.findFirstOrThrow({ where: { pelangganId: d.pelanggan.id, mode: "EVENT", total: 300 }, include: { baris: { orderBy: { urutan: "asc" } } } });
+  await jalankan("FJ jalur ID tiga baris", () => buatFaktur(formulir({ pesananId: psjF.id, ppnPersen: 0, baris: psjF.baris.map((b) => ({ barisPesananId: b.id, jumlah: 1 })) })));
+  const fjF = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psjF.id }, include: { baris: { orderBy: { urutan: "asc" } } } });
+  pastikan(sama(fjF.fee, 5) && sama(fjF.diskon, 5) && sama(fjF.total, 300), "faktur fee 5, diskon 5, total 300");
+  const returF: { id: string; diskon: string; fee: string; total: string }[] = [];
+  for (const [i, b] of fjF.baris.entries()) {
+    await jalankan(`RJ baris ${i + 1}`, () => buatRetur(formulir({ fakturId: fjF.id, gudangId: d.gudang.id, baris: [{ barisFakturId: b.id, jumlah: 1 }] })));
+    const r = await db.returPenjualan.findFirstOrThrow({ where: { fakturId: fjF.id, NOT: { id: { in: returF.map((x) => x.id) } } } });
+    returF.push({ id: r.id, diskon: D(r.diskon).toFixed(2), fee: D(r.fee).toFixed(2), total: D(r.total).toFixed(2) });
+  }
+  pastikan(returF.map((r) => `${r.fee}/${r.diskon}`).join() === "1.67/1.67,1.67/1.67,1.66/1.66", `fee dan diskon retur 1,67 + 1,67 + 1,66 = 5 (${returF.map((r) => `${r.fee}/${r.diskon}`).join()})`);
+  pastikan(returF.reduce((t, r) => t.plus(r.total), D(0)).equals(D(fjF.total)) && (await db.fakturPenjualan.findUniqueOrThrow({ where: { id: fjF.id } })).status === "LUNAS", "Σ total retur = total faktur; faktur LUNAS");
+  for (const r of [...returF].reverse()) await jalankan("hapus retur prorata", () => hapusDokumen("returPenjualan", r.id));
+
+  // R5: penawaran ditolak tepat saat konversi menunggu kunci baris penawaran
+  await jalankan("PNW jasa 1 @ 100", () => buatPenawaran(formulir({ pelangganId: d.pelanggan.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 100 }] })));
+  const pnw = await db.penawaranPenjualan.findFirstOrThrow({ where: { pelangganId: d.pelanggan.id } });
+  const hasilK = await berantre((tx) => tx.$executeRaw`UPDATE "PenawaranPenjualan" SET "statusKomersial" = 'DITOLAK' WHERE "id" = ${pnw.id}`, [() => konversiPenawaranKePesanan(pnw.id)]);
+  pastikan(hasilK[0].includes("berstatus Ditolak; ubah statusnya dulu"), `konversi yang menunggu penolakan serentak ikut ditolak (${hasilK[0]})`);
+  const pnwSesudah = await db.penawaranPenjualan.findUniqueOrThrow({ where: { id: pnw.id } });
+  pastikan(pnwSesudah.status === "DRAF" && pnwSesudah.statusKomersial === "DITOLAK" && (await db.pesananPenjualan.count({ where: { penawaranId: pnw.id } })) === 0, "penawaran tetap DRAF berstatus Ditolak, tanpa pesanan");
+
+  await jalankan("hapus PNW", () => hapusDokumen("penawaran", pnw.id));
+  await jalankan("hapus FJ prorata", () => hapusDokumen("faktur", fjF.id));
+  await jalankan("hapus PSJ prorata", () => hapusDokumen("pesanan", psjF.id));
+  await jalankan("hapus FJ serentak", () => hapusDokumen("faktur", fjR.id));
+  await jalankan("hapus PSJ serentak", () => hapusDokumen("pesanan", psjR.id));
 }
 
 main()
