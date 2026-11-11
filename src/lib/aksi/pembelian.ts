@@ -127,6 +127,8 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
   for (const l of daftarBaris) {
     const barisPesanan = pesanan.baris.find((ol) => ol.id === l.barisPesananId);
     if (!barisPesanan) throw new Error("Baris pesanan tidak ditemukan");
+    // stok, harga rata-rata, dan jurnal memakai barangId baris formulir, jadi wajib sama dengan baris pesanan (tinjauan P13 butir 2)
+    if (barisPesanan.barangId !== l.barangId) throw new Error("Barang tidak sesuai baris pesanan");
     const sisa = D(barisPesanan.jumlah).minus(barisPesanan.jumlahDiterima);
     if (l.jumlah.gt(sisa)) {
       throw new Error(`Kuantitas terima melebihi sisa pesanan (sisa ${format(sisa)}, diminta ${format(l.jumlah)})`);
@@ -218,6 +220,11 @@ export async function buatFakturPembelian(dataFormulir: FormData) {
     }
   }
   const perusahaanId = perusahaanDariInduk(pesanan, dataFormulir);
+  // penerimaan yang ditaut harus milik pesanan ini, sehingga juga milik perusahaan yang sama (tinjauan P13 butir 6)
+  if (penerimaanId) {
+    const penerimaan = await db.penerimaanBarang.findUnique({ where: { id: penerimaanId }, select: { pesananId: true } });
+    if (!penerimaan || penerimaan.pesananId !== pesananId) throw new Error("Penerimaan barang tidak sesuai pesanan pembelian ini");
+  }
   const hargaPesanan = new Map(pesanan.baris.map((ol) => [ol.barangId, D(ol.harga)]));
 
   // Mata uang transaksi: pilihan formulir, kalau kosong mengikuti mata uang bawaan pemasok

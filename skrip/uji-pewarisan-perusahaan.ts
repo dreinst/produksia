@@ -103,6 +103,7 @@ async function bersihkanData() {
   await hapusSemua("penggajian", await db.penggajian.findMany({ where: { baris: { some: { karyawan: { kode: { startsWith: `${KODE}-` } } } } }, ...urut }));
   // jurnal manual dan kas langsung yang memakai akun uji
   await hapusSemua("jurnal", await db.jurnal.findMany({ where: { sumber: { in: ["MANUAL", "KAS_MASUK", "KAS_KELUAR"] }, baris: { some: { akunId: { in: akunUji } } } }, ...urut }));
+  await db.pemetaanAkunTambahan.deleteMany({ where: { akunId: { in: akunUji } } });
   await db.stokBarang.deleteMany({ where: { barangId: { in: barangUji } } });
   await db.foto.deleteMany({ where: { barangId: { in: barangUji } } });
   await db.barang.deleteMany({ where: { id: { in: barangUji } } });
@@ -213,6 +214,26 @@ async function main() {
   await harusDitolak("PB ke gudang milik utama", () => buatPindahBarang(isiPb(gudangU.id, gudangUt.id, [{ barangId: barangU.id, jumlah: 1 }])), `Gudang ${KODE}-WH-UT`);
   await harusDitolak("PB barang dua pemilik", () => buatPindahBarang(isiPb(gudangB.id, gudangU.id, [{ barangId: barangU.id, jumlah: 1 }, { barangId: barangUt.id, jumlah: 1 }])), "Satu dokumen hanya untuk barang milik satu perusahaan");
   pastikan((await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangUt.id, gudangId: gudangB.id } } })).jumlah.equals(D(10)), "pindah barang yang ditolak tidak mengubah stok");
+  // tinjauan P13 butir 8: isian perusahaan yang berbeda dari pemilik barang ditolak, bukan diabaikan
+  await harusDitolak("PS dengan isian perusahaan selain pemilik barang", () => buatPenyesuaianPersediaan(formulir({ gudangId: gudangU.id, akunLawanId: modalB.id, perusahaanId: PERUSAHAAN_UTAMA, baris: [{ barangId: barangU.id, jumlahSesudah: 45, hargaSatuan: 10_000 }] })), "dokumen persediaan harus di perusahaan pemilik barang");
+  await harusDitolak("PB dengan isian perusahaan selain pemilik barang", () => buatPindahBarang(formulir({ gudangAsalId: gudangB.id, gudangTujuanId: gudangU.id, perusahaanId: PERUSAHAAN_UTAMA, baris: [{ barangId: barangU.id, jumlah: 1 }] })), "dokumen persediaan harus di perusahaan pemilik barang");
+  await harusDitolak("PJ dengan isian perusahaan selain pemilik barang", () => buatPeminjamanBarang(denganFoto({ gudangId: gudangU.id, namaPengambil: "Uji", nomorTelepon: "+6281234567890", perusahaanId: PERUSAHAAN_UTAMA, baris: [{ barangId: barangU.id, jumlah: 1 }] })), "dokumen persediaan harus di perusahaan pemilik barang");
+  await jalankan("PB dengan isian perusahaan sama dengan pemilik barang", () => buatPindahBarang(formulir({ gudangAsalId: gudangB.id, gudangTujuanId: gudangU.id, perusahaanId: U, keterangan: `${KODE} PB isian`, baris: [{ barangId: barangU.id, jumlah: 1 }] })));
+  pastikan((await db.pindahBarang.findFirstOrThrow({ where: { keterangan: `${KODE} PB isian` } })).perusahaanId === U, "isian perusahaan yang sama dengan pemilik barang diterima");
+  pastikan((await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangU.id, gudangId: gudangU.id } } })).jumlah.equals(D(41)), "stok sesudah PS dan PB yang ditolak hanya berubah oleh PB yang diterima");
+  // tinjauan P13 butir 4: barang milik perusahaan arsip tidak bisa dibukukan atau dipindah sampai perusahaannya diaktifkan
+  await db.perusahaan.update({ where: { id: U }, data: { aktif: false } });
+  try {
+    await harusDitolak("PS barang perusahaan arsip", () => buatPenyesuaianPersediaan(isiPs(gudangU.id, [{ barangId: barangU.id, jumlahSesudah: 45, hargaSatuan: 10_000 }])), "PT Uji Pewarisan sudah diarsipkan; aktifkan dulu");
+    await harusDitolak("PB barang perusahaan arsip", () => buatPindahBarang(isiPb(gudangU.id, gudangB.id, [{ barangId: barangU.id, jumlah: 1 }])), "sudah diarsipkan; aktifkan dulu");
+    await harusDitolak("PJ barang perusahaan arsip", () => buatPeminjamanBarang(denganFoto({ gudangId: gudangU.id, namaPengambil: "Uji", nomorTelepon: "+6281234567890", baris: [{ barangId: barangU.id, jumlah: 1 }] })), "sudah diarsipkan; aktifkan dulu");
+    await harusDitolak("BR barang perusahaan arsip", () => buatLaporanKerusakan(denganFoto({ gudangId: gudangU.id, namaPelapor: "Uji", baris: [{ barangId: barangU.id, jumlah: 1 }] })), "sudah diarsipkan; aktifkan dulu");
+    await harusDitolak("koreksi stok barang perusahaan arsip", () => ubahStokBarang(barangU.id, formulir({ gudangId: gudangU.id, stok: 45, akunLawanId: modalB.id })), "sudah diarsipkan; aktifkan dulu");
+    await jalankan("PS barang utama tetap bisa saat perusahaan lain diarsipkan", () => buatPenyesuaianPersediaan(isiPs(gudangB.id, [{ barangId: barangUt.id, jumlahSesudah: 12, hargaSatuan: 5_000 }], modalB.id, `${KODE} PS utama arsip`)));
+  } finally {
+    await db.perusahaan.update({ where: { id: U }, data: { aktif: true } });
+  }
+  pastikan((await db.stokBarang.findUniqueOrThrow({ where: { barangId_gudangId: { barangId: barangU.id, gudangId: gudangU.id } } })).jumlah.equals(D(41)), "dokumen persediaan perusahaan arsip yang ditolak tidak mengubah stok");
 
   await jalankan("BR barang perusahaan uji di gudang bersama", () => buatLaporanKerusakan(denganFoto({ gudangId: gudangB.id, namaPelapor: "Uji", keterangan: `${KODE} BR`, baris: [{ barangId: barangU.id, jumlah: 1 }] })));
   const br = await db.laporanKerusakanBarang.findFirstOrThrow({ where: { keterangan: `${KODE} BR` } });
@@ -241,13 +262,26 @@ async function main() {
   const isiTb = (gudangId: string, tambahan: Record<string, string> = {}) => formulir({ pesananId: psb.id, gudangId, baris: [{ barisPesananId: psb.baris[0].id, barangId: barangU.id, jumlah: 20 }], ...tambahan });
   await harusDitolak("TB ke gudang milik utama", () => buatPenerimaanBarang(isiTb(gudangUt.id)), `Gudang ${KODE}-WH-UT`);
   await harusDitolak("TB dengan isian perusahaan lain dari induk", () => buatPenerimaanBarang(isiTb(gudangU.id, { perusahaanId: PERUSAHAAN_UTAMA })), `Dokumen induk ${psb.nomor} milik perusahaan lain`);
+  // tinjauan P13 butir 2: barang baris formulir wajib sama dengan barang baris pesanan
+  await harusDitolak("TB dengan barang yang beda dari baris pesanan", () => buatPenerimaanBarang(formulir({ pesananId: psb.id, gudangId: gudangU.id, baris: [{ barisPesananId: psb.baris[0].id, barangId: barangUt.id, jumlah: 1 }] })), "Barang tidak sesuai baris pesanan");
+  pastikan((await db.stokBarang.count({ where: { barangId: barangUt.id, gudangId: gudangU.id } })) === 0, "TB yang ditolak tidak menambah stok barang utama");
   // dokumen anak tidak membaca lingkup: dibuat di lingkup utama tetap mewarisi pesanan
   await jalankan("TB 20 ke gudang perusahaan uji", () => buatPenerimaanBarang(isiTb(gudangU.id)));
   const tb = await db.penerimaanBarang.findFirstOrThrow({ where: { pesananId: psb.id }, include: { jurnal: true } });
   pastikan(tb.perusahaanId === U && tb.jurnal?.perusahaanId === U && tb.jurnal.proyekId === proyekU.id, "TB dan jurnal JU-TB milik perusahaan pesanan, berproyek");
-  await jalankan("FB 20", () => buatFakturPembelian(formulir({ pesananId: psb.id, baris: [{ barangId: barangU.id, jumlah: 20, harga: 9_000 }] })));
+  // tinjauan P13 butir 6: penerimaan yang ditaut faktur harus milik pesanan faktur itu
+  await jalankan("PSB utama untuk penerimaan pesanan lain", () => buatPesananPembelian(formulir({ pemasokId: pemasok.id, keterangan: `${KODE} PSB lain`, baris: [{ barangId: barangUt.id, jumlah: 1, harga: 5_000 }] })));
+  const psbLain = await db.pesananPembelian.findFirstOrThrow({ where: { pemasokId: pemasok.id, NOT: { id: psb.id } }, include: { baris: true } });
+  await jalankan("TB pesanan utama", () => buatPenerimaanBarang(formulir({ pesananId: psbLain.id, gudangId: gudangB.id, baris: [{ barisPesananId: psbLain.baris[0].id, barangId: barangUt.id, jumlah: 1 }] })));
+  const tbLain = await db.penerimaanBarang.findFirstOrThrow({ where: { pesananId: psbLain.id } });
+  await harusDitolak("FB menaut penerimaan pesanan lain", () => buatFakturPembelian(formulir({ pesananId: psb.id, penerimaanId: tbLain.id, baris: [{ barangId: barangU.id, jumlah: 20, harga: 9_000 }] })), "Penerimaan barang tidak sesuai pesanan pembelian ini");
+  await harusDitolak("FB menaut penerimaan yang tidak ada", () => buatFakturPembelian(formulir({ pesananId: psb.id, penerimaanId: "tidak-ada", baris: [{ barangId: barangU.id, jumlah: 20, harga: 9_000 }] })), "Penerimaan barang tidak sesuai pesanan pembelian ini");
+  nomorLog.push(tbLain.nomor, psbLain.nomor);
+  await jalankan("hapus TB pesanan utama", () => hapusDokumen("penerimaanBarang", tbLain.id));
+  await jalankan("hapus PSB utama", () => hapusDokumen("pesananPembelian", psbLain.id));
+  await jalankan("FB 20 menaut penerimaan pesanannya", () => buatFakturPembelian(formulir({ pesananId: psb.id, penerimaanId: tb.id, baris: [{ barangId: barangU.id, jumlah: 20, harga: 9_000 }] })));
   const fb = await db.fakturPembelian.findFirstOrThrow({ where: { pesananId: psb.id }, include: { jurnal: true } });
-  pastikan(fb.perusahaanId === U && fb.jurnal?.perusahaanId === U, "FB dan jurnal JU-FB milik perusahaan pesanan");
+  pastikan(fb.perusahaanId === U && fb.jurnal?.perusahaanId === U && fb.penerimaanId === tb.id, "FB dan jurnal JU-FB milik perusahaan pesanan, menaut TB pesanannya");
   pastikan(!!fb.jatuhTempo && hariDari(fb.tanggal, fb.jatuhTempo) === 30, `jatuh tempo FB memakai termin perusahaan pesanan (${fb.jatuhTempo ? hariDari(fb.tanggal, fb.jatuhTempo) : "-"} hari)`);
   await harusDitolak("BYR dari kas milik utama", () => buatPembayaranPembelian(formulir({ fakturId: fb.id, akunId: kasUt.id, jumlah: 100_000 })), `Akun ${KODE}-KAS-UT`);
   await jalankan("BYR 100.000 dari kas perusahaan uji", () => buatPembayaranPembelian(formulir({ fakturId: fb.id, akunId: kasU.id, jumlah: 100_000 })));
@@ -393,6 +427,73 @@ async function main() {
   await jalankan("ubah karyawan perusahaan arsip tanpa ganti pemilik", () => ubahDataInduk("karyawan", karyawanU.id, isiKaryawan(karyawanU.kode, karyawanU.nama, { perusahaanId: U, jabatan: "Kru" })));
   await db.perusahaan.update({ where: { id: U }, data: { aktif: true } });
   pastikan((await db.karyawan.findUniqueOrThrow({ where: { id: karyawanU.id } })).jabatan === "Kru", "data perusahaan arsip tetap bisa diubah selama pemiliknya tidak diganti");
+
+  console.log("=== 7b. Rujukan akun dan akun khusus (tinjauan P13 butir 1 dan 3) ===");
+  const akunRuj = await akunBaru("RUJ", "Akun Uji Rujukan", "ASET", null);
+  const ruj = { ...akunRuj, jenis: "ASET" };
+  const bebanUt = await akunBaru("BEBAN-UT", "Beban Uji Pewarisan Utama", "BEBAN", PERUSAHAAN_UTAMA);
+  // pemetaan akun global: kolom opsional dipinjam sebentar lalu dipulihkan
+  const peta = await db.pemetaanAkun.findFirstOrThrow({ select: { id: true, selisihKursId: true } });
+  await db.pemetaanAkun.update({ where: { id: peta.id }, data: { selisihKursId: akunRuj.id } });
+  try {
+    await harusDitolak("akun pemetaan akun diberi pemilik", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai pemetaan akun yang berlaku untuk semua perusahaan; tidak bisa dijadikan milik PT Uji Pewarisan`);
+  } finally {
+    await db.pemetaanAkun.update({ where: { id: peta.id }, data: { selisihKursId: peta.selisihKursId } });
+  }
+  await db.pemetaanAkunTambahan.create({ data: { kunci: `${KODE}-uji`, label: "Uji pewarisan", akunId: akunRuj.id, dibuatOleh: "Uji" } });
+  try {
+    await harusDitolak("akun pemetaan tambahan diberi pemilik", () => ubahAkun(ruj, U), `dipakai pemetaan akun tambahan ${KODE}-uji`);
+  } finally {
+    await db.pemetaanAkunTambahan.deleteMany({ where: { kunci: `${KODE}-uji` } });
+  }
+  // pengaturan pajak: milik perusahaan uji boleh, milik perusahaan lain ditolak
+  await db.pengaturanPerusahaan.update({ where: { id: U }, data: { akunPpnMasukanId: akunRuj.id } });
+  await harusDitolak("akun pajak perusahaan uji dijadikan milik utama", () => ubahAkun(ruj, PERUSAHAAN_UTAMA), `Akun ${KODE}-RUJ dipakai pengaturan pajak ${KODE}`);
+  await jalankan("akun pajak yang hanya dipakai pengaturan perusahaan uji dijadikan miliknya", () => ubahAkun(ruj, U));
+  pastikan((await db.akun.findUniqueOrThrow({ where: { id: akunRuj.id } })).perusahaanId === U, "akun pajak perusahaan itu sendiri boleh menjadi miliknya");
+  await jalankan("akun uji rujukan kembali bersama", () => ubahAkun(ruj, ""));
+  await db.pengaturanPerusahaan.update({ where: { id: U }, data: { akunPpnMasukanId: null } });
+  // baris "default" juga berlaku bagi perusahaan tanpa baris pengaturan sendiri
+  const pajakDefault = await db.pengaturanPerusahaan.findUnique({ where: { id: "default" }, select: { akunPph23DipotongId: true } });
+  const tanpaBaris = await db.perusahaan.count({ where: { id: { not: PERUSAHAAN_UTAMA }, pengaturan: { is: null } } });
+  if (pajakDefault && tanpaBaris > 0) {
+    await db.pengaturanPerusahaan.update({ where: { id: "default" }, data: { akunPph23DipotongId: akunRuj.id } });
+    try {
+      await harusDitolak("akun pajak baris default dijadikan milik utama", () => ubahAkun(ruj, PERUSAHAAN_UTAMA), `Akun ${KODE}-RUJ dipakai pengaturan pajak`);
+    } finally {
+      await db.pengaturanPerusahaan.update({ where: { id: "default" }, data: { akunPph23DipotongId: pajakDefault.akunPph23DipotongId } });
+    }
+  } else {
+    pastikan(true, "baris pengaturan default atau perusahaan tanpa pengaturan tidak ada, kasus default dilewati");
+  }
+  // akun khusus barang dan karyawan perusahaan lain, serta dokumen kas draf perusahaan lain
+  await db.barang.update({ where: { id: barangUt.id }, data: { akunPersediaanId: akunRuj.id } });
+  await harusDitolak("akun khusus barang utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai akun khusus barang ${KODE}-BRG-UT milik DPRO`);
+  await db.barang.update({ where: { id: barangUt.id }, data: { akunPersediaanId: null } });
+  await db.barang.update({ where: { id: jasaB.id }, data: { akunBebanId: akunRuj.id } });
+  await harusDitolak("akun khusus jasa bersama diberi pemilik", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai akun khusus barang ${KODE}-JSA bersama`);
+  await db.barang.update({ where: { id: jasaB.id }, data: { akunBebanId: null } });
+  const karyawanLama = await db.karyawan.findUniqueOrThrow({ where: { kode: `${KODE}-KRY-LAMA` } });
+  await db.karyawan.update({ where: { id: karyawanLama.id }, data: { akunBebanId: akunRuj.id } });
+  await harusDitolak("akun beban karyawan utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai akun beban karyawan ${KODE}-KRY-LAMA di DPRO`);
+  await db.karyawan.update({ where: { id: karyawanLama.id }, data: { akunBebanId: null } });
+  const kasDraf = await db.dokumenKas.create({ data: { nomor: `${KODE}-KK-DRAF`, jenis: "KELUAR", akunKasId: akunRuj.id, akunLawanId: bebanB.id, jumlah: 1_000, dibuatOleh: "Uji", perusahaanId: PERUSAHAAN_UTAMA } });
+  await harusDitolak("akun dokumen kas draf utama dijadikan milik perusahaan uji", () => ubahAkun(ruj, U), `Akun ${KODE}-RUJ dipakai dokumen kas ${KODE}-KK-DRAF DPRO yang belum disetujui`);
+  await db.dokumenKas.delete({ where: { id: kasDraf.id } });
+  await jalankan("akun tanpa rujukan perusahaan lain diberi pemilik", () => ubahAkun(ruj, U));
+  pastikan((await db.akun.findUniqueOrThrow({ where: { id: akunRuj.id } })).perusahaanId === U, "akun tanpa rujukan perusahaan lain boleh diberi pemilik");
+  // akun khusus data induk harus milik pemiliknya atau bersama
+  await harusDitolak("barang perusahaan uji dengan akun persediaan khusus milik utama", () => buatDataInduk("barang", isiBarang("BRG-AKUN", { jenis: "BARANG", perusahaanId: U, akunPersediaanId: kasUt.id })), `Akun ${KODE}-KAS-UT Kas Uji Pewarisan Utama milik`);
+  pastikan((await db.barang.count({ where: { kode: `${KODE}-BRG-AKUN` } })) === 0, "barang dengan akun khusus perusahaan lain tidak tersimpan");
+  await jalankan("barang perusahaan uji dengan akun persediaan khusus miliknya", () => buatDataInduk("barang", isiBarang("BRG-AKUN", { jenis: "BARANG", perusahaanId: U, akunPersediaanId: akunRuj.id })));
+  const barangAkun = await db.barang.findUniqueOrThrow({ where: { kode: `${KODE}-BRG-AKUN` } });
+  pastikan(barangAkun.akunPersediaanId === akunRuj.id, "akun khusus milik pemilik barang diterima");
+  await harusDitolak("barang dipindah ke utama dengan akun khusus milik perusahaan uji", () => ubahDataInduk("barang", barangAkun.id, formulir({ kode: barangAkun.kode, nama: barangAkun.nama, jenis: "BARANG", satuan: "pcs", perusahaanId: PERUSAHAAN_UTAMA, akunPersediaanId: akunRuj.id })), `Akun ${KODE}-RUJ Akun Uji Rujukan milik PT Uji Pewarisan`);
+  await harusDitolak("jasa bersama dengan akun beban khusus milik utama", () => buatDataInduk("barang", isiBarang("JSA-AKUN", { jenis: "JASA", perusahaanId: NILAI_BERSAMA, akunBebanId: bebanUt.id })), "jasa bersama hanya bisa memakai akun khusus bersama");
+  await jalankan("jasa bersama dengan akun beban khusus bersama", () => buatDataInduk("barang", isiBarang("JSA-AKUN", { jenis: "JASA", perusahaanId: NILAI_BERSAMA, akunBebanId: bebanB.id })));
+  await harusDitolak("karyawan perusahaan uji dengan akun beban milik utama", () => ubahDataInduk("karyawan", karyawanU.id, isiKaryawan(karyawanU.kode, karyawanU.nama, { perusahaanId: U, jabatan: "Kru", akunBebanId: bebanUt.id })), `Akun ${KODE}-BEBAN-UT Beban Uji Pewarisan Utama milik`);
+  await jalankan("karyawan perusahaan uji dengan akun beban bersama", () => ubahDataInduk("karyawan", karyawanU.id, isiKaryawan(karyawanU.kode, karyawanU.nama, { perusahaanId: U, jabatan: "Kru", akunBebanId: bebanB.id })));
+  pastikan((await db.karyawan.findUniqueOrThrow({ where: { id: karyawanU.id } })).akunBebanId === bebanB.id, "akun beban karyawan bersama diterima");
 
   console.log("=== 8. Hak akses ===");
   await dengan({ peran: "KRU" }, () => harusDitolak("KRU membuat gudang", () => buatDataInduk("gudang", formulir({ kode: `${KODE}-WH-KRU`, nama: "x", perusahaanId: U })), "tidak punya hak"));

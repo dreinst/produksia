@@ -11,7 +11,7 @@ import { D, uang, type Desimal } from "@/lib/uang";
 import { kurangiStok, perbaruiHargaRata, tambahStok } from "@/lib/stok";
 import { catatJurnalPenyesuaianPersediaan } from "@/lib/akuntansi";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
-import { pastikanAkunMilik, pastikanGudangMilik, pemilikTunggalBarang } from "@/lib/perusahaan";
+import { pastikanAkunMilik, pastikanGudangMilik, perusahaanDokumenPersediaan } from "@/lib/perusahaan";
 
 type BarisPenyesuaian = { barangId: string; jumlahSesudah: Desimal; hargaSatuan: Desimal | null };
 
@@ -96,7 +96,7 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
 
     // catatan C D1 §3.3: perusahaan dokumen = pemilik tunggal barang, diperiksa SESUDAH pemeriksaan baris lama
     // (stok yang sudah diubah di atas ikut dibatalkan bila galat, karena satu transaksi)
-    const perusahaanId = await pemilikTunggalBarang(tx, daftarBaris.map((b) => b.barangId));
+    const perusahaanId = await perusahaanDokumenPersediaan(tx, daftarBaris.map((b) => b.barangId), dataFormulir);
     await pastikanGudangMilik(tx, [gudangId], perusahaanId);
     await pastikanAkunMilik(tx, [akunLawanId], perusahaanId);
 
@@ -184,7 +184,7 @@ export async function buatPindahBarang(dataFormulir: FormData) {
       await tambahStok(tx, b.barangId, gudangTujuanId, b.jumlah);
     }
     // pindah barang tidak memindah kepemilikan (D1 §4.10): kedua gudang wajib bersama atau milik pemilik barang
-    const perusahaanId = await pemilikTunggalBarang(tx, daftarBaris.map((b) => b.barangId));
+    const perusahaanId = await perusahaanDokumenPersediaan(tx, daftarBaris.map((b) => b.barangId), dataFormulir);
     await pastikanGudangMilik(tx, [gudangAsalId, gudangTujuanId], perusahaanId);
     await tx.pindahBarang.create({
       data: { nomor, perusahaanId, gudangAsalId, gudangTujuanId, keterangan: keterangan || null, ...dataLangsungDisetujui(pengguna), baris: { create: daftarBaris.map((b) => ({ barangId: b.barangId, jumlah: b.jumlah })) } },

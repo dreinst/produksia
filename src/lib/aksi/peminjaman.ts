@@ -13,7 +13,7 @@ import { menungguKonfirmasiBaris, sisaBaris } from "@/lib/peminjaman";
 import { bacaProyekId } from "@/lib/proyek";
 import { bacaNomorTelepon } from "@/lib/identitasPengguna";
 import { dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
-import { pastikanGudangMilik, pemilikTunggalBarang } from "@/lib/perusahaan";
+import { pastikanGudangMilik, perusahaanDokumenPersediaan } from "@/lib/perusahaan";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 
@@ -129,7 +129,7 @@ export async function buatPeminjamanBarang(dataFormulir: FormData) {
       if (barang.jenis !== "BARANG") throw new Error(`${barang.kode} - ${barang.nama} adalah JASA, tidak punya stok`);
     }
     // perusahaan dokumen = pemilik tunggal barang (D1 §3.3 catatan C); proyek boleh milik perusahaan lain (catatan B)
-    const perusahaanId = await pemilikTunggalBarang(tx, idBarang);
+    const perusahaanId = await perusahaanDokumenPersediaan(tx, idBarang, dataFormulir);
     await pastikanGudangMilik(tx, [gudangId], perusahaanId);
     const nomor = await nomorDokumenBerikutnya(tx.peminjamanBarang, "PJ");
     const dokumen = await tx.peminjamanBarang.create({

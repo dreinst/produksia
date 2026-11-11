@@ -15,7 +15,7 @@ import { perbaruiHargaRata } from "@/lib/stok";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 import { bacaFotoDariFormulir } from "@/lib/foto";
-import { NILAI_BERSAMA, PERUSAHAAN_UTAMA, namaPerusahaan, pastikanAkunMilik, pastikanGudangMilik } from "@/lib/perusahaan";
+import { NILAI_BERSAMA, PERUSAHAAN_UTAMA, namaPerusahaan, pastikanAkunMilik, pastikanGudangMilik, pastikanPerusahaanAktif } from "@/lib/perusahaan";
 import { LABEL_STATUS_PROYEK, statusProyekSah, validasiProyek } from "@/lib/proyek";
 import { catatAktivitas } from "@/lib/log";
 
@@ -137,6 +137,45 @@ async function daftarKodePerusahaan(ids: (string | null)[]): Promise<string> {
   return daftar.map((p) => p.kode).join(", ");
 }
 
+const KOLOM_PEMETAAN_AKUN = [
+  "piutangUsahaId", "persediaanId", "hppId", "pendapatanPenjualanId", "utangUsahaId", "bebanJasaId", "barangBelumDitagihId",
+  "selisihPersediaanId", "barangTerkirimId", "uangMukaPelangganId", "labaDitahanId", "diskonPenjualanId", "pendapatanLainId", "selisihKursId",
+] as const;
+
+const KOLOM_AKUN_PAJAK = ["akunPpnKeluaranId", "akunPpnMasukanId", "akunPph23DimukaId", "akunPph23DipotongId", "akunBebanPphFinalId", "akunHutangPphFinalId"] as const;
+
+const KOLOM_AKUN_BARANG = ["akunPendapatanId", "akunPersediaanId", "akunHppId", "akunBebanId"] as const;
+
+/**
+ * Selain jurnal, akun juga dirujuk pengaturan yang berlaku untuk perusahaan lain (tinjauan P13 butir 1). Akun yang
+ * dirujuk pemetaan akun atau pemetaan tambahan (global), pengaturan pajak perusahaan lain (perusahaan tanpa baris
+ * pengaturan memakai akun baris "default" milik utama), akun khusus barang atau karyawan yang bukan milik `baru`
+ * (termasuk jasa bersama), atau dokumen kas perusahaan lain yang belum disetujui tidak bisa diberi pemilik. Tanpa
+ * pemeriksaan ini galatnya baru muncul saat perusahaan lain mencatat transaksi.
+ */
+async function pastikanAkunTanpaRujukanLain(id: string, kode: string, baru: string): Promise<void> {
+  const milik = `tidak bisa dijadikan milik ${await namaPerusahaan(db, baru)}`;
+  const [pemetaan, tambahan, pengaturan, barang, karyawan, kas] = await Promise.all([
+    db.pemetaanAkun.count({ where: { OR: KOLOM_PEMETAAN_AKUN.map((k) => ({ [k]: id })) } }),
+    db.pemetaanAkunTambahan.findFirst({ where: { akunId: id }, select: { kunci: true } }),
+    db.pengaturanPerusahaan.findMany({ where: { OR: KOLOM_AKUN_PAJAK.map((k) => ({ [k]: id })) }, select: { id: true, perusahaanId: true } }),
+    db.barang.findFirst({ where: { AND: [{ OR: KOLOM_AKUN_BARANG.map((k) => ({ [k]: id })) }, { OR: [{ perusahaanId: null }, { perusahaanId: { not: baru } }] }] }, select: { kode: true, perusahaanId: true }, orderBy: { kode: "asc" } }),
+    db.karyawan.findFirst({ where: { akunBebanId: id, NOT: { perusahaanId: baru } }, select: { kode: true, perusahaanId: true }, orderBy: { kode: "asc" } }),
+    db.dokumenKas.findFirst({ where: { OR: [{ akunKasId: id }, { akunLawanId: id }], NOT: { perusahaanId: baru }, statusPersetujuan: { not: "DISETUJUI" } }, select: { nomor: true, perusahaanId: true }, orderBy: { nomor: "asc" } }),
+  ]);
+  if (pemetaan > 0 || tambahan) throw new Error(`Akun ${kode} dipakai pemetaan akun${tambahan ? ` tambahan ${tambahan.kunci}` : ""} yang berlaku untuk semua perusahaan; ${milik}`);
+  const pajakLain = pengaturan.filter((p) => p.perusahaanId !== baru).map((p) => p.perusahaanId);
+  // baris "default" juga dipakai perusahaan lain yang belum punya baris pengaturan sendiri
+  if (pajakLain.length === 0 && pengaturan.some((p) => p.id === "default")) {
+    const tanpaPengaturan = await db.perusahaan.findMany({ where: { id: { not: PERUSAHAAN_UTAMA }, pengaturan: { is: null } }, select: { id: true } });
+    pajakLain.push(...tanpaPengaturan.map((p) => p.id));
+  }
+  if (pajakLain.length > 0) throw new Error(`Akun ${kode} dipakai pengaturan pajak ${await daftarKodePerusahaan(pajakLain)}; ${milik}`);
+  if (barang) throw new Error(`Akun ${kode} dipakai akun khusus barang ${barang.kode} ${barang.perusahaanId ? `milik ${await daftarKodePerusahaan([barang.perusahaanId])}` : "bersama"}; ${milik}`);
+  if (karyawan) throw new Error(`Akun ${kode} dipakai akun beban karyawan ${karyawan.kode} di ${await daftarKodePerusahaan([karyawan.perusahaanId])}; ${milik}`);
+  if (kas) throw new Error(`Akun ${kode} dipakai dokumen kas ${kas.nomor} ${await daftarKodePerusahaan([kas.perusahaanId])} yang belum disetujui; ${milik}`);
+}
+
 /**
  * Ganti pemilik hanya bila aman (D1 §3.5 butir 2, D5 §4.7). `baru` null = dijadikan bersama. Melempar galat yang
  * menyebut perusahaan yang sudah memakai data ini.
@@ -146,6 +185,7 @@ async function pastikanGantiPemilikAman(slug: string, id: string, lama: DataLama
     if (baru === null) return; // menjadi akun bersama selalu boleh
     const jurnal = await db.jurnal.findMany({ where: { perusahaanId: { not: baru }, baris: { some: { akunId: id } } }, distinct: ["perusahaanId"], select: { perusahaanId: true } });
     if (jurnal.length > 0) throw new Error(`Akun ${lama.kode} sudah dipakai jurnal ${await daftarKodePerusahaan(jurnal.map((j) => j.perusahaanId))}; tidak bisa dijadikan milik ${await namaPerusahaan(db, baru)}`);
+    await pastikanAkunTanpaRujukanLain(id, lama.kode, baru);
     return;
   }
   if (slug === "barang") {
@@ -238,6 +278,26 @@ async function periksaPemilik(slug: string, id: string | null, data: Record<stri
     if (jenisAkhir === "BARANG" && pemilikAkhir === null) throw new Error("Barang jenis BARANG wajib milik satu perusahaan");
   }
   if (lama && id && baru !== undefined && baru !== lama.perusahaanId) await pastikanGantiPemilikAman(slug, id, lama, baru);
+  await periksaAkunKhusus(slug, data, lama, baru);
+}
+
+/**
+ * Akun khusus barang dan karyawan harus milik pemilik data induknya atau bersama, supaya jurnal otomatis yang memakainya
+ * tidak ditolak catatJurnal (tinjauan P13 butir 3). Jasa bersama hanya boleh memakai akun bersama. Nilai akhir = isian
+ * formulir bila terkirim, selain itu nilai lama.
+ */
+async function periksaAkunKhusus(slug: string, data: Record<string, unknown>, lama: DataLama | null, baru: string | null | undefined): Promise<void> {
+  if (slug !== "barang" && slug !== "karyawan") return;
+  const kolom: readonly string[] = slug === "barang" ? KOLOM_AKUN_BARANG : ["akunBebanId"];
+  const akunIds = kolom.map((k) => (k in data ? data[k] : (lama as Record<string, unknown> | null)?.[k])).filter((x): x is string => typeof x === "string" && x !== "");
+  if (akunIds.length === 0) return;
+  const pemilikAkhir = baru !== undefined ? baru : lama ? lama.perusahaanId : PERUSAHAAN_UTAMA;
+  if (pemilikAkhir) {
+    await pastikanAkunMilik(db, akunIds, pemilikAkhir);
+    return;
+  }
+  const berpemilik = await db.akun.findFirst({ where: { id: { in: akunIds }, perusahaanId: { not: null } }, select: { kode: true, nama: true, perusahaanId: true }, orderBy: { kode: "asc" } });
+  if (berpemilik) throw new Error(`Akun ${berpemilik.kode} ${berpemilik.nama} milik ${await namaPerusahaan(db, berpemilik.perusahaanId!)}; jasa bersama hanya bisa memakai akun khusus bersama`);
 }
 
 const PANJANG_DESKRIPSI_BARANG = 3000;
@@ -419,6 +479,7 @@ export async function ubahStokBarang(barangId: string, dataFormulir: FormData) {
   if (selisih.gt(0) && hargaSatuan.lte(0)) throw new Error("Isi Harga Beli barang ini lebih dulu untuk menghitung nilai penyesuaian stok");
   // dokumen koreksi stok milik pemilik barang (D1 §3.3): gudang dan akun lawan harus milik perusahaan itu atau bersama
   const perusahaanId = barang.perusahaanId ?? PERUSAHAAN_UTAMA;
+  await pastikanPerusahaanAktif(db, perusahaanId);
   await pastikanGudangMilik(db, [gudangId], perusahaanId);
   await pastikanAkunMilik(db, [akunLawanId], perusahaanId);
 

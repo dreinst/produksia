@@ -64,7 +64,7 @@ export default async function HalamanDataInduk({
           config={config}
           daftarOpsi={daftarOpsi}
           aksi={buatDataIndukFormulir.bind(null, entitas)}
-          perusahaanBawaan={lingkup.perusahaanId}
+          perusahaanBawaan={lingkup.perusahaan?.aktif ? lingkup.perusahaanId : null}
           labelTombol={`Tambah ${config.label}`}
         />
       )}

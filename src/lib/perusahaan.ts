@@ -173,6 +173,27 @@ export async function pemilikTunggalBarang(klien: Klien, barangIds: string[]): P
   return pemilik[0] ?? PERUSAHAAN_UTAMA;
 }
 
+/**
+ * Perusahaan dokumen persediaan (PS, PB, PJ, BR) = pemilik tunggal barang. Isian "perusahaanId" formulir yang berbeda
+ * dari pemilik barang ditolak, dan pemilik yang sudah diarsipkan ditolak karena arsip berarti buku perusahaan itu
+ * tidak menerima dokumen baru (keputusan tinjauan P13 butir 4 dan 8).
+ */
+export async function perusahaanDokumenPersediaan(klien: Klien, barangIds: string[], dataFormulir?: FormData): Promise<string> {
+  const perusahaanId = await pemilikTunggalBarang(klien, barangIds);
+  const isian = String(dataFormulir?.get("perusahaanId") ?? "").trim();
+  if (isian && isian !== perusahaanId) {
+    throw new Error(`Barang di dokumen ini milik ${await namaPerusahaan(klien, perusahaanId)}; dokumen persediaan harus di perusahaan pemilik barang`);
+  }
+  await pastikanPerusahaanAktif(klien, perusahaanId);
+  return perusahaanId;
+}
+
+/** Galat bila perusahaan pemilik sudah diarsipkan (dokumen persediaan dan koreksi stok, keputusan tinjauan P13 butir 4). */
+export async function pastikanPerusahaanAktif(klien: Klien, perusahaanId: string): Promise<void> {
+  const p = await klien.perusahaan.findUnique({ where: { id: perusahaanId }, select: { nama: true, aktif: true } });
+  if (p && !p.aktif) throw new Error(`Perusahaan ${p.nama} sudah diarsipkan; aktifkan dulu`);
+}
+
 export async function pastikanKaryawanMilik(klien: Klien, karyawanIds: string[], perusahaanId: string): Promise<void> {
   const ids = unik(karyawanIds);
   if (ids.length === 0) return;
