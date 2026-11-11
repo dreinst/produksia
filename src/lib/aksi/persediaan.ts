@@ -8,7 +8,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { D, uang, type Desimal } from "@/lib/uang";
-import { kurangiStok, perbaruiHargaRata, tambahStok } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, perbaruiHargaRata, tambahStok } from "@/lib/stok";
 import { catatJurnalPenyesuaianPersediaan } from "@/lib/akuntansi";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
 import { pastikanAkunMilik, pastikanGudangMilik, perusahaanDokumenPersediaan } from "@/lib/perusahaan";
@@ -67,6 +67,15 @@ export async function buatPenyesuaianPersediaan(dataFormulir: FormData) {
     });
     const petaBarang = new Map(daftarBarang.map((b) => [b.id, b]));
     const barisTersimpan: { barangId: string; jumlahSebelum: Desimal; jumlahSesudah: Desimal; hargaSatuan: Desimal }[] = [];
+    if (!perluPersetujuan) {
+      // Mode langsung menulis nilai absolut sesudah membaca stok, jadi baris stok dikunci lebih dulu (kontrak perbaikan
+      // tinjauan P21 butir 2, pola posting penyesuaian). Baris yang belum ada dibuat nol supaya ikut terkunci; bila
+      // transaksi gagal, baris nol ikut dibatalkan. Barang yang tidak ada atau JASA tetap ditolak di bawah.
+      const sah = daftarBaris.filter((b) => petaBarang.get(b.barangId)?.jenis === "BARANG");
+      const baru = sah.filter((b) => !b.jumlahSesudah.isZero());
+      if (baru.length) await tx.stokBarang.createMany({ data: baru.map((b) => ({ barangId: b.barangId, gudangId, jumlah: 0 })), skipDuplicates: true });
+      await kunciStokUrut(tx, sah.map((b) => ({ barangId: b.barangId, gudangId })));
+    }
 
     for (const b of daftarBaris) {
       const barang = petaBarang.get(b.barangId);
@@ -176,6 +185,7 @@ export async function buatPindahBarang(dataFormulir: FormData) {
   await db.$transaction(async (tx) => {
     const daftarBarang = await tx.barang.findMany({ where: { id: { in: daftarBaris.map((b) => b.barangId) } }, select: { id: true, kode: true, nama: true, jenis: true } });
     const petaBarang = new Map(daftarBarang.map((b) => [b.id, b]));
+    await kunciStokUrut(tx, daftarBaris.flatMap((b) => [{ barangId: b.barangId, gudangId: gudangAsalId }, { barangId: b.barangId, gudangId: gudangTujuanId }]));
     for (const b of daftarBaris) {
       const barang = petaBarang.get(b.barangId);
       if (!barang) throw new Error("Barang tidak ditemukan");

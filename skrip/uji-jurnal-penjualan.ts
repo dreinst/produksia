@@ -564,9 +564,17 @@ async function main() {
     // antrean kunci, baru aksi kedua, lalu penahan dilepas. Setujui lebih dulu: hapus menunggu, lalu membuang jurnal
     // hasil persetujuan bersama dokumennya. Hapus lebih dulu: setujui ditolak "tidak ditemukan". Tanpa kunci baris di
     // hapusDokumen, hapus membaca jurnalId lama (null) sebelum persetujuan selesai, sehingga jurnalnya tertinggal.
-    const tungguAntre = async (n: number) => {
+    // hanya sesi yang terhalang penahan (langsung atau berantai) yang dihitung, bukan kunci proses lain (tinjauan
+    // perbaikan P22 butir 5)
+    const tungguAntre = async (pidPenahan: number, n: number) => {
       for (let t = 0; t < 400; t++) {
-        const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`SELECT count(*)::int AS "antre" FROM pg_locks WHERE NOT granted`;
+        const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`
+          WITH RECURSIVE rantai(pid) AS (
+            SELECT a.pid FROM pg_stat_activity a WHERE ${pidPenahan}::int = ANY(pg_blocking_pids(a.pid))
+            UNION
+            SELECT a.pid FROM pg_stat_activity a JOIN rantai r ON r.pid = ANY(pg_blocking_pids(a.pid))
+          )
+          SELECT count(*)::int AS "antre" FROM rantai`;
         if (antre >= n) return;
         await new Promise((r) => setTimeout(r, 25));
       }
@@ -574,23 +582,24 @@ async function main() {
     };
     const berantre = async (jenis: JenisPersetujuan, id: string, kerja: (() => Promise<unknown>)[]): Promise<PromiseSettledResult<unknown>[]> => {
       let lepas!: () => void;
-      let siap!: () => void;
+      let siap!: (pid: number) => void;
       const tahan = new Promise<void>((r) => (lepas = r));
-      const terkunci = new Promise<void>((r) => (siap = r));
+      const terkunci = new Promise<number>((r) => (siap = r));
       const penahan = db.$transaction(
         async (tx) => {
           await BERKAS[jenis].kunci(tx, id);
-          siap();
+          const [{ pid }] = await tx.$queryRaw<{ pid: number }[]>`SELECT pg_backend_pid() AS "pid"`;
+          siap(pid);
           await tahan;
         },
         { timeout: 60_000 },
       );
-      await terkunci;
+      const pidPenahan = await terkunci;
       const hasil: Promise<PromiseSettledResult<unknown>>[] = [];
       try {
         for (const [i, k] of kerja.entries()) {
           hasil.push(sesudahCommit(k).then((value) => ({ status: "fulfilled" as const, value }), (reason: unknown) => ({ status: "rejected" as const, reason })));
-          await tungguAntre(i + 1);
+          await tungguAntre(pidPenahan, i + 1);
         }
       } finally {
         lepas();

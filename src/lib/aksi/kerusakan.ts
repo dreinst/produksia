@@ -8,7 +8,7 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { uang, type Desimal } from "@/lib/uang";
 import { bacaFotoDariFormulir } from "@/lib/foto";
-import { kurangiStok, labelBarang } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, labelBarang } from "@/lib/stok";
 import { bacaProyekId } from "@/lib/proyek";
 import { dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
 import { pastikanGudangMilik, perusahaanDokumenPersediaan } from "@/lib/perusahaan";
@@ -116,6 +116,7 @@ export async function buatLaporanKerusakan(dataFormulir: FormData) {
     await simpanFotoBukti(tx, dokumen.id, daftarFoto);
     if (!perluPersetujuan) {
       const label = await labelBarang(tx, idBarang);
+      await kunciStokUrut(tx, daftarBaris.map((b) => ({ barangId: b.barangId, gudangId })));
       for (const b of daftarBaris) await kurangiStok(tx, b.barangId, gudangId, b.jumlah, label.get(b.barangId) ?? b.barangId);
     }
   });

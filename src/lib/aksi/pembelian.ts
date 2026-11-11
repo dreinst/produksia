@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, kali, bacaUang, jumlahkan, type Desimal } from "@/lib/uang";
-import { kurangiStok, tambahStok, labelBarang, jenisBarang, perbaruiHargaRata, sesuaikanHargaRata } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, jenisBarang, perbaruiHargaRata, sesuaikanHargaRata } from "@/lib/stok";
 import {
   catatJurnalPenerimaanBarang,
   catatJurnalFakturPembelian,
@@ -168,6 +168,7 @@ export async function buatPenerimaanBarang(dataFormulir: FormData) {
       },
     });
 
+    await kunciStokUrut(tx, barisNilai.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
     for (const baris of barisNilai) {
       if (daftarJenis.get(baris.barangId) === "BARANG") {
         await tambahStok(tx, baris.barangId, gudangId, baris.jumlah);
@@ -406,6 +407,7 @@ export async function buatReturPembelian(dataFormulir: FormData) {
       },
     });
 
+    await kunciStokUrut(tx, daftarBaris.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
     for (const l of daftarBaris) {
       if (daftarJenis.get(l.barangId) === "BARANG") {
         await kurangiStok(tx, l.barangId, gudangId, l.jumlah, daftarLabel.get(l.barangId) ?? l.barangId);

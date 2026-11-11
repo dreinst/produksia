@@ -8,7 +8,7 @@ import { db } from "@/lib/db";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, kali, bacaUang, jumlahkan, terkecil, terbesar, type Desimal } from "@/lib/uang";
-import { kurangiStok, tambahStok, labelBarang, jenisBarang } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, jenisBarang } from "@/lib/stok";
 import { catatJurnalPengiriman, catatJurnalFakturPenjualan, catatJurnalPenerimaanPenjualan, catatJurnalReturPenjualan, catatJurnalUangMuka, tandaiProyek } from "@/lib/akuntansi";
 import { bacaProyekId } from "@/lib/proyek";
 import { dataLangsungDisetujui, persetujuanWajib } from "@/lib/persetujuan";
@@ -430,6 +430,7 @@ export async function buatPengiriman(dataFormulir: FormData) {
       },
     });
 
+    await kunciStokUrut(tx, barisNilai.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
     for (const baris of barisNilai) {
       // JASA tidak punya stok: surat jalan hanya mencatat bahwa jasanya sudah diserahkan
       if (daftarJenis.get(baris.barangId) === "BARANG") {
@@ -742,6 +743,7 @@ export async function buatRetur(dataFormulir: FormData) {
       },
     });
 
+    await kunciStokUrut(tx, barisRetur.filter((l) => daftarJenis.get(l.barangId) === "BARANG").map((l) => ({ barangId: l.barangId, gudangId })));
     for (const l of barisRetur) {
       if (daftarJenis.get(l.barangId) === "BARANG") await tambahStok(tx, l.barangId, gudangId, l.jumlah);
     }

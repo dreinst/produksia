@@ -8,11 +8,11 @@ import { nomorDokumenBerikutnya } from "@/lib/penomoran";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, type Desimal } from "@/lib/uang";
 import { bacaFotoDariFormulir } from "@/lib/foto";
-import { kurangiStok, labelBarang, tambahStok } from "@/lib/stok";
+import { kunciStokUrut, kurangiStok, labelBarang, tambahStok } from "@/lib/stok";
 import { menungguKonfirmasiBaris, sisaBaris } from "@/lib/peminjaman";
 import { bacaProyekId } from "@/lib/proyek";
 import { bacaNomorTelepon } from "@/lib/identitasPengguna";
-import { dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
+import { BERKAS, dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
 import { pastikanGudangMilik, perusahaanDokumenPersediaan } from "@/lib/perusahaan";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
@@ -151,6 +151,7 @@ export async function buatPeminjamanBarang(dataFormulir: FormData) {
     await simpanFotoBukti(tx, dokumen.id, "KELUAR", daftarFoto);
     if (!perluPersetujuan) {
       const label = await labelBarang(tx, idBarang);
+      await kunciStokUrut(tx, daftarBaris.map((b) => ({ barangId: b.barangId, gudangId })));
       for (const b of daftarBaris) await kurangiStok(tx, b.barangId, gudangId, b.jumlah, label.get(b.barangId) ?? b.barangId);
     }
   });
@@ -173,6 +174,9 @@ export async function ajukanKembaliPeminjamanBarang(peminjamanId: string, dataFo
   const daftarFoto = await bacaFotoDariFormulir(dataFormulir, "foto", { wajib: true });
 
   await db.$transaction(async (tx) => {
+    // Dokumen dikunci lebih dulu, sebelum baris anaknya, sama urutannya dengan setujui dan hapus (tinjauan perbaikan
+    // P22 butir 2). Pembacaan sesudah kunci mendapat data terbaru.
+    await BERKAS.peminjaman.kunci(tx, peminjamanId);
     const dokumen = await tx.peminjamanBarang.findUnique({
       where: { id: peminjamanId },
       include: { baris: { include: { barang: { select: { kode: true } } } } },
@@ -212,6 +216,9 @@ export async function konfirmasiKembaliPeminjamanBarang(peminjamanId: string, da
   if (!tutupDenganSelisih && !daftarKonfirmasi.some((b) => b.jumlahKembali.gt(0))) throw new Error("Isi jumlah yang dikonfirmasi kembali minimal pada satu barang");
 
   await db.$transaction(async (tx) => {
+    // Dokumen dikunci lebih dulu, lalu stok, lalu baris anak: urutan yang sama dengan setujui dan hapus (tinjauan
+    // perbaikan P22 butir 2). Tanpa itu, hapus yang memegang dokumen dan konfirmasi yang memegang baris saling menunggu.
+    await BERKAS.peminjaman.kunci(tx, peminjamanId);
     const dokumen = await tx.peminjamanBarang.findUnique({
       where: { id: peminjamanId },
       include: { baris: { include: { barang: { select: { kode: true } } } } },
@@ -221,6 +228,7 @@ export async function konfirmasiKembaliPeminjamanBarang(peminjamanId: string, da
     if (dokumen.ditutupPada) throw new Error(`${dokumen.nomor} sudah ditutup`);
     const petaBaris = new Map(dokumen.baris.map((b) => [b.barangId, b]));
     const sisaSetelah = new Map(dokumen.baris.map((b) => [b.barangId, D(sisaBaris(b))]));
+    await kunciStokUrut(tx, daftarKonfirmasi.filter((k) => k.jumlahKembali.gt(0) && petaBaris.has(k.barangId)).map((k) => ({ barangId: k.barangId, gudangId: dokumen.gudangId })));
     for (const k of daftarKonfirmasi) {
       const baris = petaBaris.get(k.barangId);
       if (!baris) throw new Error("Barang tidak ada di dokumen ini");

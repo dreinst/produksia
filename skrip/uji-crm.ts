@@ -90,13 +90,14 @@ async function bersihkan(mulai: Date | null) {
   }
   await db.pengguna.deleteMany({ where: { namaPengguna: NONAKTIF } });
   await db.perusahaan.deleteMany({ where: { id: { in: pIds } } });
-  // penyesuaian hak bagian 17b (ADMIN tanpa lead.lihat) bila putaran sebelumnya terhenti di tengah
-  await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "lead.lihat" } });
+  // penyesuaian hak ADMIN lead.lihat bagian 17b dipulihkan di finally-nya sendiri, jadi baris milik pengguna tidak
+  // dihapus di sini (tinjauan perbaikan P22 butir 6)
 }
 
 async function main() {
   await bersihkan(null);
   const mulaiUji = new Date();
+  const hakAwal = await db.hakAksesPeran.count();
   const ambil = async (namaPengguna: string) => db.pengguna.findUniqueOrThrow({ where: { namaPengguna }, select: { id: true, nama: true } });
   const [owner, owner2, admin, kasir] = await Promise.all([ambil("owner"), ambil("owner2"), ambil("admin"), ambil("kasir")]);
   const B = (await db.perusahaan.create({ data: { kode: KODE_B, nama: "PT Uji CRM B", urutan: 97 } })).id;
@@ -560,7 +561,10 @@ async function main() {
     const menangAwalAdmin = await jumlahNotif(admin.id, "Deal menang: ");
     const judulR3 = `${AWALAN}TL R3`;
     await jalankan("TL lewat jatuh tempo untuk admin (R3)", () => buatTL({ judul: judulR3, perusahaanId: B, jatuhTempo: "2026-01-05T09:00", ditugaskanKeId: admin.id }));
-    await db.hakAksesPeran.create({ data: { peran: "ADMIN", hak: "lead.lihat", boleh: false } });
+    // penyesuaian yang sudah ada (dipasang pengguna) disimpan lalu dipulihkan persis
+    const kunciHakAdmin = { peran_hak: { peran: "ADMIN" as const, hak: "lead.lihat" } };
+    const hakAdminLama = await db.hakAksesPeran.findUnique({ where: kunciHakAdmin });
+    await db.hakAksesPeran.upsert({ where: kunciHakAdmin, create: { peran: "ADMIN", hak: "lead.lihat", boleh: false }, update: { boleh: false } });
     try {
       pastikan(k1.picId === admin.id, "lead K1 ber-PIC admin");
       await jalankan("K1 ke Kalah saat ADMIN tanpa lead.lihat", () => pindah(k1.id, kalahB.id, "Uji R3"));
@@ -568,7 +572,8 @@ async function main() {
       pastikan((await periksaPengingatTindakLanjut(admin.id, new Date(), { paksa: true })) === 0, "R3: periksaPengingatTindakLanjut untuk penerima tanpa lead.lihat: 0");
       pastikan((await notifPengingat(admin.id, judulR3)) === 0 && (await db.tindakLanjut.findFirstOrThrow({ where: { judul: judulR3 } })).diingatkanPada === null, "R3: TL tidak diklaim, jadi bisa diingatkan bila hak kembali");
     } finally {
-      await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "lead.lihat" } });
+      if (hakAdminLama) await db.hakAksesPeran.update({ where: kunciHakAdmin, data: { boleh: hakAdminLama.boleh } });
+      else await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "lead.lihat" } });
     }
     await jalankan("K1 kembali ke Dihubungi", () => pindah(k1.id, dihubungi.id));
     await jalankan("K1 ke Menang (hak ADMIN pulih)", () => pindah(k1.id, menangB.id));
@@ -636,7 +641,7 @@ async function main() {
   }
   pastikan((await db.perusahaan.count({ where: { kode: { in: [KODE_B, KODE_C] } } })) === 0 && (await db.lead.count({ where: { nama: { startsWith: AWALAN } } })) === 0, "perusahaan dan lead uji terhapus");
   pastikan((await db.pelanggan.count({ where: { OR: [{ kode: KODE_P1 }, { namaKontak: { startsWith: AWALAN } }] } })) === 0 && (await db.tindakLanjut.count({ where: { judul: { startsWith: AWALAN } } })) === 0, "pelanggan dan tindak lanjut uji terhapus");
-  pastikan((await db.pengguna.count({ where: { namaPengguna: NONAKTIF } })) === 0 && (await db.karyawan.count({ where: { kode: KODE_KARYAWAN } })) === 0 && (await db.hakAksesPeran.count()) === 0, "pengguna dan karyawan uji terhapus, HakAksesPeran kosong");
+  pastikan((await db.pengguna.count({ where: { namaPengguna: NONAKTIF } })) === 0 && (await db.karyawan.count({ where: { kode: KODE_KARYAWAN } })) === 0 && (await db.hakAksesPeran.count()) === hakAwal, "pengguna dan karyawan uji terhapus, HakAksesPeran sama dengan awal");
   console.log("=== DONE, all crm checks passed ===");
 }
 

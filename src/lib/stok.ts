@@ -23,6 +23,26 @@ export async function kurangiStok(tx: Tx, barangId: string, gudangId: string, ju
   });
 }
 
+/** Pembanding id untuk urutan kunci stok: urutan unit kode JavaScript, sama di semua jalur (bukan collation basis data). */
+export function bandingId(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/**
+ * Mengunci baris StokBarang (FOR UPDATE) untuk semua pasangan barang dan gudang yang akan dimutasi sebuah dokumen,
+ * urut barangId lalu gudangId, sebelum mutasi pertama (tinjauan perbaikan P22 butir 3). Dua dokumen berbaris banyak
+ * yang menyentuh barang yang sama dengan urutan baris berbeda lalu saling menunggu di baris stok yang sama, bukan
+ * saling mengunci (40P01). Semua jalur stok berbaris banyak (SJ, terima barang, pindah barang, penyesuaian,
+ * peminjaman, kerusakan, retur, hapus) memanggilnya. Baris yang belum ada tidak terkunci; tambahStok membuatnya
+ * lewat upsert seperti sebelumnya. Batas: kunci lain yang diambil sesudahnya dengan urutan baris dokumen (harga
+ * rata di Barang, baris pesanan) tetap mengikuti urutan dokumen.
+ */
+export async function kunciStokUrut(tx: Tx, pasangan: { barangId: string; gudangId: string }[]) {
+  const unik = new Map(pasangan.map((p) => [`${p.barangId}\u0000${p.gudangId}`, p]));
+  const urut = [...unik.values()].sort((x, y) => bandingId(x.barangId, y.barangId) || bandingId(x.gudangId, y.gudangId));
+  for (const p of urut) await tx.$queryRaw`SELECT 1 FROM "StokBarang" WHERE "barangId" = ${p.barangId} AND "gudangId" = ${p.gudangId} FOR UPDATE`;
+}
+
 export async function tambahStok(tx: Tx, barangId: string, gudangId: string, jumlah: Desimal) {
   await tx.stokBarang.upsert({
     where: { barangId_gudangId: { barangId, gudangId } },
