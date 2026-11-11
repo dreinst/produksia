@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { D, jumlahkan, type Desimal } from "@/lib/uang";
-import type { Periode } from "@/lib/laporan";
+import type { OpsiLaporan, Periode } from "@/lib/laporan";
 
 /*
  * Laporan arus kas metode langsung, langsung dari jurnal: setiap jurnal yang menyentuh akun kas/bank
@@ -36,18 +36,24 @@ export function kelasArus(akun: { jenis: string; kode: string }): KelasArus {
   return "OPERASI";
 }
 
-export async function hitungArusKas(klien: PrismaClient = db, periode: Periode): Promise<ArusKas> {
-  const akunKas = await klien.akun.findMany({ where: { kasBank: true, kelompok: false }, orderBy: { kode: "asc" } });
+/**
+ * `opsi.perusahaanId` diisi (D1 §4.6): akun kas milik perusahaan itu atau bersama, dan hanya jurnal perusahaan itu,
+ * untuk saldo maupun arus. Karena tiap jurnal seimbang dan milik satu perusahaan, `cocok` tetap berlaku per perusahaan.
+ * Kosong: semua perusahaan, kuerinya sama persis dengan sebelumnya.
+ */
+export async function hitungArusKas(klien: PrismaClient = db, periode: Periode, opsi: Pick<OpsiLaporan, "perusahaanId"> = {}): Promise<ArusKas> {
+  const p = opsi.perusahaanId || null;
+  const akunKas = await klien.akun.findMany({ where: { kasBank: true, kelompok: false, ...(p ? { OR: [{ perusahaanId: p }, { perusahaanId: null }] } : {}) }, orderBy: { kode: "asc" } });
   const idKas = akunKas.map((a) => a.id);
   const saldoKas = async (sampai: Date) => {
-    const agg = await klien.barisJurnal.groupBy({ by: ["akunId"], where: { akunId: { in: idKas }, jurnal: { tanggal: { lte: sampai } } }, _sum: { debit: true, kredit: true } });
+    const agg = await klien.barisJurnal.groupBy({ by: ["akunId"], where: { akunId: { in: idKas }, jurnal: { tanggal: { lte: sampai }, ...(p ? { perusahaanId: p } : {}) } }, _sum: { debit: true, kredit: true } });
     return new Map(agg.map((a) => [a.akunId, D(a._sum.debit ?? 0).minus(D(a._sum.kredit ?? 0))]));
   };
   const [awal, akhir, daftarJurnal] = await Promise.all([
     saldoKas(new Date(periode.dari.getTime() - 1)),
     saldoKas(periode.sampai),
     klien.jurnal.findMany({
-      where: { tanggal: { gte: periode.dari, lte: periode.sampai }, baris: { some: { akunId: { in: idKas } } } },
+      where: { tanggal: { gte: periode.dari, lte: periode.sampai }, baris: { some: { akunId: { in: idKas } } }, ...(p ? { perusahaanId: p } : {}) },
       include: { baris: { include: { akun: { select: { id: true, kode: true, nama: true, jenis: true, kasBank: true, kelompok: true } } } } },
     }),
   ]);

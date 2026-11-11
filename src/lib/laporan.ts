@@ -173,12 +173,17 @@ export type Neraca = {
   seimbang: boolean;
 };
 
-/** Neraca per tanggal: aset = kewajiban + ekuitas (akun) + laba tahun-tahun lalu + laba tahun berjalan. */
-export async function hitungNeraca(klien: PrismaClient = db, sampai: Date, sampaiTeks: string): Promise<Neraca> {
+/**
+ * Neraca per tanggal: aset = kewajiban + ekuitas (akun) + laba tahun-tahun lalu + laba tahun berjalan.
+ * `opsi.perusahaanId` diisi: hanya jurnal perusahaan itu (D1 §4.6). Setiap jurnal seimbang dan milik satu perusahaan,
+ * jadi Neraca tiap perusahaan seimbang sendiri. Kosong: semua perusahaan, sama persis dengan sebelumnya.
+ */
+export async function hitungNeraca(klien: PrismaClient = db, sampai: Date, sampaiTeks: string, opsi: Pick<OpsiLaporan, "perusahaanId"> = {}): Promise<Neraca> {
   const awalTahun = new Date(sampai.getFullYear(), 0, 1);
+  const milik: OpsiLaporan = opsi.perusahaanId ? { perusahaanId: opsi.perusahaanId } : {};
   const [kumulatif, sebelumTahunIni] = await Promise.all([
-    saldoAkunPeriode(klien, null, sampai),
-    saldoAkunPeriode(klien, null, new Date(awalTahun.getTime() - 1)),
+    saldoAkunPeriode(klien, null, sampai, false, milik),
+    saldoAkunPeriode(klien, null, new Date(awalTahun.getTime() - 1), false, milik),
   ]);
   const labaDari = (daftar: AkunSaldo[]) =>
     jumlahkan(daftar.filter((a) => !a.kelompok && a.jenis === "PENDAPATAN").map((a) => a.saldo)).minus(

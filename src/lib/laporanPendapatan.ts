@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@/prisma-klien/client";
 import { D, type Desimal } from "@/lib/uang";
-import { saldoAkunPeriode, susunHierarki, type BarisLaporan, type Periode } from "@/lib/laporan";
+import { saldoAkunPeriode, susunHierarki, type BarisLaporan, type OpsiLaporan, type Periode } from "@/lib/laporan";
 
 /*
  * Ringkasan Pendapatan periode, dibaca dari buku besar (akun jenis PENDAPATAN, tanpa jurnal penutup)
@@ -29,11 +29,16 @@ export type RingkasanPendapatan = {
 
 export const TANPA_PELANGGAN = "Tanpa pelanggan (kas masuk, jurnal umum, lainnya)";
 
-export async function ringkasanPendapatan(klien: PrismaClient, periode: Periode): Promise<RingkasanPendapatan> {
+/**
+ * `opsi.perusahaanId` diisi (D1 §4.6): baris jurnal dan saldo layanan hanya dari jurnal perusahaan itu. Kosong: semua
+ * perusahaan, sama persis dengan sebelumnya.
+ */
+export async function ringkasanPendapatan(klien: PrismaClient, periode: Periode, opsi: Pick<OpsiLaporan, "perusahaanId"> = {}): Promise<RingkasanPendapatan> {
   const rentang = { gte: periode.dari, lte: periode.sampai };
+  const p = opsi.perusahaanId || null;
   const [baris, daftarAkun] = await Promise.all([
     klien.barisJurnal.findMany({
-      where: { akun: { jenis: "PENDAPATAN" }, jurnal: { tanggal: rentang, sumber: { not: "PENUTUP" } } },
+      where: { akun: { jenis: "PENDAPATAN" }, jurnal: { tanggal: rentang, sumber: { not: "PENUTUP" }, ...(p ? { perusahaanId: p } : {}) } },
       select: {
         debit: true,
         kredit: true,
@@ -45,7 +50,7 @@ export async function ringkasanPendapatan(klien: PrismaClient, periode: Periode)
         },
       },
     }),
-    saldoAkunPeriode(klien, periode.dari, periode.sampai, true),
+    saldoAkunPeriode(klien, periode.dari, periode.sampai, true, p ? { perusahaanId: p } : {}),
   ]);
 
   const peta = new Map<string, PendapatanPelanggan & { fakturIds: Set<string> }>();

@@ -135,3 +135,202 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
 
   return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim, uangMuka };
 }
+
+// ---------- Konsistensi perusahaan (D1 §4.9) ----------
+
+export type KodeKonsistensi =
+  | "JURNAL_DOKUMEN"
+  | "ANAK_INDUK"
+  | "AKUN_JURNAL"
+  | "GUDANG_DOKUMEN"
+  | "PROYEK_DOKUMEN"
+  | "BARANG_BARIS"
+  | "STOK_GUDANG"
+  | "KARYAWAN_GAJI"
+  | "BERKAS_ENTITAS";
+export type HasilKonsistensi = { konsisten: boolean; total: number; rincian: { kode: KodeKonsistensi; label: string; jumlah: number }[] };
+
+/** Nama tabel atau kolom bertanda kutip. Hanya untuk konstanta di berkas ini, tidak pernah untuk masukan pengguna. */
+const nm = (nama: string) => Prisma.raw(`"${nama}"`);
+
+/** Baris tabel `t` yang perusahaannya berbeda dengan induk lewat kolom `fk` (induk `ti`, kolom perusahaan `kp` di induk). */
+const bedaInduk = (t: string, fk: string, ti: string, kp = "perusahaanId", kpAnak = "perusahaanId") =>
+  Prisma.sql`SELECT COUNT(*) FROM ${nm(t)} a JOIN ${nm(ti)} b ON b."id" = a.${nm(fk)} WHERE a.${nm(kpAnak)} <> b.${nm(kp)}`;
+
+/** Dokumen berjurnal: perusahaan dokumen = perusahaan jurnalnya. */
+const DOKUMEN_BERJURNAL = [
+  "PengirimanPesanan", "FakturPenjualan", "UangMukaPelanggan", "PenerimaanPenjualan", "ReturPenjualan", "PenerimaanBarang", "FakturPembelian",
+  "PembayaranPembelian", "ReturPembelian", "DokumenKas", "PenyesuaianPersediaan", "Prive", "Penggajian", "PphFinalBulanan", "TutupBukuPerusahaan",
+  "TalanganMitra", "PembayaranMitra",
+];
+
+/** Dokumen turunan [tabel, kolom induk, tabel induk]. PJ dan BR dibandingkan dengan penyesuaian yang ditautkan. */
+const ANAK_INDUK: [string, string, string][] = [
+  ["PesananPenjualan", "penawaranId", "PenawaranPenjualan"],
+  ["PengirimanPesanan", "pesananId", "PesananPenjualan"],
+  ["FakturPenjualan", "pesananId", "PesananPenjualan"],
+  ["FakturPenjualan", "pengirimanId", "PengirimanPesanan"],
+  ["UangMukaPelanggan", "pesananId", "PesananPenjualan"],
+  ["UangMukaPelanggan", "rencanaTerminId", "RencanaTermin"],
+  ["PenerimaanPenjualan", "fakturId", "FakturPenjualan"],
+  ["ReturPenjualan", "fakturId", "FakturPenjualan"],
+  ["PenerimaanBarang", "pesananId", "PesananPembelian"],
+  ["FakturPembelian", "pesananId", "PesananPembelian"],
+  ["FakturPembelian", "penerimaanId", "PenerimaanBarang"],
+  ["PembayaranPembelian", "fakturId", "FakturPembelian"],
+  ["ReturPembelian", "fakturId", "FakturPembelian"],
+  ["PeminjamanBarang", "penyesuaianId", "PenyesuaianPersediaan"],
+  ["LaporanKerusakanBarang", "penyesuaianId", "PenyesuaianPersediaan"],
+  ["RencanaTermin", "penawaranId", "PenawaranPenjualan"],
+  ["RencanaTermin", "pesananId", "PesananPenjualan"],
+  // CRM (D4 §3.13 butir 4): tahap, tindak lanjut, dan penawaran berlead satu perusahaan dengan lead
+  ["Lead", "tahapId", "TahapLead"],
+  ["TindakLanjut", "leadId", "Lead"],
+  ["PenawaranPenjualan", "leadId", "Lead"],
+  ["PesananPenjualan", "leadId", "Lead"],
+  // kerja tim (D6 §3.0 butir 5): tugas desain mewarisi konten atau kampanyenya
+  ["TugasDesain", "kontenId", "Konten"],
+  ["TugasDesain", "kampanyeId", "Kampanye"],
+];
+
+/** Dokumen bergudang [tabel, kolom gudang]. */
+const DOKUMEN_BERGUDANG: [string, string][] = [
+  ["PengirimanPesanan", "gudangId"], ["ReturPenjualan", "gudangId"], ["PenerimaanBarang", "gudangId"], ["ReturPembelian", "gudangId"],
+  ["PenyesuaianPersediaan", "gudangId"], ["PindahBarang", "gudangAsalId"], ["PindahBarang", "gudangTujuanId"], ["PeminjamanBarang", "gudangId"],
+  ["LaporanKerusakanBarang", "gudangId"],
+];
+
+/** Data berproyek. Peminjaman dan laporan kerusakan sengaja tidak ikut (catatan B D1 §3.3). */
+const DATA_BERPROYEK = ["PenawaranPenjualan", "PesananPenjualan", "PesananPembelian", "Jurnal", "DokumenKas", "Penggajian", "TalanganMitra", "PembayaranMitra", "Konten", "TugasDesain", "Kampanye", "Berkas"];
+
+/** Tabel baris ber-barangId [tabel baris, kolom kepala, tabel kepala]. */
+const BARIS_BERBARANG: [string, string, string][] = [
+  ["BarisPenawaranPenjualan", "penawaranId", "PenawaranPenjualan"],
+  ["BarisPesananPenjualan", "pesananId", "PesananPenjualan"],
+  ["BarisPengiriman", "pengirimanId", "PengirimanPesanan"],
+  ["BarisFakturPenjualan", "fakturId", "FakturPenjualan"],
+  ["BarisReturPenjualan", "returId", "ReturPenjualan"],
+  ["BarisPesananPembelian", "pesananId", "PesananPembelian"],
+  ["BarisPenerimaanBarang", "penerimaanId", "PenerimaanBarang"],
+  ["BarisFakturPembelian", "fakturId", "FakturPembelian"],
+  ["BarisReturPembelian", "returId", "ReturPembelian"],
+  ["BarisPenyesuaianPersediaan", "penyesuaianId", "PenyesuaianPersediaan"],
+  ["BarisPindahBarang", "pindahId", "PindahBarang"],
+  ["BarisPeminjamanBarang", "peminjamanId", "PeminjamanBarang"],
+  ["BarisKerusakanBarang", "laporanId", "LaporanKerusakanBarang"],
+];
+
+/**
+ * Tabel entitas tiap `Berkas.jenisEntitas` (registri JENIS_LAMPIRAN di berkas.ts). Lampiran mewarisi perusahaan
+ * entitasnya. Disalin di sini supaya berkas ini tetap bebas sesi; uji-laporan-perusahaan memastikan setiap jenis
+ * lampiran punya tabel di peta ini.
+ */
+export const TABEL_ENTITAS_BERKAS: Record<string, string> = {
+  penawaran: "PenawaranPenjualan",
+  pesanan: "PesananPenjualan",
+  "uang-muka": "UangMukaPelanggan",
+  faktur: "FakturPenjualan",
+  penerimaan: "PenerimaanPenjualan",
+  "faktur-pembelian": "FakturPembelian",
+  pembayaran: "PembayaranPembelian",
+  "kas-masuk": "DokumenKas",
+  "kas-keluar": "DokumenKas",
+  jurnal: "Jurnal",
+  aset: "AsetTetap",
+  proyek: "Proyek",
+  "laporan-keuangan-proyek": "Proyek",
+  "rencana-termin": "RencanaTermin",
+  konten: "Konten",
+  "tugas-desain": "TugasDesain",
+  "hasil-desain": "TugasDesain",
+  kampanye: "Kampanye",
+  "kop-surat": "KopSurat",
+  "talangan-mitra": "TalanganMitra",
+  "pembayaran-mitra": "PembayaranMitra",
+};
+
+function aturanKonsistensi(): { kode: KodeKonsistensi; label: string; hitung: Prisma.Sql[] }[] {
+  const jenisPerTabel = new Map<string, string[]>();
+  for (const [jenis, tabel] of Object.entries(TABEL_ENTITAS_BERKAS)) jenisPerTabel.set(tabel, [...(jenisPerTabel.get(tabel) ?? []), jenis]);
+  return [
+    {
+      kode: "JURNAL_DOKUMEN",
+      label: "Jurnal berbeda perusahaan dengan dokumennya",
+      hitung: [
+        ...DOKUMEN_BERJURNAL.map((t) => bedaInduk(t, "jurnalId", "Jurnal")),
+        bedaInduk("AsetTetap", "jurnalPerolehanId", "Jurnal"),
+        Prisma.sql`SELECT COUNT(*) FROM "PelepasanAset" x JOIN "AsetTetap" a ON a."id" = x."asetId" JOIN "Jurnal" j ON j."id" = x."jurnalId" WHERE a."perusahaanId" <> j."perusahaanId"`,
+        Prisma.sql`SELECT COUNT(*) FROM "PenyusutanAset" x JOIN "AsetTetap" a ON a."id" = x."asetId" JOIN "Jurnal" j ON j."id" = x."jurnalId" WHERE a."perusahaanId" <> j."perusahaanId"`,
+        bedaInduk("TransaksiAntarPerusahaan", "jurnalPemberiId", "Jurnal", "perusahaanId", "pemberiId"),
+        bedaInduk("TransaksiAntarPerusahaan", "jurnalPenerimaId", "Jurnal", "perusahaanId", "penerimaId"),
+        // TutupBuku.jurnalId selalu JU-TUTUP utama (P12); jurnal penutup perusahaan lain ada di TutupBukuPerusahaan
+        Prisma.sql`SELECT COUNT(*) FROM "TutupBuku" x JOIN "Jurnal" j ON j."id" = x."jurnalId" WHERE j."perusahaanId" <> 'utama'`,
+      ],
+    },
+    {
+      kode: "ANAK_INDUK",
+      label: "Dokumen turunan berbeda perusahaan dengan induknya",
+      hitung: [
+        ...ANAK_INDUK.map(([t, fk, ti]) => bedaInduk(t, fk, ti)),
+        Prisma.sql`SELECT COUNT(*) FROM "PemakaianUangMuka" x JOIN "UangMukaPelanggan" u ON u."id" = x."uangMukaId" JOIN "FakturPenjualan" f ON f."id" = x."fakturId" WHERE u."perusahaanId" <> f."perusahaanId"`,
+      ],
+    },
+    {
+      kode: "AKUN_JURNAL",
+      label: "Baris jurnal memakai akun milik perusahaan lain",
+      hitung: [Prisma.sql`SELECT COUNT(*) FROM "BarisJurnal" bj JOIN "Jurnal" j ON j."id" = bj."jurnalId" JOIN "Akun" a ON a."id" = bj."akunId" WHERE a."perusahaanId" IS NOT NULL AND a."perusahaanId" <> j."perusahaanId"`],
+    },
+    {
+      kode: "GUDANG_DOKUMEN",
+      label: "Dokumen memakai gudang milik perusahaan lain",
+      hitung: DOKUMEN_BERGUDANG.map(([t, kolom]) => Prisma.sql`SELECT COUNT(*) FROM ${nm(t)} d JOIN "Gudang" g ON g."id" = d.${nm(kolom)} WHERE g."perusahaanId" IS NOT NULL AND g."perusahaanId" <> d."perusahaanId"`),
+    },
+    {
+      kode: "PROYEK_DOKUMEN",
+      label: "Dokumen atau jurnal memakai proyek perusahaan lain",
+      hitung: [
+        ...DATA_BERPROYEK.map((t) => bedaInduk(t, "proyekId", "Proyek")),
+        bedaInduk("TransaksiAntarPerusahaan", "proyekPemberiId", "Proyek", "perusahaanId", "pemberiId"),
+        bedaInduk("TransaksiAntarPerusahaan", "proyekPenerimaId", "Proyek", "perusahaanId", "penerimaId"),
+      ],
+    },
+    {
+      kode: "BARANG_BARIS",
+      label: "Baris dokumen memakai barang milik perusahaan lain",
+      hitung: BARIS_BERBARANG.map(
+        ([t, fk, tk]) => Prisma.sql`SELECT COUNT(*) FROM ${nm(t)} x JOIN ${nm(tk)} d ON d."id" = x.${nm(fk)} JOIN "Barang" b ON b."id" = x."barangId" WHERE b."perusahaanId" IS NOT NULL AND b."perusahaanId" <> d."perusahaanId"`,
+      ),
+    },
+    {
+      kode: "STOK_GUDANG",
+      label: "Stok barang tersimpan di gudang milik perusahaan lain",
+      hitung: [Prisma.sql`SELECT COUNT(*) FROM "StokBarang" s JOIN "Barang" b ON b."id" = s."barangId" JOIN "Gudang" g ON g."id" = s."gudangId" WHERE s."jumlah" <> 0 AND g."perusahaanId" IS NOT NULL AND g."perusahaanId" <> b."perusahaanId"`],
+    },
+    {
+      kode: "KARYAWAN_GAJI",
+      label: "Baris gaji untuk karyawan perusahaan lain",
+      hitung: [Prisma.sql`SELECT COUNT(*) FROM "BarisPenggajian" x JOIN "Penggajian" g ON g."id" = x."penggajianId" JOIN "Karyawan" k ON k."id" = x."karyawanId" WHERE k."perusahaanId" <> g."perusahaanId"`],
+    },
+    {
+      kode: "BERKAS_ENTITAS",
+      label: "Berkas lampiran berbeda perusahaan dengan data yang dilampirinya",
+      hitung: [...jenisPerTabel].map(
+        ([tabel, jenis]) => Prisma.sql`SELECT COUNT(*) FROM "Berkas" x JOIN ${nm(tabel)} e ON e."id" = x."entitasId" WHERE x."jenisEntitas" IN (${Prisma.join(jenis)}) AND x."perusahaanId" <> e."perusahaanId"`,
+      ),
+    },
+  ];
+}
+
+/**
+ * Pemeriksaan konsistensi perusahaan untuk lingkup gabungan (D1 §4.9): menghitung data yang perusahaannya tidak cocok
+ * dengan jurnal, induk, akun, gudang, proyek, barang, karyawan, atau entitas lampirannya. Semua harus 0. Satu kueri
+ * berisi sub-kueri COUNT; tidak ada baris yang dimuat ke memori.
+ */
+export async function periksaKonsistensiPerusahaan(klien: PrismaClient | Prisma.TransactionClient = db): Promise<HasilKonsistensi> {
+  const aturan = aturanKonsistensi();
+  const kolom = aturan.map((a, i) => Prisma.sql`(${Prisma.join(a.hitung.map((q) => Prisma.sql`(${q})`), " + ")})::int AS ${Prisma.raw(`"k${i}"`)}`);
+  const [baris] = await klien.$queryRaw<Record<string, number | bigint>[]>`SELECT ${Prisma.join(kolom, ", ")}`;
+  const rincian = aturan.map((a, i) => ({ kode: a.kode, label: a.label, jumlah: Number(baris?.[`k${i}`] ?? 0) }));
+  const total = rincian.reduce((s, r) => s + r.jumlah, 0);
+  return { konsisten: total === 0, total, rincian };
+}

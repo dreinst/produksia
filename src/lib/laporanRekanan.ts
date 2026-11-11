@@ -18,6 +18,8 @@ export type BarisUmur = {
   sisa: Desimal;
   umurHari: number; // hari lewat jatuh tempo (negatif = belum)
   keranjang: number; // indeks KERANJANG_UMUR
+  /** perusahaan faktur, untuk lencana perusahaan di laporan gabungan (D1 §4.6) */
+  perusahaanId?: string;
 };
 export type KelompokRekanan = { id: string; kode: string; nama: string; faktur: BarisUmur[]; sisa: Desimal; perKeranjang: Desimal[] };
 export type LaporanUmur = { sampai: Date; kelompok: KelompokRekanan[]; total: Desimal; perKeranjang: Desimal[]; jumlahFaktur: number };
@@ -52,11 +54,14 @@ function susun(sampai: Date, daftar: { rekanan: { id: string; kode: string; nama
   };
 }
 
-/** Piutang usaha per tanggal: faktur penjualan s.d. tanggal itu dikurangi uang muka, penerimaan, dan retur s.d. tanggal itu. */
-export async function laporanPiutang(klien: PrismaClient = db, sampai: Date): Promise<LaporanUmur> {
+/**
+ * Piutang usaha per tanggal: faktur penjualan s.d. tanggal itu dikurangi uang muka, penerimaan, dan retur s.d. tanggal itu.
+ * `perusahaanId` diisi: hanya faktur perusahaan itu (penerimaan dan retur selalu satu perusahaan dengan fakturnya).
+ */
+export async function laporanPiutang(klien: PrismaClient = db, sampai: Date, perusahaanId?: string | null): Promise<LaporanUmur> {
   // Faktur yang belum disetujui belum membentuk piutang di buku besar, jadi belum masuk laporan ini
   const faktur = await klien.fakturPenjualan.findMany({
-    where: { tanggal: { lte: sampai }, statusPersetujuan: "DISETUJUI" },
+    where: { tanggal: { lte: sampai }, statusPersetujuan: "DISETUJUI", ...(perusahaanId ? { perusahaanId } : {}) },
     include: { pelanggan: { select: { id: true, kode: true, nama: true } }, penerimaan: { where: { tanggal: { lte: sampai } }, select: { jumlah: true, potonganPajak: true } }, retur: { where: { tanggal: { lte: sampai } }, select: { total: true } } },
   });
   return susun(
@@ -64,16 +69,19 @@ export async function laporanPiutang(klien: PrismaClient = db, sampai: Date): Pr
     faktur.map((f) => {
       const terbayar = D(f.uangMuka).plus(jumlahkan(f.penerimaan.map((p) => D(p.jumlah).plus(p.potonganPajak)))).plus(jumlahkan(f.retur.map((r) => r.total)));
       const umurHari = f.jatuhTempo ? Math.floor((sampai.getTime() - f.jatuhTempo.getTime()) / hari) : 0;
-      return { rekanan: f.pelanggan, faktur: { id: f.id, nomor: f.nomor, tanggal: f.tanggal, jatuhTempo: f.jatuhTempo, total: D(f.total), terbayar, sisa: D(f.total).minus(terbayar), umurHari, keranjang: keranjangDari(umurHari) } };
+      return { rekanan: f.pelanggan, faktur: { id: f.id, nomor: f.nomor, tanggal: f.tanggal, jatuhTempo: f.jatuhTempo, total: D(f.total), terbayar, sisa: D(f.total).minus(terbayar), umurHari, keranjang: keranjangDari(umurHari), perusahaanId: f.perusahaanId } };
     }),
   );
 }
 
-/** Hutang usaha per tanggal: faktur pembelian s.d. tanggal itu dikurangi pembayaran dan retur s.d. tanggal itu. */
-export async function laporanHutang(klien: PrismaClient = db, sampai: Date): Promise<LaporanUmur> {
+/**
+ * Hutang usaha per tanggal: faktur pembelian s.d. tanggal itu dikurangi pembayaran dan retur s.d. tanggal itu.
+ * `perusahaanId` diisi: hanya faktur perusahaan itu.
+ */
+export async function laporanHutang(klien: PrismaClient = db, sampai: Date, perusahaanId?: string | null): Promise<LaporanUmur> {
   // Faktur yang belum disetujui belum membentuk hutang di buku besar, jadi belum masuk laporan ini
   const faktur = await klien.fakturPembelian.findMany({
-    where: { tanggal: { lte: sampai }, statusPersetujuan: "DISETUJUI" },
+    where: { tanggal: { lte: sampai }, statusPersetujuan: "DISETUJUI", ...(perusahaanId ? { perusahaanId } : {}) },
     include: { pemasok: { select: { id: true, kode: true, nama: true } }, pembayaran: { where: { tanggal: { lte: sampai } }, select: { jumlah: true, potonganPajak: true } }, retur: { where: { tanggal: { lte: sampai } }, select: { total: true } } },
   });
   return susun(
@@ -81,7 +89,7 @@ export async function laporanHutang(klien: PrismaClient = db, sampai: Date): Pro
     faktur.map((f) => {
       const terbayar = jumlahkan(f.pembayaran.map((p) => D(p.jumlah).plus(p.potonganPajak))).plus(jumlahkan(f.retur.map((r) => r.total)));
       const umurHari = f.jatuhTempo ? Math.floor((sampai.getTime() - f.jatuhTempo.getTime()) / hari) : 0;
-      return { rekanan: f.pemasok, faktur: { id: f.id, nomor: f.nomor, tanggal: f.tanggal, jatuhTempo: f.jatuhTempo, total: D(f.total), terbayar, sisa: D(f.total).minus(terbayar), umurHari, keranjang: keranjangDari(umurHari) } };
+      return { rekanan: f.pemasok, faktur: { id: f.id, nomor: f.nomor, tanggal: f.tanggal, jatuhTempo: f.jatuhTempo, total: D(f.total), terbayar, sisa: D(f.total).minus(terbayar), umurHari, keranjang: keranjangDari(umurHari), perusahaanId: f.perusahaanId } };
     }),
   );
 }
@@ -102,10 +110,12 @@ export type PerubahanModal = {
 /**
  * Laporan Perubahan Modal (ekuitas): ekuitas awal + setoran modal + laba bersih − prive ± lainnya = ekuitas akhir,
  * dicek terhadap total ekuitas neraca. Prive = akun modal bernama "Prive"; jurnal penutup tidak dihitung sebagai setoran.
+ * `perusahaanId` diisi: hanya jurnal perusahaan itu. Pemanggil wajib memakai perusahaan yang SAMA untuk laba bersih
+ * (hitungLabaRugi) dan kedua ekuitas (hitungNeraca), supaya `cocok` bermakna.
  */
-export async function laporanPerubahanModal(klien: PrismaClient = db, dari: Date, sampai: Date, labaBersih: Desimal, ekuitasAwal: Desimal, ekuitasAkhir: Desimal): Promise<PerubahanModal> {
+export async function laporanPerubahanModal(klien: PrismaClient = db, dari: Date, sampai: Date, labaBersih: Desimal, ekuitasAwal: Desimal, ekuitasAkhir: Desimal, perusahaanId?: string | null): Promise<PerubahanModal> {
   const baris = await klien.barisJurnal.findMany({
-    where: { jurnal: { tanggal: { gte: dari, lte: sampai }, sumber: { not: "PENUTUP" } }, akun: { jenis: "MODAL", kelompok: false } },
+    where: { jurnal: { tanggal: { gte: dari, lte: sampai }, sumber: { not: "PENUTUP" }, ...(perusahaanId ? { perusahaanId } : {}) }, akun: { jenis: "MODAL", kelompok: false } },
     select: { debit: true, kredit: true, akun: { select: { kode: true, nama: true } } },
   });
   const peta = new Map<string, { kode: string; nama: string; mutasi: Desimal }>();
