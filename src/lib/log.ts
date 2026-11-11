@@ -1,9 +1,12 @@
-import type { Prisma, PrismaClient } from "@/prisma-klien/client";
+import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 import { bacaWaktuLokal } from "@/lib/waktu";
+import { potongAman } from "@/lib/tipeBerkas";
+// siklus impor yang aman: berkas.ts juga mengimpor log.ts, tetapi keduanya hanya saling memakai di dalam fungsi
+import { jenisLampiranTanpaHakLihat } from "@/lib/berkas";
 
 /*
- * Log aktivitas diperluas (D7 §3.7). Berkas ini TIDAK "use server" dan tidak mengimpor db: klien basis data
+ * Log aktivitas diperluas (D7 §3.7). Berkas ini TIDAK "use server" dan tidak memakai db langsung: klien basis data
  * selalu dikirim pemanggil (db atau tx), jadi pencatatan ikut transaksi perubahannya.
  * Pencatat lama (logAktivitas.create langsung di aksi lama) tidak diubah dan tetap menulis modul null.
  */
@@ -62,7 +65,8 @@ export function modulLogSah(nilai: string): nilai is ModulLog {
 export const PANJANG_NOMOR_LOG = 120;
 export const PANJANG_KETERANGAN_LOG = 500;
 
-const potong = (teks: string, batas: number) => (teks.length > batas ? teks.slice(0, batas) : teks);
+// pemotongan per code point supaya emoji di batas tidak menyisakan surrogate tunggal
+const potong = (teks: string, batas: number) => (teks.length > batas ? potongAman(teks, batas) : teks);
 
 /** Pelaku log: pengguna sesi atau ringkasan { id, nama }. Pengguna semu skrip uji ditulis tanpa penggunaId. */
 export type PelakuLog = { id: string; nama: string } | PenggunaSesi;
@@ -119,16 +123,24 @@ export type RuangTersembunyi = { folder: string[]; proyek: string[] } | null;
 /**
  * Syarat Prisma catatan log yang boleh dilihat pengguna (D7 §3.7.4). Cabang { modul: null } wajib ada: tanpa itu
  * "modul" IN (...) membuang semua catatan lama. Baris berkas selalu punya meta.folder dan meta.proyekId, jadi
- * perbandingan path JSON tidak pernah bernilai NULL.
+ * perbandingan path JSON keduanya tidak pernah bernilai NULL.
+ * Selain folder dan proyek tersembunyi, catatan berkas juga disaring menurut folder kunci jenis lampirannya (lampiran
+ * faktur yang dipindah ke folder lain tetap tersembunyi bila folder FAKTUR tersembunyi) dan menurut hak lihat jenis
+ * lampirannya (sama dengan syarat berkasnya, bolehAksesBerkas langkah 1). Saringan jenis berlaku juga untuk akses penuh.
+ * meta.folderKunci dan meta.jenisEntitas baru ditulis sejak perbaikan tinjauan P06, jadi path yang tidak ada (SQL NULL)
+ * dianggap lolos lewat cabang DbNull; tanpa itu NOT (NULL) membuang catatan berkas yang lebih lama.
  */
 export function syaratLogTerlihat(pengguna: PenggunaSesi, ruang: RuangTersembunyi): Prisma.LogAktivitasWhereInput {
   const boleh = DAFTAR_MODUL_LOG.filter((m) => {
     const h = MODUL_LOG[m].hakLihat;
     return !h || punyaHak(pengguna, h);
   });
-  const syaratBerkas: Prisma.LogAktivitasWhereInput[] = ruang
-    ? [...ruang.folder.map((f) => ({ NOT: { meta: { path: ["folder"], equals: f } } })), ...ruang.proyek.map((p) => ({ NOT: { meta: { path: ["proyekId"], equals: p } } }))]
-    : [];
+  const bukan = (kunci: string, nilai: string): Prisma.LogAktivitasWhereInput => ({ NOT: { meta: { path: [kunci], equals: nilai } } });
+  const bukanAtauTiada = (kunci: string, nilai: string): Prisma.LogAktivitasWhereInput => ({ OR: [bukan(kunci, nilai), { meta: { path: [kunci], equals: Prisma.DbNull } }] });
+  const syaratBerkas: Prisma.LogAktivitasWhereInput[] = [
+    ...(ruang ? [...ruang.folder.flatMap((f) => [bukan("folder", f), bukanAtauTiada("folderKunci", f)]), ...ruang.proyek.map((p) => bukan("proyekId", p))] : []),
+    ...jenisLampiranTanpaHakLihat(pengguna).map((k) => bukanAtauTiada("jenisEntitas", k)),
+  ];
   return {
     OR: [
       { modul: null },

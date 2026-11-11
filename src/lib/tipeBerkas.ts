@@ -103,27 +103,49 @@ export function disajikanInline(tipeMime: string): boolean {
 export const PANJANG_NAMA_BERKAS = 200;
 
 /**
+ * Potong teks paling banyak `batas` unit UTF-16 tanpa membelah pasangan surrogate (emoji di batas ikut dibuang
+ * utuh), lalu ganti surrogate tunggal yang mungkin sudah ada dengan U+FFFD supaya hasilnya selalu UTF-16 sah.
+ */
+export function potongAman(teks: string, batas: number): string {
+  let hasil = "";
+  for (const c of teks) {
+    if (hasil.length + c.length > batas) break;
+    hasil += c;
+  }
+  return utf16Sah(hasil);
+}
+
+/** Surrogate tunggal diganti U+FFFD (pengganti String.prototype.toWellFormed yang belum ada di lib ES2017). */
+export function utf16Sah(teks: string): string {
+  return teks.replace(/[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g, "\ufffd");
+}
+
+/**
  * Nama tampil yang aman (D7 §3.3.3): NFC, tanpa karakter kendali dan / \ : * ? " < > |, spasi rapi, tanpa titik/spasi
  * di tepi, ekstensi hasil deteksi selalu di akhir (tidak ganda), total paling panjang 200 karakter.
+ * Tambahan dari D7: karakter format Unicode (Cf: pengatur arah teks seperti U+202E, lebar nol, BOM), kendali C1, dan
+ * pemisah baris/paragraf U+2028/U+2029 ikut dibuang supaya nama tidak bisa menyamarkan ekstensinya di tampilan.
+ * Pemotongan per code point, jadi emoji di batas tidak terbelah.
  */
 export function bersihkanNamaBerkas(nama: string, ekstensi: string): string {
   const ext = ekstensi.toLowerCase();
-  let dasar = nama
+  let dasar = utf16Sah(nama)
     .normalize("NFC")
-    .replace(/[\u0000-\u001f\u007f]/g, "")
+    .replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, "")
     .replace(/[/\\:*?"<>|]/g, " ")
     .replace(/\s+/g, " ")
     .replace(/^[\s.]+|[\s.]+$/g, "");
   if (dasar.toLowerCase().endsWith(`.${ext}`)) dasar = dasar.slice(0, -(ext.length + 1)).replace(/[\s.]+$/g, "");
   const ruang = PANJANG_NAMA_BERKAS - (ext.length + 1);
-  if (dasar.length > ruang) dasar = dasar.slice(0, ruang).replace(/[\s.]+$/g, "");
+  if (dasar.length > ruang) dasar = potongAman(dasar, ruang).replace(/[\s.]+$/g, "");
   return `${dasar || "berkas"}.${ext}`;
 }
 
 /** Kepala Content-Disposition RFC 5987: filename ASCII aman dan filename* UTF-8. */
 export function kepalaDisposisi(jenis: "inline" | "attachment", nama: string): string {
   const amanAscii = nama.replace(/[^\x20-\x7e]|["\\]/g, "_");
-  // encodeURIComponent membiarkan ' ( ) * ! yang bukan attr-char RFC 5987, jadi ikut disandikan
-  const tersandi = encodeURIComponent(nama).replace(/['()*!]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+  // encodeURIComponent membiarkan ' ( ) * ! yang bukan attr-char RFC 5987, jadi ikut disandikan. Surrogate tunggal
+  // diganti dulu karena encodeURIComponent melemparnya sebagai URIError.
+  const tersandi = encodeURIComponent(utf16Sah(nama)).replace(/['()*!]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
   return `${jenis}; filename="${amanAscii}"; filename*=UTF-8''${tersandi}`;
 }

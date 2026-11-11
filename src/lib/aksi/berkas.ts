@@ -20,6 +20,7 @@ import {
   jenisLampiran,
   kodeFolderDariNama,
   kodeFolderUnik,
+  metaRuangLog,
   rapikanPeranBoleh,
   ruangTersembunyi,
   type MetaBerkas,
@@ -88,7 +89,7 @@ export async function ubahBerkas(id: string, dataFormulir: FormData) {
 
   if (namaBerkas === b.namaBerkas && folderKode === b.folderKode && proyekId === b.proyekId) return;
   await db.$transaction(async (tx) => {
-    const baru = await tx.berkas.update({ where: { id: b.id }, data: { namaBerkas, folderKode, proyekId }, select: { id: true, namaBerkas: true, folderKode: true, proyekId: true, perusahaanId: true } });
+    const baru = await tx.berkas.update({ where: { id: b.id }, data: { namaBerkas, folderKode, proyekId }, select: { id: true, namaBerkas: true, folderKode: true, proyekId: true, perusahaanId: true, jenisEntitas: true } });
     await catatLogBerkas(tx, pengguna, baru, "UBAH", { meta: { namaLama: b.namaBerkas, folderLama: b.folderKode, proyekLama: b.proyekId } });
   });
   revalidasiBerkas(b);
@@ -117,7 +118,7 @@ export async function pulihkanBerkas(id: string) {
 
 export async function hapusPermanenBerkas(id: string) {
   const pengguna = await wajibHakAksi("berkas.akses-penuh");
-  const b = await db.berkas.findUnique({ where: { id }, select: { id: true, namaBerkas: true, folderKode: true, proyekId: true, perusahaanId: true, ukuran: true, dihapusPada: true, isiDihapusPada: true } });
+  const b = await db.berkas.findUnique({ where: { id }, select: { id: true, namaBerkas: true, folderKode: true, proyekId: true, perusahaanId: true, jenisEntitas: true, ukuran: true, dihapusPada: true, isiDihapusPada: true } });
   if (!b || b.isiDihapusPada) throw new Error(PESAN_BERKAS_TIDAK_ADA);
   if (!b.dihapusPada) throw new Error("Buang berkas ke Sampah dulu sebelum menghapus permanen");
   await db.$transaction(async (tx) => {
@@ -163,7 +164,7 @@ export async function cabutTautanBagi(tautanId: string) {
   }
   if (!boleh) throw new Error("Anda tidak punya hak mencabut tautan ini");
   if (t.dicabutPada) return;
-  const b = await db.berkas.findUniqueOrThrow({ where: { id: t.berkasId }, select: { id: true, namaBerkas: true, folderKode: true, proyekId: true, perusahaanId: true } });
+  const b = await db.berkas.findUniqueOrThrow({ where: { id: t.berkasId }, select: { id: true, namaBerkas: true, folderKode: true, proyekId: true, perusahaanId: true, jenisEntitas: true } });
   await db.$transaction(async (tx) => {
     await tx.tautanBagiBerkas.updateMany({ where: { id: t.id, dicabutPada: null }, data: { dicabutPada: new Date(), dicabutOlehId: idTersimpan(pengguna) } });
     await catatLogBerkas(tx, pengguna, b, "CABUT", { meta: { tautanId: t.id } });
@@ -196,7 +197,7 @@ export async function simpanAksesFolder(dataFormulir: FormData) {
         nomor: p.kode,
         keterangan: p.terbatas ? `Terbatas untuk ${p.peranBoleh.length ? p.peranBoleh.join(", ") : "akses penuh saja"}` : "Terbuka",
         modul: "berkas",
-        meta: { folder: p.kode, proyekId: null, terbatas: p.terbatas, peranBoleh: p.peranBoleh },
+        meta: { ...metaRuangLog(p.kode, null, null), terbatas: p.terbatas, peranBoleh: p.peranBoleh },
       });
     }
   });
@@ -219,7 +220,7 @@ export async function buatFolderBerkas(dataFormulir: FormData) {
   const urutan = Math.max(0, ...semua.map((f) => f.urutan)) + 1;
   await db.$transaction(async (tx) => {
     await tx.folderBerkas.create({ data: { kode, nama, urutan, sistem: false } });
-    await catatAktivitas(tx, pengguna, { aksi: "BUAT", jenis: "Folder Berkas", nomor: kode, keterangan: nama, modul: "berkas", meta: { folder: kode, proyekId: null } });
+    await catatAktivitas(tx, pengguna, { aksi: "BUAT", jenis: "Folder Berkas", nomor: kode, keterangan: nama, modul: "berkas", meta: metaRuangLog(kode, null, null) });
   });
   revalidasiPengaturan();
 }
@@ -233,7 +234,7 @@ export async function ubahFolderBerkas(kode: string, dataFormulir: FormData) {
   await pastikanNamaFolderUnik(nama, kode);
   await db.$transaction(async (tx) => {
     await tx.folderBerkas.update({ where: { kode }, data: { nama } });
-    await catatAktivitas(tx, pengguna, { aksi: "UBAH", jenis: "Folder Berkas", nomor: kode, keterangan: `${folder.nama} menjadi ${nama}`, modul: "berkas", meta: { folder: kode, proyekId: null, namaLama: folder.nama } });
+    await catatAktivitas(tx, pengguna, { aksi: "UBAH", jenis: "Folder Berkas", nomor: kode, keterangan: `${folder.nama} menjadi ${nama}`, modul: "berkas", meta: { ...metaRuangLog(kode, null, null), namaLama: folder.nama } });
   });
   revalidasiPengaturan();
 }
@@ -247,7 +248,7 @@ export async function hapusFolderBerkas(kode: string) {
   if (isi > 0) throw new Error(`Folder masih berisi ${isi} berkas; pindahkan atau hapus permanen dulu`);
   await db.$transaction(async (tx) => {
     await tx.folderBerkas.delete({ where: { kode } });
-    await catatAktivitas(tx, pengguna, { aksi: "HAPUS", jenis: "Folder Berkas", nomor: kode, keterangan: folder.nama, modul: "berkas", meta: { folder: kode, proyekId: null } });
+    await catatAktivitas(tx, pengguna, { aksi: "HAPUS", jenis: "Folder Berkas", nomor: kode, keterangan: folder.nama, modul: "berkas", meta: metaRuangLog(kode, null, null) });
   });
   revalidasiPengaturan();
 }
@@ -279,7 +280,7 @@ export async function simpanAksesBerkasProyek(proyekId: string, dataFormulir: Fo
       keterangan: peranBoleh.length || penggunaIds.length ? `Terbatas untuk ${[...peranBoleh, `${penggunaIds.length} pengguna`].join(", ")}` : "Terbatas untuk akses penuh saja",
       modul: "berkas",
       perusahaanId: proyek.perusahaanId,
-      meta: { folder: null, proyekId, terbatas: true, peranBoleh, jumlahPengguna: penggunaIds.length },
+      meta: { ...metaRuangLog(null, null, proyekId), terbatas: true, peranBoleh, jumlahPengguna: penggunaIds.length },
     });
   });
   revalidasiPengaturan();
@@ -299,7 +300,7 @@ export async function bukaPembatasanProyek(proyekId: string) {
       keterangan: "Pembatasan dibuka",
       modul: "berkas",
       perusahaanId: proyek.perusahaanId,
-      meta: { folder: null, proyekId, terbatas: false },
+      meta: { ...metaRuangLog(null, null, proyekId), terbatas: false },
     });
   });
   revalidasiPengaturan();

@@ -2,12 +2,16 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server dan pustaka di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { db } from "../src/lib/db";
 import nextConfig from "../next.config";
+import { Prisma } from "../src/prisma-klien/client";
 import { hashKataSandi } from "../src/lib/kataSandi";
 import { penggunaSaatIni } from "../src/lib/otentikasi";
 import { SEMUA_HAK, hitungHak, jalurPublik, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
+import { punyaHak } from "../src/lib/hakAkses";
 import { syaratLogTerlihat } from "../src/lib/log";
+import { potongAman } from "../src/lib/tipeBerkas";
 import {
   BATAS_PERMINTAAN_UNGGAH,
   BATAS_UKURAN_BERKAS,
@@ -15,21 +19,25 @@ import {
   JENIS_CETAK_KE_LAMPIRAN,
   JENIS_LAMPIRAN,
   ambilBerkasTerlihat,
+  bacaFormulirTerbatas,
   bacaIsiBerkas,
   bacaTautanPublik,
   bacaUntukDikirim,
   bersihkanNamaBerkas,
   bolehAksesBerkas,
+  bolehUnggahSesuatu,
   buangLampiranEntitas,
   buangSatuBerkas,
   buatTautanBagiBerkas,
   cariBerkas,
+  catatLogBerkas,
   daftarBerkasAktifEntitas,
   daftarBerkasTerlihat,
   daftarFolderTerlihat,
   deteksiTipe,
   hashTokenBagi,
   kepalaDisposisi,
+  periksaTautanPublik,
   ringkasPenyimpanan,
   ruangTersembunyi,
   simpanBerkas,
@@ -55,6 +63,8 @@ import { buatPenawaran } from "../src/lib/aksi/penjualan";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import type { PeranPengguna } from "../src/prisma-klien/client";
 import { formulir, harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
+import { NextRequest } from "next/server";
+import { config as configProxy, proxy } from "../src/proxy";
 
 /*
  * Uji pustaka berkas, aksi berkas, dan jalur publik (P06, D7 §9.2): deteksi tipe, nama, unggah, hak per berkas,
@@ -184,6 +194,28 @@ async function pulihkanFolder() {
   }
 }
 
+/**
+ * Pencocok matcher proxy memakai fungsi Next yang sama dengan unstable_doesMiddlewareMatch (getMiddlewareMatchers dan
+ * getMiddlewareRouteMatcher). Dijalankan di proses node terpisah karena modul analisis Next tidak bisa dimuat sesudah
+ * next/headers di proses skrip ini (AsyncLocalStorage tiruan).
+ */
+function cocokMatcherProxy(matcher: readonly string[]): (jalur: string) => boolean {
+  const kode = `
+    const { getMiddlewareMatchers } = require("next/dist/build/analysis/get-page-static-info");
+    const { getMiddlewareRouteMatcher } = require("next/dist/shared/lib/router/utils/middleware-route-matcher");
+    const [matcher, daftar] = JSON.parse(process.argv[process.argv.length - 1]);
+    const cocok = getMiddlewareRouteMatcher(getMiddlewareMatchers(matcher, {}));
+    process.stdout.write(JSON.stringify(daftar.map((u) => { const x = new URL(u, "http://127.0.0.1"); return cocok(x.pathname, { headers: {}, cookies: {} }, Object.fromEntries(x.searchParams)); })));`;
+  const daftar = ["/api/berkas", "/api/berkas/abc", "/api/berkas/abc?unduh=1", "/", "/buku-besar", "/berkas", "/api/berkasx", "/api/notifikasi", "/api/sehat", "/b/token", "/masuk", "/pengaturan/berkas", "/_next/static/x.js", "/logo.png"];
+  const hasil = JSON.parse(execFileSync(process.execPath, ["-e", kode, JSON.stringify([matcher, daftar])], { cwd: process.cwd(), encoding: "utf8" })) as boolean[];
+  const peta = new Map(daftar.map((u, i) => [u, hasil[i]]));
+  return (jalur) => {
+    const v = peta.get(jalur);
+    if (v === undefined) throw new Error(`jalur ${jalur} tidak ada di daftar cocokMatcherProxy`);
+    return v;
+  };
+}
+
 async function main() {
   await bersihkanData();
   potret = await db.folderBerkas.findMany({ select: { kode: true, nama: true, urutan: true, sistem: true, terbatas: true, peranBoleh: true } });
@@ -191,8 +223,16 @@ async function main() {
 
   console.log("=== 0. Struktur ===");
   const exp = nextConfig.experimental as { proxyClientMaxBodySize?: string; serverActions?: { bodySizeLimit?: string } };
-  const ukuranProxy = Number(/^(\d+)mb$/.exec(exp.proxyClientMaxBodySize ?? "")?.[1] ?? 0) * 1024 * 1024;
-  pastikan(ukuranProxy >= BATAS_PERMINTAAN_UNGGAH && exp.serverActions?.bodySizeLimit === "3mb", "next.config: proxyClientMaxBodySize >= batas unggah, serverActions tetap 3mb");
+  pastikan(exp.proxyClientMaxBodySize === undefined && exp.serverActions?.bodySizeLimit === "3mb", "next.config: tanpa proxyClientMaxBodySize (batas bawaan 10 MB), serverActions tetap 3mb");
+  // perbaikan tinjauan P06 butir 1: /api/berkas tidak melewati proxy, rute lain tetap
+  const lewatProxy = cocokMatcherProxy(configProxy.matcher);
+  pastikan(!lewatProxy("/api/berkas") && !lewatProxy("/api/berkas/abc") && !lewatProxy("/api/berkas/abc?unduh=1"), "matcher proxy: /api/berkas dan /api/berkas/[id] dilewati");
+  pastikan(["/", "/buku-besar", "/berkas", "/api/berkasx", "/api/notifikasi", "/api/sehat", "/b/token", "/masuk", "/pengaturan/berkas"].every(lewatProxy), "matcher proxy: rute lain (termasuk /api/berkasx dan /berkas) tetap lewat proxy");
+  pastikan(!lewatProxy("/_next/static/x.js") && !lewatProxy("/logo.png"), "matcher proxy: aset statis tetap dilewati");
+  const alihBukuBesar = proxy(new NextRequest("http://127.0.0.1/buku-besar"));
+  pastikan(alihBukuBesar.status === 307 && (alihBukuBesar.headers.get("location") ?? "").includes("/masuk?kembali=%2Fbuku-besar"), "proxy: /buku-besar tanpa sesi dialihkan ke /masuk");
+  const apiTanpaSesi = proxy(new NextRequest("http://127.0.0.1/api/notifikasi"));
+  pastikan(apiTanpaSesi.status === 401, "proxy: /api/notifikasi tanpa sesi 401");
   pastikan(BATAS_UKURAN_BERKAS === 26_214_400 && BATAS_PERMINTAAN_UNGGAH === 27_262_976, "konstanta batas 25 MB dan batas permintaan");
   pastikan(jalurPublik("/b/abc") && jalurPublik("/b") && jalurPublik("/b/x"), "jalurPublik /b dan /b/... benar");
   pastikan(!jalurPublik("/buku-besar") && !jalurPublik("/berkas") && !jalurPublik("/api/berkas") && !jalurPublik("/bx"), "jalurPublik /buku-besar, /berkas, /api/berkas salah");
@@ -264,6 +304,23 @@ async function main() {
   const disp = kepalaDisposisi("attachment", "Laporan Mei ç.pdf");
   pastikan(disp.startsWith("attachment;") && disp.includes('filename="Laporan Mei _.pdf"') && disp.includes("filename*=UTF-8''Laporan%20Mei%20%C3%A7.pdf"), `kepala disposisi RFC 5987: ${disp}`);
   pastikan(kepalaDisposisi("inline", 'a"b.pdf').includes('filename="a_b.pdf"'), "tanda kutip di nama ASCII diganti _");
+  // perbaikan tinjauan P06 butir 4: pemotongan tidak membelah pasangan surrogate
+  const emoji = bersihkanNamaBerkas(`${"a".repeat(195)}\u{1F600}\u{1F600}.pdf`, "pdf");
+  pastikan(emoji.isWellFormed() && emoji.length <= 200 && emoji === `${"a".repeat(195)}.pdf`, `emoji di batas 200 dibuang utuh: panjang ${emoji.length}`);
+  pastikan(bersihkanNamaBerkas(`${"a".repeat(194)}\u{1F600}.pdf`, "pdf") === `${"a".repeat(194)}\u{1F600}.pdf`, "emoji yang muat tetap utuh");
+  let dispSurrogate = "";
+  try {
+    dispSurrogate = kepalaDisposisi("attachment", "a\ud83d.pdf");
+  } catch (galat) {
+    dispSurrogate = `GALAT ${galat}`;
+  }
+  pastikan(dispSurrogate.includes("filename*=UTF-8''a%EF%BF%BD.pdf"), `kepalaDisposisi surrogate tunggal tidak melempar: ${dispSurrogate}`);
+  pastikan(potongAman(`${"a".repeat(119)}\u{1F600}`, 120) === "a".repeat(119) && potongAman("abc", 2) === "ab", "potongAman (dipakai potong log) tidak membelah emoji");
+  // butir 5: karakter arah teks, lebar nol, BOM, C1, pemisah baris dibuang
+  pastikan(bersihkanNamaBerkas("faktur\u202Efdp.zip", "zip") === "fakturfdp.zip", "U+202E (RLO) dibuang");
+  const tersamar = bersihkanNamaBerkas("a\u0085b\u200Bc\u2066d\u2069e\uFEFFf\u2028g\u2029h\u200Ei\u00ADj.pdf", "pdf");
+  pastikan(tersamar === "abcdefghij.pdf", `C1, lebar nol, isolasi arah, BOM, U+2028/2029, LRM, soft hyphen dibuang: ${tersamar}`);
+  pastikan(bersihkanNamaBerkas("Laporan Mei \u00E7 \u4E2D\u6587 \u0627\u0644.pdf", "pdf") === "Laporan Mei \u00E7 \u4E2D\u6587 \u0627\u0644.pdf", "huruf non-Latin dan teks kanan-ke-kiri biasa tetap");
 
   console.log("=== Data uji ===");
   const pelanggan = await db.pelanggan.create({ data: { kode: `${P}PLG`, nama: "Pelanggan Uji Berkas" } });
@@ -295,6 +352,35 @@ async function main() {
   await pastikanGagal("SVG", unggah(PEMILIK, `${P}a.svg`, teksByte("<svg/>")), 415, "Jenis berkas .svg tidak didukung");
   await pastikanGagal("isi tidak cocok", unggah(PEMILIK, `${P}a.jpg`, CONTOH.pdf), 415, "tidak cocok");
   pastikan((await db.berkas.count({ where: { namaBerkas: { startsWith: P } } })) === 0, "setelah semua penolakan: tidak ada Berkas UJIB- baru");
+  // perbaikan tinjauan P06 butir 6: rute menolak 403 sebelum badan dibaca bila tidak ada tujuan unggah sama sekali
+  pastikan([PEMILIK, ADMIN, KASIR, SOSMED, IKLAN, DESAINER].every(bolehUnggahSesuatu) && !bolehUnggahSesuatu(sesi("KRU")) && !bolehUnggahSesuatu(sesi("GUEST")), "bolehUnggahSesuatu: KRU dan GUEST tidak, peran lain ya");
+  pastikan(bolehUnggahSesuatu(sesi("KASIR", ["penawaran.lihat", "penawaran.buat"])) && !bolehUnggahSesuatu(sesi("KASIR", ["penawaran.buat"])), "bolehUnggahSesuatu: hak unggah jenis hanya berlaku bersama hak lihatnya");
+  // butir 1: aliran badan dipotong di batas
+  const fdKecil = new FormData();
+  fdKecil.set("folderKode", "LAINNYA");
+  fdKecil.set("berkas", berkasUji(`${P}kecil.pdf`, CONTOH.pdf));
+  const formKecil = await bacaFormulirTerbatas(new Request("http://127.0.0.1/api/berkas", { method: "POST", body: fdKecil }), BATAS_PERMINTAAN_UNGGAH);
+  pastikan(formKecil instanceof FormData && formKecil.get("folderKode") === "LAINNYA" && (formKecil.get("berkas") as File).size === CONTOH.pdf.length, "bacaFormulirTerbatas: formulir di bawah batas terbaca utuh");
+  const fdBesar = new FormData();
+  fdBesar.set("berkas", berkasUji(`${P}besar.pdf`, new Uint8Array(64 * 1024)));
+  pastikan((await bacaFormulirTerbatas(new Request("http://127.0.0.1/api/berkas", { method: "POST", body: fdBesar }), 16 * 1024)) === 413, "bacaFormulirTerbatas: badan melewati batas dipotong, 413");
+  pastikan((await bacaFormulirTerbatas(new Request("http://127.0.0.1/api/berkas", { method: "POST", body: "bukan multipart", headers: { "content-type": "multipart/form-data; boundary=x" } }), 1024)) === 400, "bacaFormulirTerbatas: badan rusak 400");
+  pastikan((await bacaFormulirTerbatas(new Request("http://127.0.0.1/api/berkas", { method: "POST" }), 1024)) === 400, "bacaFormulirTerbatas: tanpa badan 400");
+  // galat Prisma dari pembacaan perusahaan dilempar (jadi 500 di rute), bukan diteruskan ke klien sebagai 400
+  const klienPutus = new Proxy(db, {
+    get(target, kunci, penerima) {
+      if (kunci === "perusahaan") return { findUnique: () => Promise.reject(new Prisma.PrismaClientKnownRequestError("koneksi rahasia putus", { code: "P1001", clientVersion: "uji" })) };
+      return Reflect.get(target, kunci, penerima);
+    },
+  });
+  let galatPutus = "";
+  try {
+    const h = await simpanBerkas(klienPutus, PEMILIK, { berkas: berkasUji(`${P}a.pdf`, CONTOH.pdf), perusahaanId: "utama" });
+    galatPutus = h.ok ? "LOLOS" : `dikembalikan ${h.status} ${h.galat}`;
+  } catch (galat) {
+    galatPutus = galat instanceof Prisma.PrismaClientKnownRequestError ? "dilempar" : `lain: ${galat}`;
+  }
+  pastikan(galatPutus === "dilempar", `galat Prisma di simpanBerkas dilempar, tidak jadi 400: ${galatPutus}`);
 
   console.log("=== 4. Unggah sukses ===");
   const jpg = await unggahSukses(PEMILIK, `${P}foto.jpg`, CONTOH.jpeg, { folderKode: "LAINNYA", proyekId: p1.id });
@@ -414,6 +500,10 @@ async function main() {
   const unduh = await bacaUntukDikirim(db, PEMILIK, jpg.id, { unduh: true, ifNoneMatch: null });
   pastikan(unduh.status === 200 && unduh.kepala["Content-Disposition"].startsWith("attachment;") && unduh.kepala["Content-Type"] === "application/octet-stream", "unduh=1: attachment + application/octet-stream");
   pastikan((await jumlahLog(jpg.id, "UNDUH")) === 1, "unduh: tepat satu log UNDUH");
+  // perbaikan tinjauan P06 butir 7: unduhan tidak pernah 304 dan tidak disimpan cache peramban
+  pastikan(unduh.kepala["Cache-Control"] === "private, no-store" && unduh.kepala.ETag === undefined, "unduh: private, no-store tanpa ETag");
+  const unduhUlang = await bacaUntukDikirim(db, PEMILIK, jpg.id, { unduh: true, ifNoneMatch: `"${jpg.sha256}"` });
+  pastikan(unduhUlang.status === 200 && unduhUlang.isi !== undefined && (await jumlahLog(jpg.id, "UNDUH")) === 2, "unduh dengan If-None-Match cocok tetap 200 dan dicatat UNDUH");
   const unduhDocx = await bacaUntukDikirim(db, PEMILIK, docx.id, { unduh: false, ifNoneMatch: null });
   pastikan(unduhDocx.status === 200 && unduhDocx.kepala["Content-Disposition"].startsWith("attachment;") && unduhDocx.kepala["Content-Type"] === "application/octet-stream", "DOCX selalu attachment");
   const tanpaSesi = await bacaUntukDikirim(db, null, jpg.id, { unduh: false, ifNoneMatch: null });
@@ -481,6 +571,10 @@ async function main() {
   pastikan(publik.status === 200 && publik.kepala["Content-Disposition"].startsWith("attachment;") && publik.kepala["Content-Type"] === "application/octet-stream" && publik.kepala["Cache-Control"] === "private, no-store" && publik.kepala["X-Robots-Tag"] === "noindex, nofollow" && publik.kepala["Referrer-Policy"] === "no-referrer", "tautan publik: 200 attachment, no-store, noindex, no-referrer");
   pastikan(Buffer.from(publik.isi!).equals(Buffer.from(CONTOH.zip)) && (await db.tautanBagiBerkas.findUniqueOrThrow({ where: { id: bagi.tautanId } })).jumlahUnduh === 1, "isi benar, jumlahUnduh = 1");
   pastikan((await bacaTautanPublik(db, `${bagi.token}x`)).status === 404 && (await bacaTautanPublik(db, "")).status === 404, "token salah: 404");
+  // perbaikan tinjauan P06 butir 8: HEAD tanpa isi dan tanpa menaikkan penghitung
+  const kepalaPublik = await periksaTautanPublik(db, bagi.token);
+  pastikan(kepalaPublik.status === 200 && kepalaPublik.isi === undefined && kepalaPublik.kepala["Content-Disposition"] === publik.kepala["Content-Disposition"] && kepalaPublik.kepala["Content-Length"] === String(CONTOH.zip.length), "periksaTautanPublik (HEAD): 200, kepala sama, tanpa isi");
+  pastikan((await db.tautanBagiBerkas.findUniqueOrThrow({ where: { id: bagi.tautanId } })).jumlahUnduh === 1 && (await periksaTautanPublik(db, `${bagi.token}x`)).status === 404, "HEAD tidak menaikkan jumlahUnduh; token salah 404");
   const bagiLampau = await buatTautanBagiBerkas(db, PEMILIK, docx.id, "1");
   await db.tautanBagiBerkas.update({ where: { id: bagiLampau.tautanId }, data: { kedaluwarsa: new Date(Date.now() - 1000) } });
   pastikan((await bacaTautanPublik(db, bagiLampau.token)).status === 404, "kedaluwarsa di masa lalu: 404");
@@ -494,7 +588,11 @@ async function main() {
   await harusDitolak("masa berlaku 5", () => buatTautanBagiBerkas(db, PEMILIK, docx.id, "5"), "Masa berlaku tidak dikenal");
   await harusDitolak("masa berlaku bukan angka", () => buatTautanBagiBerkas(db, PEMILIK, docx.id, "7 hari"), "Masa berlaku tidak dikenal");
   const aktifSekarang = await db.tautanBagiBerkas.count({ where: { berkasId: docx.id, dicabutPada: null, kedaluwarsa: { gt: new Date() } } });
-  for (let i = aktifSekarang; i < 10; i++) await buatTautanBagiBerkas(db, PEMILIK, docx.id, "");
+  for (let i = aktifSekarang; i < 7; i++) await buatTautanBagiBerkas(db, PEMILIK, docx.id, "");
+  // perbaikan tinjauan P06 butir 9: enam permintaan serentak saat 7 aktif, hanya tiga yang lolos
+  const serentak = await Promise.allSettled(Array.from({ length: 6 }, () => buatTautanBagiBerkas(db, PEMILIK, docx.id, "")));
+  const lolosSerentak = serentak.filter((h) => h.status === "fulfilled").length;
+  pastikan(lolosSerentak === 3 && serentak.every((h) => h.status === "fulfilled" || String(h.reason).includes("sudah punya 10 tautan aktif")), `pembuatan serentak: ${lolosSerentak} lolos, sisanya ditolak batas 10`);
   pastikan((await db.tautanBagiBerkas.count({ where: { berkasId: docx.id, dicabutPada: null, kedaluwarsa: { gt: new Date() } } })) === 10, "10 tautan aktif (masa kosong = bawaan 7 hari)");
   await harusDitolak("tautan ke-11", () => buatTautanBagiBerkas(db, PEMILIK, docx.id, "7"), "sudah punya 10 tautan aktif");
   const bagiAkhir = await db.tautanBagiBerkas.findFirstOrThrow({ where: { berkasId: docx.id, dicabutPada: null, kedaluwarsa: { gt: new Date() } }, select: { id: true } });
@@ -612,6 +710,24 @@ async function main() {
   pastikan((await nomorLog(PEMILIK, null)).has(`${P}LOG-FAKTUR`), "PEMILIK melihat semua log berkas");
   const logUnggahFaktur = await db.logAktivitas.count({ where: { AND: [syaratLogTerlihat(ADMIN, ruangAdmin), { modul: "berkas", entitasId: pdfFaktur.id }] } });
   pastikan(logUnggahFaktur === 0 && (await db.logAktivitas.count({ where: { modul: "berkas", entitasId: pdfFaktur.id } })) >= 1, "log UNGGAH nyata di FAKTUR tersembunyi bagi ADMIN");
+  // perbaikan tinjauan P06 butir 2 dan 3: folder kunci dan hak lihat jenis lampiran ikut menyaring log
+  const tiruan = (nomor: string, folderKode: string, jenisEntitas: string | null) => ({ id: `ujib-${nomor}`, namaBerkas: `${P}LOG-${nomor}`, folderKode, proyekId: null, perusahaanId: "utama", jenisEntitas });
+  await catatLogBerkas(db, PEMILIK, tiruan("KUNCI", "LAINNYA", "faktur"), "UNGGAH", { keterangan: "Lampiran Faktur Penjualan uji" });
+  await catatLogBerkas(db, PEMILIK, tiruan("KOP", "KOP", "kop-surat"), "UNGGAH");
+  await catatLogBerkas(db, PEMILIK, tiruan("PNW", "LAINNYA", "penawaran"), "UBAH");
+  const metaKunci = (await db.logAktivitas.findFirstOrThrow({ where: { nomor: `${P}LOG-KUNCI` } })).meta as Record<string, unknown>;
+  pastikan(metaKunci.folder === "LAINNYA" && metaKunci.folderKunci === "FAKTUR" && metaKunci.jenisEntitas === "faktur" && metaKunci.proyekId === null, "catatLogBerkas menulis folder, folderKunci, jenisEntitas, proyekId");
+  const lihatAdmin2 = await nomorLog(ADMIN, ruangAdmin);
+  pastikan(!lihatAdmin2.has(`${P}LOG-KUNCI`) && lihatAdmin2.has(`${P}LOG-PNW`) && lihatAdmin2.has(`${P}LOG-UMUM`), "ADMIN (FAKTUR tersembunyi): log lampiran faktur di LAINNYA tidak terlihat, lampiran penawaran dan baris lama tanpa folderKunci tetap terlihat");
+  pastikan(!punyaHak(ADMIN, JENIS_LAMPIRAN["kop-surat"].hakLihat) && !lihatAdmin2.has(`${P}LOG-KOP`), "ADMIN tanpa pengaturan.tulis tidak melihat log lampiran kop");
+  const lihatPemilik = await nomorLog(PEMILIK, null);
+  pastikan(["KUNCI", "KOP", "PNW", "FAKTUR", "UMUM"].every((n) => lihatPemilik.has(`${P}LOG-${n}`)), "PEMILIK melihat semua log berkas, termasuk kop dan lampiran faktur");
+  const tanpaLihatPenawaran = sesi("PEMILIK", PEMILIK.hak.filter((h) => h !== "penawaran.lihat"));
+  const lihatTanpaPnw = await nomorLog(tanpaLihatPenawaran, null);
+  pastikan(!lihatTanpaPnw.has(`${P}LOG-PNW`) && lihatTanpaPnw.has(`${P}LOG-KUNCI`), "akses penuh tanpa penawaran.lihat: log lampiran penawaran tersembunyi (saringan jenis tanpa ruang)");
+  const logSuite = await db.logAktivitas.findMany({ where: { modul: "berkas", waktu: { gte: mulaiUji }, NOT: { nomor: { startsWith: `${P}LOG-` } } }, select: { aksi: true, nomor: true, meta: true } });
+  const tanpaKunci = logSuite.filter((l) => { const m = (l.meta ?? {}) as Record<string, unknown>; return !["folder", "folderKunci", "jenisEntitas", "proyekId"].every((k) => k in m); });
+  pastikan(logSuite.length > 20 && tanpaKunci.length === 0, `semua ${logSuite.length} log berkas suite ini memuat keempat kunci meta: ${tanpaKunci.map((l) => `${l.aksi} ${l.nomor}`).join("; ")}`);
 
   console.log("=== 16. Bersih-bersih ===");
   await bersihkanData();

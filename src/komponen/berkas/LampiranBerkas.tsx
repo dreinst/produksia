@@ -40,17 +40,24 @@ export async function petaTautanAktif(pengguna: PenggunaSesi, berkas: readonly P
   return peta;
 }
 
-/** Nama berkas sebagai pemicu: gambar membuka pratinjau, PDF membuka tab baru, jenis lain teks biasa. */
+/**
+ * Nama berkas sebagai pemicu: gambar membuka pratinjau, PDF membuka tab baru, jenis lain teks biasa. Nama selalu di
+ * <bdi> supaya karakter arah teks (mis. U+202E pada nama lama) tidak menyamarkan ekstensi di tampilan.
+ */
 export function NamaBerkas({ b }: { b: Pick<MetaBerkas, "id" | "namaBerkas" | "tipeMime"> }) {
   const keluarga = keluargaDariMime(b.tipeMime);
   if (keluarga === "gambar") return <DialogPratinjauGambar id={b.id} nama={b.namaBerkas} label={b.namaBerkas} tanpaIkon className="text-left font-medium text-slate-900 hover:text-blue-700 hover:underline break-all" />;
   if (keluarga === "pdf")
     return (
       <a href={`/api/berkas/${b.id}`} target="_blank" rel="noopener noreferrer" className="font-medium text-slate-900 hover:text-blue-700 hover:underline break-all">
-        {b.namaBerkas}
+        <bdi>{b.namaBerkas}</bdi>
       </a>
     );
-  return <span className="font-medium text-slate-900 break-all">{b.namaBerkas}</span>;
+  return (
+    <span className="font-medium text-slate-900 break-all">
+      <bdi>{b.namaBerkas}</bdi>
+    </span>
+  );
 }
 
 export default async function LampiranBerkas({

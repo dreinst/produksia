@@ -373,6 +373,11 @@ export function bolehAksesBerkas(pengguna: PenggunaSesi, berkas: { jenisEntitas:
 
 // ---------- Ruang tersembunyi dan syarat kueri (D7 §3.3.8) ----------
 
+/** Jenis lampiran yang hak lihatnya tidak dimiliki pengguna: berkasnya dan catatan log-nya tersembunyi. */
+export function jenisLampiranTanpaHakLihat(pengguna: PenggunaSesi): JenisEntitas[] {
+  return DAFTAR_JENIS.filter((k) => !punyaHak(pengguna, JENIS_LAMPIRAN[k].hakLihat));
+}
+
 /** Folder terbatas dan proyek terbatas yang tidak boleh dibuka pengguna. null = akses penuh. */
 export async function ruangTersembunyi(klien: KlienDb, pengguna: PenggunaSesi): Promise<RuangTersembunyi> {
   if (punyaHak(pengguna, "berkas.akses-penuh")) return null;
@@ -463,11 +468,14 @@ export async function ambilBerkasTerlihat(klien: KlienDb, pengguna: PenggunaSesi
 
 // ---------- Log berkas (D7 §3.3.16) ----------
 
-/** Catatan log modul berkas; meta selalu memuat folder dan proyekId (syarat saringan log). */
+/**
+ * Catatan log modul berkas. meta selalu memuat folder, folderKunci, jenisEntitas, dan proyekId (null ditulis sebagai
+ * JSON null, bukan dihilangkan) karena syaratLogTerlihat membandingkan keempat path itu.
+ */
 export async function catatLogBerkas(
   klien: KlienDb,
   pelaku: PenggunaSesi,
-  b: { id: string; namaBerkas: string; folderKode: string; proyekId: string | null; perusahaanId: string },
+  b: { id: string; namaBerkas: string; folderKode: string; proyekId: string | null; perusahaanId: string; jenisEntitas: string | null },
   aksi: string,
   tambahan: { keterangan?: string | null; meta?: Record<string, Prisma.InputJsonValue | null> } = {},
 ): Promise<void> {
@@ -479,8 +487,13 @@ export async function catatLogBerkas(
     modul: "berkas",
     entitasId: b.id,
     perusahaanId: b.perusahaanId,
-    meta: { folder: b.folderKode, proyekId: b.proyekId, ...(tambahan.meta ?? {}) },
+    meta: { ...(tambahan.meta ?? {}), ...metaRuangLog(b.folderKode, b.jenisEntitas, b.proyekId) },
   });
+}
+
+/** Empat kunci meta yang disaring syaratLogTerlihat. Dipakai juga pencatat log berkas di luar catatLogBerkas. */
+export function metaRuangLog(folder: string | null, jenisEntitas: string | null, proyekId: string | null): { folder: string | null; folderKunci: string | null; jenisEntitas: string | null; proyekId: string | null } {
+  return { folder, folderKunci: jenisLampiran(jenisEntitas)?.folderKunci ?? null, jenisEntitas: jenisEntitas ?? null, proyekId };
 }
 
 // ---------- Unggah (D7 §3.3.9) ----------
@@ -498,6 +511,45 @@ export type MasukanBerkas = {
   perusahaanId?: string | null;
   dataFormulir?: FormData;
 };
+
+/**
+ * Benar bila pengguna boleh mengunggah ke setidaknya satu tujuan (berkas umum atau salah satu jenis lampiran).
+ * Dipakai POST /api/berkas untuk menolak 403 sebelum badan permintaan dibaca.
+ */
+export function bolehUnggahSesuatu(pengguna: PenggunaSesi): boolean {
+  return bolehAksesBerkas(pengguna, { jenisEntitas: null }, "unggah") || DAFTAR_JENIS.some((k) => bolehAksesBerkas(pengguna, { jenisEntitas: k }, "unggah"));
+}
+
+/**
+ * Membaca badan multipart paling banyak `batas` byte. Pengurai formulir berhenti begitu jumlah byte melewati batas,
+ * jadi formulir dari badan yang lebih besar dari batas tidak pernah dirakit. 413 bila melewati batas, 400 bila
+ * formulirnya tidak valid. Aliran sumber sengaja tidak dibatalkan (cancel): aliran badan Next mengisi antrean dari
+ * event 'data' Node tanpa memeriksa status, sehingga pembatalan membuat event berikutnya melempar galat tak tertangkap.
+ */
+export async function bacaFormulirTerbatas(request: Request, batas: number): Promise<FormData | 400 | 413> {
+  if (!request.body) return 400;
+  const pembaca = request.body.getReader();
+  let terbaca = 0;
+  let lewat = false;
+  // aliran tarik: potongan berikutnya baru dibaca saat pengurai formulir memintanya, jadi tidak ada yang disangga di depan
+  const terbatas = new ReadableStream<Uint8Array>({
+    async pull(kendali) {
+      const { done, value } = await pembaca.read();
+      if (done) return kendali.close();
+      terbaca += value.byteLength;
+      if (terbaca > batas) {
+        lewat = true;
+        return kendali.error(new Error("Badan permintaan melewati batas"));
+      }
+      kendali.enqueue(value);
+    },
+  });
+  try {
+    return await new Response(terbatas, { headers: { "content-type": request.headers.get("content-type") ?? "" } }).formData();
+  } catch {
+    return lewat ? 413 : 400;
+  }
+}
 
 // dibulatkan ke atas supaya berkas yang sedikit di atas batas tidak tertulis "25 MB"
 const MB = (byte: number) => (Math.ceil((byte / 1024 / 1024) * 10) / 10).toLocaleString("id-ID", { maximumFractionDigits: 1 });
@@ -542,7 +594,10 @@ export async function simpanBerkas(klien: KlienDb, pengguna: PenggunaSesi, masuk
     try {
       perusahaanId = await perusahaanDokumenBaru(fd, klien);
     } catch (galat) {
-      return gagal(400, (galat as Error).message);
+      // hanya galat validasi (Error biasa dari perusahaanDokumenBaru) yang diteruskan ke klien; galat Prisma, koneksi,
+      // dan galat tak terduga lain dilempar supaya dijawab 500 tanpa rincian
+      if (galat instanceof Error && Object.getPrototypeOf(galat) === Error.prototype) return gagal(400, galat.message);
+      throw galat;
     }
     proyekId = teks(masukan.proyekId) || null;
     if (proyekId) {
@@ -612,15 +667,16 @@ const cocokEtag = (ifNoneMatch: string | null, etag: string) =>
 
 /**
  * Isi berkas untuk GET /api/berkas/[id]. Tidak berhak dijawab 404 (bukan 403) supaya keberadaan berkas tidak bocor.
- * If-None-Match yang cocok dijawab 304 tanpa membaca isi. Unduhan (bukan pratinjau) dicatat UNDUH.
+ * Pratinjau: If-None-Match yang cocok dijawab 304 tanpa membaca isi (private, no-cache + ETag). Unduhan (?unduh=1)
+ * tidak pernah 304 dan tidak boleh disimpan cache peramban (private, no-store), jadi setiap unduhan dicatat UNDUH.
  */
 export async function bacaUntukDikirim(klien: KlienDb, pengguna: PenggunaSesi | null, id: string, opsi: { unduh: boolean; ifNoneMatch: string | null }): Promise<HasilKirim> {
   if (!pengguna) return { status: 401, kepala: {}, galat: "Belum masuk" };
   const b = await ambilBerkasTerlihat(klien, pengguna, id);
   if (!b) return { status: 404, kepala: {}, galat: PESAN_BERKAS_TIDAK_ADA };
   const etag = `"${b.sha256}"`;
-  const kepalaCache = { ETag: etag, "Cache-Control": "private, no-cache" };
-  if (cocokEtag(opsi.ifNoneMatch, etag)) return { status: 304, kepala: kepalaCache };
+  const kepalaCache: Record<string, string> = opsi.unduh ? { "Cache-Control": "private, no-store" } : { ETag: etag, "Cache-Control": "private, no-cache" };
+  if (!opsi.unduh && cocokEtag(opsi.ifNoneMatch, etag)) return { status: 304, kepala: kepalaCache };
   const isi = await klien.isiBerkas.findUnique({ where: { berkasId: b.id } });
   if (!isi) return { status: 404, kepala: {}, galat: PESAN_BERKAS_TIDAK_ADA };
   const inline = !opsi.unduh && disajikanInline(b.tipeMime);
@@ -649,35 +705,53 @@ export function hashTokenBagi(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
+type HasilTautanPublik = { status: 200 | 404; kepala: Record<string, string>; isi?: Uint8Array<ArrayBuffer> };
+
+const kepalaTautanPublik = (namaBerkas: string, ukuran: number): Record<string, string> => ({
+  "Content-Type": "application/octet-stream",
+  "Content-Disposition": kepalaDisposisi("attachment", namaBerkas),
+  "Content-Length": String(ukuran),
+  "Cache-Control": "private, no-store",
+  "X-Robots-Tag": "noindex, nofollow",
+  "Referrer-Policy": "no-referrer",
+  "X-Content-Type-Options": "nosniff",
+});
+
+/** Baris tautan yang masih berlaku (belum dicabut, belum kedaluwarsa, berkasnya aktif dan isinya ada), atau null. */
+async function tautanPublikBerlaku(klien: KlienDb, token: string, sekarang: Date) {
+  if (!token || token.length > 200) return null;
+  const t = await klien.tautanBagiBerkas.findUnique({
+    where: { tokenHash: hashTokenBagi(token) },
+    select: { id: true, kedaluwarsa: true, dicabutPada: true, berkas: { select: { id: true, namaBerkas: true, ukuran: true, dihapusPada: true, isiDihapusPada: true } } },
+  });
+  if (!t || t.dicabutPada || t.kedaluwarsa <= sekarang || t.berkas.dihapusPada || t.berkas.isiDihapusPada) return null;
+  return t;
+}
+
+const TAUTAN_TIDAK_BERLAKU = { status: 404 as const, kepala: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" } };
+
 /**
  * Isi berkas untuk GET /b/[token] (tanpa sesi). Pembatasan folder/proyek tidak dinilai: tautan adalah izin eksplisit.
  * Selalu attachment. Tidak menulis LogAktivitas; penghitung unduhan ada di baris tautan.
  */
-export async function bacaTautanPublik(klien: KlienDb, token: string): Promise<{ status: 200 | 404; kepala: Record<string, string>; isi?: Uint8Array<ArrayBuffer> }> {
-  const tidakBerlaku = { status: 404 as const, kepala: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" } };
-  if (!token || token.length > 200) return tidakBerlaku;
+export async function bacaTautanPublik(klien: KlienDb, token: string): Promise<HasilTautanPublik> {
   const sekarang = new Date();
-  const t = await klien.tautanBagiBerkas.findUnique({
-    where: { tokenHash: hashTokenBagi(token) },
-    select: { id: true, kedaluwarsa: true, dicabutPada: true, berkas: { select: { id: true, namaBerkas: true, dihapusPada: true, isiDihapusPada: true } } },
-  });
-  if (!t || t.dicabutPada || t.kedaluwarsa <= sekarang || t.berkas.dihapusPada || t.berkas.isiDihapusPada) return tidakBerlaku;
+  const t = await tautanPublikBerlaku(klien, token, sekarang);
+  if (!t) return TAUTAN_TIDAK_BERLAKU;
   const isi = await klien.isiBerkas.findUnique({ where: { berkasId: t.berkas.id } });
-  if (!isi) return tidakBerlaku;
+  if (!isi) return TAUTAN_TIDAK_BERLAKU;
   await klien.tautanBagiBerkas.updateMany({ where: { id: t.id }, data: { jumlahUnduh: { increment: 1 }, terakhirDiunduh: sekarang } });
-  return {
-    status: 200,
-    kepala: {
-      "Content-Type": "application/octet-stream",
-      "Content-Disposition": kepalaDisposisi("attachment", t.berkas.namaBerkas),
-      "Content-Length": String(isi.isi.byteLength),
-      "Cache-Control": "private, no-store",
-      "X-Robots-Tag": "noindex, nofollow",
-      "Referrer-Policy": "no-referrer",
-      "X-Content-Type-Options": "nosniff",
-    },
-    isi: new Uint8Array(isi.isi),
-  };
+  return { status: 200, kepala: kepalaTautanPublik(t.berkas.namaBerkas, isi.isi.byteLength), isi: new Uint8Array(isi.isi) };
+}
+
+/**
+ * Jawaban HEAD /b/[token]: status dan kepala yang sama dengan GET, tanpa membaca isi dan tanpa menaikkan penghitung
+ * unduhan (pengambil pratinjau tautan seperti WhatsApp sering mengirim HEAD lebih dulu).
+ */
+export async function periksaTautanPublik(klien: KlienDb, token: string): Promise<HasilTautanPublik> {
+  const t = await tautanPublikBerlaku(klien, token, new Date());
+  if (!t) return TAUTAN_TIDAK_BERLAKU;
+  return { status: 200, kepala: kepalaTautanPublik(t.berkas.namaBerkas, t.berkas.ukuran) };
 }
 
 /**
@@ -693,11 +767,13 @@ export async function buatTautanBagiBerkas(klien: KlienDb, pengguna: PenggunaSes
   const hari = isian ? Number(isian) : MASA_BERLAKU_BAWAAN;
   if (!/^\d*$/.test(isian) || !(MASA_BERLAKU_TAUTAN as readonly number[]).includes(hari)) throw new Error("Masa berlaku tidak dikenal");
   const sekarang = new Date();
-  const aktif = await klien.tautanBagiBerkas.count({ where: { berkasId: b.id, dicabutPada: null, kedaluwarsa: { gt: sekarang } } });
-  if (aktif >= MAKS_TAUTAN_AKTIF) throw new Error(`Berkas ini sudah punya ${MAKS_TAUTAN_AKTIF} tautan aktif; cabut salah satu dulu`);
   const token = randomBytes(32).toString("base64url");
   const kedaluwarsa = new Date(sekarang.getTime() + hari * 24 * 60 * 60 * 1000);
   const tautanId = await dalamTransaksi(klien, async (tx) => {
+    // baris berkas dikunci supaya permintaan serentak dihitung bergantian dan batas 10 tautan aktif tidak terlewati
+    await tx.$queryRaw`SELECT "id" FROM "Berkas" WHERE "id" = ${b.id} FOR UPDATE`;
+    const aktif = await tx.tautanBagiBerkas.count({ where: { berkasId: b.id, dicabutPada: null, kedaluwarsa: { gt: sekarang } } });
+    if (aktif >= MAKS_TAUTAN_AKTIF) throw new Error(`Berkas ini sudah punya ${MAKS_TAUTAN_AKTIF} tautan aktif; cabut salah satu dulu`);
     const t = await tx.tautanBagiBerkas.create({ data: { berkasId: b.id, tokenHash: hashTokenBagi(token), kedaluwarsa, dibuatOlehId: idTersimpan(pengguna), dibuatOlehNama: pengguna.nama }, select: { id: true } });
     await catatLogBerkas(tx, pengguna, b, "BAGIKAN", { keterangan: `Tautan bagi ${hari} hari`, meta: { kedaluwarsa: kedaluwarsa.toISOString() } });
     return t.id;
@@ -852,7 +928,7 @@ export async function buangLampiranEntitas(tx: KlienDb, jenisEntitas: JenisEntit
     modul: "berkas",
     entitasId,
     perusahaanId: aktif[0].perusahaanId,
-    meta: { folder: j.folderKunci ?? j.folderBawaan, proyekId: aktif[0].proyekId, jenisEntitas, jumlah: aktif.length, berkasIds: ids },
+    meta: { jumlah: aktif.length, berkasIds: ids, ...metaRuangLog(j.folderKunci ?? j.folderBawaan, jenisEntitas, aktif[0].proyekId) },
   });
   return aktif.length;
 }

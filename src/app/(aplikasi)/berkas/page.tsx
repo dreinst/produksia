@@ -213,7 +213,7 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
                         <td>
                           <span className="flex items-start gap-2">
                             <IkonBerkas tipeMime={b.tipeMime} />
-                            <span className="font-medium text-slate-900 break-all">{b.namaBerkas}</span>
+                            <bdi className="font-medium text-slate-900 break-all">{b.namaBerkas}</bdi>
                           </span>
                         </td>
                         <td className="whitespace-nowrap">{b.folder.nama}</td>

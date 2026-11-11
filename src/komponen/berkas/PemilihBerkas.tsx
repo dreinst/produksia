@@ -192,7 +192,7 @@ export default function PemilihBerkas({
           {daftar.map((b) => (
             <li key={b.kunci} className="px-3 py-2 space-y-1">
               <div className="flex items-center justify-between gap-3">
-                <span className="min-w-0 truncate">{b.berkas.name}</span>
+                <bdi className="min-w-0 truncate">{b.berkas.name}</bdi>
                 <span className={`shrink-0 text-xs ${b.status === "kebesaran" || b.status === "gagal" ? "text-rose-600" : b.status === "selesai" ? "text-emerald-700" : "text-slate-500"}`}>
                   {ukuranBerkas(b.berkas.size)}
                   {b.status === "kebesaran" && " · Melebihi 25 MB"}
