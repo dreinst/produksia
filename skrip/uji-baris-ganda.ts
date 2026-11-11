@@ -9,6 +9,7 @@ import { KODE_BARANG_LAIN } from "../src/lib/barangLainLain";
 import { buatPenawaran, buatPesanan, buatPengiriman, buatFaktur, buatRetur, konversiPenawaranKePesanan } from "../src/lib/aksi/penjualan";
 import { buatPenyesuaianPersediaan } from "../src/lib/aksi/persediaan";
 import { hapusDokumen, type JenisDokumen } from "../src/lib/aksi/hapusDokumen";
+import { ubahPenawaran } from "../src/lib/aksi/dokumenPenjualan";
 import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
 
 /*
@@ -18,7 +19,9 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  *  6. retur jalur ID memakai harga baris faktur itu; jalur lama faktur dan retur pada pesanan STANDAR berbarang ganda
  *  membagi jumlah ke baris berbarang sama (tinjauan P23 S1); 7. hapus faktur jalur ID hanya membalik barisnya; 8. jalur
  *  lama pada pesanan bergaya lama tetap lolos dan hapusnya sama dengan cabang lama; 8b. tinjauan P23 R1-R5 (sisa
- *  kumulatif, faktur serentak, prorata retur, surat jalan rujukan, klaim konversi); 9. bersih-bersih dan sinkron.
+ *  kumulatif, faktur serentak, prorata retur, surat jalan rujukan, klaim konversi); 8c. perbaikan P25: konversi membaca
+ *  baris penawaran di dalam transaksi sesudah klaim, jadi ubahPenawaran yang selesai tepat sebelumnya ikut tersalin;
+ *  9. bersih-bersih dan sinkron.
  */
 
 const K = "GND";
@@ -348,6 +351,46 @@ async function bagianTinjauan(d: { pelanggan: { id: string }; gudang: { id: stri
   pastikan(pnwSesudah.status === "DRAF" && pnwSesudah.statusKomersial === "DITOLAK" && (await db.pesananPenjualan.count({ where: { penawaranId: pnw.id } })) === 0, "penawaran tetap DRAF berstatus Ditolak, tanpa pesanan");
 
   await jalankan("hapus PNW", () => hapusDokumen("penawaran", pnw.id));
+
+  // 8c (perbaikan P25): ubahPenawaran dan konversi menunggu kunci baris penawaran yang sama. Konversi membaca penawaran
+  // sebelum ubah selesai, tetapi pesanan harus memuat isi sesudah ubah karena baris dibaca ulang sesudah klaim.
+  console.log("=== 8c. Konversi sesudah ubah penawaran serentak ===");
+  const kunciPnw = (id: string) => (tx: Prisma.TransactionClient) => tx.$queryRaw`SELECT 1 FROM "PenawaranPenjualan" WHERE "id" = ${id} FOR UPDATE`;
+  await jalankan("PNW-U jasa 1 @ 100", () => buatPenawaran(formulir({ pelangganId: d.pelanggan.id, ppnPersen: 0, namaEvent: "Ubah Lalu Konversi", baris: [{ barangId: jasa.id, jumlah: 1, harga: 100 }] })));
+  const pnwU = await db.penawaranPenjualan.findFirstOrThrow({ where: { pelangganId: d.pelanggan.id, namaEvent: "Ubah Lalu Konversi" } });
+  const isianUbah = formulir({
+    pelangganId: d.pelanggan.id,
+    ppnPersen: 0,
+    namaEvent: "Ubah Lalu Konversi (revisi)",
+    jenisFee: "NOMINAL",
+    nilaiFee: 20,
+    baris: [
+      { barangId: jasa.id, jumlah: 3, harga: 200, bagian: "Hari 1" },
+      { nama: "Transport revisi", jumlah: 1, harga: 50, bagian: "Hari 1" },
+    ],
+    rencanaTermin: [{ label: "DP", nilai: 50 }, { label: "Pelunasan" }],
+  });
+  const hasilU = await berantre(kunciPnw(pnwU.id), [() => ubahPenawaran(pnwU.id, isianUbah), () => konversiPenawaranKePesanan(pnwU.id)]);
+  pastikan(hasilU[0] === "ok" && hasilU[1] === "ok", `ubah lalu konversi serentak sama-sama lolos (${hasilU.join(" | ")})`);
+  const psjU = await db.pesananPenjualan.findFirstOrThrow({ where: { penawaranId: pnwU.id }, include: { baris: { orderBy: { urutan: "asc" } }, rencanaTermin: { orderBy: { no: "asc" } } } });
+  pastikan(
+    psjU.baris.length === 2 && sama(psjU.baris[0].jumlah, 3) && sama(psjU.baris[0].harga, 200) && psjU.baris[1].nama === "Transport revisi" && sama(psjU.baris[1].harga, 50),
+    `pesanan memuat baris sesudah ubah, bukan baris lama (${psjU.baris.map((b) => `${D(b.jumlah).toFixed(0)}@${D(b.harga).toFixed(0)}`).join(", ")})`,
+  );
+  pastikan(sama(psjU.total, 670) && sama(psjU.fee, 20) && psjU.namaEvent === "Ubah Lalu Konversi (revisi)", `kepala pesanan dari isi sesudah ubah: total 650 + fee 20 = 670, nama event revisi (total ${D(psjU.total).toFixed(2)})`);
+  pastikan(psjU.rencanaTermin.length === 2 && psjU.rencanaTermin.map((b) => b.label).join() === "DP,Pelunasan", "rencana termin sesudah ubah ikut tersalin ke pesanan");
+
+  // urutan sebaliknya: konversi menang, ubah yang menunggu ditolak, pesanan memuat baris asli
+  await jalankan("PNW-K jasa 1 @ 100", () => buatPenawaran(formulir({ pelangganId: d.pelanggan.id, ppnPersen: 0, namaEvent: "Konversi Lalu Ubah", baris: [{ barangId: jasa.id, jumlah: 1, harga: 100 }] })));
+  const pnwK = await db.penawaranPenjualan.findFirstOrThrow({ where: { pelangganId: d.pelanggan.id, namaEvent: "Konversi Lalu Ubah" } });
+  const hasilK2 = await berantre(kunciPnw(pnwK.id), [() => konversiPenawaranKePesanan(pnwK.id), () => ubahPenawaran(pnwK.id, isianUbah)]);
+  pastikan(hasilK2[0] === "ok" && hasilK2[1].includes("sudah dikonversi tidak bisa diubah"), `konversi lebih dulu: ubah yang menunggu ditolak (${hasilK2.join(" | ")})`);
+  const psjK = await db.pesananPenjualan.findFirstOrThrow({ where: { penawaranId: pnwK.id }, include: { baris: true } });
+  const pnwKSesudah = await db.penawaranPenjualan.findUniqueOrThrow({ where: { id: pnwK.id }, include: { baris: true } });
+  pastikan(psjK.baris.length === 1 && sama(psjK.baris[0].jumlah, 1) && sama(psjK.total, 100) && pnwKSesudah.baris.length === 1 && sama(pnwKSesudah.total, 100), "pesanan dan penawaran tetap berisi baris asli");
+
+  for (const p of [psjU, psjK]) await jalankan("hapus PSJ konversi serentak", () => hapusDokumen("pesanan", p.id));
+  for (const p of [pnwU, pnwK]) await jalankan("hapus PNW konversi serentak", () => hapusDokumen("penawaran", p.id));
   await jalankan("hapus FJ prorata", () => hapusDokumen("faktur", fjF.id));
   await jalankan("hapus PSJ prorata", () => hapusDokumen("pesanan", psjF.id));
   await jalankan("hapus FJ serentak", () => hapusDokumen("faktur", fjR.id));

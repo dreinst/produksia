@@ -264,9 +264,10 @@ export async function buatPenawaran(dataFormulir: FormData) {
 
 export async function konversiPenawaranKePesanan(penawaranId: string) {
   const pengguna = await wajibHakAksi("pesanan.buat");
+  // pemeriksaan awal saja; isi yang disalin dibaca ulang di dalam transaksi sesudah klaim (perbaikan P25)
   const penawaran = await db.penawaranPenjualan.findUniqueOrThrow({
     where: { id: penawaranId },
-    include: { baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }] }, rencanaTermin: true },
+    select: { id: true, nomor: true, status: true, statusKomersial: true },
   });
   if (penawaran.status === "DIKONVERSI") throw new Error("Penawaran sudah dikonversi");
   if (penawaran.statusKomersial === "DITOLAK" || penawaran.statusKomersial === "KEDALUWARSA") {
@@ -289,15 +290,22 @@ export async function konversiPenawaranKePesanan(penawaranId: string) {
       }
       throw new Error("Penawaran sudah dikonversi");
     }
+    // klaim sudah memegang kunci baris penawaran, jadi ubahPenawaran yang selesai sebelum klaim sudah terlihat di sini
+    // dan ubahPenawaran sesudahnya ditolak (penawaran tidak lagi DRAF). Kepala, baris, dan rencana termin dibaca di
+    // sini, bukan dari bacaan di luar transaksi (perbaikan P25).
+    const isi = await tx.penawaranPenjualan.findUniqueOrThrow({
+      where: { id: penawaran.id },
+      include: { baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }] }, rencanaTermin: true },
+    });
     // pesanan mewarisi perusahaan penawaran (dokumen anak, D1 §3.3), juga bila perusahaannya sudah diarsipkan
     await tx.pesananPenjualan.create({
       data: {
         nomor,
-        penawaranId: penawaran.id,
-        ...salinKolom(penawaran, KOLOM_SALIN_PENAWARAN_KE_PESANAN),
+        penawaranId: isi.id,
+        ...salinKolom(isi, KOLOM_SALIN_PENAWARAN_KE_PESANAN),
         ...dataLangsungDisetujui(pengguna),
-        baris: { create: penawaran.baris.map((l) => salinKolom(l, KOLOM_SALIN_BARIS)) },
-        rencanaTermin: { create: salinButirKePesanan(penawaran.rencanaTermin) },
+        baris: { create: isi.baris.map((l) => salinKolom(l, KOLOM_SALIN_BARIS)) },
+        rencanaTermin: { create: salinButirKePesanan(isi.rencanaTermin) },
       },
     });
   });
