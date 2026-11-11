@@ -356,15 +356,20 @@ function peranTambahanSah(peran: PeranPengguna, peranTambahan: readonly PeranPen
   return [...new Set(peranTambahan)].filter((p) => p !== peran && PERAN_TAMBAHAN_BOLEH.includes(p));
 }
 
+/** Hak yang hanya boleh berasal dari peran utama, supaya peran tambahan tidak mengubah lingkup perusahaan peran lama. */
+const HAK_PERAN_UTAMA_SAJA: readonly Hak[] = ["perusahaan-gabungan.lihat"];
+
 /**
  * Hak efektif pengguna = gabungan hak peran utama dan tiap peran tambahan yang sah, masing-masing dengan
  * penyesuaian perannya sendiri. Tanpa peran tambahan hasilnya persis hitungHak(peran, penyesuaian peran itu).
+ * Kunci di HAK_PERAN_UTAMA_SAJA tidak diambil dari peran tambahan: KASIR + SOSMED tetap berlingkup satu
+ * perusahaan seperti KASIR (HAK.md §5, perubahan setelah DF1).
  */
 export function hitungHakPengguna(peran: PeranPengguna, peranTambahan: readonly PeranPengguna[], penyesuaian: readonly PenyesuaianPeran[] = []): Hak[] {
   if (peranTertinggi(peran)) return [...SEMUA_HAK];
-  const hasil = new Set<Hak>();
-  for (const p of [peran, ...peranTambahanSah(peran, peranTambahan)]) {
-    for (const h of hitungHak(p, penyesuaian.filter((x) => x.peran === p))) hasil.add(h);
+  const hasil = new Set<Hak>(hitungHak(peran, penyesuaian.filter((x) => x.peran === peran)));
+  for (const p of peranTambahanSah(peran, peranTambahan)) {
+    for (const h of hitungHak(p, penyesuaian.filter((x) => x.peran === p))) if (!HAK_PERAN_UTAMA_SAJA.includes(h)) hasil.add(h);
   }
   return SEMUA_HAK.filter((h) => hasil.has(h));
 }

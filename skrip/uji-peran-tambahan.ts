@@ -3,9 +3,10 @@ import "dotenv/config";
 process.env.UJI_TANPA_SESI = "1";
 import { randomBytes } from "node:crypto";
 import { db } from "../src/lib/db";
-import { HAK_BAWAAN, hitungHak, labelPeranPengguna, punyaHak } from "../src/lib/hakAkses";
+import { HAK_BAWAAN, hitungHak, hitungHakPengguna, labelPeranPengguna, punyaHak, type PenggunaSesi } from "../src/lib/hakAkses";
 import { buatPengguna, ubahPengguna } from "../src/lib/aksi/pengguna";
 import { penggunaSaatIni, wajibHakAksi } from "../src/lib/otentikasi";
+import { lingkupPerusahaan, simpanLingkupSesi, tentukanLingkup } from "../src/lib/perusahaan";
 import { hashKataSandi } from "../src/lib/kataSandi";
 import type { PeranPengguna } from "../src/prisma-klien/enums";
 import { jalankan, sebagai } from "./bantuan";
@@ -13,7 +14,7 @@ import { jalankan, sebagai } from "./bantuan";
 /*
  * Peran tambahan per pengguna lewat aksi Pengaturan › Pengguna (D7 §3.1.2, §6.6): nilai yang boleh, nilai yang sama
  * dengan peran utama dibuang, penanda peranTambahanDikirim, pencabutan sesi, aturan akun sendiri, aturan akun
- * Superadmin/Pemilik, dan hak efektif gabungan. Semua pengguna uji berawalan "ujipt-". Pemeriksa lokal melempar galat
+ * Superadmin/Pemilik, hak efektif gabungan, dan hak lingkup gabungan yang hanya datang dari peran utama. Semua pengguna uji berawalan "ujipt-". Pemeriksa lokal melempar galat
  * (bukan process.exit) supaya blok finally selalu menghapus pengguna uji dan baris HakAksesPeran buatan suite ini.
  */
 
@@ -80,7 +81,7 @@ async function main() {
   pastikan((await db.hakAksesPeran.count()) === 0, "HakAksesPeran kosong sebelum suite mulai");
   try {
     // Pemilik uji nyata untuk aturan akun sendiri dan sasaran aturan Superadmin/Pemilik.
-    await db.pengguna.create({ data: { nama: "Pemilik Uji PT", namaPengguna: `${PREFIKS}pemilik`, nomorTelepon: "+6281200000098", kataSandiHash: await hashKataSandi("rahasia123"), peran: "PEMILIK" } });
+    const pemilikId = (await db.pengguna.create({ data: { nama: "Pemilik Uji PT", namaPengguna: `${PREFIKS}pemilik`, nomorTelepon: "+6281200000098", kataSandiHash: await hashKataSandi("rahasia123"), peran: "PEMILIK" } })).id;
 
     console.log("=== 1. Buat pengguna dengan peran tambahan ===");
     await jalankan("buat KASIR + SOSMED + DESAINER (penanda)", () =>
@@ -105,10 +106,15 @@ async function main() {
     pastikan(admin.peranTambahan.length === 0, "tanpa penanda: tambahan kosong");
 
     console.log("=== 2. Ubah pengguna ===");
+    // Sesi Pemilik uji menjadi pembanding: perubahan tambahan pengguna lain tidak boleh ikut mencabutnya.
+    await buatSesi(admin.id);
+    await buatSesi(pemilikId);
     await jalankan("ubah ADMIN, tambahan DESAINER (penanda)", () =>
       ubahPengguna(admin.id, formulirPengguna({ nama: "Admin Uji PT", namaPengguna: `${PREFIKS}admin`, peran: "ADMIN", tambahan: ["DESAINER"], penanda: true })),
     );
     pastikan(sama((await ambil(`${PREFIKS}admin`)).peranTambahan, ["DESAINER"]), "tambahan DESAINER tersimpan lewat ubah");
+    pastikan((await jumlahSesi(admin.id)) === 0, "tambahan yang ditambah mencabut sesi pengguna itu");
+    pastikan((await jumlahSesi(pemilikId)) === 1, "sesi pengguna lain tidak ikut terhapus saat tambahan ditambah");
 
     await buatSesi(kasir.id);
     await jalankan("ubah nama KASIR tanpa penanda", () => ubahPengguna(kasir.id, formulirPengguna({ nama: "Kasir Uji PT Baru", namaPengguna: `${PREFIKS}kasir`, peran: "KASIR" })));
@@ -121,7 +127,7 @@ async function main() {
     );
     pastikan((await jumlahSesi(kasir.id)) === 1, "tambahan yang sama (urutan lain) tidak mencabut sesi");
 
-    await harusDitolak("ubah dengan tambahan KASIR", () =>
+    await harusDitolak("ubah dengan tambahan GUDANG", () =>
       ubahPengguna(kasir.id, formulirPengguna({ nama: "Kasir Uji PT Baru", namaPengguna: `${PREFIKS}kasir`, peran: "KASIR", tambahan: ["GUDANG"], penanda: true })), PESAN_TOLAK);
     pastikan(sama((await ambil(`${PREFIKS}kasir`)).peranTambahan, ["DESAINER", "SOSMED"]) && (await jumlahSesi(kasir.id)) === 1, "penolakan ubah tidak mengubah tambahan dan sesi");
 
@@ -129,7 +135,8 @@ async function main() {
       ubahPengguna(kasir.id, formulirPengguna({ nama: "Kasir Uji PT Baru", namaPengguna: `${PREFIKS}kasir`, peran: "KASIR", penanda: true })),
     );
     pastikan((await ambil(`${PREFIKS}kasir`)).peranTambahan.length === 0, "penanda tanpa centang mengosongkan tambahan");
-    pastikan((await jumlahSesi(kasir.id)) === 0, "perubahan tambahan mencabut sesi pengguna itu");
+    pastikan((await jumlahSesi(kasir.id)) === 0, "tambahan yang dikurangi mencabut sesi pengguna itu");
+    pastikan((await jumlahSesi(pemilikId)) === 1, "sesi pengguna lain tidak ikut terhapus saat tambahan dikurangi");
 
     console.log("=== 3. Akun sendiri dan akun Pemilik ===");
     const pemilik = await ambil(`${PREFIKS}pemilik`);
@@ -171,10 +178,30 @@ async function main() {
 
     const sesiAdmin = await sebagai(`${PREFIKS}admin`, () => penggunaSaatIni());
     pastikan(sesiAdmin !== null && labelPeranPengguna(sesiAdmin) === "Admin + Desainer", "label Admin + Desainer");
-    pastikan(sesiAdmin.hak.includes("tugas-desain.ubah") && sesiAdmin.hak.includes("lead.lihat"), "ADMIN + DESAINER memuat tugas-desain.ubah dan lead.lihat");
+    const adminSosmed = await denganEnv({ UJI_PERAN: "ADMIN", UJI_PERAN_TAMBAHAN: "SOSMED" }, () => penggunaSaatIni());
+    pastikan(adminSosmed !== null && !HAK_BAWAAN.ADMIN.includes("konten.buat") && adminSosmed.hak.includes("konten.buat") && hitungHak("ADMIN").every((h) => adminSosmed.hak.includes(h)), "ADMIN + SOSMED: konten.buat (tidak ada di bawaan ADMIN) bertambah, hak ADMIN tetap utuh");
 
     const sesiPemilik = await sebagai(`${PREFIKS}pemilik`, () => penggunaSaatIni());
     pastikan(sesiPemilik !== null && labelPeranPengguna(sesiPemilik) === "Pemilik", "tanpa tambahan: label peran utama saja");
+
+    console.log("=== 6. Lingkup gabungan hanya dari peran utama ===");
+    const semuaId = new Set((await db.perusahaan.findMany({ select: { id: true } })).map((p) => p.id));
+    for (const utama of ["KASIR", "KRU", "GUEST"] as const) {
+      const hak = hitungHakPengguna(utama, ["SOSMED", "IKLAN", "DESAINER"]);
+      const label = `${utama} + SOSMED/IKLAN/DESAINER`;
+      pastikan(!hak.includes("perusahaan-gabungan.lihat") && hak.includes("konten.buat"), `${label}: tanpa perusahaan-gabungan.lihat, kunci pemasaran lain tetap bertambah`);
+      pastikan(tentukanLingkup({ pilihan: null, bolehGabungan: hak.includes("perusahaan-gabungan.lihat"), adaIds: semuaId }) === "utama", `${label}: tanpa pilihan lingkup tetap utama`);
+      const lingkup = await denganEnv({ UJI_PERAN: utama, UJI_PERAN_TAMBAHAN: "SOSMED", UJI_PERUSAHAAN: "semua" }, () => lingkupPerusahaan());
+      pastikan(lingkup.perusahaanId === "utama" && !lingkup.bolehGabungan, `${utama} + SOSMED meminta gabungan lewat UJI_PERUSAHAAN=semua: tetap utama`);
+      const sesiSintetis: PenggunaSesi = { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, nomorTelepon: null, peran: utama, peranTambahan: ["SOSMED"], hak };
+      await harusDitolak(`${utama} + SOSMED memilih Semua perusahaan`, () => simpanLingkupSesi(db, "sesi-tidak-ada", "semua", sesiSintetis), "tidak punya hak");
+    }
+    pastikan(!sesiKasir.hak.includes("perusahaan-gabungan.lihat"), "sesi nyata KASIR + SOSMED tanpa perusahaan-gabungan.lihat");
+    pastikan(hitungHakPengguna("KASIR", ["SOSMED"], [{ peran: "SOSMED", hak: "perusahaan-gabungan.lihat", boleh: true }]).includes("perusahaan-gabungan.lihat") === false, "penyesuaian boleh pada peran tambahan tidak membuka lingkup gabungan");
+    pastikan(hitungHakPengguna("KASIR", ["SOSMED"], [{ peran: "KASIR", hak: "perusahaan-gabungan.lihat", boleh: true }]).includes("perusahaan-gabungan.lihat"), "penyesuaian boleh pada peran utama KASIR tetap membuka lingkup gabungan");
+    for (const utama of ["ADMIN", "GUDANG", "SOSMED"] as const) {
+      pastikan(hitungHakPengguna(utama, ["IKLAN", "DESAINER"]).includes("perusahaan-gabungan.lihat"), `${utama} + tambahan: hak gabungan dari peran utama tetap ada`);
+    }
   } finally {
     await bersihkan();
   }

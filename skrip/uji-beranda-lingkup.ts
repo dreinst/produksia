@@ -10,6 +10,7 @@ import { periksaSinkron, type HasilSinkron } from "../src/lib/sinkron";
 import { bacaPeriode, hitungLabaRugiBulanan, saldoAkunPeriode } from "../src/lib/laporan";
 import { urutkanAkunKas } from "../src/lib/berandaKeuangan";
 import { ambilPengaturanPerusahaan } from "../src/lib/pengaturanPerusahaan";
+import { ID_PERUSAHAAN_STANDAR } from "../src/lib/perusahaan";
 import { alasanKontenSaya, geserTanggalIso, kontenSaya, menungguPenyetujuSaja } from "../src/lib/konten";
 import { KALIMAT_INTEGRITAS_LAMA, kalimatIntegritas } from "../src/lib/beranda";
 import { Prisma } from "../src/prisma-klien/client";
@@ -178,6 +179,9 @@ async function bersihkanDataUji() {
 }
 
 async function main() {
+  // Bila putaran sebelumnya terhenti di tengah bagian 6, perusahaan standar bisa tertinggal nonaktif; aktifkan lagi
+  // lewat SQL (diubahPada tidak tersentuh). Keenamnya aktif sejak migrasi.
+  await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = true WHERE "aktif" = false AND "id" IN (${Prisma.join([...ID_PERUSAHAAN_STANDAR])})`;
   await bersihkanDataUji();
   const tahun = (await ambilPengaturanPerusahaan(db)).tahunBuku;
   const periode = bacaPeriode({ dari: `${tahun}-01-01`, sampai: `${tahun}-12-31` });
@@ -371,11 +375,12 @@ async function main() {
   // lalu dipulihkan di finally sebelum pemeriksaan (pastikan menghentikan proses bila gagal)
   const aktifLain = (await db.perusahaan.findMany({ where: { aktif: true, id: { not: "utama" } }, select: { id: true } })).map((p) => p.id);
   let halKasirSatu: Awaited<ReturnType<typeof muat>> | null = null;
-  await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = false WHERE "id" IN (${Prisma.join(aktifLain)})`;
+  // Prisma.join menolak daftar kosong; tanpa perusahaan aktif lain, instalasi sudah satu perusahaan sehingga UPDATE dilewati
+  if (aktifLain.length > 0) await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = false WHERE "id" IN (${Prisma.join(aktifLain)})`;
   try {
     halKasirSatu = await muat("KASIR", undefined);
   } finally {
-    await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = true WHERE "id" IN (${Prisma.join(aktifLain)})`;
+    if (aktifLain.length > 0) await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = true WHERE "id" IN (${Prisma.join(aktifLain)})`;
   }
   pastikan((await db.perusahaan.count({ where: { id: { in: aktifLain }, aktif: true } })) === aktifLain.length, `perusahaan yang dinonaktifkan sementara sudah aktif lagi (${aktifLain.length})`);
   const integritasSatu = potong(halKasirSatu!.teks, "Integritas & Sinkronisasi", "PostgreSQL 18");
