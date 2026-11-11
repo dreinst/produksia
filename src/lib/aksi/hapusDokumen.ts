@@ -12,6 +12,7 @@ import type { Prisma } from "@/prisma-klien/client";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { BERKAS, type JenisPersetujuan } from "@/lib/persetujuan";
 import { catatAktivitas } from "@/lib/log";
+import { kunciBarisPesananPenjualan, kunciBarisSuratJalan, kunciBarisSuratJalanPesanan } from "@/lib/dokumenPenjualan";
 
 /*
  * Menghapus dokumen transaksi = MEMBALIK seluruh efeknya dalam satu transaksi: stok fisik & harga pokok,
@@ -246,7 +247,12 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (fakturSetelah.length) {
           throw new Error(`Faktur ${daftarNomor(fakturSetelah)} dibuat setelah ${d.nomor} dan sudah mengakui HPP-nya; hapus faktur itu dulu`);
         }
+        // pengaman FK Restrict KonsumsiSuratJalan: baris SJ yang masih tercatat dikonsumsi faktur tidak boleh hilang
+        const pemakai = await tx.fakturPenjualan.findMany({ where: { baris: { some: { konsumsiSj: { some: { barisPengiriman: { pengirimanId: id } } } } } }, select: { nomor: true } });
+        if (pemakai.length) throw new Error(`Faktur ${daftarNomor(pemakai)} sudah mengakui HPP ${d.nomor}; hapus faktur itu dulu`);
         await kunciStokBaris(tx, d.baris.filter((b) => b.barang.jenis === "BARANG"), d.gudangId, true);
+        // baris pesanan dikunci sesudah stok, urut `urutan` lalu id seperti buatPengiriman dan faktur (tinjauan P27 R1)
+        await kunciBarisPesananPenjualan(tx, d.pesananId, d.baris.map((b) => b.barisPesananId));
         // urut barangId supaya kunci Barang (harga rata) berurutan sama dengan kunci stok (tinjauan P22b T4)
         for (const b of urutBarang(d.baris)) {
           if (b.barang.jenis === "BARANG") {
@@ -266,7 +272,12 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       case "faktur": {
         const d = await tx.fakturPenjualan.findUniqueOrThrow({
           where: { id },
-          include: { penerimaan: true, retur: true, baris: { include: { barang: { select: { jenis: true } } } }, pesanan: { include: { faktur: true, pengiriman: true } } },
+          include: {
+            penerimaan: true,
+            retur: true,
+            baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }], include: { barang: { select: { jenis: true } } } },
+            pesanan: { include: { faktur: true, pengiriman: true } },
+          },
         });
         if (d.penerimaan.length) throw new Error(`${d.nomor} sudah punya penerimaan ${daftarNomor(d.penerimaan)}; hapus itu dulu`);
         if (d.retur.length) throw new Error(`${d.nomor} sudah punya retur ${daftarNomor(d.retur)}; hapus itu dulu`);
@@ -274,50 +285,42 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         if (lebihBaru.length) throw new Error(`Hapus faktur yang lebih baru dulu (${daftarNomor(lebihBaru)}) agar pengakuan HPP bisa dibalik urut`);
         const sjSetelah = (d.pesanan?.pengiriman ?? []).filter((s) => s.tanggal > d.tanggal);
         if (sjSetelah.length) throw new Error(`Surat jalan ${daftarNomor(sjSetelah)} dibuat setelah ${d.nomor}; hapus itu dulu`);
-        // baris pesanan yang penuh ditagih sebelum pembalikan: SJ-nya bisa dikonsumsi lintas baris oleh faktur ini (SJ yatim
-        // di buatFaktur, tinjauan P25 T1)
-        const penuhSebelum = d.pesananId
-          ? (await tx.barisPesananPenjualan.findMany({ where: { pesananId: d.pesananId }, select: { id: true, jumlah: true, jumlahDifaktur: true } }))
-              .filter((bp) => D(bp.jumlahDifaktur).gte(D(bp.jumlah)))
-              .map((bp) => bp.id)
-          : [];
+        // Kunci baris pesanan (urut `urutan` lalu id) lalu baris SJ (urut id), urutan yang sama dengan buatFaktur
+        // (tinjauan P27 R1, S1)
+        if (d.pesananId) await kunciBarisPesananPenjualan(tx, d.pesananId);
         for (const b of d.baris) {
-          if (d.pesananId) {
-            // Baris faktur jalur id (barisPesananId terisi) membalik tepat baris pesanan dan baris SJ-nya, sehingga barang
-            // yang muncul di beberapa baris pesanan tidak menumpuk di baris pertama (D2 §4.6, bug B-10 / §10.5 no. 6).
-            // Tanpa barisPesananId: kode lama persis (baris pesanan pertama dengan barang sama).
-            const bp = b.barisPesananId ? { id: b.barisPesananId } : await tx.barisPesananPenjualan.findFirst({ where: { pesananId: d.pesananId, barangId: b.barangId } });
-            if (bp) await tx.barisPesananPenjualan.update({ where: { id: bp.id }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
-            if (b.barang.jenis === "BARANG") {
-              // kembalikan konsumsi transit ke baris SJ, terbaru lebih dulu (kebalikan urutan konsumsi)
-              let sisa = D(b.jumlah);
-              const whereSj = b.barisPesananId ? { barisPesananId: b.barisPesananId, pengiriman: { pesananId: d.pesananId } } : { barangId: b.barangId, pengiriman: { pesananId: d.pesananId } };
-              const barisSj = await tx.barisPengiriman.findMany({ where: whereSj, orderBy: { pengiriman: { tanggal: "desc" } } });
-              let nilai = D(0);
-              for (const sj of barisSj) {
-                if (sisa.lte(0)) break;
-                const bisa = terkecil(D(sj.jumlahDifaktur), sisa);
-                if (bisa.lte(0)) continue;
-                await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { decrement: bisa } } });
-                sisa = sisa.minus(bisa);
-                nilai = nilai.plus(kali(bisa, D(sj.hargaPokok)));
-              }
-              // sisa nilai transit yang belum terbalik berasal dari SJ yatim baris pesanan lain (buatFaktur, konsumsiSjYatim)
-              const yatim = penuhSebelum.filter((id) => id !== b.barisPesananId);
-              if (b.barisPesananId && sisa.gt(0) && nilai.lt(D(b.nilaiTransit)) && yatim.length > 0) {
-                const barisYatim = await tx.barisPengiriman.findMany({
-                  where: { barangId: b.barangId, barisPesananId: { in: yatim }, pengiriman: { pesananId: d.pesananId } },
-                  orderBy: [{ pengiriman: { tanggal: "desc" } }, { id: "desc" }],
-                });
-                for (const sj of barisYatim) {
-                  if (sisa.lte(0) || nilai.gte(D(b.nilaiTransit))) break;
-                  const bisa = terkecil(D(sj.jumlahDifaktur), sisa);
-                  if (bisa.lte(0)) continue;
-                  await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { decrement: bisa } } });
-                  sisa = sisa.minus(bisa);
-                  nilai = nilai.plus(kali(bisa, D(sj.hargaPokok)));
-                }
-              }
+          if (!d.pesananId) continue;
+          // Baris faktur jalur id (barisPesananId terisi) membalik tepat baris pesanannya, sehingga barang yang muncul di
+          // beberapa baris pesanan tidak menumpuk di baris pertama (D2 §4.6, bug B-10 / §10.5 no. 6). Tanpa
+          // barisPesananId: kode lama persis (baris pesanan pertama dengan barang sama).
+          const bp = b.barisPesananId ? { id: b.barisPesananId } : await tx.barisPesananPenjualan.findFirst({ where: { pesananId: d.pesananId, barangId: b.barangId } });
+          if (bp) await tx.barisPesananPenjualan.update({ where: { id: bp.id }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
+        }
+        if (d.konsumsiSjTercatat) {
+          // Konsumsi SJ dibalik persis menurut catatan KonsumsiSuratJalan (tinjauan P27 T1, S2): hanya baris SJ yang
+          // benar-benar dipakai faktur ini, sebanyak yang dipakainya, termasuk SJ yatim baris pesanan lain. Catatannya
+          // ikut terhapus (kaskade) bersama baris faktur.
+          const catatan = await tx.konsumsiSuratJalan.findMany({ where: { barisFaktur: { fakturId: id } }, orderBy: [{ barisPengirimanId: "asc" }, { id: "asc" }] });
+          await kunciBarisSuratJalan(tx, catatan.map((c) => c.barisPengirimanId));
+          for (const c of catatan) await tx.barisPengiriman.update({ where: { id: c.barisPengirimanId }, data: { jumlahDifaktur: { decrement: c.jumlah } } });
+        } else if (d.pesananId) {
+          // Faktur lama tanpa catatan konsumsi: perilaku kode lama 46729a2, kembalikan konsumsi transit ke baris SJ
+          // terbaru lebih dulu (kebalikan urutan konsumsi), dibatasi jumlah baris faktur. Baris dengan barisPesananId
+          // (hasil isi ulang migrasi lebur, barangnya tunggal di pesanan) memakai baris SJ baris pesanan itu, yang sama
+          // dengan per barang. Batas lama tetap berlaku untuk data lama: pembalikan tidak tahu baris SJ mana yang dipakai
+          // faktur ini (bug lama S2 tinjauan P27).
+          await kunciBarisSuratJalanPesanan(tx, d.pesananId);
+          for (const b of d.baris) {
+            if (b.barang.jenis !== "BARANG") continue;
+            let sisa = D(b.jumlah);
+            const whereSj = b.barisPesananId ? { barisPesananId: b.barisPesananId, pengiriman: { pesananId: d.pesananId } } : { barangId: b.barangId, pengiriman: { pesananId: d.pesananId } };
+            const barisSj = await tx.barisPengiriman.findMany({ where: whereSj, orderBy: { pengiriman: { tanggal: "desc" } } });
+            for (const sj of barisSj) {
+              if (sisa.lte(0)) break;
+              const bisa = terkecil(D(sj.jumlahDifaktur), sisa);
+              if (bisa.lte(0)) continue;
+              await tx.barisPengiriman.update({ where: { id: sj.id }, data: { jumlahDifaktur: { decrement: bisa } } });
+              sisa = sisa.minus(bisa);
             }
           }
         }

@@ -637,6 +637,38 @@ export function jalurLamaBolehUntuk(pesanan: Pick<PesananSumber, "mode" | "baris
 export type TerkirimBelumDifaktur = { barisPesananId: string; jumlah: Angka };
 
 /**
+ * Urutan kunci baris pesanan penjualan (tinjauan P25 R6, P27 R1): jalur yang memperbarui jumlahTerkirim atau
+ * jumlahDifaktur mengunci baris pesanannya lebih dulu, urut `urutan` lalu id. Kuncinya FOR NO KEY UPDATE, sama dengan
+ * UPDATE biasa, jadi tidak bentrok dengan FOR KEY SHARE dari sisipan baris SJ atau faktur yang menaut baris itu.
+ * Tanpa `ids`: semua baris pesanan (buatFaktur dan hapus faktur). Dengan `ids`: baris itu saja (surat jalan).
+ */
+export async function kunciBarisPesananPenjualan(tx: Prisma.TransactionClient, pesananId: string, ids?: readonly string[]) {
+  if (ids === undefined) {
+    await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesananId} ORDER BY "urutan", "id" FOR NO KEY UPDATE`;
+  } else if (ids.length > 0) {
+    await tx.$queryRaw`SELECT "id" FROM "BarisPesananPenjualan" WHERE "pesananId" = ${pesananId} AND "id" = ANY(${[...new Set(ids)]}::text[]) ORDER BY "urutan", "id" FOR NO KEY UPDATE`;
+  }
+}
+
+/**
+ * Kunci baris SJ (FOR UPDATE, urut id) sebelum sisa jumlahDifaktur-nya dibaca atau diubah (tinjauan P27 S1). Dipanggil
+ * sesudah kunci baris pesanan. `barangIds` membatasi ke barang tertentu; tanpa itu semua baris SJ pesanan.
+ */
+export async function kunciBarisSuratJalanPesanan(tx: Prisma.TransactionClient, pesananId: string, barangIds?: readonly string[]) {
+  if (barangIds === undefined) {
+    await tx.$queryRaw`SELECT "id" FROM "BarisPengiriman" WHERE "pengirimanId" IN (SELECT "id" FROM "PengirimanPesanan" WHERE "pesananId" = ${pesananId}) ORDER BY "id" FOR UPDATE`;
+  } else if (barangIds.length > 0) {
+    await tx.$queryRaw`SELECT "id" FROM "BarisPengiriman" WHERE "pengirimanId" IN (SELECT "id" FROM "PengirimanPesanan" WHERE "pesananId" = ${pesananId}) AND "barangId" = ANY(${[...new Set(barangIds)]}::text[]) ORDER BY "id" FOR UPDATE`;
+  }
+}
+
+/** Kunci baris SJ tertentu (FOR UPDATE, urut id), misalnya baris yang tercatat di KonsumsiSuratJalan sebuah faktur. */
+export async function kunciBarisSuratJalan(tx: Prisma.TransactionClient, ids: readonly string[]) {
+  if (ids.length === 0) return;
+  await tx.$queryRaw`SELECT "id" FROM "BarisPengiriman" WHERE "id" = ANY(${[...new Set(ids)]}::text[]) ORDER BY "id" FOR UPDATE`;
+}
+
+/**
  * Baris SJ pesanan yang belum habis difaktur, urut tanggal SJ lalu id (urutan konsumsi transit di buatFaktur). Dipakai
  * jalur lama untuk mendahulukan baris pesanan yang barangnya sudah dikirim (tinjauan P25 T1).
  */

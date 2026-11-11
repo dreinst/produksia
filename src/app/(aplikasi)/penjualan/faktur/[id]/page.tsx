@@ -44,6 +44,8 @@ export default async function HalamanDetailFaktur({ params }: { params: Promise<
   if (!f) notFound();
 
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
+  const lihatPenerimaan = boleh("penerimaan.lihat");
+  const lihatRetur = boleh("retur-penjualan.lihat");
   const tampil = nomorTampil(f);
   const disetujui = f.statusPersetujuan === "DISETUJUI";
   const terbayar = jumlahkan(f.penerimaan.map((r) => D(r.jumlah).plus(D(r.potonganPajak))));
@@ -165,41 +167,48 @@ export default async function HalamanDetailFaktur({ params }: { params: Promise<
         <TabelBarisDokumen baris={f.baris.map(barisTampil)} mode={f.mode} />
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Kartu judul="Penerimaan">
-          {f.penerimaan.length === 0 ? (
-            <p className="text-sm text-slate-500">Belum ada penerimaan.</p>
-          ) : (
-            <ul className="text-sm divide-y divide-slate-100">
-              {f.penerimaan.map((r) => (
-                <BarisTurunan key={r.id} jenis="Penerimaan" nomor={r.nomor} nomorCetak={r.nomorCetak} tanggal={r.tanggal} href={boleh("penerimaan.lihat") ? `/penjualan/penerimaan/${r.id}` : undefined}>
-                  <Rp nilai={D(r.jumlah)} />
-                  {D(r.potonganPajak).gt(0) && (
-                    <span className="text-slate-500">
-                      + PPh 23 <Rp nilai={D(r.potonganPajak)} />
-                    </span>
-                  )}
-                  <span className="text-slate-500">{labelMetodeBayar(r.metodeBayar)}</span>
-                </BarisTurunan>
-              ))}
-            </ul>
+      {/* rincian penerimaan dan retur hanya untuk pemegang hak lihat jenisnya; angka agregat tetap di Ringkasan (tinjauan P27 R3) */}
+      {(lihatPenerimaan || lihatRetur) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {lihatPenerimaan && (
+            <Kartu judul="Penerimaan">
+              {f.penerimaan.length === 0 ? (
+                <p className="text-sm text-slate-500">Belum ada penerimaan.</p>
+              ) : (
+                <ul className="text-sm divide-y divide-slate-100">
+                  {f.penerimaan.map((r) => (
+                    <BarisTurunan key={r.id} jenis="Penerimaan" nomor={r.nomor} nomorCetak={r.nomorCetak} tanggal={r.tanggal} href={`/penjualan/penerimaan/${r.id}`}>
+                      <Rp nilai={D(r.jumlah)} />
+                      {D(r.potonganPajak).gt(0) && (
+                        <span className="text-slate-500">
+                          + PPh 23 <Rp nilai={D(r.potonganPajak)} />
+                        </span>
+                      )}
+                      <span className="text-slate-500">{labelMetodeBayar(r.metodeBayar)}</span>
+                    </BarisTurunan>
+                  ))}
+                </ul>
+              )}
+            </Kartu>
           )}
-        </Kartu>
-        <Kartu judul="Retur">
-          {f.retur.length === 0 ? (
-            <p className="text-sm text-slate-500">Belum ada retur.</p>
-          ) : (
-            <ul className="text-sm divide-y divide-slate-100">
-              {f.retur.map((r) => (
-                <BarisTurunan key={r.id} jenis="Retur" nomor={r.nomor} tanggal={r.tanggal}>
-                  <Rp nilai={D(r.total)} />
-                  <LencanaPersetujuan status={r.statusPersetujuan} />
-                </BarisTurunan>
-              ))}
-            </ul>
+          {lihatRetur && (
+            <Kartu judul="Retur">
+              {f.retur.length === 0 ? (
+                <p className="text-sm text-slate-500">Belum ada retur.</p>
+              ) : (
+                <ul className="text-sm divide-y divide-slate-100">
+                  {f.retur.map((r) => (
+                    <BarisTurunan key={r.id} jenis="Retur" nomor={r.nomor} tanggal={r.tanggal}>
+                      <Rp nilai={D(r.total)} />
+                      <LencanaPersetujuan status={r.statusPersetujuan} />
+                    </BarisTurunan>
+                  ))}
+                </ul>
+              )}
+            </Kartu>
           )}
-        </Kartu>
-      </div>
+        </div>
+      )}
 
       <KartuTeksSurat teks={f} />
 

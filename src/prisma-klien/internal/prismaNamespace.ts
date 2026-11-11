@@ -420,6 +420,7 @@ export const ModelName = {
   BarisPesananPenjualan: 'BarisPesananPenjualan',
   PengirimanPesanan: 'PengirimanPesanan',
   BarisPengiriman: 'BarisPengiriman',
+  KonsumsiSuratJalan: 'KonsumsiSuratJalan',
   FakturPenjualan: 'FakturPenjualan',
   BarisFakturPenjualan: 'BarisFakturPenjualan',
   UangMukaPelanggan: 'UangMukaPelanggan',
@@ -513,7 +514,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "perusahaan" | "tutupBukuPerusahaan" | "transaksiAntarPerusahaan" | "mataUang" | "kursMataUang" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "dokumenKas" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "foto" | "peminjamanBarang" | "barisPeminjamanBarang" | "laporanKerusakanBarang" | "barisKerusakanBarang" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "penggajian" | "barisPenggajian" | "pemetaanAkunTambahan" | "logAktivitas" | "folderBerkas" | "berkas" | "isiBerkas" | "tautanBagiBerkas" | "aksesBerkasProyek" | "aksesBerkasProyekPengguna" | "notifikasi" | "rencanaTermin" | "formatNomor" | "penghitungNomor" | "pengaturanDokumenPenjualan" | "kopSurat" | "templateCetak" | "asetKopSurat" | "tahapLead" | "sumberLead" | "lead" | "aktivitasLead" | "tindakLanjut" | "kategoriAnggaran" | "akunKategoriAnggaran" | "barisAnggaranProyek" | "mitraProyek" | "talanganMitra" | "pembayaranMitra" | "konten" | "riwayatPersetujuanKonten" | "tugasDesain" | "revisiDesain" | "kampanye" | "setIklan" | "iklan" | "metrikIklan" | "pengaturanPemasaran"
+    modelProps: "pengguna" | "sesi" | "percobaanMasuk" | "perusahaan" | "tutupBukuPerusahaan" | "transaksiAntarPerusahaan" | "mataUang" | "kursMataUang" | "departemen" | "karyawan" | "pelanggan" | "pemasok" | "proyek" | "gudang" | "kelompokBarang" | "barang" | "stokBarang" | "penawaranPenjualan" | "barisPenawaranPenjualan" | "pesananPenjualan" | "barisPesananPenjualan" | "pengirimanPesanan" | "barisPengiriman" | "konsumsiSuratJalan" | "fakturPenjualan" | "barisFakturPenjualan" | "uangMukaPelanggan" | "pemakaianUangMuka" | "penerimaanPenjualan" | "returPenjualan" | "barisReturPenjualan" | "pesananPembelian" | "barisPesananPembelian" | "penerimaanBarang" | "barisPenerimaanBarang" | "fakturPembelian" | "barisFakturPembelian" | "pembayaranPembelian" | "returPembelian" | "barisReturPembelian" | "akun" | "pemetaanAkun" | "jurnal" | "barisJurnal" | "dokumenKas" | "asetTetap" | "pelepasanAset" | "penyusutanAset" | "pindahBarang" | "barisPindahBarang" | "penyesuaianPersediaan" | "barisPenyesuaianPersediaan" | "foto" | "peminjamanBarang" | "barisPeminjamanBarang" | "laporanKerusakanBarang" | "barisKerusakanBarang" | "pengaturanPerusahaan" | "tutupBuku" | "pphFinalBulanan" | "hakAksesPeran" | "permintaanAturUlang" | "mutasiBank" | "prive" | "penggajian" | "barisPenggajian" | "pemetaanAkunTambahan" | "logAktivitas" | "folderBerkas" | "berkas" | "isiBerkas" | "tautanBagiBerkas" | "aksesBerkasProyek" | "aksesBerkasProyekPengguna" | "notifikasi" | "rencanaTermin" | "formatNomor" | "penghitungNomor" | "pengaturanDokumenPenjualan" | "kopSurat" | "templateCetak" | "asetKopSurat" | "tahapLead" | "sumberLead" | "lead" | "aktivitasLead" | "tindakLanjut" | "kategoriAnggaran" | "akunKategoriAnggaran" | "barisAnggaranProyek" | "mitraProyek" | "talanganMitra" | "pembayaranMitra" | "konten" | "riwayatPersetujuanKonten" | "tugasDesain" | "revisiDesain" | "kampanye" | "setIklan" | "iklan" | "metrikIklan" | "pengaturanPemasaran"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2216,6 +2217,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.BarisPengirimanCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.BarisPengirimanCountAggregateOutputType> | number
+        }
+      }
+    }
+    KonsumsiSuratJalan: {
+      payload: Prisma.$KonsumsiSuratJalanPayload<ExtArgs>
+      fields: Prisma.KonsumsiSuratJalanFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.KonsumsiSuratJalanFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.KonsumsiSuratJalanFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>
+        }
+        findFirst: {
+          args: Prisma.KonsumsiSuratJalanFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.KonsumsiSuratJalanFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>
+        }
+        findMany: {
+          args: Prisma.KonsumsiSuratJalanFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>[]
+        }
+        create: {
+          args: Prisma.KonsumsiSuratJalanCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>
+        }
+        createMany: {
+          args: Prisma.KonsumsiSuratJalanCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.KonsumsiSuratJalanCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>[]
+        }
+        delete: {
+          args: Prisma.KonsumsiSuratJalanDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>
+        }
+        update: {
+          args: Prisma.KonsumsiSuratJalanUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>
+        }
+        deleteMany: {
+          args: Prisma.KonsumsiSuratJalanDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.KonsumsiSuratJalanUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.KonsumsiSuratJalanUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>[]
+        }
+        upsert: {
+          args: Prisma.KonsumsiSuratJalanUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KonsumsiSuratJalanPayload>
+        }
+        aggregate: {
+          args: Prisma.KonsumsiSuratJalanAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKonsumsiSuratJalan>
+        }
+        groupBy: {
+          args: Prisma.KonsumsiSuratJalanGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KonsumsiSuratJalanGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.KonsumsiSuratJalanCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KonsumsiSuratJalanCountAggregateOutputType> | number
         }
       }
     }
@@ -8474,6 +8549,18 @@ export const BarisPengirimanScalarFieldEnum = {
 export type BarisPengirimanScalarFieldEnum = (typeof BarisPengirimanScalarFieldEnum)[keyof typeof BarisPengirimanScalarFieldEnum]
 
 
+export const KonsumsiSuratJalanScalarFieldEnum = {
+  id: 'id',
+  barisFakturId: 'barisFakturId',
+  barisPengirimanId: 'barisPengirimanId',
+  jumlah: 'jumlah',
+  nilaiTransit: 'nilaiTransit',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type KonsumsiSuratJalanScalarFieldEnum = (typeof KonsumsiSuratJalanScalarFieldEnum)[keyof typeof KonsumsiSuratJalanScalarFieldEnum]
+
+
 export const FakturPenjualanScalarFieldEnum = {
   id: 'id',
   nomor: 'nomor',
@@ -8495,6 +8582,7 @@ export const FakturPenjualanScalarFieldEnum = {
   kursRevaluasi: 'kursRevaluasi',
   revaluasiPada: 'revaluasiPada',
   jurnalId: 'jurnalId',
+  konsumsiSjTercatat: 'konsumsiSjTercatat',
   perusahaanId: 'perusahaanId',
   statusPersetujuan: 'statusPersetujuan',
   diajukanOlehId: 'diajukanOlehId',
@@ -10895,6 +10983,7 @@ export type GlobalOmitConfig = {
   barisPesananPenjualan?: Prisma.BarisPesananPenjualanOmit
   pengirimanPesanan?: Prisma.PengirimanPesananOmit
   barisPengiriman?: Prisma.BarisPengirimanOmit
+  konsumsiSuratJalan?: Prisma.KonsumsiSuratJalanOmit
   fakturPenjualan?: Prisma.FakturPenjualanOmit
   barisFakturPenjualan?: Prisma.BarisFakturPenjualanOmit
   uangMukaPelanggan?: Prisma.UangMukaPelangganOmit

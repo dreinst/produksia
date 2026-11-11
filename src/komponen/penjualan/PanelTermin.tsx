@@ -21,6 +21,11 @@ type Props =
       bolehUbah: boolean;
       /** tautan "Catat pembayaran" (uang-muka.buat dan pesanan belum difaktur semua) */
       bolehBayar: boolean;
+      /**
+       * uang-muka.lihat dan penerimaan.lihat: angka diterima, dibayar, sisa, progres, dan status bayar per butir.
+       * Tanpa itu panel hanya menampilkan rencana dan status tagih (tinjauan P27 R4).
+       */
+      lihatBayar: boolean;
     };
 
 const GAYA_STATUS_BUTIR: Record<StatusButirTermin, string> = {
@@ -71,7 +76,7 @@ export default function PanelTermin(p: Props) {
     );
   }
 
-  const { progres } = p;
+  const { progres, lihatBayar } = p;
   const kontrak = progres.nilaiKontrakBruto;
   const lebar = kontrak.gt(0) ? Math.min(100, progres.totalDiterima.div(kontrak).mul(100).toNumber()) : 0;
   return (
@@ -81,21 +86,27 @@ export default function PanelTermin(p: Props) {
           <p className="teks-label">Nilai kontrak (termasuk PPN)</p>
           <p className="font-semibold text-slate-900"><Rp nilai={kontrak} /></p>
         </div>
-        <div>
-          <p className="teks-label">Sudah diterima</p>
-          <p className="font-semibold text-emerald-700"><Rp nilai={progres.totalDiterima} /></p>
-        </div>
-        <div>
-          <p className="teks-label">Belum dibayar</p>
-          <p className="font-semibold text-slate-900"><Rp nilai={progres.belumDibayar} /></p>
-        </div>
+        {lihatBayar && (
+          <>
+            <div>
+              <p className="teks-label">Sudah diterima</p>
+              <p className="font-semibold text-emerald-700"><Rp nilai={progres.totalDiterima} /></p>
+            </div>
+            <div>
+              <p className="teks-label">Belum dibayar</p>
+              <p className="font-semibold text-slate-900"><Rp nilai={progres.belumDibayar} /></p>
+            </div>
+          </>
+        )}
       </div>
-      <div className="h-2 rounded-full bg-slate-100" role="progressbar" aria-label="Progres pembayaran" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(lebar)}>
-        <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${lebar}%` }} />
-      </div>
+      {lihatBayar && (
+        <div className="h-2 rounded-full bg-slate-100" role="progressbar" aria-label="Progres pembayaran" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(lebar)}>
+          <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${lebar}%` }} />
+        </div>
+      )}
 
       <div className="bungkus-tabel">
-        <table className="tabel min-w-[64rem]">
+        <table className={`tabel ${lihatBayar ? "min-w-[64rem]" : "min-w-[48rem]"}`}>
           <thead>
             <tr>
               <th>No</th>
@@ -104,8 +115,8 @@ export default function PanelTermin(p: Props) {
               <th className="text-right">Nilai</th>
               <th className="text-right">Termasuk PPN</th>
               <th>Jatuh tempo</th>
-              <th className="text-right">Dibayar</th>
-              <th className="text-right">Sisa</th>
+              {lihatBayar && <th className="text-right">Dibayar</th>}
+              {lihatBayar && <th className="text-right">Sisa</th>}
               <th>Status</th>
               <th className="th-lekat" />
             </tr>
@@ -123,13 +134,18 @@ export default function PanelTermin(p: Props) {
                 <td className="text-right"><Rp nilai={b.jumlah} /></td>
                 <td className="text-right"><Rp nilai={b.bruto} /></td>
                 <td className="whitespace-nowrap text-slate-600">{tanggal(b.jatuhTempo)}</td>
-                <td className="text-right"><Rp nilai={b.dibayar} /></td>
-                <td className="text-right font-medium"><Rp nilai={b.sisa} /></td>
+                {lihatBayar && <td className="text-right"><Rp nilai={b.dibayar} /></td>}
+                {lihatBayar && <td className="text-right font-medium"><Rp nilai={b.sisa} /></td>}
                 <td>
-                  <span className="flex flex-wrap gap-1">
-                    <span className={`lencana ${GAYA_STATUS_BUTIR[b.status]}`}>{b.status}</span>
-                    {b.lewatJatuhTempo && <span className="lencana lencana-rose">Lewat jatuh tempo</span>}
-                  </span>
+                  {lihatBayar ? (
+                    <span className="flex flex-wrap gap-1">
+                      <span className={`lencana ${GAYA_STATUS_BUTIR[b.status]}`}>{b.status}</span>
+                      {b.lewatJatuhTempo && <span className="lencana lencana-rose">Lewat jatuh tempo</span>}
+                    </span>
+                  ) : (
+                    // status bayar (Lunas, Dibayar sebagian, lewat jatuh tempo) bersumber dari uang muka dan penerimaan
+                    <span className={`lencana ${b.ditagihPada ? GAYA_STATUS_BUTIR.Ditagih : GAYA_STATUS_BUTIR["Belum ditagih"]}`}>{b.ditagihPada ? "Ditagih" : "Belum ditagih"}</span>
+                  )}
                 </td>
                 <td className="td-lekat">
                   <AksiButir pesananId={p.pesananId} butir={b} bolehUbah={p.bolehUbah} bolehBayar={p.bolehBayar} />
@@ -140,7 +156,7 @@ export default function PanelTermin(p: Props) {
         </table>
       </div>
 
-      {progres.dpTanpaTermin.gt(0) && (
+      {lihatBayar && progres.dpTanpaTermin.gt(0) && (
         <p className="text-sm text-slate-600">
           Uang muka tanpa termin: Rp <Rp nilai={progres.dpTanpaTermin} />
         </p>

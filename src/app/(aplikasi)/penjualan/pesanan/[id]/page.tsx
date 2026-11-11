@@ -56,7 +56,12 @@ export default async function HalamanDetailPesanan({ params }: { params: Promise
     p.rencanaTermin.length > 0
       ? hitungProgresTermin({ total: p.total, ppnPersen: p.ppnPersen, butir: p.rencanaTermin, uangMuka: p.uangMuka, penerimaan: p.faktur.flatMap((f) => f.penerimaan) })
       : null;
-  const adaTurunan = p.penawaran || p.pengiriman.length > 0 || p.faktur.length > 0 || p.uangMuka.length > 0;
+  // dihitung dari daftar yang sudah disaring hak, supaya kartu tidak tampil kosong (tinjauan P27 R5)
+  const adaTurunan =
+    !!p.penawaran ||
+    (boleh("pengiriman.lihat") && p.pengiriman.length > 0) ||
+    (boleh("uang-muka.lihat") && p.uangMuka.length > 0) ||
+    (boleh("faktur.lihat") && p.faktur.length > 0);
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -149,7 +154,14 @@ export default async function HalamanDetailPesanan({ params }: { params: Promise
 
       {progres && (
         <Kartu judul="Termin pembayaran">
-          <PanelTermin jenis="pesanan" pesananId={p.id} progres={progres} bolehUbah={boleh("pesanan.ubah")} bolehBayar={!difakturSemua && boleh("uang-muka.buat")} />
+          <PanelTermin
+            jenis="pesanan"
+            pesananId={p.id}
+            progres={progres}
+            bolehUbah={boleh("pesanan.ubah")}
+            bolehBayar={!difakturSemua && boleh("uang-muka.buat")}
+            lihatBayar={boleh("uang-muka.lihat") && boleh("penerimaan.lihat")}
+          />
         </Kartu>
       )}
 

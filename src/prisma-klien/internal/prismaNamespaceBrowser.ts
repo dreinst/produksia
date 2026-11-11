@@ -74,6 +74,7 @@ export const ModelName = {
   BarisPesananPenjualan: 'BarisPesananPenjualan',
   PengirimanPesanan: 'PengirimanPesanan',
   BarisPengiriman: 'BarisPengiriman',
+  KonsumsiSuratJalan: 'KonsumsiSuratJalan',
   FakturPenjualan: 'FakturPenjualan',
   BarisFakturPenjualan: 'BarisFakturPenjualan',
   UangMukaPelanggan: 'UangMukaPelanggan',
@@ -614,6 +615,18 @@ export const BarisPengirimanScalarFieldEnum = {
 export type BarisPengirimanScalarFieldEnum = (typeof BarisPengirimanScalarFieldEnum)[keyof typeof BarisPengirimanScalarFieldEnum]
 
 
+export const KonsumsiSuratJalanScalarFieldEnum = {
+  id: 'id',
+  barisFakturId: 'barisFakturId',
+  barisPengirimanId: 'barisPengirimanId',
+  jumlah: 'jumlah',
+  nilaiTransit: 'nilaiTransit',
+  dibuatPada: 'dibuatPada'
+} as const
+
+export type KonsumsiSuratJalanScalarFieldEnum = (typeof KonsumsiSuratJalanScalarFieldEnum)[keyof typeof KonsumsiSuratJalanScalarFieldEnum]
+
+
 export const FakturPenjualanScalarFieldEnum = {
   id: 'id',
   nomor: 'nomor',
@@ -635,6 +648,7 @@ export const FakturPenjualanScalarFieldEnum = {
   kursRevaluasi: 'kursRevaluasi',
   revaluasiPada: 'revaluasiPada',
   jurnalId: 'jurnalId',
+  konsumsiSjTercatat: 'konsumsiSjTercatat',
   perusahaanId: 'perusahaanId',
   statusPersetujuan: 'statusPersetujuan',
   diajukanOlehId: 'diajukanOlehId',

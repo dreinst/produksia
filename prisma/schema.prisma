@@ -1056,10 +1056,29 @@ model BarisPengiriman {
   hargaPokok     Decimal               @default(0) @db.Decimal(18, 2)
   /// bagian dari baris ini yang sudah dikonsumsi Faktur Penjualan (HPP sudah diakui)
   jumlahDifaktur Decimal               @default(0) @db.Decimal(18, 2)
+  konsumsiFaktur KonsumsiSuratJalan[]
 
   @@index([pengirimanId])
   @@index([barisPesananId])
   @@index([barangId])
+}
+
+/// Catatan baris SJ yang dikonsumsi satu baris faktur penjualan (jumlah dan nilai transitnya), ditulis buatFaktur.
+/// Hapus faktur membalik persis catatan ini, termasuk konsumsi lintas baris pesanan (SJ yatim). Faktur yang dibuat
+/// sebelum tabel ini ada (`FakturPenjualan.konsumsiSjTercatat` = false) dibalik dengan cara lama per barang.
+model KonsumsiSuratJalan {
+  id                String               @id @default(cuid())
+  barisFakturId     String
+  barisFaktur       BarisFakturPenjualan @relation(fields: [barisFakturId], references: [id], onDelete: Cascade)
+  barisPengirimanId String
+  barisPengiriman   BarisPengiriman      @relation(fields: [barisPengirimanId], references: [id], onDelete: Restrict)
+  jumlah            Decimal              @db.Decimal(18, 2)
+  /// jumlah x harga pokok baris SJ; jumlah per baris faktur = BarisFakturPenjualan.nilaiTransit
+  nilaiTransit      Decimal              @db.Decimal(18, 2)
+  dibuatPada        DateTime             @default(now())
+
+  @@index([barisFakturId])
+  @@index([barisPengirimanId])
 }
 
 model FakturPenjualan {
@@ -1097,6 +1116,10 @@ model FakturPenjualan {
   jurnalId          String?             @unique
   jurnal            Jurnal?             @relation("JurnalFakturPenjualan", fields: [jurnalId], references: [id])
   pemakaianUangMuka PemakaianUangMuka[]
+
+  /// true = konsumsi SJ faktur ini tercatat lengkap di KonsumsiSuratJalan (buatFaktur sejak tabel itu ada), termasuk
+  /// faktur yang tidak mengonsumsi SJ sama sekali. false = faktur lama; hapus faktur memakai pembalikan kode lama.
+  konsumsiSjTercatat Boolean @default(false)
 
   /// Pemilik pembukuan (lihat model Perusahaan). Dokumen anak mewarisi induknya; jurnal mewarisi dokumennya.
   perusahaanId String     @default("utama")
@@ -1195,6 +1218,7 @@ model BarisFakturPenjualan {
   barisPesananId  String?
   barisPesanan    BarisPesananPenjualan? @relation(fields: [barisPesananId], references: [id], onDelete: SetNull)
   barisRetur      BarisReturPenjualan[]
+  konsumsiSj      KonsumsiSuratJalan[]
 
   @@index([fakturId])
   @@index([barangId])

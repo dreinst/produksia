@@ -143,6 +143,13 @@ export type PengirimanPesanan = Prisma.PengirimanPesananModel
  */
 export type BarisPengiriman = Prisma.BarisPengirimanModel
 /**
+ * Model KonsumsiSuratJalan
+ * Catatan baris SJ yang dikonsumsi satu baris faktur penjualan (jumlah dan nilai transitnya), ditulis buatFaktur.
+ * Hapus faktur membalik persis catatan ini, termasuk konsumsi lintas baris pesanan (SJ yatim). Faktur yang dibuat
+ * sebelum tabel ini ada (`FakturPenjualan.konsumsiSjTercatat` = false) dibalik dengan cara lama per barang.
+ */
+export type KonsumsiSuratJalan = Prisma.KonsumsiSuratJalanModel
+/**
  * Model FakturPenjualan
  * 
  */
