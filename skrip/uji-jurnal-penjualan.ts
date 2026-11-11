@@ -36,8 +36,10 @@ import { harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
  * 8. persetujuan bersamaan (tinjauan P21 butir 1): dua setujui atas faktur atau kas masuk yang sama menghasilkan satu
  *    jurnal dan satu nomor cetak, setujui dan tolak bersamaan berakhir konsisten, ajukan ganda tercatat sekali;
  * 9. basis kas memakai akun Pendapatan Penjualan untuk bagian fee bila pemetaan fee bukan akun rinci Pendapatan
- *    (tinjauan P21 butir 3).
- * Bagian 1-6 dan 9 berjalan di transaksi yang selalu dibatalkan. Data bagian 5 (alur sungguhan), 7, dan 8 dihapus di akhir,
+ *    (tinjauan P21 butir 3);
+ * 10. hapus dan setujui serentak atas faktur dan kas masuk yang sama (temuan sampingan perbaikan P21): hasilnya selalu
+ *    konsisten, tidak ada jurnal tanpa dokumen.
+ * Bagian 1-6 dan 9 berjalan di transaksi yang selalu dibatalkan. Data bagian 5 (alur sungguhan), 7, 8, dan 10 dihapus di akhir,
  * pemetaan tambahan fee uji dipulihkan, dan periksaSinkron(db) sama dengan sebelum uji.
  */
 
@@ -541,6 +543,76 @@ async function main() {
       // UM 30% dari total: seluruh 20.083.800 tetap pendapatan kas, termasuk bagian fee 1.825.800 di akun bawaan
       pastikan(hasil.total === "20083800.00" && D(hasil.k4200).plus(hasil.bawaan).toFixed(2) === "20083800.00", `pemetaan fee ${label}: kas uang muka utuh di pendapatan (${hasil.total}, kamar ${hasil.k4200}, bawaan ${hasil.bawaan})`);
     }
+
+    console.log("=== 10. Hapus dan setujui serentak: tidak ada jurnal tanpa dokumen ===");
+    // Urutan dibuat pasti: transaksi penahan mengunci baris dokumen, aksi pertama dijalankan dan ditunggu sampai masuk
+    // antrean kunci, baru aksi kedua, lalu penahan dilepas. Setujui lebih dulu: hapus menunggu, lalu membuang jurnal
+    // hasil persetujuan bersama dokumennya. Hapus lebih dulu: setujui ditolak "tidak ditemukan". Tanpa kunci baris di
+    // hapusDokumen, hapus membaca jurnalId lama (null) sebelum persetujuan selesai, sehingga jurnalnya tertinggal.
+    const tungguAntre = async (n: number) => {
+      for (let t = 0; t < 400; t++) {
+        const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`SELECT count(*)::int AS "antre" FROM pg_locks WHERE NOT granted`;
+        if (antre >= n) return;
+        await new Promise((r) => setTimeout(r, 25));
+      }
+      throw new Error(`antrean kunci tidak mencapai ${n}`);
+    };
+    const berantre = async (jenis: JenisPersetujuan, id: string, kerja: (() => Promise<unknown>)[]): Promise<PromiseSettledResult<unknown>[]> => {
+      let lepas!: () => void;
+      let siap!: () => void;
+      const tahan = new Promise<void>((r) => (lepas = r));
+      const terkunci = new Promise<void>((r) => (siap = r));
+      const penahan = db.$transaction(
+        async (tx) => {
+          await BERKAS[jenis].kunci(tx, id);
+          siap();
+          await tahan;
+        },
+        { timeout: 60_000 },
+      );
+      await terkunci;
+      const hasil: Promise<PromiseSettledResult<unknown>>[] = [];
+      try {
+        for (const [i, k] of kerja.entries()) {
+          hasil.push(sesudahCommit(k).then((value) => ({ status: "fulfilled" as const, value }), (reason: unknown) => ({ status: "rejected" as const, reason })));
+          await tungguAntre(i + 1);
+        }
+      } finally {
+        lepas();
+        await penahan;
+      }
+      return Promise.all(hasil);
+    };
+    for (const [i, setujuiDulu] of [true, false, true, false].entries()) {
+      const f = await buatDraf(db, `${AWALAN}-FJH${i + 1}`, { diajukanOlehId: kasir.id });
+      const setujui = () => setujuiDokumen("faktur", f.id);
+      const hapus = () => hapusDokumen("faktur", f.id);
+      const h = await sebagai("owner", () => berantre("faktur", f.id, setujuiDulu ? [setujui, hapus] : [hapus, setujui]));
+      const [hSetujui, hHapus] = setujuiDulu ? h : [h[1], h[0]];
+      const jurnalF = await jumlahJurnal(f.nomor);
+      const setujuiSesuai = setujuiDulu ? hSetujui.status === "fulfilled" : ditolakDengan([hSetujui]).every((t) => t.includes("tidak ditemukan")) && hSetujui.status === "rejected";
+      pastikan(
+        hHapus.status === "fulfilled" && setujuiSesuai && (await db.fakturPenjualan.count({ where: { id: f.id } })) === 0 && jurnalF === 0 && (await db.logAktivitas.count({ where: { aksi: "HAPUS", nomor: f.nomor } })) === 1,
+        `faktur, ${setujuiDulu ? "setujui lalu hapus" : "hapus lalu setujui"}: hapus berhasil, faktur dan jurnalnya hilang (jurnal ${jurnalF}) ${JSON.stringify(ditolakDengan(h))}`,
+      );
+    }
+    for (const [i, setujuiDulu] of [true, false].entries()) {
+      const nomor = `${AWALAN}-KMH${i + 1}`;
+      const km = await db.dokumenKas.create({ data: { nomor, jenis: "MASUK", akunKasId: kKas, akunLawanId: m.pendapatanPenjualanId!, jumlah: 2_000 * (i + 1), keterangan: `Kas masuk uji ${nomor}`, dibuatOleh: "kasir" } });
+      await sebagai("kasir", () => jalankan(`ajukan ${nomor}`, () => ajukanDokumen("dokumenKas", km.id)));
+      const setujui = () => setujuiDokumen("dokumenKas", km.id);
+      const hapus = () => hapusDokumen("dokumenKas", km.id);
+      const h = await sebagai("owner", () => berantre("dokumenKas", km.id, setujuiDulu ? [setujui, hapus] : [hapus, setujui]));
+      const [hSetujui, hHapus] = setujuiDulu ? h : [h[1], h[0]];
+      const jurnalKm = await jumlahJurnal(nomor);
+      pastikan(
+        hHapus.status === "fulfilled" && hSetujui.status === (setujuiDulu ? "fulfilled" : "rejected") && (await db.dokumenKas.count({ where: { id: km.id } })) === 0 && jurnalKm === 0,
+        `kas masuk, ${setujuiDulu ? "setujui lalu hapus" : "hapus lalu setujui"}: dokumen dan jurnal KM hilang (jurnal ${jurnalKm}) ${JSON.stringify(ditolakDengan(h))}`,
+      );
+    }
+    const yatim = await db.jurnal.count({ where: { OR: [{ keterangan: { contains: `${AWALAN}-FJH` } }, { keterangan: { contains: `${AWALAN}-KMH` } }], fakturPenjualan: { is: null }, dokumenKas: { is: null } } });
+    pastikan(yatim === 0, `tidak ada jurnal faktur atau kas masuk uji tanpa dokumen (${yatim})`);
+    pastikan((await periksaSinkron(db)).seimbang, "periksaSinkron seimbang sesudah hapus dan setujui serentak");
   } finally {
     await bersihkan();
     if (feeAwal) await db.pemetaanAkunTambahan.create({ data: feeAwal });

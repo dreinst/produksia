@@ -59,18 +59,22 @@ import { formulir, harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
  * karyawan KRY-UJICRM (bila admin belum punya karyawan), pelanggan UJICRM-P1, lead dan tindak lanjut berawalan
  * "UjiCRM ". Pengguna seed owner, owner2, admin, dan kasir dipakai sebagai pelaku nyata. Semua data uji, notifikasi
  * untuk pengguna seed sejak uji mulai, dan log modul crm sejak uji mulai dihapus di akhir. CRM tidak membuat jurnal.
+ * Bagian 17b (perbaikan tinjauan P22) memakai perusahaan UJICRMR1 sampai UJICRMR4 dan penyesuaian hak sementara
+ * ADMIN tanpa lead.lihat, keduanya dibuang lagi.
  */
 
 const AWALAN = "UjiCRM ";
 const KODE_B = "UJICRMB";
 const KODE_C = "UJICRMC";
+/** Perusahaan baru per putaran uji serentak buatLead dan pengaturan (tinjauan P22 R1). */
+const AWALAN_KODE_R1 = "UJICRMR";
 const KODE_P1 = "UJICRM-P1";
 const NONAKTIF = "uji-crm-nonaktif";
 const KODE_KARYAWAN = "KRY-UJICRM";
 
 /** Membersihkan semua data uji (di awal untuk sisa putaran yang terhenti, dan di akhir). */
 async function bersihkan(mulai: Date | null) {
-  const perusahaan = await db.perusahaan.findMany({ where: { kode: { in: [KODE_B, KODE_C] } }, select: { id: true } });
+  const perusahaan = await db.perusahaan.findMany({ where: { OR: [{ kode: { in: [KODE_B, KODE_C] } }, { kode: { startsWith: AWALAN_KODE_R1 } }] }, select: { id: true } });
   const pIds = perusahaan.map((p) => p.id);
   const lead = await db.lead.findMany({ where: { OR: [{ perusahaanId: { in: pIds } }, { nama: { startsWith: AWALAN } }] }, select: { id: true, pelangganId: true } });
   const leadIds = lead.map((l) => l.id);
@@ -86,6 +90,8 @@ async function bersihkan(mulai: Date | null) {
   }
   await db.pengguna.deleteMany({ where: { namaPengguna: NONAKTIF } });
   await db.perusahaan.deleteMany({ where: { id: { in: pIds } } });
+  // penyesuaian hak bagian 17b (ADMIN tanpa lead.lihat) bila putaran sebelumnya terhenti di tengah
+  await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "lead.lihat" } });
 }
 
 async function main() {
@@ -527,6 +533,98 @@ async function main() {
     pastikan(JSON.stringify(bacaTag(" A ,b, a,,")) === '["a","b"]' && JSON.stringify(bacaFieldTambahan("Nama: x\nnama: y\nLain:")) === '{"nama":"y","Lain":""}', "bacaTag dan bacaFieldTambahan: nama sama tanpa beda huruf besar, yang terakhir menimpa");
     await catatAktivitasLead(db, { leadId: leadB.id, jenis: "CATATAN", isi: "dari skrip", pengguna: { id: "skrip-uji", nama: "Skrip Uji" } });
     pastikan((await db.aktivitasLead.findFirstOrThrow({ where: { leadId: leadB.id, isi: "dari skrip" } })).penggunaId === null, "catatAktivitasLead: pengguna semu disimpan tanpa penggunaId");
+
+    console.log("=== 17b. Perbaikan tinjauan P22 (S1, R1, R3, R4) ===");
+    // S1: penerima berganti mengosongkan diingatkanPada, jadi penerima baru tetap diingatkan
+    const notifPengingat = (penggunaId: string, judul: string) => db.notifikasi.count({ where: { penggunaId, judul: "Tindak lanjut jatuh tempo", isi: judul } });
+    const judulS1 = `${AWALAN}TL S1`;
+    const ubahS1 = (nama: string, penerimaId: string, jatuhTempo = "2026-01-05T09:00") =>
+      sebagai(nama, () => ubahTindakLanjut(tlS1.id, formulir({ judul: judulS1, jatuhTempo, ditugaskanKeId: penerimaId })));
+    await jalankan("TL lewat jatuh tempo untuk admin", () => buatTL({ judul: judulS1, perusahaanId: B, jatuhTempo: "2026-01-05T09:00", ditugaskanKeId: admin.id }));
+    const tlS1 = await db.tindakLanjut.findFirstOrThrow({ where: { judul: judulS1 } });
+    await periksaPengingatTindakLanjut(admin.id, new Date(), { paksa: true });
+    pastikan((await notifPengingat(admin.id, judulS1)) === 1 && (await db.tindakLanjut.findUniqueOrThrow({ where: { id: tlS1.id } })).diingatkanPada !== null, "S1: admin diingatkan sekali, diingatkanPada terisi");
+    await jalankan("alihkan TL ke owner2 tanpa mengubah jatuh tempo", () => ubahS1("owner", owner2.id));
+    pastikan((await db.tindakLanjut.findUniqueOrThrow({ where: { id: tlS1.id } })).diingatkanPada === null, "S1: penerima berganti mengosongkan diingatkanPada walau jatuh tempo sama");
+    await periksaPengingatTindakLanjut(owner2.id, new Date(), { paksa: true });
+    pastikan((await notifPengingat(owner2.id, judulS1)) === 1 && (await notifPengingat(admin.id, judulS1)) === 1, "S1: owner2 (penerima baru) mendapat 1 pengingat, admin tetap 1");
+    const dialihkanOwner = await jumlahNotif(owner.id, "Tindak lanjut dialihkan ke Anda");
+    await jalankan("owner mengalihkan TL ke dirinya sendiri", () => ubahS1("owner", owner.id));
+    await periksaPengingatTindakLanjut(owner.id, new Date(), { paksa: true });
+    pastikan((await jumlahNotif(owner.id, "Tindak lanjut dialihkan ke Anda")) === dialihkanOwner && (await notifPengingat(owner.id, judulS1)) === 1, "S1: pelaku yang mengalihkan ke dirinya tidak mendapat notifikasi dialihkan, tetapi tetap mendapat pengingat");
+    await jalankan("ubah TL tanpa mengganti penerima dan jatuh tempo", () => ubahS1("owner", owner.id));
+    pastikan((await db.tindakLanjut.findUniqueOrThrow({ where: { id: tlS1.id } })).diingatkanPada !== null, "S1 kontrol: penerima dan jatuh tempo sama, diingatkanPada tetap");
+
+    // R3: PIC dan penerima pengingat yang kehilangan lead.lihat tidak diberi tahu
+    const kalahAwalAdmin = await jumlahNotif(admin.id, "Deal kalah: ");
+    const menangAwalAdmin = await jumlahNotif(admin.id, "Deal menang: ");
+    const judulR3 = `${AWALAN}TL R3`;
+    await jalankan("TL lewat jatuh tempo untuk admin (R3)", () => buatTL({ judul: judulR3, perusahaanId: B, jatuhTempo: "2026-01-05T09:00", ditugaskanKeId: admin.id }));
+    await db.hakAksesPeran.create({ data: { peran: "ADMIN", hak: "lead.lihat", boleh: false } });
+    try {
+      pastikan(k1.picId === admin.id, "lead K1 ber-PIC admin");
+      await jalankan("K1 ke Kalah saat ADMIN tanpa lead.lihat", () => pindah(k1.id, kalahB.id, "Uji R3"));
+      pastikan((await jumlahNotif(admin.id, "Deal kalah: ")) === kalahAwalAdmin && (await jumlahAktivitas(k1.id, "KALAH")) === 1, "R3: PIC tanpa lead.lihat tidak mendapat Deal kalah, pindah tahap tetap tercatat");
+      pastikan((await periksaPengingatTindakLanjut(admin.id, new Date(), { paksa: true })) === 0, "R3: periksaPengingatTindakLanjut untuk penerima tanpa lead.lihat: 0");
+      pastikan((await notifPengingat(admin.id, judulR3)) === 0 && (await db.tindakLanjut.findFirstOrThrow({ where: { judul: judulR3 } })).diingatkanPada === null, "R3: TL tidak diklaim, jadi bisa diingatkan bila hak kembali");
+    } finally {
+      await db.hakAksesPeran.deleteMany({ where: { peran: "ADMIN", hak: "lead.lihat" } });
+    }
+    await jalankan("K1 kembali ke Dihubungi", () => pindah(k1.id, dihubungi.id));
+    await jalankan("K1 ke Menang (hak ADMIN pulih)", () => pindah(k1.id, menangB.id));
+    pastikan((await jumlahNotif(admin.id, "Deal menang: ")) === menangAwalAdmin + 1, "R3 kontrol: PIC dengan lead.lihat mendapat Deal menang");
+    await periksaPengingatTindakLanjut(admin.id, new Date(), { paksa: true });
+    pastikan((await notifPengingat(admin.id, judulR3)) === 1, "R3 kontrol: sesudah hak pulih, pengingat TL R3 terkirim sekali");
+    await db.tindakLanjut.create({ data: { perusahaanId: B, judul: `${AWALAN}TL R3 nonaktif`, jatuhTempo: new Date("2026-01-05T02:00:00Z"), ditugaskanKeId: nonaktif.id, dibuatOlehNama: "Uji" } });
+    pastikan((await periksaPengingatTindakLanjut(nonaktif.id, new Date(), { paksa: true })) === 0 && (await db.tindakLanjut.findFirstOrThrow({ where: { judul: `${AWALAN}TL R3 nonaktif` } })).diingatkanPada === null, "R3: penerima nonaktif tidak diingatkan dan TL tidak diklaim");
+
+    // R1: buatLead dan tambah tahap atau sumber serentak di perusahaan yang belum pernah membuka CRM
+    for (let i = 1; i <= 4; i++) {
+      const kode = `${AWALAN_KODE_R1}${i}`;
+      const R = (await db.perusahaan.create({ data: { kode, nama: `PT Uji CRM R${i}`, urutan: 99 } })).id;
+      const pengaturan = i % 2 ? () => tambahTahapLead(formulir({ perusahaanId: R, nama: "Survei", jenis: "BERJALAN" })) : () => tambahSumberLead(formulir({ perusahaanId: R, nama: "TikTok" }));
+      const kerja = [() => buatLead(formLead({ perusahaanId: R, nama: `${AWALAN}R${i}`, namaUsaha: `PT Uji R${i}` })), pengaturan];
+      if (i > 2) kerja.reverse();
+      const hasil = await sebagai("owner", () =>
+        Promise.allSettled(
+          kerja.map(async (k) => {
+            try {
+              await k();
+            } catch (e) {
+              const digest = (e as { digest?: string })?.digest ?? "";
+              if (!digest.startsWith("NEXT_REDIRECT") && !String((e as Error)?.message ?? "").includes("static generation store missing")) throw e;
+            }
+          }),
+        ),
+      );
+      const galatR1 = hasil.filter((h): h is PromiseRejectedResult => h.status === "rejected").map((h) => (h.reason as Error).message);
+      const tahapR = await db.tahapLead.count({ where: { perusahaanId: R } });
+      const sumberR = await db.sumberLead.count({ where: { perusahaanId: R } });
+      pastikan(
+        galatR1.length === 0 && (await db.lead.count({ where: { perusahaanId: R } })) === 1 && tahapR === TAHAP_BAWAAN.length + (i % 2) && sumberR === SUMBER_BAWAAN.length + (1 - (i % 2)),
+        `R1 putaran ${i}: buatLead dan ${i % 2 ? "tambah tahap" : "tambah sumber"} serentak keduanya berhasil tanpa deadlock (tahap ${tahapR}, sumber ${sumberR}) ${JSON.stringify(galatR1)}`,
+      );
+    }
+    pastikan(process.env.UJI_PENGGUNA === undefined, "UJI_PENGGUNA dipulihkan sesudah uji serentak R1");
+
+    // R4: kode manual berpola otomatis ditolak; nomor otomatis yang habis memberi pesan jelas
+    await buatLeadK("K6", { namaUsaha: "CV Konversi Uji Enam", telepon: "0811 7777 6001", whatsapp: "0811 7777 6002", sumber: sisaSumber[0].nama });
+    const k6 = await leadBernama("K6");
+    const tahunUsaha = (await kodePelangganBerikutnya(db)).slice(4, 8);
+    await harusDitolak("kode manual PLG-tahun-999999999", () => konversi(k6.id, { kode: `PLG-${tahunUsaha}-999999999` }), "Kode berpola PLG-tahun-nomor dipakai penomoran otomatis");
+    await harusDitolak("kode manual PLG-tahun-0001", () => konversi(k6.id, { kode: "PLG-2020-0001" }), "Kode berpola PLG-tahun-nomor dipakai penomoran otomatis");
+    pastikan((await db.lead.findUniqueOrThrow({ where: { id: k6.id } })).pelangganId === null, "R4: lead K6 belum dikonversi sesudah kode ditolak");
+    // kode itu tetap bisa dibuat dari Data Induk (di luar CRM): nomor otomatis berikutnya ditolak dengan pesan jelas
+    const plgMaks = await db.pelanggan.create({ data: { kode: `PLG-${tahunUsaha}-999999999`, nama: "Pelanggan Uji Kode Maks", namaKontak: `${AWALAN}Maks` } });
+    try {
+      await harusDitolak("kodePelangganBerikutnya sesudah 999999999", () => kodePelangganBerikutnya(db), `Nomor kode pelanggan otomatis PLG-${tahunUsaha}- sudah habis karena ada pelanggan berkode PLG-${tahunUsaha}-999999999`);
+      await harusDitolak("konversi otomatis sesudah 999999999", () => konversi(k6.id), "sudah habis");
+      await jalankan("konversi K6 dengan kode manual lain", () => konversi(k6.id, { kode: "UJICRM-K6" }));
+      pastikan((await db.lead.findUniqueOrThrow({ where: { id: k6.id }, include: { pelanggan: true } })).pelanggan?.kode === "UJICRM-K6", "R4: kode manual lain tetap diterima");
+    } finally {
+      await db.pelanggan.delete({ where: { id: plgMaks.id } });
+    }
+    pastikan(/^PLG-\d{4}-\d{4,}$/.test(await kodePelangganBerikutnya(db)), "R4: sesudah kode maks dihapus, nomor otomatis kembali normal");
 
     console.log("=== 18. Akhir ===");
     const sinkronAkhir = await periksaSinkron(db);

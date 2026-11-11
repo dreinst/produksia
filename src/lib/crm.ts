@@ -831,8 +831,20 @@ export async function pastikanLeadUntukPenawaran(klien: KlienDb, leadId: string,
 // ---------- Konversi ke pelanggan ----------
 
 export const POLA_KODE_PELANGGAN_MANUAL = /^\S{1,30}$/;
+/**
+ * Pola kode otomatis. Kode manual berpola ini ditolak saat konversi (tinjauan P22 R4): kode manual seperti
+ * PLG-2026-999999999 membuat nomor berikutnya 10 digit, di luar jangkauan MAX, sehingga setiap konversi otomatis
+ * tahun itu bentrok.
+ */
+export const POLA_KODE_PELANGGAN_OTOMATIS = /^PLG-\d{4}-\d+$/;
+export const PESAN_KODE_POLA_OTOMATIS = "Kode berpola PLG-tahun-nomor dipakai penomoran otomatis. Kosongkan kode untuk memakai nomor otomatis, atau pakai kode lain";
+/** Nomor terbesar yang dibaca MAX (9 digit, muat di INTEGER). */
+export const MAKS_NOMOR_PELANGGAN_OTOMATIS = 999_999_999;
 
-/** Kode pelanggan otomatis PLG-{tahun}-{NNNN}; tahun dari zona usaha (bukan jam server). */
+/**
+ * Kode pelanggan otomatis PLG-{tahun}-{NNNN}; tahun dari zona usaha (bukan jam server). Bila nomor terbesar sudah
+ * mencapai batas 9 digit (kode itu dibuat manual dari Data Induk), galat menyebut kodenya alih-alih bentrok berulang.
+ */
 export async function kodePelangganBerikutnya(tx: KlienDb, sekarang: Date = new Date()): Promise<string> {
   const awalan = `PLG-${tanggalIso(sekarang).slice(0, 4)}-`;
   const mulai = awalan.length + 1;
@@ -840,7 +852,11 @@ export async function kodePelangganBerikutnya(tx: KlienDb, sekarang: Date = new 
   const [baris] = await tx.$queryRaw<{ maks: number | null }[]>`
     SELECT MAX(CAST(substring("kode" FROM ${mulai}::int) AS INTEGER)) AS "maks"
     FROM "Pelanggan" WHERE "kode" LIKE ${`${awalan}%`} AND substring("kode" FROM ${mulai}::int) ~ '^[0-9]{1,9}$'`;
-  return `${awalan}${String((baris?.maks ?? 0) + 1).padStart(4, "0")}`;
+  const maks = baris?.maks ?? 0;
+  if (maks >= MAKS_NOMOR_PELANGGAN_OTOMATIS) {
+    throw new Error(`Nomor kode pelanggan otomatis ${awalan} sudah habis karena ada pelanggan berkode ${awalan}${maks}. Isi kode pelanggan lain secara manual, atau ganti kode pelanggan itu di Data Induk`);
+  }
+  return `${awalan}${String(maks + 1).padStart(4, "0")}`;
 }
 
 /** Angka telepon untuk pembanding: hanya digit, awalan 62 menjadi 0. */

@@ -17,7 +17,9 @@ import {
   PANJANG_CATATAN_LEAD,
   PANJANG_CATATAN_TINDAK_LANJUT,
   PANJANG_JUDUL_TINDAK_LANJUT,
+  PESAN_KODE_POLA_OTOMATIS,
   POLA_KODE_PELANGGAN_MANUAL,
+  POLA_KODE_PELANGGAN_OTOMATIS,
   STATUS_TINDAK_LANJUT,
   bacaIsianLead,
   bacaJatuhTempoTindakLanjut,
@@ -75,8 +77,10 @@ export async function buatLead(dataFormulir: FormData) {
   const perusahaanId = await perusahaanDokumenBaru(dataFormulir);
   const data = bacaIsianLead(dataFormulir, "buat");
   const id = await db.$transaction(async (tx) => {
-    await pastikanBawaanCrm(tx, perusahaanId);
+    // kunci bersama lebih dulu, baru bawaan: urutan sama dengan aksi pengaturan (kunci eksklusif lalu bawaan), jadi
+    // sisipan tahap bawaan pertama kali tidak bisa saling menunggu dengan tambah tahap atau sumber (tinjauan P22 R1)
     await kunciPengaturanCrm(tx, perusahaanId, false);
+    await pastikanBawaanCrm(tx, perusahaanId);
     const rujukan = await validasiRujukanLead(tx, data, { perusahaanId, pengguna });
     const tahap = rujukan.tahap!;
     const lead = await tx.lead.create({
@@ -191,7 +195,9 @@ export async function pindahTahapLead(leadId: string, dataFormulir: FormData) {
     await catatAktivitasLead(tx, { leadId, jenis, meta, pengguna });
     if (ditutup) {
       const isi = `${l.tahap.nama} → ${ke.nama}${alasan ? ` (alasan: ${alasan})` : ""}`;
-      await beritahu(tx, pengguna, { penerima: [l.picId], judul: `${ke.jenis === "MENANG" ? "Deal menang" : "Deal kalah"}: ${l.nama}`, isi, tautan: tautanLeadNotifikasi(leadId), jenis: "STATUS", perusahaanId: l.perusahaanId });
+      // PIC bisa kehilangan lead.lihat atau dinonaktifkan sesudah ditetapkan: periksa ulang sebelum memberi tahu (tinjauan P22 R3)
+      const pic = l.picId ? await pastikanPenggunaCrm(tx, l.picId, "PIC").catch(() => null) : null;
+      await beritahu(tx, pengguna, { penerima: [pic?.id], judul: `${ke.jenis === "MENANG" ? "Deal menang" : "Deal kalah"}: ${l.nama}`, isi, tautan: tautanLeadNotifikasi(leadId), jenis: "STATUS", perusahaanId: l.perusahaanId });
     }
   });
   revalidasi(ruteLead(leadId), RUTE_LEAD, RUTE_PIPELINE, RUTE_DASBOR);
@@ -295,6 +301,7 @@ async function pesanKodeDipakai(kode: string) {
 
 async function pastikanKodePelangganBebas(kode: string) {
   if (!POLA_KODE_PELANGGAN_MANUAL.test(kode)) throw new Error("Kode pelanggan maksimal 30 karakter tanpa spasi");
+  if (POLA_KODE_PELANGGAN_OTOMATIS.test(kode)) throw new Error(PESAN_KODE_POLA_OTOMATIS);
   if (await db.pelanggan.findUnique({ where: { kode }, select: { id: true } })) throw new Error(await pesanKodeDipakai(kode));
 }
 
@@ -473,7 +480,10 @@ async function tindakLanjutTerbuka(tx: Parameters<Parameters<typeof db.$transact
   return t;
 }
 
-/** Ubah judul, jatuh tempo, catatan, penerima. Jatuh tempo berubah = pengingat dikirim lagi (diingatkanPada null). */
+/**
+ * Ubah judul, jatuh tempo, catatan, penerima. Jatuh tempo atau penerima berubah = pengingat dikirim lagi
+ * (diingatkanPada null), supaya penerima baru tetap diingatkan walau penerima lama sudah (tinjauan P22 S1).
+ */
 export async function ubahTindakLanjut(id: string, dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("lead.ubah");
   const judul = bacaJudul(dataFormulir);
@@ -484,9 +494,10 @@ export async function ubahTindakLanjut(id: string, dataFormulir: FormData) {
     const t = await tindakLanjutTerbuka(tx, id);
     const penerima = penerimaIsian ? (await pastikanPenggunaCrm(tx, penerimaIsian, "Penerima tindak lanjut")).id : t.ditugaskanKeId;
     const jatuhTempoBerubah = t.jatuhTempo.getTime() !== jatuhTempo.getTime();
+    const penerimaBerubah = penerima !== t.ditugaskanKeId;
     await tx.tindakLanjut.update({
       where: { id: t.id },
-      data: { judul, jatuhTempo, catatan, ditugaskanKeId: penerima, ...(jatuhTempoBerubah ? { diingatkanPada: null } : {}) },
+      data: { judul, jatuhTempo, catatan, ditugaskanKeId: penerima, ...(jatuhTempoBerubah || penerimaBerubah ? { diingatkanPada: null } : {}) },
     });
     if (penerima && penerima !== t.ditugaskanKeId) {
       await beritahu(tx, pengguna, {

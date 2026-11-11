@@ -9,6 +9,7 @@ import { kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata
 import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
 import type { Prisma } from "@/prisma-klien/client";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
+import { BERKAS, type JenisPersetujuan } from "@/lib/persetujuan";
 
 /*
  * Menghapus dokumen transaksi = MEMBALIK seluruh efeknya dalam satu transaksi: stok fisik & harga pokok,
@@ -172,11 +173,33 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal" | "dokumenKas">, Hak> = {
 
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
 
+/**
+ * Jenis hapus untuk setiap jenis dokumen persetujuan (BERKAS). Record lengkap, jadi jenis persetujuan baru gagal tsc
+ * sampai dipetakan di sini.
+ */
+const HAPUS_BERPERSETUJUAN: Record<JenisPersetujuan, JenisDokumen> = {
+  faktur: "faktur",
+  fakturPembelian: "fakturPembelian",
+  dokumenKas: "dokumenKas",
+  penyesuaian: "penyesuaian",
+  peminjaman: "peminjamanBarang",
+  kerusakan: "laporanKerusakan",
+  aset: "aset",
+  penggajian: "penggajian",
+};
+const PERSETUJUAN_DARI_HAPUS = new Map(Object.entries(HAPUS_BERPERSETUJUAN).map(([p, h]) => [h, p as JenisPersetujuan]));
+
 export async function hapusDokumen(jenis: JenisDokumen, id: string) {
   // Jurnal & dokumen kas haknya ditentukan setelah datanya dibaca (menurut sumber jurnal / jenis kas)
   const pengguna = jenis === "jurnal" || jenis === "dokumenKas" ? await wajibMasukAksi() : await wajibHakAksi(HAK_HAPUS[jenis]);
 
   await db.$transaction(async (tx) => {
+    // Dokumen berpersetujuan dikunci lebih dulu dengan kunci yang sama dengan ajukan, setujui, dan tolak (perbaikan
+    // tinjauan P21). Hapus yang berjalan bersamaan dengan persetujuan menunggu persetujuan selesai, lalu membaca status
+    // dan jurnalId terbaru, sehingga jurnalnya ikut dihapus. Bila hapus lebih dulu, persetujuan mendapat "tidak
+    // ditemukan". Tanpa kunci, jurnal hasil persetujuan bisa tertinggal tanpa dokumen.
+    const jenisPersetujuan = PERSETUJUAN_DARI_HAPUS.get(jenis);
+    if (jenisPersetujuan) await BERKAS[jenisPersetujuan].kunci(tx, id);
     switch (jenis) {
       case "penawaran": {
         const d = await tx.penawaranPenjualan.findUniqueOrThrow({ where: { id }, include: { pesanan: true } });

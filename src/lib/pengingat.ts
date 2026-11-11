@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import type { Prisma } from "@/prisma-klien/client";
-import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
+import { hitungHakPengguna, punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { kirimNotifikasi } from "@/lib/notifikasi";
 import { formatTanggal, tanggalIso } from "@/lib/waktu";
 
@@ -71,13 +71,29 @@ async function pengingatFaktur(pengguna: PenggunaSesi, sekarang: Date): Promise<
 }
 
 /**
+ * Penerima masih aktif dan memegang lead.lihat menurut data tersimpan (peran utama, peran tambahan, dan penyesuaian
+ * Hak Akses). Peran bisa berganti sesudah tindak lanjut ditugaskan, jadi hak saat penugasan tidak cukup (tinjauan
+ * P22 R3). Rumusnya sama dengan pastikanPenggunaCrm di crm.ts, ditulis ulang di sini karena berkas ini tidak
+ * mengimpor crm.ts (DESAIN L3).
+ */
+async function penerimaBolehLihatLead(penggunaId: string): Promise<boolean> {
+  const p = await db.pengguna.findUnique({ where: { id: penggunaId }, select: { aktif: true, peran: true, peranTambahan: true } });
+  if (!p?.aktif) return false;
+  const penyesuaian = await db.hakAksesPeran.findMany({ where: { peran: { in: [p.peran, ...p.peranTambahan] } }, select: { peran: true, hak: true, boleh: true } });
+  return hitungHakPengguna(p.peran, p.peranTambahan, penyesuaian).includes("lead.lihat");
+}
+
+/**
  * Pengingat tindak lanjut CRM yang sudah jatuh tempo milik penerimanya (D4 §3.5), lintas perusahaan, tanpa
  * tindak lanjut milik lead terarsip. Tiap baris diklaim atomik (diingatkanPada diisi bersyarat) di transaksi yang
- * sama dengan notifikasinya, jadi dua permintaan serentak tidak menggandakan. Mengembalikan jumlah notifikasi.
+ * sama dengan notifikasinya, jadi dua permintaan serentak tidak menggandakan. Penerima yang nonaktif atau tidak lagi
+ * memegang lead.lihat tidak diingatkan dan barisnya tidak diklaim, jadi pengingat tetap terkirim bila haknya kembali.
+ * Mengembalikan jumlah notifikasi.
  */
 export async function periksaPengingatTindakLanjut(penggunaId: string | null | undefined, sekarang = new Date(), opsi: { paksa?: boolean } = {}): Promise<number> {
   if (!penggunaId || penggunaId === ID_SKRIP_UJI) return 0;
   if (!lewatPembatas(terakhirTindakLanjut, penggunaId, !!opsi.paksa)) return 0;
+  if (!(await penerimaBolehLihatLead(penggunaId))) return 0;
   // Syarat yang sama dipakai saat membaca dan saat mengklaim, supaya perubahan penerima, jatuh tempo, atau arsip
   // lead di antara keduanya tidak menghasilkan pengingat untuk keadaan lama.
   const syarat = {
