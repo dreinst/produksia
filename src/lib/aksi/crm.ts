@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { punyaHak } from "@/lib/hakAkses";
 import { pastikanHak, wajibHakAksi } from "@/lib/otentikasi";
-import { perusahaanDokumenBaru } from "@/lib/perusahaan";
+import { lingkupPerusahaan, perusahaanDokumenBaru, perusahaanFormulir } from "@/lib/perusahaan";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { formatWaktu } from "@/lib/waktu";
 import type { JenisTahapLead, StatusTindakLanjut } from "@/prisma-klien/enums";
@@ -38,6 +38,7 @@ import {
   pastikanPenggunaCrm,
   periksaInvarianTahap,
   rapikanUrutanTahap,
+  rutePenawaranLead,
   tautanLeadNotifikasi,
   tautanTindakLanjutNotifikasi,
   validasiRujukanLead,
@@ -305,8 +306,10 @@ async function pastikanKodePelangganBebas(kode: string) {
   if (await db.pelanggan.findUnique({ where: { kode }, select: { id: true } })) throw new Error(await pesanKodeDipakai(kode));
 }
 
-function tujuanSesudahKonversi(leadId: string, lanjut: string, pengguna: Parameters<typeof punyaHak>[0]) {
-  return lanjut === "penawaran" && punyaHak(pengguna, "penawaran.buat") ? `/penjualan/penawaran/baru?leadId=${leadId}` : ruteLead(leadId);
+/** Sesudah konversi: formulir penawaran bila diminta dan tidak terhalang perusahaan lead (tinjauan P32 S1), selain itu detail lead. */
+async function tujuanSesudahKonversi(leadId: string, lanjut: string, pengguna: Parameters<typeof punyaHak>[0]) {
+  if (lanjut !== "penawaran" || !punyaHak(pengguna, "penawaran.buat")) return ruteLead(leadId);
+  return (await rutePenawaranLead(db, leadId, perusahaanFormulir(await lingkupPerusahaan()))) ?? ruteLead(leadId);
 }
 
 /**
@@ -366,7 +369,7 @@ export async function konversiLeadKePelanggan(leadId: string, dataFormulir: Form
   const akhir = await db.lead.findUniqueOrThrow({ where: { id: leadId }, select: { pelangganId: true, dihapusPada: true } });
   if (!akhir.pelangganId) throw new Error(akhir.dihapusPada ? PESAN_TERARSIP : "Konversi gagal. Coba lagi");
   revalidasi(RUTE_LEAD, ruteLead(leadId), "/data-induk/pelanggan");
-  redirect(tujuanSesudahKonversi(leadId, lanjut, pengguna));
+  redirect(await tujuanSesudahKonversi(leadId, lanjut, pengguna));
 }
 
 export async function konversiLeadKePelangganFormulir(leadId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
@@ -402,7 +405,7 @@ export async function tautkanLeadKePelanggan(leadId: string, pelangganId: string
   const akhir = await db.lead.findUniqueOrThrow({ where: { id: leadId }, select: { pelangganId: true, dihapusPada: true } });
   if (!akhir.pelangganId) throw new Error(akhir.dihapusPada ? PESAN_TERARSIP : "Penautan gagal. Coba lagi");
   revalidasi(RUTE_LEAD, ruteLead(leadId), "/data-induk/pelanggan");
-  redirect(tujuanSesudahKonversi(leadId, lanjut, pengguna));
+  redirect(await tujuanSesudahKonversi(leadId, lanjut, pengguna));
 }
 
 export async function tautkanLeadKePelangganFormulir(leadId: string, pelangganId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {

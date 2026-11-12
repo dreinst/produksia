@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
-import { lingkupPerusahaan } from "@/lib/perusahaan";
-import { daftarPenggunaCrm, pasanganFieldTambahan } from "@/lib/crm";
+import { lingkupPerusahaan, perusahaanFormulir } from "@/lib/perusahaan";
+import { daftarPenggunaCrm, halanganPenawaranLead, pasanganFieldTambahan } from "@/lib/crm";
 import { formatTanggal, formatWaktu } from "@/lib/waktu";
 import { arsipkanLeadFormulir, pindahTahapLeadFormulir, pulihkanLeadFormulir, tambahCatatanLeadFormulir } from "@/lib/aksi/crm";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -33,7 +33,7 @@ export default async function HalamanDetailLead({ params }: { params: Promise<{ 
     include: {
       tahap: { select: { id: true, nama: true, jenis: true } },
       pic: { select: { nama: true } },
-      perusahaan: { select: { id: true, kode: true, nama: true, warna: true } },
+      perusahaan: { select: { id: true, kode: true, nama: true, warna: true, aktif: true } },
       pelanggan: { select: { kode: true, nama: true } },
     },
   });
@@ -91,8 +91,19 @@ export default async function HalamanDetailLead({ params }: { params: Promise<{ 
     ...field.map(([k, v]) => [k, v || "-"] as [string, string]),
   ];
 
-  // Buat penawaran (D4 §3.8): berpelanggan langsung ke formulir; belum lewat konversi bila boleh; selain itu nonaktif
-  const tombolPenawaran = !boleh("penawaran.buat") ? null : lead.pelangganId ? (
+  // Buat penawaran (D4 §3.8): berpelanggan langsung ke formulir; belum lewat konversi bila boleh; selain itu nonaktif.
+  // Formulir penawaran baru hanya menerima lead perusahaan lingkup aktif (tinjauan P32 S1), jadi lead perusahaan
+  // lain atau perusahaan arsip mendapat tombol nonaktif dengan keterangan.
+  const halangan = halanganPenawaranLead(lead.perusahaan, perusahaanFormulir(lingkup));
+  const tombolPenawaran = !boleh("penawaran.buat") ? null : halangan && (lead.pelangganId || bolehKonversi) ? (
+    <span className="inline-flex flex-wrap items-center gap-2">
+      <span className="tombol tombol-garis opacity-60 cursor-not-allowed" aria-disabled="true" title={halangan}>
+        <Ikon nama="request_quote" className="!text-[18px]" />
+        Buat penawaran
+      </span>
+      <span className="text-xs text-amber-700">{halangan}</span>
+    </span>
+  ) : lead.pelangganId ? (
     <Link href={`/penjualan/penawaran/baru?leadId=${encodeURIComponent(id)}`} className="tombol tombol-garis">
       <Ikon nama="request_quote" className="!text-[18px]" />
       Buat penawaran

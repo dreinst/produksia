@@ -2,7 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
-import { cariPelangganMirip } from "@/lib/crm";
+import { cariPelangganMirip, halanganPenawaranLead } from "@/lib/crm";
+import { lingkupPerusahaan, perusahaanFormulir } from "@/lib/perusahaan";
 import { tanggalIso } from "@/lib/waktu";
 import { konversiLeadKePelangganFormulir, tautkanLeadKePelangganFormulir } from "@/lib/aksi/crm";
 import FormulirAksi from "@/komponen/FormulirAksi";
@@ -11,7 +12,9 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 
 /*
  * Jadikan pelanggan (D4 §3.7, §7.2): data yang disalin, pelanggan yang mirip (tautkan), dan formulir pelanggan baru.
- * Lead yang sudah berpelanggan langsung diarahkan (idempoten), ke penawaran baru bila ?lanjut=penawaran.
+ * Lead yang sudah berpelanggan langsung diarahkan (idempoten), ke penawaran baru bila ?lanjut=penawaran. Lanjut ke
+ * penawaran tidak dijalankan bila perusahaan lead bukan perusahaan lingkup aktif atau sudah diarsipkan (tinjauan P32
+ * S1): halaman ini dan detail lead menampilkan keterangannya.
  */
 
 export default async function HalamanKonversiLead({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ lanjut?: string | string[] }> }) {
@@ -19,10 +22,14 @@ export default async function HalamanKonversiLead({ params, searchParams }: { pa
   const pengguna = await wajibHak("data-induk.tulis");
   const { id } = await params;
   const q = await searchParams;
-  const lanjut = q.lanjut === "penawaran" ? "penawaran" : "";
-  const lead = await db.lead.findUnique({ where: { id }, include: { pic: { select: { nama: true, karyawan: { select: { nama: true } } } } } });
+  const lead = await db.lead.findUnique({
+    where: { id },
+    include: { pic: { select: { nama: true, karyawan: { select: { nama: true } } } }, perusahaan: { select: { id: true, nama: true, aktif: true } } },
+  });
   if (!lead) notFound();
   if (lead.dihapusPada) redirect(`/crm/lead/${id}`);
+  const halangan = q.lanjut === "penawaran" ? halanganPenawaranLead(lead.perusahaan, perusahaanFormulir(await lingkupPerusahaan())) : null;
+  const lanjut = q.lanjut === "penawaran" && !halangan ? "penawaran" : "";
   if (lead.pelangganId) redirect(lanjut && punyaHak(pengguna, "penawaran.buat") ? `/penjualan/penawaran/baru?leadId=${encodeURIComponent(id)}` : `/crm/lead/${id}`);
 
   const mirip = await cariPelangganMirip(db, lead);
@@ -44,7 +51,7 @@ export default async function HalamanKonversiLead({ params, searchParams }: { pa
       <KepalaHalaman
         jejak={[{ label: "CRM", href: "/crm/dasbor" }, { label: "Lead", href: "/crm/lead" }, { label: lead.nama, href: `/crm/lead/${id}` }, { label: "Jadikan pelanggan" }]}
         judul="Jadikan pelanggan"
-        subjudul={lanjut ? "Sesudah lead menjadi pelanggan, formulir penawaran baru langsung dibuka." : undefined}
+        subjudul={halangan ?? (lanjut ? "Sesudah lead menjadi pelanggan, formulir penawaran baru langsung dibuka." : undefined)}
       />
 
       <div className="kartu kartu-tabel">

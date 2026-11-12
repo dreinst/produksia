@@ -798,6 +798,20 @@ export async function cariLead(klien: KlienDb, q: string, perusahaanId: string |
   });
 }
 
+/**
+ * Tautan "{n} lainnya" kolom pipeline ke daftar lead (tinjauan P32 R3): tahap ditambah saringan pipeline yang aktif
+ * (q, sumber, pic; nama parameternya sama di daftar lead), supaya daftar yang dibuka berisi lead yang sama dengan
+ * hitungan kolom.
+ */
+export function tautanLeadTahap(tahapId: string, saringan: { q?: string; sumber?: string; pic?: string }): string {
+  const u = new URLSearchParams({ tahap: tahapId });
+  for (const k of ["q", "sumber", "pic"] as const) {
+    const v = saringan[k];
+    if (v) u.set(k, v);
+  }
+  return `/crm/lead?${u}`;
+}
+
 // ---------- Lead aktif, penawaran ----------
 
 /**
@@ -822,6 +836,25 @@ export async function pastikanLeadUntukPenawaran(klien: KlienDb, leadId: string,
   if (!lead || lead.dihapusPada) throw new Error("Lead tidak ditemukan atau sudah diarsipkan");
   if (perusahaanId && lead.perusahaanId !== perusahaanId) throw new Error(`Lead milik ${lead.perusahaan.nama}; penawaran harus atas nama perusahaan yang sama`);
   return lead;
+}
+
+/**
+ * Halangan membuka formulir penawaran baru dari lead (tinjauan P32 S1). Halaman penawaran baru (P26) mencari lead
+ * di perusahaan formulir (`perusahaanFormulir(lingkup)`: perusahaan lingkup bila satu perusahaan aktif, null di
+ * gabungan dan lingkup arsip) dan hanya bila perusahaan lead aktif. Di luar itu formulirnya menolak lead dan terbuka
+ * kosong, jadi tombol dan pengalihan dari lead dimatikan dengan pesan ini. null = boleh.
+ */
+export function halanganPenawaranLead(perusahaanLead: { id: string; nama: string; aktif: boolean }, perusahaanFormulirId: string | null): string | null {
+  if (!perusahaanLead.aktif) return `Perusahaan ${perusahaanLead.nama} sudah diarsipkan, jadi penawaran dari lead ini tidak bisa dibuat`;
+  if (perusahaanFormulirId && perusahaanFormulirId !== perusahaanLead.id) return `Ganti perusahaan aktif ke ${perusahaanLead.nama} untuk membuat penawaran`;
+  return null;
+}
+
+/** Rute formulir penawaran baru dari lead, atau null bila lead tidak ada atau ada halangan (halanganPenawaranLead). */
+export async function rutePenawaranLead(klien: KlienDb, leadId: string, perusahaanFormulirId: string | null): Promise<string | null> {
+  const lead = await klien.lead.findUnique({ where: { id: leadId }, select: { perusahaan: { select: { id: true, nama: true, aktif: true } } } });
+  if (!lead || halanganPenawaranLead(lead.perusahaan, perusahaanFormulirId)) return null;
+  return `/penjualan/penawaran/baru?leadId=${encodeURIComponent(leadId)}`;
 }
 
 // ---------- Konversi ke pelanggan ----------

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { daftarPerusahaan, lingkupPerusahaan } from "@/lib/perusahaan";
-import { daftarPenggunaCrm, pastikanBawaanCrm, ringkasRupiah, whereLead } from "@/lib/crm";
+import { daftarPenggunaCrm, pastikanBawaanCrm, ringkasRupiah, tautanLeadTahap, whereLead } from "@/lib/crm";
 import type { JenisTahapLead } from "@/prisma-klien/enums";
 import FilterLead from "@/komponen/crm/FilterLead";
 import PapanPipeline from "@/komponen/crm/PapanPipeline";
@@ -12,7 +12,7 @@ import type { KartuKanban, KolomKanban, NadaKanban } from "@/komponen/ui/Kanban"
 /*
  * Pipeline lead (D4 §3.11, §7.2): satu perusahaan per papan karena tahap tiap perusahaan berbeda; gabungan memilih
  * lewat ?perusahaan= (bawaan perusahaan pertama). Ringkasan kolom dihitung dari SEMUA lead yang cocok saringan,
- * kartu paling banyak 100 terbaru per kolom dengan tautan sisanya ke daftar lead.
+ * kartu paling banyak 100 terbaru per kolom dengan tautan sisanya ke daftar lead (membawa saringan yang aktif).
  */
 
 const MAKS_KARTU = 100;
@@ -55,7 +55,7 @@ export default async function HalamanPipeline({ searchParams }: { searchParams: 
       judul: t.nama,
       ringkasan: `${r.jumlah.toLocaleString("id-ID")} · ${ringkasRupiah(r.nilai)}`,
       nada: NADA[t.jenis],
-      lebihBanyak: sisa > 0 ? { jumlah: sisa, href: `/crm/lead?tahap=${encodeURIComponent(t.id)}` } : undefined,
+      lebihBanyak: sisa > 0 ? { jumlah: sisa, href: tautanLeadTahap(t.id, saringan) } : undefined,
     };
   });
   const kartu: KartuKanban[] = perKolom.flat().map((l) => ({

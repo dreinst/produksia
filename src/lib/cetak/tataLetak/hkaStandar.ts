@@ -202,12 +202,20 @@ export const penerimaHka = (m: MasukanTataLetak, kw: boolean) => satuBaris(kw ? 
 
 /**
  * Baris label dan nilai berposisi tetap (rekening): tinggi seluruh baris diukur dulu, lalu pindah halaman bila tidak
- * muat (ruangUtuh), supaya tidak turun ke kaki halaman.
+ * muat (ruangUtuh), supaya tidak turun ke kaki halaman. `awalan` (mis. judul "BAYAR KE:" beserta jaraknya) ikut
+ * diukur dan digambar sesudah pindah halaman, supaya judul tidak tertinggal sendirian di halaman sebelumnya.
  */
-export function barisLabelHka(h: Hka, daftar: [string, string][], label: (teks: string, y: number) => OpsiTeks, nilai: (teks: string, y: number) => OpsiTeks): void {
+export function barisLabelHka(
+  h: Hka,
+  daftar: [string, string][],
+  label: (teks: string, y: number) => OpsiTeks,
+  nilai: (teks: string, y: number) => OpsiTeks,
+  awalan?: { tinggi: number; gambar: () => void },
+): void {
   const { k } = h;
   const tinggi = daftar.reduce((n, [a, b]) => n + Math.max(k.ukur(a, label(a, 0)).tinggi, k.ukur(b, nilai(b, 0)).tinggi), 0);
-  ruangUtuh(k, tinggi);
+  ruangUtuh(k, tinggi + (awalan?.tinggi ?? 0));
+  awalan?.gambar();
   for (const [a, b] of daftar) {
     const y = k.y;
     k.y = y + Math.max(k.teks(a, label(a, y)), k.teks(b, nilai(b, y)));

@@ -33,7 +33,8 @@ import {
 
 export async function renderHkaMinimal(m: MasukanTataLetak, judulBerkas: string): Promise<Uint8Array> {
   const h = mulaiHka(m, judulBerkas, { gelombang: false, ikon: true });
-  // spec/02 §14: warna tinta minimal = warna aksen kop (cadangan #111111), termasuk teks kaki di dekorasi
+  // spec/02 §14: warna tinta minimal = warna aksen kop (cadangan #111111). Teks kaki di dekorasi tidak memakai
+  // h.tinta (dekorasiHka memakai ABU.label), jadi perubahan sesudah mulaiHka ini hanya berlaku untuk isi dokumen.
   h.tinta = h.aksen || "#111111";
   const { k, x0, W, mm, tinta } = h;
   const { dok, identitas: i } = m;
@@ -131,8 +132,15 @@ export async function renderHkaMinimal(m: MasukanTataLetak, judulBerkas: string)
 
   // BAYAR KE
   if (!kw) {
-    paragrafHka(h, berspasi("BAYAR KE:"), 12, { font: "B" });
-    jarak(k, mm(2));
+    // Judul, jarak 2 mm, dan baris rekening diukur bersama lalu pindah halaman utuh (judul tidak tertinggal sendirian)
+    const judulBayar = berspasi("BAYAR KE:");
+    const judul = {
+      tinggi: k.ukur(judulBayar, o(h, 12, { font: "B" })).tinggi + mm(2),
+      gambar: () => {
+        paragrafHka(h, judulBayar, 12, { font: "B" });
+        jarak(k, mm(2));
+      },
+    };
     const rekening = rekeningHka(m);
     if (rekening) {
       const urut: [string, string][] = [rekening[0], rekening[2], rekening[1]];
@@ -141,8 +149,12 @@ export async function renderHkaMinimal(m: MasukanTataLetak, judulBerkas: string)
         urut.map(([label, nilai]) => [berspasi(label.toLocaleUpperCase("id-ID")), nilai.trim() || "-"]),
         (_, y) => o(h, 9, { y, lebar: mm(52), warna: ABU.sedang }),
         (_, y) => o(h, 10, { x: x0 + mm(52), y, lebar: W - mm(52) }),
+        judul,
       );
-    } else paragrafHka(h, dok.surat.infoBank!.trim(), 10);
+    } else {
+      judul.gambar();
+      paragrafHka(h, dok.surat.infoBank!.trim(), 10);
+    }
     const syarat = syaratHka(m);
     if (syarat) {
       jarak(k, mm(3));

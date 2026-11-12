@@ -646,6 +646,9 @@ async function main() {
         ] as [TataLetakCetak, number, RegExp][]) {
           let terburuk = -Infinity;
           let pindah = 0;
+          // R1 tinjauan P32: judul "BAYAR KE:" minimal selalu sehalaman dengan baris rekening pertamanya
+          const yatim: number[] = [];
+          let judulPindah = 0;
           for (let n = 1; n <= 40; n++) {
             const d = banyakBaris("hkaStandar", n, 0);
             d.catatan = null;
@@ -655,8 +658,15 @@ async function main() {
             const rek = m.perekam!.teks.filter((t) => label.test(t.teks) && t.y > T / 2);
             for (const t of rek) terburuk = Math.max(terburuk, t.y + t.tinggi - (T - mm(bawahMm)));
             if (new Set(rek.map((t) => t.halaman)).size === 1 && rek.length && rek[0].halaman > 1) pindah++;
+            if (tl === "HKA_MINIMAL") {
+              const judul = m.perekam!.teks.filter((t) => /^B A Y A R/.test(t.teks));
+              const bank = m.perekam!.teks.find((t) => /^B A N K/.test(t.teks));
+              if (judul.length !== 1 || !bank || judul[0].halaman !== bank.halaman) yatim.push(n);
+              else if (judul[0].halaman > 1) judulPindah++;
+            }
           }
           pastikan(terburuk <= 0.5 && pindah > 0, `${tl}: rekening 1 sampai 40 baris tidak melewati margin bawah (paling dekat ${terburuk.toFixed(1)} pt) dan pindah halaman utuh (${pindah} kasus)`);
+          if (tl === "HKA_MINIMAL") pastikan(yatim.length === 0 && judulPindah > 0, `HKA_MINIMAL: judul BAYAR KE ikut pindah halaman bersama rekening (${judulPindah} kasus pindah, yatim: ${yatim.join(", ") || "tidak ada"})`);
         }
       }
 
