@@ -65,7 +65,7 @@ export default function BilahAtas({ pengguna, saatMenu }: { pengguna: PenggunaSe
             ref={refCari}
             name="q"
             type="search"
-            placeholder="Cari nomor transaksi, akun, atau rekanan..."
+            placeholder="Cari nomor transaksi, rekanan, lead, konten, atau berkas..."
             className="w-full h-9 pl-9 pr-14 bg-slate-50 text-slate-900 placeholder:text-slate-400 text-sm rounded-lg border border-transparent focus:border-slate-300 focus:bg-white focus:outline-none transition-all"
           />
           <kbd className="hidden sm:block absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] font-mono text-slate-400 bg-white border border-slate-200 px-1.5 py-0.5 rounded">

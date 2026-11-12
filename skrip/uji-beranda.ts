@@ -52,8 +52,8 @@ async function denganEnv<T>(isian: Record<string, string | undefined>, fn: () =>
   }
 }
 
-function penggunaSintetis(peran: PeranPengguna, hak: readonly Hak[] = hitungHak(peran)): PenggunaSesi {
-  return { id: "skrip-uji", nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, nomorTelepon: null, peran, hak };
+function penggunaSintetis(peran: PeranPengguna, hak: readonly Hak[] = hitungHak(peran), id = "skrip-uji"): PenggunaSesi {
+  return { id, nama: "Skrip Uji", namaPengguna: "skrip-uji", email: null, nomorTelepon: null, peran, hak };
 }
 
 const sama = (a: readonly unknown[], b: readonly unknown[]) => a.length === b.length && a.every((x, i) => x === b[i]);
@@ -452,6 +452,17 @@ async function main() {
   pastikan(penjualanP1.teks.includes("Deal menang") && penjualanP1.teks.includes("Rp 4,0 jt") && penjualanP1.teks.includes("28,6%") && penjualanP1.teks.includes("Closing 66,7%"), "tab penjualan lingkup UJB1: KPI CRM dari statistikCrm");
   const tidakAda = [...new Set(semuaHref)].filter((h) => !ruteAda(h));
   pastikan(semuaHref.length > 0 && tidakAda.length === 0, `semua tautan panel menuju rute yang ada (${[...new Set(semuaHref)].join(", ")})${tidakAda.length ? `; tidak ada: ${tidakAda.join(", ")}` : ""}`);
+  // P46: tautan panel ke halaman baru (CRM dan detail faktur)
+  pastikan(semuaHref.includes("/crm/dasbor"), "tab penjualan: tautan Buka dasbor CRM ke /crm/dasbor");
+  const crmAndi = await render(PanelCrmBeranda({ pengguna: penggunaSintetis("ADMIN", hitungHak("ADMIN"), uA.id), perusahaanId: p1.id }));
+  pastikan(crmAndi.href.includes(`/crm/lead/${L1.id}`) && crmAndi.href.includes("/crm/tindak-lanjut"), "tindak lanjut ber-lead menaut /crm/lead/{id}, tanpa lead ke /crm/tindak-lanjut");
+  const sayaAndi = await render(PanelSaya({ pengguna: penggunaSintetis("ADMIN", hitungHak("ADMIN"), uA.id), perusahaanId: p1.id }));
+  pastikan(sayaAndi.href.includes(`/crm/lead/${L1.id}`), "Tugas Saya: tindak lanjut ber-lead menaut ke lead");
+  const dokPemilik = await render(PanelPenjualanDokumen({ pengguna: pemilik, perusahaanId: null }));
+  const idFakturTampil = gabPemilik.fakturBelumLunas.daftar.map((f) => `/penjualan/faktur/${f.id}`);
+  pastikan(idFakturTampil.every((h) => dokPemilik.href.includes(h)), `nomor faktur menunggu pembayaran menaut ke detail (${idFakturTampil.length} faktur)`);
+  const hrefPanel = [...crmAndi.href, ...sayaAndi.href, ...dokPemilik.href].filter((h) => !ruteAda(h));
+  pastikan(hrefPanel.length === 0, `tautan panel CRM, Tugas Saya, dan dokumen menuju rute yang ada${hrefPanel.length ? `; tidak ada: ${hrefPanel.join(", ")}` : ""}`);
   const satuTab = await render(DasborModul({ tab: "saya", daftarTab: ["saya"], pengguna: penggunaSintetis("SOSMED") }));
   pastikan(!satuTab.href.some((h) => h.startsWith("/?tab=")), "pengguna satu tab: baris tab tidak dirender");
 

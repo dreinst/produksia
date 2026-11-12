@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { existsSync } from "node:fs";
 // Skrip ini memanggil halaman, aksi, dan pustaka di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { isValidElement, type ReactElement, type ReactNode } from "react";
@@ -510,7 +511,12 @@ async function main() {
   pastikan(json(hanyaKonten) === json([{ kode: "konten", label: "Konten media sosial", jumlah: 1 }]), "pemegang konten.setujui saja: baris menunggu konten (kartu dan penghitung memakai daftar hak yang sama)");
   pastikan((await menungguPersetujuanSaya(penggunaSintetis("IKLAN", ["konten.lihat", "konten.ubah"]), p1.id)).length === 0, "tanpa hak setujui: tidak ada baris menunggu");
   pastikan(!sayaS.teks.includes("Tugas desain saya") && sayaS.teks.includes("Menunggu persetujuan Anda"), "SOSMED tanpa tugas yang ditugaskan: tanpa kartu tugas desain kosong, dengan kartu menunggu persetujuan");
-  pastikan(sayaS.href.length === 0, "kartu Tugas Saya SOSMED tidak menaut ke halaman yang belum ada");
+  // Sejak P46 halaman Pemasaran sudah ada dan kartu Tugas Saya menaut ke sana; asersi semula (tanpa tautan sama sekali)
+  // diganti pemeriksaan bahwa setiap tautan menuju halaman Pemasaran yang memang ada.
+  pastikan(
+    sayaS.href.every((h) => ["/pemasaran/konten", "/pemasaran/desain"].includes(h.split("?")[0]) && existsSync(`src/app/(aplikasi)${h.split("?")[0]}/page.tsx`)),
+    `kartu Tugas Saya SOSMED tidak menaut ke halaman yang belum ada (${sayaS.href.join(", ")})`,
+  );
   await db.tugasDesain.create({ data: { perusahaanId: p1.id, judul: "UJL Tugas untuk sosmed", status: "DITUGASKAN", desainerId: uS.id, dibuatOlehNama: "Skrip Uji" } });
   pastikan((await render(PanelSaya({ pengguna: sosmed, perusahaanId: p1.id }))).teks.includes("UJL Tugas untuk sosmed"), "SOSMED yang ditugasi desain: kartu tugas desain muncul");
   const sayaD = await render(PanelSaya({ pengguna: desainer, perusahaanId: p2.id }));

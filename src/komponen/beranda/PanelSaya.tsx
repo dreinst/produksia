@@ -14,13 +14,31 @@ import Ikon from "@/komponen/ui/Ikon";
 /*
  * Tab "Tugas Saya" (D7 §3.5, §7.4): tugas desain saya, konten saya, tindak lanjut saya, dan yang menunggu persetujuan
  * pengguna (dokumen maker-checker, konten, dan tinjauan desain). Tiap kartu hanya tampil bila relevan bagi hak
- * pengguna (kartuTugasSaya). Tautan ke halaman Pemasaran dipasang paket Pemasaran setelah halamannya ada.
+ * pengguna (kartuTugasSaya). Judul tugas, konten, dan tindak lanjut menaut ke laci atau lead-nya, dan baris konten
+ * serta desain yang menunggu menaut ke daftar Perencana Konten dan Tugas Desain. Tiap tautan hanya dipasang bila
+ * pengguna memegang hak lihat halaman tujuannya (KODE_MENUNGGU_PEMASARAN dan TAUTAN_MENUNGGU).
  */
 
 type BarisMenunggu = { kode: string; label: string; jumlah: number };
 
 /** Kode baris "menunggu" modul Pemasaran; sisanya dokumen maker-checker yang ditangani halaman /persetujuan. */
 export const KODE_MENUNGGU_PEMASARAN: readonly string[] = ["konten", "desain"];
+
+/** Tautan baris "menunggu" Pemasaran beserta hak lihat halaman tujuannya. */
+export const TAUTAN_MENUNGGU: Readonly<Record<string, { href: string; hak: Hak }>> = {
+  konten: { href: "/pemasaran/konten?tampilan=daftar&persetujuan=MENUNGGU", hak: "konten.lihat" },
+  desain: { href: "/pemasaran/desain?tampilan=daftar&status=DITINJAU", hak: "tugas-desain.lihat" },
+};
+
+/** Judul baris sebagai tautan bila `href` ada, selain itu teks biasa dengan gaya yang sama. */
+function JudulBaris({ href, judul }: { href: string | null; judul: string }) {
+  if (!href) return <div className="font-medium text-slate-800 truncate" title={judul}>{judul}</div>;
+  return (
+    <Link href={href} className="block font-medium text-slate-800 truncate hover:text-blue-700 hover:underline" title={judul}>
+      {judul}
+    </Link>
+  );
+}
 
 type SaringMenunggu = {
   statusPersetujuan: "MENUNGGU";
@@ -135,6 +153,8 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
   const totalMenunggu = menunggu.reduce((s, b) => s + b.jumlah, 0);
   const adaDokumen = menunggu.some((b) => !KODE_MENUNGGU_PEMASARAN.includes(b.kode));
   const adaKartu = !!desain || kartu.konten || kartu.tindakLanjut || kartu.menunggu;
+  const lihatTugas = punyaHak(pengguna, "tugas-desain.lihat");
+  const lihatKonten = punyaHak(pengguna, "konten.lihat");
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
@@ -162,7 +182,7 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
                 return (
                   <li key={t.id} className="py-2.5 flex items-start justify-between gap-3 text-sm">
                     <div className="min-w-0">
-                      <div className="font-medium text-slate-800 truncate">{t.judul}</div>
+                      <JudulBaris href={lihatTugas ? `/pemasaran/desain?tugas=${t.id}` : null} judul={t.judul} />
                       <div className={`text-xs truncate ${lewat ? "text-rose-600 font-medium" : "text-slate-500"}`}>
                         {t.tenggat ? `Tenggat ${formatTanggal(t.tenggat)}` : "Tanpa tenggat"}
                         {lewat ? " · Lewat tenggat" : ""}
@@ -200,7 +220,7 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
                 const p = petaPerusahaan.get(k.perusahaanId);
                 return (
                   <li key={k.id} className="py-2.5 text-sm space-y-1">
-                    <div className="font-medium text-slate-800 truncate" title={k.judul}>{k.judul}</div>
+                    <JudulBaris href={lihatKonten ? `/pemasaran/konten?konten=${k.id}` : null} judul={k.judul} />
                     <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                       <div className="text-xs text-slate-500 flex items-center gap-1.5 whitespace-nowrap">
                         <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TITIK_PLATFORM[k.platform]}`} aria-hidden="true" />
@@ -247,7 +267,7 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
                 return (
                   <li key={t.id} className="py-2.5 flex items-start justify-between gap-3 text-sm">
                     <div className="min-w-0">
-                      <div className="font-medium text-slate-800 truncate">{t.judul}</div>
+                      <JudulBaris href={t.leadId ? `/crm/lead/${t.leadId}` : "/crm/tindak-lanjut"} judul={t.judul} />
                       <div className="text-xs text-slate-500 truncate">
                         {t.namaLead ? `${t.namaLead}${t.namaUsahaLead ? `, ${t.namaUsahaLead}` : ""}` : "Tanpa lead"} · {formatWaktu(t.jatuhTempo)}
                       </div>
@@ -278,12 +298,21 @@ export default async function PanelSaya({ pengguna, perusahaanId }: { pengguna: 
           ) : (
             <>
               <ul className="divide-y divide-slate-100 text-sm">
-                {menunggu.map((b) => (
+                {menunggu.map((b) => {
+                  const tautan = TAUTAN_MENUNGGU[b.kode];
+                  return (
                   <li key={b.kode} className="py-2 flex items-center justify-between gap-3">
-                    <span className="text-slate-600">{b.label}</span>
+                    {tautan && punyaHak(pengguna, tautan.hak) ? (
+                      <Link href={tautan.href} className="tombol-tautan">
+                        {b.label}
+                      </Link>
+                    ) : (
+                      <span className="text-slate-600">{b.label}</span>
+                    )}
                     <span className="angka font-semibold text-slate-800">{b.jumlah.toLocaleString("id-ID")}</span>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
               {adaDokumen && (
                 <div className="mt-4">

@@ -207,7 +207,8 @@ export const JENIS_LAMPIRAN = {
     hakHapus: ["data-induk.tulis"],
     folderBawaan: "DOKUMEN",
     baca: bacaProyek,
-    tautan: () => "/data-induk/proyek",
+    // halaman detail proyek memakai hak yang sama dengan hakLihat jenis ini (P46)
+    tautan: (id) => `/proyek/${id}`,
   },
   "rencana-termin": {
     // PDF tagihan termin (D2); pesanan.ubah ikut karena tagihan termin diterbitkan lewat hak itu

@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { ringkasRupiah, statistikCrm, tindakLanjutSaya, tindakLanjutTerlambat } from "@/lib/crm";
 import { daftarPerusahaan } from "@/lib/perusahaan";
 import { formatWaktu } from "@/lib/waktu";
 import KartuKpi from "@/komponen/ui/KartuKpi";
+import Ikon from "@/komponen/ui/Ikon";
 import { LencanaStatus } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 
@@ -11,8 +13,8 @@ const persen = (x: { toFixed(n: number): string }) => `${Number(x.toFixed(1)).to
 
 /**
  * Ringkasan CRM untuk tab "Penjualan & CRM" beranda (D4 §7.5). Angka dari statistikCrm menurut lingkup perusahaan.
- * Pada lingkup gabungan tiap tindak lanjut diberi lencana perusahaan, sama dengan tab Tugas Saya.
- * Tautan ke dasbor CRM menyusul bersama halaman CRM.
+ * Pada lingkup gabungan tiap tindak lanjut diberi lencana perusahaan, sama dengan tab Tugas Saya. Tautan "Buka dasbor
+ * CRM" ke /crm/dasbor, dan judul tindak lanjut ke lead-nya (/crm/lead/{id}) atau ke /crm/tindak-lanjut bila tanpa lead.
  */
 export default async function PanelCrmBeranda({ pengguna, perusahaanId }: { pengguna: PenggunaSesi; perusahaanId: string | null }) {
   if (!punyaHak(pengguna, "lead.lihat")) return null;
@@ -27,6 +29,12 @@ export default async function PanelCrmBeranda({ pengguna, perusahaanId }: { peng
 
   return (
     <div className="space-y-7">
+      <div className="flex justify-end">
+        <Link href="/crm/dasbor" className="tombol tombol-lembut tombol-kecil">
+          <Ikon nama="monitoring" className="!text-[18px] text-slate-500" />
+          Buka dasbor CRM
+        </Link>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <KartuKpi judul="Deal menang" ikon="verified" nilai={stat.menang} awalan="" sub={`nilai ${ringkasRupiah(stat.nilaiMenang)}`} />
         <KartuKpi judul="Pipeline" ikon="trending_up" nilai={ringkasRupiah(stat.nilaiPipeline)} sub={`${stat.totalLead.toLocaleString("id-ID")} lead`} />
@@ -51,7 +59,9 @@ export default async function PanelCrmBeranda({ pengguna, perusahaanId }: { peng
                 return (
                   <li key={t.id} className="py-2.5 flex items-start justify-between gap-3 text-sm">
                     <div className="min-w-0">
-                      <div className="font-medium text-slate-800 truncate">{t.judul}</div>
+                      <Link href={t.leadId ? `/crm/lead/${t.leadId}` : "/crm/tindak-lanjut"} className="block font-medium text-slate-800 truncate hover:text-blue-700 hover:underline">
+                        {t.judul}
+                      </Link>
                       <div className="text-xs text-slate-500 truncate">{t.namaLead ?? "Tanpa lead"} · {formatWaktu(t.jatuhTempo)}</div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">

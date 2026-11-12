@@ -146,7 +146,11 @@ export default async function PanelPenjualanDokumen({ pengguna, perusahaanId }: 
                     const lewat = !!f.jatuhTempo && f.jatuhTempo < sekarang;
                     return (
                       <tr key={f.id}>
-                        <td><NomorDokumen nomor={f.nomor} /></td>
+                        <td>
+                          <Link href={`/penjualan/faktur/${f.id}`} className="hover:underline">
+                            <NomorDokumen nomor={f.nomor} />
+                          </Link>
+                        </td>
                         {gabungan && <td><LencanaPerusahaan kode={f.perusahaan.kode} warna={f.perusahaan.warna} nama={f.perusahaan.nama} /></td>}
                         <td className="text-slate-600">{f.pelanggan}</td>
                         <td className={`whitespace-nowrap ${lewat ? "text-rose-600 font-medium" : "text-slate-500"}`}>{f.jatuhTempo ? formatTanggal(f.jatuhTempo) : "-"}</td>

@@ -26,7 +26,7 @@ import Beranda from "../src/app/(aplikasi)/page";
 import DasborModul from "../src/komponen/beranda/DasborModul";
 import PanelPemasaran, { muatDataPemasaran } from "../src/komponen/beranda/PanelPemasaran";
 import PanelProyek from "../src/komponen/beranda/PanelProyek";
-import PanelSaya, { menungguPersetujuanSaya } from "../src/komponen/beranda/PanelSaya";
+import PanelSaya, { TAUTAN_MENUNGGU, menungguPersetujuanSaya } from "../src/komponen/beranda/PanelSaya";
 import AngkaBergerak from "../src/komponen/ui/AngkaBergerak";
 import type { PeranPengguna } from "../src/prisma-klien/client";
 import { aturPersetujuan, formulir, jalankan, pastikan, sebagai } from "./bantuan";
@@ -334,7 +334,13 @@ async function main() {
   pastikan(panelP2.teks.includes("UJM Perusahaan dua") && !panelP2.teks.includes("UJM Tiga hari") && panelP2.teks.includes("Rp 1.000"), "lingkup perusahaan dua: hanya konten dan iklan perusahaan dua");
   const panelGab = await render(PanelPemasaran({ pengguna: pemilik, perusahaanId: null }));
   pastikan(panelGab.teks.includes("UJM1") && panelGab.teks.includes("UJM2"), "gabungan: daftar akan terbit memuat lencana perusahaan");
-  pastikan(panelGab.href.length === 0, "panel pemasaran belum menaut ke halaman yang belum ada");
+  // P46: tautan "Buka ..." per kartu dan judul konten mendatang ke lacinya
+  pastikan(["/pemasaran/konten", "/pemasaran/desain", "/pemasaran/iklan"].every((h) => panelGab.href.includes(h)) && panelGab.href.some((h) => h.startsWith("/pemasaran/konten?konten=")), "PEMILIK: Buka kalender konten, Buka tugas desain, Buka iklan, dan judul konten menaut lacinya");
+  pastikan(!panelSosmed.href.includes("/pemasaran/iklan") && panelSosmed.href.includes("/pemasaran/desain"), "SOSMED tanpa kampanye.lihat: tanpa tautan Buka iklan");
+  const panelIklanSaja = await render(PanelPemasaran({ pengguna: penggunaSintetis("IKLAN", ["kampanye.lihat"]), perusahaanId: p1.id }));
+  pastikan(sama(panelIklanSaja.href, ["/pemasaran/iklan"]), "hanya kampanye.lihat: satu tautan Buka iklan");
+  const tautanMati = [...panelGab.href, ...panelSosmed.href, ...panelIklan.href].filter((h) => !ruteAda(h));
+  pastikan(tautanMati.length === 0, `tautan panel pemasaran menuju rute yang ada${tautanMati.length ? `; tidak ada: ${tautanMati.join(", ")}` : ""}`);
 
   console.log("=== 8. Tugas Saya: tugas desain dan persetujuan pemasaran ===");
   const sayaDesainer = await sebagai(`${PREFIKS}d`, async () => (await import("../src/lib/otentikasi")).penggunaSaatIni());
@@ -352,6 +358,15 @@ async function main() {
   pastikan((mGab.find((b) => b.kode === "konten")?.jumlah ?? 0) - sebelumKontenGab.menungguPersetujuan === 2, "gabungan: konten menunggu kedua perusahaan");
   const panelSayaS = await render(PanelSaya({ pengguna: penggunaSintetis("SOSMED"), perusahaanId: p1.id }));
   pastikan(panelSayaS.teks.includes("Tinjauan desain") && !panelSayaS.href.includes("/persetujuan"), "SOSMED: baris Tinjauan desain tanpa tautan Persetujuan (bukan dokumen maker-checker)");
+  // P46: judul tugas desain saya ke laci tugas, baris konten dan desain menunggu ke daftar Pemasaran
+  pastikan(panelSayaD.href.some((h) => h.startsWith("/pemasaran/desain?tugas=")), "DESAINER: judul tugas desain saya menaut laci tugas");
+  const panelSayaP = await render(PanelSaya({ pengguna: pemilik, perusahaanId: p1.id }));
+  pastikan(panelSayaP.href.includes(TAUTAN_MENUNGGU.konten.href) && panelSayaP.href.includes(TAUTAN_MENUNGGU.desain.href), "PEMILIK: baris konten dan desain menunggu menaut ke daftar Perencana Konten dan Tugas Desain");
+  pastikan(TAUTAN_MENUNGGU.konten.href.startsWith("/pemasaran/konten") && TAUTAN_MENUNGGU.desain.href.startsWith("/pemasaran/desain"), "tujuan baris menunggu: /pemasaran/konten dan /pemasaran/desain");
+  const sayaTanpaLihat = await render(PanelSaya({ pengguna: penggunaSintetis("SOSMED", hitungHak("SOSMED").filter((h) => h !== "tugas-desain.lihat")), perusahaanId: p1.id }));
+  pastikan(!sayaTanpaLihat.href.some((h) => h.startsWith("/pemasaran/desain")), "tanpa tugas-desain.lihat: baris Tinjauan desain tanpa tautan");
+  const mati8 = [...panelSayaD.href, ...panelSayaP.href].filter((h) => !ruteAda(h));
+  pastikan(mati8.length === 0, `tautan Tugas Saya menuju rute yang ada${mati8.length ? `; tidak ada: ${mati8.join(", ")}` : ""}`);
   const panelSayaK = await render(PanelSaya({ pengguna: penggunaSintetis("KASIR"), perusahaanId: p1.id }));
   pastikan(!panelSayaK.teks.includes("Tugas desain saya"), "KASIR tanpa tugas-desain.lihat: tanpa kartu tugas desain");
 
@@ -427,6 +442,7 @@ async function main() {
   const panelUtama = await render(PanelProyek({ pengguna: pemilik, perusahaanId: "utama" }));
   pastikan(panelUtama.teks.includes("UJM-PRJ-1") && !panelUtama.teks.includes("UJM-PRJ-2") && !panelUtama.teks.includes("UJM-PRJ-3"), "PEMILIK lingkup utama: proyek berjalan utama");
   pastikan(panelUtama.href.includes(`/rekonsiliasi/event/${proyek.id}`) && panelUtama.href.includes("/rekonsiliasi"), "tautan LPJ per proyek dan daftar LPJ");
+  pastikan(panelUtama.href.includes(`/proyek/${proyek.id}/keuangan`) && ruteAda(`/proyek/${proyek.id}/keuangan`), "P46: nama proyek menaut ke /proyek/{id}/keuangan");
   const panelDua = await render(PanelProyek({ pengguna: pemilik, perusahaanId: p2.id }));
   pastikan(panelDua.teks.includes("UJM-PRJ-2") && !panelDua.teks.includes("UJM-PRJ-1") && panelDua.teks.includes("Rp 250.000"), "lingkup perusahaan dua: proyeknya saja dan anggaran 250.000");
   const adminTanpaLpj = penggunaSintetis("ADMIN", hitungHak("ADMIN").filter((h) => h !== "rekonsiliasi.lihat"));

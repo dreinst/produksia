@@ -19,7 +19,8 @@ export const teksPersen = (p: Desimal | null) => (p === null ? "-" : `${Number(p
 /**
  * Tab "Keuangan Proyek" beranda: proyek berjalan dalam lingkup perusahaan dengan pendapatan (kontrak), tagihan,
  * penerimaan, anggaran, biaya aktual, dan margin kas (rumus D5 §3.7, biaya dari jurnal bertanda proyek seperti LPJ).
- * Dijaga anggaran-proyek.lihat (HAK.md); tautan ke LPJ hanya bagi pemegang rekonsiliasi.lihat.
+ * Dijaga anggaran-proyek.lihat (HAK.md), jadi nama proyek selalu menaut ke /proyek/{id}/keuangan yang memakai hak
+ * yang sama; tautan ke LPJ hanya bagi pemegang rekonsiliasi.lihat.
  */
 export default async function PanelProyek({ pengguna, perusahaanId }: { pengguna: PenggunaSesi; perusahaanId: string | null }) {
   if (!punyaHak(pengguna, "anggaran-proyek.lihat")) return null;
@@ -78,7 +79,9 @@ export default async function PanelProyek({ pengguna, perusahaanId }: { pengguna
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ background: p.warna ?? "#71717a" }} aria-hidden="true" />
                         <span className="mono text-xs text-slate-500">{p.kode}</span>
-                        <span className="font-medium text-slate-800">{p.nama}</span>
+                        <Link href={`/proyek/${p.id}/keuangan`} className="font-medium text-slate-800 hover:text-blue-700 hover:underline">
+                          {p.nama}
+                        </Link>
                       </div>
                       {p.klien && <div className="text-xs text-slate-500 mt-0.5">{p.klien}</div>}
                     </td>

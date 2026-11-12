@@ -43,6 +43,13 @@ function tautanBerkas(isian: Record<string, string | undefined>): string {
 }
 
 /** Halaman Berkas (D7 §7.2): folder terlihat, unggah umum, daftar berkas dengan aksi per baris, dan Sampah. */
+/**
+ * Halaman detail tujuan "Menempel di" yang tidak ada di menu: detail kampanye (kampanye.lihat), detail proyek
+ * (proyek.lihat), keuangan proyek (anggaran-proyek.lihat), dan dokumen mitra (talangan-mitra.lihat,
+ * pembayaran-mitra.lihat). Hak halaman itu sama dengan hakLihat jenis lampirannya, jadi pembaca berkas boleh membukanya.
+ */
+const RUTE_DETAIL_LAMPIRAN: readonly RegExp[] = [/^\/pemasaran\/iklan\/[^/]+$/, /^\/proyek\/[^/]+$/, /^\/proyek\/[^/]+\/keuangan(\/(talangan|bayar)\/[^/]+)?$/];
+
 export default async function HalamanBerkas({ searchParams }: { searchParams: Promise<ParamMentah> }) {
   const pengguna = await wajibHak("berkas.lihat");
   const param = await bacaParamDaftar(searchParams, UKURAN_HALAMAN_BERKAS);
@@ -91,8 +98,10 @@ export default async function HalamanBerkas({ searchParams }: { searchParams: Pr
       if (!j || !b.entitasId) return null;
       const info = await j.baca(db, b.entitasId);
       const href = info ? j.tautan(b.entitasId, info) : null;
-      // tautan hanya dirender bila rutenya sudah ada di menu (G19)
-      return { label: j.label, nama: info?.label ?? null, href: href && hrefMenu.has(href.split("?")[0]) ? href : null };
+      // tautan hanya dirender bila rutenya ada: alamat menu (G19) atau halaman detail yang haknya sama dengan hakLihat
+      // jenis lampirannya (RUTE_DETAIL_LAMPIRAN, P46)
+      const jalur = href?.split("?")[0] ?? "";
+      return { label: j.label, nama: info?.label ?? null, href: href && (hrefMenu.has(jalur) || RUTE_DETAIL_LAMPIRAN.some((r) => r.test(jalur))) ? href : null };
     }),
   );
   const tautanAktif = sampah ? new Map<string, TautanAktifBerkas[]>() : await petaTautanAktif(pengguna, baris);

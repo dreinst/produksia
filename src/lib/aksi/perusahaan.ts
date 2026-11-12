@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { sesiSaatIni, wajibHakAksi, wajibMasukAksi } from "@/lib/otentikasi";
-import { PERUSAHAAN_UTAMA, simpanLingkupSesi } from "@/lib/perusahaan";
+import { PERUSAHAAN_UTAMA, aturPerusahaanAktif, simpanLingkupSesi } from "@/lib/perusahaan";
 import { ambilPengaturanPerusahaan, idPengaturan } from "@/lib/pengaturanPerusahaan";
 import { pastikanAkunRinci } from "@/lib/baganAkun";
 import { catatAktivitas } from "@/lib/log";
@@ -35,6 +35,20 @@ export async function gantiPerusahaanAktif(dataFormulir: FormData) {
 
 export async function gantiPerusahaanAktifFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
   return jalankanFormulir(() => gantiPerusahaanAktif(dataFormulir));
+}
+
+/**
+ * Tombol "Jadikan lingkup aktif" di hasil pencarian Perusahaan (D7 §3.6, P46): lingkup sesi diganti lewat
+ * aturPerusahaanAktif (perusahaan harus ada dan aktif), lalu semua halaman dimuat ulang dengan lingkup baru.
+ */
+export async function jadikanLingkupAktif(perusahaanId: string) {
+  await wajibMasukAksi();
+  if (!(await aturPerusahaanAktif(perusahaanId))) throw new Error("Lingkup perusahaan hanya bisa diganti dari peramban yang sedang masuk");
+  revalidatePath("/", "layout");
+}
+
+export async function jadikanLingkupAktifFormulir(perusahaanId: string): Promise<StatusFormulir> {
+  return jalankanFormulir(() => jadikanLingkupAktif(perusahaanId));
 }
 
 // ---------- Buat dan ubah perusahaan (D1 §3.6, §3.7) ----------
