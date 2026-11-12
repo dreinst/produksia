@@ -61,19 +61,37 @@ export async function cariAtauBuatKategori(tx: Klien, namaMentah: string): Promi
   return { ...k, baru: count === 1 };
 }
 
-const KELOMPOK_STANDAR = new Map(BAGAN_AKUN_STANDAR.map((a) => [a.kode, !!a.kelompok]));
+const STANDAR = new Map(BAGAN_AKUN_STANDAR.map((a) => [a.kode, a]));
+
+/**
+ * Alasan akun berkode bawaan tidak diberi pemetaan bawaan, atau null bila cocok. Akun harus berjenis BEBAN, kelompok
+ * atau rinci sama dengan bagan standar, DAN namanya (dirapikan, tanpa beda huruf besar) sama dengan bagan standar,
+ * karena kode standar bisa sudah dipakai akun buatan pengguna dengan arti lain (tinjauan P34 R4).
+ */
+export function alasanLewatiPemetaanBawaan(a: { kode: string; nama: string; jenis: string; kelompok: boolean }): string | null {
+  const st = STANDAR.get(a.kode);
+  if (!st) return "kode ini tidak ada di bagan standar";
+  if (a.jenis !== "BEBAN") return `berjenis ${a.jenis}, bukan BEBAN`;
+  if (a.kelompok !== !!st.kelompok) return a.kelompok ? "berupa kelompok, di bagan standar akun rinci" : "akun rinci, di bagan standar berupa kelompok";
+  if (kunciNama(a.nama) !== kunciNama(st.nama)) return `namanya berbeda dari bagan standar (${st.nama})`;
+  return null;
+}
 
 /**
  * Menerapkan kategori bawaan dan pemetaan akunnya (D5 §3.4), idempoten. Kategori bawaan dikenali dari tanda `bawaan`
  * dan urutannya, jadi kategori bawaan yang sudah diganti nama tidak dibuat ulang; kategori buatan pengguna yang
- * namanya sama dengan kategori bawaan dijadikan kategori bawaan itu. Pemetaan hanya dibuat untuk akun yang belum
- * punya pemetaan, dan hanya bila akun dengan kode itu berjenis BEBAN dan kelompok-tidaknya sama dengan bagan standar
- * (kode standar bisa sudah dipakai akun buatan pengguna, KONTRAK-TAMBAHAN P34). Pemetaan buatan pengguna tidak pernah
- * ditimpa.
+ * namanya sama dengan kategori bawaan dijadikan kategori bawaan itu.
+ *
+ * Pemetaan bawaan hanya dibuat untuk kategori bawaan yang baru dibuat (atau baru dijadikan bawaan) di panggilan ini
+ * (tinjauan P34 S2). Pemetaan yang sengaja dikosongkan pengguna sesudah kategori ada tidak pernah dibuat ulang oleh
+ * "Terapkan ke sistem", "Siapkan kategori bawaan", atau sinkron. Ini menyimpang dari kalimat D5 §3.4 ("akun yang belum
+ * punya pemetaan"). Pemetaan juga hanya untuk akun yang lolos alasanLewatiPemetaanBawaan, dan pemetaan buatan
+ * pengguna tidak pernah ditimpa.
  */
 export async function terapkanKategoriAnggaranBawaan(klien: Klien): Promise<{ kategoriDibuat: number; pemetaanDibuat: number }> {
   let kategoriDibuat = 0;
   const idPerUrutan = new Map<number, string>();
+  const baruDiPanggilanIni = new Set<number>();
   const bawaan = await klien.kategoriAnggaran.findMany({ where: { bawaan: true }, select: { id: true, urutan: true }, orderBy: [{ dibuatPada: "asc" }, { id: "asc" }] });
   for (const k of bawaan) if (!idPerUrutan.has(k.urutan)) idPerUrutan.set(k.urutan, k.id);
   for (const k of KATEGORI_BAWAAN) {
@@ -83,21 +101,42 @@ export async function terapkanKategoriAnggaranBawaan(klien: Klien): Promise<{ ka
     kategoriDibuat += count;
     const baris = await klien.kategoriAnggaran.update({ where: { namaKunci }, data: { bawaan: true, urutan: k.urutan }, select: { id: true } });
     idPerUrutan.set(k.urutan, baris.id);
+    baruDiPanggilanIni.add(k.urutan);
   }
 
-  const semuaKode = KATEGORI_BAWAAN.flatMap((k) => k.kodeAkun);
-  const akun = await klien.akun.findMany({ where: { kode: { in: semuaKode } }, select: { id: true, kode: true, jenis: true, kelompok: true, kategoriAnggaran: { select: { akunId: true } } } });
+  const perluPemetaan = KATEGORI_BAWAAN.filter((k) => baruDiPanggilanIni.has(k.urutan));
+  if (perluPemetaan.length === 0) return { kategoriDibuat, pemetaanDibuat: 0 };
+  const semuaKode = perluPemetaan.flatMap((k) => k.kodeAkun);
+  const akun = await klien.akun.findMany({ where: { kode: { in: semuaKode } }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, kategoriAnggaran: { select: { akunId: true } } } });
   const perKode = new Map(akun.map((a) => [a.kode, a]));
   const data: { akunId: string; kategoriId: string }[] = [];
-  for (const k of KATEGORI_BAWAAN) {
+  for (const k of perluPemetaan) {
     for (const kode of k.kodeAkun) {
       const a = perKode.get(kode);
-      if (!a || a.kategoriAnggaran || a.jenis !== "BEBAN" || a.kelompok !== KELOMPOK_STANDAR.get(kode)) continue;
+      if (!a || a.kategoriAnggaran || alasanLewatiPemetaanBawaan(a) !== null) continue;
       data.push({ akunId: a.id, kategoriId: idPerUrutan.get(k.urutan)! });
     }
   }
   const pemetaanDibuat = data.length ? (await klien.akunKategoriAnggaran.createMany({ data, skipDuplicates: true })).count : 0;
   return { kategoriDibuat, pemetaanDibuat };
+}
+
+export type PemetaanBawaanDilewati = { akunId: string; kode: string; nama: string; kategori: string; alasan: string };
+
+/**
+ * Akun berkode pemetaan bawaan yang tidak punya pemetaan dan tidak lolos alasanLewatiPemetaanBawaan: daftar periksa
+ * manual di halaman Kategori Anggaran Proyek dan sesudah deploy (CATATAN-DEPLOY). Akun yang dikosongkan pengguna
+ * dengan sengaja tetapi lolos aturan tidak dicantumkan.
+ */
+export async function pemetaanBawaanDilewati(klien: Klien): Promise<PemetaanBawaanDilewati[]> {
+  const kodeKe = new Map(KATEGORI_BAWAAN.flatMap((k) => k.kodeAkun.map((kode) => [kode, k] as const)));
+  const akun = await klien.akun.findMany({ where: { kode: { in: [...kodeKe.keys()] }, kategoriAnggaran: { is: null } }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true } });
+  const hasil: PemetaanBawaanDilewati[] = [];
+  for (const a of akun) {
+    const alasan = alasanLewatiPemetaanBawaan(a);
+    if (alasan) hasil.push({ akunId: a.id, kode: a.kode, nama: a.nama, kategori: kodeKe.get(a.kode)!.nama, alasan });
+  }
+  return hasil;
 }
 
 /** Kategori bawaan "Lainnya" (dikenali dari urutannya, jadi tetap ditemukan sesudah diganti nama), dibuat bila belum ada. */

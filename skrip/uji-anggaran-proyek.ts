@@ -5,12 +5,15 @@ import { db } from "../src/lib/db";
 import { D, uang } from "../src/lib/uang";
 import { punyaHak } from "../src/lib/hakAkses";
 import { hitungRingkasanKeuangan, persen, ringkasanKeuanganProyek, type MasukanKeuangan } from "../src/lib/keuanganProyek";
-import { KATEGORI_BAWAAN, cariAtauBuatKategori, kunciNama, muatPetaKategori, penentuKategori, rapikanNama, terapkanKategoriAnggaranBawaan } from "../src/lib/kategoriAnggaran";
-import { beriKunci, muatBarisSumber, statusSinkronAnggaran, tandaSumber } from "../src/lib/sinkronAnggaran";
+import type { Prisma } from "../src/prisma-klien/client";
+import { KATEGORI_BAWAAN, cariAtauBuatKategori, kunciNama, muatPetaKategori, pemetaanBawaanDilewati, penentuKategori, rapikanNama, terapkanKategoriAnggaranBawaan } from "../src/lib/kategoriAnggaran";
+import { beriKunci, muatBarisSumber, sinkronDokumenDalamTransaksi, statusSinkronAnggaran, tandaSumber, type HasilSinkronAnggaran } from "../src/lib/sinkronAnggaran";
 import { periksaKonsistensiPerusahaan } from "../src/lib/sinkron";
 import { hapusBarisAnggaran, samakanAnggaranBiayaProyek, sinkronAnggaranDariDokumen, tambahBarisAnggaran, ubahBarisAnggaran } from "../src/lib/aksi/anggaranProyek";
 import { hapusKategoriAnggaran, siapkanKategoriBawaan, simpanPemetaanKategori, tambahKategoriAnggaran, ubahKategoriAnggaran } from "../src/lib/aksi/kategoriAnggaran";
 import { buatPenawaran, konversiPenawaranKePesanan } from "../src/lib/aksi/penjualan";
+import { ubahPenawaran } from "../src/lib/aksi/dokumenPenjualan";
+import { ubahDataInduk } from "../src/lib/aksi/dataInduk";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
 import { terapkanBaganAkun } from "../src/lib/aksi/pengaturan";
 import { formulir, harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
@@ -19,7 +22,11 @@ import { formulir, harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
  * Uji kategori dan anggaran proyek (P34, D5 §9.1): bagian A fungsi murni (A8 sampai A16; A1 sampai A7 bagi hasil
  * milik P35 bersama src/lib/bagiHasil.ts), bagian B alur basis data untuk kategori bawaan (B0), kategori dan
  * pemetaan (B4), baris anggaran (B5), sinkron dari penawaran dan pesanan (B8, B9), samakan anggaran biaya LPJ (B19),
- * dan konsistensi perusahaan sumber impor. Data uji berawalan KPA (proyek, pelanggan, barang, akun, perusahaan,
+ * dan konsistensi perusahaan sumber impor. Perbaikan tinjauan P34: sinkron serentak dengan hapus dan ubah dokumen
+ * sumber (S1, memakai klien transaksi yang ditahan seperti skrip peninjau), pemetaan bawaan yang dikosongkan tidak
+ * dibuat ulang (S2), ganti perusahaan proyek dengan baris anggaran dari dokumen yang pindah proyek (R1), dua sinkron
+ * serentak yang menambah baris (R2), samakan tanpa baris anggaran (R3), dan aturan nama pemetaan bawaan (R4).
+ * Data uji berawalan KPA (proyek, pelanggan, barang, akun, perusahaan,
  * kategori "KPA ..."). Kategori dan pemetaan yang tidak ada saat uji mulai dihapus lagi, nama kategori yang diganti
  * dipulihkan, dan penyesuaian HakAksesPeran sementara dipulihkan di finally.
  */
@@ -41,6 +48,88 @@ async function bersihkanData() {
   await db.pelanggan.deleteMany({ where: { kode: `${AWALAN}-CUST` } });
   await db.akun.deleteMany({ where: { kode: { startsWith: `${AWALAN}-` } } });
   await db.perusahaan.deleteMany({ where: { kode: `${AWALAN}X` } });
+}
+
+/** Menunggu sampai n sesi terhalang oleh pid penahan (langsung atau berantai). false bila tidak tercapai. */
+async function tungguAntre(pid: number, n: number, percobaan = 400): Promise<boolean> {
+  for (let t = 0; t < percobaan; t++) {
+    const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`
+      WITH RECURSIVE r(pid) AS (
+        SELECT a.pid FROM pg_stat_activity a WHERE ${pid}::int = ANY(pg_blocking_pids(a.pid))
+        UNION SELECT a.pid FROM pg_stat_activity a JOIN r ON r.pid = ANY(pg_blocking_pids(a.pid))
+      ) SELECT count(*)::int AS antre FROM r`;
+    if (antre >= n) return true;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  return false;
+}
+
+/** Galat revalidatePath atau redirect di luar HTTP terjadi sesudah transaksi selesai, jadi dianggap sukses. */
+async function aksi(k: () => Promise<unknown>): Promise<string> {
+  try {
+    await k();
+    return "ok";
+  } catch (e) {
+    const pesan = String((e as Error)?.message ?? e);
+    const digest = String((e as { digest?: string })?.digest ?? "");
+    return pesan.includes("static generation store missing") || digest.startsWith("NEXT_REDIRECT") ? "ok" : `${(e as { code?: string }).code ?? ""} ${pesan.split("\n").slice(-2).join(" ")}`.trim();
+  }
+}
+
+/**
+ * Proksi klien transaksi yang menahan panggilan `barisAnggaranProyek.{metode}` sampai `gerbang` dibuka (pola skrip
+ * peninjau P34). Urutan pernyataan kode asli tidak berubah; `sampai` terpenuhi saat panggilan itu dicapai.
+ */
+function tahanDi(tx: Prisma.TransactionClient, metode: string, sampai: () => void, gerbang: Promise<void>): Prisma.TransactionClient {
+  const asli = tx.barisAnggaranProyek;
+  const ikat = (o: object, k: string | symbol) => {
+    const v = (o as Record<string | symbol, unknown>)[k];
+    return typeof v === "function" ? (v as (...a: unknown[]) => unknown).bind(o) : v;
+  };
+  const model = new Proxy(asli, {
+    get(o, m) {
+      if (m === metode)
+        return async (...arg: unknown[]) => {
+          sampai();
+          await gerbang;
+          return ((o as unknown as Record<string, (...a: unknown[]) => unknown>)[metode])(...arg);
+        };
+      return ikat(o, m);
+    },
+  });
+  return new Proxy(tx, { get: (t, k) => (k === "barisAnggaranProyek" ? model : ikat(t, k)) }) as Prisma.TransactionClient;
+}
+
+/**
+ * Sinkron dokumen sumber di transaksi T1 yang ditahan pada `barisAnggaranProyek.{metode}`, lalu `selagi(pid T1)`
+ * dijalankan, lalu tahanan dilepas. Mengembalikan hasil T1 ("ok" + hasil sinkron, atau pesan galat) dan hasil selagi.
+ */
+async function sinkronDitahan<T>(proyek: { id: string; kode: string }, sumber: { jenis: "penawaran" | "pesanan"; id: string }, metode: string, selagi: (pid: number) => Promise<T>) {
+  let lepas!: () => void;
+  const gerbang = new Promise<void>((r) => (lepas = r));
+  let sampai!: (pid: number) => void;
+  const tercapai = new Promise<number>((r) => (sampai = r));
+  const t1 = db
+    .$transaction(
+      async (tx) => {
+        const [{ pid }] = await tx.$queryRaw<{ pid: number }[]>`SELECT pg_backend_pid() AS "pid"`;
+        return sinkronDokumenDalamTransaksi(tahanDi(tx, metode, () => sampai(pid), gerbang), proyek, sumber, new Date());
+      },
+      { timeout: 60_000 },
+    )
+    .then(
+      (h): { ok: true; h: HasilSinkronAnggaran } => ({ ok: true, h }),
+      (e: Error) => ({ ok: false as const, pesan: `${(e as { code?: string }).code ?? ""} ${e.message.split("\n").slice(-2).join(" ")}` }),
+    );
+  const pid = await Promise.race([tercapai, t1.then(() => -1)]);
+  try {
+    const hasil = await selagi(pid);
+    lepas();
+    return { t1: await t1, hasil };
+  } finally {
+    lepas();
+    await t1;
+  }
 }
 
 function masukanDasar(lain: Partial<MasukanKeuangan> = {}): MasukanKeuangan {
@@ -151,20 +240,43 @@ async function main() {
     pastikan(peta.kategoriUntukAkun((await akunKode("5-3100")).id) === idBawaan(70) && peta.kategoriUntukAkun((await akunKode("5-3500")).id) === idBawaan(80), "5-3100 masuk Logistik (pemetaan sendiri), 5-3500 masuk Operasional lewat induk 5-3000");
     pastikan(peta.kategoriUntukAkun((await akunKode("5-1500")).id) === idBawaan(10) && peta.kategoriUntukAkun((await akunKode("5-1600")).id) === idBawaan(20), "5-1500 Talent / Artis, 5-1600 Venue");
     pastikan((await db.akunKategoriAnggaran.count({ where: { akun: { kode: "5-1700" } } })) === 0, "5-1700 (bagi hasil) tidak pernah dipetakan");
-    // kode standar dipakai akun dengan jenis atau kelompok lain: tidak dipetakan (digulung balik)
+    pastikan((await pemetaanBawaanDilewati(db)).length === 0, "data seed: tidak ada akun berkode bawaan yang dilewati pemetaan bawaan");
+    // kode standar dipakai akun dengan jenis, kelompok, atau nama lain: tidak dipetakan (tinjauan P34 R4). Kategori
+    // Talent / Artis, Venue, Pemasaran, dan Logistik dihapus lalu dibuat ulang supaya pemetaan bawaannya dicoba lagi
+    // (pemetaan bawaan hanya untuk kategori yang baru dibuat, S2). Semua digulung balik.
     await db
       .$transaction(async (tx) => {
-        await tx.akunKategoriAnggaran.deleteMany({ where: { akun: { kode: { in: ["5-1500", "5-1600"] } } } });
-        await tx.akun.update({ where: { kode: "5-1500" }, data: { jenis: "ASET" } });
+        await tx.kategoriAnggaran.deleteMany({ where: { bawaan: true, urutan: { in: [10, 20, 60, 70] } } });
+        await tx.akun.update({ where: { kode: "5-1500" }, data: { nama: "  biaya TALENT /  artis " } });
         await tx.akun.update({ where: { kode: "5-1600" }, data: { kelompok: true } });
+        await tx.akun.update({ where: { kode: "5-7000" }, data: { nama: "Sewa Sound" } });
+        await tx.akun.update({ where: { kode: "5-3100" }, data: { jenis: "ASET" } });
         const h = await terapkanKategoriAnggaranBawaan(tx);
-        pastikan(h.pemetaanDibuat === 0 && (await tx.akunKategoriAnggaran.count({ where: { akun: { kode: { in: ["5-1500", "5-1600"] } } } })) === 0, "kode 5-1500 berjenis lain dan 5-1600 berupa kelompok: tidak dipetakan");
+        const dipetakan = new Set((await tx.akunKategoriAnggaran.findMany({ where: { akun: { kode: { in: ["5-1500", "5-1600", "5-7000", "5-3100", "5-3200", "5-3300", "5-3400"] } } }, select: { akun: { select: { kode: true } } } })).map((p) => p.akun.kode));
+        pastikan(h.kategoriDibuat === 4 && sama([...dipetakan].sort(), ["5-1500", "5-3200", "5-3300", "5-3400"]), `kategori dibuat ulang 4; 5-1500 (nama beda huruf dan spasi saja) dipetakan, 5-1600 kelompok, 5-7000 bernama lain, 5-3100 berjenis lain tidak (${[...dipetakan].sort().join(", ")})`);
+        const lewat = await pemetaanBawaanDilewati(tx);
+        pastikan(sama(lewat.map((a) => a.kode), ["5-1600", "5-3100", "5-7000"]) && lewat.find((a) => a.kode === "5-7000")!.alasan.includes("namanya berbeda") && lewat.find((a) => a.kode === "5-7000")!.kategori === "Pemasaran", `pemetaanBawaanDilewati mencantumkan 5-1600, 5-3100, 5-7000 beserta alasannya (${JSON.stringify(lewat.map((a) => [a.kode, a.alasan]))})`);
         throw new Error(BATAL);
       })
       .catch((e: Error) => {
         if (e.message !== BATAL) throw e;
       });
     pastikan((await db.akunKategoriAnggaran.count({ where: { akun: { kode: { in: ["5-1500", "5-1600"] } } } })) === 2, "akun 5-1500 dan 5-1600 kembali seperti semula sesudah digulung balik");
+    // pemetaan bawaan yang dikosongkan pengguna tidak dibuat ulang (tinjauan P34 S2)
+    const a3100 = await akunKode("5-3100");
+    await jalankan("kosongkan pemetaan 5-3100", () => sebagai("owner", () => simpanPemetaanKategori(formulir({ [`kategori_${a3100.id}`]: "" }))));
+    pastikan((await muatPetaKategori(db)).kategoriUntukAkun(a3100.id) === idBawaan(80), "5-3100 dikosongkan: ikut induk 5-3000 (Operasional)");
+    await jalankan("Terapkan ke sistem lagi", () => sebagai("owner", () => terapkanBaganAkun()));
+    const siapUlang = await sebagai("owner", () => siapkanKategoriBawaan()).catch((e: { message?: string }) => {
+      if (!String(e?.message).includes("static generation store missing")) throw e;
+      return null;
+    });
+    pastikan(
+      (await db.akunKategoriAnggaran.findUnique({ where: { akunId: a3100.id } })) === null && (await terapkanKategoriAnggaranBawaan(db)).pemetaanDibuat === 0 && (siapUlang === null || siapUlang.pemetaanDibuat === 0),
+      "sesudah Terapkan ke sistem, Siapkan kategori bawaan, dan terapkan ulang: pemetaan 5-3100 tetap kosong",
+    );
+    pastikan((await pemetaanBawaanDilewati(db)).length === 0, "akun yang sengaja dikosongkan tetapi cocok bagan standar tidak masuk daftar periksa");
+    await jalankan("pulihkan pemetaan 5-3100", () => sebagai("owner", () => simpanPemetaanKategori(formulir({ [`kategori_${a3100.id}`]: idBawaan(70) }))));
     // kategori bawaan yang diganti nama tidak dibuat ulang
     const venue = bawaan.find((k) => k.urutan === 20)!;
     await jalankan("ganti nama Venue", () => sebagai("owner", () => ubahKategoriAnggaran(venue.id, formulir({ nama: "Venue Acara" }))));
@@ -258,6 +370,10 @@ async function main() {
     await jalankan("samakan (anggaranBiaya null)", () => sebagai("owner", () => samakanAnggaranBiayaProyek(p1.id)));
     pastikan(D((await db.proyek.findUniqueOrThrow({ where: { id: p1.id } })).anggaranBiaya).equals(juta(5)), "anggaranBiaya = total rencana 5 juta");
     await harusDitolak("samakan kedua", () => sebagai("owner", () => samakanAnggaranBiayaProyek(p1.id)), "Anggaran biaya event sudah sama dengan total anggaran");
+    await db.proyek.update({ where: { id: p2.id }, data: { anggaranBiaya: 7_000_000 } });
+    await harusDitolak("samakan proyek tanpa baris anggaran (tinjauan P34 R3)", () => sebagai("owner", () => samakanAnggaranBiayaProyek(p2.id)), "Proyek belum punya baris anggaran");
+    pastikan(D((await db.proyek.findUniqueOrThrow({ where: { id: p2.id } })).anggaranBiaya).equals(juta(7)), "anggaran biaya LPJ proyek tanpa baris anggaran tetap 7 juta");
+    await db.proyek.update({ where: { id: p2.id }, data: { anggaranBiaya: null } });
     pastikan((await db.logAktivitas.count({ where: { modul: "anggaran-proyek", jenis: "Proyek", aksi: "UBAH", entitasId: p1.id, waktu: { gte: mulai } } })) === 1, "satu log UBAH jenis Proyek");
 
     console.log("=== B8. Sinkron dari penawaran ===");
@@ -326,8 +442,54 @@ async function main() {
     pastikan(!per2.get("lights kpa||1")!.dihapusDariSumber && per2.get("backdrop|kpa dekorasi panggung|1")!.kategori.nama === "KPA Dekorasi Panggung" && per2.get("genset|venue|1")!.kategori.nama === "Venue", "Lights cocok lagi; bagian baru jadi kategori baru, bagian 'venue' memakai Venue");
     pastikan(sama(log.meta.kategoriBaru, ["KPA Dekorasi Panggung"]) && log.meta.ditambah === 3, `meta kategoriBaru ${JSON.stringify(log.meta)}`);
     const totalSesudah = impor.length;
-    await Promise.all([jalankan("sinkron serentak (1)", () => sinkron(p1.id, `penawaran:${pnw.id}`)), jalankan("sinkron serentak (2)", () => sinkron(p1.id, `penawaran:${pnw.id}`))]);
-    pastikan((await dariPnw()).length === totalSesudah, "dua sinkron serentak tidak menggandakan baris (kunci baris proyek)");
+    // dokumen mendapat satu baris baru lebih dulu, jadi kedua sinkron serentak sama-sama ingin menambah baris (tinjauan P34 R2)
+    await db.barisPenawaranPenjualan.create({ data: { penawaranId: pnw.id, barangId: bStage.id, nama: "Kabel KPA", jumlah: 1, harga: 100_000, subtotal: 100_000, urutan: 6 } });
+    const logSebelumSerentak = new Date();
+    const serentak = await Promise.all([aksi(() => sinkron(p1.id, `penawaran:${pnw.id}`)), aksi(() => sinkron(p1.id, `penawaran:${pnw.id}`))]);
+    const metaSerentak = (await db.logAktivitas.findMany({ where: { modul: "anggaran-proyek", entitasId: p1.id, aksi: "SINKRON", waktu: { gte: logSebelumSerentak } }, select: { meta: true } })).map((l) => (l.meta as { ditambah: number }).ditambah).sort();
+    pastikan(serentak.every((h) => h === "ok") && (await dariPnw()).length === totalSesudah + 1 && sama(metaSerentak, [0, 1]), `dua sinkron serentak sesudah dokumen bertambah satu baris: total bertambah tepat 1, log ditambah 1 dan 0 (${serentak.join(" | ")}; ${JSON.stringify(metaSerentak)})`);
+
+    console.log("=== Sinkron serentak dengan hapus dan ubah dokumen sumber (tinjauan P34 S1) ===");
+    const p3 = await db.proyek.create({ data: { kode: `${AWALAN}-PRJ-3`, nama: "Event Uji KPA Tiga", pelangganId: pelanggan.id } });
+    const idPnw3: string[] = [];
+    const pnwBaru = async (harga: number) => {
+      await jalankan(`PNW proyek tiga ${harga}`, () => sebagai("owner", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, proyekId: p3.id, baris: [{ barangId: bSound.id, jumlah: 1, harga }, { barangId: bLights.id, jumlah: 1, harga: 1_000_000 }] }))));
+      const d = await db.penawaranPenjualan.findFirstOrThrow({ where: { proyekId: p3.id, id: { notIn: idPnw3 } } });
+      idPnw3.push(d.id);
+      nomorDokumen.push(d.nomor);
+      await jalankan(`impor ${d.nomor}`, () => sinkron(p3.id, `penawaran:${d.id}`));
+      return d;
+    };
+    // S1a: sinkron yang menambah satu baris ditahan tepat sebelum sisipan; hapus penawaran berjalan di tengahnya.
+    // Tanpa kunci dokumen sumber di depan, hapus (dokumen lalu baris anggaran) dan sinkron (baris anggaran lalu dokumen)
+    // saling mengunci dan salah satunya gagal P2034.
+    const pnwH = await pnwBaru(4_100_000);
+    await db.barisPenawaranPenjualan.create({ data: { penawaranId: pnwH.id, barangId: bStage.id, nama: "Tambahan Hapus", jumlah: 1, harga: 500_000, subtotal: 500_000, urutan: 9 } });
+    const s1a = await sinkronDitahan(p3, { jenis: "penawaran", id: pnwH.id }, "createMany", async (pid) => {
+      const hapus = aksi(() => sebagai("owner", () => hapusDokumen("penawaran", pnwH.id)));
+      const antre = await tungguAntre(pid, 1);
+      return { hapus, antre };
+    });
+    const hapusH = await s1a.hasil.hapus;
+    const sisaH = await db.barisAnggaranProyek.findMany({ where: { proyekId: p3.id }, select: { sumberPenawaranId: true } });
+    pastikan(
+      s1a.t1.ok && s1a.t1.h.ditambah === 1 && s1a.hasil.antre && hapusH === "ok" && (await db.penawaranPenjualan.count({ where: { id: pnwH.id } })) === 0 && sisaH.length === 3 && sisaH.every((b) => b.sumberPenawaranId === null),
+      `S1a sinkron (menambah 1 baris) dan hapus penawaran serentak: hapus menunggu sinkron lalu berhasil, 3 baris anggaran tetap dengan sumber dikosongkan (sinkron=[${s1a.t1.ok ? `ditambah ${s1a.t1.h.ditambah}` : s1a.t1.pesan}] hapus=[${hapusH}] antre=${s1a.hasil.antre})`,
+    );
+    // S1b: ubah penawaran saat sinkron sedang berjalan menunggu sinkron selesai (FOR SHARE), jadi sinkron tidak memakai
+    // isi yang berubah di tengah jalan. Sesudahnya dokumen basi dan sinkron berikutnya menyamakannya.
+    const pnwU = await pnwBaru(4_200_000);
+    const s1b = await sinkronDitahan(p3, { jenis: "penawaran", id: pnwU.id }, "findMany", async (pid) => {
+      const ubah = aksi(() => sebagai("owner", () => ubahPenawaran(pnwU.id, formulir({ pelangganId: pelanggan.id, proyekId: p3.id, baris: [{ barangId: bSound.id, jumlah: 1, harga: 4_300_000 }, { barangId: bLights.id, jumlah: 1, harga: 1_000_000 }] }))));
+      const antre = await tungguAntre(pid, 1, 120);
+      return { ubah, antre };
+    });
+    const ubahU = await s1b.hasil.ubah;
+    const statusU = await statusSinkronAnggaran(db, p3.id);
+    pastikan(s1b.t1.ok && s1b.hasil.antre && ubahU === "ok" && statusU.get(`penawaran:${pnwU.id}`)?.basi === true, `S1b ubah penawaran menunggu sinkron yang sedang berjalan, lalu tersimpan dan dokumen basi (sinkron=[${s1b.t1.ok ? "ok" : s1b.t1.pesan}] ubah=[${ubahU}] antre=${s1b.hasil.antre})`);
+    await jalankan("sinkron sesudah ubah", () => sinkron(p3.id, `penawaran:${pnwU.id}`));
+    const soundU = await db.barisAnggaranProyek.findFirstOrThrow({ where: { sumberPenawaranId: pnwU.id, kunciSumber: "sound kpa||1" } });
+    pastikan((await statusSinkronAnggaran(db, p3.id)).get(`penawaran:${pnwU.id}`)?.basi === false && D(soundU.nilaiAcuan).equals(D(4_300_000)), "sinkron berikutnya memakai isi terbaru (acuan Sound 4,3 juta) dan tidak basi");
 
     console.log("=== B9. Sinkron ditolak dan sinkron dari pesanan ===");
     await jalankan("PNW proyek dua", () => sebagai("owner", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, proyekId: p2.id, baris: [{ barangId: bLights.id, jumlah: 1, harga: 1_000_000 }] }))));
@@ -384,6 +546,21 @@ async function main() {
       .catch((e: Error) => {
         if (e.message !== BATAL) throw e;
       });
+
+    console.log("=== Ganti perusahaan proyek dengan baris anggaran dari dokumen yang pindah proyek (tinjauan P34 R1) ===");
+    // pnw2 diimpor ke proyek dua lalu dipindah ke proyek tiga; baris anggaran proyek dua tetap menunjuk pnw2
+    await db.penawaranPenjualan.update({ where: { id: pnw2.id }, data: { proyekId: p3.id } });
+    try {
+      pastikan(!(await statusSinkronAnggaran(db, p2.id)).has(`penawaran:${pnw2.id}`) && (await db.barisAnggaranProyek.count({ where: { proyekId: p2.id, sumberPenawaranId: pnw2.id } })) === nSumber, "statusSinkronAnggaran tidak mencantumkan dokumen yang sudah pindah proyek; barisnya tetap");
+      await harusDitolak(
+        "proyek dua dipindah ke perusahaan X",
+        () => sebagai("owner", () => ubahDataInduk("proyek", p2.id, formulir({ kode: p2.kode, nama: p2.nama, status: "BERJALAN", perusahaanId: X }))),
+        `Proyek ${AWALAN}-PRJ-2 punya baris anggaran yang bersumber dokumen`,
+      );
+      pastikan((await db.proyek.findUniqueOrThrow({ where: { id: p2.id } })).perusahaanId === p2.perusahaanId, "perusahaan proyek dua tidak berubah");
+    } finally {
+      await db.penawaranPenjualan.update({ where: { id: pnw2.id }, data: { proyekId: p2.id } });
+    }
   } finally {
     await bersihkanDokumen();
     await bersihkanData();

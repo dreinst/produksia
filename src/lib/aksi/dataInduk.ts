@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Prisma } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
-import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
+import { galatMasihDipakai, jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { BIDANG_PERUSAHAAN, ambilKonfigurasiEntitas, type KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { hakDataInduk, type PenggunaSesi } from "@/lib/hakAkses";
@@ -264,6 +264,10 @@ async function pastikanGantiPemilikAman(slug: string, id: string, lama: DataLama
     ]);
     const pemakai = [...ap.map((t) => (t.proyekPemberiId === id ? t.pemberiId : t.penerimaId)), ...dokumen.flat().map((d) => d.perusahaanId)];
     if (pemakai.length > 0) throw new Error(`Proyek ${lama.kode} sudah punya jurnal atau dokumen ${await daftarKodePerusahaan(pemakai)}; perusahaan pemilik event tidak bisa diganti ke ${await namaPerusahaan(db, baru)}`);
+    // baris anggaran yang diimpor dari dokumen yang kemudian pindah proyek tetap menunjuk dokumen itu (tinjauan P34 R1)
+    const sumberLain = { perusahaanId: { not: baru }, barisAnggaranProyek: { some: { proyekId: id } } };
+    const sumber = (await Promise.all([db.penawaranPenjualan.findMany({ where: sumberLain, ...pilih }), db.pesananPenjualan.findMany({ where: sumberLain, ...pilih })])).flat();
+    if (sumber.length > 0) throw new Error(`Proyek ${lama.kode} punya baris anggaran yang bersumber dokumen ${await daftarKodePerusahaan(sumber.map((d) => d.perusahaanId))}; perusahaan pemilik event tidak bisa diganti ke ${await namaPerusahaan(db, baru)}`);
     return;
   }
   if (slug === "karyawan") {
@@ -433,11 +437,50 @@ export async function ubahDataInduk(slug: string, id: string, dataFormulir: Form
   redirect(`/data-induk/${slug}`);
 }
 
+/** Galat basis data yang berarti proyek sedang atau masih dipakai transaksi lain (P2034 deadlock/konflik, P2003 FK). */
+function galatProyekDipakai(e: unknown): boolean {
+  const kode = (e as { code?: unknown } | null)?.code;
+  return kode === "P2034" || kode === "40P01" || kode === "40001" || galatMasihDipakai(e);
+}
+
+/**
+ * Hapus proyek (catatan orkestrator sesudah P35). Baris Proyek dikunci FOR UPDATE sebagai perintah pertama, lalu anak
+ * yang dicascade atau menahan hapus dibaca ulang di dalam transaksi: dokumen mitra, mitra, baris anggaran, jurnal,
+ * dan berkas. Bila masih ada, hapus ditolak dengan pesan jelas sebelum DELETE, sehingga tidak bertemu siklus kunci
+ * dengan posting dokumen mitra (kunci mitra lalu sisipan jurnal ber-proyekId, P33 S1). Proyek tanpa anak tetap
+ * terhapus seperti dulu; dokumen lain yang hanya menautkan proyek (penawaran, pesanan, dan sebagainya) dikosongkan
+ * proyeknya oleh basis data seperti sebelumnya.
+ */
+async function hapusProyek(id: string) {
+  try {
+    await db.$transaction(async (tx) => {
+      const [p] = await tx.$queryRaw<{ kode: string }[]>`SELECT "kode" FROM "Proyek" WHERE "id" = ${id} FOR UPDATE`;
+      if (!p) throw new Error("Data tidak ditemukan (mungkin sudah dihapus).");
+      // berurutan: transaksi interaktif tidak boleh menjalankan kueri bersamaan
+      const anak: [string, number][] = [
+        ["talangan mitra", await tx.talanganMitra.count({ where: { proyekId: id } })],
+        ["pembayaran ke mitra", await tx.pembayaranMitra.count({ where: { proyekId: id } })],
+        ["mitra", await tx.mitraProyek.count({ where: { proyekId: id } })],
+        ["baris anggaran", await tx.barisAnggaranProyek.count({ where: { proyekId: id } })],
+        ["jurnal", await tx.jurnal.count({ where: { proyekId: id } })],
+        ["berkas", await tx.berkas.count({ where: { proyekId: id } })],
+      ];
+      const ada = anak.filter(([, n]) => n > 0);
+      if (ada.length) throw new Error(`Proyek ${p.kode} masih punya ${ada.map(([nama, n]) => `${n} ${nama}`).join(", ")}; hapus atau pindahkan data itu dulu`);
+      await tx.proyek.delete({ where: { id } });
+    });
+  } catch (e) {
+    if (galatProyekDipakai(e)) throw new Error("Proyek masih dipakai; muat ulang lalu coba lagi");
+    throw e;
+  }
+}
+
 export async function hapusDataInduk(slug: string, id: string) {
   const { config, pengguna } = await konfigurasiDenganHak(slug);
   // Ambil identitas akun sebelum dihapus agar jejak audit tetap bermakna
   const jejakAkun = slug === "akun" ? await db.akun.findUnique({ where: { id }, select: { kode: true, nama: true } }) : null;
-  await delegasi(config.model).delete({ where: { id } });
+  if (slug === "proyek") await hapusProyek(String(id ?? ""));
+  else await delegasi(config.model).delete({ where: { id } });
   if (slug === "akun") await catatBaganAkun(pengguna, "HAPUS", jejakAkun?.kode ?? id, jejakAkun ? `Akun ${jejakAkun.kode} — ${jejakAkun.nama} dihapus` : `Akun ${id} dihapus`);
   revalidatePath(`/data-induk/${slug}`);
 }

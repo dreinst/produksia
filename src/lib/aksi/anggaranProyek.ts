@@ -8,7 +8,7 @@ import { catatAktivitas } from "@/lib/log";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { BATAS_UANG_D5, kunciBarisProyek } from "@/lib/keuanganProyek";
 import { cariAtauBuatKategori, terapkanKategoriAnggaranBawaan } from "@/lib/kategoriAnggaran";
-import { muatBarisSumber, terapkanSinkronAnggaran, type JenisSumberAnggaran } from "@/lib/sinkronAnggaran";
+import { muatBarisSumber, sinkronDokumenDalamTransaksi, type JenisSumberAnggaran } from "@/lib/sinkronAnggaran";
 import { bacaUang, D, format, uang, type Desimal } from "@/lib/uang";
 
 /*
@@ -176,8 +176,9 @@ function bacaSumber(v: string): { jenis: JenisSumberAnggaran; id: string } {
 
 /**
  * Impor (panggilan pertama untuk dokumen itu) atau sinkron anggaran dari penawaran atau pesanan proyek yang sama
- * (D5 §3.6). Baris dokumen dibaca di dalam transaksi sesudah kunci baris proyek (FOR NO KEY UPDATE), sehingga dua
- * sinkron serentak berjalan bergiliran dan tidak menggandakan baris.
+ * (D5 §3.6). Transaksi mengunci dokumen sumber (FOR SHARE) lalu baris proyek (FOR NO KEY UPDATE), dan baris dokumen
+ * dibaca sesudahnya, sehingga dua sinkron serentak berjalan bergiliran dan tidak menggandakan baris, serta tidak
+ * saling mengunci dengan hapus atau ubah dokumen (tinjauan P34 S1).
  */
 export async function sinkronAnggaranDariDokumen(proyekId: string, dataFormulir: FormData) {
   const pengguna = await wajibHakAksi("anggaran-proyek.buat");
@@ -192,13 +193,7 @@ export async function sinkronAnggaranDariDokumen(proyekId: string, dataFormulir:
   await pastikanAdaKategori();
 
   const hasil = await db.$transaction(async (tx) => {
-    await kunciBarisProyek(tx, proyek.id);
-    // dibaca ulang sesudah kunci: isi dan pemilik dokumen bisa berubah sejak pemeriksaan di atas
-    const dok = await muatBarisSumber(tx, sumber.jenis, sumber.id);
-    if (!dok) throw new Error("Dokumen tidak ditemukan");
-    if (dok.proyekId !== proyek.id) throw new Error(`Dokumen ${dok.nomor} bukan milik proyek ${proyek.kode}`);
-    if (dok.baris.length === 0) throw new Error(`Dokumen ${dok.nomor} tidak punya baris`);
-    const h = await terapkanSinkronAnggaran(tx, proyek.id, dok, new Date());
+    const { dok, ...h } = await sinkronDokumenDalamTransaksi(tx, proyek, sumber, new Date());
     const keterangan = h.pertama
       ? `Impor anggaran dari ${dok.nomor}: ${h.ditambah} baris`
       : `Sinkron dengan ${dok.nomor}: ${h.diperbarui} harga berubah, ${h.ditambah} ditambah, ${h.dihapus} tidak ada lagi di dokumen`;
@@ -233,7 +228,8 @@ export async function sinkronAnggaranDariDokumenFormulir(proyekId: string, _sebe
 
 /**
  * Samakan anggaran biaya event (kolom lama yang dibaca LPJ) dengan total rencana anggaran (D5 §3.5). Hanya lewat
- * tombol, tidak pernah otomatis. Hak anggaran-proyek.ubah DAN data-induk.tulis.
+ * tombol, tidak pernah otomatis. Hak anggaran-proyek.ubah DAN data-induk.tulis. Ditolak bila proyek belum punya baris
+ * anggaran; tombolnya juga tidak ditampilkan dalam keadaan itu.
  */
 export async function samakanAnggaranBiayaProyek(proyekId: string) {
   const pengguna = await wajibHakAksi("anggaran-proyek.ubah");
@@ -242,7 +238,9 @@ export async function samakanAnggaranBiayaProyek(proyekId: string) {
   await db.$transaction(async (tx) => {
     await kunciBarisProyek(tx, proyek.id);
     const p = await tx.proyek.findUniqueOrThrow({ where: { id: proyek.id }, select: { anggaranBiaya: true } });
-    const total = await tx.barisAnggaranProyek.aggregate({ where: { proyekId: proyek.id }, _sum: { rencana: true } });
+    const total = await tx.barisAnggaranProyek.aggregate({ where: { proyekId: proyek.id }, _sum: { rencana: true }, _count: true });
+    // proyek lama tanpa baris anggaran: jangan menolkan angka LPJ yang sudah dipakai (tinjauan P34 R3)
+    if (total._count === 0) throw new Error("Proyek belum punya baris anggaran");
     const ke = uang(total._sum.rencana);
     const dari = p.anggaranBiaya === null ? null : uang(p.anggaranBiaya);
     if (dari !== null && dari.equals(ke)) throw new Error("Anggaran biaya event sudah sama dengan total anggaran");
