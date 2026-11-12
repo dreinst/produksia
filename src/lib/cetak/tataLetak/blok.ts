@@ -144,7 +144,8 @@ export function barisDicetak(m: MasukanTataLetak): BarisCetak[] {
     `- Termin ${kt.no} dari ${kt.jumlahButir} (${persen(m, kt.persen)}% dari nilai kontrak)`,
     `- Ref. pesanan ${kt.nomorPesanan}`,
     `- Nilai kontrak (termasuk PPN): ${rp(kt.nilaiKontrakBruto)}`,
-    `- Sudah dibayar (termin sebelumnya): ${rp(kt.dibayarSebelumnya)}`,
+    // null: pengguna tanpa hak lihat uang muka dan penerimaan (dataCetakUntukPengguna)
+    ...(kt.dibayarSebelumnya ? [`- Sudah dibayar (termin sebelumnya): ${rp(kt.dibayarSebelumnya)}`] : []),
     `- Sisa tagihan setelah termin ini: ${rp(kt.sisaSetelahTermin)}`,
   ].join("\n");
   return [{ no: 1, nama, deskripsi, bagian: null, keterangan: null, jumlah: satu, satuan: "termin", frekuensi: satu, satuanFrekuensi: null, harga: kt.jumlah, nilai: kt.jumlah }];

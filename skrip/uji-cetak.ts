@@ -590,13 +590,15 @@ async function main() {
           d.baris = Array.from({ length: n }, (_, i) => ({ ...b0, no: i + 1, nama: `Item ${i}`, deskripsi: desk ? panjang(desk) : null }));
         });
 
-      // T1: font terdaftar memakai cache pdfkit, jadi waktu render tidak lagi sebanding jumlah potongan teks
+      // T1: font terdaftar memakai cache pdfkit, jadi waktu render tidak lagi sebanding jumlah potongan teks. Penjaga
+      // utamanya _fontCount di bawah; batas jam dinding 500 x 3.000 dilonggarkan ke 10 detik supaya mesin sibuk tidak
+      // memberi kegagalan palsu, sedangkan regresi besar (puluhan detik) tetap tertangkap (tinjauan P32 S2).
       const waktu: string[] = [];
       for (const [tl, nama, n, desk, batas] of [
         ["HKA_STANDAR", "hkaStandar", 100, 300, 1000],
         ["DPRO_INVOICE", "invoiceDpro", 100, 300, 1000],
-        ["HKA_STANDAR", "hkaStandar", 500, 3000, 3000],
-        ["DPRO_INVOICE", "invoiceDpro", 500, 3000, 3000],
+        ["HKA_STANDAR", "hkaStandar", 500, 3000, 10000],
+        ["DPRO_INVOICE", "invoiceDpro", 500, 3000, 10000],
       ] as [TataLetakCetak, NamaContoh, number, number, number][]) {
         const kop = { ...kopPolos(p1.id), gayaEntitas: tl.startsWith("DPRO") ? ("DPRO" as const) : null };
         const m = masukan(kop, banyakBaris(nama, n, desk));
@@ -613,6 +615,9 @@ async function main() {
         const awal = fontKe();
         for (let n = 0; n < 200; n++) k.ukur(n % 2 ? "Teks tebal" : "Teks biasa", { x: 0, lebar: 1e6, ukuran: 10, font: n % 2 ? "B" : "R" });
         pastikan(fontKe() === awal, `font R dan B tidak dibuka ulang di setiap pengukuran (${awal} lalu ${fontKe()})`);
+        // lebar kata disimpan per kanvas: ukuran ulang memberi hasil yang sama dengan ukuran pertama
+        const lebar = (t: string, ukuran: number) => k.ukur(t, { x: 0, lebar: 1e6, ukuran, font: "R" }).lebar;
+        pastikan(lebar("Kata sama", 10) === lebar("Kata sama", 10) && lebar("Kata sama", 12) > lebar("Kata sama", 10), "simpanan lebar kata dipisah per ukuran font");
       }
 
       // T2: baris kosong di tengah yang melewati slot tidak menelan sisa teks diam-diam

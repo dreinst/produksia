@@ -208,7 +208,7 @@ function cocokMatcherProxy(matcher: readonly string[]): (jalur: string) => boole
     const [matcher, daftar] = JSON.parse(process.argv[process.argv.length - 1]);
     const cocok = getMiddlewareRouteMatcher(getMiddlewareMatchers(matcher, {}));
     process.stdout.write(JSON.stringify(daftar.map((u) => { const x = new URL(u, "http://127.0.0.1"); return cocok(x.pathname, { headers: {}, cookies: {} }, Object.fromEntries(x.searchParams)); })));`;
-  const daftar = ["/api/berkas", "/api/berkas/abc", "/api/berkas/abc?unduh=1", "/", "/buku-besar", "/berkas", "/api/berkasx", "/api/notifikasi", "/api/sehat", "/b/token", "/masuk", "/pengaturan/berkas", "/_next/static/x.js", "/logo.png"];
+  const daftar = ["/api/berkas", "/api/berkas/abc", "/api/berkas/abc?unduh=1", "/", "/buku-besar", "/berkas", "/api/berkasx", "/api/notifikasi", "/api/sehat", "/b/token", "/masuk", "/pengaturan/berkas", "/_next/static/x.js", "/logo.png", "/api/cetak/kop/x/aset", "/api/cetak", "/api/cetakx", "/cetak/faktur/x", "/cetak/contoh/x"];
   const hasil = JSON.parse(execFileSync(process.execPath, ["-e", kode, JSON.stringify([matcher, daftar])], { cwd: process.cwd(), encoding: "utf8" })) as boolean[];
   const peta = new Map(daftar.map((u, i) => [u, hasil[i]]));
   return (jalur) => {
@@ -229,6 +229,8 @@ async function main() {
   // perbaikan tinjauan P06 butir 1: /api/berkas tidak melewati proxy, rute lain tetap
   const lewatProxy = cocokMatcherProxy(configProxy.matcher);
   pastikan(!lewatProxy("/api/berkas") && !lewatProxy("/api/berkas/abc") && !lewatProxy("/api/berkas/abc?unduh=1"), "matcher proxy: /api/berkas dan /api/berkas/[id] dilewati");
+  // tinjauan P31 S1: unggah gambar kop juga tidak disangga proxy; rute cetak GET (/cetak/...) tetap lewat proxy
+  pastikan(!lewatProxy("/api/cetak/kop/x/aset") && !lewatProxy("/api/cetak") && lewatProxy("/api/cetakx") && lewatProxy("/cetak/faktur/x") && lewatProxy("/cetak/contoh/x"), "matcher proxy: /api/cetak/kop/[kopId]/aset dilewati, /cetak/... tetap lewat proxy");
   pastikan(["/", "/buku-besar", "/berkas", "/api/berkasx", "/api/notifikasi", "/api/sehat", "/b/token", "/masuk", "/pengaturan/berkas"].every(lewatProxy), "matcher proxy: rute lain (termasuk /api/berkasx dan /berkas) tetap lewat proxy");
   pastikan(!lewatProxy("/_next/static/x.js") && !lewatProxy("/logo.png"), "matcher proxy: aset statis tetap dilewati");
   const alihBukuBesar = proxy(new NextRequest("http://127.0.0.1/buku-besar"));

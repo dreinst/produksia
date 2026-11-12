@@ -22,10 +22,11 @@ export function proxy(request: NextRequest) {
 }
 
 /*
- * /api/berkas (unggah dan unduh) sengaja tidak melewati proxy: Next menyangga seluruh badan POST yang melewati proxy
- * sebelum rute berjalan, termasuk dari pengirim tanpa sesi. Rutenya memeriksa sesi (401 JSON yang sama), asal, hak,
- * dan ukuran sendiri. Batas badan di reverse proxy tetap dianjurkan (lihat catatan deploy).
+ * /api/berkas (unggah dan unduh) dan /api/cetak (unggah gambar kop) sengaja tidak melewati proxy: Next menyangga
+ * seluruh badan POST yang melewati proxy (sampai 10 MB) sebelum rute berjalan, termasuk dari pengirim tanpa sesi.
+ * Rutenya memeriksa sesi (401 JSON yang sama), asal, hak, dan ukuran sendiri. Batas badan di reverse proxy tetap
+ * dianjurkan (lihat catatan deploy).
  */
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|manifest\\.webmanifest|api/berkas(?:/|$)|.*\\.(?:png|jpg|jpeg|svg|webp|woff2?|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|manifest\\.webmanifest|api/berkas(?:/|$)|api/cetak(?:/|$)|.*\\.(?:png|jpg|jpeg|svg|webp|woff2?|ico)$).*)"],
 };

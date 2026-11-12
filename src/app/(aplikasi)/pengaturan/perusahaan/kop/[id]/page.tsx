@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { punyaHak } from "@/lib/hakAkses";
+import { slotTandaTangan } from "@/lib/berkas";
 import { asetBawaan, folderGaya } from "@/lib/cetak/aset";
 import { JUDUL_BAWAAN, LABEL_JENIS_DOKUMEN, LABEL_UKURAN, TATA_LETAK_SAH } from "@/lib/cetak/kop";
 import { hapusAsetKopFormulir, hapusKopSuratFormulir, simpanTemplateCetakFormulir, ubahKopSuratFormulir } from "@/lib/aksi/kopSurat";
@@ -74,7 +76,9 @@ function Isian({ k, nilai }: { k: KolomIsian; nilai: string | null }) {
 }
 
 export default async function HalamanUbahKopSurat({ params }: { params: Promise<{ id: string }> }) {
-  await wajibHak("pengaturan.tulis");
+  const pengguna = await wajibHak("pengaturan.tulis");
+  // gambar tanda tangan dan stempel juga butuh hak tanda tangan cetak (tinjauan P31 R4)
+  const bolehTtd = punyaHak(pengguna, "tanda-tangan-cetak.buat");
   const { id } = await params;
   const kop = await db.kopSurat.findUnique({
     where: { id },
@@ -253,8 +257,9 @@ export default async function HalamanUbahKopSurat({ params }: { params: Promise<
             <tbody>
               {SLOT.map((s) => {
                 const unggahan = aset.get(s.jenis);
+                const tertutup = slotTandaTangan(s.jenis) && !bolehTtd;
                 const bawaan = !unggahan && kop.gayaEntitas && asetBawaan(kop.gayaEntitas, s.jenis) ? kop.gayaEntitas : null;
-                const src = unggahan ? `/api/berkas/${unggahan.berkasId}` : bawaan ? `/cetak/aset-bawaan/${folderGaya(bawaan)}/${s.jenis}` : null;
+                const src = tertutup ? null : unggahan ? `/api/berkas/${unggahan.berkasId}` : bawaan ? `/cetak/aset-bawaan/${folderGaya(bawaan)}/${s.jenis}` : null;
                 return (
                   <tr key={s.jenis}>
                     <td>{s.label}</td>
@@ -277,16 +282,20 @@ export default async function HalamanUbahKopSurat({ params }: { params: Promise<
                     </td>
                     <td className="angka">{unggahan ? `${unggahan.lebarPx} × ${unggahan.tinggiPx} px` : "-"}</td>
                     <td className="td-lekat">
-                      <div className="flex flex-col items-start gap-2">
-                        <UnggahAsetKop kopId={kop.id} jenis={s.jenis} label={s.label} />
-                        {unggahan && (
-                          <FormulirAksi aksi={hapusAsetKopFormulir.bind(null, kop.id, s.jenis)} pesanKonfirmasi={`Hapus unggahan ${s.label}? Berkasnya dipindah ke Sampah.`}>
-                            <button type="submit" className="tombol-tautan-bahaya">
-                              Hapus unggahan
-                            </button>
-                          </FormulirAksi>
-                        )}
-                      </div>
+                      {tertutup ? (
+                        <span className="petunjuk">Butuh hak tanda tangan cetak</span>
+                      ) : (
+                        <div className="flex flex-col items-start gap-2">
+                          <UnggahAsetKop kopId={kop.id} jenis={s.jenis} label={s.label} />
+                          {unggahan && (
+                            <FormulirAksi aksi={hapusAsetKopFormulir.bind(null, kop.id, s.jenis)} pesanKonfirmasi={`Hapus unggahan ${s.label}? Berkasnya dipindah ke Sampah.`}>
+                              <button type="submit" className="tombol-tautan-bahaya">
+                                Hapus unggahan
+                              </button>
+                            </FormulirAksi>
+                          )}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );

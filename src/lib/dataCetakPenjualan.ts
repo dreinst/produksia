@@ -319,7 +319,7 @@ function progresPesanan(p: PesananCetak) {
 }
 
 function terminProgres(p: PesananCetak): DokumenCetakPenjualan["termin"] {
-  return progresPesanan(p).butir.map((b) => ({ no: b.no, label: b.label, persen: s2(b.persen), jumlah: s2(b.jumlah), jumlahBruto: s2(b.bruto), jatuhTempo: b.jatuhTempo, status: b.status }));
+  return progresPesanan(p).butir.map((b) => ({ no: b.no, label: b.label, persen: s2(b.persen), jumlah: s2(b.jumlah), jumlahBruto: s2(b.bruto), jatuhTempo: b.jatuhTempo, status: b.status, ditagih: !!b.ditagihPada }));
 }
 
 async function cetakKwitansiDp(klien: Klien, id: string): Promise<DokumenCetakPenjualan | null> {
@@ -431,16 +431,34 @@ async function cetakTagihanTermin(klien: Klien, id: string): Promise<DokumenCeta
   };
 }
 
+/** Status butir tanpa informasi bayar (Lunas dan Dibayar sebagian bersumber dari uang muka dan penerimaan), sama dengan PanelTermin. */
+function terminTanpaBayar(termin: DokumenCetakPenjualan["termin"]): DokumenCetakPenjualan["termin"] {
+  return termin.map((t) => ({ ...t, status: t.ditagih ? "Ditagih" : "Belum ditagih" }));
+}
+
 /**
  * Data cetak untuk satu pengguna (KONTRAK-TAMBAHAN P31): kwitansi membawa baris dan ringkasan faktur yang dilunasinya,
  * dan kwitansi DP membawa baris, ringkasan, dan progres termin pesanannya. Pemegang penerimaan.lihat atau
  * uang-muka.lihat tanpa faktur.lihat (kwitansi) atau pesanan.lihat (kwitansi DP) tidak boleh melihat isi dokumen asal
  * itu lewat PDF, jadi bagian tersebut dikosongkan. Nomor dokumen asal dan nilai kwitansi tetap, karena tercantum di
  * kwitansi itu sendiri. Rute cetak dan aksi simpan PDF memanggil ini sesudah dataCetakPenjualan.
+ *
+ * Tagihan termin dan progres termin kwitansi DP (tinjauan P31 R1): tanpa uang-muka.lihat DAN penerimaan.lihat,
+ * pembayaran disembunyikan seperti PanelTermin, yaitu terbayar 0, sisa = nilai butir, "Sudah dibayar (termin
+ * sebelumnya)" tidak dicetak, dan status butir hanya Ditagih atau Belum ditagih.
  */
 export function dataCetakUntukPengguna(data: DokumenCetakPenjualan, pengguna: PenggunaSesi): DokumenCetakPenjualan {
   const hakAsal = data.jenis === "kwitansi" ? "faktur.lihat" : data.jenis === "kwitansi-dp" ? "pesanan.lihat" : null;
-  if (!hakAsal || punyaHak(pengguna, hakAsal)) return data;
+  const lihatBayar = punyaHak(pengguna, "uang-muka.lihat") && punyaHak(pengguna, "penerimaan.lihat");
+  if (!hakAsal || punyaHak(pengguna, hakAsal)) {
+    if (lihatBayar || (data.jenis !== "tagihan-termin" && data.jenis !== "kwitansi-dp")) return data;
+    return {
+      ...data,
+      ringkasan: data.jenis === "tagihan-termin" ? { ...data.ringkasan, terbayar: s2(NOL), sisa: data.ringkasan.total } : data.ringkasan,
+      termin: terminTanpaBayar(data.termin),
+      konteksTermin: data.konteksTermin ? { ...data.konteksTermin, dibayarSebelumnya: null } : null,
+    };
+  }
   const nol = s2(NOL);
   return {
     ...data,

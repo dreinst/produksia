@@ -109,6 +109,8 @@ export class KanvasCetak {
   private readonly pemeriksaGlyph = new Map<Font, (c: number) => boolean>();
   private readonly gambarTerbuka = new WeakMap<Uint8Array, GambarTerbuka>();
   private readonly isiBerkas = new Map<string, Uint8Array>();
+  /** simpanan lebarTeks, kunci `${font}|${ukuran}|${jarakHuruf}|${teks}` */
+  private readonly simpananLebar = new Map<string, number>();
   private readonly halaman: { kertas: Kertas; lapisan: Lapisan }[] = [];
   private indeks = -1;
   private _y = 0;
@@ -276,10 +278,21 @@ export class KanvasCetak {
     this.doc.font(font).fontSize(ukuran);
   }
 
+  /**
+   * Lebar teks per (font, ukuran, jarak huruf, teks). Pemecah baris mengukur kata yang sama berulang kali (catatan
+   * orkestrator sesudah perbaikan P30), jadi lebar potongan sampai 64 karakter disimpan per kanvas. Lebar hanya
+   * bergantung pada keempat kunci itu; penggambar selalu memanggil aturFont sendiri sebelum doc.text.
+   */
   private lebarTeks(teks: string, font: Font, ukuran: number, jarakHuruf: number): number {
     if (!teks) return 0;
+    const simpan = teks.length <= 64;
+    const kunci = simpan ? `${font}|${ukuran}|${jarakHuruf}|${teks}` : "";
+    const ada = simpan ? this.simpananLebar.get(kunci) : undefined;
+    if (ada !== undefined) return ada;
     this.aturFont(font, ukuran);
-    return this.doc.widthOfString(teks, { characterSpacing: jarakHuruf });
+    const lebar = this.doc.widthOfString(teks, { characterSpacing: jarakHuruf });
+    if (simpan) this.simpananLebar.set(kunci, lebar);
+    return lebar;
   }
 
   private tinggiBaris(opsi: OpsiTeks): number {

@@ -4,7 +4,7 @@ import { pastikanHak, wajibHakAksi, wajibMasukAksi } from "@/lib/otentikasi";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
+import { galatMasihDipakai, jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
 import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata, urutBarang } from "@/lib/stok";
 import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
@@ -227,17 +227,25 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
       }
       case "pesanan": {
         // Baris pesanan dikunci urut id lebih dulu, sama dengan faktur, surat jalan, dan hapus keduanya (tinjauan perbaikan
-        // P27 tahap 2 T2). Surat jalan, faktur, dan uang muka dibaca sesudah kunci, jadi faktur yang selesai selagi hapus ini
-        // menunggu ikut menahan hapus, bukan tertinggal tanpa pesanan (FK faktur ON DELETE SET NULL).
+        // P27 tahap 2 T2). Surat jalan dan faktur dibaca sesudah kunci, jadi faktur yang selesai selagi hapus ini menunggu
+        // ikut menahan hapus, bukan tertinggal tanpa pesanan (FK faktur ON DELETE SET NULL). buatUangMuka TIDAK mengunci
+        // baris pesanan, jadi uang muka yang selesai sesudah bacaan di bawah tidak tertahan kunci ini; ia membuat DELETE
+        // gagal oleh FK Restrict (P2003) dan seluruh hapus dibatalkan, yang diterjemahkan menjadi pesan di bawah
+        // (tinjauan P31 R3, urutan kunci sengaja tidak diubah).
         await kunciBarisPesananPenjualan(tx, id);
         const d = await tx.pesananPenjualan.findUniqueOrThrow({ where: { id }, include: { pengiriman: true, faktur: true, uangMuka: true } });
         if (d.pengiriman.length) throw new Error(`${d.nomor} sudah punya surat jalan ${daftarNomor(d.pengiriman)}; hapus itu dulu`);
         if (d.faktur.length) throw new Error(`${d.nomor} sudah punya faktur ${daftarNomor(d.faktur)}; hapus itu dulu`);
         if (d.uangMuka.length) throw new Error(`${d.nomor} sudah punya uang muka ${daftarNomor(d.uangMuka)}; hapus itu dulu`);
         // penjaga uang muka di atas menjamin tidak ada UM yang menaut butir termin (FK Restrict); G11: lampiran tetap
-        await tx.rencanaTermin.deleteMany({ where: { pesananId: id } });
-        await tx.barisPesananPenjualan.deleteMany({ where: { pesananId: id } });
-        await tx.pesananPenjualan.delete({ where: { id } });
+        try {
+          await tx.rencanaTermin.deleteMany({ where: { pesananId: id } });
+          await tx.barisPesananPenjualan.deleteMany({ where: { pesananId: id } });
+          await tx.pesananPenjualan.delete({ where: { id } });
+        } catch (e) {
+          if (galatMasihDipakai(e)) throw new Error(`${d.nomor} punya uang muka baru; muat ulang halaman lalu coba lagi`);
+          throw e;
+        }
         if (d.penawaranId) await tx.penawaranPenjualan.update({ where: { id: d.penawaranId }, data: { status: "DRAF" } });
         await catatLog(tx, pengguna, jenis, d.nomor, d.penawaranId ? "Pesanan dihapus; penawaran asal kembali menjadi draf" : "Pesanan dihapus");
         return;

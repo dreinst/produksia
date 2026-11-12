@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { wajibHakAksi } from "@/lib/otentikasi";
+import { pastikanHak, wajibHakAksi } from "@/lib/otentikasi";
 import type { PenggunaSesi } from "@/lib/hakAkses";
 import { perusahaanDokumenBaru } from "@/lib/perusahaan";
 import { catatAktivitas } from "@/lib/log";
-import { buangSatuBerkas } from "@/lib/berkas";
+import { buangSatuBerkas, slotTandaTangan } from "@/lib/berkas";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { LABEL_SLOT_ASET, PRESET_KOP, UKURAN_SAH, galatTemplate, tataLetakHka } from "@/lib/cetak/kop";
 import type { Prisma } from "@/prisma-klien/client";
@@ -330,16 +330,24 @@ export async function simpanTemplateCetakFormulir(kopId: string, _sebelumnya: St
 
 // ---------- Hapus gambar kop ----------
 
-/** Hapus gambar satu slot: baris AsetKopSurat dihapus dan berkasnya dibuang ke Sampah (buangSatuBerkas D7). */
+/**
+ * Hapus gambar satu slot: baris AsetKopSurat dihapus dan berkasnya dibuang ke Sampah (buangSatuBerkas D7). Slot
+ * tanda tangan dan stempel juga butuh tanda-tangan-cetak.buat (tinjauan P31 R4). Baris kop dikunci FOR NO KEY UPDATE
+ * sebelum aset dibaca, sama dengan rute unggah, lalu aset dihapus bersyarat id yang dibaca (tinjauan P31 R5), jadi
+ * hapus yang berpapasan dengan unggah slot yang sama mendapat pesan jelas, bukan galat P2025.
+ */
 export async function hapusAsetKop(kopId: string, jenis: string) {
   const pengguna = await wajibHakAksi("pengaturan.tulis");
   if (!(JENIS_ASET as readonly string[]).includes(jenis)) throw new Error("Jenis gambar tidak dikenal");
   const slot = jenis as JenisAsetKop;
+  if (slotTandaTangan(slot)) pastikanHak(pengguna, "tanda-tangan-cetak.buat");
   await db.$transaction(async (tx) => {
     const kop = await kopAktif(tx, kopId);
+    await tx.$queryRaw`SELECT 1 FROM "KopSurat" WHERE "id" = ${kop.id} FOR NO KEY UPDATE`;
     const aset = await tx.asetKopSurat.findUnique({ where: { kopSuratId_jenis: { kopSuratId: kopId, jenis: slot } } });
     if (!aset) throw new Error(`Gambar ${LABEL_SLOT_ASET[slot].toLocaleLowerCase("id-ID")} kop ini belum diunggah`);
-    await tx.asetKopSurat.delete({ where: { id: aset.id } });
+    const { count } = await tx.asetKopSurat.deleteMany({ where: { id: aset.id, berkasId: aset.berkasId } });
+    if (count !== 1) throw new Error("Gambar sudah diganti; muat ulang halaman");
     await buangSatuBerkas(tx, aset.berkasId, pengguna, { keterangan: `Gambar ${LABEL_SLOT_ASET[slot]} kop ${kop.nama} dihapus` });
     await logKop(tx, pengguna, kop, "HAPUS", `Gambar ${LABEL_SLOT_ASET[slot]} dihapus`, { jenis: slot, berkasId: aset.berkasId });
   });

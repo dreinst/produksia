@@ -2,14 +2,20 @@ import "dotenv/config";
 // Skrip ini memanggil aksi server dan route handler di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
 import { deflateSync } from "node:zlib";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { AppRouterContext, type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { db } from "../src/lib/db";
 import { penggunaSaatIni } from "../src/lib/otentikasi";
-import type { Hak, PenggunaSesi } from "../src/lib/hakAkses";
+import { punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
+import { ambilBerkasTerlihat, bacaUntukDikirim } from "../src/lib/berkas";
+import type { Prisma } from "../src/prisma-klien/client";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { PESAN_GAMBAR_TIDAK_SAH } from "../src/lib/cetak/aset";
 import { PESAN_ASET_FORMAT, PESAN_ASET_TERLALU_BESAR, PESAN_KOP_BUKAN_MILIK } from "../src/lib/cetak/kop";
 import { dataCetakPenjualan, dataCetakUntukPengguna } from "../src/lib/dataCetakPenjualan";
+import { dariDataPenjualan } from "../src/lib/cetak/dariDataPenjualan";
+import { barisDicetak, type MasukanTataLetak } from "../src/lib/cetak/tataLetak/blok";
 import type { JenisCetakPenjualan } from "../src/lib/cetak/tipe";
 import { buatFaktur, buatPenawaran, buatPenerimaan, buatPesanan, buatUangMuka } from "../src/lib/aksi/penjualan";
 import { terbitkanTagihanTermin } from "../src/lib/aksi/dokumenPenjualan";
@@ -20,6 +26,7 @@ import { GET as contohGet } from "../src/app/cetak/contoh/[kopId]/route";
 import { GET as asetBawaanGet } from "../src/app/cetak/aset-bawaan/[gaya]/[slot]/route";
 import { POST as unggahPost } from "../src/app/api/cetak/kop/[kopId]/aset/route";
 import PanelCetak from "../src/komponen/cetak/PanelCetak";
+import HalamanUbahKopSurat from "../src/app/(aplikasi)/pengaturan/perusahaan/kop/[id]/page";
 import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./bantuan";
 
 /*
@@ -29,13 +36,15 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  *     daftar putih (warna HEX, email, tata letak umum, perusahaanId diabaikan, log UBAH), template per jenis, hak.
  *  2. Unggah aset (POST /api/cetak/kop/[kopId]/aset): PNG sah lolos dan menggantikan unggahan lama, PNG rusak, GIF, dan
  *     gambar lebih dari 2 MB ditolak tanpa mematikan proses, Content-Length lebih dari 3 MB 413, asal beda 403, hak,
- *     jenis tidak dikenal, kop tidak ada; hapus unggahan.
+ *     jenis tidak dikenal, kop tidak ada; hapus unggahan. Slot tanda tangan dan stempel butuh tanda-tangan-cetak.buat
+ *     untuk unggah, hapus, pratinjau, dan /api/berkas (tinjauan P31 R4); hapus dan unggah berpapasan (R5).
  *  3. GET /cetak/[jenis]/[id]: lima jenis dokumen nyata 200 PDF inline, unduh attachment, jenis tidak dikenal dan id
  *     acak 404, GUDANG 403, ukuran tidak sah 400, ?ukuran=A5, ?kop milik perusahaan lain 400, log CETAK hanya untuk
  *     unduhan dan cetakan bertanda tangan (ADMIN ttd=1 bertanda tangan, KASIR tidak), kop dokumen yang dihapus jatuh
  *     ke kop bawaan.
  *  4. Pratinjau contoh (semua preset × lima jenis PDF sah, ADMIN 403, jenis tidak dikenal 400) dan aset bawaan.
- *  5. Data kuitansi tanpa faktur.lihat atau pesanan.lihat dikosongkan (KONTRAK-TAMBAHAN P31).
+ *  5. Data kuitansi tanpa faktur.lihat atau pesanan.lihat dikosongkan (KONTRAK-TAMBAHAN P31); tagihan termin dan
+ *     progres termin kwitansi DP tanpa uang-muka.lihat dan penerimaan.lihat tanpa angka bayar (tinjauan P31 R1).
  *  6. PanelCetak: alasan tanpa tanda tangan (draf, peran, kop tanpa gambar), ukuran sah per kop.
  * Data uji berawalan RCT, dibersihkan di awal dan akhir; kop bawaan utama sebelum uji dikembalikan.
  */
@@ -119,6 +128,59 @@ async function unggah(kopId: string, jenis: string, isi: Uint8Array | null, opsi
 }
 
 const idUji = { berkas: [] as string[] };
+
+/** Menunggu sampai n sesi terhalang penahan, langsung atau berantai (pola uji-kunci-persetujuan). */
+async function tungguAntre(pidPenahan: number, n: number) {
+  for (let t = 0; t < 400; t++) {
+    const [{ antre }] = await db.$queryRaw<{ antre: number }[]>`
+      WITH RECURSIVE rantai(pid) AS (
+        SELECT a.pid FROM pg_stat_activity a WHERE ${pidPenahan}::int = ANY(pg_blocking_pids(a.pid))
+        UNION
+        SELECT a.pid FROM pg_stat_activity a JOIN rantai r ON r.pid = ANY(pg_blocking_pids(a.pid))
+      )
+      SELECT count(*)::int AS "antre" FROM rantai`;
+    if (antre >= n) return;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  throw new Error(`antrean kunci tidak mencapai ${n}`);
+}
+
+/** Penahan memegang kunci lewat `pegang`; kerja dari `isi` ditunggu sesudah penahan melepas kuncinya. */
+async function denganPenahan<T>(pegang: (tx: Prisma.TransactionClient) => Promise<unknown>, isi: (pid: number) => Promise<Promise<T>[]>): Promise<T[]> {
+  let lepas!: () => void;
+  let siap!: (pid: number) => void;
+  const tahan = new Promise<void>((r) => (lepas = r));
+  const terkunci = new Promise<number>((r) => (siap = r));
+  const penahan = db.$transaction(
+    async (tx) => {
+      await pegang(tx);
+      const [{ pid }] = await tx.$queryRaw<{ pid: number }[]>`SELECT pg_backend_pid() AS "pid"`;
+      siap(pid);
+      await tahan;
+    },
+    { timeout: 60_000 },
+  );
+  const pid = await Promise.race([terkunci, penahan.then(() => Promise.reject(new Error("penahan selesai sebelum mengunci")))]);
+  let janji: Promise<T>[] = [];
+  try {
+    janji = await isi(pid);
+  } finally {
+    lepas();
+    await penahan;
+  }
+  return Promise.all(janji);
+}
+/** Galat redirect atau revalidatePath di luar HTTP terjadi sesudah transaksi selesai, jadi dianggap sukses. */
+const hasilAksi = async (k: () => Promise<unknown>): Promise<string> => {
+  try {
+    await k();
+    return "ok";
+  } catch (e) {
+    const digest = (e as { digest?: string })?.digest ?? "";
+    const pesan = String((e as Error)?.message ?? e);
+    return digest.startsWith("NEXT_REDIRECT") || pesan.includes("static generation store missing") ? "ok" : pesan;
+  }
+};
 
 async function bersihkan() {
   const pel = (await db.pelanggan.findMany({ where: { kode: { startsWith: `PLG-${K}` } }, select: { id: true } })).map((p) => p.id);
@@ -297,6 +359,60 @@ async function main() {
     await harusDitolak("hapus unggahan yang tidak ada", () => hapusAsetKop(dpro.id, "LOGO"), "belum diunggah");
     await harusDitolak("hapus unggahan jenis tidak dikenal", () => hapusAsetKop(dpro.id, "XYZ"), "Jenis gambar tidak dikenal");
 
+    // tinjauan P31 R4: slot tanda tangan dan stempel butuh pengaturan.tulis DAN tanda-tangan-cetak.buat. KASIR diberi
+    // pengaturan.tulis sementara (baris lama HakAksesPeran disimpan lalu dipulihkan persis).
+    console.log("=== 2b. Slot tanda tangan tanpa tanda-tangan-cetak.buat ===");
+    const kunciKasir = { peran_hak: { peran: "KASIR" as const, hak: "pengaturan.tulis" } };
+    const hakKasirLama = await db.hakAksesPeran.findUnique({ where: kunciKasir });
+    await db.hakAksesPeran.upsert({ where: kunciKasir, create: { peran: "KASIR", hak: "pengaturan.tulis", boleh: true }, update: { boleh: true } });
+    try {
+      const kasirTulis = (await sebagaiPeran("KASIR", () => penggunaSaatIni()))!;
+      pastikan(punyaHak(kasirTulis, "pengaturan.tulis") && !punyaHak(kasirTulis, "tanda-tangan-cetak.buat"), "KASIR sementara memegang pengaturan.tulis tanpa tanda-tangan-cetak.buat");
+      for (const slot of ["TANDA_TANGAN", "STEMPEL"]) {
+        const r = await sebagaiPeran("KASIR", () => unggah(dpro.id, slot, png(16, 16)));
+        pastikan(r.status === 403 && (r.isi.galat ?? "").includes("tanda tangan dan stempel"), `KASIR unggah ${slot} ditolak 403 (${r.status} ${r.isi.galat ?? ""})`);
+      }
+      const logoKasir = await sebagaiPeran("KASIR", () => unggah(dpro.id, "LOGO", png(16, 16)));
+      pastikan(logoKasir.status === 200, "KASIR dengan pengaturan.tulis tetap bisa mengunggah logo");
+      const logoK = await db.asetKopSurat.findUniqueOrThrow({ where: { kopSuratId_jenis: { kopSuratId: dpro.id, jenis: "LOGO" } } });
+      idUji.berkas.push(logoK.berkasId);
+      await harusDitolak("KASIR hapus tanda tangan", () => sebagaiPeran("KASIR", () => hapusAsetKop(dpro.id, "TANDA_TANGAN")), "Tanda tangan cetak");
+      pastikan((await db.asetKopSurat.count({ where: { kopSuratId: dpro.id, jenis: "TANDA_TANGAN" } })) === 1, "tanda tangan tetap ada sesudah penolakan");
+      pastikan((await ambilBerkasTerlihat(db, kasirTulis, aset2.berkasId)) === null && (await bacaUntukDikirim(db, kasirTulis, aset2.berkasId, { unduh: false, ifNoneMatch: null })).status === 404, "/api/berkas: gambar tanda tangan 404 untuk KASIR");
+      pastikan((await ambilBerkasTerlihat(db, kasirTulis, aset1.berkasId, { sampah: true })) === null, "tanda tangan lama di Sampah juga tertutup untuk KASIR");
+      pastikan((await ambilBerkasTerlihat(db, kasirTulis, logoK.berkasId)) !== null, "gambar logo tetap terlihat untuk KASIR");
+      const pemilik = (await penggunaSaatIni())!;
+      pastikan((await ambilBerkasTerlihat(db, pemilik, aset2.berkasId)) !== null && (await ambilBerkasTerlihat(db, pemilik, aset1.berkasId, { sampah: true })) !== null, "PEMILIK tetap melihat tanda tangan dan tanda tangan lama di Sampah");
+      const router = { back() {}, forward() {}, refresh() {}, push() {}, replace() {}, prefetch() {} } as unknown as AppRouterInstance;
+      const halaman = async (peran: string) =>
+        renderToStaticMarkup(createElement(AppRouterContext.Provider, { value: router }, await sebagaiPeran(peran, async () => HalamanUbahKopSurat({ params: Promise.resolve({ id: dpro.id }) }))));
+      const hKasir = await halaman("KASIR");
+      pastikan(!hKasir.includes(`/api/berkas/${aset2.berkasId}`) && hKasir.includes(`/api/berkas/${logoK.berkasId}`) && (hKasir.match(/Butuh hak tanda tangan cetak/g) ?? []).length === 2, "halaman kop KASIR: tanpa pratinjau dan kontrol tanda tangan dan stempel, logo tetap tampil");
+      const hPemilik = await halaman("PEMILIK");
+      pastikan(hPemilik.includes(`/api/berkas/${aset2.berkasId}`) && !hPemilik.includes("Butuh hak tanda tangan cetak"), "halaman kop PEMILIK: pratinjau tanda tangan tampil");
+      await jalankan("hapus logo KASIR", () => hapusAsetKop(dpro.id, "LOGO"));
+    } finally {
+      if (hakKasirLama) await db.hakAksesPeran.update({ where: kunciKasir, data: { boleh: hakKasirLama.boleh } });
+      else await db.hakAksesPeran.deleteMany({ where: { peran: "KASIR", hak: "pengaturan.tulis" } });
+    }
+
+    // tinjauan P31 R5: hapus gambar mengunci baris kop seperti unggah, jadi keduanya bergiliran tanpa galat P2025
+    console.log("=== 2c. Hapus dan unggah gambar slot yang sama berpapasan ===");
+    const [hUnggah, hHapus] = await denganPenahan(
+      (tx) => tx.$queryRaw`SELECT 1 FROM "KopSurat" WHERE "id" = ${dpro.id} FOR NO KEY UPDATE`,
+      async (pid) => {
+        const u = unggah(dpro.id, "TANDA_TANGAN", png(24, 16)).then((r) => `${r.status}${r.isi.galat ? ` ${r.isi.galat}` : ""}`);
+        await tungguAntre(pid, 1);
+        const h = hasilAksi(() => hapusAsetKop(dpro.id, "TANDA_TANGAN"));
+        await tungguAntre(pid, 2);
+        return [u, h];
+      },
+    );
+    pastikan(hUnggah === "200" && hHapus === "ok", `unggah lalu hapus yang menunggu sama-sama selesai (${hUnggah}, ${hHapus})`);
+    pastikan((await db.asetKopSurat.count({ where: { kopSuratId: dpro.id, jenis: "TANDA_TANGAN" } })) === 0 && (await db.berkas.count({ where: { jenisEntitas: "kop-surat", entitasId: dpro.id, dihapusPada: null } })) === 0, "hapus yang menunggu menghapus gambar terbaru; tidak ada berkas kop yatim");
+    const ttd3 = await unggah(dpro.id, "TANDA_TANGAN", png(40, 20));
+    pastikan(ttd3.status === 200, "tanda tangan diunggah lagi untuk bagian berikutnya");
+
     // ---------- 3. Dokumen nyata ----------
     console.log("=== 3. GET /cetak/[jenis]/[id] ===");
     const jasa = await db.barang.create({ data: { kode: `BRG-${K}-JASA`, nama: "Jasa Uji Rute Cetak", jenis: "JASA", satuan: "paket", hargaBeli: 0, hargaJual: 1_000_000 } });
@@ -414,6 +530,28 @@ async function main() {
     pastikan(dataCetakUntukPengguna(kwdp, tanpa("faktur.lihat")) === kwdp, "kwitansi DP hanya bergantung pesanan.lihat");
     const fkt = (await dataCetakPenjualan("faktur", fj.id))!;
     pastikan(dataCetakUntukPengguna(fkt, tanpa("pesanan.lihat")) === fkt, "jenis selain kuitansi tidak disaring");
+
+    // tinjauan P31 R1: tagihan termin dan progres termin kwitansi DP tanpa uang-muka.lihat dan penerimaan.lihat
+    const t2 = psj.rencanaTermin[1];
+    const tt1 = (await dataCetakPenjualan("tagihan-termin", t1.id))!;
+    const tt2 = (await dataCetakPenjualan("tagihan-termin", t2.id))!;
+    pastikan(tt1.ringkasan.terbayar === "500000.00" && tt1.ringkasan.sisa === "0.00" && tt1.termin[0].status === "Lunas", "data tagihan DP mentah: terbayar 500.000, sisa 0, status Lunas");
+    pastikan(tt2.konteksTermin?.dibayarSebelumnya === "500000.00", "data tagihan pelunasan mentah: sudah dibayar sebelumnya 500.000");
+    pastikan(dataCetakUntukPengguna(tt2, kasir!) === tt2 && dataCetakUntukPengguna(kwdp, kasir!) === kwdp, "dengan uang-muka.lihat dan penerimaan.lihat tagihan termin dan kwitansi DP utuh");
+    for (const hak of ["uang-muka.lihat", "penerimaan.lihat"] as const) {
+      const s1 = dataCetakUntukPengguna(tt1, tanpa(hak));
+      const s2 = dataCetakUntukPengguna(tt2, tanpa(hak));
+      pastikan(
+        s1.ringkasan.terbayar === "0.00" && s1.ringkasan.sisa === s1.ringkasan.total && s1.ringkasan.total === tt1.ringkasan.total && s1.termin.map((t) => t.status).join() === "Ditagih,Belum ditagih",
+        `tagihan DP tanpa ${hak}: terbayar 0, sisa = nilai butir, status hanya Ditagih atau Belum ditagih`,
+      );
+      pastikan(s2.konteksTermin?.dibayarSebelumnya === null && s2.konteksTermin.sisaSetelahTermin === tt2.konteksTermin?.sisaSetelahTermin && s2.konteksTermin.nilaiKontrakBruto === tt2.konteksTermin.nilaiKontrakBruto, `tagihan pelunasan tanpa ${hak}: sudah dibayar sebelumnya disembunyikan, nilai kontrak dan sisa sesudah termin tetap`);
+    }
+    const tema = { gayaAngka: "TITIK", desimal: 0 } as MasukanTataLetak["tema"];
+    const uraian = (d: typeof tt2) => barisDicetak({ dok: dariDataPenjualan(d), tema } as MasukanTataLetak)[0]?.deskripsi ?? "";
+    pastikan(uraian(tt2).includes("Sudah dibayar (termin sebelumnya): Rp 500.000") && !uraian(dataCetakUntukPengguna(tt2, tanpa("penerimaan.lihat"))).includes("Sudah dibayar"), "baris tagihan tercetak: Sudah dibayar hanya untuk pemegang hak lihat bayar");
+    const kwdpBayar = dataCetakUntukPengguna(kwdp, tanpa("penerimaan.lihat"));
+    pastikan(kwdp.termin[0].status === "Lunas" && kwdpBayar.termin.map((t) => t.status).join() === "Ditagih,Belum ditagih" && kwdpBayar.baris.length === 1, "kwitansi DP tanpa penerimaan.lihat: baris tetap, status termin tanpa informasi bayar");
 
     // ---------- 6. PanelCetak ----------
     console.log("=== 6. PanelCetak ===");

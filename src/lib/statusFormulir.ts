@@ -34,6 +34,12 @@ function kodeSqlState(e: { code?: unknown; meta?: unknown }): string | null {
 /** 23503 foreign_key_violation; 23001 restrict_violation (FK ON DELETE RESTRICT, mis. hapus perusahaan yang punya data). */
 const SQLSTATE_MASIH_DIPAKAI = new Set(["23503", "23001"]);
 
+/** Galat FK (P2003, SQLSTATE 23503/23001): baris masih dirujuk data lain. Untuk pemanggil yang ingin pesan sendiri. */
+export function galatMasihDipakai(galat: unknown): boolean {
+  const e = galat as { code?: unknown; meta?: unknown } | null;
+  return e?.code === "P2003" || SQLSTATE_MASIH_DIPAKAI.has(kodeSqlState(e ?? {}) ?? "");
+}
+
 function pesanRamah(galat: unknown): string {
   const e = galat as { code?: string; message?: string; meta?: { target?: string[] } };
   if (e?.code === "P2002") {
@@ -42,7 +48,7 @@ function pesanRamah(galat: unknown): string {
       ? `Data dengan ${bidang} yang sama sudah ada (harus unik).`
       : "Data dengan nilai yang sama sudah ada (harus unik).";
   }
-  if (e?.code === "P2003" || SQLSTATE_MASIH_DIPAKAI.has(kodeSqlState(e ?? {}) ?? "")) {
+  if (galatMasihDipakai(e)) {
     return "Data ini masih dipakai oleh data/transaksi lain, tidak bisa dihapus atau diubah.";
   }
   if (e?.code === "P2025") {

@@ -21,7 +21,8 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  *       grup yang sudah dalam batas tidak disentuh, data yang tidak bisa dibagi ulang menghentikan migrasi tanpa
  *       mengubah apa pun, dan faktur lama atas data yang dibagi ulang tetap bisa dihapus (pembalik urut terbalik).
  *  t2.  Hapus pesanan yang berbarengan dengan faktur baru mengunci baris pesanan lebih dulu, jadi ditolak "sudah punya
- *       faktur", bukan menghapus pesanan dan meninggalkan faktur tanpa pesanan.
+ *       faktur", bukan menghapus pesanan dan meninggalkan faktur tanpa pesanan. Uang muka yang kedahuluan masuk sesudah
+ *       bacaan hapus membuat hapus ditolak dengan pesan jelas (tinjauan P31 R3).
  *  t3.  Tanggal faktur diambil sesudah kunci baris pesanan.
  *  t4.  Tagihan termin untuk butir yang sudah lunas ditolak.
  *  t5.  Batas kuantitas cadangan faktur lama dibulatkan ke bawah, jadi nilai yang dibalik tidak melewati nilaiTransit.
@@ -342,6 +343,28 @@ async function bagianT2(k: Konteks) {
   pastikan(f.pesananId === psj.id && f.baris[0].barisPesananId === bJ.id && (await db.pesananPenjualan.count({ where: { id: psj.id } })) === 1, "pesanan tetap ada dan faktur tetap menaut pesanan dan barisnya");
   await jalankan("hapus F t2", () => hapusDokumen("faktur", f.id));
   await jalankan("hapus PSJ t2", () => hapusDokumen("pesanan", psj.id));
+
+  // tinjauan P31 R3: buatUangMuka tidak mengunci baris pesanan, jadi uang muka yang selesai sesudah hapus membaca anak
+  // pesanan membuat DELETE gagal oleh FK; pesannya jelas dan hapus dibatalkan utuh. Penahan memegang butir termin
+  // supaya hapus berhenti tepat sesudah bacaan itu.
+  const psjUm = await pesananBaru(k, "T2b: jasa 1 @ 100.000 bertermin", [{ barangId: k.jasa.id, jumlah: 1, harga: 100_000 }], { rencanaTermin: [{ label: "DP", nilai: 50 }, { label: "Pelunasan" }] });
+  const butirUm = await db.rencanaTermin.findMany({ where: { pesananId: psjUm.id }, orderBy: { no: "asc" }, select: { id: true } });
+  const [hapusUm] = await denganPenahan(
+    (tx) => tx.$queryRaw`SELECT 1 FROM "RencanaTermin" WHERE "id" = ${butirUm[0].id} FOR UPDATE`,
+    async (pid) => {
+      const h = aksi(() => hapusDokumen("pesanan", psjUm.id));
+      await tungguAntre(pid, 1);
+      const um = await aksi(() => buatUangMuka(formulir({ pesananId: psjUm.id, akunId: k.kas.id, jumlah: 10_000 })));
+      pastikan(um === "ok", `uang muka tanpa butir lolos selagi hapus pesanan menunggu (${um})`);
+      return [h];
+    },
+  );
+  pastikan(hapusUm.includes(`${psjUm.nomor} punya uang muka baru; muat ulang halaman`), `hapus pesanan yang kedahuluan uang muka ditolak dengan pesan jelas (${hapusUm})`);
+  pastikan((await db.pesananPenjualan.count({ where: { id: psjUm.id } })) === 1 && (await db.rencanaTermin.count({ where: { pesananId: psjUm.id } })) === 2 && (await db.barisPesananPenjualan.count({ where: { pesananId: psjUm.id } })) === 1, "pesanan, butir termin, dan barisnya tetap utuh");
+  const umBaru = await db.uangMukaPelanggan.findFirstOrThrow({ where: { pesananId: psjUm.id } });
+  pastikan((await aksi(() => hapusDokumen("pesanan", psjUm.id))).includes("sudah punya uang muka"), "hapus ulang ditolak dengan pesan uang muka biasa");
+  await jalankan("hapus UM t2b", () => hapusDokumen("uangMuka", umBaru.id));
+  await jalankan("hapus PSJ t2b", () => hapusDokumen("pesanan", psjUm.id));
   await transitTepat("sesudah t2", awal, 0);
 }
 

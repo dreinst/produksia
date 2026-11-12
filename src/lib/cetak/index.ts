@@ -78,7 +78,7 @@ function nilaiUang(d: DokumenCetak): NilaiAngka[] {
     ...(r.addOn ? [r.addOn.nilai] : []),
     ...d.skemaTermin.map((t) => t.jumlahBruto),
     ...d.uangMukaDipakai.map((u) => u.jumlah),
-    ...(kt ? [kt.jumlah, kt.jumlahBruto, kt.nilaiKontrakBruto, kt.dibayarSebelumnya, kt.sisaSetelahTermin] : []),
+    ...(kt ? [kt.jumlah, kt.jumlahBruto, kt.nilaiKontrakBruto, ...(kt.dibayarSebelumnya ? [kt.dibayarSebelumnya] : []), kt.sisaSetelahTermin] : []),
     ...(d.kwitansi ? [d.kwitansi.jumlah, d.kwitansi.potonganPajak] : []),
   ];
 }

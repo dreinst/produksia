@@ -95,7 +95,8 @@ export type DokumenCetakPenjualan = {
   /** faktur: dari PemakaianUangMuka ke UangMukaPelanggan.rencanaTermin */
   uangMukaDipakai: { nomor: string; labelTermin: string | null; jumlah: string }[];
   /** penawaran: skema pembayaran */
-  termin: { no: number; label: string; persen: string; jumlah: string; jumlahBruto: string; jatuhTempo: Date | null; status: string }[];
+  /** `ditagih` (opsional): tagihan butir sudah diterbitkan; dipakai untuk status netral tanpa hak lihat bayar */
+  termin: { no: number; label: string; persen: string; jumlah: string; jumlahBruto: string; jatuhTempo: Date | null; status: string; ditagih?: boolean }[];
   /** tagihan termin */
   konteksTermin: {
     no: number;
@@ -105,7 +106,8 @@ export type DokumenCetakPenjualan = {
     jumlah: string;
     jumlahBruto: string;
     nilaiKontrakBruto: string;
-    dibayarSebelumnya: string;
+    /** null: disembunyikan untuk pengguna tanpa uang-muka.lihat dan penerimaan.lihat (baris "Sudah dibayar" tidak dicetak) */
+    dibayarSebelumnya: string | null;
     sisaSetelahTermin: string;
     nomorPesanan: string;
   } | null;
@@ -189,7 +191,8 @@ export type DokumenCetak = {
     jumlah: Desimal;
     jumlahBruto: Desimal;
     nilaiKontrakBruto: Desimal;
-    dibayarSebelumnya: Desimal;
+    /** null: baris "Sudah dibayar (termin sebelumnya)" tidak dicetak */
+    dibayarSebelumnya: Desimal | null;
     sisaSetelahTermin: Desimal;
     nomorPesanan: string;
   };

@@ -456,6 +456,10 @@ export type MetaBerkas = Prisma.BerkasGetPayload<{ select: typeof PILIH_META }>;
  * Metadata berkas yang boleh dilihat pengguna, atau null bila tidak ada, sudah dibuang (kecuali opsi.sampah), isinya
  * sudah dihapus permanen, tersembunyi oleh ruang, atau tidak lolos hak lihat. Tidak pernah membaca isi.
  */
+/** Slot kop bernilai hukum (D3): gambarnya butuh pengaturan.tulis DAN tanda-tangan-cetak.buat (tinjauan P31 R4). */
+export const SLOT_KOP_TANDA_TANGAN = ["TANDA_TANGAN", "STEMPEL"] as const;
+export const slotTandaTangan = (jenis: string): boolean => (SLOT_KOP_TANDA_TANGAN as readonly string[]).includes(jenis);
+
 export async function ambilBerkasTerlihat(klien: KlienDb, pengguna: PenggunaSesi, id: string, opsi: { sampah?: boolean } = {}): Promise<MetaBerkas | null> {
   if (!id) return null;
   const b = await klien.berkas.findUnique({ where: { id }, select: PILIH_META });
@@ -463,6 +467,12 @@ export async function ambilBerkasTerlihat(klien: KlienDb, pengguna: PenggunaSesi
   if (opsi.sampah ? !b.dihapusPada : !!b.dihapusPada) return null;
   if (!bolehAksesBerkas(pengguna, b, "lihat")) return null;
   if (berkasTersembunyi(b, await ruangTersembunyi(klien, pengguna))) return null;
+  // Gambar kop tanpa tanda-tangan-cetak.buat: hanya yang sedang terpasang di slot selain tanda tangan dan stempel.
+  // Berkas kop yang sudah dilepas dari slotnya (di Sampah) tidak lagi diketahui slotnya, jadi ikut tertutup.
+  if (b.jenisEntitas === "kop-surat" && !punyaHak(pengguna, "tanda-tangan-cetak.buat")) {
+    const aset = await klien.asetKopSurat.findUnique({ where: { berkasId: b.id }, select: { jenis: true } });
+    if (!aset || slotTandaTangan(aset.jenis)) return null;
+  }
   return b;
 }
 

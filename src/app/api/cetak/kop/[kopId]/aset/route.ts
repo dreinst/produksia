@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { penggunaSaatIni } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { catatAktivitas } from "@/lib/log";
-import { bacaFormulirTerbatas, buangSatuBerkas, simpanBerkas } from "@/lib/berkas";
+import { bacaFormulirTerbatas, buangSatuBerkas, simpanBerkas, slotTandaTangan } from "@/lib/berkas";
 import { LABEL_SLOT_ASET, periksaAsetKop } from "@/lib/cetak/kop";
 import type { InfoGambar } from "@/lib/cetak/aset";
 import type { JenisAsetKop } from "@/prisma-klien/enums";
@@ -49,6 +49,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ kop
     const jenisMasukan = fd.get("jenis");
     const jenis = SLOT.find((s) => s === jenisMasukan);
     if (!jenis) return galat(400, "Jenis gambar tidak dikenal");
+    // slot tanda tangan dan stempel juga butuh hak tanda tangan cetak (tinjauan P31 R4)
+    if (slotTandaTangan(jenis) && !punyaHak(pengguna, "tanda-tangan-cetak.buat")) return galat(403, "Anda tidak punya hak mengubah gambar tanda tangan dan stempel");
     const gambar = fd.get("gambar");
     if (!(gambar instanceof File) || (gambar.size === 0 && !gambar.name)) return galat(400, "Pilih satu gambar");
     const kop = await db.kopSurat.findUnique({ where: { id: kopId }, select: { id: true, nama: true, perusahaanId: true, dihapusPada: true } });

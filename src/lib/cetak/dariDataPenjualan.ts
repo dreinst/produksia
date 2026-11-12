@@ -89,7 +89,7 @@ export function dariDataPenjualan(data: DokumenCetakPenjualan): DokumenCetak {
           jumlah: D(kt.jumlah),
           jumlahBruto: D(kt.jumlahBruto),
           nilaiKontrakBruto: D(kt.nilaiKontrakBruto),
-          dibayarSebelumnya: D(kt.dibayarSebelumnya),
+          dibayarSebelumnya: kt.dibayarSebelumnya === null ? null : D(kt.dibayarSebelumnya),
           sisaSetelahTermin: D(kt.sisaSetelahTermin),
           nomorPesanan: kt.nomorPesanan,
         }
