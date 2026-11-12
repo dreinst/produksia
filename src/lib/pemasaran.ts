@@ -124,7 +124,9 @@ export async function pastikanPenanggungJawab(klien: Klien, id: string | null | 
   if (!id) return null;
   const p = await klien.pengguna.findUnique({ where: { id }, select: { id: true, aktif: true, peran: true, peranTambahan: true } });
   const gagal = `${label} harus pengguna aktif yang berhak ${labelHak(hak)}`;
-  if (!p || !p.aktif) throw new Error(gagal);
+  // Superadmin (admin IT) tidak pernah menjadi penanggung jawab, sama dengan pilihan formulir (perbaikan tinjauan P41 R6).
+  // Pemanggil tidak memeriksa ulang nilai lama, jadi aturan ini hanya berlaku untuk pilihan baru.
+  if (!p || !p.aktif || p.peran === "SUPERADMIN") throw new Error(gagal);
   const penyesuaian = await klien.hakAksesPeran.findMany({ where: { peran: { in: [p.peran, ...p.peranTambahan] } }, select: { peran: true, hak: true, boleh: true } });
   if (!hitungHakPengguna(p.peran, p.peranTambahan, penyesuaian).includes(hak)) throw new Error(gagal);
   return p.id;
@@ -161,7 +163,32 @@ export type NotifikasiPemasaran = {
  * yang tidak aktif, lalu memotong judul (120) dan isi (500). Mengembalikan jumlah notifikasi yang tersimpan.
  */
 export async function kirimNotifikasiPemasaran(tx: Klien, n: NotifikasiPemasaran): Promise<number> {
-  return kirimNotifikasi(tx, { penggunaIds: n.penerima, judul: n.judul, isi: n.isi, tautan: n.tautan, jenis: n.jenis, perusahaanId: n.perusahaanId, kecuali: n.pelaku.id });
+  const hak = hakTautanPemasaran(n.tautan);
+  const penerima = hak ? await penerimaBerhak(tx, n.penerima, hak) : n.penerima;
+  return kirimNotifikasi(tx, { penggunaIds: penerima, judul: n.judul, isi: n.isi, tautan: n.tautan, jenis: n.jenis, perusahaanId: n.perusahaanId, kecuali: n.pelaku.id });
+}
+
+/** Hak lihat halaman tujuan tautan notifikasi Pemasaran; null untuk tautan lain. */
+export function hakTautanPemasaran(tautan: string): Hak | null {
+  if (tautan.startsWith("/pemasaran/konten")) return "konten.lihat";
+  if (tautan.startsWith("/pemasaran/desain")) return "tugas-desain.lihat";
+  if (tautan.startsWith("/pemasaran/iklan")) return "kampanye.lihat";
+  return null;
+}
+
+/**
+ * Penerima tersimpan (SMM, desainer, pembuat konten) yang sekarang masih memegang hak lihat halaman tautannya, menurut
+ * hak efektif (peran utama dan tambahan beserta penyesuaian Hak Akses). Penerima yang haknya sudah dicabut tidak lagi
+ * menerima judul konten atau masukan penyetuju (perbaikan tinjauan P41 R5, pola penerima CRM).
+ */
+async function penerimaBerhak(tx: Klien, ids: readonly (string | null | undefined)[], hak: Hak): Promise<string[]> {
+  const unik = [...new Set(ids.filter((x): x is string => !!x))];
+  if (unik.length === 0) return [];
+  const calon = await tx.pengguna.findMany({ where: { id: { in: unik }, aktif: true }, select: { id: true, peran: true, peranTambahan: true } });
+  if (calon.length === 0) return [];
+  const peran = [...new Set(calon.flatMap((p) => [p.peran, ...p.peranTambahan]))];
+  const penyesuaian = await tx.hakAksesPeran.findMany({ where: { peran: { in: peran } }, select: { peran: true, hak: true, boleh: true } });
+  return calon.filter((p) => hitungHakPengguna(p.peran, p.peranTambahan, penyesuaian).includes(hak)).map((p) => p.id);
 }
 
 export type ModulPemasaran = Extract<ModulLog, "konten" | "tugas-desain" | "kampanye">;

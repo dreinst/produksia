@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { perusahaanDokumenBaru } from "@/lib/perusahaan";
 import { bacaProyekId } from "@/lib/proyek";
-import { berkasTersembunyi, bolehAksesBerkas, ruangTersembunyi, sinkronProyekLampiran } from "@/lib/berkas";
+import { ambilBerkasTerlihat, sinkronProyekLampiran } from "@/lib/berkas";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { STATUS_KAMPANYE } from "@/lib/labelPemasaran";
 import { JENIS_LOG_KAMPANYE, catatLogPemasaran } from "@/lib/pemasaran";
@@ -190,14 +190,14 @@ export async function hapusSetIklanFormulir(id: string): Promise<StatusFormulir>
 const PESAN_KREATIF_TIDAK_ADA = "Berkas kreatif tidak ditemukan";
 
 /**
- * Berkas kreatif (D6 §3.3 no. 3): berkas ada, belum dibuang, milik perusahaan kampanye, dan terlihat bagi pelaku
- * (bolehAksesBerkas lihat serta tidak di folder atau proyek yang tersembunyi baginya). Semua kegagalan memakai pesan
- * yang sama supaya keberadaan berkas lain tidak terbaca.
+ * Berkas kreatif (D6 §3.3 no. 3): berkas yang terlihat bagi pelaku menurut ambilBerkasTerlihat (belum dibuang, isi
+ * belum dihapus, hak lihat, folder dan proyek tidak tersembunyi, dan aturan slot tanda tangan dan stempel kop),
+ * lalu milik perusahaan kampanye (perbaikan tinjauan P41 R3). Semua kegagalan memakai pesan yang sama supaya
+ * keberadaan berkas lain tidak terbaca.
  */
 async function pastikanKreatif(tx: Klien, pengguna: PenggunaSesi, berkasId: string, kampanye: Pick<Kampanye, "perusahaanId">): Promise<void> {
-  const b = await tx.berkas.findUnique({ where: { id: berkasId }, select: { id: true, perusahaanId: true, jenisEntitas: true, folderKode: true, proyekId: true, dihapusPada: true, isiDihapusPada: true } });
-  if (!b || b.dihapusPada || b.isiDihapusPada || b.perusahaanId !== kampanye.perusahaanId) throw new Error(PESAN_KREATIF_TIDAK_ADA);
-  if (!bolehAksesBerkas(pengguna, b, "lihat") || berkasTersembunyi(b, await ruangTersembunyi(tx, pengguna))) throw new Error(PESAN_KREATIF_TIDAK_ADA);
+  const b = await ambilBerkasTerlihat(tx, pengguna, berkasId);
+  if (!b || b.perusahaanId !== kampanye.perusahaanId) throw new Error(PESAN_KREATIF_TIDAK_ADA);
 }
 
 /** Set iklan tujuan harus milik kampanye yang sama. */

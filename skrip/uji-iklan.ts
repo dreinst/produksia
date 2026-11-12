@@ -7,7 +7,7 @@ import { periksaKonsistensiPerusahaan, periksaSinkron } from "../src/lib/sinkron
 import { tanggalIso } from "../src/lib/waktu";
 import { D } from "../src/lib/uang";
 import { simpanBerkas } from "../src/lib/berkas";
-import { daftarKampanye, kampanyeLengkap, ringkasanIklan, totalMetrik, turunanMetrik, urlTujuanSah, type BarisMetrik } from "../src/lib/iklan";
+import { aturanHasil, dasarHasil, daftarKampanye, kampanyeLengkap, ringkasanIklan, totalMetrik, turunanMetrik, urlTujuanSah, type BarisMetrik } from "../src/lib/iklan";
 import {
   arsipkanKampanye,
   buatIklan,
@@ -116,6 +116,11 @@ async function main() {
     pastikan(totalMetrik([m1, m2], ["PROSPEK", "TRAFFIC"]).cpr === null, "total lintas tujuan: CPR null");
     pastikan(urlTujuanSah("https://dpro.id/promo") && urlTujuanSah("http://x.id") && !urlTujuanSah("javascript:alert(1)") && !urlTujuanSah("ftp://x.id") && !urlTujuanSah("dpro.id"), "urlTujuanSah hanya http dan https");
 
+    // perbaikan tinjauan P41 R8: aturanHasil dan dasarHasil dari satu peta; INTERAKSI tanpa hitungan otomatis
+    const dasarUji = { jangkauan: 1, klik: 2, leads: 3, konversi: 4 };
+    pastikan(aturanHasil("INTERAKSI") === null && dasarHasil(dasarUji, "INTERAKSI") === 0, "R8: INTERAKSI tanpa aturan hasil otomatis, dasar 0");
+    pastikan((["PROSPEK", "PENJUALAN", "PROMOSI_APLIKASI", "TRAFFIC", "KESADARAN"] as const).every((t) => dasarHasil(dasarUji, t) === dasarUji[aturanHasil(t) as keyof typeof dasarUji]), "R8: aturanHasil sejalan dengan dasarHasil untuk semua tujuan lain");
+
     console.log("=== I2. Hak bawaan ===");
     const AKSI = ["lihat", "buat", "ubah", "hapus"] as const;
     const hak = (p: PeranPengguna) => JSON.stringify(AKSI.filter((a) => punyaHak(p, `kampanye.${a}`)));
@@ -193,12 +198,16 @@ async function main() {
     console.log("=== I5. Laporan harian ===");
     await sebagai(IKL, () => jalankan("catat laporan 1", () => catatMetrikIklan(k1.id, formulir(LAP1))));
     await sebagai(IKL, () => jalankan("catat laporan 2", () => catatMetrikIklan(k1.id, formulir(LAP2))));
-    const lengkap = await kampanyeLengkap(db, k1.id);
+    const lengkap = await kampanyeLengkap(db, k1.id, sesi(ownerP));
     pastikan(!!lengkap && lengkap.laporan.length === 2 && tanggalIso(lengkap.laporan[0].tanggal) === "2026-09-19", "kampanyeLengkap memuat dua laporan, tanggal terbaru dulu");
     const tk = lengkap!.total;
     pastikan(tk.ctr.equals("2.11") && tk.cpc.equals("982.46") && tk.cpm.equals("20740.74") && sama(tk.cpr, "51376.15") && tk.roas.equals("3.84") && tk.belanja.equals("5600000") && tk.jangkauan === 175000, "total kampanyeLengkap sama dengan I1");
     pastikan(lengkap!.laporan[1].turunan.ctr.equals("2.00") && !lengkap!.laporan[1].manual.ctr && lengkap!.laporan[1].dicatatOlehNama === iklanP.nama, "turunan per baris dan penanda manual");
     pastikan(lengkap!.setIklan.length === 2 && lengkap!.setIklan[0].id === setA.id && lengkap!.iklan.length === 1 && lengkap!.iklan[0].berkasKreatif?.namaBerkas === "uji-d6-kreatif.png" && lengkap!.iklan[0].setIklan.id === setB.id, "kampanyeLengkap memuat set iklan urut dibuat dan iklan dengan nama kreatif");
+    // perbaikan tinjauan P41 R4: nama kreatif hanya bila berkasnya terlihat bagi pembaca, tugas desain hanya bagi tugas-desain.lihat
+    const tanpaLihatBerkas: PenggunaSesi = { ...sesi(ownerP), hak: HAK_BAWAAN.PEMILIK.filter((h) => !h.startsWith("kampanye.") && !h.startsWith("tugas-desain.")) };
+    const lengkapTerbatas = (await kampanyeLengkap(db, k1.id, tanpaLihatBerkas))!;
+    pastikan(lengkapTerbatas.iklan[0].berkasKreatif === null && lengkapTerbatas.iklan[0].kreatifTersembunyi && !lengkap!.iklan[0].kreatifTersembunyi && lengkapTerbatas.tugasDesain.length === 0, "R4: kreatif yang tidak terlihat tidak dikirim, tugas desain kosong tanpa hak");
     pastikan((await jumlahLog("BUAT", "Laporan Iklan")) === 2 && (await db.logAktivitas.count({ where: { waktu: { gte: mulaiUji }, modul: "kampanye", jenis: "Laporan Iklan", nomor: "2026-09-18" } })) === 1, "log BUAT Laporan Iklan berlabel tanggal ISO");
     await sebagai(IKL, () => harusDitolak("laporan ganda di tanggal sama", () => catatMetrikIklan(k1.id, formulir({ ...LAP1, belanja: "1" })), "Laporan tanggal 18 Sep 2026 untuk kampanye ini sudah ada"));
     await sebagai(IKL, () => harusDitolak("tanggal kosong", () => catatMetrikIklan(k1.id, formulir({ ...LAP1, tanggal: "" })), "Tanggal laporan wajib diisi"));
@@ -213,10 +222,10 @@ async function main() {
     const lap2 = await db.metrikIklan.findFirstOrThrow({ where: { kampanyeId: k1.id, belanja: D(3100000) } });
     await sebagai(IKL, () => harusDitolak("ubah laporan 1 ke tanggal laporan 2", () => ubahMetrikIklan(lap1.id, formulir({ ...LAP1, tanggal: "2026-09-19" })), "Laporan tanggal 19 Sep 2026 untuk kampanye ini sudah ada"));
     await sebagai(IKL, () => jalankan("ubah laporan 1 dengan CTR manual kosong dan klik baru", () => ubahMetrikIklan(lap1.id, formulir({ ...LAP1, klik: "3000", ctrManual: "" }))));
-    const sesudahKlik = (await kampanyeLengkap(db, k1.id))!.laporan.find((l) => l.id === lap1.id)!;
+    const sesudahKlik = (await kampanyeLengkap(db, k1.id, sesi(ownerP)))!.laporan.find((l) => l.id === lap1.id)!;
     pastikan(sesudahKlik.turunan.ctr.equals("2.50") && sesudahKlik.ctrManual === null, "CTR dihitung ulang dari klik baru (jebakan formulir HKA tidak terjadi)");
     await sebagai(IKL, () => jalankan("ubah laporan 1 dengan CTR manual 9", () => ubahMetrikIklan(lap1.id, formulir({ ...LAP1, klik: "3000", ctrManual: "9" }))));
-    const lengkapManual = (await kampanyeLengkap(db, k1.id))!;
+    const lengkapManual = (await kampanyeLengkap(db, k1.id, sesi(ownerP)))!;
     const barisManual = lengkapManual.laporan.find((l) => l.id === lap1.id)!;
     pastikan(barisManual.turunan.ctr.equals("9.00") && barisManual.manual.ctr && lengkapManual.total.ctr.equals("2.33"), `CTR manual 9.00 di baris, total tetap dari jumlah (${lengkapManual.total.ctr})`);
     await sebagai(IKL, () => jalankan("kembalikan klik laporan 1", () => ubahMetrikIklan(lap1.id, formulir({ ...LAP1, ctrManual: "" }))));
@@ -274,7 +283,7 @@ async function main() {
     await sebagai(IKL, () => jalankan("IKLAN arsip kampanye 1", () => arsipkanKampanye(k1.id)));
     const k1Arsip = await db.kampanye.findUniqueOrThrow({ where: { id: k1.id } });
     pastikan(!!k1Arsip.diarsipkanPada && k1Arsip.diarsipkanOlehNama === iklanP.nama && (await jumlahLog("ARSIP", "Kampanye Iklan", k1.id)) === 1, "kampanye diarsipkan, log ARSIP");
-    pastikan((await kampanyeLengkap(db, k1.id)) === null, "kampanyeLengkap kampanye arsip = null");
+    pastikan((await kampanyeLengkap(db, k1.id, sesi(ownerP))) === null, "kampanyeLengkap kampanye arsip = null");
     const ringkasArsip = await ringkasanIklan(db, { q: `${AWALAN}-IKL` });
     pastikan(ringkasArsip.jumlahKampanye === 1 && ringkasArsip.total.belanja.equals("100000"), "kampanye arsip dan laporannya tidak ikut ringkasan");
     await sebagai(IKL, () => harusDitolak("laporan untuk kampanye arsip", () => catatMetrikIklan(k1.id, formulir({ ...LAP1, tanggal: "2026-09-21" })), "Kampanye tidak ditemukan"));

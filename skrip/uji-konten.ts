@@ -330,10 +330,15 @@ async function main() {
     pastikan(daftarProyek.baris.every((b) => b.proyek?.id === proyekA.id) && daftarProyek.baris.some((b) => b.id === k4.id) && daftarTanpaProyek.baris.some((b) => b.id === kTanpa.id) && !daftarTanpaProyek.baris.some((b) => b.id === k4.id), "saringan proyek dan tanpa proyek");
     const urut = (await kontenDaftar(db, {}, param, null)).baris;
     pastikan(urut.findIndex((b) => b.id === k4.id) < urut.findIndex((b) => b.id === kS.id) && urut.findIndex((b) => b.id === kS.id) < urut.findIndex((b) => b.id === kTanpa.id), "urut tanggal terbit naik, yang belum dijadwalkan terakhir");
-    const detail = await detailKonten(db, k4.id);
+    const sesiPemilik: PenggunaSesi = { id: owner.id, nama: owner.nama, namaPengguna: "owner", email: null, nomorTelepon: null, peran: "PEMILIK", hak: HAK_BAWAAN.PEMILIK };
+    const detail = await detailKonten(db, k4.id, sesiPemilik);
     pastikan(!!detail && detail.riwayat.length >= 6 && detail.riwayat.every((r, i, a) => i === 0 || a[i - 1].dibuatPada >= r.dibuatPada) && detail.riwayat[0].aksi === "DISETUJUI", "detailKonten: riwayat urut terbaru dulu");
     pastikan(detail?.tugasAktif?.id === tugas.id && detail.tugasAktif.desainer?.id === desainer.id && detail.proyek?.kode === KODE_PROYEK.A && detail.smm?.id === owner.id, "detailKonten memuat tugas aktif, desainer, proyek, SMM");
-    pastikan((await detailKonten(db, "tidak-ada")) === null, "detailKonten id tidak ada = null");
+    pastikan((await detailKonten(db, "tidak-ada", sesiPemilik)) === null, "detailKonten id tidak ada = null");
+    // perbaikan tinjauan P41 R4: tugas aktif (desainer, revisi) hanya bagi pemegang tugas-desain.lihat
+    const tanpaLihatTugas: PenggunaSesi = { ...sesiPemilik, hak: HAK_BAWAAN.PEMILIK.filter((h) => !h.startsWith("tugas-desain.")) };
+    const detailTanpaHak = await detailKonten(db, k4.id, tanpaLihatTugas);
+    pastikan(!!detailTanpaHak && detailTanpaHak.tugasAktif === null && detailTanpaHak.adaTugasAktif && detail?.adaTugasAktif === true, "detailKonten tanpa tugas-desain.lihat: tugasAktif null, adaTugasAktif tetap benar (R4)");
     await sebagai(SOS, () => jalankan("ajukan konten tanpa tanggal", () => ajukanKonten(kTanpa.id, formulir({}))));
     const ringkasan = await ringkasanKontenBeranda(db, "utama");
     pastikan(ringkasan.menungguPersetujuan === (await db.konten.count({ where: { perusahaanId: "utama", diarsipkanPada: null, statusPersetujuan: "MENUNGGU" } })) && ringkasan.menungguPersetujuan >= 1, "ringkasanKontenBeranda menghitung menunggu persetujuan");
@@ -375,7 +380,7 @@ async function main() {
     await sebagai(SOS, () => jalankan("SOSMED arsip K4", () => arsipkanKonten(k4.id)));
     const k20 = await db.konten.findUniqueOrThrow({ where: { id: k4.id } });
     pastikan(!!k20.diarsipkanPada && k20.diarsipkanOlehNama === sosmed.nama && (await jumlahLog("konten", "ARSIP", k4.id)) === 1, "diarsipkanPada terisi, log ARSIP");
-    pastikan((await detailKonten(db, k4.id)) === null && !(await kontenDaftar(db, {}, param, null)).baris.some((b) => b.id === k4.id), "detailKonten null, tidak muncul di daftar");
+    pastikan((await detailKonten(db, k4.id, ownerSesi)) === null && !(await kontenDaftar(db, {}, param, null)).baris.some((b) => b.id === k4.id), "detailKonten null, tidak muncul di daftar");
     pastikan(!(await kontenKalender(db, { bulan: "2026-12" }, "utama")).sel.some((s) => s.konten.some((k) => k.id === k4.id)) && !(await cariPemasaran(db, AWALAN, ownerSesi, null)).konten?.some((k) => k.id === k4.id), "konten arsip tidak di kalender dan pencarian");
     const tugasSesudahArsip = await db.tugasDesain.findUniqueOrThrow({ where: { id: tugas.id } });
     pastikan(tugasSesudahArsip.kontenId === k4.id && !tugasSesudahArsip.diarsipkanPada, "tugas tertaut tetap ada dengan kontenId sama");

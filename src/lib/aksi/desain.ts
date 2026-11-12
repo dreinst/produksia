@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHakAksi } from "@/lib/otentikasi";
+import { punyaHak } from "@/lib/hakAkses";
 import { perusahaanDokumenBaru } from "@/lib/perusahaan";
 import { bacaProyekId } from "@/lib/proyek";
 import { sinkronProyekLampiran } from "@/lib/berkas";
@@ -19,6 +20,7 @@ import {
   ajukanTinjauanInternal,
   bacaIsianTugas,
   bacaRujukanTugas,
+  galatUnikKunciKonten,
   catatLogTugas,
   catatPenugasanDesainer,
   cekStatusDesain,
@@ -50,8 +52,7 @@ function revalidasiDesain(kampanyeId?: string | null) {
 
 /** Galat unik kunciKontenAktif (dua penautan serentak) menjadi pesan yang sama dengan pemeriksaan biasa. */
 function terjemahkanUnikTugas(galat: unknown): never {
-  const e = galat as { code?: string; meta?: { target?: unknown } };
-  if (e?.code === "P2002" && JSON.stringify(e.meta?.target ?? "").includes("kunciKontenAktif")) throw new Error(PESAN_KONTEN_SUDAH_ADA_TUGAS);
+  if (galatUnikKunciKonten(galat)) throw new Error(PESAN_KONTEN_SUDAH_ADA_TUGAS);
   throw galat;
 }
 
@@ -140,12 +141,21 @@ export async function ubahTugasDesain(id: string, dataFormulir: FormData) {
       if (lama.kontenId !== awal.kontenId || lama.kampanyeId !== awal.kampanyeId) throw new Error(PESAN_TUGAS_BERUBAH);
       const proyekId = await bacaProyekId(dataFormulir, tx, lama.perusahaanId);
       const desainerId = await pastikanDesainerTugas(tx, isian.desainerId, lama);
-      const statusIsian = isian.status ?? lama.status;
-      // desainer diisi saat status Permintaan: disimpan Ditugaskan tanpa N7 (N5 penugasan sudah memberi tahu)
-      const otomatis = !!desainerId && statusIsian === "PERMINTAAN";
+      const kontenId = rujukan.konten?.id ?? null;
+      // Melepas atau mengganti konten yang kuncinya dipegang tugas ini membuka penjaga "desain harus disetujui dulu" di
+      // konten lama, jadi butuh hak yang sama kuatnya dengan arsip tugas atau tinjauan (perbaikan tinjauan P41 S1).
+      if (lama.kunciKontenAktif && kontenId !== lama.kontenId && !punyaHak(pengguna, "tugas-desain.hapus") && !punyaHak(pengguna, "tugas-desain.setujui")) {
+        throw new Error("Hanya peninjau desain yang boleh melepas atau mengganti konten terkait tugas ini");
+      }
+      // Tugas yang sudah Disetujui atau Selesai dipindah ke konten lain belum pernah ditinjau untuk konten itu: kembali
+      // ke Ditugaskan (Permintaan bila tanpa desainer) lewat terapkanStatusDesain, dengan log STATUS dan N7.
+      const tinjauUlang = !!kontenId && kontenId !== lama.kontenId && (lama.status === "DISETUJUI" || lama.status === "SELESAI");
+      const statusIsian = tinjauUlang ? (desainerId ? "DITUGASKAN" : "PERMINTAAN") : (isian.status ?? lama.status);
+      // desainer diisi pada tugas yang memang masih Permintaan: disimpan Ditugaskan tanpa N7 (N5 penugasan sudah
+      // memberi tahu). Status lama selain Permintaan mengikuti jalur biasa (perbaikan tinjauan P41 S2).
+      const otomatis = !!desainerId && statusIsian === "PERMINTAAN" && lama.status === "PERMINTAAN";
       const ke = otomatis ? "DITUGASKAN" : statusIsian;
       if (ke !== lama.status && !otomatis) cekStatusDesain(pengguna, ke, "formulir");
-      const kontenId = rujukan.konten?.id ?? null;
       kampanyeId = rujukan.kampanye?.id ?? null;
       const data = {
         judul: isian.judul,

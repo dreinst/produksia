@@ -6,11 +6,13 @@ import { HAK_BAWAAN, punyaHak, type PenggunaSesi } from "../src/lib/hakAkses";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { tanggalIso } from "../src/lib/waktu";
 import { simpanBerkas } from "../src/lib/berkas";
-import { detailKonten } from "../src/lib/konten";
+import { PESAN_DESAINER_KONTEN_TIDAK_BERHAK, detailKonten } from "../src/lib/konten";
+import { hakTautanPemasaran, kirimNotifikasiPemasaran, pastikanPenanggungJawab } from "../src/lib/pemasaran";
 import {
   bacaBerkasRevisi,
   berkasHasilAktif,
   detailTugasDesain,
+  galatUnikKunciKonten,
   kartuKanbanTugas,
   ringkasanDesainBeranda,
   tugasDaftar,
@@ -240,7 +242,7 @@ async function main() {
     pastikan(t2Rev.status === "REVISI" && t2Rev.jumlahRevisi === 1 && t2Rev.catatanRevisi === "perbesar logo", "tugas REVISI, jumlahRevisi 1, catatanRevisi");
     const notifRevisi = await db.notifikasi.findFirstOrThrow({ where: { penggunaId: desainer.id, judul: "Revisi desain #1 diminta", tautan: `/pemasaran/desain?tugas=${t2.id}` } });
     pastikan(notifRevisi.isi === `${JUDUL_T2}: perbesar logo` && notifRevisi.jenis === "REVISI", "N9 isi judul: catatan, jenis REVISI");
-    const kontenD7 = await detailKonten(db, kontenD4.id);
+    const kontenD7 = await detailKonten(db, kontenD4.id, sesi(owner));
     pastikan(kontenD7?.tugasAktif?.catatanRevisi === "perbesar logo" && kontenD7.tugasAktif.revisi[0]?.catatan === "perbesar logo", "detailKonten memuat catatan revisi tugas aktif");
 
     console.log("=== D8. Tinjau setuju ===");
@@ -253,10 +255,10 @@ async function main() {
     pastikan(t2Setuju.status === "DISETUJUI" && t2Setuju.catatanRevisi === null && t2Setuju.jumlahRevisi === 1, "tugas DISETUJUI, catatanRevisi null");
     pastikan((await jumlahNotif(desainer.id, "Desain disetujui")) === 1, "N8 ke desainer");
     pastikan((await jumlahNotif(owner.id, "Desain untuk konten Anda sudah disetujui")) === 1 && (await jumlahNotif(sosmed.id, "Desain untuk konten Anda sudah disetujui")) === 0, "N10 ke SMM (owner); pembuat konten dilewati karena dia peninjaunya");
-    const detailT2 = await detailTugasDesain(db, t2.id);
+    const detailT2 = await detailTugasDesain(db, t2.id, sesi(owner));
     pastikan(detailT2?.konten?.briefDesain === "Brief D4 awal" && detailT2.konten.smm?.id === owner.id && !detailT2.kontenDiarsipkan && detailT2.revisi.length === 2 && detailT2.desainer?.id === desainer.id, "detailTugasDesain: brief dan SMM konten, dua revisi");
     await sebagai(SOS, async () => jalankan("ubah brief konten", async () => ubahKonten(kontenD4.id, formulir({ judul: kontenD4.judul, status: "DESAIN", smmId: owner.id, proyekId: proyekA.id, tanggalTerbit: "2026-12-15", caption: "Caption D4", briefDesain: "Brief D4 baru" }))));
-    pastikan((await detailTugasDesain(db, t2.id))?.konten?.briefDesain === "Brief D4 baru", "brief dibaca langsung dari konten (K9 lewat detailTugasDesain)");
+    pastikan((await detailTugasDesain(db, t2.id, sesi(owner)))?.konten?.briefDesain === "Brief D4 baru", "brief dibaca langsung dari konten (K9 lewat detailTugasDesain)");
     await sebagai(SOS, () => jalankan("ajukan konten terkait", () => ajukanKonten(kontenD4.id, formulir({}))));
     pastikan((await db.konten.findUniqueOrThrow({ where: { id: kontenD4.id } })).statusPersetujuan === "MENUNGGU", "konten terkait bisa diajukan sesudah desain disetujui");
 
@@ -301,7 +303,7 @@ async function main() {
     console.log("=== D11. Riwayat tahan hapus berkas ===");
     await sebagai(DSN, () => harusDitolak("DESAINER membuang berkas hasil", () => buangBerkas(hasil1.id), "tidak punya hak"));
     await sebagai("owner", () => jalankan("owner membuang hasil-1.png", () => buangBerkas(hasil1.id)));
-    const detailD11 = await detailTugasDesain(db, t2.id);
+    const detailD11 = await detailTugasDesain(db, t2.id, sesi(owner));
     const revisi1 = detailD11!.revisi.find((r) => r.keputusan === "MINTA_REVISI")!;
     pastikan(bacaBerkasRevisi(revisi1.berkasBaru).some((b) => b.nama === "hasil-1.png"), "revisi #1 masih menampilkan nama hasil-1.png");
     pastikan((await berkasHasilAktif(db, t2.id)).length === 1, "berkas hasil aktif tinggal 1");
@@ -318,7 +320,7 @@ async function main() {
     await sebagai("owner", () => jalankan("owner arsip T12", () => arsipkanTugasDesain(t12.id)));
     const t12Arsip = await db.tugasDesain.findUniqueOrThrow({ where: { id: t12.id } });
     pastikan(!!t12Arsip.diarsipkanPada && t12Arsip.kunciKontenAktif === null && t12Arsip.kontenId === kontenD12.id && (await jumlahLog("tugas-desain", "ARSIP", t12.id)) === 1, "arsip: kunci dilepas, kontenId tetap, log ARSIP");
-    pastikan((await detailTugasDesain(db, t12.id)) === null, "detailTugasDesain tugas arsip = null");
+    pastikan((await detailTugasDesain(db, t12.id, sesi(owner))) === null, "detailTugasDesain tugas arsip = null");
     await sebagai("owner", () => harusDitolak("arsip kedua", () => arsipkanTugasDesain(t12.id), "Tugas desain tidak ditemukan"));
     await sebagai(DSN, () => harusDitolak("pindah status tugas arsip", () => pindahStatusDesain(t12.id, "DIKERJAKAN"), "Tugas desain tidak ditemukan"));
     await sebagai(SOS, () => jalankan("ajukan konten D12 tanpa syarat desain lama", () => ajukanKonten(kontenD12.id, formulir({}))));
@@ -353,6 +355,69 @@ async function main() {
     pastikan(kartu.kolomId === "SELESAI" && kartu.subjudul === "Perencana · Instagram · terbit 15 Des 2026" && kartu.lencana?.[0]?.teks === "Sedang" && kartu.baris?.includes(`${desainer.nama} · Rev 1`) && kartu.href === `/pemasaran/desain?tugas=${t2.id}`, `kartuKanbanTugas T2 (${kartu.subjudul} | ${kartu.baris?.join(" | ")})`);
     const barisT1 = (await tugasDaftar(db, {}, { q: JUDUL_T1, lewati: 0, ambil: 1 }, desainer.id, "utama")).baris[0];
     pastikan(kartuKanbanTugas({ ...barisT1, status: "DIKERJAKAN" }, { href: (id) => id, sekarang: new Date("2026-12-05T12:00:00") }).baris?.includes("Lewat tenggat 01 Des 2026") === true && kartuKanbanTugas(barisT1, { href: (id) => id, sekarang: new Date("2026-12-05T12:00:00") }).baris?.includes("Tenggat 01 Des 2026") === true, "kartu menandai lewat tenggat hanya bila belum disetujui");
+
+    console.log("=== D15. Perbaikan tinjauan P41 ===");
+    // S1: melepas konten yang kuncinya dipegang tugas butuh tugas-desain.hapus atau tugas-desain.setujui
+    const kontenS1 = await kontenBaru(`${AWALAN} Konten S1`);
+    const JUDUL_S1 = `${AWALAN} S1 lepas konten`;
+    await sebagai(IKL, () => jalankan("tugas untuk konten S1", () => buatTugasDesain(formTugas({ judul: JUDUL_S1, kontenId: kontenS1.id, desainerId: desainer.id }))));
+    const tS1 = await tugasBernama(JUDUL_S1);
+    await sebagai(DSN, async () => harusDitolak("DESAINER melepas konten tugas", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { kontenId: "" })), "Hanya peninjau desain"));
+    await sebagai(SOS, () => harusDitolak("konten S1 tetap tertahan penjaga desain", () => ajukanKonten(kontenS1.id, formulir({})), "Desain konten ini harus disetujui dulu"));
+    const kontenS1b = await kontenBaru(`${AWALAN} Konten S1b`);
+    await sebagai(DSN, async () => harusDitolak("DESAINER mengganti konten tugas", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { kontenId: kontenS1b.id })), "Hanya peninjau desain"));
+    pastikan((await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } })).kunciKontenAktif === kontenS1.id, "kunci konten S1 tetap dipegang tugas");
+    // S1: tugas Disetujui dipindah ke konten lain kembali Ditugaskan dengan log STATUS dan N7
+    await sebagai("owner", () => jalankan("owner setujui tugas S1 langsung", () => pindahStatusDesain(tS1.id, "DISETUJUI")));
+    const n7Awal = await jumlahNotif(desainer.id, "Tugas desain dipindah ke Ditugaskan");
+    await sebagai(SOS, async () => jalankan("SOSMED (peninjau) memindah tugas Disetujui ke konten S1b", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { kontenId: kontenS1b.id }))));
+    const tS1Pindah = await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } });
+    pastikan(tS1Pindah.status === "DITUGASKAN" && tS1Pindah.kunciKontenAktif === kontenS1b.id, "tugas Disetujui yang dipindah ke konten lain kembali Ditugaskan");
+    pastikan((await jumlahNotif(desainer.id, "Tugas desain dipindah ke Ditugaskan")) === n7Awal + 1, "N7 ke desainer saat tugas kembali Ditugaskan");
+    const logStatusS1 = async () => (await db.logAktivitas.findMany({ where: { modul: "tugas-desain", aksi: "STATUS", entitasId: tS1.id, waktu: { gte: mulaiUji } }, select: { meta: true } })).map((l) => l.meta as { dari?: string; ke?: string });
+    pastikan((await logStatusS1()).some((m) => m.dari === "DISETUJUI" && m.ke === "DITUGASKAN"), "log STATUS Disetujui ke Ditugaskan");
+    await sebagai(SOS, () => jalankan("konten S1 bebas sesudah dilepas peninjau", () => ajukanKonten(kontenS1.id, formulir({}))));
+    // S2: status Permintaan dari formulir untuk tugas yang bukan Permintaan mengikuti jalur biasa (N7, log sebenarnya)
+    await sebagai("owner", () => jalankan("owner setujui tugas S1 lagi", () => pindahStatusDesain(tS1.id, "DISETUJUI")));
+    const n7Permintaan = await jumlahNotif(desainer.id, "Tugas desain dipindah ke Permintaan");
+    await sebagai("admin", async () => jalankan("ADMIN mengirim status Permintaan untuk tugas Disetujui", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { status: "PERMINTAAN" }))));
+    pastikan((await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } })).status === "PERMINTAAN", "S2: tugas Disetujui tidak otomatis menjadi Ditugaskan");
+    pastikan((await jumlahNotif(desainer.id, "Tugas desain dipindah ke Permintaan")) === n7Permintaan + 1, "S2: N7 terkirim");
+    pastikan((await logStatusS1()).some((m) => m.dari === "DISETUJUI" && m.ke === "PERMINTAAN") && !(await logStatusS1()).some((m) => m.ke === "DITUGASKAN" && m.dari === "PERMINTAAN"), "S2: log STATUS memakai status lama sebenarnya");
+    // R1: galat unik kunciKontenAktif dari adapter pg dikenali
+    let galatUnik: unknown = null;
+    await db.tugasDesain.create({ data: { judul: `${AWALAN} R1 ganda`, kontenId: kontenS1b.id, kunciKontenAktif: kontenS1b.id, dibuatOlehNama: "Skrip Uji" } }).catch((e) => (galatUnik = e));
+    pastikan(galatUnikKunciKonten(galatUnik) && !galatUnikKunciKonten(new Error("lain")), "R1: P2002 kunciKontenAktif dikenali lewat meta adapter");
+    // R4: brief konten dan kampanye hanya bagi pemegang hak lihatnya
+    const JUDUL_R4 = `${AWALAN} R4 kampanye`;
+    await sebagai("owner", () => jalankan("tugas dengan kampanye", () => buatTugasDesain(formTugas({ judul: JUDUL_R4, kampanyeId: kampanyeU.id }))));
+    const tR4 = await tugasBernama(JUDUL_R4);
+    pastikan((await detailTugasDesain(db, tR4.id, sesi(desainer)))?.kampanye === null && (await detailTugasDesain(db, tR4.id, sesi(owner)))?.kampanye?.id === kampanyeU.id, "R4: DESAINER (tanpa kampanye.lihat) tidak menerima kampanye");
+    const tanpaKonten: PenggunaSesi = { ...sesi(owner), hak: HAK_BAWAAN.PEMILIK.filter((h) => !h.startsWith("konten.")) };
+    const detailR4 = await detailTugasDesain(db, tS1.id, tanpaKonten);
+    pastikan(detailR4?.konten === null && detailR4.kontenId === kontenS1b.id && (await detailTugasDesain(db, tS1.id, sesi(owner)))?.konten?.id === kontenS1b.id, "R4: tanpa konten.lihat brief tidak ikut, kontenId tetap");
+    // R5: penerima notifikasi disaring hak lihat tautannya
+    pastikan(hakTautanPemasaran("/pemasaran/konten?konten=x") === "konten.lihat" && hakTautanPemasaran("/pemasaran/desain?tugas=x") === "tugas-desain.lihat" && hakTautanPemasaran("/crm") === null, "R5: hak tautan Pemasaran");
+    const BATAL = new Error("batal");
+    let jumlahR5 = -1;
+    await db
+      .$transaction(async (tx) => {
+        jumlahR5 = await kirimNotifikasiPemasaran(tx, { penerima: [kasir.id, desainer.id], pelaku: sesi(owner), judul: `${AWALAN} R5`, tautan: `/pemasaran/konten?konten=${kontenS1.id}`, jenis: "STATUS", perusahaanId: "utama" });
+        throw BATAL;
+      })
+      .catch((e) => {
+        if (e !== BATAL) throw e;
+      });
+    pastikan(jumlahR5 === 1, "R5: KASIR (tanpa konten.lihat) tidak menerima notifikasi konten, desainer menerima");
+    // R6: Superadmin ditolak sebagai penanggung jawab baru
+    await harusDitolak("Superadmin sebagai desainer", () => pastikanPenanggungJawab(db, superadmin.id, "tugas-desain.ubah", "Desainer"), "Desainer harus pengguna aktif");
+    await sebagai(IKL, () => harusDitolak("tugas dengan desainer Superadmin", () => buatTugasDesain(formTugas({ judul: `${AWALAN} R6`, desainerId: superadmin.id })), "Desainer harus pengguna aktif"));
+    // R7: kirim ke desain dengan desainer kosong dan desainer konten yang tidak lagi berhak
+    const kontenR7 = await kontenBaru(`${AWALAN} Konten R7`);
+    await db.konten.update({ where: { id: kontenR7.id }, data: { desainerId: kasir.id } });
+    await sebagai(IKL, () => harusDitolak("kirim ke desain, desainer konten tidak berhak", () => kirimKeDesain(kontenR7.id, formulir({})), PESAN_DESAINER_KONTEN_TIDAK_BERHAK));
+    await sebagai(IKL, () => jalankan("kirim ke desain dengan desainer dipilih", () => kirimKeDesain(kontenR7.id, formulir({ desainerId: desainer.id }))));
+    pastikan((await db.tugasDesain.findFirstOrThrow({ where: { kunciKontenAktif: kontenR7.id } })).desainerId === desainer.id, "R7: desainer pilihan dipakai");
 
     console.log("=== D14. Tanpa efek akuntansi ===");
     pastikan((await db.jurnal.count()) === jumlahJurnalAwal, "tidak ada jurnal yang dibuat modul Pemasaran");

@@ -226,6 +226,7 @@ export const PESAN_SUDAH_MENUNGGU = "Konten ini sudah menunggu persetujuan";
 export const PESAN_TIDAK_MENUNGGU = "Konten ini tidak sedang menunggu persetujuan";
 export const PESAN_DESAIN_BELUM_DISETUJUI = "Desain konten ini harus disetujui dulu sebelum konten diajukan";
 export const PESAN_SUDAH_ADA_TUGAS = "Konten ini sudah punya tugas desain";
+export const PESAN_DESAINER_KONTEN_TIDAK_BERHAK = "Desainer konten ini sudah tidak aktif atau tidak berhak mengerjakan tugas desain. Pilih desainer";
 
 /** Jalur perubahan status: formulir buat/ubah, atau papan kanban dan tombol pindah. */
 export type JalurStatusKonten = "formulir" | "papan";
@@ -424,7 +425,13 @@ export function tenggatBawaanDesain(tanggalTerbit: Date | null): Date | null {
  */
 export async function buatTugasDariKonten(tx: Klien, konten: Konten, pengguna: PenggunaSesi, isian: IsianKirimDesain): Promise<string> {
   if (await tx.tugasDesain.findUnique({ where: { kunciKontenAktif: konten.id }, select: { id: true } })) throw new Error(PESAN_SUDAH_ADA_TUGAS);
-  const desainerId = await pastikanPenanggungJawab(tx, isian.desainerId ?? konten.desainerId, "tugas-desain.ubah", "Desainer");
+  // Isian kosong memakai desainer konten. Bila desainer itu sudah tidak aktif atau tidak berhak, pesannya menunjuk
+  // isian yang harus diisi, bukan pesan umum penanggung jawab (perbaikan tinjauan P41 R7).
+  const desainerId = isian.desainerId
+    ? await pastikanPenanggungJawab(tx, isian.desainerId, "tugas-desain.ubah", "Desainer")
+    : await pastikanPenanggungJawab(tx, konten.desainerId, "tugas-desain.ubah", "Desainer").catch(() => {
+        throw new Error(PESAN_DESAINER_KONTEN_TIDAK_BERHAK);
+      });
   const tugas = await tx.tugasDesain.create({
     data: {
       perusahaanId: konten.perusahaanId,
@@ -750,15 +757,22 @@ const PILIH_DETAIL_KONTEN = {
 } satisfies Prisma.KontenInclude;
 
 type DetailKontenMentah = Prisma.KontenGetPayload<{ include: typeof PILIH_DETAIL_KONTEN }>;
-export type DetailKonten = Omit<DetailKontenMentah, "tugasDesain"> & { tugasAktif: DetailKontenMentah["tugasDesain"][number] | null };
+export type DetailKonten = Omit<DetailKontenMentah, "tugasDesain"> & {
+  /** tugas desain aktif; null bila tidak ada ATAU pembaca tidak memegang tugas-desain.lihat (D6 §3.1.7) */
+  tugasAktif: DetailKontenMentah["tugasDesain"][number] | null;
+  /** benar bila konten punya tugas desain aktif, apa pun hak pembacanya (penjaga ajukan dan kirim ke desain) */
+  adaTugasAktif: boolean;
+};
 
 /**
  * Laci konten (D6 §6.6): konten beserta perusahaan, proyek, SMM, desainer, riwayat persetujuan (terbaru dulu, 100), dan
- * tugas desain aktif (dengan desainer dan 20 revisi terbaru). null bila tidak ada atau sudah diarsipkan.
+ * tugas desain aktif (dengan desainer dan 20 revisi terbaru) yang hanya diisi bila `pengguna` memegang
+ * tugas-desain.lihat (perbaikan tinjauan P41 R4). null bila tidak ada atau sudah diarsipkan.
  */
-export async function detailKonten(klien: Klien, id: string): Promise<DetailKonten | null> {
+export async function detailKonten(klien: Klien, id: string, pengguna: PenggunaSesi): Promise<DetailKonten | null> {
   const k = await klien.konten.findFirst({ where: { id, ...SYARAT_KONTEN_AKTIF }, include: PILIH_DETAIL_KONTEN });
   if (!k) return null;
   const { tugasDesain, ...sisa } = k;
-  return { ...sisa, tugasAktif: tugasDesain[0] ?? null };
+  const tugas = tugasDesain[0] ?? null;
+  return { ...sisa, tugasAktif: tugas && punyaHak(pengguna, "tugas-desain.lihat") ? tugas : null, adaTugasAktif: !!tugas };
 }

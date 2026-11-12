@@ -26,6 +26,7 @@ import {
   tinjauKontenInternal,
   type IsianKirimDesain,
 } from "@/lib/konten";
+import { galatUnikKunciKonten } from "@/lib/desain";
 import type { Konten } from "@/prisma-klien/client";
 import type { StatusKonten } from "@/prisma-klien/enums";
 
@@ -47,8 +48,7 @@ function revalidasiKonten(denganDesain = false) {
 
 /** Galat unik kunciKontenAktif (dua klik serentak) menjadi pesan yang sama dengan pemeriksaan biasa (D6 §3.1.5 no. 4). */
 function terjemahkanUnikTugas(galat: unknown): never {
-  const e = galat as { code?: string; meta?: { target?: unknown } };
-  if (e?.code === "P2002" && JSON.stringify(e.meta?.target ?? "").includes("kunciKontenAktif")) throw new Error(PESAN_SUDAH_ADA_TUGAS);
+  if (galatUnikKunciKonten(galat)) throw new Error(PESAN_SUDAH_ADA_TUGAS);
   throw galat;
 }
 

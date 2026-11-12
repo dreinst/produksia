@@ -5,6 +5,8 @@ import { saringPerusahaan } from "@/lib/perusahaan";
 import { D, uang, type Desimal } from "@/lib/uang";
 import type { ParamDaftar } from "@/lib/daftar";
 import { bacaWaktuLokal, tanggalIso } from "@/lib/waktu";
+import { ambilBerkasTerlihat } from "@/lib/berkas";
+import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import {
   bulatOpsional,
   enumWajib,
@@ -76,21 +78,23 @@ export type TotalMetrik = {
 const NOL = D(0);
 const manual = (v: Angka | null | undefined): Desimal | null => (v === null || v === undefined || v === "" ? null : uang(v));
 
-/** Dasar "hasil" otomatis menurut tujuan kampanye. INTERAKSI tidak punya dasar (isi manual bila ingin CPR). */
+/**
+ * Kolom dasar "hasil" otomatis per tujuan kampanye, satu-satunya sumber untuk dasarHasil dan aturanHasil (perbaikan
+ * tinjauan P41 R8). INTERAKSI tidak punya dasar: hasil otomatisnya 0, jadi CPR hanya ada bila hasil diisi manual.
+ */
+const KOLOM_HASIL: Record<TujuanKampanye, "leads" | "konversi" | "klik" | "jangkauan" | null> = {
+  PROSPEK: "leads",
+  PENJUALAN: "konversi",
+  PROMOSI_APLIKASI: "konversi",
+  TRAFFIC: "klik",
+  KESADARAN: "jangkauan",
+  INTERAKSI: null,
+};
+
+/** Dasar "hasil" otomatis menurut tujuan kampanye (KOLOM_HASIL). INTERAKSI = 0 (isi manual bila ingin CPR). */
 export function dasarHasil(m: Pick<DasarMetrik, "jangkauan" | "klik" | "leads" | "konversi">, tujuan: TujuanKampanye): number {
-  switch (tujuan) {
-    case "PROSPEK":
-      return m.leads;
-    case "PENJUALAN":
-    case "PROMOSI_APLIKASI":
-      return m.konversi;
-    case "TRAFFIC":
-      return m.klik;
-    case "KESADARAN":
-      return m.jangkauan;
-    case "INTERAKSI":
-      return 0;
-  }
+  const kolom = KOLOM_HASIL[tujuan];
+  return kolom ? m[kolom] : 0;
 }
 
 /** CTR persen = klik × 100 ÷ tayangan; perkalian dulu, baru pembagian. */
@@ -521,48 +525,50 @@ export type LaporanIklan = KampanyeLengkapMentah["metrik"][number] & {
 
 export type IklanLengkap = Prisma.IklanGetPayload<{ include: { setIklan: { select: { id: true; nama: true } }; berkasKreatif: { select: { id: true; namaBerkas: true; tipeMime: true; dihapusPada: true } } } }>;
 
-export type KampanyeLengkap = Omit<KampanyeLengkapMentah, "metrik"> & {
-  iklan: IklanLengkap[];
+export type KampanyeLengkap = Omit<KampanyeLengkapMentah, "metrik" | "tugasDesain"> & {
+  /** berkasKreatif null bila tanpa kreatif ATAU berkasnya tidak terlihat bagi pembaca (`kreatifTersembunyi` benar) */
+  iklan: (IklanLengkap & { kreatifTersembunyi: boolean })[];
   laporan: LaporanIklan[];
   /** total dari jumlah angka dasar; nilai manual per laporan diabaikan (D6 §3.3 no. 5) */
   total: TotalMetrik;
+  /** tugas desain aktif yang menaut kampanye ini; kosong bila pembaca tidak memegang tugas-desain.lihat */
+  tugasDesain: KampanyeLengkapMentah["tugasDesain"];
 };
 
 /**
  * Detail kampanye (D6 §6.6): kampanye, perusahaan, proyek, set iklan (urut dibuat), iklan (urut dibuat, dengan nama set
  * dan berkas kreatif), laporan harian (tanggal terbaru dulu, dengan turunan per baris), total, dan tugas desain aktif
- * yang menaut kampanye ini. null bila tidak ada atau sudah diarsipkan.
+ * yang menaut kampanye ini. Berkas kreatif hanya ditampilkan bila terlihat bagi `pengguna` (ambilBerkasTerlihat), dan
+ * tugas desain hanya bagi pemegang tugas-desain.lihat (perbaikan tinjauan P41 R4). null bila tidak ada atau sudah
+ * diarsipkan.
  */
-export async function kampanyeLengkap(klien: Klien, id: string): Promise<KampanyeLengkap | null> {
+export async function kampanyeLengkap(klien: Klien, id: string, pengguna: PenggunaSesi): Promise<KampanyeLengkap | null> {
   const k = await klien.kampanye.findFirst({ where: { id, diarsipkanPada: null }, include: PILIH_KAMPANYE_LENGKAP });
   if (!k) return null;
-  const iklan = await klien.iklan.findMany({
+  const iklanMentah = await klien.iklan.findMany({
     where: { setIklan: { kampanyeId: id } },
     orderBy: [{ dibuatPada: "asc" }, { id: "asc" }],
     include: { setIklan: { select: { id: true, nama: true } }, berkasKreatif: { select: { id: true, namaBerkas: true, tipeMime: true, dihapusPada: true } } },
   });
-  const { metrik, ...sisa } = k;
+  const idKreatif = [...new Set(iklanMentah.flatMap((i) => (i.berkasKreatifId ? [i.berkasKreatifId] : [])))];
+  const terlihat = new Set((await Promise.all(idKreatif.map((b) => ambilBerkasTerlihat(klien, pengguna, b)))).flatMap((b) => (b ? [b.id] : [])));
+  const iklan = iklanMentah.map((i) => {
+    const tampil = !!i.berkasKreatifId && terlihat.has(i.berkasKreatifId);
+    return { ...i, berkasKreatif: tampil ? i.berkasKreatif : null, kreatifTersembunyi: !!i.berkasKreatifId && !tampil };
+  });
+  const { metrik, tugasDesain, ...sisa } = k;
   const laporan: LaporanIklan[] = metrik.map((m) => ({
     ...m,
     turunan: turunanMetrik(m, k.tujuan),
     manual: { ctr: m.ctrManual !== null, cpc: m.cpcManual !== null, cpm: m.cpmManual !== null, hasil: m.hasil !== null },
   }));
-  return { ...sisa, iklan, laporan, total: totalMetrik(metrik, k.tujuan) };
+  return { ...sisa, iklan, laporan, total: totalMetrik(metrik, k.tujuan), tugasDesain: punyaHak(pengguna, "tugas-desain.lihat") ? tugasDesain : [] };
 }
 
-/** Penjelasan "hasil" otomatis menurut tujuan kampanye, untuk label formulir dan KPI (mis. "Hasil = leads"). */
-export function aturanHasil(tujuan: TujuanKampanye): string {
-  switch (tujuan) {
-    case "PROSPEK":
-      return "leads";
-    case "PENJUALAN":
-    case "PROMOSI_APLIKASI":
-      return "konversi";
-    case "TRAFFIC":
-      return "klik";
-    case "KESADARAN":
-      return "jangkauan";
-    case "INTERAKSI":
-      return "isi manual";
-  }
+/**
+ * Nama kolom dasar "hasil" otomatis menurut tujuan kampanye, untuk label formulir dan KPI (mis. "leads" untuk "Hasil =
+ * leads"). null untuk INTERAKSI, yang tidak punya hitungan otomatis: UI menulis "isi manual, tanpa hitungan otomatis".
+ */
+export function aturanHasil(tujuan: TujuanKampanye): string | null {
+  return KOLOM_HASIL[tujuan];
 }

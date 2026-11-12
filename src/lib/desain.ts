@@ -104,6 +104,15 @@ export const PESAN_KONTEN_SUDAH_ADA_TUGAS = "Konten ini sudah punya tugas desain
 export const PESAN_CATATAN_REVISI_WAJIB = "Catatan revisi wajib diisi";
 export const PESAN_BERKAS_HASIL_WAJIB = "Unggah minimal satu berkas hasil sebelum mengajukan tinjauan";
 
+/**
+ * Galat unik indeks kunciKontenAktif (dua penautan serentak ke konten yang sama). Adapter pg Prisma 7 tidak mengisi
+ * meta.target; nama indeks ada di meta.driverAdapterError, jadi seluruh meta yang dicocokkan (perbaikan tinjauan P41 R1).
+ */
+export function galatUnikKunciKonten(galat: unknown): boolean {
+  const e = galat as { code?: string; meta?: unknown } | null;
+  return e?.code === "P2002" && JSON.stringify(e.meta ?? {}).includes("kunciKontenAktif");
+}
+
 /** Jalur perubahan status: formulir buat/ubah, atau papan kanban dan tombol pindah. */
 export type JalurStatusDesain = "formulir" | "papan";
 
@@ -498,20 +507,33 @@ const PILIH_DETAIL_TUGAS = {
 } satisfies Prisma.TugasDesainInclude;
 
 type DetailTugasMentah = Prisma.TugasDesainGetPayload<{ include: typeof PILIH_DETAIL_TUGAS }>;
-export type DetailTugasDesain = Omit<DetailTugasMentah, "konten"> & {
-  /** konten aktif yang tertaut (brief dibaca langsung, tanpa salinan); null bila tanpa konten atau sudah diarsipkan */
+export type DetailTugasDesain = Omit<DetailTugasMentah, "konten" | "kampanye"> & {
+  /**
+   * konten aktif yang tertaut (brief dibaca langsung, tanpa salinan); null bila tanpa konten, sudah diarsipkan, atau
+   * pembaca tidak memegang konten.lihat
+   */
   konten: NonNullable<DetailTugasMentah["konten"]> | null;
-  /** benar bila tugas tertaut konten yang sudah diarsipkan ("Konten terkait sudah diarsipkan.") */
+  /** benar bila tugas tertaut konten yang sudah diarsipkan ("Konten terkait sudah diarsipkan."); false tanpa konten.lihat */
   kontenDiarsipkan: boolean;
+  /** kampanye tertaut; null bila tanpa kampanye atau pembaca tidak memegang kampanye.lihat */
+  kampanye: DetailTugasMentah["kampanye"];
 };
 
 /**
  * Laci tugas desain (D6 §6.6): tugas beserta desainer, proyek, kampanye, konten aktif (seluruh isian brief dan SMM), dan
- * riwayat revisi (terbaru dulu, 100). null bila tidak ada atau sudah diarsipkan.
+ * riwayat revisi (terbaru dulu, 100). Brief konten hanya bagi pemegang konten.lihat dan kampanye hanya bagi pemegang
+ * kampanye.lihat (D6 §3.6, perbaikan tinjauan P41 R4); kontenId dan kampanyeId tugas tetap ada untuk formulir ubah.
+ * null bila tidak ada atau sudah diarsipkan.
  */
-export async function detailTugasDesain(klien: Klien, id: string): Promise<DetailTugasDesain | null> {
+export async function detailTugasDesain(klien: Klien, id: string, pengguna: PenggunaSesi): Promise<DetailTugasDesain | null> {
   const t = await klien.tugasDesain.findFirst({ where: { id, ...SYARAT_TUGAS_AKTIF }, include: PILIH_DETAIL_TUGAS });
   if (!t) return null;
-  const kontenDiarsipkan = !!t.konten?.diarsipkanPada;
-  return { ...t, konten: t.konten && !kontenDiarsipkan ? t.konten : null, kontenDiarsipkan };
+  const lihatKonten = punyaHak(pengguna, "konten.lihat");
+  const kontenDiarsipkan = lihatKonten && !!t.konten?.diarsipkanPada;
+  return {
+    ...t,
+    konten: lihatKonten && t.konten && !t.konten.diarsipkanPada ? t.konten : null,
+    kontenDiarsipkan,
+    kampanye: punyaHak(pengguna, "kampanye.lihat") ? t.kampanye : null,
+  };
 }
