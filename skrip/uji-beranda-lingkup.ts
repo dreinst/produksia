@@ -514,7 +514,8 @@ async function main() {
   // Sejak P46 halaman Pemasaran sudah ada dan kartu Tugas Saya menaut ke sana; asersi semula (tanpa tautan sama sekali)
   // diganti pemeriksaan bahwa setiap tautan menuju halaman Pemasaran yang memang ada.
   pastikan(
-    sayaS.href.every((h) => ["/pemasaran/konten", "/pemasaran/desain"].includes(h.split("?")[0]) && existsSync(`src/app/(aplikasi)${h.split("?")[0]}/page.tsx`)),
+    sayaS.href.length > 0 &&
+      sayaS.href.every((h) => ["/pemasaran/konten", "/pemasaran/desain"].includes(h.split("?")[0]) && existsSync(`src/app/(aplikasi)${h.split("?")[0]}/page.tsx`)),
     `kartu Tugas Saya SOSMED tidak menaut ke halaman yang belum ada (${sayaS.href.join(", ")})`,
   );
   await db.tugasDesain.create({ data: { perusahaanId: p1.id, judul: "UJL Tugas untuk sosmed", status: "DITUGASKAN", desainerId: uS.id, dibuatOlehNama: "Skrip Uji" } });

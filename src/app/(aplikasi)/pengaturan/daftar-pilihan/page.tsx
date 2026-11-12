@@ -25,8 +25,9 @@ export default async function HalamanDaftarPilihan({ searchParams }: { searchPar
   const pilihan = typeof q.perusahaan === "string" ? q.perusahaan : undefined;
   const [lingkup, aktif, semua] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan(), daftarPerusahaan(true)]);
   // ?perusahaan= yang diisi tidak pernah jatuh ke lingkup: perusahaan arsip atau id tak dikenal memberi kotak amber
-  // (perbaikan tinjauan P44 R1). Tanpa ?perusahaan=, lingkup aktif dipakai; lingkup perusahaan arsip juga diberi tahu.
-  const diminta = pilihan ?? lingkup.perusahaanId ?? undefined;
+  // (perbaikan tinjauan P44 R1). Tanpa ?perusahaan= atau dengan nilai kosong, lingkup aktif dipakai; lingkup perusahaan
+  // arsip juga diberi tahu.
+  const diminta = pilihan || lingkup.perusahaanId || undefined;
   const p = diminta ? (aktif.find((x) => x.id === diminta) ?? null) : null;
   const arsip = diminta && !p ? (semua.find((x) => x.id === diminta) ?? null) : null;
   const tidakDikenal = !!pilihan && !p && !arsip;

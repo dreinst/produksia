@@ -6,17 +6,20 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
 import { lingkupPerusahaan, daftarPerusahaan } from "@/lib/perusahaan";
 import { cariPekerjaan, syaratNomorDokumen, MIN_KATA_CARI, type KelompokCari } from "@/lib/cariGlobal";
+import { normalkanKataCari } from "@/lib/daftar";
 import { jadikanLingkupAktifFormulir } from "@/lib/aksi/perusahaan";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 
 type Hit = { nomor: string; nomorCetak?: string | null; tanggal?: Date; status?: string; siapa?: string; href: string; jenis: string };
 
-export default async function HalamanCari({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+export default async function HalamanCari({ searchParams }: { searchParams: Promise<{ q?: string | string[] }> }) {
   const pengguna = await wajibMasuk();
   const boleh = (hak: Hak) => punyaHak(pengguna, hak);
-  const { q = "" } = await searchParams;
-  const term = q.trim();
+  // Dinormalkan sekali (larik, byte NUL, panjang). Kueri lama di bawah tetap memakai contains biasa, jadi `%` dan `_`
+  // berlaku sebagai wildcard di kelompok lama seperti sebelum peleburan. Nomor penawaran, faktur, dan penerimaan
+  // (syaratNomorDokumen) serta kartu Pekerjaan & Berkas mencocokkannya apa adanya.
+  const term = normalkanKataCari((await searchParams).q);
   const ci = { contains: term, mode: "insensitive" as const };
 
   // Tiap kelompok hasil hanya dikueri bila pemanggil punya hak-lihat modul terkait,
@@ -90,7 +93,7 @@ export default async function HalamanCari({ searchParams }: { searchParams: Prom
             <div className="kepala-kartu">
               <div>
                 <h2 className="judul-kartu">Dokumen</h2>
-                <p className="kartu-subjudul">Klik untuk membuka daftar modul terkait.</p>
+                <p className="kartu-subjudul">Klik untuk membuka detail dokumen atau daftar modulnya.</p>
               </div>
             </div>
             <div className="bungkus-tabel">

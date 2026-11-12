@@ -6,6 +6,7 @@ import { cariPemasaran } from "@/lib/pemasaran";
 import { cariBerkas } from "@/lib/berkas";
 import { daftarPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
 import { formatTanggal } from "@/lib/waktu";
+import { loloskanWildcard, normalkanKataCari } from "@/lib/daftar";
 
 /*
  * Pencarian global kelompok "Pekerjaan & Berkas" (D7 §3.6, §6.8, DESAIN G12, R1, H5). Kelompok lama di /cari tetap
@@ -33,10 +34,10 @@ export type KelompokCari = { jenis: JenisKelompokCari; label: string; hasil: Has
 
 /**
  * Syarat nomor dokumen penjualan untuk /cari (D2 §8.3): nomor internal ATAU nomor cetak, tanpa beda huruf besar.
- * Dipakai penawaran, faktur, dan penerimaan.
+ * Dipakai penawaran, faktur, dan penerimaan. `%` dan `_` dicocokkan apa adanya (loloskanWildcard).
  */
 export function syaratNomorDokumen(term: string): { OR: [{ nomor: Prisma.StringFilter }, { nomorCetak: Prisma.StringFilter }] } {
-  const ci = { contains: term, mode: "insensitive" as const };
+  const ci = { contains: loloskanWildcard(term), mode: "insensitive" as const };
   return { OR: [{ nomor: ci }, { nomorCetak: ci }] };
 }
 
@@ -51,7 +52,7 @@ export function tautanProyekCari(pengguna: Pick<PenggunaSesi, "hak">, id: string
   return null;
 }
 
-const ci = (term: string) => ({ contains: term, mode: "insensitive" as const });
+const ci = (term: string) => ({ contains: loloskanWildcard(term), mode: "insensitive" as const });
 
 async function cariProyek(pengguna: PenggunaSesi, term: string, perusahaanId: string | null): Promise<HasilCari[] | null> {
   if (!tautanProyekCari(pengguna, "x")) return null;
@@ -100,7 +101,7 @@ async function cariDokumenMitra(pengguna: PenggunaSesi, term: string, perusahaan
  * tidak ikut. Kata kunci di bawah MIN_KATA_CARI karakter menghasilkan [].
  */
 export async function cariPekerjaan(pengguna: PenggunaSesi, q: string, perusahaanId: string | null): Promise<KelompokCari[]> {
-  const term = q.trim();
+  const term = normalkanKataCari(q);
   if (term.length < MIN_KATA_CARI) return [];
   const boleh = (h: Hak) => punyaHak(pengguna, h);
   const { proyek, dokumenMitra, lead, pemasaran, berkas, perusahaan } = await Promise.all([

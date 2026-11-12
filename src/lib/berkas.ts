@@ -4,6 +4,7 @@ import { PERAN_DAPAT_DIATUR, peranEfektif, punyaHak, type Hak, type PenggunaSesi
 import { catatAktivitas, type KlienDb, type RuangTersembunyi } from "@/lib/log";
 import { perusahaanDokumenBaru } from "@/lib/perusahaan";
 import { bersihkanNamaBerkas, deteksiTipe, disajikanInline, kepalaDisposisi } from "@/lib/tipeBerkas";
+import { loloskanWildcard, normalkanKataCari } from "@/lib/daftar";
 
 /*
  * Pustaka berkas (D7 §3.3, §6.1). Isi berkas disimpan di PostgreSQL (IsiBerkas), metadatanya di Berkas.
@@ -877,11 +878,11 @@ export type HasilCariBerkas = { id: string; namaBerkas: string; tipeMime: string
 
 /** Pencarian nama berkas untuk /cari (paling banyak 10), memakai syarat terlihat yang sama dengan daftar. */
 export async function cariBerkas(klien: KlienDb, pengguna: PenggunaSesi, q: string, perusahaanId?: string | null): Promise<HasilCariBerkas[]> {
-  const kata = q.trim();
+  const kata = normalkanKataCari(q);
   if (!kata) return [];
   const ruang = await ruangTersembunyi(klien, pengguna);
   const baris = await klien.berkas.findMany({
-    where: { AND: [syaratBerkasTerlihat(pengguna, ruang), { namaBerkas: { contains: kata, mode: "insensitive" as const } }, perusahaanId ? { perusahaanId } : {}] },
+    where: { AND: [syaratBerkasTerlihat(pengguna, ruang), { namaBerkas: { contains: loloskanWildcard(kata), mode: "insensitive" as const } }, perusahaanId ? { perusahaanId } : {}] },
     select: { id: true, namaBerkas: true, tipeMime: true, folderKode: true, jenisEntitas: true, perusahaanId: true, dibuatPada: true },
     orderBy: [{ dibuatPada: "desc" }, { id: "asc" }],
     take: 10,

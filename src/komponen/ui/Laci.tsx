@@ -25,9 +25,14 @@ function elemenFokus(wadah: HTMLElement): HTMLElement[] {
   return [...wadah.querySelectorAll<HTMLElement>(BISA_DIFOKUS)].filter((el) => el.getClientRects().length > 0 && !el.closest("[inert]"));
 }
 
-/** Tab dan Shift+Tab berputar di dalam `wadah` (pola jebakFokus Kanban). */
+/**
+ * Tab dan Shift+Tab berputar di dalam `wadah` (pola jebakFokus Kanban). Event React dari portal (mis. dialog pratinjau
+ * gambar di document.body) tetap merambat ke panel laci; event yang asalnya di luar `wadah` dibiarkan supaya Tab di
+ * dialog itu tidak direbut laci.
+ */
 function putarFokus(e: KeyboardEventReact<HTMLElement>, wadah: HTMLElement | null) {
   if (e.key !== "Tab" || !wadah) return;
+  if (!(e.target instanceof Node) || !wadah.contains(e.target)) return;
   const bisa = elemenFokus(wadah);
   if (bisa.length === 0) {
     e.preventDefault();

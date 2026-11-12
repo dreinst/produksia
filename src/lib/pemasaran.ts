@@ -7,7 +7,7 @@ import { JENIS_KONTEN_BAWAAN, LABEL_PLATFORM, PILAR_KONTEN_BAWAAN, STATUS_DESAIN
 import { saringPerusahaan } from "@/lib/perusahaan";
 import { bacaUang, uang, type Desimal } from "@/lib/uang";
 import { tanggalIso } from "@/lib/waktu";
-import { cocokTeks } from "@/lib/daftar";
+import { cocokTeks, loloskanWildcard, normalkanKataCari } from "@/lib/daftar";
 
 /*
  * Pembantu bersama modul Pemasaran (D6 §3.0, §3.4, §3.5, §6.1): pembaca isian, penanggung jawab, notifikasi, log,
@@ -299,12 +299,12 @@ export const BATAS_CARI_PEMASARAN = 10;
  * Data arsip tidak ikut. perusahaanId null/undefined = gabungan.
  */
 export async function cariPemasaran(klien: Klien, q: string, pengguna: PenggunaSesi, perusahaanId?: string | null): Promise<KelompokCariPemasaran> {
-  const kata = q.trim();
+  const kata = normalkanKataCari(q);
   const boleh = (h: Hak) => pengguna.hak.includes(h);
   const lingkup = { diarsipkanPada: null, ...saringPerusahaan(perusahaanId) };
   const kosong = (h: Hak) => (boleh(h) ? [] : null);
   if (!kata) return { konten: kosong("konten.lihat"), tugas: kosong("tugas-desain.lihat"), kampanye: kosong("kampanye.lihat") };
-  const c = cocokTeks(kata);
+  const c = cocokTeks(loloskanWildcard(kata));
   const [konten, tugas, kampanye] = await Promise.all([
     boleh("konten.lihat")
       ? klien.konten.findMany({

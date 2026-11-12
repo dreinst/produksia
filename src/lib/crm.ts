@@ -6,6 +6,7 @@ import { bacaWaktuLokal, formatWaktu, tanggalIso } from "@/lib/waktu";
 import { hitungHakPengguna, type PenggunaSesi } from "@/lib/hakAkses";
 import { kirimNotifikasi, penggunaDenganHak, type PenerimaHak } from "@/lib/notifikasi";
 import { catatAktivitas } from "@/lib/log";
+import { loloskanWildcard, normalkanKataCari } from "@/lib/daftar";
 
 /*
  * Pustaka CRM (D4 §6.3). Bukan "use server": konstanta, validator isian, bawaan tahap dan sumber per perusahaan,
@@ -787,9 +788,9 @@ export type HasilCariLead = { id: string; nama: string; namaUsaha: string; perus
  * gabungan), 10 terbaru. Pemanggil memeriksa hak lead.lihat.
  */
 export async function cariLead(klien: KlienDb, q: string, perusahaanId: string | null = null): Promise<HasilCariLead[]> {
-  const term = q.trim();
+  const term = normalkanKataCari(q);
   if (term.length < 2) return [];
-  const ci = { contains: term, mode: "insensitive" as const };
+  const ci = { contains: loloskanWildcard(term), mode: "insensitive" as const };
   return klien.lead.findMany({
     where: { dihapusPada: null, ...(perusahaanId ? { perusahaanId } : {}), OR: [{ nama: ci }, { namaUsaha: ci }, { email: ci }, { telepon: ci }, { whatsapp: ci }] },
     select: { id: true, nama: true, namaUsaha: true, perusahaanId: true, tahap: { select: { nama: true, jenis: true } } },

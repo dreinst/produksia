@@ -42,7 +42,6 @@ function tautanBerkas(isian: Record<string, string | undefined>): string {
   return s ? `/berkas?${s}` : "/berkas";
 }
 
-/** Halaman Berkas (D7 §7.2): folder terlihat, unggah umum, daftar berkas dengan aksi per baris, dan Sampah. */
 /**
  * Halaman detail tujuan "Menempel di" yang tidak ada di menu: detail kampanye (kampanye.lihat), detail proyek
  * (proyek.lihat), keuangan proyek (anggaran-proyek.lihat), dan dokumen mitra (talangan-mitra.lihat,
@@ -50,6 +49,7 @@ function tautanBerkas(isian: Record<string, string | undefined>): string {
  */
 const RUTE_DETAIL_LAMPIRAN: readonly RegExp[] = [/^\/pemasaran\/iklan\/[^/]+$/, /^\/proyek\/[^/]+$/, /^\/proyek\/[^/]+\/keuangan(\/(talangan|bayar)\/[^/]+)?$/];
 
+/** Halaman Berkas (D7 §7.2): folder terlihat, unggah umum, daftar berkas dengan aksi per baris, dan Sampah. */
 export default async function HalamanBerkas({ searchParams }: { searchParams: Promise<ParamMentah> }) {
   const pengguna = await wajibHak("berkas.lihat");
   const param = await bacaParamDaftar(searchParams, UKURAN_HALAMAN_BERKAS);

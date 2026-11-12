@@ -72,6 +72,7 @@ async function bersihkan() {
   await db.talanganMitra.deleteMany({ where: { nomor: { startsWith: AWALAN } } });
   await db.mitraProyek.deleteMany({ where: { proyekId: { in: proyek } } });
   await db.berkas.deleteMany({ where: { namaBerkas: { startsWith: AWALAN } } });
+  await db.aksesBerkasProyek.deleteMany({ where: { proyekId: { in: proyek } } });
   await db.tugasDesain.deleteMany({ where: { judul: { startsWith: AWALAN } } });
   await db.konten.deleteMany({ where: { judul: { startsWith: AWALAN } } });
   await db.kampanye.deleteMany({ where: { nama: { startsWith: AWALAN } } });
@@ -187,6 +188,32 @@ async function main() {
     pastikan(!halamanDesainer.teks.includes(kampanye.nama) && !halamanDesainer.teks.includes(bFaktur.namaBerkas) && !halamanDesainer.teks.includes(talangan.nomor), "/cari DESAINER: tanpa kampanye, berkas Faktur, dan dokumen mitra");
     const halamanSatu = await denganEnv({ UJI_PERAN: "PEMILIK", UJI_PERUSAHAAN: "semua" }, async () => render(await HalamanCari({ searchParams: Promise.resolve({ q: "U" }) })));
     pastikan(halamanSatu.teks.includes("Ketik minimal 2 karakter"), "/cari satu karakter: kartu Pekerjaan meminta minimal 2 karakter");
+
+    console.log("=== 7. Perbaikan tinjauan P46: proyek terbatas, wildcard, dan kata kunci aneh ===");
+    const prjT = await db.proyek.create({ data: { kode: `${AWALAN}-PRJ-T`, nama: `${AWALAN} Proyek terbatas`, perusahaanId: utama.id } });
+    await db.aksesBerkasProyek.create({ data: { proyekId: prjT.id, peranBoleh: [] } });
+    const bRahasia = await db.berkas.create({
+      data: { perusahaanId: utama.id, proyekId: prjT.id, folderKode: "DOKUMEN", namaBerkas: `${AWALAN}-rahasia.pdf`, tipeMime: "application/pdf", ukuran: 1, sha256: "0".repeat(64), diunggahOlehNama: "Skrip Uji" },
+    });
+    pastikan(!judulDi(await cariPekerjaan(sintetis("ADMIN"), `${AWALAN}-rahasia`, null), "berkas").includes(bRahasia.namaBerkas), "ADMIN: berkas proyek terbatas tidak muncul");
+    pastikan(!judulDi(await cariPekerjaan(sintetis("DESAINER"), `${AWALAN}-rahasia`, null), "berkas").includes(bRahasia.namaBerkas), "DESAINER: berkas proyek terbatas tidak muncul");
+    pastikan(judulDi(await cariPekerjaan(pemilik, `${AWALAN}-rahasia`, null), "berkas").includes(bRahasia.namaBerkas), "PEMILIK: berkas proyek terbatas muncul");
+    for (const kata of ["%%", "__", `${AWALAN}%Proyek`, `${AWALAN}_Proyek`]) {
+      const h = await cariPekerjaan(pemilik, kata, null);
+      pastikan(
+        !judulDi(h, "proyek").some((j) => j.includes(AWALAN)) && !judulDi(h, "konten").some((j) => j.startsWith(AWALAN)) && !judulDi(h, "lead").some((j) => j.startsWith(AWALAN)) && !judulDi(h, "berkas").some((j) => j.startsWith(AWALAN)),
+        `"${kata}" dicocokkan apa adanya, bukan wildcard`,
+      );
+    }
+    pastikan((await db.fakturPenjualan.findMany({ where: syaratNomorDokumen("CG/INV/77%"), select: { id: true } })).length === 0, "syaratNomorDokumen: % bukan wildcard");
+    const denganNul = await cariPekerjaan(pemilik, `${AWALAN}-PRJ-U\u0000`, null);
+    pastikan(kelompok(denganNul, "proyek")?.hasil.some((h) => h.id === prjU.id) === true, "byte NUL dibuang, pencarian tetap jalan");
+    pastikan((await cariPekerjaan(pemilik, "\u0000\u0000", null)).length === 0, "kata kunci yang hanya NUL: []");
+    pastikan(Array.isArray(await cariPekerjaan(pemilik, `${AWALAN}${"x".repeat(20_000)}`, null)), "kata kunci 20.000 karakter dipotong tanpa galat");
+    const halamanLarik = await denganEnv({ UJI_PERAN: "PEMILIK", UJI_PERUSAHAAN: "semua" }, async () => render(await HalamanCari({ searchParams: Promise.resolve({ q: ["CG/INV/7731", "lain"] }) })));
+    pastikan(halamanLarik.href.includes(`/penjualan/faktur/${faktur.id}`), "/cari?q=a&q=b: elemen pertama dipakai tanpa galat");
+    const halamanNul = await denganEnv({ UJI_PERAN: "PEMILIK", UJI_PERUSAHAAN: "semua" }, async () => render(await HalamanCari({ searchParams: Promise.resolve({ q: "\u0000" }) })));
+    pastikan(typeof halamanNul.teks === "string", "/cari?q=%00 dirender tanpa galat");
   } finally {
     await bersihkan();
     const sisa = await Promise.all([

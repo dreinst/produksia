@@ -27,3 +27,24 @@ export async function bacaParamDaftar(searchParams: Promise<ParamMentah>, ukuran
 export function cocokTeks(q: string) {
   return { contains: q, mode: "insensitive" as const };
 }
+
+/**
+ * Loloskan `\`, `%`, dan `_` supaya `contains` Prisma (LIKE/ILIKE) mencocokkan kata kunci apa adanya, bukan sebagai
+ * wildcard. Dipakai jalur pencarian peleburan (pencarian global, lead, pemasaran, berkas). `cocokTeks` dan kueri lama
+ * `/cari` sengaja tidak diubah, jadi di sana `%` dan `_` tetap berlaku sebagai wildcard seperti sebelumnya.
+ */
+export function loloskanWildcard(term: string): string {
+  return term.replace(/[\\%_]/g, "\\$&");
+}
+
+/** Batas panjang kata kunci pencarian global sesudah dinormalkan. */
+export const MAKS_PANJANG_CARI = 100;
+
+/**
+ * Kata kunci pencarian dari searchParams atau pemanggil lain: elemen pertama bila larik (`?q=a&q=b`), byte NUL dibuang
+ * (PostgreSQL menolak 0x00 di teks), dirapikan, lalu dipotong `MAKS_PANJANG_CARI` karakter.
+ */
+export function normalkanKataCari(q: string | string[] | null | undefined): string {
+  const mentah = Array.isArray(q) ? q[0] : q;
+  return String(mentah ?? "").replace(/\u0000/g, "").trim().slice(0, MAKS_PANJANG_CARI);
+}
