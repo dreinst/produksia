@@ -373,20 +373,23 @@ export async function muatBagiHasil(klien: Klien, proyekId: string, ringkasan: P
   };
 }
 
+export type HasilRingkasanKeuanganProyek = { proyek: ProyekKeuangan; ringkasan: RingkasanKeuangan; bagiHasil: BagiHasilProyek | null };
+
 /**
- * Ringkasan keuangan satu proyek beserta bagi hasilnya; null bila proyek tidak ada. `denganBagiHasil: false` (pengguna
- * tanpa bagi-hasil.lihat) melewati pemuatan mitra dan mengembalikan bagiHasil null.
+ * Ringkasan keuangan satu proyek; null bila proyek tidak ada. Bagi hasil dimuat hanya bila pemanggil memilih
+ * `denganBagiHasil` secara eksplisit (tinjauan P35 R3): halaman dan PDF mengisinya dengan
+ * `punyaHak(pengguna, "bagi-hasil.lihat")`, sehingga tsc memaksa setiap pemanggil memilih. Panggilan tanpa opsi
+ * (bentuk lama DF4, dipakai panel beranda) hanya mengembalikan proyek dan ringkasan tanpa memuat mitra.
  */
-export async function ringkasanKeuanganProyek(
-  klien: Klien,
-  proyekId: string,
-  opsi: { denganBagiHasil?: boolean } = {},
-): Promise<{ proyek: ProyekKeuangan; ringkasan: RingkasanKeuangan; bagiHasil: BagiHasilProyek | null } | null> {
+export async function ringkasanKeuanganProyek(klien: Klien, proyekId: string): Promise<Omit<HasilRingkasanKeuanganProyek, "bagiHasil"> | null>;
+export async function ringkasanKeuanganProyek(klien: Klien, proyekId: string, opsi: { denganBagiHasil: boolean }): Promise<HasilRingkasanKeuanganProyek | null>;
+export async function ringkasanKeuanganProyek(klien: Klien, proyekId: string, opsi?: { denganBagiHasil: boolean }): Promise<HasilRingkasanKeuanganProyek | Omit<HasilRingkasanKeuanganProyek, "bagiHasil"> | null> {
   const p = await klien.proyek.findUnique({ where: { id: proyekId }, select: PILIH_PROYEK });
   if (!p) return null;
   const masukan = (await muatMasukanKeuangan(klien, [p.id])).get(p.id)!;
   const ringkasan = hitungRingkasanKeuangan(masukan);
-  const bagiHasil = opsi.denganBagiHasil === false ? null : await muatBagiHasil(klien, p.id, ringkasan);
+  if (!opsi) return { proyek: proyekRingkas(p), ringkasan };
+  const bagiHasil = opsi.denganBagiHasil === true ? await muatBagiHasil(klien, p.id, ringkasan) : null;
   return { proyek: proyekRingkas(p), ringkasan, bagiHasil };
 }
 
@@ -417,19 +420,46 @@ function sumberLampiran(j: { id: string; dokumenKas: { id: string; jenis: string
   return { jenisEntitas: "jurnal", entitasId: j.id };
 }
 
+export type RincianRealisasi = {
+  baris: BarisRealisasi[];
+  /** true bila baris yang memenuhi syarat lebih banyak dari batas (tinjauan P35 R6); halaman menampilkan penanda */
+  terpotong: boolean;
+  /** batas yang dipakai, untuk teks penanda "menampilkan {batas} baris terbaru" */
+  batas: number;
+  /**
+   * Σ baris akun Bagi Hasil Mitra Proyek yang disembunyikan karena `denganBagiHasil` false (tinjauan P35 R4), untuk
+   * keterangan "termasuk bagi laba" tanpa rincian per mitra. null bila baris bagi hasil ikut tampil.
+   */
+  bagiLabaTersembunyi: Desimal | null;
+};
+
 /**
  * Rincian realisasi (tab Biaya, D5 §3.8): satu baris per BarisJurnal akun BEBAN pada jurnal bertanda proyek yang
- * bukan jurnal penutup, urut tanggal turun lalu nomor. Σ jumlah baris yang bukan bagiHasil = aktual ringkasan.
- * `pengguna` diisi: jumlah lampiran memakai syarat berkas terlihat pengguna itu (folder dan proyek terbatas, hak lihat
- * jenis lampiran). `batas` membatasi jumlah baris (bawaan 500).
+ * bukan jurnal penutup, urut tanggal turun lalu nomor. Bila tidak terpotong, Σ jumlah baris yang bukan bagiHasil =
+ * aktual ringkasan.
+ * - `denganBagiHasil` wajib (tinjauan P35 R4): false membuang baris akun Bagi Hasil Mitra Proyek (keterangan "Bagi laba
+ *   {mitra}") dan hanya mengembalikan jumlahnya di `bagiLabaTersembunyi`. Isi dengan `punyaHak(pengguna, "bagi-hasil.lihat")`.
+ * - `pengguna` diisi: jumlah lampiran memakai syarat berkas terlihat pengguna itu (folder dan proyek terbatas, hak
+ *   lihat jenis lampiran).
+ * - `batas` (bawaan 500) membatasi jumlah baris; `terpotong` menandai bila ada baris lain di luar batas.
  */
-export async function rincianRealisasi(klien: Klien, proyekId: string, pengguna?: PenggunaSesi, batas = 500): Promise<BarisRealisasi[]> {
+export async function rincianRealisasi(
+  klien: Klien,
+  proyekId: string,
+  opsi: { denganBagiHasil: boolean; pengguna?: PenggunaSesi; batas?: number },
+): Promise<RincianRealisasi> {
+  const batas = opsi.batas ?? 500;
+  const { pengguna } = opsi;
   const proyek = await klien.proyek.findUnique({ where: { id: proyekId }, select: { perusahaan: { select: { nama: true } } } });
-  if (!proyek) return [];
-  const baris = await klien.barisJurnal.findMany({
-    where: { akun: { jenis: "BEBAN" }, jurnal: { proyekId, sumber: { not: "PENUTUP" } } },
+  if (!proyek) return { baris: [], terpotong: false, batas, bagiLabaTersembunyi: opsi.denganBagiHasil ? null : D(0) };
+  const akunPeran = await akunKeuanganProyek(klien);
+  const idBagi = akunPeran.bebanBagiHasil?.id ?? null;
+  const syaratJurnal = { proyekId, sumber: { not: "PENUTUP" as const } };
+  const sembunyikan = !opsi.denganBagiHasil && idBagi !== null;
+  const hasil = await klien.barisJurnal.findMany({
+    where: { akun: { jenis: "BEBAN" }, jurnal: syaratJurnal, ...(sembunyikan ? { akunId: { not: idBagi } } : {}) },
     orderBy: [{ jurnal: { tanggal: "desc" } }, { jurnal: { nomor: "asc" } }, { id: "asc" }],
-    take: batas,
+    take: batas + 1,
     select: {
       id: true, debit: true, kredit: true, keterangan: true,
       akun: { select: { id: true, kode: true, nama: true } },
@@ -443,8 +473,17 @@ export async function rincianRealisasi(klien: Klien, proyekId: string, pengguna?
       },
     },
   });
+  const terpotong = hasil.length > batas;
+  const baris = terpotong ? hasil.slice(0, batas) : hasil;
+  let bagiLabaTersembunyi: Desimal | null = null;
+  if (!opsi.denganBagiHasil) {
+    if (idBagi === null) bagiLabaTersembunyi = D(0);
+    else {
+      const agr = await klien.barisJurnal.aggregate({ where: { akunId: idBagi, jurnal: syaratJurnal }, _sum: { debit: true, kredit: true } });
+      bagiLabaTersembunyi = D(agr._sum.debit ?? 0).minus(D(agr._sum.kredit ?? 0));
+    }
+  }
   const peta = await muatPetaKategori(klien);
-  const akunPeran = await akunKeuanganProyek(klien);
   const sumber = new Map(baris.map((b) => [b.jurnal.id, sumberLampiran(b.jurnal)]));
   let lampiran: Map<string, number> | null = null;
   if (pengguna && sumber.size > 0) {
@@ -457,24 +496,29 @@ export async function rincianRealisasi(klien: Klien, proyekId: string, pengguna?
     });
     lampiran = new Map(hitung.map((h) => [`${h.jenisEntitas}:${h.entitasId}`, h._count._all]));
   }
-  return baris.map((b) => {
-    const kategoriId = peta.kategoriUntukAkun(b.akun.id);
-    const s = sumber.get(b.jurnal.id)!;
-    return {
-      barisId: b.id,
-      jurnalId: b.jurnal.id,
-      tanggal: b.jurnal.tanggal,
-      nomorJurnal: b.jurnal.nomor,
-      keterangan: b.keterangan ?? b.jurnal.keterangan,
-      akun: b.akun,
-      kategoriId,
-      kategori: kategoriId ? (peta.namaKategori.get(kategoriId) ?? NAMA_TANPA_KATEGORI) : NAMA_TANPA_KATEGORI,
-      didanaiOleh: b.jurnal.talanganMitra ? `${b.jurnal.talanganMitra.mitra.nama} (talangan)` : proyek.perusahaan.nama,
-      jumlah: D(b.debit).minus(D(b.kredit)),
-      lampiran: lampiran ? (lampiran.get(`${s.jenisEntitas}:${s.entitasId}`) ?? 0) : null,
-      bagiHasil: akunPeran.bebanBagiHasil?.id === b.akun.id,
-    };
-  });
+  return {
+    terpotong,
+    batas,
+    bagiLabaTersembunyi,
+    baris: baris.map((b) => {
+      const kategoriId = peta.kategoriUntukAkun(b.akun.id);
+      const s = sumber.get(b.jurnal.id)!;
+      return {
+        barisId: b.id,
+        jurnalId: b.jurnal.id,
+        tanggal: b.jurnal.tanggal,
+        nomorJurnal: b.jurnal.nomor,
+        keterangan: b.keterangan ?? b.jurnal.keterangan,
+        akun: b.akun,
+        kategoriId,
+        kategori: kategoriId ? (peta.namaKategori.get(kategoriId) ?? NAMA_TANPA_KATEGORI) : NAMA_TANPA_KATEGORI,
+        didanaiOleh: b.jurnal.talanganMitra ? `${b.jurnal.talanganMitra.mitra.nama} (talangan)` : proyek.perusahaan.nama,
+        jumlah: D(b.debit).minus(D(b.kredit)),
+        lampiran: lampiran ? (lampiran.get(`${s.jenisEntitas}:${s.entitasId}`) ?? 0) : null,
+        bagiHasil: idBagi === b.akun.id,
+      };
+    }),
+  };
 }
 
 /**

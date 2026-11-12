@@ -444,29 +444,38 @@ function galatProyekDipakai(e: unknown): boolean {
 }
 
 /**
- * Hapus proyek (catatan orkestrator sesudah P35). Baris Proyek dikunci FOR UPDATE sebagai perintah pertama, lalu anak
- * yang dicascade atau menahan hapus dibaca ulang di dalam transaksi: dokumen mitra, mitra, baris anggaran, jurnal,
- * dan berkas. Bila masih ada, hapus ditolak dengan pesan jelas sebelum DELETE, sehingga tidak bertemu siklus kunci
- * dengan posting dokumen mitra (kunci mitra lalu sisipan jurnal ber-proyekId, P33 S1). Proyek tanpa anak tetap
- * terhapus seperti dulu; dokumen lain yang hanya menautkan proyek (penawaran, pesanan, dan sebagainya) dikosongkan
- * proyeknya oleh basis data seperti sebelumnya.
+ * Hapus proyek. Perilaku main dipertahankan: jurnal dan dokumen lama yang menautkan proyek dikosongkan proyeknya oleh
+ * basis data (SET NULL), sedangkan mitra, baris anggaran, dan pembatasan berkas ikut terhapus (CASCADE di skema).
+ * Penolakan hanya untuk anak yang FK-nya RESTRICT: talangan mitra, pembayaran ke mitra, dan berkas (D7 §3.3.7 no. 5).
+ *
+ * Urutan kunci (catatan orkestrator sesudah P35 dan P36, tinjauan P36 R1): pesanan lalu penawaran penjualan yang menaut
+ * proyek dikunci FOR UPDATE urut id lebih dulu, karena SET NULL akan menulis baris itu. Sinkron anggaran memegang
+ * dokumen sumber (FOR SHARE) sebelum Proyek, jadi hapus harus memakai urutan yang sama: dokumen, lalu Proyek. Pesanan
+ * dikunci sebelum penawaran seperti hapus pesanan (kepala pesanan lalu penawaran asal). Sesudah itu baris Proyek FOR
+ * UPDATE, lalu anak RESTRICT dihitung di dalam transaksi. Baris mitra lalu dikunci FOR UPDATE SKIP LOCKED. Mitra yang sedang dipegang
+ * jalur dokumen mitra (kunci mitra lalu sisipan ber-proyekId) tidak ditunggu, karena menunggunya lewat cascade
+ * membentuk siklus kunci (P33 S1). Hapus langsung ditolak "Proyek masih dipakai" dan jalur itu tetap selesai.
  */
 async function hapusProyek(id: string) {
   try {
     await db.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR UPDATE`;
+      await tx.$queryRaw`SELECT 1 FROM "PenawaranPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR UPDATE`;
       const [p] = await tx.$queryRaw<{ kode: string }[]>`SELECT "kode" FROM "Proyek" WHERE "id" = ${id} FOR UPDATE`;
       if (!p) throw new Error("Data tidak ditemukan (mungkin sudah dihapus).");
       // berurutan: transaksi interaktif tidak boleh menjalankan kueri bersamaan
       const anak: [string, number][] = [
         ["talangan mitra", await tx.talanganMitra.count({ where: { proyekId: id } })],
         ["pembayaran ke mitra", await tx.pembayaranMitra.count({ where: { proyekId: id } })],
-        ["mitra", await tx.mitraProyek.count({ where: { proyekId: id } })],
-        ["baris anggaran", await tx.barisAnggaranProyek.count({ where: { proyekId: id } })],
-        ["jurnal", await tx.jurnal.count({ where: { proyekId: id } })],
         ["berkas", await tx.berkas.count({ where: { proyekId: id } })],
       ];
       const ada = anak.filter(([, n]) => n > 0);
       if (ada.length) throw new Error(`Proyek ${p.kode} masih punya ${ada.map(([nama, n]) => `${n} ${nama}`).join(", ")}; hapus atau pindahkan data itu dulu`);
+      const jumlahMitra = await tx.mitraProyek.count({ where: { proyekId: id } });
+      if (jumlahMitra > 0) {
+        const terkunci = await tx.$queryRaw<{ id: string }[]>`SELECT "id" FROM "MitraProyek" WHERE "proyekId" = ${id} FOR UPDATE SKIP LOCKED`;
+        if (terkunci.length !== jumlahMitra) throw new Error("Proyek masih dipakai; muat ulang lalu coba lagi");
+      }
       await tx.proyek.delete({ where: { id } });
     });
   } catch (e) {

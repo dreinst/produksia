@@ -74,7 +74,8 @@ export async function terapkanBaganAkun() {
   await wajibHakAksi("pengaturan.tulis");
   const hasil = await terapkanBaganAkunStandar(db);
   await terapkanDataFlagship(db);
-  await terapkanKategoriAnggaranBawaan(db);
+  // akun standar yang baru dibuat tetap dipetakan walaupun kategori bawaannya sudah ada (tinjauan P36 S1)
+  await terapkanKategoriAnggaranBawaan(db, { akunBaru: hasil.idDibuat });
   revalidatePath("/pengaturan/kategori-anggaran");
   revalidatePath("/pengaturan/bagan-akun");
   revalidatePath("/pengaturan/pemetaan-akun");

@@ -9,7 +9,7 @@ import { penggunaSaatIni } from "../src/lib/otentikasi";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
 import { KATEGORI_BAWAAN, muatPetaKategori, terapkanKategoriAnggaranBawaan } from "../src/lib/kategoriAnggaran";
-import { bagiMargin, hitungBagiHasil, statusBayarMitra, PERINGATAN_BELUM_ADA_MARGIN, PERINGATAN_NOMINAL_MELEBIHI, type MitraBagi } from "../src/lib/bagiHasil";
+import { bagiMargin, hitungBagiHasil, statusBayarMitra, PERINGATAN_AKTUAL_KURANG_DARI_TALANGAN, PERINGATAN_BELUM_ADA_MARGIN, PERINGATAN_NOMINAL_MELEBIHI, type MitraBagi } from "../src/lib/bagiHasil";
 import { PENGHITUNG_MODUL_PROYEK, penghitungTerlihat } from "../src/lib/hitunganModulProyek";
 import { daftarDokumenMitra, daftarKeuanganProyek, daftarProyekUntukHalaman, kunciBarisProyek, rincianRealisasi, ringkasanKeuanganProyek } from "../src/lib/keuanganProyek";
 import { ringkasanProyek, daftarProyekAktif } from "../src/lib/proyek";
@@ -18,6 +18,7 @@ import { buatPembayaranMitra, buatTalanganMitra, hapusMitraProyek, pindahUrutanM
 import { ubahTampilanProyek } from "../src/lib/aksi/proyek";
 import { simpanPemetaanKategori, tambahKategoriAnggaran } from "../src/lib/aksi/kategoriAnggaran";
 import { buatFaktur, buatPenawaran, buatPenerimaan, konversiPenawaranKePesanan } from "../src/lib/aksi/penjualan";
+import { batalkanTagihanTermin, terbitkanTagihanTermin, ubahRencanaTermin } from "../src/lib/aksi/dokumenPenjualan";
 import { buatKasKeluar } from "../src/lib/aksi/jurnal";
 import { hapusDataInduk, ubahDataInduk } from "../src/lib/aksi/dataInduk";
 import { bukaPembatasanProyek, simpanAksesBerkasProyek } from "../src/lib/aksi/berkas";
@@ -185,6 +186,13 @@ function bagianA() {
     st(100, "100.5") === "LUNAS" && st(100, "100.51") === "LEBIH_BAYAR" && st(100, "99.5") === "LUNAS" && st(100, "99.49") === "DIBAYAR_SEBAGIAN" && st(0, 0) === "BELUM_ADA_HAK" && st(0, 1) === "LEBIH_BAYAR" && st(100, 0) === "PERLU_DIBAYAR",
     "A7 (100; 100,5) lunas, (100; 100,51) lebih bayar, (100; 99,5) lunas, (100; 99,49) sebagian, (0; 0) belum ada hak, (0; 1) lebih bayar, (100; 0) perlu dibayar",
   );
+  // tinjauan P35 R1: biaya aktual negatif tanpa talangan tidak memicu peringatan talangan; dengan talangan tetap muncul
+  const tanpaTalangan = hitungBagiHasil({ marginRencana: D(0), marginKas: D(500), diterima: D(0), aktual: D(-500) }, [], new Map(), new Map());
+  const denganTalangan = hitungBagiHasil({ marginRencana: D(0), marginKas: D(500), diterima: D(0), aktual: D(-500) }, [{ id: "M", nama: "M", mode: "PERSEN", nilai: D(10) }], new Map([["M", D(1_000)]]), new Map());
+  pastikan(
+    !tanpaTalangan.peringatan.includes(PERINGATAN_AKTUAL_KURANG_DARI_TALANGAN) && tanpaTalangan.peringatan.length === 0 && denganTalangan.peringatan.includes(PERINGATAN_AKTUAL_KURANG_DARI_TALANGAN),
+    `R1 peringatan biaya aktual kurang dari talangan hanya bila ada talangan (${JSON.stringify(tanpaTalangan.peringatan)})`,
+  );
 }
 
 // ---------- Bersih-bersih ----------
@@ -307,18 +315,18 @@ async function main() {
     await jalankan("KK 5-1600 2.500.000 (proyek)", () => buatKasKeluar(formulir({ akunKasId: kas.id, akunLawanId: a1600.id, jumlah: 2_500_000, keterangan: "Sewa venue uji", proyekId: prj.id })));
     await jalankan("KK 5-1500 1.000.000 (proyek)", () => buatKasKeluar(formulir({ akunKasId: kas.id, akunLawanId: a1500.id, jumlah: 1_000_000, keterangan: "Honor talent uji", proyekId: prj.id })));
     await jalankan("TRM sebesar total faktur", () => buatPenerimaan(formulir({ fakturId: fj.id, akunId: kas.id, jumlah: D(fj.total).toFixed(2) })));
-    const kp = (await ringkasanKeuanganProyek(db, prj.id))!;
+    const kp = (await ringkasanKeuanganProyek(db, prj.id, { denganBagiHasil: true }))!;
     r = kp.ringkasan;
     const lpj = (await ringkasanProyek(db, prj.id))!;
     pastikan(sama(r.diterima, 10_000_000) && r.piutang.isZero() && sama(r.aktual, 3_500_000) && sama(r.marginKas, 6_500_000) && sama(r.persenMarginKas, "65.0"), `diterima 10 juta, aktual 3,5 juta, margin kas 6,5 juta (65,0%) (${r.diterima}, ${r.aktual}, ${r.marginKas})`);
     pastikan(r.aktual.plus(r.bagiHasilDibayar).equals(lpj.labaRugi.totalBeban), `identitas aktual + bagi hasil dibayar = total beban LPJ (${r.aktual} + ${r.bagiHasilDibayar} = ${lpj.labaRugi.totalBeban})`);
-    pastikan(kp.bagiHasil !== null && kp.bagiHasil.mitra.length === 0 && (await ringkasanKeuanganProyek(db, prj.id, { denganBagiHasil: false }))!.bagiHasil === null, "bagi hasil termuat (tanpa mitra), dan null bila diminta tanpa bagi hasil");
+    pastikan(kp.bagiHasil !== null && kp.bagiHasil.mitra.length === 0 && (await ringkasanKeuanganProyek(db, prj.id, { denganBagiHasil: false }))!.bagiHasil === null && !("bagiHasil" in (await ringkasanKeuanganProyek(db, prj.id))!), "bagi hasil termuat (tanpa mitra), null bila diminta tanpa bagi hasil, dan tidak dimuat tanpa opsi (R3)");
     const peta = await muatPetaKategori(db);
     const kat = new Map(r.kategori.map((x) => [x.kategoriId, x]));
     pastikan(sama(kat.get(peta.kategoriUntukAkun(a1600.id))?.aktual, 2_500_000) && sama(kat.get(peta.kategoriUntukAkun(a1500.id))?.aktual, 1_000_000), "realisasi per kategori mengikuti pemetaan akun 5-1600 dan 5-1500");
-    const rinci = await rincianRealisasi(db, prj.id, pemilik);
-    pastikan(rinci.length === 2 && rinci.reduce((s, b) => s.plus(b.jumlah), D(0)).equals(r.aktual) && rinci.every((b) => b.didanaiOleh === kp.proyek.perusahaan.nama) && rinci.every((b) => b.lampiran === 0 && !b.bagiHasil), `rincian realisasi: dua baris, Σ = aktual, lampiran 0 (${rinci.map((b) => `${b.akun.kode} ${b.jumlah} ${b.didanaiOleh}`).join("; ")})`);
-    pastikan((await rincianRealisasi(db, prj.id)).every((b) => b.lampiran === null), "tanpa pengguna: jumlah lampiran tidak dihitung");
+    const { baris: rinci, terpotong: rinciTerpotong } = await rincianRealisasi(db, prj.id, { pengguna: pemilik, denganBagiHasil: true });
+    pastikan(rinci.length === 2 && rinci.reduce((s, b) => s.plus(b.jumlah), D(0)).equals(r.aktual) && rinci.every((b) => b.didanaiOleh === kp.proyek.perusahaan.nama) && !rinciTerpotong && rinci.every((b) => b.lampiran === 0 && !b.bagiHasil), `rincian realisasi: dua baris, Σ = aktual, lampiran 0 (${rinci.map((b) => `${b.akun.kode} ${b.jumlah} ${b.didanaiOleh}`).join("; ")})`);
+    pastikan((await rincianRealisasi(db, prj.id, { denganBagiHasil: true })).baris.every((b) => b.lampiran === null), "tanpa pengguna: jumlah lampiran tidak dihitung");
 
     console.log("=== B7. Ember kategori ===");
     await jalankan("kategori KPU Sound System", () => tambahKategoriAnggaran(formulir({ nama: "KPU Sound System" })));
@@ -405,13 +413,13 @@ async function main() {
     const fj2 = await db.fakturPenjualan.findFirstOrThrow({ where: { pesananId: psj2.id } });
     await jalankan("TRM sebesar total faktur", () => buatPenerimaan(formulir({ fakturId: fj2.id, akunId: kas.id, jumlah: D(fj2.total).toFixed(2) })));
     await jalankan("KK 5-1300 3.500.000 (PRJ-KPU2)", () => buatKasKeluar(formulir({ akunKasId: kas.id, akunLawanId: a1300.id, jumlah: 3_500_000, keterangan: "Produksi uji", proyekId: prj2.id, perusahaanId: P2 })));
-    let k2 = (await ringkasanKeuanganProyek(db, prj2.id))!;
+    let k2 = (await ringkasanKeuanganProyek(db, prj2.id, { denganBagiHasil: true }))!;
     let bh = k2.bagiHasil!;
     const bm = (id: string) => bh.mitra.find((x) => x.id === id)!;
     pastikan(sama(k2.ringkasan.diterima, 10_000_000) && sama(k2.ringkasan.aktual, 5_500_000) && sama(k2.ringkasan.marginKas, 4_500_000), `diterima 10 juta, aktual 5,5 juta, margin kas 4,5 juta (${k2.ringkasan.aktual})`);
     pastikan(bh.mitra.map((x) => x.nama).join() === "Mitra B,Mitra A" && sama(bm(mA.id).realisasi, 1_000_000) && sama(bm(mB.id).realisasi, 1_050_000) && sama(bh.perusahaan.realisasi, 2_450_000), "contoh B: A 1.000.000, B 1.050.000, perusahaan 2.450.000");
     pastikan(sama(bm(mB.id).modalMasuk, 2_000_000) && sama(bm(mB.id).totalHak, 3_050_000) && sama(bm(mA.id).totalHak, 1_000_000) && sama(bh.perusahaan.total, 5_950_000) && sama(bh.penyelesaian.totalTerdistribusi, 10_000_000), "hak B 3.050.000, A 1.000.000, perusahaan 5.950.000, terdistribusi 10.000.000");
-    const rinci2 = await rincianRealisasi(db, prj2.id, pemilik);
+    const rinci2 = (await rincianRealisasi(db, prj2.id, { pengguna: pemilik, denganBagiHasil: true })).baris;
     pastikan(rinci2.some((b) => b.didanaiOleh === "Mitra B (talangan)" && sama(b.jumlah, 2_000_000)) && rinci2.reduce((s, b) => s.plus(b.jumlah), D(0)).equals(k2.ringkasan.aktual), "rincian: talangan didanai Mitra B, Σ = aktual");
 
     console.log("=== B13. Pembayaran ===");
@@ -438,7 +446,7 @@ async function main() {
     log.pembayaran++;
     const bymLaba = await db.pembayaranMitra.findFirstOrThrow({ where: { mitraId: mB.id, jenis: "LABA" }, include: { jurnal: { include: { baris: { orderBy: { debit: "desc" } } } } } });
     pastikan(bymLaba.jurnal!.baris[0].akunId === a1700.id && bymLaba.jurnal!.baris[1].akunId === kas.id, "LABA: Dr 5-1700 / Cr kas");
-    k2 = (await ringkasanKeuanganProyek(db, prj2.id))!;
+    k2 = (await ringkasanKeuanganProyek(db, prj2.id, { denganBagiHasil: true }))!;
     bh = k2.bagiHasil!;
     const lpj2 = (await ringkasanProyek(db, prj2.id))!;
     pastikan(bm(mB.id).status === "LUNAS" && sama(k2.ringkasan.aktual, 5_500_000) && sama(k2.ringkasan.bagiHasilDibayar, 1_050_000), "B lunas, aktual tetap 5.500.000, bagi hasil dibayar 1.050.000");
@@ -446,8 +454,24 @@ async function main() {
     pastikan(bh.pembayaran.length === 2 && bh.pembayaran.every((p) => p.mitraId === mB.id), "daftar pembayaran disetujui di hasil bagi hasil");
     await jalankan("LABA A 2.000.000", () => buatPembayaranMitra(prj2.id, isiBayar({ mitraId: mA.id, jenis: "LABA", jumlah: 2_000_000 })));
     log.pembayaran++;
-    bh = (await ringkasanKeuanganProyek(db, prj2.id))!.bagiHasil!;
+    bh = (await ringkasanKeuanganProyek(db, prj2.id, { denganBagiHasil: true }))!.bagiHasil!;
     pastikan(bm(mA.id).status === "LEBIH_BAYAR" && sama(bm(mA.id).terutang, -1_000_000), "A lebih bayar (terutang -1.000.000)");
+    // R4: tanpa bagi-hasil.lihat baris bagi laba per mitra dibuang, jumlahnya hanya sebagai keterangan "termasuk bagi laba"
+    const rinciBagi = await rincianRealisasi(db, prj2.id, { denganBagiHasil: true });
+    const rinciTanpa = await rincianRealisasi(db, prj2.id, { denganBagiHasil: false });
+    const sigma = (xs: { jumlah: Desimal }[]) => xs.reduce((t, b) => t.plus(b.jumlah), D(0));
+    pastikan(
+      rinciBagi.baris.filter((b) => b.bagiHasil).length === 2 && rinciBagi.bagiLabaTersembunyi === null && rinciBagi.baris.some((b) => b.bagiHasil && (b.keterangan ?? "").includes("Mitra")),
+      "R4: dengan bagi hasil, dua baris bagi laba per mitra tampil",
+    );
+    pastikan(
+      rinciTanpa.baris.every((b) => !b.bagiHasil && !(b.keterangan ?? "").startsWith("Bagi laba")) && sama(rinciTanpa.bagiLabaTersembunyi, 3_050_000) && sigma(rinciTanpa.baris).equals(k2.ringkasan.aktual) && sigma(rinciTanpa.baris).plus(rinciTanpa.bagiLabaTersembunyi!).equals(sigma(rinciBagi.baris)),
+      `R4: tanpa bagi hasil, baris bagi laba dibuang, Σ = aktual, bagi laba tersembunyi 3.050.000 (${rinciTanpa.bagiLabaTersembunyi})`,
+    );
+    // R6: penanda terpotong
+    const rinciSatu = await rincianRealisasi(db, prj2.id, { denganBagiHasil: true, batas: 1 });
+    const rinciPas = await rincianRealisasi(db, prj2.id, { denganBagiHasil: true, batas: rinciBagi.baris.length });
+    pastikan(rinciSatu.terpotong && rinciSatu.baris.length === 1 && rinciSatu.batas === 1 && !rinciPas.terpotong && rinciPas.baris.length === rinciBagi.baris.length && !rinciBagi.terpotong, "R6: rincian terpotong ditandai, tepat di batas tidak terpotong");
     const dokMitra = await daftarDokumenMitra(db, prj2.id);
     pastikan(dokMitra.talangan.length === 1 && dokMitra.pembayaran.length === 3, "daftarDokumenMitra: satu talangan, tiga pembayaran");
 
@@ -491,6 +515,113 @@ async function main() {
       await sebagai("owner", () => jalankan("hapus MODAL menunggu", () => hapusDokumen("pembayaranMitra", bDraf.id)));
     } finally {
       aturPersetujuan(false);
+    }
+
+    console.log("=== R7 dan R2 tinjauan P35: penjaga buat dan posting dokumen mitra ===");
+    // perusahaan proyek diarsipkan: buat ditolak (pastikanPerusahaanAktif), dan draf lama tidak bisa disetujui (R2)
+    aturPersetujuan(true);
+    try {
+      await sebagai("owner", () => jalankan("owner buat talangan A 1.000 (draf, sebelum arsip)", () => buatTalanganMitra(prj2.id, isiTalangan({ mitraId: mA.id, jumlah: 1_000 }))));
+      log.talangan++;
+      await sebagai("owner", () => jalankan("owner buat LABA A 1.000 (draf, sebelum arsip)", () => buatPembayaranMitra(prj2.id, isiBayar({ mitraId: mA.id, jenis: "LABA", jumlah: 1_000 }))));
+      log.pembayaran++;
+      const tArsip = await db.talanganMitra.findFirstOrThrow({ where: { mitraId: mA.id, statusPersetujuan: "DRAFT" } });
+      const bArsip = await db.pembayaranMitra.findFirstOrThrow({ where: { mitraId: mA.id, statusPersetujuan: "DRAFT" } });
+      nomorDokumen.push(tArsip.nomor, bArsip.nomor);
+      await sebagai("owner", () => jalankan("ajukan talangan draf", () => ajukanDokumen("talanganMitra", tArsip.id)));
+      await sebagai("owner", () => jalankan("ajukan LABA draf", () => ajukanDokumen("pembayaranMitra", bArsip.id)));
+      await db.perusahaan.update({ where: { id: P2 }, data: { aktif: false } });
+      try {
+        await harusDitolak("buat talangan proyek perusahaan arsip", () => buatTalanganMitra(prj2.id, isiTalangan({ mitraId: mA.id, jumlah: 1_000 })), "sudah diarsipkan; aktifkan dulu");
+        await harusDitolak("buat pembayaran proyek perusahaan arsip", () => buatPembayaranMitra(prj2.id, isiBayar({ mitraId: mA.id, jenis: "LABA", jumlah: 1_000 })), "sudah diarsipkan; aktifkan dulu");
+        await sebagai("admin", () => harusDitolak("R2 admin setujui talangan draf lama di perusahaan arsip", () => setujuiDokumen("talanganMitra", tArsip.id), "sudah diarsipkan; aktifkan dulu"));
+        await harusDitolak("R2 owner setujui LABA draf lama di perusahaan arsip", () => setujuiDokumen("pembayaranMitra", bArsip.id), "sudah diarsipkan; aktifkan dulu");
+        const [tA, bA] = [await db.talanganMitra.findUniqueOrThrow({ where: { id: tArsip.id } }), await db.pembayaranMitra.findUniqueOrThrow({ where: { id: bArsip.id } })];
+        pastikan(tA.statusPersetujuan === "MENUNGGU" && tA.jurnalId === null && bA.statusPersetujuan === "MENUNGGU" && bA.jurnalId === null, "R2: draf lama tetap menunggu tanpa jurnal");
+      } finally {
+        await db.perusahaan.update({ where: { id: P2 }, data: { aktif: true } });
+      }
+      await sebagai("admin", () => jalankan("sesudah diaktifkan lagi, admin setujui talangan draf", () => setujuiDokumen("talanganMitra", tArsip.id)));
+      pastikan((await db.talanganMitra.findUniqueOrThrow({ where: { id: tArsip.id } })).jurnalId !== null, "perusahaan aktif lagi: talangan dijurnal");
+      await jalankan("hapus LABA draf", () => hapusDokumen("pembayaranMitra", bArsip.id));
+      await jalankan("hapus talangan uji arsip", () => hapusDokumen("talanganMitra", tArsip.id));
+    } finally {
+      aturPersetujuan(false);
+    }
+    // akun milik perusahaan lain dan tahun tertutup
+    const bebanUtama = await db.akun.create({ data: { kode: `${K}-BUT`, nama: "Beban Uji Milik Utama", jenis: "BEBAN", perusahaanId: "utama" } });
+    const kasUtama = await db.akun.create({ data: { kode: `${K}-KUT`, nama: "Kas Uji Milik Utama", jenis: "ASET", kasBank: true, perusahaanId: "utama" } });
+    await harusDitolak("talangan dengan akun beban milik perusahaan lain", () => buatTalanganMitra(prj2.id, isiTalangan({ mitraId: mA.id, akunBebanId: bebanUtama.id, jumlah: 1_000 })), `Akun ${K}-BUT Beban Uji Milik Utama milik`);
+    await harusDitolak("pembayaran dengan akun kas milik perusahaan lain", () => buatPembayaranMitra(prj2.id, isiBayar({ mitraId: mA.id, jenis: "LABA", akunKasId: kasUtama.id, jumlah: 1_000 })), `Akun ${K}-KUT Kas Uji Milik Utama milik`);
+    let tahunTutup = 2001;
+    while (await db.tutupBuku.findUnique({ where: { tahun: tahunTutup } })) tahunTutup++;
+    const tutupUji = await db.tutupBuku.create({ data: { tahun: tahunTutup, labaBersih: 0, penggunaNama: "Skrip Uji" } });
+    try {
+      await harusDitolak("talangan bertanggal tahun tertutup", () => buatTalanganMitra(prj2.id, isiTalangan({ mitraId: mA.id, jumlah: 1_000, tanggal: `${tahunTutup}-06-01` })), `Tahun buku ${tahunTutup} sudah ditutup`);
+      await harusDitolak("pembayaran bertanggal tahun tertutup", () => buatPembayaranMitra(prj2.id, isiBayar({ mitraId: mA.id, jenis: "LABA", jumlah: 1_000, tanggal: `${tahunTutup}-06-01` })), `Tahun buku ${tahunTutup} sudah ditutup`);
+    } finally {
+      await db.tutupBuku.delete({ where: { id: tutupUji.id } });
+    }
+    pastikan((await db.talanganMitra.count({ where: { proyekId: prj2.id, mitraId: mA.id } })) === 0 && (await db.pembayaranMitra.count({ where: { mitraId: mA.id, jenis: "LABA", jumlah: 1_000 } })) === 0, "penolakan tidak menyimpan dokumen");
+    // jumlah lampiran di rincian realisasi: talangan berlampiran terlihat 1 oleh PEMILIK dan ADMIN, 0 bagi ADMIN sesudah
+    // proyek dibatasi, PEMILIK (akses penuh) tetap 1
+    await jalankan("talangan A 1.000 berlampiran", () => buatTalanganMitra(prj2.id, isiTalangan({ mitraId: mA.id, jumlah: 1_000 })));
+    log.talangan++;
+    const tLamp = await db.talanganMitra.findFirstOrThrow({ where: { proyekId: prj2.id, mitraId: mA.id } });
+    nomorDokumen.push(tLamp.nomor);
+    const bLamp = await db.berkas.create({ data: { perusahaanId: P2, namaBerkas: `${K}-bukti.txt`, tipeMime: "text/plain", ukuran: 1, sha256: "0".repeat(64), jenisEntitas: "talangan-mitra", entitasId: tLamp.id, proyekId: prj2.id, diunggahOlehNama: "Skrip Uji" } });
+    try {
+      const lampiranTalangan = async (u: Parameters<typeof rincianRealisasi>[2]["pengguna"]) =>
+        (await rincianRealisasi(db, prj2.id, { pengguna: u, denganBagiHasil: true })).baris.find((b) => b.jurnalId === tLamp.jurnalId)?.lampiran;
+      const lampAdmin = () => sebagaiPeran("ADMIN", async () => lampiranTalangan((await penggunaSaatIni())!));
+      const sebelum = [await lampiranTalangan(pemilik), await lampAdmin()];
+      await jalankan("batasi berkas PRJ-KPU2 untuk akses penuh saja", () => simpanAksesBerkasProyek(prj2.id, formulir({})));
+      const sesudah = [await lampiranTalangan(pemilik), await lampAdmin()];
+      await jalankan("buka pembatasan PRJ-KPU2", () => bukaPembatasanProyek(prj2.id));
+      pastikan(sebelum[0] === 1 && sebelum[1] === 1 && sesudah[0] === 1 && sesudah[1] === 0, `lampiran talangan: PEMILIK dan ADMIN 1, sesudah dibatasi PEMILIK 1 dan ADMIN 0 (${sebelum.join("/")} lalu ${sesudah.join("/")})`);
+    } finally {
+      await db.berkas.delete({ where: { id: bLamp.id } });
+    }
+    await jalankan("hapus talangan berlampiran", () => hapusDokumen("talanganMitra", tLamp.id));
+    // hapus mitra berbarengan dengan buat talangan atas mitra itu: tanpa deadlock, tepat satu yang lolos
+    for (let i = 0; i < 4; i++) {
+      await tambah(`mitra HM${i}`, { nama: `Mitra HM${i}`, mode: "NOMINAL", nilai: 1_000 });
+      const mH = await db.mitraProyek.findFirstOrThrow({ where: { proyekId: prj2.id, nama: `Mitra HM${i}` } });
+      const tal = () => aksi(() => buatTalanganMitra(prj2.id, isiTalangan({ mitraId: mH.id, jumlah: 1_000 })));
+      const hps = () => aksi(() => hapusMitraProyek(prj2.id, mH.id));
+      const [hT, hM] = i % 2 === 0 ? await Promise.all([tal(), hps()]) : (await Promise.all([hps(), tal()])).reverse();
+      if (hT === "ok") log.talangan++;
+      if (hM === "ok") log.mitra.HAPUS++;
+      const sah = (hM === "ok" && hT.includes("Mitra tidak ditemukan di proyek ini")) || (hT === "ok" && hM.includes(`Mitra Mitra HM${i} sudah menalangi biaya proyek`));
+      pastikan(sah, `hapus mitra lawan buat talangan #${i}: tepat satu lolos, lawannya ditolak jelas (talangan=[${hT}] hapus=[${hM}])`);
+      for (const t of await db.talanganMitra.findMany({ where: { mitraId: mH.id }, select: { id: true, nomor: true } })) {
+        nomorDokumen.push(t.nomor);
+        await jalankan(`hapus ${t.nomor}`, () => hapusDokumen("talanganMitra", t.id));
+      }
+      if (await db.mitraProyek.count({ where: { id: mH.id } })) {
+        await jalankan(`hapus mitra HM${i}`, () => hapusMitraProyek(prj2.id, mH.id));
+        log.mitra.HAPUS++;
+      }
+    }
+    // butir termin ditagih lewat aksi P25 masuk "ditagih" ringkasan (PAKET P35 uji_baru), dan keluar lagi saat dibatalkan
+    {
+      const prjT = await db.proyek.create({ data: { kode: `PRJ-${K}-TRM`, nama: "Event Uji Termin", pelangganId: pelanggan.id } });
+      await jalankan("PNW termin 1.000.000", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, proyekId: prjT.id, baris: [{ barangId: jasa.id, jumlah: 1, harga: 1_000_000 }] })));
+      const pnwT = await db.penawaranPenjualan.findFirstOrThrow({ where: { proyekId: prjT.id } });
+      await jalankan("konversi PNW termin ke PSJ", () => konversiPenawaranKePesanan(pnwT.id));
+      const psjT = await db.pesananPenjualan.findFirstOrThrow({ where: { penawaranId: pnwT.id } });
+      await jalankan("rencana termin pesanan 40% + sisa", () => ubahRencanaTermin("pesanan", psjT.id, formulir({ rencanaTermin: [{ label: "DP", nilai: 40 }, { label: "Pelunasan" }] })));
+      const [t1] = await db.rencanaTermin.findMany({ where: { pesananId: psjT.id }, orderBy: { no: "asc" } });
+      const ditagihT = async () => (await ringkasanKeuanganProyek(db, prjT.id))!.ringkasan;
+      const sebelumT = await ditagihT();
+      await jalankan("terbitkan tagihan DP", () => terbitkanTagihanTermin(t1.id, formulir({})));
+      const sesudahT = await ditagihT();
+      await jalankan("batalkan tagihan DP", () => batalkanTagihanTermin(t1.id));
+      const batalT = await ditagihT();
+      pastikan(
+        sebelumT.ditagih.isZero() && D(t1.jumlah).gt(0) && sesudahT.ditagih.equals(D(t1.jumlah)) && sesudahT.piutang.equals(D(t1.jumlah)) && batalT.ditagih.isZero(),
+        `termin DP ditagih lewat aksi P25: ditagih 0 lalu ${sesudahT.ditagih} (= butir ${t1.jumlah}), batal kembali 0`,
+      );
     }
 
     console.log("=== Pola E. Proyek dipegang lalu mitra ditulis, berbarengan dengan setujui MODAL ===");
@@ -561,8 +692,10 @@ async function main() {
         `hapus proyek selagi kunci mitra dipegang: langsung ditolak dengan pesan jelas, posting selesai (hapus=[${awalTunggu === "TERTAHAN" ? "TERTAHAN, lalu " : ""}${hHapus}] posting=[${hPosting}])`,
       );
       // pola skrip peninjau P35 (tinjau35b): buat talangan mitra dan hapus proyek serentak atas proyek bermitra tanpa
-      // dokumen. Kode lama: DELETE proyek memegang Proyek lalu menunggu kunci mitra lewat cascade, sedangkan talangan
-      // memegang mitra lalu menyisipkan jurnal ber-proyekId, jadi sebagian putaran berakhir deadlock.
+      // dokumen. Mitra ikut terhapus (CASCADE), jadi hasil yang sah ada dua: talangan tersimpan dan hapus ditolak, atau
+      // proyek terhapus dan talangan ditolak "Mitra tidak ditemukan". Tidak boleh ada deadlock atau galat mentah.
+      // Kode lama (DELETE langsung) menunggu kunci mitra lewat cascade sehingga sebagian putaran berakhir deadlock.
+      const hasilSerentak = { talangan: 0, hapus: 0 };
       for (let i = 0; i < 6; i++) {
         const prjD = await db.proyek.create({ data: { kode: `PRJ-${K}-HD${i}`, nama: `Event Uji Hapus Serentak ${i}`, perusahaanId: P2 } });
         await jalankan(`mitra proyek HD${i}`, () => tambahMitraProyek(prjD.id, formulir({ nama: "Mitra HD", mode: "PERSEN", nilai: 5 })));
@@ -572,9 +705,14 @@ async function main() {
         const hapusD = () => aksi(() => hapusDataInduk("proyek", prjD.id));
         const [hT, hH] = i % 2 === 0 ? await Promise.all([talangan(), hapusD()]) : (await Promise.all([hapusD(), talangan()])).reverse();
         if (hT === "ok") log.talangan++;
+        const masih = (await db.proyek.count({ where: { id: prjD.id } })) === 1;
+        const talanganMenang = hT === "ok" && masih && (hH.includes(`Proyek PRJ-${K}-HD${i} masih punya 1 talangan mitra`) || hH.includes("Proyek masih dipakai; muat ulang lalu coba lagi"));
+        const hapusMenang = hH === "ok" && !masih && hT.includes("Mitra tidak ditemukan di proyek ini") && (await db.mitraProyek.count({ where: { proyekId: prjD.id } })) === 0;
+        if (talanganMenang) hasilSerentak.talangan++;
+        if (hapusMenang) hasilSerentak.hapus++;
         pastikan(
-          hT === "ok" && hH.includes(`Proyek PRJ-${K}-HD${i} masih punya`) && (await db.proyek.count({ where: { id: prjD.id } })) === 1,
-          `putaran ${i}: buat talangan dan hapus proyek serentak tanpa deadlock, talangan tersimpan dan hapus ditolak jelas (talangan=[${hT.replace(/\s+/g, " ").slice(-160)}] hapus=[${hH.replace(/\s+/g, " ").slice(-160)}])`,
+          talanganMenang || hapusMenang,
+          `putaran ${i}: buat talangan dan hapus proyek serentak tanpa deadlock, salah satu menang dan lawannya ditolak jelas (talangan=[${hT.replace(/\s+/g, " ").slice(-160)}] hapus=[${hH.replace(/\s+/g, " ").slice(-160)}])`,
         );
         // talangan uji dibuang lagi supaya angka hutang mitra perusahaan kedua di B18 tetap
         for (const t of await db.talanganMitra.findMany({ where: { proyekId: prjD.id }, select: { id: true, nomor: true } })) {
@@ -582,11 +720,66 @@ async function main() {
           await jalankan(`hapus ${t.nomor}`, () => hapusDokumen("talanganMitra", t.id));
         }
       }
-      // proyek tanpa anak tetap terhapus seperti dulu; data yang hanya menautkan proyek dikosongkan proyeknya
+      console.log(`  (putaran serentak: talangan menang ${hasilSerentak.talangan}, hapus menang ${hasilSerentak.hapus})`);
+      // hapus proyek selagi baris mitranya dikunci transaksi lain (jalur dokumen mitra sebelum menyisipkan dokumen):
+      // tidak menunggu kunci itu, langsung ditolak, dan transaksi lawannya tetap selesai
+      {
+        const prjK = await db.proyek.create({ data: { kode: `PRJ-${K}-HK`, nama: "Event Uji Hapus Terkunci", perusahaanId: P2 } });
+        const mK = await db.mitraProyek.create({ data: { proyekId: prjK.id, nama: "Mitra HK", mode: "PERSEN", nilai: 5 } });
+        let lepas!: () => void;
+        const tahan = new Promise<void>((r) => (lepas = r));
+        let siap!: () => void;
+        const terkunci = new Promise<void>((r) => (siap = r));
+        const pegang = db
+          .$transaction(
+            async (tx) => {
+              await kunciBarisMitra(tx, mK.id);
+              siap();
+              await tahan;
+            },
+            { timeout: 60_000 },
+          )
+          .then(() => "ok", (e: Error) => e.message);
+        await terkunci;
+        const hapusK = aksi(() => hapusDataInduk("proyek", prjK.id));
+        const awalK = await Promise.race([hapusK, new Promise<string>((r) => setTimeout(() => r("TERTAHAN"), 5_000))]);
+        lepas();
+        const [hPegang, hHapusK] = await Promise.all([pegang, hapusK]);
+        pastikan(
+          awalK !== "TERTAHAN" && hHapusK.includes("Proyek masih dipakai; muat ulang lalu coba lagi") && hPegang === "ok" && (await db.mitraProyek.count({ where: { id: mK.id } })) === 1,
+          `hapus proyek selagi mitranya dikunci: langsung ditolak tanpa menunggu (hapus=[${awalK === "TERTAHAN" ? "TERTAHAN, lalu " : ""}${hHapusK}] lawan=[${hPegang}])`,
+        );
+        await jalankan("hapus proyek bermitra sesudah kunci dilepas", () => hapusDataInduk("proyek", prjK.id));
+        pastikan((await db.proyek.count({ where: { id: prjK.id } })) === 0 && (await db.mitraProyek.count({ where: { id: mK.id } })) === 0, "proyek bermitra tanpa dokumen terhapus, mitranya ikut terhapus (CASCADE)");
+      }
+      // berkas proyek (FK RESTRICT, D7 §3.3.7 no. 5) tetap menahan hapus, termasuk berkas di Sampah
+      {
+        const prjB = await db.proyek.create({ data: { kode: `PRJ-${K}-HB`, nama: "Event Uji Hapus Berkas", perusahaanId: P2 } });
+        const bk = await db.berkas.create({ data: { perusahaanId: P2, namaBerkas: `${K}-hapus.txt`, tipeMime: "text/plain", ukuran: 1, sha256: "0".repeat(64), proyekId: prjB.id, diunggahOlehNama: "Skrip Uji", dihapusPada: new Date() } });
+        await harusDitolak("hapus proyek yang punya berkas di Sampah", () => hapusDataInduk("proyek", prjB.id), `Proyek PRJ-${K}-HB masih punya 1 berkas`);
+        await db.berkas.delete({ where: { id: bk.id } });
+        await jalankan("hapus proyek sesudah berkasnya dihapus permanen", () => hapusDataInduk("proyek", prjB.id));
+      }
+      // regresi perilaku main: proyek dengan jurnal, baris anggaran, dan konten (tanpa dokumen mitra dan berkas) tetap
+      // terhapus. Jurnal dan konten kehilangan proyekId (SET NULL), baris anggaran ikut terhapus (CASCADE).
       const prjH = await db.proyek.create({ data: { kode: `PRJ-${K}-HPS`, nama: "Event Uji Hapus", perusahaanId: P2 } });
       const konten = await db.konten.create({ data: { judul: `${K} konten hapus proyek`, dibuatOlehNama: "Skrip Uji", proyekId: prjH.id, status: "DRAF" } });
-      await jalankan("hapus proyek tanpa anak", () => hapusDataInduk("proyek", prjH.id));
-      pastikan((await db.proyek.count({ where: { id: prjH.id } })) === 0 && (await db.konten.findUniqueOrThrow({ where: { id: konten.id } })).proyekId === null, "proyek tanpa anak terhapus, konten yang menautkannya dikosongkan proyeknya (perilaku lama)");
+      const jurnalH = await db.jurnal.create({ data: { nomor: `JU-${K}-HPS`, keterangan: `${K} jurnal hapus proyek`, proyekId: prjH.id, perusahaanId: P2 } });
+      const katH = await db.kategoriAnggaran.findFirstOrThrow({ orderBy: { urutan: "asc" } });
+      const barisH = await db.barisAnggaranProyek.create({ data: { proyekId: prjH.id, kategoriId: katH.id, deskripsi: `${K} baris hapus proyek`, rencana: 1_000 } });
+      try {
+        await jalankan("hapus proyek berjurnal tanpa dokumen mitra", () => hapusDataInduk("proyek", prjH.id));
+        pastikan(
+          (await db.proyek.count({ where: { id: prjH.id } })) === 0 &&
+            (await db.jurnal.findUniqueOrThrow({ where: { id: jurnalH.id } })).proyekId === null &&
+            (await db.konten.findUniqueOrThrow({ where: { id: konten.id } })).proyekId === null &&
+            (await db.barisAnggaranProyek.count({ where: { id: barisH.id } })) === 0,
+          "proyek berjurnal terhapus seperti main: jurnal dan konten dikosongkan proyeknya, baris anggaran ikut terhapus",
+        );
+      } finally {
+        await db.jurnal.deleteMany({ where: { id: jurnalH.id } });
+        await db.barisAnggaranProyek.deleteMany({ where: { id: barisH.id } });
+      }
       await harusDitolak("hapus proyek yang sudah terhapus", () => hapusDataInduk("proyek", prjH.id), "Data tidak ditemukan");
     });
 

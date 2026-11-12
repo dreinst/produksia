@@ -97,12 +97,15 @@ export async function akunPeranMitra(klien: Klien, peran: Peran): Promise<{ id: 
 }
 
 /** Dokumen mitra harus milik perusahaan proyeknya, dan mitranya milik proyek itu (data dari luar aplikasi ditolak). */
-function pastikanSatuProyek(dok: { nomor: string; perusahaanId: string; proyekId: string; mitra: { proyekId: string; nama: string }; proyek: { kode: string; perusahaanId: string } }) {
+function pastikanSatuProyek(dok: { nomor: string; perusahaanId: string; proyekId: string; mitra: { proyekId: string; nama: string }; proyek: { kode: string; perusahaanId: string; perusahaan: { nama: string; aktif: boolean } } }) {
+  // sama dengan pastikanPerusahaanAktif saat buat (tinjauan P35 R2, pola persetujuan.ts untuk penyesuaian stok): draf
+  // yang dibuat sebelum perusahaan proyeknya diarsipkan tidak boleh dijurnal ke buku perusahaan arsip saat disetujui
+  if (!dok.proyek.perusahaan.aktif) throw new Error(`Perusahaan ${dok.proyek.perusahaan.nama} sudah diarsipkan; aktifkan dulu`);
   if (dok.mitra.proyekId !== dok.proyekId) throw new Error(`Mitra ${dok.mitra.nama} bukan mitra proyek ${dok.proyek.kode}; ${dok.nomor} tidak bisa dijurnal`);
   if (dok.perusahaanId !== dok.proyek.perusahaanId) throw new Error(`${dok.nomor} tercatat di perusahaan yang berbeda dari proyek ${dok.proyek.kode}; hapus lalu catat ulang dari proyeknya`);
 }
 
-const PILIH_PROYEK = { proyek: { select: { kode: true, perusahaanId: true } }, mitra: { select: { proyekId: true, nama: true } } } as const;
+const PILIH_PROYEK = { proyek: { select: { kode: true, perusahaanId: true, perusahaan: { select: { nama: true, aktif: true } } } }, mitra: { select: { proyekId: true, nama: true } } } as const;
 
 /** Jurnal Talangan Mitra (JU-TLM, D5 §4.1). Menyimpan jurnalId di dokumen. Dokumen yang sudah dijurnal ditolak. */
 export async function postingTalanganMitra(tx: Tx, id: string): Promise<void> {
@@ -115,7 +118,9 @@ export async function postingTalanganMitra(tx: Tx, id: string): Promise<void> {
   const jumlah = D(d.jumlah);
   if (!jumlah.gt(0)) throw new Error(`Jumlah talangan ${d.nomor} harus lebih dari 0`);
   if (d.akunBeban.jenis !== "BEBAN" || d.akunBeban.kelompok) throw new Error("Akun beban harus akun Beban rinci (bukan kelompok)");
-  const [hutang, bagiHasil] = await Promise.all([akunPeranMitra(tx, "hutangMitra"), akunKeuanganProyek(tx)]);
+  // berurutan: tx interaktif menjalankan satu kueri sekali jalan
+  const hutang = await akunPeranMitra(tx, "hutangMitra");
+  const bagiHasil = await akunKeuanganProyek(tx);
   if (bagiHasil.bebanBagiHasil?.id === d.akunBebanId) throw new Error("Akun Bagi Hasil Mitra Proyek tidak boleh dipakai untuk talangan");
   const NOL = D(0);
   const jurnal = await catatJurnal(
@@ -179,10 +184,8 @@ export async function postingPembayaranMitra(tx: Tx, id: string): Promise<void> 
  */
 export async function pastikanTalanganBolehDihapus(tx: Tx, d: { id: string; nomor: string; mitraId: string; mitra: { nama: string } }): Promise<void> {
   await kunciBarisMitra(tx, d.mitraId);
-  const [talangan, modal] = await Promise.all([
-    tx.talanganMitra.findMany({ where: { mitraId: d.mitraId, statusPersetujuan: "DISETUJUI", id: { not: d.id } }, select: { jumlah: true } }),
-    tx.pembayaranMitra.findMany({ where: { mitraId: d.mitraId, jenis: "MODAL", statusPersetujuan: "DISETUJUI" }, select: { nomor: true, jumlah: true }, orderBy: { nomor: "asc" } }),
-  ]);
+  const talangan = await tx.talanganMitra.findMany({ where: { mitraId: d.mitraId, statusPersetujuan: "DISETUJUI", id: { not: d.id } }, select: { jumlah: true } });
+  const modal = await tx.pembayaranMitra.findMany({ where: { mitraId: d.mitraId, jenis: "MODAL", statusPersetujuan: "DISETUJUI" }, select: { nomor: true, jumlah: true }, orderBy: { nomor: "asc" } });
   const sisa = jumlahkan(talangan.map((t) => t.jumlah)).minus(jumlahkan(modal.map((m) => m.jumlah)));
   if (sisa.lt(0)) throw new Error(`${d.nomor} sudah dikembalikan sebagai modal ke ${d.mitra.nama} lewat ${modal.map((m) => m.nomor).join(", ")}. Hapus pengembalian modalnya dulu`);
 }

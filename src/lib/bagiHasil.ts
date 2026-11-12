@@ -186,7 +186,8 @@ export function hitungBagiHasil(
   if (belumAdaMargin) peringatan.push(PERINGATAN_BELUM_ADA_MARGIN);
   else if (nominalTotal.gt(terbesar(angka.marginKas, NOL))) peringatan.push(PERINGATAN_NOMINAL_MELEBIHI);
   if (modalMitraTotal.gt(0) && diterima.lt(aktual)) peringatan.push(peringatanModalProporsional(teksPersen(rasio)));
-  if (aktual.lt(modalMitraTotal)) peringatan.push(PERINGATAN_AKTUAL_KURANG_DARI_TALANGAN);
+  // hanya bila ada talangan (tinjauan P35 R1): biaya aktual negatif tanpa talangan tidak menyebut talangan
+  if (modalMitraTotal.gt(0) && aktual.lt(modalMitraTotal)) peringatan.push(PERINGATAN_AKTUAL_KURANG_DARI_TALANGAN);
   for (const b of baris) if (b.dibayarModal.gt(b.modalMasuk)) peringatan.push(peringatanModalLebihKembali(b.nama));
 
   return {

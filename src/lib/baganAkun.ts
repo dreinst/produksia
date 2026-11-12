@@ -8,7 +8,14 @@ type Klien = PrismaClient | Prisma.TransactionClient;
 /** Akun yang kodenya sama dengan akun standar tetapi jenis atau tanda kelompoknya berbeda (mis. akun buatan pengguna). */
 export type AkunStandarBerbeda = { kode: string; nama: string; jenis: JenisAkun; kelompok: boolean; namaStandar: string; jenisStandar: JenisAkun; kelompokStandar: boolean };
 
-export type HasilTerapkanBagan = { dibuat: number; sudahAda: number; pemetaanDibuat: boolean; berbeda: AkunStandarBerbeda[] };
+export type HasilTerapkanBagan = {
+  dibuat: number;
+  sudahAda: number;
+  pemetaanDibuat: boolean;
+  berbeda: AkunStandarBerbeda[];
+  /** id akun yang baru dibuat di panggilan ini; diteruskan ke terapkanKategoriAnggaranBawaan (tinjauan P36 S1) */
+  idDibuat: string[];
+};
 
 /** Membandingkan akun yang sudah ada dengan definisi standarnya; null bila jenis dan tanda kelompoknya sama. */
 export function bedaDenganStandar(ada: { kode: string; nama: string; jenis: JenisAkun; kelompok: boolean }, standar: AkunStandar): AkunStandarBerbeda | null {
@@ -24,7 +31,7 @@ export function bedaDenganStandar(ada: { kode: string; nama: string; jenis: Jeni
  * atau tanda kelompok berbeda dari standar dilaporkan di `berbeda` (tidak diubah), supaya Pemilik bisa memutuskan.
  */
 export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<HasilTerapkanBagan> {
-  const hasil: HasilTerapkanBagan = { dibuat: 0, sudahAda: 0, pemetaanDibuat: false, berbeda: [] };
+  const hasil: HasilTerapkanBagan = { dibuat: 0, sudahAda: 0, pemetaanDibuat: false, berbeda: [], idDibuat: [] };
   const idByKode = new Map<string, string>();
 
   for (const a of BAGAN_AKUN_STANDAR) {
@@ -51,6 +58,7 @@ export async function terapkanBaganAkunStandar(klien: Klien = db): Promise<Hasil
     });
     idByKode.set(a.kode, baru.id);
     hasil.dibuat++;
+    hasil.idDibuat.push(baru.id);
   }
 
   if (!(await klien.pemetaanAkun.findUnique({ where: { id: "default" } }))) {

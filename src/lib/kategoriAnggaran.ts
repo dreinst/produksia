@@ -87,8 +87,12 @@ export function alasanLewatiPemetaanBawaan(a: { kode: string; nama: string; jeni
  * "Terapkan ke sistem", "Siapkan kategori bawaan", atau sinkron. Ini menyimpang dari kalimat D5 §3.4 ("akun yang belum
  * punya pemetaan"). Pemetaan juga hanya untuk akun yang lolos alasanLewatiPemetaanBawaan, dan pemetaan buatan
  * pengguna tidak pernah ditimpa.
+ *
+ * `akunBaru` (tinjauan P36 S1): id akun yang baru dibuat terapkanBaganAkunStandar di panggilan yang sama. Akun itu tetap
+ * diberi pemetaan bawaan walaupun kategorinya sudah ada (misalnya 5-1500 dan 5-1600 sesudah "Siapkan kategori bawaan"
+ * dijalankan lebih dulu). Akun yang baru lahir tidak mungkin sudah dikosongkan pengguna, jadi keputusan S2 tetap terjaga.
  */
-export async function terapkanKategoriAnggaranBawaan(klien: Klien): Promise<{ kategoriDibuat: number; pemetaanDibuat: number }> {
+export async function terapkanKategoriAnggaranBawaan(klien: Klien, opsi: { akunBaru?: string[] } = {}): Promise<{ kategoriDibuat: number; pemetaanDibuat: number }> {
   let kategoriDibuat = 0;
   const idPerUrutan = new Map<number, string>();
   const baruDiPanggilanIni = new Set<number>();
@@ -104,16 +108,20 @@ export async function terapkanKategoriAnggaranBawaan(klien: Klien): Promise<{ ka
     baruDiPanggilanIni.add(k.urutan);
   }
 
-  const perluPemetaan = KATEGORI_BAWAAN.filter((k) => baruDiPanggilanIni.has(k.urutan));
+  const akunBaru = new Set(opsi.akunBaru ?? []);
+  // kategori yang baru dibuat memetakan semua akun berkodenya; kategori lama hanya memetakan akun yang baru dibuat
+  const perluPemetaan = KATEGORI_BAWAAN.filter((k) => baruDiPanggilanIni.has(k.urutan) || akunBaru.size > 0);
   if (perluPemetaan.length === 0) return { kategoriDibuat, pemetaanDibuat: 0 };
   const semuaKode = perluPemetaan.flatMap((k) => k.kodeAkun);
   const akun = await klien.akun.findMany({ where: { kode: { in: semuaKode } }, select: { id: true, kode: true, nama: true, jenis: true, kelompok: true, kategoriAnggaran: { select: { akunId: true } } } });
   const perKode = new Map(akun.map((a) => [a.kode, a]));
   const data: { akunId: string; kategoriId: string }[] = [];
   for (const k of perluPemetaan) {
+    const kategoriBaru = baruDiPanggilanIni.has(k.urutan);
     for (const kode of k.kodeAkun) {
       const a = perKode.get(kode);
       if (!a || a.kategoriAnggaran || alasanLewatiPemetaanBawaan(a) !== null) continue;
+      if (!kategoriBaru && !akunBaru.has(a.id)) continue;
       data.push({ akunId: a.id, kategoriId: idPerUrutan.get(k.urutan)! });
     }
   }
