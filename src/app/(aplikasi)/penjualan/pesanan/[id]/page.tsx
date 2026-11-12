@@ -19,7 +19,7 @@ import { BarisTurunan, DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, 
 
 /**
  * Detail pesanan penjualan (D2 §7.3) dengan termin pembayaran. Tombol Kirim, Uang Muka, dan Fakturkan memakai syarat
- * yang sama dengan daftar pesanan. Ubah tampilan dan ubah termin dipasang P28; cetak tagihan milik P45.
+ * yang sama dengan daftar pesanan. Ubah tampilan dan ubah termin dipasang P28; Cetak tagihan ada di panel termin untuk butir yang sudah ditagih.
  */
 export default async function HalamanDetailPesanan({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("pesanan.lihat");

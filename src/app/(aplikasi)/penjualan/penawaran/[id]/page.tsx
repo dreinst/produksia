@@ -14,6 +14,7 @@ import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import LampiranBerkas from "@/komponen/berkas/LampiranBerkas";
 import LencanaStatusKomersial, { DAFTAR_STATUS_KOMERSIAL, GAYA_STATUS_KOMERSIAL } from "@/komponen/penjualan/LencanaStatusKomersial";
 import NomorDokumenCetak from "@/komponen/penjualan/NomorDokumenCetak";
+import TombolCetakDokumen from "@/komponen/penjualan/TombolCetakDokumen";
 import PanelTermin from "@/komponen/penjualan/PanelTermin";
 import RingkasanNilaiDokumen from "@/komponen/penjualan/RingkasanNilaiDokumen";
 import TabelBarisDokumen, { barisTampil } from "@/komponen/penjualan/TabelBarisDokumen";
@@ -21,7 +22,7 @@ import { DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, nomorTampil } 
 
 /**
  * Detail penawaran penjualan (D2 §7.3). Tidak mengikuti lingkup perusahaan (lingkup hanya pilihan tampilan, D1).
- * Ubah (draf) dan Ubah tampilan dipasang P28; tombol cetak milik P45.
+ * Ubah (draf) dan Ubah tampilan dipasang P28; tombol Cetak dari TombolCetakDokumen.
  */
 export default async function HalamanDetailPenawaran({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("penawaran.lihat");
@@ -67,6 +68,7 @@ export default async function HalamanDetailPenawaran({ params }: { params: Promi
         }
         aksi={
           <>
+            <TombolCetakDokumen jenis="penawaran" id={p.id} pengguna={pengguna} />
             {draf && boleh("pesanan.buat") && (
               <FormulirAksi aksi={konversiPenawaranKePesananFormulir.bind(null, p.id)} pesanKonfirmasi={`Konversi penawaran ${p.nomor} menjadi Pesanan Penjualan?`} className="inline">
                 <button type="submit" className="tombol tombol-utama">

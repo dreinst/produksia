@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FormulirAksi from "@/komponen/FormulirAksi";
+import TautanCetak from "@/komponen/cetak/TautanCetak";
 import Ikon from "@/komponen/ui/Ikon";
 import { Rp } from "@/komponen/ui/Lencana";
 import { D, type Desimal } from "@/lib/uang";
@@ -179,7 +180,10 @@ function AksiButir({ pesananId, butir: b, bolehUbah, bolehBayar, lihatBayar }: {
   // server menolak batal bila butir sudah punya uang muka; dibayar menghitung semua uang muka butir
   const batal = bolehUbah && !!b.ditagihPada && (!lihatBayar || b.dibayar.isZero());
   const bayar = bolehBayar && (!lihatBayar || b.sisa.gt(0));
-  if (!terbit && !batal && !bayar) return null;
+  // PDF tagihan termin hanya untuk butir yang sudah diterbitkan (halaman pesanan sudah memeriksa pesanan.lihat, hak cetak
+  // tagihan termin); angka bayar di PDF disaring dataCetakUntukPengguna, jadi tidak bergantung lihatBayar
+  const cetak = !!b.ditagihPada;
+  if (!terbit && !batal && !bayar && !cetak) return null;
   return (
     <div className="flex flex-col items-start gap-2 whitespace-nowrap">
       {terbit && (
@@ -206,6 +210,12 @@ function AksiButir({ pesananId, butir: b, bolehUbah, bolehBayar, lihatBayar }: {
             </button>
           </FormulirAksi>
         </details>
+      )}
+      {cetak && (
+        <span className="inline-flex items-center gap-1">
+          <Ikon nama="print" className="!text-[16px]" />
+          <TautanCetak jenis="tagihan-termin" id={b.id} label="Cetak tagihan" />
+        </span>
       )}
       {batal && (
         <FormulirAksi aksi={batalkanTagihanTerminFormulir.bind(null, b.id)} pesanKonfirmasi={`Batalkan tagihan ${b.label}? Nomor tagihannya dilepas.`} className="inline">

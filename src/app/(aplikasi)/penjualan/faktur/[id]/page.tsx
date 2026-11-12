@@ -12,13 +12,14 @@ import KontrolPersetujuan from "@/komponen/KontrolPersetujuan";
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import LampiranBerkas from "@/komponen/berkas/LampiranBerkas";
 import NomorDokumenCetak from "@/komponen/penjualan/NomorDokumenCetak";
+import TombolCetakDokumen from "@/komponen/penjualan/TombolCetakDokumen";
 import RingkasanNilaiDokumen from "@/komponen/penjualan/RingkasanNilaiDokumen";
 import TabelBarisDokumen, { barisTampil } from "@/komponen/penjualan/TabelBarisDokumen";
 import { BarisTurunan, DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, nomorTampil } from "../../_detail/bagian";
 
 /**
  * Detail faktur penjualan (D2 §7.3): persetujuan, uang muka terpakai, penerimaan, dan retur. Terima Bayar dan Retur
- * memakai syarat daftar faktur (hanya faktur DISETUJUI). Ubah tampilan dipasang P28; cetak milik P45.
+ * memakai syarat daftar faktur (hanya faktur DISETUJUI). Ubah tampilan dipasang P28; tombol Cetak (pratinjau, unduh, simpan PDF ke lampiran) dari TombolCetakDokumen.
  */
 export default async function HalamanDetailFaktur({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("faktur.lihat");
@@ -73,6 +74,7 @@ export default async function HalamanDetailFaktur({ params }: { params: Promise<
         }
         aksi={
           <>
+            <TombolCetakDokumen jenis="faktur" id={f.id} pengguna={pengguna} />
             <KontrolPersetujuan
               jenis="faktur"
               kode="faktur"

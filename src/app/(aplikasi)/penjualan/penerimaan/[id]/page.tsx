@@ -11,11 +11,12 @@ import { LencanaPersetujuan, Rp, labelMetodeBayar } from "@/komponen/ui/Lencana"
 import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import LampiranBerkas from "@/komponen/berkas/LampiranBerkas";
 import NomorDokumenCetak from "@/komponen/penjualan/NomorDokumenCetak";
+import TombolCetakDokumen from "@/komponen/penjualan/TombolCetakDokumen";
 import { DaftarInfo, Kartu, nomorTampil } from "../../_detail/bagian";
 
 /**
  * Detail penerimaan penjualan sebagai kuitansi (D2 §7.3) dengan lampiran bukti transfer. Terima dari dan keperluan
- * kosong memakai bawaan data cetak kuitansi. Ubah tampilan dipasang P28; cetak milik P45.
+ * kosong memakai bawaan data cetak kuitansi. Ubah tampilan dipasang P28; tombol Cetak mencetak kwitansi lewat TombolCetakDokumen.
  */
 export default async function HalamanDetailPenerimaan({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("penerimaan.lihat");
@@ -47,6 +48,7 @@ export default async function HalamanDetailPenerimaan({ params }: { params: Prom
         lencana={<LencanaPersetujuan status={r.statusPersetujuan} />}
         aksi={
           <>
+            <TombolCetakDokumen jenis="kwitansi" id={r.id} pengguna={pengguna} />
             {boleh("penerimaan.ubah") && (
               <Link href={`/penjualan/penerimaan/${r.id}/tampilan`} className="tombol tombol-garis">
               <Ikon nama="tune" className="!text-[18px]" />

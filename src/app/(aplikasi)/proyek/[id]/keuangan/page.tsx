@@ -11,6 +11,8 @@ import { statusSinkronAnggaran } from "@/lib/sinkronAnggaran";
 import { progresTermin } from "@/lib/rencanaTermin";
 import { hapusBarisAnggaranFormulir, samakanAnggaranBiayaProyekFormulir, sinkronAnggaranDariDokumenFormulir, tambahBarisAnggaranFormulir, ubahBarisAnggaranFormulir } from "@/lib/aksi/anggaranProyek";
 import { siapkanKategoriBawaanFormulir } from "@/lib/aksi/kategoriAnggaran";
+import { simpanLaporanKeuanganKeBerkasFormulir } from "@/lib/aksi/laporanKeuanganProyek";
+import { bolehAksesBerkas } from "@/lib/berkas";
 import { hapusMitraProyekFormulir, pindahUrutanMitraFormulir, tambahMitraProyekFormulir, ubahMitraProyekFormulir } from "@/lib/aksi/bagiHasil";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import { SelPersetujuan } from "@/komponen/KontrolPersetujuan";
@@ -30,7 +32,8 @@ import TitikWarnaProyek from "@/komponen/proyek/TitikWarnaProyek";
  * Detail keuangan satu proyek (D5 §7.2): tujuh KPI, rekonsiliasi dengan LPJ, lalu tab Anggaran vs realisasi, Anggaran,
  * Biaya aktual, Pendapatan, dan Bagi hasil. Halaman detail memakai perusahaan proyek itu sendiri, bukan lingkup aktif
  * (D5 §4.7). Tab Bagi hasil dan data mitra hanya dimuat untuk pemegang bagi-hasil.lihat; tab Biaya membuang baris bagi
- * laba per mitra bagi yang tidak memegangnya (tinjauan P35 R4). Tombol PDF dipasang paket cetak laporan (P45).
+ * laba per mitra bagi yang tidak memegangnya (tinjauan P35 R4). Kepala halaman memuat Pratinjau PDF, Unduh PDF
+ * (/cetak/proyek/[id]/keuangan), dan Simpan PDF ke berkas bagi yang boleh mengunggah lampiran laporan keuangan proyek.
  */
 
 type Tab = "ringkasan" | "anggaran" | "biaya" | "pendapatan" | "bagi-hasil";
@@ -94,6 +97,22 @@ export default async function HalamanDetailKeuanganProyek({
         }
         aksi={
           <>
+            <a href={`/cetak/proyek/${proyek.id}/keuangan`} target="_blank" rel="noopener" className="tombol tombol-garis">
+              <Ikon nama="open_in_new" className="!text-[18px]" />
+              Pratinjau PDF
+            </a>
+            <a href={`/cetak/proyek/${proyek.id}/keuangan?unduh=1`} className="tombol tombol-garis">
+              <Ikon nama="picture_as_pdf" className="!text-[18px]" />
+              Unduh PDF
+            </a>
+            {bolehAksesBerkas(pengguna, { jenisEntitas: "laporan-keuangan-proyek" }, "unggah") && (
+              <FormulirAksi aksi={simpanLaporanKeuanganKeBerkasFormulir.bind(null, proyek.id)} pesanSukses="Laporan disimpan ke Berkas proyek" className="inline">
+                <button type="submit" className="tombol tombol-garis">
+                  <Ikon nama="attach_file" className="!text-[18px]" />
+                  Simpan PDF ke berkas
+                </button>
+              </FormulirAksi>
+            )}
             {boleh("rekonsiliasi.lihat") && (
               <Link href={`/rekonsiliasi/event/${proyek.id}`} className="tombol tombol-garis">
                 <Ikon nama="fact_check" className="!text-[18px]" />
