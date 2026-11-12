@@ -27,7 +27,7 @@ export type HasilSinkron = {
   barangBelumDitagih: Perbandingan;
   barangTerkirim: Perbandingan;
   uangMuka: Perbandingan;
-  /** Hutang Mitra Proyek = Σ talangan DISETUJUI − Σ pengembalian modal DISETUJUI (D5 §4.4); kosong bila akunnya belum ada */
+  /** Hutang Mitra Proyek = Σ talangan DISETUJUI − Σ pengembalian modal DISETUJUI (D5 §4.4); tanpa akun sah, buku besar = 0 */
   hutangMitra: Perbandingan;
 };
 
@@ -140,9 +140,10 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
   const nilaiUangMuka = D(uangMukaAgg._sum.jumlah ?? 0).minus(uangMukaAgg._sum.jumlahDipakai ?? 0);
   const uangMuka = pemetaan.uangMukaPelangganId ? banding(saldo([pemetaan.uangMukaPelangganId], false), nilaiUangMuka) : kosong;
 
-  const hutangMitra = akunMitra.hutangMitra
-    ? banding(saldo([akunMitra.hutangMitra.id], false), D(talanganAgg._sum.jumlah ?? 0).minus(modalMitraAgg._sum.jumlah ?? 0))
-    : kosong;
+  // Akun peran belum ada atau tidak sah (jenis salah, akun kelompok): buku besar dianggap 0, jadi dokumen mitra
+  // disetujui yang masih bersaldo tetap terlihat selisih (tinjauan P33 R1). Tanpa dokumen bersaldo hasilnya 0 = 0.
+  const dokumenMitra = D(talanganAgg._sum.jumlah ?? 0).minus(modalMitraAgg._sum.jumlah ?? 0);
+  const hutangMitra = banding(akunMitra.hutangMitra ? saldo([akunMitra.hutangMitra.id], false) : nol, dokumenMitra);
 
   return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim, uangMuka, hutangMitra };
 }

@@ -2,6 +2,7 @@ import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import { D, format, jumlahkan, uang, type Desimal } from "@/lib/uang";
 import { catatJurnal } from "@/lib/akuntansi";
 import { akunKeuanganProyek } from "@/lib/keuanganProyek";
+import type { KlienTransaksi } from "@/lib/nomorCetak";
 
 /*
  * Jurnal dokumen mitra proyek (D5 §3.10, §3.11, §4.1, §4.2). Bukan "use server".
@@ -28,30 +29,34 @@ export async function kunciBarisMitra(tx: Tx, mitraId: string): Promise<void> {
   await tx.$queryRaw`SELECT 1 FROM "MitraProyek" WHERE "id" = ${mitraId} FOR NO KEY UPDATE`;
 }
 
+type OpsiSisaModal = { hanyaDisetujui: boolean; kecualiPembayaranId?: string };
+
 /**
  * Sisa modal mitra = Σ talangan DISETUJUI − Σ pembayaran MODAL (D5 §3.11). `hanyaDisetujui`: saat posting hanya
  * pembayaran DISETUJUI yang dihitung; saat dibuat semua yang belum DITOLAK ikut memesan sisa. `kecualiPembayaranId`
- * mengecualikan dokumen yang sedang diposting. `kunci` (hanya di dalam transaksi) mengunci baris mitra lebih dulu,
- * supaya sisa tidak berubah sampai transaksi selesai.
+ * mengecualikan dokumen yang sedang diposting. `kunci: true` mengunci baris mitra lebih dulu supaya sisa tidak berubah
+ * sampai transaksi selesai, jadi hanya menerima `tx` dari db.$transaction (tsc menolak klien db biasa) dan di runtime
+ * menolak klien yang punya $connect (klien db biasa; tx Prisma 7 tidak punya): tanpa transaksi kuncinya langsung
+ * lepas (tinjauan P33 R2).
  */
-export async function sisaModalMitra(
-  klien: Klien,
-  mitraId: string,
-  opsi: { hanyaDisetujui: boolean; kecualiPembayaranId?: string; kunci?: boolean },
-): Promise<Desimal> {
-  if (opsi.kunci) await kunciBarisMitra(klien as Tx, mitraId);
-  const [talangan, modal] = await Promise.all([
-    klien.talanganMitra.aggregate({ where: { mitraId, statusPersetujuan: "DISETUJUI" }, _sum: { jumlah: true } }),
-    klien.pembayaranMitra.aggregate({
-      where: {
-        mitraId,
-        jenis: "MODAL",
-        statusPersetujuan: opsi.hanyaDisetujui ? "DISETUJUI" : { not: "DITOLAK" },
-        ...(opsi.kecualiPembayaranId ? { id: { not: opsi.kecualiPembayaranId } } : {}),
-      },
-      _sum: { jumlah: true },
-    }),
-  ]);
+export async function sisaModalMitra(klien: KlienTransaksi, mitraId: string, opsi: OpsiSisaModal & { kunci: true }): Promise<Desimal>;
+export async function sisaModalMitra(klien: Klien, mitraId: string, opsi: OpsiSisaModal & { kunci?: false }): Promise<Desimal>;
+export async function sisaModalMitra(klien: Klien, mitraId: string, opsi: OpsiSisaModal & { kunci?: boolean }): Promise<Desimal> {
+  if (opsi.kunci) {
+    if (typeof (klien as { $connect?: unknown }).$connect === "function") throw new Error("sisaModalMitra dengan kunci harus dipanggil di dalam db.$transaction");
+    await kunciBarisMitra(klien as Tx, mitraId);
+  }
+  // berurutan, bukan Promise.all: klien biasanya tx interaktif yang menjalankan satu kueri sekali jalan
+  const talangan = await klien.talanganMitra.aggregate({ where: { mitraId, statusPersetujuan: "DISETUJUI" }, _sum: { jumlah: true } });
+  const modal = await klien.pembayaranMitra.aggregate({
+    where: {
+      mitraId,
+      jenis: "MODAL",
+      statusPersetujuan: opsi.hanyaDisetujui ? "DISETUJUI" : { not: "DITOLAK" },
+      ...(opsi.kecualiPembayaranId ? { id: { not: opsi.kecualiPembayaranId } } : {}),
+    },
+    _sum: { jumlah: true },
+  });
   return uang(D(talangan._sum.jumlah ?? 0).minus(D(modal._sum.jumlah ?? 0)));
 }
 

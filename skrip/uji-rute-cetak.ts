@@ -8,7 +8,7 @@ import { AppRouterContext, type AppRouterInstance } from "next/dist/shared/lib/a
 import { db } from "../src/lib/db";
 import { penggunaSaatIni } from "../src/lib/otentikasi";
 import { punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
-import { ambilBerkasTerlihat, bacaUntukDikirim } from "../src/lib/berkas";
+import { ambilBerkasTerlihat, bacaUntukDikirim, cariBerkas, daftarBerkasTerlihat, daftarFolderTerlihat } from "../src/lib/berkas";
 import type { Prisma } from "../src/prisma-klien/client";
 import { periksaSinkron } from "../src/lib/sinkron";
 import { PESAN_GAMBAR_TIDAK_SAH } from "../src/lib/cetak/aset";
@@ -37,7 +37,8 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  *  2. Unggah aset (POST /api/cetak/kop/[kopId]/aset): PNG sah lolos dan menggantikan unggahan lama, PNG rusak, GIF, dan
  *     gambar lebih dari 2 MB ditolak tanpa mematikan proses, Content-Length lebih dari 3 MB 413, asal beda 403, hak,
  *     jenis tidak dikenal, kop tidak ada; hapus unggahan. Slot tanda tangan dan stempel butuh tanda-tangan-cetak.buat
- *     untuk unggah, hapus, pratinjau, dan /api/berkas (tinjauan P31 R4); hapus dan unggah berpapasan (R5).
+ *     untuk unggah, hapus, pratinjau, dan /api/berkas (tinjauan P31 R4), juga daftar /berkas, hitungan folder, dan /cari
+ *     (tinjauan P33 R4); hapus dan unggah berpapasan (R5).
  *  3. GET /cetak/[jenis]/[id]: lima jenis dokumen nyata 200 PDF inline, unduh attachment, jenis tidak dikenal dan id
  *     acak 404, GUDANG 403, ukuran tidak sah 400, ?ukuran=A5, ?kop milik perusahaan lain 400, log CETAK hanya untuk
  *     unduhan dan cetakan bertanda tangan (ADMIN ttd=1 bertanda tangan, KASIR tidak), kop dokumen yang dihapus jatuh
@@ -381,6 +382,16 @@ async function main() {
       pastikan((await ambilBerkasTerlihat(db, kasirTulis, aset2.berkasId)) === null && (await bacaUntukDikirim(db, kasirTulis, aset2.berkasId, { unduh: false, ifNoneMatch: null })).status === 404, "/api/berkas: gambar tanda tangan 404 untuk KASIR");
       pastikan((await ambilBerkasTerlihat(db, kasirTulis, aset1.berkasId, { sampah: true })) === null, "tanda tangan lama di Sampah juga tertutup untuk KASIR");
       pastikan((await ambilBerkasTerlihat(db, kasirTulis, logoK.berkasId)) !== null, "gambar logo tetap terlihat untuk KASIR");
+      // tinjauan P33 R4: daftar /berkas, hitungan folder, dan /cari memakai syarat yang sama dengan ambilBerkasTerlihat
+      const [bTtd, bLogo] = await Promise.all([aset2.berkasId, logoK.berkasId].map((id) => db.berkas.findUniqueOrThrow({ where: { id }, select: { namaBerkas: true, folderKode: true } })));
+      const adaDiDaftar = async (p: PenggunaSesi, id: string, sampah = false) => (await daftarBerkasTerlihat(db, p, { id, sampah })).total === 1;
+      pastikan(!(await adaDiDaftar(kasirTulis, aset2.berkasId)) && !(await adaDiDaftar(kasirTulis, aset1.berkasId, true)) && (await adaDiDaftar(kasirTulis, logoK.berkasId)), "daftar /berkas KASIR: tanda tangan aktif dan di Sampah tidak tampil, logo tampil");
+      const cariKasir = async (nama: string) => (await cariBerkas(db, kasirTulis, nama)).map((b) => b.id);
+      pastikan(!(await cariKasir(bTtd.namaBerkas)).includes(aset2.berkasId) && (await cariKasir(bLogo.namaBerkas)).includes(logoK.berkasId), "/cari KASIR: tanda tangan tidak ditemukan, logo ditemukan");
+      const jumlahFolder = async (p: PenggunaSesi) => (await daftarFolderTerlihat(db, p)).find((f) => f.kode === bTtd.folderKode)?.jumlah ?? 0;
+      pastikan((await jumlahFolder(kasirTulis)) === (await daftarBerkasTerlihat(db, kasirTulis, { folderKode: bTtd.folderKode })).total, "hitungan folder KASIR sama dengan isi daftar folder itu (tanda tangan tidak dihitung)");
+      const pemilikDaftar = (await penggunaSaatIni())!;
+      pastikan((await adaDiDaftar(pemilikDaftar, aset2.berkasId)) && (await adaDiDaftar(pemilikDaftar, aset1.berkasId, true)) && (await cariBerkas(db, pemilikDaftar, bTtd.namaBerkas)).some((b) => b.id === aset2.berkasId), "PEMILIK tetap melihat tanda tangan di daftar, Sampah, dan /cari");
       const pemilik = (await penggunaSaatIni())!;
       pastikan((await ambilBerkasTerlihat(db, pemilik, aset2.berkasId)) !== null && (await ambilBerkasTerlihat(db, pemilik, aset1.berkasId, { sampah: true })) !== null, "PEMILIK tetap melihat tanda tangan dan tanda tangan lama di Sampah");
       const router = { back() {}, forward() {}, refresh() {}, push() {}, replace() {}, prefetch() {} } as unknown as AppRouterInstance;

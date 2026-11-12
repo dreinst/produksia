@@ -399,9 +399,15 @@ export function berkasTersembunyi(b: { folderKode: string; jenisEntitas: string 
   return ruang.folder.includes(b.folderKode) || (!!kunci && ruang.folder.includes(kunci)) || (!!b.proyekId && ruang.proyek.includes(b.proyekId));
 }
 
+/** Slot kop bernilai hukum (D3): gambarnya butuh pengaturan.tulis DAN tanda-tangan-cetak.buat (tinjauan P31 R4). */
+export const SLOT_KOP_TANDA_TANGAN = ["TANDA_TANGAN", "STEMPEL"] as const;
+export const slotTandaTangan = (jenis: string): boolean => (SLOT_KOP_TANDA_TANGAN as readonly string[]).includes(jenis);
+
 /**
  * Syarat Prisma berkas terlihat (daftar, pencarian, lampiran, hitungan). Cabang null ditulis eksplisit karena di SQL
  * NOT IN bernilai NULL untuk kolom NULL, sehingga berkas umum dan berkas tanpa proyek ikut hilang tanpa cabang itu.
+ * Berkas kop surat mengikuti ambilBerkasTerlihat: tanpa tanda-tangan-cetak.buat hanya gambar yang terpasang di slot
+ * selain tanda tangan dan stempel yang terlihat (tinjauan P33 R4).
  */
 export function syaratBerkasTerlihat(pengguna: PenggunaSesi, ruang: RuangTersembunyi, opsi: { sampah?: boolean } = {}): Prisma.BerkasWhereInput {
   const jenisBoleh = DAFTAR_JENIS.filter((k) => punyaHak(pengguna, JENIS_LAMPIRAN[k].hakLihat));
@@ -422,6 +428,9 @@ export function syaratBerkasTerlihat(pengguna: PenggunaSesi, ruang: RuangTersemb
             { OR: [{ proyekId: null }, { proyekId: { notIn: ruang.proyek } }] },
           ]
         : []),
+      ...(punyaHak(pengguna, "tanda-tangan-cetak.buat")
+        ? []
+        : [{ OR: [{ jenisEntitas: null }, { jenisEntitas: { not: "kop-surat" } }, { asetKopSurat: { is: { jenis: { notIn: [...SLOT_KOP_TANDA_TANGAN] } } } }] }]),
     ],
   };
 }
@@ -456,10 +465,6 @@ export type MetaBerkas = Prisma.BerkasGetPayload<{ select: typeof PILIH_META }>;
  * Metadata berkas yang boleh dilihat pengguna, atau null bila tidak ada, sudah dibuang (kecuali opsi.sampah), isinya
  * sudah dihapus permanen, tersembunyi oleh ruang, atau tidak lolos hak lihat. Tidak pernah membaca isi.
  */
-/** Slot kop bernilai hukum (D3): gambarnya butuh pengaturan.tulis DAN tanda-tangan-cetak.buat (tinjauan P31 R4). */
-export const SLOT_KOP_TANDA_TANGAN = ["TANDA_TANGAN", "STEMPEL"] as const;
-export const slotTandaTangan = (jenis: string): boolean => (SLOT_KOP_TANDA_TANGAN as readonly string[]).includes(jenis);
-
 export async function ambilBerkasTerlihat(klien: KlienDb, pengguna: PenggunaSesi, id: string, opsi: { sampah?: boolean } = {}): Promise<MetaBerkas | null> {
   if (!id) return null;
   const b = await klien.berkas.findUnique({ where: { id }, select: PILIH_META });
