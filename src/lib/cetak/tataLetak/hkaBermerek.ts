@@ -4,6 +4,8 @@ import { PUTIH, barisDicetak, berbutir, jarak, satuBaris, type MasukanTataLetak 
 import {
   ABU,
   LABEL_NOMOR_HKA,
+  alamatHka,
+  barisLabelHka,
   butirHka,
   catatanPotonganHka,
   garisSisi,
@@ -14,6 +16,7 @@ import {
   nilaiTotal,
   o,
   paragrafHka,
+  penerimaHka,
   qtyBaris,
   rekeningHka,
   ringkasanHka,
@@ -79,8 +82,8 @@ export async function renderHkaBermerek(m: MasukanTataLetak, judulBerkas: string
     const y = k.y;
     let yL = y;
     yL += k.teks(kw ? "DITERIMA DARI" : "KEPADA", o(h, 10, { y: yL, lebar: w, font: "B", warna: navy }));
-    yL += k.teks(kw ? (dok.kwitansi?.terimaDari ?? dok.kepada.nama) : satuBaris(dok.kepada.nama), o(h, 10, { y: yL, lebar: w, font: "B" }));
-    for (const baris of [dok.kepada.up, dok.kepada.alamat, dok.kepada.telepon, dok.kepada.email]) if (baris?.trim()) yL += k.teks(baris.trim(), o(h, 9.5, { y: yL, lebar: w }));
+    yL += k.teks(penerimaHka(m, kw), o(h, 10, { y: yL, lebar: w, font: "B" }));
+    for (const baris of [dok.kepada.up, alamatHka(h, dok.kepada.alamat), dok.kepada.telepon, dok.kepada.email]) if (baris?.trim()) yL += k.teks(baris.trim(), o(h, 9.5, { y: yL, lebar: w }));
     const xR = x0 + w;
     let yR = y;
     yR += k.teks("PEMBAYARAN KE", o(h, 10, { x: xR, y: yR, lebar: w, font: "B", warna: navy, rata: "kanan" }));
@@ -138,12 +141,12 @@ export async function renderHkaBermerek(m: MasukanTataLetak, judulBerkas: string
     if (i.catatanBank?.trim()) paragrafHka(h, i.catatanBank.trim(), 9.5, { warna: ABU.teks });
     const rekening = rekeningHka(m);
     if (rekening) {
-      for (const [label, nilai] of rekening) {
-        const y = k.y;
-        const a = k.teks(label, o(h, 10, { y, lebar: mm(32), font: "B" }));
-        const b = k.teks(`: ${nilai.trim() || "-"}`, o(h, 10, { x: x0 + mm(32), y, lebar: mm(80), font: "B" }));
-        k.y = y + Math.max(a, b);
-      }
+      barisLabelHka(
+        h,
+        rekening.map(([label, nilai]) => [label, `: ${nilai.trim() || "-"}`]),
+        (_, y) => o(h, 10, { y, lebar: mm(32), font: "B" }),
+        (_, y) => o(h, 10, { x: x0 + mm(32), y, lebar: mm(80), font: "B" }),
+      );
     } else paragrafHka(h, dok.surat.infoBank!.trim(), 10, { font: "B" });
     const syarat = syaratHka(m);
     if (syarat) {

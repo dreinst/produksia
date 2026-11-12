@@ -91,6 +91,7 @@ type GambarTerbuka = { width: number; height: number; orientation?: number };
 type DokumenPdf = PDFKit.PDFDocument & {
   openImage(src: Buffer): GambarTerbuka;
   _font: { ascender: number; font: { hasGlyphForCodePoint(c: number): boolean } };
+  _fontFamilies: Record<string, unknown>;
 };
 
 const fontSegmen = (dasar: Font, s: { tebal?: boolean; miring?: boolean }): Font => {
@@ -105,6 +106,7 @@ export class KanvasCetak {
   private readonly perekam?: Perekam;
   private readonly glyph = new Map<Font, { hasGlyphForCodePoint(c: number): boolean }>();
   private readonly ascender = new Map<Font, number>();
+  private readonly pemeriksaGlyph = new Map<Font, (c: number) => boolean>();
   private readonly gambarTerbuka = new WeakMap<Uint8Array, GambarTerbuka>();
   private readonly isiBerkas = new Map<string, Uint8Array>();
   private readonly halaman: { kertas: Kertas; lapisan: Lapisan }[] = [];
@@ -131,6 +133,9 @@ export class KanvasCetak {
     for (const f of SEMUA_FONT) {
       this.doc.registerFont(f, jalurFont(f));
       this.doc.font(f);
+      // pdfkit tidak menyimpan font di kunci nama terdaftar bila font bernama sama sudah ada (Regular dari opsi
+      // `font`), sehingga setiap font("R") membuka dan mengurai TTF lagi. Simpan sendiri supaya font() memakai cache.
+      this.doc._fontFamilies[f] = this.doc._font;
       this.glyph.set(f, this.doc._font.font);
       this.ascender.set(f, this.doc._font.ascender / 1000);
     }
@@ -251,9 +256,20 @@ export class KanvasCetak {
 
   // ---------- Teks ----------
 
+  /** Pemeriksa glyph per font dengan simpanan per titik kode (pencarian cmap fontkit mahal bila diulang per huruf). */
   private adaGlyph(font: Font): (c: number) => boolean {
-    const f = this.glyph.get(font)!;
-    return (c) => f.hasGlyphForCodePoint(c);
+    let cek = this.pemeriksaGlyph.get(font);
+    if (!cek) {
+      const f = this.glyph.get(font)!;
+      const simpan = new Map<number, boolean>();
+      cek = (c) => {
+        let ada = simpan.get(c);
+        if (ada === undefined) simpan.set(c, (ada = f.hasGlyphForCodePoint(c)));
+        return ada;
+      };
+      this.pemeriksaGlyph.set(font, cek);
+    }
+    return cek;
   }
 
   private aturFont(font: Font, ukuran: number): void {

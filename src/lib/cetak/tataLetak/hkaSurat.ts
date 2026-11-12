@@ -101,7 +101,7 @@ export async function renderHkaSurat(m: MasukanTataLetak, judulBerkas: string): 
             isi(rpHka(m, b.nilai, "Rp. "), { rata: "kanan" }),
           ],
         })),
-        ...(adaRinci ? r.rinci.map((b) => total(b.label, nilaiTotal(m, b), false, 9.5)) : []),
+        ...(adaRinci ? r.rinci.map((b) => total(b.label, nilaiTotal(m, b, "Rp. "), false, 9.5)) : []),
         total("Total", rpHka(m, r.total, "Rp. "), true, 10),
         ...r.tambahan.map((b) => total(b.label, nilaiTotal(m, b, "Rp. "), true, 10)),
       ],

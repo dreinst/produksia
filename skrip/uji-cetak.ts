@@ -27,8 +27,9 @@ import {
   pilihKopDanTemplate,
   temaKop,
 } from "../src/lib/cetak/kop";
-import { buatPerekam, type Perekam } from "../src/lib/cetak/mesin/kanvas";
-import { petaAsetBawaan, type MasukanTataLetak } from "../src/lib/cetak/tataLetak/blok";
+import { KanvasCetak, buatPerekam, type OpsiTeks, type Perekam } from "../src/lib/cetak/mesin/kanvas";
+import { isiSlotBaris, pecahBaris, petaAsetBawaan, type MasukanTataLetak } from "../src/lib/cetak/tataLetak/blok";
+import { MAKS_BARIS_ALAMAT } from "../src/lib/cetak/tataLetak/hkaStandar";
 import { renderDokumen } from "../src/lib/cetak/tataLetak";
 import { periksaKonsistensiPerusahaan } from "../src/lib/sinkron";
 import type { DokumenCetakPenjualan } from "../src/lib/cetak/tipe";
@@ -179,6 +180,12 @@ async function dalamTxBatal<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>)
 }
 
 /** Berkas sumber .ts/.tsx di bawah src. */
+/** Berkas diawali direktif "use client" sesudah komentar dan baris kosong (tinjauan P30 T9). */
+function direktifKlien(isi: string): boolean {
+  const awal = isi.replace(/^(?:\s+|\/\/[^\n]*(?:\n|$)|\/\*[\s\S]*?\*\/)*/, "");
+  return /^["']use client["']/.test(awal);
+}
+
 function semuaSumber(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
     const p = path.join(dir, n);
@@ -538,7 +545,11 @@ async function main() {
     console.log("=== 7. Penjaga impor data contoh ===");
     {
       const sumber = semuaSumber("src");
-      const klien = sumber.filter((f) => /^\s*["']use client["']/.test(readFileSync(f, "utf8")));
+      pastikan(
+        direktifKlien('/* komponen */\n// catatan\n\n"use client";\nexport {}') && direktifKlien("'use client'") && !direktifKlien('const a = "use client";') && !direktifKlien('// "use client"\nexport {}'),
+        "pengenal komponen klien melewati komentar dan baris kosong di awal berkas",
+      );
+      const klien = sumber.filter((f) => direktifKlien(readFileSync(f, "utf8")));
       const contoh = path.normalize("src/lib/cetak/contoh.ts");
       const dilihat = new Set<string>(klien);
       const antre = [...klien];
@@ -556,6 +567,161 @@ async function main() {
       pastikan(!kopTs.includes("@/lib/cetak/contoh") && !kopTs.includes('"use client"'), "penyaji dan kop tidak mengimpor data contoh dan bukan komponen klien");
       const hka = ["hkaStandar", "hkaBermerek", "hkaSurat", "hkaMinimal", "hkaEvent", "index"].map((f) => readFileSync(`src/lib/cetak/tataLetak/${f}.ts`, "utf8"));
       pastikan(hka.every((s) => !s.includes("@/lib/db") && !s.includes("@/prisma-klien/client") && !s.includes('"use client"')), "tata letak HKA dan dispatcher tidak membaca basis data");
+    }
+
+    console.log("=== 8. Perbaikan tinjauan P30: waktu render, potongan teks, rekening, alamat, warna ===");
+    {
+      const T = 841.89;
+      const mm = (v: number) => (v * 72) / 25.4;
+      const masukan = (kop: ReturnType<typeof kopPolos>, d: DokumenCetakPenjualan, lain: Partial<MasukanTataLetak> = {}): MasukanTataLetak => ({
+        dok: dariDataPenjualan(d),
+        identitas: identitasCetak(kop, p1),
+        judul: "INVOICE",
+        ukuran: "A4",
+        tandaTangan: false,
+        perekam: buatPerekam(),
+        tema: { ...temaKop(kop), gayaAngka: "TITIK", desimal: 0, aset: {} },
+        ...lain,
+      });
+      const panjang = (n: number) => "kata panjang sekali ".repeat(Math.ceil(n / 20)).slice(0, n);
+      const banyakBaris = (nama: NamaContoh, n: number, desk: number) =>
+        data(nama, p1.id, (d) => {
+          const b0 = d.baris[0];
+          d.baris = Array.from({ length: n }, (_, i) => ({ ...b0, no: i + 1, nama: `Item ${i}`, deskripsi: desk ? panjang(desk) : null }));
+        });
+
+      // T1: font terdaftar memakai cache pdfkit, jadi waktu render tidak lagi sebanding jumlah potongan teks
+      const waktu: string[] = [];
+      for (const [tl, nama, n, desk, batas] of [
+        ["HKA_STANDAR", "hkaStandar", 100, 300, 1000],
+        ["DPRO_INVOICE", "invoiceDpro", 100, 300, 1000],
+        ["HKA_STANDAR", "hkaStandar", 500, 3000, 3000],
+        ["DPRO_INVOICE", "invoiceDpro", 500, 3000, 3000],
+      ] as [TataLetakCetak, NamaContoh, number, number, number][]) {
+        const kop = { ...kopPolos(p1.id), gayaEntitas: tl.startsWith("DPRO") ? ("DPRO" as const) : null };
+        const m = masukan(kop, banyakBaris(nama, n, desk));
+        const t0 = performance.now();
+        const isi = await renderDokumen(m, { tataLetak: tl, tampilanEvent: null, judulBerkas: "Uji" });
+        const ms = Math.round(performance.now() - t0);
+        waktu.push(`${tl} ${n}x${desk} ${ms} ms`);
+        pastikan(pdfSah(isi) && ms < batas, `${tl} ${n} baris x ${desk} huruf selesai ${ms} ms (< ${batas} ms, ${halamanPdf(isi)} hal)`);
+      }
+      console.log(`  waktu: ${waktu.join("; ")}`);
+      {
+        const k = new KanvasCetak({ judul: "a", subjek: "b", penulis: "c" });
+        const fontKe = () => (k as unknown as { doc: { _fontCount: number } }).doc._fontCount;
+        const awal = fontKe();
+        for (let n = 0; n < 200; n++) k.ukur(n % 2 ? "Teks tebal" : "Teks biasa", { x: 0, lebar: 1e6, ukuran: 10, font: n % 2 ? "B" : "R" });
+        pastikan(fontKe() === awal, `font R dan B tidak dibuka ulang di setiap pengukuran (${awal} lalu ${fontKe()})`);
+      }
+
+      // T2: baris kosong di tengah yang melewati slot tidak menelan sisa teks diam-diam
+      {
+        const r = buatPerekam();
+        const k = new KanvasCetak({ judul: "a", subjek: "b", penulis: "c", perekam: r });
+        const opsi = { lebar: 200, ukuran: 10, font: "R" as const };
+        const teks = "Baris satu\n\n\nBaris empat penting";
+        pastikan(JSON.stringify(pecahBaris(k, teks, opsi)) === JSON.stringify(["Baris satu", "", "", "Baris empat penting"]), "pecahBaris tanpa batas tetap menyimpan baris kosong di tengah");
+        pastikan(pecahBaris(k, teks, opsi, 2).length > 2, "pecahBaris yang berhenti di batas tidak membuang baris kosong di ujung hasil");
+        const slot = isiSlotBaris(k, teks, 2, { ...opsi, ukuranMin: 9.5 });
+        pastikan(slot.baris.length === 2 && slot.baris[1].endsWith("…") && r.peringatan.some((p) => p.startsWith("teks terpotong")), `baris kosong di tengah melewati slot: dipotong "…" dengan peringatan (${JSON.stringify(slot.baris)})`);
+        const r2 = buatPerekam();
+        const k2 = new KanvasCetak({ judul: "a", subjek: "b", penulis: "c", perekam: r2 });
+        const akhir = isiSlotBaris(k2, "Baris satu\nBaris dua\n\n\n", 2, { ...opsi, ukuranMin: 9.5 });
+        pastikan(JSON.stringify(akhir.baris) === JSON.stringify(["Baris satu", "Baris dua"]) && r2.peringatan.length === 0, "baris kosong di ujung teks tidak dianggap terpotong");
+      }
+
+      // T3: baris rekening pindah halaman utuh, tidak turun ke ikon sosial atau kaki
+      {
+        const kop = kopPolos(p1.id);
+        const id = { ...identitasCetak(kop, p1), alamatKaki: "Jl. Contoh 1\nMalang", instagram: "@hka", email: "a@b.id" };
+        for (const [tl, bawahMm, label] of [
+          ["HKA_BERMEREK", 42, /^(Bank|No\. Rekening|Atas Nama|: )/],
+          ["HKA_MINIMAL", 30, /^(B A N K|N O|A T A S|BCA$|1112223334$|PT Cetak Uji Satu$)/],
+        ] as [TataLetakCetak, number, RegExp][]) {
+          let terburuk = -Infinity;
+          let pindah = 0;
+          for (let n = 1; n <= 40; n++) {
+            const d = banyakBaris("hkaStandar", n, 0);
+            d.catatan = null;
+            d.syaratPembayaran = null;
+            const m = masukan(kop, d, { identitas: id });
+            await renderDokumen(m, { tataLetak: tl, tampilanEvent: null, judulBerkas: "Uji" });
+            const rek = m.perekam!.teks.filter((t) => label.test(t.teks) && t.y > T / 2);
+            for (const t of rek) terburuk = Math.max(terburuk, t.y + t.tinggi - (T - mm(bawahMm)));
+            if (new Set(rek.map((t) => t.halaman)).size === 1 && rek.length && rek[0].halaman > 1) pindah++;
+          }
+          pastikan(terburuk <= 0.5 && pindah > 0, `${tl}: rekening 1 sampai 40 baris tidak melewati margin bawah (paling dekat ${terburuk.toFixed(1)} pt) dan pindah halaman utuh (${pindah} kasus)`);
+        }
+      }
+
+      // T4: alamat dan terima dari berbaris banyak tidak meluap keluar kertas
+      {
+        const kop = kopPolos(p1.id);
+        const luap = (r: Perekam) => r.teks.filter((t) => t.y + t.tinggi > T + 0.5).length;
+        const kasus: [TataLetakCetak, "RINCI" | null, NamaContoh, DokumenCetakPenjualan["jenis"]][] = [
+          ["HKA_STANDAR", null, "hkaStandar", "faktur"],
+          ["HKA_BERMEREK", null, "hkaStandar", "faktur"],
+          ["HKA_MINIMAL", null, "hkaStandar", "faktur"],
+          ["HKA_BERMEREK", "RINCI", "hkaNawasena", "faktur"],
+        ];
+        for (const [tl, tampilan, nama, jenis] of kasus) {
+          const m = masukan(kop, data(nama, p1.id, (d) => ((d.jenis = jenis), (d.kepada.alamat = "a\n".repeat(250)))));
+          await renderDokumen(m, { tataLetak: tl, tampilanEvent: tampilan, judulBerkas: "Uji" });
+          const baris = m.perekam!.teks.filter((t) => t.teks.split("\n").every((s) => s === "a" || s === "a…") && t.halaman === 1);
+          pastikan(luap(m.perekam!) === 0 && m.perekam!.peringatan.some((p) => p.startsWith("teks terpotong: alamat")) && baris.length <= MAKS_BARIS_ALAMAT, `${tl}${tampilan ? ` ${tampilan}` : ""}: alamat 250 baris dipotong ke ${MAKS_BARIS_ALAMAT} baris dengan peringatan, tidak ada teks di luar kertas`);
+        }
+        for (const tl of ["HKA_STANDAR", "HKA_BERMEREK", "HKA_MINIMAL"] as const) {
+          const m = masukan(kop, data("kwitansiDpro", p1.id, (d) => ((d.jenis = "kwitansi"), (d.kwitansi!.terimaDari = "x\n".repeat(100)))), { judul: "KWITANSI" });
+          await renderDokumen(m, { tataLetak: tl, tampilanEvent: null, judulBerkas: "Uji" });
+          pastikan(luap(m.perekam!) === 0 && m.perekam!.teks.some((t) => t.teks.toLowerCase().includes("x x x")), `${tl} kwitansi: terima dari 100 baris dicetak satu baris, tidak ada teks di luar kertas`);
+        }
+      }
+
+      // T5: awalan rupiah tabel surat seragam "Rp. "
+      {
+        const m = masukan(kopPolos(p1.id), data("hkaStandar", p1.id, (d) => (d.jenis = "faktur")));
+        await renderDokumen(m, { tataLetak: "HKA_SURAT", tampilanEvent: null, judulBerkas: "Uji" });
+        const tanpaTitik = m.perekam!.teks.filter((t) => /Rp \d/.test(t.teks)).map((t) => t.teks);
+        pastikan(teksAda(m.perekam!, "Rp. 1.898.100") && tanpaTitik.length === 0, `surat faktur: semua nominal tabel berawalan "Rp. " (${tanpaTitik.join(", ") || "tanpa Rp polos"})`);
+      }
+
+      // T6: tinta minimal = warna aksen kop
+      {
+        const warna = new Map<string, string | undefined>();
+        const asli = KanvasCetak.prototype.teks;
+        KanvasCetak.prototype.teks = function (this: KanvasCetak, isi: Parameters<typeof asli>[0], opsi: OpsiTeks) {
+          if (typeof isi === "string") warna.set(isi, opsi.warna);
+          return asli.call(this, isi, opsi);
+        };
+        try {
+          const kop = { ...kopPolos(p1.id), warnaAksen: "#CA1E1E", warnaTinta: "#1A1A1F" };
+          const m = masukan(kop, data("hkaStandar", p1.id, (d) => (d.jenis = "faktur")));
+          await renderDokumen(m, { tataLetak: "HKA_MINIMAL", tampilanEvent: null, judulBerkas: "Uji" });
+        } finally {
+          KanvasCetak.prototype.teks = asli;
+        }
+        const judul = [...warna.entries()].find(([t]) => t === "I N V O I C E");
+        const pakaiTinta = [...warna.values()].filter((w) => w?.toUpperCase() === "#1A1A1F").length;
+        pastikan(judul?.[1]?.toUpperCase() === "#CA1E1E" && pakaiTinta === 0, `minimal: judul dan teks memakai warna aksen kop, bukan warna tinta (${judul?.[1]}, ${pakaiTinta} teks bertinta)`);
+      }
+
+      // T7: retur tanpa pembayaran tercetak di tampilan event
+      for (const tampilan of ["RINCI", "RINGKAS"] as const) {
+        const m = masukan(
+          kopPolos(p1.id),
+          data(tampilan === "RINCI" ? "hkaNawasena" : "hkaEvoked", p1.id, (d) => {
+            d.jenis = "faktur";
+            d.ringkasan.terbayar = "0.00";
+            d.ringkasan.uangMuka = "0.00";
+            d.uangMukaDipakai = [];
+            d.ringkasan.retur = "100000.00";
+            d.ringkasan.sisa = new Prisma.Decimal(d.ringkasan.total).minus(100000).toFixed(2);
+          }),
+        );
+        await renderDokumen(m, { tataLetak: "HKA_BERMEREK", tampilanEvent: tampilan, judulBerkas: "Uji" });
+        pastikan(teksAda(m.perekam!, "Retur") && teksAda(m.perekam!, "Sisa Tagihan") && teksAda(m.perekam!, "100.000"), `faktur event ${tampilan}: retur tanpa pembayaran mencetak Retur dan Sisa Tagihan`);
+      }
     }
   } finally {
     await bersihkan();

@@ -248,7 +248,8 @@ export function pecahBaris(k: KanvasCetak, teks: string, opsi: OpsiPecah, batas 
   const muat = (s: string) => k.ukur(s, { x: 0, ...opsi, lebar: 1e6 }).lebar <= opsi.lebar + 0.01;
   const hasil: string[] = [];
   const penuh = () => hasil.length > batas;
-  for (const paragraf of teks.split("\n")) {
+  // paragraf kosong di ujung teks tidak menambah baris, jadi dibuang sebelum dipecah
+  for (const paragraf of teks.replace(/\s+$/, "").split("\n")) {
     const kata = paragraf.split(/ +/).filter(Boolean);
     let baris = "";
     for (const kataIni of kata) {
@@ -273,8 +274,9 @@ export function pecahBaris(k: KanvasCetak, teks: string, opsi: OpsiPecah, batas 
     if (penuh()) break;
     if (baris || !kata.length) hasil.push(baris);
   }
-  // paragraf kosong di ujung tidak menambah baris
-  while (hasil.length > 1 && hasil[hasil.length - 1] === "") hasil.pop();
+  // Baris kosong di ujung hanya dibuang bila pemecahan selesai. Bila berhenti karena batas, sisa teks sesudah baris
+  // kosong itu belum masuk hasil, jadi panjang hasil harus tetap melebihi batas supaya pemanggil memotong dengan "…".
+  if (!penuh()) while (hasil.length > 1 && hasil[hasil.length - 1] === "") hasil.pop();
   return hasil;
 }
 

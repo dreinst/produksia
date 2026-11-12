@@ -4,6 +4,8 @@ import type { Desimal } from "@/lib/uang";
 import { barisDicetak, berbutir, jarak, satuBaris, tandaTanganDipakai, type MasukanTataLetak } from "@/lib/cetak/tataLetak/blok";
 import {
   ABU,
+  alamatHka,
+  barisLabelHka,
   berspasi,
   butirHka,
   catatanPotonganHka,
@@ -13,6 +15,7 @@ import {
   mulaiHka,
   o,
   paragrafHka,
+  penerimaHka,
   qtyBaris,
   rekeningHka,
   ringkasanHka,
@@ -23,13 +26,15 @@ import {
 } from "@/lib/cetak/tataLetak/hkaStandar";
 
 /*
- * Tata letak minimal HKA (spec/02 §14): monokrom warna tinta, logo kiri dan merek kanan, judul berspasi huruf besar,
+ * Tata letak minimal HKA (spec/02 §14): monokrom warna aksen kop, logo kiri dan merek kanan, judul berspasi huruf besar,
  * meta KEPADA/TANGGAL, tabel URAIAN/QTY/SATUAN/JUMLAH tanpa harga satuan, TOTAL TAGIHAN, BAYAR KE, syarat, catatan,
  * tanda tangan hanya bila kop punya nama penanda tangan atau gambar tanda tangan, garis penutup tebal, kaki teks.
  */
 
 export async function renderHkaMinimal(m: MasukanTataLetak, judulBerkas: string): Promise<Uint8Array> {
   const h = mulaiHka(m, judulBerkas, { gelombang: false, ikon: true });
+  // spec/02 §14: warna tinta minimal = warna aksen kop (cadangan #111111), termasuk teks kaki di dekorasi
+  h.tinta = h.aksen || "#111111";
   const { k, x0, W, mm, tinta } = h;
   const { dok, identitas: i } = m;
   const kw = kwitansiHka(m);
@@ -59,11 +64,12 @@ export async function renderHkaMinimal(m: MasukanTataLetak, judulBerkas: string)
 
   // Meta (52 mm + sisa)
   const meta: [string, string][] = [
-    [kw ? "DITERIMA DARI:" : "KEPADA:", (kw ? (dok.kwitansi?.terimaDari ?? dok.kepada.nama) : satuBaris(dok.kepada.nama)).toLocaleUpperCase("id-ID")],
+    [kw ? "DITERIMA DARI:" : "KEPADA:", penerimaHka(m, kw).toLocaleUpperCase("id-ID")],
     ["TANGGAL:", formatTanggalPanjang(dok.tanggal).toLocaleUpperCase("id-ID")],
   ];
   if (!kw && dok.tanggalKedua) meta.push([`${dok.tanggalKedua.label.toLocaleUpperCase("id-ID")}:`, formatTanggalPanjang(dok.tanggalKedua.tanggal).toLocaleUpperCase("id-ID")]);
-  if (dok.kepada.alamat?.trim()) meta.push(["ALAMAT:", dok.kepada.alamat.trim()]);
+  const alamat = alamatHka(h, dok.kepada.alamat);
+  if (alamat) meta.push(["ALAMAT:", alamat]);
   for (const [label, nilai] of meta) {
     const y = k.y;
     const a = k.teks(berspasi(label), o(h, 10, { y, lebar: mm(52), font: "B" }));
@@ -130,12 +136,12 @@ export async function renderHkaMinimal(m: MasukanTataLetak, judulBerkas: string)
     const rekening = rekeningHka(m);
     if (rekening) {
       const urut: [string, string][] = [rekening[0], rekening[2], rekening[1]];
-      for (const [label, nilai] of urut) {
-        const y = k.y;
-        const a = k.teks(berspasi(label.toLocaleUpperCase("id-ID")), o(h, 9, { y, lebar: mm(52), warna: ABU.sedang }));
-        const b = k.teks(nilai.trim() || "-", o(h, 10, { x: x0 + mm(52), y, lebar: W - mm(52) }));
-        k.y = y + Math.max(a, b);
-      }
+      barisLabelHka(
+        h,
+        urut.map(([label, nilai]) => [berspasi(label.toLocaleUpperCase("id-ID")), nilai.trim() || "-"]),
+        (_, y) => o(h, 9, { y, lebar: mm(52), warna: ABU.sedang }),
+        (_, y) => o(h, 10, { x: x0 + mm(52), y, lebar: W - mm(52) }),
+      );
     } else paragrafHka(h, dok.surat.infoBank!.trim(), 10);
     const syarat = syaratHka(m);
     if (syarat) {

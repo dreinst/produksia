@@ -6,7 +6,7 @@ import { terbilangRupiah } from "@/lib/cetak/terbilang";
 import type { TampilanEventCetak } from "@/lib/cetak/tipe";
 import type { Desimal } from "@/lib/uang";
 import { PUTIH, barisDicetak, berbutir, bukanNol, hurufJudul, jarak, persen, ruangUtuh, satuBaris, tandaTanganDipakai, type MasukanTataLetak } from "@/lib/cetak/tataLetak/blok";
-import { ABU, LABEL_NOMOR_HKA, butirHka, ikonSosial, kepalaTengah, mulaiHka, namaPenerbit, o, paragrafHka, qtyHka, rpHka, sel, syaratHka, teksRekeningHka, tint, type Hka } from "@/lib/cetak/tataLetak/hkaStandar";
+import { ABU, LABEL_NOMOR_HKA, alamatHka, butirHka, ikonSosial, kepalaTengah, mulaiHka, namaPenerbit, o, paragrafHka, qtyHka, rpHka, sel, syaratHka, teksRekeningHka, tint, type Hka } from "@/lib/cetak/tataLetak/hkaStandar";
 
 /*
  * Tampilan event HKA (spec/02 §16, D3 §3.8) untuk penawaran dan faktur mode event bertata letak HKA_*: rinci (satu
@@ -74,7 +74,7 @@ function totalEvent(h: Hka, denganBayar: boolean): void {
   if (bukanNol(r.fee) && bukanNol(r.ppn)) tambah("Total", rpHka(m, r.total.minus(r.ppn)), { tebal: true, latar: muda });
   if (bukanNol(r.ppn)) tambah(`PPN ${persen(m, r.ppnPersen)}%`, rpHka(m, r.ppn), { tebal: true, latar: muda });
   tambah("GRAND TOTAL", rpHka(m, r.total), { tebal: true, latar: aksen, warna: PUTIH });
-  if (denganBayar && m.dok.jenis === "faktur" && bukanNol(r.terbayar)) {
+  if (denganBayar && m.dok.jenis === "faktur" && (bukanNol(r.terbayar) || bukanNol(r.retur))) {
     tambah("Total Terbayar", rpHka(m, r.terbayar), { tebal: true });
     if (bukanNol(r.retur)) tambah("Retur", rpHka(m, r.retur), { tebal: true });
     tambah("Sisa Tagihan", rpHka(m, r.sisa), { tebal: true });
@@ -148,7 +148,7 @@ function rinci(h: Hka): void {
     let yL = y;
     yL += k.teks(faktur ? "DITUJUKAN KEPADA:" : "DISIAPKAN UNTUK:", o(h, 8.5, { y: yL, lebar: wKiri, font: "B", warna: ABU.sedang }));
     yL += k.teks(satuBaris(dok.kepada.nama), o(h, 11, { y: yL, lebar: wKiri, font: "B" }));
-    for (const b of [dok.kepada.up, dok.kepada.alamat, dok.kepada.telepon, dok.kepada.email]) if (b?.trim()) yL += k.teks(b.trim(), o(h, 9, { y: yL, lebar: wKiri, warna: ABU.teks }));
+    for (const b of [dok.kepada.up, alamatHka(h, dok.kepada.alamat), dok.kepada.telepon, dok.kepada.email]) if (b?.trim()) yL += k.teks(b.trim(), o(h, 9, { y: yL, lebar: wKiri, warna: ABU.teks }));
     if (dok.event.namaEvent?.trim()) {
       yL += mm(1.5);
       const isi: Segmen[] = [{ teks: "Event:", tebal: true }, { teks: ` ${satuBaris(dok.event.namaEvent)}${dok.event.venue?.trim() ? ` · ${satuBaris(dok.event.venue)}` : ""}` }];
@@ -274,7 +274,7 @@ function ringkas(h: Hka): void {
     const baris: BarisTabel[] = [];
     const tambah = (label: string, nilai: string) => baris.push({ sel: [isi(label, "kiri", { font: "B" }), isi(nilai, "kanan", { font: "B" })] });
     tambah("Total Tagihan", rpHka(m, r.total));
-    if (bukanNol(r.terbayar)) {
+    if (bukanNol(r.terbayar) || bukanNol(r.retur)) {
       tambah("Total Terbayar", rpHka(m, r.terbayar));
       if (bukanNol(r.retur)) tambah("Retur", rpHka(m, r.retur));
       tambah("Sisa Tagihan", rpHka(m, r.sisa));

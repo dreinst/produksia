@@ -180,6 +180,40 @@ export const LABEL_NOMOR_HKA: Record<JenisCetak, string> = {
   "kwitansi-dp": "No. Kwitansi",
 };
 
+/** Batas baris alamat pelanggan di blok KEPADA (textarea 500 karakter, baris baru disimpan apa adanya). */
+export const MAKS_BARIS_ALAMAT = 6;
+
+/**
+ * Alamat pelanggan paling banyak MAKS_BARIS_ALAMAT baris. Sisanya dibuang, baris terakhir ditutup "…", dan peringatan
+ * "teks terpotong" dicatat, supaya blok KEPADA yang digambar ber-y tetap tidak meluap keluar kertas.
+ */
+export function alamatHka(h: Hka, alamat: string | null | undefined): string | null {
+  const baris = (alamat ?? "").trim().split("\n").map((s) => s.trimEnd());
+  if (!baris.join("").trim()) return null;
+  if (baris.length <= MAKS_BARIS_ALAMAT) return baris.join("\n");
+  h.k.peringatan(`teks terpotong: alamat ${baris[0].slice(0, 50)}`);
+  const sisa = baris.slice(0, MAKS_BARIS_ALAMAT);
+  sisa[MAKS_BARIS_ALAMAT - 1] = `${sisa[MAKS_BARIS_ALAMAT - 1]}…`;
+  return sisa.join("\n");
+}
+
+/** Nama penerima kwitansi (terima dari) atau nama pelanggan, selalu satu baris. */
+export const penerimaHka = (m: MasukanTataLetak, kw: boolean) => satuBaris(kw ? (m.dok.kwitansi?.terimaDari ?? m.dok.kepada.nama) : m.dok.kepada.nama);
+
+/**
+ * Baris label dan nilai berposisi tetap (rekening): tinggi seluruh baris diukur dulu, lalu pindah halaman bila tidak
+ * muat (ruangUtuh), supaya tidak turun ke kaki halaman.
+ */
+export function barisLabelHka(h: Hka, daftar: [string, string][], label: (teks: string, y: number) => OpsiTeks, nilai: (teks: string, y: number) => OpsiTeks): void {
+  const { k } = h;
+  const tinggi = daftar.reduce((n, [a, b]) => n + Math.max(k.ukur(a, label(a, 0)).tinggi, k.ukur(b, nilai(b, 0)).tinggi), 0);
+  ruangUtuh(k, tinggi);
+  for (const [a, b] of daftar) {
+    const y = k.y;
+    k.y = y + Math.max(k.teks(a, label(a, y)), k.teks(b, nilai(b, y)));
+  }
+}
+
 export const kwitansiHka = (m: MasukanTataLetak) => m.dok.jenis === "kwitansi" || m.dok.jenis === "kwitansi-dp";
 
 /** Rupiah dengan awalan pilihan ("Rp ", "Rp. ", "Rp.", atau ""). */
@@ -392,8 +426,8 @@ export async function renderHkaStandar(m: MasukanTataLetak, judulBerkas: string)
     const y = k.y;
     let yL = y;
     yL += k.teks(kw ? "DITERIMA DARI" : "KEPADA", o(h, 7, { y: yL, lebar: wKiri, font: "B", warna: ABU.label }));
-    yL += k.teks(kw ? (dok.kwitansi?.terimaDari ?? dok.kepada.nama) : satuBaris(dok.kepada.nama), o(h, 10, { y: yL, lebar: wKiri, font: "B" }));
-    const kontak = [dok.kepada.up, dok.kepada.email, dok.kepada.telepon, dok.kepada.alamat].filter((s): s is string => !!s?.trim()).join("\n");
+    yL += k.teks(penerimaHka(m, kw), o(h, 10, { y: yL, lebar: wKiri, font: "B" }));
+    const kontak = [dok.kepada.up, dok.kepada.email, dok.kepada.telepon, alamatHka(h, dok.kepada.alamat)].filter((s): s is string => !!s?.trim()).join("\n");
     if (kontak) yL += k.teks(kontak, o(h, 8.5, { y: yL, lebar: wKiri, warna: ABU.teks }));
     const kedua = tanggalKeduaHka(m, "Tanggal bayar");
     const meta: [string, string][] = [["Tanggal", formatTanggalPendek(dok.tanggal)], [kedua.label, kedua.nilai]];
