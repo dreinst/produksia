@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { punyaHak } from "@/lib/hakAkses";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { PERUSAHAAN_UTAMA, saringMilikAtauBersama } from "@/lib/perusahaan";
 import { ubahPerusahaanFormulir } from "@/lib/aksi/perusahaan";
@@ -14,7 +15,7 @@ import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
  * nama, pajak, dan akun pajak sama dengan halaman Perusahaan & Pajak lama dan tetap tersimpan di baris "default".
  */
 export default async function HalamanUbahPerusahaan({ params }: { params: Promise<{ id: string }> }) {
-  await wajibHak("pengaturan.tulis");
+  const pengguna = await wajibHak("pengaturan.tulis");
   const { id } = await params;
   const perusahaan = await db.perusahaan.findUnique({ where: { id }, include: { pengaturan: { select: { id: true } } } });
   if (!perusahaan) notFound();
@@ -105,6 +106,14 @@ export default async function HalamanUbahPerusahaan({ params }: { params: Promis
             </Link>
             <span className="redup"> · kop surat, gambar, tanda tangan, dan tata letak PDF</span>
           </li>
+          {punyaHak(pengguna, "pengaturan-crm.ubah") && (
+            <li>
+              <Link href={`/crm/pengaturan?perusahaan=${encodeURIComponent(perusahaan.id)}`} className="tombol-tautan">
+                Pengaturan CRM
+              </Link>
+              <span className="redup"> · tahap pipeline dan sumber lead</span>
+            </li>
+          )}
         </ul>
       </div>
     </div>

@@ -371,14 +371,14 @@ async function main() {
     const t1 = await tl("UJIN T1", jam(-1));
     pastikan((await periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })) === 1, "T1 lewat 1 jam: 1 notifikasi");
     const [nT1] = await tlAdmin();
-    pastikan(nT1?.jenis === "TINDAK_LANJUT" && nT1.isi === "UJIN T1" && nT1.tautan === null && nT1.perusahaanId === "utama", "isi judul, tautan null sampai rute /crm ada (P32), perusahaan tindak lanjut");
+    pastikan(nT1?.jenis === "TINDAK_LANJUT" && nT1.isi === "UJIN T1" && nT1.tautan === "/crm/tindak-lanjut" && nT1.perusahaanId === "utama", "isi judul, tautan /crm/tindak-lanjut tanpa lead, perusahaan tindak lanjut");
     pastikan((await db.tindakLanjut.findUniqueOrThrow({ where: { id: t1.id } })).diingatkanPada?.getTime() === kini.getTime(), "diingatkanPada T1 terisi");
     pastikan((await periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })) === 0, "dipanggil lagi: 0");
     const t2 = await tl("UJIN T2", jam(-2), { leadId: leadAktif.id });
     const serentak = await Promise.all([periksaPengingatTindakLanjut(admin.id, kini, { paksa: true }), periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })]);
     const nT2 = (await tlAdmin()).filter((n) => n.isi?.startsWith("UJIN T2"));
     pastikan(serentak[0] + serentak[1] === 1 && nT2.length === 1, `T2 dengan dua panggilan serentak: total tepat 1 (${serentak.join("+")})`);
-    pastikan(nT2[0].isi === "UJIN T2 · UJIN Lead Aktif" && nT2[0].tautan === null, "isi memuat nama lead, tautan null sampai P32");
+    pastikan(nT2[0].isi === "UJIN T2 · UJIN Lead Aktif" && nT2[0].tautan === `/crm/lead/${leadAktif.id}`, "isi memuat nama lead, tautan ke lead");
     void t2;
     const t3 = await tl("UJIN T3", jam(24));
     pastikan((await periksaPengingatTindakLanjut(admin.id, kini, { paksa: true })) === 0, "T3 besok: tidak diingatkan");

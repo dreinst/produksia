@@ -31,6 +31,17 @@ export const GRUP_OPERASIONAL: Grup[] = [
       { href: "/penjualan/retur", label: "Retur Penjualan", kode: "RJ", hak: "retur-penjualan.lihat" },
     ],
   },
+  // CRM (D4 §7.1, D7 §7.8, DESAIN R2/R3): Pengaturan CRM ada di tautan pengaturan, bukan di grup ini
+  {
+    judul: "CRM",
+    ikon: "handshake",
+    tautan: [
+      { href: "/crm/dasbor", label: "Dasbor CRM", hak: "lead.lihat" },
+      { href: "/crm/lead", label: "Lead", hak: "lead.lihat" },
+      { href: "/crm/pipeline", label: "Pipeline", hak: "lead.lihat" },
+      { href: "/crm/tindak-lanjut", label: "Tindak Lanjut", hak: "lead.lihat" },
+    ],
+  },
   {
     judul: "Pembelian",
     ikon: "shopping_bag",
@@ -139,6 +150,7 @@ export const TAUTAN_PENGATURAN: TautanBerikon[] = [
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
   { href: "/pengaturan/hak-akses", label: "Hak Akses", ikon: "shield", hak: "hak-akses.kelola" },
   { href: "/pengaturan/log-aktivitas", label: "Log Aktivitas", ikon: "history", hak: "log-aktivitas.lihat" },
+  { href: "/crm/pengaturan", label: "Pengaturan CRM", ikon: "handshake", hak: "pengaturan-crm.ubah" },
   { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" },
 ];
 

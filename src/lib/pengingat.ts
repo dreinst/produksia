@@ -105,7 +105,7 @@ export async function periksaPengingatTindakLanjut(penggunaId: string | null | u
   } satisfies Prisma.TindakLanjutWhereInput;
   const daftar = await db.tindakLanjut.findMany({
     where: syarat,
-    select: { id: true, judul: true, perusahaanId: true, lead: { select: { nama: true } } },
+    select: { id: true, judul: true, perusahaanId: true, leadId: true, lead: { select: { nama: true } } },
     orderBy: [{ jatuhTempo: "asc" }, { id: "asc" }],
     take: BATAS_PENGINGAT,
   });
@@ -118,9 +118,9 @@ export async function periksaPengingatTindakLanjut(penggunaId: string | null | u
         penggunaIds: [penggunaId],
         judul: "Tindak lanjut jatuh tempo",
         isi: t.lead ? `${t.judul} · ${t.lead.nama}` : t.judul,
-        // Rute /crm baru lahir di P32; sampai itu tautan kosong sehingga notifikasi dibuka ke /notifikasi.
-        // P32 mengisinya: t.leadId ? `/crm/lead/${t.leadId}` : "/crm/tindak-lanjut" (D4 §3.14).
-        tautan: null,
+        // sama dengan tautanTindakLanjutNotifikasi di crm.ts (D4 §3.14); ditulis ulang karena berkas ini tidak boleh
+        // mengimpor crm.ts (DESAIN L3)
+        tautan: t.leadId ? `/crm/lead/${t.leadId}` : "/crm/tindak-lanjut",
         jenis: "TINDAK_LANJUT",
         perusahaanId: t.perusahaanId,
       });

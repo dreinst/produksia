@@ -379,6 +379,7 @@ async function main() {
       pastikan(Boolean(nilai(n)), `isian ${n} ada di halaman ubah utama`);
     }
     pastikan(halUtama.teks.includes("Tersimpan") && halUtama.teks.includes("Dokumen cetak") && halUtama.href.includes("/pengaturan/perusahaan/kop?perusahaan=utama"), "lencana pajak tersimpan dan kartu dokumen cetak menaut Kop & Template (P31)");
+    pastikan(halUtama.href.includes("/crm/pengaturan?perusahaan=utama"), "kartu dokumen cetak menaut Pengaturan CRM perusahaan ini bagi pemegang pengaturan-crm.ubah (P32)");
     const halTapussa = await render(await HalamanUbahPerusahaan({ params: Promise.resolve({ id: "tapussa" }) }));
     const adaBarisTapussa = (await db.pengaturanPerusahaan.count({ where: { perusahaanId: "tapussa" } })) > 0;
     pastikan(halTapussa.teks.includes(adaBarisTapussa ? "Tersimpan" : "Masih bawaan") && halTapussa.isian.some((x) => x.name === "aktif" && x.type === "checkbox" && !x.disabled), "perusahaan lain: kotak aktif bisa diubah");

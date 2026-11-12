@@ -179,6 +179,23 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
   // P03 tidak menambah entri.
   { paket: "P07", letak: "atas", setelah: "/persetujuan", tautan: { href: "/berkas", label: "Berkas", ikon: "folder", hak: "berkas.lihat" } },
   { paket: "P07", letak: "pengaturan", setelah: "/pengaturan/log-aktivitas", tautan: { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" } },
+  {
+    paket: "P32",
+    letak: "grup-baru",
+    bagian: "operasional",
+    setelah: "Penjualan",
+    grup: {
+      judul: "CRM",
+      ikon: "handshake",
+      tautan: [
+        { href: "/crm/dasbor", label: "Dasbor CRM", hak: "lead.lihat" },
+        { href: "/crm/lead", label: "Lead", hak: "lead.lihat" },
+        { href: "/crm/pipeline", label: "Pipeline", hak: "lead.lihat" },
+        { href: "/crm/tindak-lanjut", label: "Tindak Lanjut", hak: "lead.lihat" },
+      ],
+    },
+  },
+  { paket: "P32", letak: "pengaturan", setelah: "/pengaturan/log-aktivitas", tautan: { href: "/crm/pengaturan", label: "Pengaturan CRM", ikon: "handshake", hak: "pengaturan-crm.ubah" } },
   { paket: "P24", letak: "grup", grup: "Buku Besar", setelah: "/buku-besar/jurnal", tautan: { href: "/buku-besar/antar-perusahaan", label: "Transaksi Antar Perusahaan", kode: "AP", hak: "antar-perusahaan.lihat" } },
 ];
 
@@ -354,6 +371,23 @@ async function main() {
     pastikan(h.indexOf("/buku-besar/antar-perusahaan") === h.indexOf("/buku-besar/jurnal") + 1, `${peran}: Transaksi Antar Perusahaan tepat sesudah Jurnal Umum`);
   }
   for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST", "SOSMED", "IKLAN", "DESAINER"] as const) pastikan(!mPeran(peran).includes("/buku-besar/antar-perusahaan"), `${peran}: tanpa Transaksi Antar Perusahaan`);
+  // P32 (D4 §7.1, D7 §7.8, HAK.md §2.6): grup CRM sesudah Penjualan untuk lead.lihat, Pengaturan CRM hanya pengaturan-crm.ubah
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    const judul = m.operasional.map((g) => g.judul);
+    const crm = m.operasional.find((g) => g.judul === "CRM");
+    pastikan(judul.indexOf("CRM") === judul.indexOf("Penjualan") + 1 && crm?.ikon === "handshake" && crm.tautan.map((l) => l.label).join(", ") === "Dasbor CRM, Lead, Pipeline, Tindak Lanjut", `${peran}: grup CRM (Dasbor CRM, Lead, Pipeline, Tindak Lanjut) tepat sesudah Penjualan`);
+    const atur = m.pengaturan.map((l) => l.href);
+    pastikan(peran === "ADMIN" ? !atur.includes("/crm/pengaturan") : atur.indexOf("/crm/pengaturan") === atur.indexOf("/pengaturan/log-aktivitas") + 1, `${peran}: ${peran === "ADMIN" ? "tanpa Pengaturan CRM" : "Pengaturan CRM tepat sesudah Log Aktivitas"}`);
+  }
+  for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST", "SOSMED", "IKLAN", "DESAINER"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    pastikan(!m.operasional.some((g) => g.judul === "CRM") && !hrefTerlihat(m).some((h) => h.startsWith("/crm")), `${peran}: tanpa grup CRM dan Pengaturan CRM`);
+  }
+  for (const href of ["/crm/lead", "/crm/lead/baru", "/crm/lead/abc", "/crm/lead/abc/ubah", "/crm/lead/abc/konversi"]) {
+    const nyala = ["/crm/dasbor", "/crm/lead", "/crm/pipeline", "/crm/tindak-lanjut", "/crm/pengaturan"].filter((h) => aktifDi(h, href));
+    pastikan(nyala.join() === "/crm/lead", `${href} hanya menyalakan Lead`);
+  }
   for (const peran of ["SUPERADMIN", "PEMILIK"] as const) {
     const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
     const atas = m.atas.map((t) => t.href);

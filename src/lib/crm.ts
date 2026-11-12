@@ -700,18 +700,14 @@ export function teksAktivitas(a: { jenis: JenisAktivitasLead; meta: unknown; isi
 
 // ---------- Notifikasi dan log ----------
 
-/**
- * Tautan notifikasi lead. Rute /crm lahir di P32; sampai itu null supaya notifikasi tidak menaut ke halaman yang belum
- * ada (notifikasi dibuka ke /notifikasi). P32 mengganti isi fungsi ini dengan `/crm/lead/${leadId}` (D4 §3.14).
- */
+/** Tautan notifikasi lead ke halaman detailnya (D4 §3.14). Tipe tetap string | null supaya pemanggil lama tidak berubah. */
 export function tautanLeadNotifikasi(leadId: string): string | null {
-  void leadId;
-  return null;
+  return `/crm/lead/${leadId}`;
 }
 
-/** Tautan notifikasi tindak lanjut: lead bila ada, selain itu daftar tindak lanjut. null sampai P32 (lihat atas). */
+/** Tautan notifikasi tindak lanjut: detail lead bila berlead, selain itu daftar tindak lanjut (D4 §3.14). */
 export function tautanTindakLanjutNotifikasi(leadId: string | null): string | null {
-  return leadId ? tautanLeadNotifikasi(leadId) : null;
+  return leadId ? tautanLeadNotifikasi(leadId) : "/crm/tindak-lanjut";
 }
 
 /**
