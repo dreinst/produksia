@@ -352,7 +352,7 @@ export default async function HalamanUbahKopSurat({ params }: { params: Promise<
                     </td>
                     <td>
                       <select name={`gayaAngka_${jenis}`} defaultValue={t?.gayaAngka ?? ""} aria-label={`Format angka ${label}`} className="isian">
-                        <option value="">Bawaan</option>
+                        <option value="">Bawaan (titik)</option>
                         <option value="TITIK">Titik (1.234.567)</option>
                         <option value="KOMA">Koma (1,234,567)</option>
                       </select>

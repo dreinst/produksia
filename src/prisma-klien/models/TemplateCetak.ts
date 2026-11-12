@@ -648,7 +648,7 @@ export type $TemplateCetakPayload<ExtArgs extends runtime.Types.Extensions.Inter
     tataLetak: $Enums.TataLetakCetak
     ukuran: $Enums.UkuranKertas
     /**
-     * null = bawaan tata letak (DPRO_INVOICE, DPRO_PROPOSAL: KOMA; lainnya: TITIK)
+     * null = bawaan tata letak (TITIK untuk semua tata letak)
      */
     gayaAngka: $Enums.GayaAngka | null
     /**

@@ -319,7 +319,7 @@ async function main() {
     await db.templateCetak.create({ data: { kopSuratId: beta.id, jenis: "PENAWARAN", tataLetak: "DPRO_INVOICE", ukuran: "A4" } });
     {
       const p = await pilih();
-      pastikan(p.tataLetak === "DPRO_INVOICE" && p.ukuran === "A5" && p.gayaAngka === "KOMA" && p.template.tandaTanganBawaan === false, "template faktur: invoice D'Pro A5, gaya angka bawaan KOMA");
+      pastikan(p.tataLetak === "DPRO_INVOICE" && p.ukuran === "A5" && p.gayaAngka === "TITIK" && p.template.tandaTanganBawaan === false, "template faktur: invoice D'Pro A5, gaya angka bawaan TITIK (P-29)");
       pastikan((await pilih({ ukuran: "A5L" })).ukuran === "A5_LANDSCAPE" && (await pilih({ ukuran: "A4" })).ukuran === "A4", "?ukuran yang sah untuk tata letak mengalahkan template");
       const kw = await pilihKopDanTemplate(db, dariDataPenjualan(data("kwitansiDpro", p1.id, (d) => (d.jenis = "kwitansi"))), { ukuran: "A5" });
       pastikan(kw.tataLetak === "KWITANSI_ENTITAS" && kw.ukuran === "A4" && kw.gayaAngka === "KOMA" && kw.judul === "TANDA TERIMA", "kwitansi: ?ukuran A5 tidak sah diabaikan, template A4, gaya KOMA, judul template");

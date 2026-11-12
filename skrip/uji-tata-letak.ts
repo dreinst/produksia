@@ -137,14 +137,15 @@ async function main() {
 
   console.log("=== 2. Invoice D'Pro A4, A5, A5 landscape ===");
   for (const [ukuran, bawahPx, s] of [["A4", 300, 1], ["A5", 300, 1748 / 2480], ["A5_LANDSCAPE", 255, 1]] as const) {
-    const m = masukan("invoiceDpro", "DPRO", { ukuran, gayaAngka: "KOMA" });
+    const m = masukan("invoiceDpro", "DPRO", { ukuran, gayaAngka: "TITIK" });
     const t0 = Date.now();
     const isi = await renderDproInvoice(m);
     const lama = Date.now() - t0;
     const r = m.perekam!;
     periksaUmum(`invoice ${ukuran}`, isi, m, 1, ukuran, pxKePt(bawahPx, s));
-    for (const t of ["73,166,600", "7,316,660", "80,483,260", "Invoice No. 071/DPRO-INV2/IX/2026", "21 September 2026", "BANK CENTRAL ASIA", "440.008.0033", "AN. DONATUS PURBANDONO", "Donatus Purbandono", "ISSUED TO:", "Kantor Perwakilan Bank Indonesia Malang", "TERBILANG:"]) pastikan(ada(r, t), `invoice ${ukuran}: memuat "${t}"`);
+    for (const t of ["73.166.600", "7.316.660", "80.483.260", "Invoice No. 071/DPRO-INV2/IX/2026", "21 September 2026", "BANK CENTRAL ASIA", "440.008.0033", "AN. DONATUS PURBANDONO", "Donatus Purbandono", "ISSUED TO:", "Kantor Perwakilan Bank Indonesia Malang", "TERBILANG:"]) pastikan(ada(r, t), `invoice ${ukuran}: memuat "${t}"`);
     pastikan(gabung(r).includes(TERBILANG_INVOICE), `invoice ${ukuran}: terbilang KAPITAL 80.483.260`);
+    pastikan(!teksHal(r).some((t) => /\d,\d{3}\b/.test(t)), `invoice ${ukuran}: tidak ada angka berpemisah koma (P-29)`);
     pastikan(["Total", "Management Fee", "Grand Total"].every((t) => teksHal(r).includes(t)) && ["Discount", "PPN", "Uang Muka", "Sisa Tagihan", "Pembayaran Diterima", "Retur"].every((t) => !ada(r, t)), `invoice ${ukuran}: tepat tiga baris ringkasan Figma (tanpa Discount, PPN, Uang Muka)`);
     pastikan(["KOP", "KAKI", "WATERMARK", "JUDUL_INVOICE", "LABEL_PEMBAYARAN", "LABEL_SALAM"].every((n) => slot(r, n)) && !slot(r, "TANDA_TANGAN"), `invoice ${ukuran}: slot kop, kaki, watermark, judul, label pembayaran, label salam; tanpa tanda tangan`);
     pastikan(teksHal(r).filter((t) => t === "Rp").length === 8, `invoice ${ukuran}: "Rp" kiri di 5 baris rincian dan 3 baris ringkasan`);
@@ -153,9 +154,13 @@ async function main() {
     pastikan(lama < 1000, `invoice ${ukuran}: render ${lama} ms (< 1 detik)`);
   }
   {
-    const m = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK" });
+    // P-29: titik jadi bawaan semua tata letak, koma Figma tetap tersedia sebagai pilihan template
+    const m = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA" });
     await renderDproInvoice(m);
-    pastikan(ada(m.perekam!, "80.483.260") && !ada(m.perekam!, "80,483,260"), "invoice gaya TITIK: 80.483.260");
+    pastikan(ada(m.perekam!, "80,483,260") && !ada(m.perekam!, "80.483.260") && gabung(m.perekam!).includes(TERBILANG_INVOICE), "invoice pilihan KOMA: 80,483,260, terbilang tetap");
+    const p = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN" });
+    await renderDproProposal(p);
+    pastikan(ada(p.perekam!, "159,515,000", 1) && !ada(p.perekam!, "159.515.000", 1), "proposal pilihan KOMA: 159,515,000");
     const kop = m.perekam!.gambar.find((g) => g.slot === "KOP")!;
     pastikan(Math.abs(kop.w - 210 * PT_PER_MM) < 0.1 && Math.abs(kop.h - pxKePt(415)) < 0.1 && kop.y === 0, "kop selebar kertas setinggi 415 px menempel tepi atas");
   }
@@ -163,7 +168,7 @@ async function main() {
   console.log("=== 3. Invoice dengan PPN, uang muka, pembayaran, retur ===");
   {
     const m = masukan("invoiceDpro", "DPRO", {
-      gayaAngka: "KOMA",
+      gayaAngka: "TITIK",
       ubah: (d) => {
         d.ringkasan = { ...d.ringkasan, ppnPersen: D(11), ppn: D(8_853_159), total: D(89_336_419), uangMuka: D(20_000_000), terbayar: D(50_000_000), retur: D(1_000_000), sisa: D(38_336_419) };
         d.uangMukaDipakai = [{ nomor: "UM-0001", labelTermin: "Termin 1", jumlah: D(20_000_000) }];
@@ -173,7 +178,7 @@ async function main() {
     const isi = await renderDproInvoice(m);
     const r = m.perekam!;
     periksaUmum("invoice berpotongan", isi, m, 1, "A4", pxKePt(300));
-    for (const t of ["PPN 11%", "8,853,159", "Uang Muka", "20,000,000", "Pembayaran Diterima", "30,000,000", "Retur", "1,000,000", "Sisa Tagihan", "38,336,419", "Uang muka yang dipotong:", "UM-0001 (Termin 1): Rp 20,000,000", "Transfer paling lambat 14 hari"]) pastikan(ada(r, t), `invoice berpotongan: memuat "${t}"`);
+    for (const t of ["PPN 11%", "8.853.159", "Uang Muka", "20.000.000", "Pembayaran Diterima", "30.000.000", "Retur", "1.000.000", "Sisa Tagihan", "38.336.419", "Uang muka yang dipotong:", "UM-0001 (Termin 1): Rp 20.000.000", "Transfer paling lambat 14 hari"]) pastikan(ada(r, t), `invoice berpotongan: memuat "${t}"`);
     const urut = ["Grand Total", "Uang Muka", "Pembayaran Diterima", "Retur", "Sisa Tagihan"].map((t) => r.teks.find((x) => x.teks === t)!.y);
     pastikan(urut.every((y, i) => i === 0 || y > urut[i - 1]), "invoice berpotongan: Uang Muka, Pembayaran Diterima, Retur, Sisa Tagihan di bawah Grand Total berurutan");
     pastikan(gabung(r).includes("DELAPAN PULUH SEMBILAN JUTA TIGA RATUS TIGA PULUH ENAM RIBU EMPAT RATUS SEMBILAN BELAS RUPIAH"), "invoice berpotongan: terbilang tetap dari total");
@@ -187,23 +192,23 @@ async function main() {
       d.ringkasan = { ...d.ringkasan, subtotal: D(4_000_000), fee: D(0), dpp: D(4_000_000), ppnPersen: D(11), ppn: D(440_000), total: D(4_440_000), sisa: D(4_440_000) };
       d.konteksTermin = { no: 2, jumlahButir: 3, label: "Termin 2", persen: D(40), jumlah: D(4_000_000), jumlahBruto: D(4_440_000), nilaiKontrakBruto: D(11_100_000), dibayarSebelumnya: D(3_330_000), sisaSetelahTermin: D(3_330_000), nomorPesanan: "SO-0001" };
     };
-    const m = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", ubah });
+    const m = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", ubah });
     await renderDproInvoice(m);
     const r = m.perekam!;
-    pastikan(ada(r, "Termin 2 - Kantor Perwakilan Bank Indonesia Malang") && ada(r, "Termin 2 dari 3 (40% dari nilai kontrak)") && ada(r, "Ref. pesanan SO-0001") && ada(r, "Sisa tagihan setelah termin ini: Rp 3,330,000"), "tagihan termin: satu baris dibangun dari konteksTermin dengan butir posisi kontrak");
+    pastikan(ada(r, "Termin 2 - Kantor Perwakilan Bank Indonesia Malang") && ada(r, "Termin 2 dari 3 (40% dari nilai kontrak)") && ada(r, "Ref. pesanan SO-0001") && ada(r, "Sisa tagihan setelah termin ini: Rp 3.330.000"), "tagihan termin: satu baris dibangun dari konteksTermin dengan butir posisi kontrak");
     pastikan(ada(r, "Invoice No. 071/DPRO-INV2/IX/2026") && slot(r, "JUDUL_INVOICE"), "tagihan termin berjudul INVOICE: label Invoice No. dan gambar judul");
-    const m2 = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", ubah, judul: "TAGIHAN TERMIN" });
+    const m2 = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", ubah, judul: "TAGIHAN TERMIN" });
     await renderDproInvoice(m2);
     pastikan(ada(m2.perekam!, "No. Tagihan Termin 071/DPRO-INV2/IX/2026") && ada(m2.perekam!, "TAGIHAN TERMIN") && !slot(m2.perekam!, "JUDUL_INVOICE"), "judul TAGIHAN TERMIN: teks judul, label No. Tagihan Termin, tanpa gambar INVOICE");
   }
 
   console.log("=== 5. Proposal D'Pro A4 ===");
   {
-    const m = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN" });
+    const m = masukan("proposalDpro", "DPRO", { gayaAngka: "TITIK", judul: "PENAWARAN" });
     const isi = await renderDproProposal(m);
     const r = m.perekam!;
     periksaUmum("proposal", isi, m, 2, "A4", pxKePt(300));
-    for (const t of ["159,515,000", "890,000", "158,625,000", "3,625,000", "TOTAL BIAYA LANGSUNG (NETT)", "DISCOUNT", "GRAND TOTAL BIAYA", "ADD ON", "Diajukan Oleh", "Disetujui Oleh", "NO: 064/DPRO/P1/VIII/2026", "Malang, 26 Agustus 2026", "Kepada Yth :", "PPK Balai BPHL Wilayah IX Mataram", ": Kunjungan Lapangan BPHL Wilayah IX Mataram", ": 27-30 Agustus 2026", "Dengan hormat,", "48,750,000", "650,000", "D'Production"])
+    for (const t of ["159.515.000", "890.000", "158.625.000", "3.625.000", "TOTAL BIAYA LANGSUNG (NETT)", "DISCOUNT", "GRAND TOTAL BIAYA", "ADD ON", "Diajukan Oleh", "Disetujui Oleh", "NO: 064/DPRO/P1/VIII/2026", "Malang, 26 Agustus 2026", "Kepada Yth :", "PPK Balai BPHL Wilayah IX Mataram", ": Kunjungan Lapangan BPHL Wilayah IX Mataram", ": 27-30 Agustus 2026", "Dengan hormat,", "48.750.000", "650.000", "D'Production"])
       pastikan(ada(r, t, 1), `proposal halaman 1: memuat "${t}"`);
     pastikan(!teksHal(r, 1).some((t) => /^Rp\b/.test(t)), "proposal: tidak ada teks Rp di tabel (angka tanpa Rp)");
     pastikan(["MANAGEMENT FEE", "PPN"].every((t) => !ada(r, t)), "proposal contoh: tanpa baris MANAGEMENT FEE dan PPN (persis empat baris Figma)");
@@ -214,7 +219,7 @@ async function main() {
     pastikan(nomor.join() === "1,2,3,4,5,6,7,8,9,10,11,12", `proposal: 12 baris anggaran (nomor ${nomor.join(",")})`);
 
     const panjang = masukan("proposalDpro", "DPRO", {
-      gayaAngka: "KOMA",
+      gayaAngka: "TITIK",
       judul: "PENAWARAN",
       ubah: (d) => {
         d.baris = Array.from({ length: 40 }, (_, i) => ({ ...d.baris[i % 12], no: i + 1 }));
@@ -343,13 +348,13 @@ async function main() {
   console.log("=== 10. Draf, stempel, dan tanda tangan ===");
   {
     const aset = { ...petaAsetBawaan("DPRO"), TANDA_TANGAN: ttdUji() };
-    const sah = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", tandaTangan: true, aset });
+    const sah = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", tandaTangan: true, aset });
     await renderDproInvoice(sah);
     pastikan(slot(sah.perekam!, "TANDA_TANGAN") && tandaTanganDipakai(sah) !== null && !ada(sah.perekam!, "DRAF"), "invoice bukan draf dengan tanda tangan: gambar TANDA_TANGAN dibubuhkan, tanpa stempel");
-    const tidakDiminta = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", tandaTangan: false, aset });
+    const tidakDiminta = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", tandaTangan: false, aset });
     await renderDproInvoice(tidakDiminta);
     pastikan(!slot(tidakDiminta.perekam!, "TANDA_TANGAN"), "tanda tangan tidak diminta: tidak dibubuhkan walau asetnya ada");
-    const draf = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN", tandaTangan: true, aset, ubah: (d) => (d.draf = true) });
+    const draf = masukan("proposalDpro", "DPRO", { gayaAngka: "TITIK", judul: "PENAWARAN", tandaTangan: true, aset, ubah: (d) => (d.draf = true) });
     await renderDproProposal(draf);
     const rd = draf.perekam!;
     pastikan(!slot(rd, "TANDA_TANGAN") && tandaTanganDipakai(draf) === null, "draf: tanda tangan tidak dibubuhkan walau diminta");
@@ -361,7 +366,7 @@ async function main() {
     const polos = masukan("kwitansiSmara", "SMARA", { judul: "KWITANSI", tandaTangan: true, aset: { TANDA_TANGAN: ttdUji() } });
     await renderKwitansiPolos(polos);
     pastikan(slot(polos.perekam!, "TANDA_TANGAN"), "kwitansi polos: tanda tangan dari unggahan kop");
-    const tanpaAset = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", aset: {} });
+    const tanpaAset = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", aset: {} });
     const isiTanpa = await renderDproInvoice(tanpaAset);
     pastikan(pdfSah(isiTanpa) && tanpaAset.perekam!.gambar.length === 0 && ada(tanpaAset.perekam!, "PAYMENT METHOD") && ada(tanpaAset.perekam!, "Hormat kami,") && ada(tanpaAset.perekam!, "INVOICE"), "kop tanpa aset: judul dan label ditulis sebagai teks, PDF tetap jadi");
   }
@@ -464,21 +469,21 @@ async function main() {
 
     // T6: kolom satu baris dirapikan
     const nl = "PT Contoh\n\n\n\nSejahtera";
-    const inv = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", ubah: (d) => (d.kepada.nama = nl) });
+    const inv = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", ubah: (d) => (d.kepada.nama = nl) });
     await renderDproInvoice(inv);
-    const prop = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN", ubah: (d) => ((d.kepada.nama = nl), (d.event.namaEvent = "Fest\n\n\nRaya"), (d.event.tanggalEvent = "1\n\n2 Mei")) });
+    const prop = masukan("proposalDpro", "DPRO", { gayaAngka: "TITIK", judul: "PENAWARAN", ubah: (d) => ((d.kepada.nama = nl), (d.event.namaEvent = "Fest\n\n\nRaya"), (d.event.tanggalEvent = "1\n\n2 Mei")) });
     await renderDproProposal(prop);
     pastikan(ada(inv.perekam!, "PT Contoh Sejahtera") && ada(prop.perekam!, "PT Contoh Sejahtera") && ada(prop.perekam!, ": Fest Raya") && ada(prop.perekam!, ": 1 2 Mei") && inv.perekam!.peringatan.length === 0, "nama pelanggan, event, dan tanggal event berbaris baru dicetak satu baris");
 
     // T8: tinggi gambar label mengikuti orientasi EXIF, sama dengan yang digambar
     const jpeg = jpegBerputar();
-    const ber = masukan("invoiceDpro", "DPRO", { gayaAngka: "KOMA", aset: { ...petaAsetBawaan("DPRO"), LABEL_SALAM: jpeg } });
+    const ber = masukan("invoiceDpro", "DPRO", { gayaAngka: "TITIK", aset: { ...petaAsetBawaan("DPRO"), LABEL_SALAM: jpeg } });
     await renderDproInvoice(ber);
     const gs = ber.perekam!.gambar.find((x) => x.slot === "LABEL_SALAM")!;
     const kk = new KanvasCetak({ judul: "uji", subjek: "uji", penulis: "uji" });
     const hRuang = tinggiGambarSlot(kk, ber, "LABEL_SALAM", gs.w);
     pastikan(Math.abs(gs.h - 4 * gs.w) < 0.01 && hRuang !== null && Math.abs(hRuang - gs.h) < 0.01, `JPEG berorientasi 6: ruang ${hRuang?.toFixed(1)} pt = tinggi tergambar ${gs.h.toFixed(1)} pt (tegak)`);
-    const propJ = masukan("proposalDpro", "DPRO", { gayaAngka: "KOMA", judul: "PENAWARAN", aset: { ...petaAsetBawaan("DPRO"), LABEL_SALAM: jpeg } });
+    const propJ = masukan("proposalDpro", "DPRO", { gayaAngka: "TITIK", judul: "PENAWARAN", aset: { ...petaAsetBawaan("DPRO"), LABEL_SALAM: jpeg } });
     await renderDproProposal(propJ);
     pastikan(propJ.perekam!.gambar.some((x) => x.slot === "LABEL_SALAM") && !ada(propJ.perekam!, "Hormat kami,", 2), "proposal: label salam JPEG digambar sebagai gambar, bukan teks");
   }

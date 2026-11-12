@@ -47,13 +47,14 @@ export const UKURAN_SAH: Record<TataLetakCetak, readonly UkuranKertas[]> = {
   KWITANSI_POLOS: ["A4"],
 };
 
+/** Semua tata letak memakai titik ("Rp 80.483.260") sesuai keputusan P-29; koma tetap bisa dipilih per template. */
 export const GAYA_ANGKA_BAWAAN: Record<TataLetakCetak, GayaAngka> = {
   HKA_STANDAR: "TITIK",
   HKA_BERMEREK: "TITIK",
   HKA_SURAT: "TITIK",
   HKA_MINIMAL: "TITIK",
-  DPRO_INVOICE: "KOMA",
-  DPRO_PROPOSAL: "KOMA",
+  DPRO_INVOICE: "TITIK",
+  DPRO_PROPOSAL: "TITIK",
   KWITANSI_ENTITAS: "TITIK",
   KWITANSI_POLOS: "TITIK",
 };

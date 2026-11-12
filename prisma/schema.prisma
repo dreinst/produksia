@@ -2989,7 +2989,7 @@ enum UkuranKertas {
   A5_LANDSCAPE
 }
 
-/// TITIK = "Rp 1.234.567" (gaya Indonesia, HKA, kwitansi D'Pro). KOMA = "1,234,567" (invoice & proposal Figma D'Pro).
+/// TITIK = "Rp 1.234.567" (gaya Indonesia, bawaan semua tata letak). KOMA = "1,234,567" (gaya Figma D'Pro, hanya bila dipilih di template).
 enum GayaAngka {
   TITIK
   KOMA
@@ -3112,7 +3112,7 @@ model TemplateCetak {
   jenis             JenisDokumenCetak
   tataLetak         TataLetakCetak
   ukuran            UkuranKertas      @default(A4)
-  /// null = bawaan tata letak (DPRO_INVOICE, DPRO_PROPOSAL: KOMA; lainnya: TITIK)
+  /// null = bawaan tata letak (TITIK untuk semua tata letak)
   gayaAngka         GayaAngka?
   /// ≤60; null = judul bawaan jenis. Kalah oleh judulCetak dokumen (D2)
   judul             String?
