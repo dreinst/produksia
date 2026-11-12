@@ -10,8 +10,8 @@ Sistem informasi akuntansi untuk usaha event/wedding organizer: penjualan, pembe
 - **Rekonsiliasi**: **Rekonsiliasi Event (LPJ)** per proyek — pemasukan (proposal ter-acc/pesanan → LPJ faktur & TOP → kas masuk → laba/rugi) dan pengeluaran (pengadaan/pembelian/beban → nota → cash flow → neraca & L/R); **Rekonsiliasi Kas/Bank** dengan **impor mutasi rekening** (CSV/HTML), pencocokan otomatis & manual
 - **Proyek/Event sebagai dimensi transaksi**: penawaran, pesanan penjualan/pembelian, kas, dan jurnal manual bisa diberi event; semua jurnal turunannya bertanda event
 - **Aset Tetap**: Daftar Aset (dengan nilai buku), Penyusutan garis lurus bulanan otomatis + posting jurnal, **Pelepasan aset** (dijual/dihapusbukukan dengan laba-rugi vs nilai buku)
-- **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, lima peran (Superadmin, Pemilik, Admin, Kasir, Gudang; Superadmin & Pemilik setara), kelola pengguna, **hak akses per dokumen** (lihat/buat/hapus tiap jenis dokumen per peran, diatur Superadmin/Pemilik di Pengaturan → Hak Akses)
-- **Bagan akun standar EO/WO**: 117 akun hasil kurasi catatan pemilik (termasuk pendapatan flagship: Tiket 4-1300, Sponsor 4-1400, Tenant & Booth 4-1500), diterapkan satu klik bersama data induk flagship (jasa tiket/paket sponsor/booth, pelanggan "Pelanggan Umum"); akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
+- **Pengguna & hak akses**: masuk dengan nama pengguna + kata sandi, peran Superadmin, Pemilik, Admin, Kasir, Gudang, Kru, Guest, serta tiga peran pemasaran (Pengelola Media Sosial, Pengelola Iklan, Desainer) yang juga bisa ditempelkan sebagai peran tambahan (Superadmin & Pemilik setara), kelola pengguna, **hak akses per dokumen** (lihat/buat/hapus tiap jenis dokumen per peran, diatur Superadmin/Pemilik di Pengaturan → Hak Akses)
+- **Bagan akun standar EO/WO**: 124 akun hasil kurasi catatan pemilik (termasuk pendapatan flagship: Tiket 4-1300, Sponsor 4-1400, Tenant & Booth 4-1500), diterapkan satu klik bersama data induk flagship (jasa tiket/paket sponsor/booth, pelanggan "Pelanggan Umum"); akun kelompok tidak bisa dijurnal, akun kas/bank bertanda
 - **Kebijakan akuntansi** (`KEBIJAKAN-AKUNTANSI.md`): buku besar akrual (wajib pajak) + laporan manajemen basis kas, alur penjualan EO yang dibakukan (kontrak → DP/termin sebagai kewajiban → faktur setelah acara → pelunasan), SOP tiket/sponsor/tenant, diskon, omzet pajak, tanda event
 - **Verifikasi sebelum simpan**: formulir Penawaran, Pesanan Penjualan/Pembelian, Kas Masuk/Keluar, dan Jurnal Umum menampilkan dialog ringkasan isian + peringatan (tanpa event; kas masuk langsung ke akun pendapatan) sebelum tersimpan
 - **Persediaan**: stok per gudang, penyesuaian stok (saldo awal/opname) berjurnal, **pindah barang antar gudang** (stok berpindah, nilai tetap, tanpa jurnal), harga pokok rata-rata bergerak, nilai stok selalu = saldo akun Persediaan
@@ -24,6 +24,28 @@ Sistem informasi akuntansi untuk usaha event/wedding organizer: penjualan, pembe
 - **Multi mata uang**: buku besar tetap Rupiah (mata uang fungsional), dokumen boleh dalam mata uang lain dengan kurs yang disimpan per dokumen, dan ada revaluasi laba/rugi selisih kurs di akhir periode. Detail di `DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md`
 
 Seluruh kode, skema basis data, rute, dan antarmuka memakai bahasa Indonesia (lihat `ARCHITECTURE.md`).
+
+## Fitur hasil peleburan HKA Console
+
+Fitur HKA Console yang belum ada di Produksia dimasukkan tanpa mengubah perilaku lama. Data HKA tidak dimigrasi. Rincian teknisnya di `ARCHITECTURE.md` bagian 6.5 sampai 6.14, perlakuan akuntansinya di `KEBIJAKAN-AKUNTANSI.md` bagian 8d sampai 8i.
+
+Multi perusahaan. Satu basis data memuat enam perusahaan grup D'Pro: DPRO (perusahaan utama dan pemilik semua data lama), Tapussa, SMARA, Bonanova, Sahara, dan Nawasena. Kartu perusahaan di bilah samping memilih lingkup aktif, yaitu satu perusahaan atau gabungan semua perusahaan (Kasir, Kru, dan Guest tidak bisa memilih gabungan). Daftar, laporan, beranda, dan Pajak & SPT mengikuti lingkup. Setiap dokumen dan jurnal milik tepat satu perusahaan; data induk boleh milik satu perusahaan atau dipakai bersama. Pengaturan › Perusahaan mengelola identitas, pajak, rekening, warna, dan arsip tiap perusahaan, ditambah halaman Integritas per perusahaan. Transaksi Antar Perusahaan (Buku Besar, nomor AP) mencatat tagihan dan pelunasan antar perusahaan dengan dua jurnal sekaligus. Tutup buku tetap serentak untuk semua perusahaan, dengan jurnal penutup per perusahaan.
+
+Dokumen penjualan dan nomor cetak. Penawaran, pesanan, faktur, uang muka, dan penerimaan punya halaman detail dan "Ubah tampilan" untuk teks cetak (nama baris, deskripsi, seksi, teks pembuka dan penutup) tanpa menyentuh angka. Baris bisa diberi frekuensi (hari, malam, kali) yang hanya mengalikan nilai uang, faktur bisa diberi management fee, dan penawaran atau pesanan bisa punya rencana termin yang ditagih per butir. Setiap perusahaan punya format nomor cetak sendiri per jenis dokumen (Pengaturan › Dokumen & nomor cetak). Nomor internal (FJ, PSJ, dan seterusnya) tetap dipakai sistem.
+
+Cetak PDF dan kop. Tombol Cetak di halaman detail membuka panel pratinjau PDF dengan pilihan ukuran (A4, A5, A5 mendatar), tata letak (D'Pro, beberapa gaya HKA, kwitansi), tanda tangan dan stempel, lalu unduh atau simpan ke lampiran. Jenis yang dicetak: penawaran, faktur, kwitansi, kwitansi uang muka, tagihan termin, dan laporan keuangan proyek. PDF dibuat di server dengan pdfkit dan font Carlito (`src/aset-cetak`). Kop & Template per perusahaan mengatur gambar kop, kaki, tanda tangan, dan stempel. Dokumen draf selalu bercap DRAF dan tidak pernah bertanda tangan.
+
+CRM. Menu CRM berisi Dasbor, Lead, Pipeline (papan tahap), dan Tindak Lanjut. Lead punya riwayat aktivitas, tindak lanjut dengan pengingat di lonceng, dan bisa dikonversi menjadi pelanggan lalu penawaran. Tahap pipeline dan sumber lead diatur per perusahaan di Pengaturan CRM.
+
+Keuangan proyek. Menu Proyek & Event berisi daftar dan detail proyek; Keuangan Proyek menampilkan anggaran per kategori, realisasi dari jurnal bertanda proyek, pendapatan tanpa PPN, mitra, Talangan Mitra (TLM), Pembayaran ke Mitra (BYM), dan perhitungan bagi hasil. Talangan dan pembayaran mitra melewati persetujuan. Kategori anggaran dan pemetaan akun bebannya diatur di Pengaturan › Kategori Anggaran Proyek. Laporan keuangan proyek bisa dicetak sebagai PDF.
+
+Pemasaran. Konten (kalender, papan, daftar, dengan persetujuan konten), Desain (papan tugas desain, revisi, berkas referensi dan hasil), dan Iklan (kampanye Meta, set iklan, iklan, laporan metrik harian dengan CTR, CPC, CPM, CPR, ROAS). Jenis dan pilar konten diatur di Pengaturan › Daftar Pilihan.
+
+Berkas. Menu Berkas menyimpan berkas di PostgreSQL (paling besar 25 MB per berkas) dalam sepuluh folder bawaan, dengan lampiran di dokumen dan proyek, Sampah, tautan bagi publik `/b/<token>` yang kedaluwarsa (1, 7, atau 30 hari), dan akses per folder atau per proyek (Pengaturan › Akses Berkas).
+
+Kerja tim. Lonceng notifikasi di bilah atas (persetujuan diminta dan hasilnya, penugasan konten dan desain, tindak lanjut jatuh tempo, faktur jatuh tempo). Log Aktivitas kini bermodul dan bisa disaring per modul, pelaku, dan perusahaan. Beranda dibagi tab menurut hak: Keuangan, Tugas Saya, Penjualan & CRM, Pemasaran, Keuangan Proyek, dan Sistem. Pencarian global di bilah atas mencari nomor dokumen (termasuk nomor cetak), rekanan, proyek, lead, konten, tugas desain, kampanye, berkas, dan perusahaan.
+
+Sesudah deploy pertama versi ini, Pemilik wajib menjalankan Pengaturan › Bagan Akun Standar, kartu "Terapkan ke sistem", sekali. Urutan deploy lengkap ada di `DEPLOY.md` bagian 10.
 
 ## Ini SIA sesungguhnya, bukan sekadar software pencatatan jurnal
 
@@ -101,7 +123,7 @@ Bawaan hak tiap peran ada di `src/lib/hakAkses.ts` (`HAK_BAWAAN`); Superadmin/Pe
 
 ## Bagan akun (Event/Wedding Organizer)
 
-Bagan akun standar 117 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
+Bagan akun standar 124 akun (`src/lib/baganAkunStandar.ts`, dokumentasi & keputusan kurasi di `BAGAN-AKUN.md`) diterapkan lewat **Pengaturan → Bagan Akun Standar**. Aturan yang ditegakkan sistem: akun **kelompok** (induk) hanya wadah dan ditolak di semua jurnal; akun bertanda **kas/bank** yang tampil di pilihan Penerimaan/Pembayaran/Kas; Neraca Saldo menampilkan subtotal per kelompok. Tabel Markdown-nya dicetak ulang dengan `npx tsx skrip/cetak-bagan-akun.ts`.
 
 ## Sinkronisasi buku besar
 
@@ -156,7 +178,7 @@ Pengaturan → **Perusahaan & Pajak** menyimpan nama perusahaan, status **PKP**,
 - **Mengurangi stok → `kurangiStok()`** (`src/lib/stok.ts`), yang mengecek ketersediaan; DB juga punya `CHECK ("jumlah" >= 0)`. Baris **JASA** tidak pernah menyentuh stok/HPP (`jenisBarang`). Barang masuk selalu lewat `perbaruiHargaRata` (rata-rata bergerak).
 - **Dokumen yang mengubah uang/stok wajib menjurnal** lewat fungsi di `src/lib/akuntansi.ts` di dalam `$transaction` yang sama, dengan nomor dokumen di keterangan jurnal. Tambahkan pemeriksaan ke `src/lib/sinkron.ts` bila memperkenalkan saldo baru yang harus cocok dengan dokumen.
 - **Label formulir** selalu `htmlFor` + `id` pada isiannya (bisa diklik, ramah pembaca layar).
-- Skrip regresi: 20 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir) — jalankan semua sebelum commit:
+- Skrip regresi: 77 suite di `skrip/uji-*.ts` (+ `uji-sinkron` dijalankan terakhir). Jalankan semua sebelum commit:
   `for s in skrip/uji-*.ts; do npx tsx $s; done`
 - **Tabel** dalam `.kartu.kartu-tabel > .bungkus-tabel`, form `grid-cols-1 md:grid-cols-2`, elemen lebar penuh `md:col-span-2`.
 - Hasil audit lengkap & daftar pekerjaan yang masih terbuka: `AUDIT.md`.
@@ -200,7 +222,7 @@ Label status yang tampil (Draf, Sebagian, Diproses, Lunas, Dikonversi, Dibatalka
 - `src/app/(aplikasi)/pengaturan/pengguna` — kelola akun; `profil` — ganti kata sandi; `tanpa-akses` — halaman 403
 - `src/lib/aksi/*.ts` — logika bisnis per modul (`penjualan`, `pembelian`, `jurnal`, `asetTetap`, `dataInduk`, `pengaturan`, `otentikasi`, `pengguna`)
 - `src/lib/{otentikasi,hakAkses,kataSandi}.ts` — sesi (tabel `Sesi` + cookie `sesi_ac`), matriks hak, hash scrypt
-- `src/lib/baganAkunStandar.ts` (data 117 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
+- `src/lib/baganAkunStandar.ts` (data 124 akun + keputusan kurasi), `src/lib/baganAkun.ts` (terapkan, `pastikanAkunRinci`, `daftarAkunKasBank`), halaman `pengaturan/bagan-akun`
 - `src/lib/akuntansi.ts` (semua aturan posting), `src/lib/sinkron.ts` (pencocokan buku besar ↔ dokumen/stok), `src/lib/aksi/persediaan.ts` + `persediaan/` (stok per gudang, penyesuaian)
 - `src/lib/laporan.ts` (Laba Rugi & Neraca dari jurnal, periode ?dari&sampai), halaman `buku-besar/laba-rugi`, `buku-besar/neraca`; `src/lib/laporanPrive.ts` + `src/lib/aksi/prive.ts` (prive & laporannya)
 - `src/lib/aksi/pengaturan.ts` — pemetaan akun standar (`PemetaanAkun`) dan **pemetaan akun tambahan** (`PemetaanAkunTambahan`: nama peran bebas → akun, dibaca modul lewat `akunPemetaanTambahan(db, kunci)`); halaman `pengaturan/pemetaan-akun` (hak `pemetaan.tulis`, termasuk Admin)
@@ -223,7 +245,7 @@ Panduan lengkap ada di **`DEPLOY.md`** dan folder `deploy/`: VPS kosong (systemd
 
 ## Alur kerja
 
-1. Masuk sebagai Pemilik/Admin, terapkan **Pengaturan → Bagan Akun Standar** (sekaligus mengisi Pemetaan Akun; keduanya wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat). Ganti nama rekening bank 1-1210 sesuai kenyataan.
+1. Masuk sebagai Pemilik/Admin, terapkan **Pengaturan → Bagan Akun Standar** (sekaligus mengisi Pemetaan Akun; keduanya wajib sebelum faktur/penerimaan/pembayaran/retur bisa dibuat). Ganti nama rekening bank 1-1210 sesuai kenyataan. Di basis data yang sudah berjalan sebelum peleburan HKA, jalankan kartu "Terapkan ke sistem" itu sekali lagi sesudah deploy supaya enam akun baru dan kategori anggaran proyek bawaan ada.
 2. Buat **Pelanggan**, **Barang & Jasa**, **Gudang** di Data Induk; stok awal lewat **Persediaan → Penyesuaian Stok** (akun lawan Modal) atau lewat pembelian (Pesanan Pembelian → Terima Barang).
 3. Buat **Penawaran Penjualan** (opsional) → konversi jadi **Pesanan Penjualan**, atau langsung buat Pesanan.
 4. Dari daftar Pesanan, **Kirim** untuk membuat Surat Jalan (stok berkurang; bisa parsial), lalu **Fakturkan**.

@@ -93,7 +93,8 @@ memeriksa.
 Kolom persetujuan (`statusPersetujuan`, `diajukanOleh/Pada`, `disetujuiOleh/Pada`,
 `ditolakOleh/Pada`, `catatanPenolakan`) ditambahkan ke **21 model dokumen transaksi** plus model baru
 `DokumenKas`, jadi datanya lengkap untuk semua jenis dokumen. Yang **alur kerjanya** sudah jalan
-penuh (draf, ajukan, setujui/tolak, jurnal dicatat saat disetujui) ada enam, satu dari tiap siklus:
+penuh (draf, ajukan, setujui/tolak, jurnal dicatat saat disetujui) ada enam dari siklus lama, ditambah
+dua dokumen keuangan proyek hasil peleburan HKA Console:
 
 | Dokumen | Modul | Yang ditahan sampai disetujui |
 |---|---|---|
@@ -103,12 +104,19 @@ penuh (draf, ajukan, setujui/tolak, jurnal dicatat saat disetujui) ada enam, sat
 | Penyesuaian Stok (PS) | Persediaan | jurnal **dan** mutasi stok fisiknya |
 | Aset Tetap (perolehan) | Aset Tetap | jurnal perolehan; aset juga belum ikut penyusutan dan belum bisa dilepas |
 | Penggajian (GJ) | SDM | jurnal beban gaji, potongan, dan kas keluar |
+| Talangan Mitra (TLM) | Keuangan Proyek | jurnal JU-TLM (Dr beban / Cr 2-1700 Hutang Mitra Proyek) |
+| Pembayaran ke Mitra (BYM) | Keuangan Proyek | jurnal JU-BYM; jenis Modal diperiksa ulang terhadap sisa modal mitra saat disetujui |
 
 Jenis dokumen berikut **belum** tersambung dan perilakunya sama persis seperti sebelumnya
 (hak akses `buat` saja, jurnal langsung dicatat, statusnya diisi DISETUJUI supaya datanya jujur):
 Penawaran, Pesanan Penjualan, Uang Muka, Surat Jalan, Penerimaan Penjualan, Retur Penjualan,
 Pesanan Pembelian, Terima Barang, Pembayaran Pembelian, Retur Pembelian, Jurnal Umum manual,
 Pindah Barang, Penyusutan, Pelepasan Aset, Prive, PPh Final Bulanan, Tutup Buku.
+
+Talangan Mitra dan Pembayaran ke Mitra tampil di halaman Persetujuan bersama dokumen lain dan
+mengikuti saklar `wajibPersetujuan` yang sama. Saat saklar mati, keduanya langsung disetujui dan
+dijurnal saat dibuat, dengan pembuat tercatat sebagai penyetuju. Transaksi Antar Perusahaan sengaja
+tidak memakai alur ini; pembatasnya hak `antar-perusahaan.buat`.
 
 Menyambungkannya tinggal menambah satu entri di `BERKAS` pada `src/lib/persetujuan.ts` (cara membaca
 statusnya, menulis statusnya, dan mencatat jurnalnya) lalu memindahkan panggilan jurnal di aksi
@@ -180,8 +188,9 @@ diperbaiki, dan alasannya ikut tersimpan di kolom `catatanPenolakan` dokumen.
 
 Pengaturan › Perusahaan & Pajak punya satu kotak centang, "Wajib persetujuan (maker-checker)", yang
 bawaannya menyala (`PengaturanPerusahaan.wajibPersetujuan`, bawaan kolom `true`). Mematikannya
-membuat keenam jenis dokumen itu kembali ke perilaku lama: dibuat oleh satu orang, jurnalnya langsung
-dicatat, statusnya diisi DISETUJUI dengan pembuatnya sebagai penyetuju.
+membuat kedelapan jenis dokumen di 1.5 kembali ke perilaku lama: dibuat oleh satu orang, jurnalnya
+langsung dicatat, statusnya diisi DISETUJUI dengan pembuatnya sebagai penyetuju. Saklar ini tetap satu
+untuk seluruh grup (dibaca dari pengaturan perusahaan utama), tidak per perusahaan.
 
 Saklar ini ada karena usaha yang stafnya dua orang memang tidak bisa memisahkan tugas, dan ini pola
 yang dipakai ERP lain (mis. Odoo) untuk hal yang sama. Kalimat peringatannya ditulis apa adanya
@@ -226,7 +235,22 @@ Dua pemeriksaan di `skrip/uji-persetujuan.ts` mengunci perilaku ini: saat ada fa
 `periksaSinkron` tetap cocok dan Laporan Piutang belum memuat fakturnya; setelah disetujui, keduanya
 ikut naik dengan nilai yang sama.
 
-### 1.13 Berkas terkait
+### 1.13 Notifikasi persetujuan
+
+Sejak peleburan HKA Console, aksi ajukan, setujui, dan tolak mengirim notifikasi ke lonceng di bilah
+atas (`src/lib/notifikasiPersetujuan.ts`, dipanggil di dalam transaksi persetujuan):
+
+- Saat diajukan, semua pemegang hak `setujui` dokumen itu kecuali pengaju menerima "Persetujuan diminta"
+  yang menaut ke halaman Persetujuan. Superadmin hanya ikut menerima bila tidak ada penerima lain.
+  Peminjaman yang diajukan Gudang hanya diberitahukan ke Pemilik dan Superadmin.
+- Saat disetujui atau ditolak, pengaju menerima hasilnya beserta alasan penolakan, dengan tautan ke
+  dokumennya.
+- Notifikasi ditulis di dalam SAVEPOINT. Bila penulisannya gagal, notifikasi dibatalkan dan dicatat di
+  log server, tetapi persetujuan tetap tersimpan.
+- Faktur penjualan yang lewat jatuh tempo memberi notifikasi "Faktur jatuh tempo" ke pengajunya, sekali
+  per faktur, diperiksa saat lonceng dimuat (paling banyak 50 per pemeriksaan).
+
+### 1.14 Berkas terkait
 
 | Berkas | Isi |
 |---|---|
@@ -306,8 +330,10 @@ Arah jurnalnya:
 | nilai rupiah hutang naik | Dr Selisih Kurs / Cr Hutang Usaha | rugi kurs |
 | nilai rupiah hutang turun | Dr Hutang Usaha / Cr Selisih Kurs | laba kurs |
 
-Satu kali jalan menghasilkan satu jurnal JU-SK yang seimbang, bertanggal tanggal penilaian, dengan
-sumber `SELISIH_KURS`, lalu `kursRevaluasi` tiap faktur yang ikut dinilai diperbarui. Karena kurs
+Satu kali jalan menghasilkan satu jurnal JU-SK yang seimbang per perusahaan yang punya selisih,
+bertanggal tanggal penilaian, dengan sumber `SELISIH_KURS`. Di lingkup satu perusahaan hanya faktur
+perusahaan itu yang dinilai; di lingkup gabungan semua perusahaan dinilai sekaligus, dan laba rugi
+kurs tetap tercatat di buku perusahaan pemilik fakturnya. Sesudah itu lalu `kursRevaluasi` tiap faktur yang ikut dinilai diperbarui. Karena kurs
 yang dibawa disimpan di dokumen, menjalankan penilaian dua kali pada kurs yang sama tidak membuat
 jurnal baru, dan penilaian periode berikutnya hanya mencatat perubahan sejak penilaian terakhir.
 Tidak perlu jurnal pembalik di awal periode. Sifat idempoten ini diuji di `skrip/uji-mata-uang.ts`
@@ -366,6 +392,12 @@ begitu jadi PKP, `kurs` dokumen dan kurs pajak perlu dipisah.
 Skrip di bagian ini **hanya untuk basis data pengembangan lokal**. Skripnya menolak berjalan bila
 `DATABASE_URL` menunjuk host non-lokal, kecuali dipaksa dengan `IZINKAN_NON_LOKAL=1`. Cadangan basis
 data produksi di VPS adalah pekerjaan terpisah yang butuh persetujuan pemilik lebih dulu; lihat 3.6.
+
+Sejak peleburan HKA Console, isi berkas yang diunggah di menu Berkas, lampiran dokumen, PDF yang
+disimpan, dan gambar kop surat tersimpan di PostgreSQL (tabel `IsiBerkas`, paling besar 25 MB per
+berkas). Isi itu ikut setiap `pg_dump`, jadi ukuran cadangan bertambah sebanding total berkas. Halaman
+Berkas menampilkan total terpakai. Tidak ada folder unggahan di disk yang perlu dicadangkan terpisah.
+Ukuran tabelnya bisa dicek dengan `SELECT pg_size_pretty(pg_total_relation_size('"IsiBerkas"'));`.
 
 ### 3.2 Tiga skrip
 
@@ -505,8 +537,8 @@ Alur persetujuan:
 - Belum ada batas nilai persetujuan (misalnya pengeluaran di atas Rp 10 juta harus disetujui Pemilik)
   maupun persetujuan berjenjang. Sekarang satu persetujuan dari siapa pun yang punya hak `setujui`
   sudah cukup.
-- Belum ada pemberitahuan (surel atau pesan) saat dokumen menunggu persetujuan; pemeriksa perlu
-  membuka halaman Persetujuan.
+- Pemberitahuan baru ada di lonceng aplikasi (lihat 1.13). Belum ada surel, WhatsApp, atau
+  pengingat untuk dokumen yang lama menunggu.
 - Tidak ada tenggat otomatis; dokumen bisa menunggu tanpa batas waktu.
 - Mengubah isi dokumen yang ditolak belum bisa dilakukan langsung. Caranya masih seperti aturan lama
   Produksia: hapus lalu buat ulang. Tombol "Ajukan Ulang" berguna bila yang ditolak hanya perlu
@@ -537,6 +569,10 @@ Cadangan:
 ---
 
 ## 5. Riwayat
+
+- 12 Nov 2026: peleburan HKA Console. Talangan Mitra dan Pembayaran ke Mitra tersambung ke alur
+  persetujuan, notifikasi lonceng untuk pengajuan dan hasil persetujuan (1.13), penilaian kurs satu
+  jurnal per perusahaan (2.4), dan isi berkas ikut cadangan basis data (3.1).
 
 - 14 Sep 2026: dokumen pertama, bersama alur persetujuan maker-checker (6 jenis dokumen tersambung
   penuh, kolom data di 21 model + `DokumenKas`), akuntansi multi mata uang (mata uang transaksi, kurs

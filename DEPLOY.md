@@ -6,6 +6,8 @@ Ada dua jalur, pilih sesuai server:
 - **Jalur C, aplikasi di Vercel + basis data di VPS** (PgBouncer TLS di port 6432, bagian 8). Tidak dipakai lagi sejak 9 Oktober 2026.
 - **Jalur B, server yang sudah memakai Docker/Coolify/Traefik** (port 80/443 sudah dipakai proxy): stack `docker-compose.yml` dengan PostgreSQL sendiri di volume, dirutekan Traefik lewat jaringan `coolify` dengan HTTPS otomatis (bagian 7). Server `187.53.129.205` (host Coolify) memakai jalur ini, dan ini yang dipakai sekarang (https://produksia.dpro.events).
 
+Rilis peleburan HKA Console (multi perusahaan, berkas, cetak PDF, CRM, keuangan proyek, pemasaran) punya urutan sendiri: baca bagian 10 sebelum deploy versi itu.
+
 ## Jalur A
 
 Target: satu VPS Ubuntu 24.04 LTS (2 vCPU, 4 GB RAM cukup untuk puluhan pengguna serentak), PostgreSQL di mesin yang sama, Caddy sebagai reverse proxy dengan HTTPS otomatis, aplikasi berjalan sebagai layanan systemd. Semua berkasnya ada di folder `deploy/`.
@@ -178,3 +180,62 @@ Catatan rilis Peminjaman Barang (migrasi `20260918095546_warna_foto_peminjaman`)
 - `next.config.ts` menaikkan `experimental.serverActions.bodySizeLimit` ke `3mb` karena formulir peminjaman mengirim sampai 3 foto HP terkompresi (maks 1 MB per foto). Batas badan permintaan Vercel sekitar 4,5 MB, jadi jangan menaikkannya lebih jauh tanpa mengecilkan batas foto. Di jalur A/B, Caddy dan Traefik bawaan tidak membatasi ukuran badan, jadi tidak ada pengaturan tambahan.
 - Foto disimpan sebagai `Bytes` di PostgreSQL (tidak ada disk di Vercel, tidak ada volume aplikasi di kontainer). Setiap foto terkompresi sekitar 200 KB; perkiraan PRD: sekitar 75 MB sekali untuk foto barang (100 barang × 3 foto) ditambah 10 sampai 15 MB per bulan untuk foto bukti, jadi basis data dan berkas backup akan tumbuh jauh lebih cepat dari sebelumnya. Pantau ukuran dump di log `backup.sh` (baris `backup: ... (ukuran)`) dan ruang di `/data/produksia/app/backup`; bila mulai ratusan MB, kurangi jumlah hari simpan di `backup.sh` atau pindahkan salinan ke `RCLONE_REMOTE`. Ukuran tabel foto bisa dicek dengan `SELECT pg_size_pretty(pg_total_relation_size('"Foto"'));`.
 - Zona waktu: Vercel menjalankan fungsi di UTC dan mengabaikan env `TZ`. Tampilan waktu keluar/kembali memakai `ZONA_WAKTU` (sudah ada di `vercel-env.txt`, bawaan `Asia/Jakarta`), jadi tidak perlu variabel baru. Di jalur A/B `TZ` dan `ZONA_WAKTU` diisi keduanya (`docker-compose.yml`, `.env`), dan nilainya harus sama.
+
+## 10. Rilis peleburan HKA Console
+
+Berlaku untuk rilis pertama cabang `fitur/lebur-hka`. Jalur A dan B sama; perintah migrasi mengikuti jalurnya.
+
+Migrasi baru (aditif, jalan lewat `migrate deploy` biasa):
+
+| Folder | Isi |
+|---|---|
+| `20261109160000_lebur_hka` | enam perusahaan (`utama` = DPRO, pemilik semua data lama; `tapussa`, `smara`, `bonanova`, `sahara`, `nawasena`), kolom perusahaan di dokumen dan data induk, berkas (`FolderBerkas`, `IsiBerkas`), notifikasi, log bermodul, CRM, pemasaran, keuangan proyek, kop surat, format nomor cetak, peran SOSMED, IKLAN, DESAINER |
+| `20261111070000_notifikasi_tautan_aman` | CHECK tautan notifikasi |
+| `20261112090000_konsumsi_surat_jalan` | catatan konsumsi surat jalan per baris faktur |
+| `20261112100000_batas_jumlah_difaktur` | bagi ulang progres faktur data lama (bug B-10), lalu CHECK `0 <= jumlahDifaktur <= jumlah`; berhenti tanpa mengubah apa pun bila datanya tidak bisa dibagi ulang |
+
+### 10.1 Sebelum deploy (baca saja, di basis data produksi)
+
+1. Cadangkan basis data dan pastikan berkas cadangannya ada.
+2. `SHOW default_transaction_isolation;` harus `read committed` (juga lewat PgBouncer).
+3. `SELECT COUNT(*) FROM "PengaturanPerusahaan";` paling banyak 1.
+4. Bentrok kode akun standar baru. Bila ada hasil berjenis lain, putuskan dulu:
+   `SELECT kode, nama, jenis, kelompok FROM "Akun" WHERE kode IN ('1-1750','2-1550','2-1700','5-1500','5-1600','5-1700');`
+5. Nama akun beban yang dipetakan otomatis ke kategori anggaran proyek. Pemetaan bawaan hanya dibuat bila kode, jenis, status rinci, dan nama sama dengan `src/lib/baganAkunStandar.ts`:
+   `SELECT kode, nama, jenis, kelompok FROM "Akun" WHERE kode IN ('5-1500','5-1600','5-1100','5-1300','5-1200','5-2000','5-7000','5-3100','5-3200','5-3300','5-3400','5-3000','5-4000','5-6000','5-1400','5-5000','5-8000','5-8500','5-9000','5-9500') ORDER BY kode;`
+6. Proyek bertanggal terbalik (harus dibetulkan sebelum bisa disimpan ulang):
+   `SELECT kode, nama, "tanggalMulai", "tanggalSelesai" FROM "Proyek" WHERE "tanggalSelesai" < "tanggalMulai";`
+7. Pesanan berbarang ganda yang akan dibagi ulang migrasi `20261112100000` (total per barang tetap):
+   `SELECT p."nomor", bp."barangId", COUNT(*) AS baris, SUM(bp."jumlah") AS dipesan, SUM(bp."jumlahDifaktur") AS difaktur, BOOL_OR(bp."jumlahDifaktur" > bp."jumlah" OR bp."jumlahDifaktur" < 0) AS dibagi_ulang FROM "BarisPesananPenjualan" bp JOIN "PesananPenjualan" p ON p."id" = bp."pesananId" GROUP BY p."nomor", bp."barangId" HAVING COUNT(*) > 1;`
+8. Data yang membuat migrasi itu berhenti. Hasilnya harus kosong; bila tidak, betulkan dulu dengan persetujuan pemilik data:
+   `SELECT 'pesanan' AS tabel, p."nomor", bp."barangId", SUM(bp."jumlahDifaktur") AS difaktur, SUM(bp."jumlah") AS jumlah FROM "BarisPesananPenjualan" bp JOIN "PesananPenjualan" p ON p."id" = bp."pesananId" GROUP BY p."nomor", bp."barangId" HAVING SUM(bp."jumlahDifaktur") < 0 OR SUM(bp."jumlahDifaktur") > SUM(bp."jumlah") UNION ALL SELECT 'surat jalan', s."nomor", bp."barangId", bp."jumlahDifaktur", bp."jumlah" FROM "BarisPengiriman" bp JOIN "PengirimanPesanan" s ON s."id" = bp."pengirimanId" WHERE bp."jumlahDifaktur" < 0 OR bp."jumlahDifaktur" > bp."jumlah";`
+9. Catat kartu Integritas di beranda dan ukuran basis data (`SELECT pg_size_pretty(pg_database_size(current_database()));`) untuk dibandingkan sesudah deploy.
+
+### 10.2 Reverse proxy
+
+- Rute unggah (`/api/berkas`, `/api/cetak/kop/<id>/aset`) memeriksa header Origin terhadap `X-Forwarded-Proto` dan Host. `deploy/Caddyfile` sudah mengirim `header_up X-Forwarded-Proto {scheme}`, dan Traefik mengirimnya secara bawaan. Tanpa header itu, unggah berkas ditolak 403.
+- Batas unggah 25 MB per berkas. Kedua rute itu dikecualikan dari matcher `src/proxy.ts` dan membatasi badan sendiri, jadi `proxyClientMaxBodySize` tidak dipakai; batas aksi server tetap `3mb`. Tambahkan batas di reverse proxy supaya badan raksasa tidak dibaca Node sampai `requestTimeout`, misalnya di Caddy `request_body { max_size 27MB }` di dalam blok situs, atau middleware `buffering` (`maxRequestBodyBytes`) di Traefik.
+- Log akses reverse proxy memuat token tautan bagi `/b/<token>`. Perlakukan log itu sebagai rahasia.
+- Isi berkas tersimpan di PostgreSQL (tabel `IsiBerkas`) dan ikut `pg_dump` harian. Ukuran cadangan bertambah sebanding total berkas; pantau dengan `SELECT pg_size_pretty(pg_total_relation_size('"IsiBerkas"'));` dan sesuaikan retensi di `backup.sh` bila perlu.
+
+### 10.3 Deploy dan pemeriksaan sesudahnya
+
+1. Deploy seperti biasa (bagian 2 atau 7). Migrasi berjalan lebih dulu.
+2. `npx prisma migrate status --config prisma7.config.ts` melaporkan skema terkini.
+3. `SELECT COUNT(*) FROM "Jurnal" WHERE "perusahaanId" <> 'utama';` = 0, `SELECT COUNT(*) FROM "Perusahaan";` = 6, `SELECT COUNT(*) FROM "FolderBerkas";` = 10.
+4. Kartu Integritas sama dengan catatan sebelum deploy. Di Pengaturan › Perusahaan › Integritas, kartu "Catatan konsumsi surat jalan" nol semua.
+
+### 10.4 Langkah sekali sesudah deploy (Pemilik)
+
+1. Pengaturan › Bagan Akun Standar, kartu "Terapkan ke sistem", tekan "Buat N akun" sekali. Langkah ini idempoten, menambah 1-1750, 2-1550, 2-1700, 5-1500, 5-1600, 5-1700 sebagai akun bersama, dan menyiapkan kategori anggaran proyek bawaan. Sebelum langkah ini, Transaksi Antar Perusahaan dan dokumen mitra ditolak dengan pesan yang menunjuk tombol tersebut.
+2. Pengaturan › Kategori Anggaran Proyek: periksa kartu "Perlu diperiksa", petakan manual akun yang sesuai, dan pastikan 5-1500 terpetakan ke Talent / Artis serta 5-1600 ke Venue.
+3. Lengkapi data perusahaan (alamat, NPWP, rekening, email yang dicetak), format nomor cetak di Dokumen & nomor cetak, serta kop dan tanda tangan di Kop & Template.
+4. Pengaturan › Hak Akses: kotak berbingkai kuning menandai hak setujui yang pernah tercabut bug lama; putuskan satu per satu.
+5. Uji singkat: pratinjau dan unduh PDF faktur dan kwitansi, simpan PDF ke lampiran, unggah satu berkas besar di /berkas, buka `/b/<token>` di jendela tanpa sesi, lonceng memuat notifikasi, dan `/cari?q=<nomor cetak faktur>` menemukan fakturnya.
+
+### 10.5 Pemulihan
+
+- Migrasi `20261112100000_batas_jumlah_difaktur` berhenti dengan pesan yang menyebut nomor dokumen: datanya belum berubah. Betulkan datanya (kueri 10.1 no. 8), lalu `npx prisma migrate resolve --rolled-back 20261112100000_batas_jumlah_difaktur --config prisma7.config.ts` dan `migrate deploy` lagi.
+- Migrasi lain gagal, atau versi baru harus ditarik sesudah jalan: pulihkan cadangan 10.1 no. 1 (bagian 3, "Pulihkan dari backup") lalu deploy kode lama. Kode lama tidak mengenal perusahaan lain, berkas, dan dokumen baru, jadi jangan menjalankannya di atas skema baru. Data yang dicatat sesudah deploy ikut hilang.
+- Faktur lama (sebelum migrasi `20261112090000`) dibalik dengan aturan lama bila dihapus. Bila pesanannya punya faktur lain, koreksi lewat retur lebih aman; periksa kartu Barang Terkirim di Integritas sebelum dan sesudahnya.
+

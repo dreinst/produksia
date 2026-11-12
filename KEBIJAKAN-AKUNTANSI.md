@@ -64,6 +64,7 @@ Yang dibakukan:
 - Omzet bruto usaha (dasar PPh Final 0,5%) dibaca dari buku besar: semua akun pendapatan usaha, tidak termasuk kelompok Diskon Penjualan (4-8xxx) dan kelompok Pendapatan Lain-lain (4-9xxx: bunga bank sudah kena pajak final sendiri, laba pelepasan aset bukan penghasilan usaha). Kedua kelompok diatur di Pengaturan → Pemetaan Akun.
 - Pendapatan yang dicatat lewat Kas Masuk atau jurnal umum (tanpa faktur) tetap ikut omzet; halaman Pajak & SPT menampilkannya di kolom "Di luar faktur" agar diperiksa. Bila perusahaan PKP, setiap penyerahan wajib faktur pajak, jadi kolom ini seharusnya nol.
 - PPN keluaran/masukan dan PPh 23 tetap dari dokumen.
+- Setiap perusahaan dalam grup diperlakukan sebagai wajib pajak sendiri. Status PKP, tarif PPN, tarif PPh Final, dan akun pajak dibaca dari pengaturan perusahaan masing-masing. PPh Final bulanan dicatat sekali per perusahaan per periode dari omzet buku besar perusahaan itu saja, dan halaman Pajak & SPT di lingkup satu perusahaan hanya membaca dokumen dan jurnal perusahaan tersebut. Di lingkup gabungan PPh Final tidak bisa dicatat; pilih perusahaannya dulu.
 - Batas omzet UMKM Rp 4,8 miliar per tahun belum dihitung otomatis.
 
 ## 6. Kas masuk langsung ke akun pendapatan
@@ -82,7 +83,7 @@ Formulir Penawaran, Pesanan Penjualan, Pesanan Pembelian, Kas Masuk, Kas Keluar,
 
 Tiga hal berikut diatur di dokumen terpisah, [DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md](DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md):
 
-- Alur persetujuan dokumen (maker-checker). Faktur Penjualan, Faktur Pembelian, Kas Masuk/Keluar, Penyesuaian Stok, Aset Tetap, dan Penggajian dibuat sebagai draf lebih dulu; jurnalnya baru masuk buku besar setelah disetujui pengguna lain, dan pembuat dokumen tidak boleh menyetujui dokumennya sendiri. Saklarnya di Pengaturan → Perusahaan & Pajak, bawaannya menyala.
+- Alur persetujuan dokumen (maker-checker). Faktur Penjualan, Faktur Pembelian, Kas Masuk/Keluar, Penyesuaian Stok, Aset Tetap, Penggajian, Talangan Mitra, dan Pembayaran ke Mitra dibuat sebagai draf lebih dulu; jurnalnya baru masuk buku besar setelah disetujui pengguna lain, dan pembuat dokumen tidak boleh menyetujui dokumennya sendiri. Saklarnya di Pengaturan → Perusahaan & Pajak, bawaannya menyala.
 - Multi mata uang. Rupiah adalah mata uang fungsional (buku besar selalu rupiah); mata uang asing melekat pada dokumen dan saldo piutang/hutangnya, dengan kurs yang disimpan per dokumen dan penilaian kembali akhir periode ke akun 5-8530 Selisih Kurs.
 - Cadangan basis data lokal beserta uji pulihnya (`skrip/cadangkan-basis-data.sh`, `skrip/pulihkan-basis-data.sh`, `skrip/verifikasi-cadangan.sh`).
 
@@ -95,6 +96,76 @@ Barang inventaris yang dibawa kru ke lokasi event dicatat sebagai dokumen Peminj
 - Barang hilang atau rusak total diselesaikan lewat Penyesuaian Stok seperti opname biasa: dokumen PS berjurnal (Cr Persediaan / Dr Selisih Persediaan) dan melewati persetujuan maker-checker. Setelah PS disetujui, Admin menautkannya ke dokumen peminjaman yang berselisih (hak penyesuaian.setujui); status peminjaman menjadi Disesuaikan dan barangnya berhenti dihitung "di luar".
 - Selama selisih belum ditautkan, nilai persediaan di buku sengaja belum turun dan barang itu tetap dihitung di luar. Dokumen peminjaman bukan bukti kerugian; Penyesuaian Stok yang disetujui yang menjadi buktinya. Daftar Riwayat menandai dokumen berstatus Selisih agar tidak terlupa.
 - Peminjaman tidak lewat persetujuan: dokumen langsung sah begitu dicatat, dengan foto bukti saat keluar dan saat kembali. Peran Gudang bisa mencatat dan mengembalikan; menghapus dokumen hanya Admin ke atas, dan dokumen yang sudah ditautkan ke PS tidak bisa dihapus.
+
+## 8d. Perusahaan sebagai dimensi pembukuan
+
+Produksia mencatat enam perusahaan grup D'Pro dalam satu basis data: DPRO (perusahaan utama, pemilik semua data lama), Tapussa, SMARA, Bonanova, Sahara, dan Nawasena. Perusahaan adalah dimensi pembukuan, sama seperti proyek. Satu jurnal selalu milik tepat satu perusahaan.
+
+Jurnal otomatis memakai perusahaan dokumen asalnya: surat jalan, faktur, penerimaan, uang muka, dan retur mengikuti pesanan atau fakturnya; terima barang, faktur pembelian, pembayaran, dan retur pembelian mengikuti pesanan pembeliannya; penyesuaian stok mengikuti dokumen penyesuaian (koreksi stok dari halaman Barang mengikuti pemilik barang); kas masuk dan kas keluar mengikuti dokumen kasnya; penggajian mengikuti perusahaan penggajian; aset, jurnal perolehannya, dan jurnal pelepasannya mengikuti perusahaan aset. Bentuk debit dan kredit setiap jurnal sama dengan sebelum ada multi perusahaan; yang berubah hanya pemiliknya. Karena setiap jurnal seimbang dan milik satu perusahaan, Neraca Saldo, Neraca, dan Arus Kas tiap perusahaan seimbang dengan sendirinya, dan laporan gabungan adalah penjumlahan semua perusahaan.
+
+Dokumen yang memulai rangkaian (penawaran, pesanan penjualan, pesanan pembelian, jurnal umum, kas masuk, kas keluar, dan prive) milik perusahaan yang dipilih di formulir. Bila tidak dipilih, dokumen itu milik perusahaan lingkup aktif; di lingkup gabungan perusahaan wajib dipilih. Dokumen lanjutan selalu mewarisi perusahaan induknya, dan pajak serta termin dokumen lanjutan dibaca dari pengaturan perusahaan induk. Dokumen persediaan (penyesuaian stok, pindah barang, peminjaman, dan laporan kerusakan) milik perusahaan pemilik barangnya, jadi satu dokumen hanya boleh berisi barang milik satu perusahaan.
+
+Akun, gudang, dan jasa boleh dipakai bersama (tanpa pemilik) atau dimiliki satu perusahaan. Barang stok selalu milik satu perusahaan; karyawan dan proyek selalu punya perusahaan. Dokumen dan jurnal ditolak bila memakai akun kas, akun lawan, akun pajak, akun beban gaji, akun laba rugi pelepasan aset, gudang, barang stok, atau proyek milik perusahaan lain. Pajak saat dokumen disetujui (PPN keluaran dan masukan) dibaca dari pengaturan perusahaan dokumen itu. Peminjaman dan laporan kerusakan boleh mencatat proyek perusahaan lain karena keduanya tidak dibukukan; kerugian barang yang dipinjam perusahaan lain diselesaikan dengan penyesuaian di buku pemilik barang lalu transaksi antar perusahaan. Pindah barang tidak memindah kepemilikan, jadi gudang asal dan tujuan wajib bersama atau milik pemilik barang. Barang milik perusahaan yang sudah diarsipkan tidak bisa disesuaikan, dipindah, dipinjamkan, dilaporkan rusak, atau dikoreksi stoknya; aktifkan dulu perusahaannya bila stok itu perlu dicatat.
+
+Pemilik data induk hanya bisa diganti bila tidak mengubah pembukuan yang sudah ada. Akun yang sudah dipakai jurnal perusahaan lain, dipakai pemetaan akun yang berlaku untuk semua perusahaan, dipakai pengaturan pajak perusahaan lain, menjadi akun khusus barang atau karyawan perusahaan lain, atau dipakai dokumen kas perusahaan lain yang belum disetujui tidak bisa diberi pemilik (menjadikannya akun bersama selalu boleh). Barang yang sudah punya stok atau transaksi tidak bisa ganti pemilik, gudang yang masih menyimpan stok atau dipakai dokumen perusahaan lain tidak bisa diberi pemilik, proyek yang sudah punya jurnal atau dokumen perusahaan lain tidak bisa pindah perusahaan, dan karyawan yang sudah masuk penggajian perusahaan lain tidak bisa dipindah. Untuk perusahaan lain, daftarkan data baru.
+
+Penyusutan bulanan dan penilaian kembali kurs dijalankan per lingkup: lingkup satu perusahaan hanya memproses aset atau faktur valas perusahaan itu, lingkup gabungan memproses semua perusahaan. Hasilnya satu jurnal JU-PNY atau JU-SK per perusahaan yang punya nilai, sehingga beban penyusutan dan laba rugi kurs tercatat di perusahaan pemilik aset atau fakturnya. Kurs yang dibawa faktur tetap disimpan per faktur, jadi penilaian ulang di lingkup lain tidak menghitung selisih yang sama dua kali.
+
+## 8e. Tutup buku tahunan untuk banyak perusahaan
+
+Tutup buku berlaku serentak untuk semua perusahaan. Satu tahun ditutup atau dibuka untuk seluruh grup sekaligus, karena tahun buku dan kuncinya bersifat global. Saat tahun ditutup, setiap perusahaan yang punya saldo pendapatan atau beban di tahun itu mendapat jurnal penutup sendiri (JU-TUTUP) bertanggal 31 Desember. Jurnal itu menolkan akun pendapatan dan beban perusahaan tersebut dan memindahkan laba atau ruginya ke Laba Ditahan. Perusahaan tanpa pendapatan dan beban di tahun itu tidak mendapat jurnal penutup. Perusahaan yang pendapatannya sama persis dengan bebannya tetap mendapat jurnal penutup, tetapi tanpa baris Laba Ditahan. Neraca tiap perusahaan sesudah tutup buku tetap seimbang dan laba berjalannya nol.
+
+Akun Laba Ditahan diambil dari Pemetaan Akun yang sama untuk semua perusahaan, jadi akun itu sebaiknya akun bersama. Bila akun Laba Ditahan, atau akun pendapatan atau beban yang bersaldo, dimiliki perusahaan lain, tutup buku ditolak seluruhnya dengan pesan yang menyebut perusahaannya; tidak ada tahun yang ditutup sebagian. Catatan tutup buku menyimpan laba bersih gabungan dan rincian laba serta jurnal penutup per perusahaan. Membuka kembali tahun menghapus semua jurnal penutup tahun itu sekaligus, termasuk jurnal penutup tunggal dari sebelum ada multi perusahaan.
+
+## 8f. Transaksi antar perusahaan dan laporan gabungan
+
+Transaksi antar perusahaan dalam grup dicatat lewat satu dokumen Transaksi Antar Perusahaan (nomor AP) di Buku Besar. Dokumen ini langsung membuat dua jurnal JU-AP bersumber `ANTAR_PERUSAHAAN`, satu di buku pemberi dan satu di buku penerima, keduanya bertanggal pukul 12.00 hari transaksi.
+
+- Jenis Tagih: pemberi membayarkan atau menanggung biaya untuk penerima. Pemberi mendebit Piutang Antar Perusahaan (1-1750) dan mengkredit akun lawannya, misalnya kas pemberi. Penerima mendebit akun lawannya (beban, aset, atau hutang usaha) dan mengkredit Hutang Antar Perusahaan (2-1550).
+- Jenis Lunas: penerima melunasi hutangnya. Pemberi mendebit kasnya dan mengkredit Piutang Antar Perusahaan; penerima mendebit Hutang Antar Perusahaan dan mengkredit kasnya.
+
+Kedua jurnal bernilai sama dan masing-masing seimbang, jadi neraca setiap perusahaan tetap seimbang. Akun 1-1750 dan 2-1550 adalah akun bersama yang ditambahkan Bagan Akun Standar; selama keduanya belum ada (atau pemetaan tambahannya belum diatur), transaksi ditolak sampai bagan standar diterapkan. Pengguna hanya memilih akun lawan, yang harus akun rinci milik perusahaan pihaknya atau akun bersama, dan bukan akun antar perusahaan itu sendiri.
+
+Dokumen ini tidak melewati maker-checker; pembatasnya hak Transaksi Antar Perusahaan (bawaan Pemilik, Superadmin, dan Admin). Koreksi dilakukan dengan menghapus dokumen, yang membuang kedua jurnal sekaligus dan tercatat di log, lalu mencatat ulang. Jurnal salah satu sisi tidak bisa dihapus lewat menu jurnal, dan tahun buku yang sudah ditutup tidak bisa menerima atau kehilangan jurnal AP. Jual beli barang stok antar perusahaan tidak memakai dokumen ini; pakai faktur penjualan di perusahaan penjual dan faktur pembelian di perusahaan pembeli. Event yang melibatkan dua perusahaan dicatat sebagai dua proyek terpisah ditambah transaksi antar perusahaan.
+
+Laporan gabungan menjumlahkan semua perusahaan tanpa eliminasi. Piutang dan hutang antar perusahaan tampil sebagai aset dan kewajiban, dan catatan di bawah laporan gabungan menunjukkan selisih keduanya, yang bernilai nol bila semua transaksi antar perusahaan dicatat lewat dokumen ini. Laporan gabungan dipakai untuk melihat grup secara utuh, bukan sebagai laporan konsolidasi resmi.
+
+## 8g. Management fee, frekuensi, dan nomor cetak faktur
+
+Management fee di faktur penjualan adalah bagian dari harga jual jasa. Fee masuk dasar pengenaan pajak (DPP) faktur, sehingga total faktur = jumlah nilai baris dikurangi diskon ditambah fee ditambah PPN. Saat jurnal faktur dicatat (langsung atau saat disetujui), fee dikredit ke akun pendapatan fee: akun dari pemetaan tambahan "Pendapatan Fee Manajemen" (kunci `pendapatan-fee-manajemen`), atau akun Pendapatan Penjualan bila pemetaan itu belum diatur. Akun fee wajib akun rinci berjenis Pendapatan dan tidak boleh berada di kelompok Diskon Penjualan atau Pendapatan Lain-lain, sehingga fee selalu ikut omzet bruto PPh Final. Pada faktur parsial, fee nominal dibagi prorata dan faktur terakhir menutup sisanya. Retur atas faktur ber-fee membalik bagian fee secara prorata nilai baris yang diretur. Faktur tanpa fee dijurnal persis seperti sebelumnya.
+
+Frekuensi (hari, malam, kali) pada baris penjualan mode event hanya mengalikan nilai uang: nilai baris = jumlah × frekuensi × harga, dibulatkan sekali ke dua desimal. Frekuensi tidak pernah mengalikan kuantitas stok, surat jalan, harga pokok, atau HPP: sewa satu unit sound selama tiga hari tetap mengeluarkan satu unit dari gudang.
+
+Di laporan basis kas, kas dari pelanggan dialokasikan ke akun pendapatan menurut bobot dokumennya. Bila dokumen punya fee, bobot baris dikurangi diskon secara prorata dan fee menjadi bobot tersendiri di akun fee. Bila pemetaan fee menunjuk akun yang bukan akun rinci Pendapatan, bagian fee masuk akun Pendapatan Penjualan supaya kas uang muka tidak hilang dari laporan.
+
+Nomor cetak faktur (nomor tampil per perusahaan, diatur di Pengaturan, Dokumen & nomor cetak) diberikan saat jurnal faktur dicatat, yaitu saat disetujui bila alur persetujuan menyala. Draf yang ditolak atau dihapus tidak memakan nomor, dan nomor manual yang sudah diisi tidak ditimpa. Perusahaan tanpa format nomor faktur aktif tidak memberi nomor cetak. Faktur yang sudah disetujui lalu dihapus meninggalkan nomornya tidak terpakai, jadi deret bisa berlubang, dan urutan nomor dalam satu periode reset mengikuti urutan persetujuan, bukan urutan tanggal faktur. Dua persetujuan serentak atas faktur yang sama hanya menghasilkan satu jurnal dan satu nomor. Nomor internal (FJ, PSJ, dan seterusnya) tetap dipakai sebagai kunci dan tidak berubah.
+
+## 8h. Konsumsi surat jalan oleh faktur
+
+Surat jalan memindahkan nilai barang dari Persediaan ke Barang Terkirim Belum Ditagih (1-1650) sebesar harga pokok rata-rata saat barang keluar. Saat faktur penjualan dibuat, setiap baris faktur barang mengambil baris surat jalan yang belum difaktur, lebih dulu milik baris pesanannya sendiri urut tanggal surat jalan, lalu (hanya untuk data lama) surat jalan berbarang sama dari baris pesanan yang sudah penuh ditagih. Nilai yang diambil diakui sebagai HPP faktur dan dicatat per baris surat jalan di catatan konsumsi. Bila faktur dihapus, yang dikembalikan tepat baris surat jalan dan jumlah di catatan itu, sehingga HPP yang dibalik selalu sama dengan HPP yang dulu diakui dan saldo Barang Terkirim tetap sama dengan nilai surat jalan yang belum difaktur.
+
+Faktur yang dibuat sebelum catatan konsumsi ada dibalik dengan aturan lama (surat jalan terbaru dulu per barang), dibatasi nilai transit baris fakturnya. Untuk faktur seperti itu, koreksi lewat retur lebih aman daripada hapus bila pesanannya punya faktur lain. Surat jalan yang sudah dikonsumsi faktur tidak bisa dihapus sebelum fakturnya dihapus. Faktur atas satu pesanan diproses bergiliran, dan faktur yang diskon atau management fee prorata-nya berubah karena faktur lain selesai lebih dulu ditolak untuk disimpan ulang. Progres faktur baris pesanan dan baris surat jalan dijaga basis data agar selalu di antara nol dan jumlah barisnya. Halaman Integritas menampilkan kartu "Catatan konsumsi surat jalan" yang harus nol semua.
+
+## 8i. Keuangan proyek: anggaran, talangan mitra, dan bagi hasil
+
+Anggaran proyek adalah rencana biaya per kategori dan tidak menjurnal. Realisasinya dibaca dari jurnal bertanda proyek, sama dengan LPJ, lalu dikelompokkan lewat pemetaan akun beban ke kategori (Pengaturan, Kategori Anggaran Proyek). Pendapatan di halaman keuangan proyek selalu tanpa PPN dan hanya dari faktur yang sudah disetujui.
+
+- Biaya proyek yang dibayar mitra dengan uangnya sendiri dicatat sebagai Talangan Mitra (TLM): Dr akun beban / Cr 2-1700 Hutang Mitra Proyek, pada tanggal biaya itu (jurnal JU-TLM).
+- Pengembalian modal ke mitra dicatat sebagai Pembayaran ke Mitra jenis Modal (BYM): Dr 2-1700 Hutang Mitra Proyek / Cr Kas/Bank, tanpa menyentuh laba rugi (jurnal JU-BYM).
+- Bagi laba ke mitra dicatat sebagai Pembayaran ke Mitra jenis Laba: Dr 5-1700 Bagi Hasil Mitra Proyek / Cr Kas/Bank, dan diakui sebagai beban saat dibayar. Hak yang belum dibayar pada akhir periode tidak dicatat sebagai kewajiban.
+- Kedua jurnal bersumber `MITRA_PROYEK`, selalu milik perusahaan proyeknya, dan akun kas atau beban yang dipakai harus milik perusahaan itu atau akun bersama. Dokumen yang perusahaannya berbeda dari proyeknya ditolak saat dijurnal, dan proyek milik perusahaan yang diarsipkan tidak menerima dokumen mitra baru.
+- Talangan Mitra dan Pembayaran ke Mitra ikut alur persetujuan seperti Kas Keluar. Bila alur persetujuan dimatikan, keduanya langsung disetujui dan dijurnal saat dibuat, dengan pembuat tercatat sebagai penyetuju.
+- Pengambilan uang oleh pemilik perusahaan tetap dicatat lewat Prive.
+
+Perhitungan bagi hasil memakai angka proyek tanpa PPN. Uang diterima adalah bagian DPP dari faktur yang sudah disetujui dan dibayar, ditambah uang muka yang belum dipakai faktur disetujui. Biaya aktual adalah beban pada jurnal bertanda proyek, di luar jurnal penutup dan di luar akun 5-1700, supaya pembayaran bagi hasil tidak mengubah haknya sendiri. Margin kas = uang diterima dikurangi biaya aktual.
+
+1. Modal kembali lebih dulu. Modal mitra adalah talangannya yang sudah disetujui; modal perusahaan adalah biaya aktual dikurangi seluruh talangan mitra. Bila uang diterima belum menutup biaya aktual, setiap pemodal mendapat modalnya kembali dengan rasio yang sama (uang diterima dibagi biaya aktual) dan belum ada laba yang dibagi.
+2. Laba dibagi dari margin kas yang positif. Bagian nominal tetap dibayar lebih dulu sesuai urutan mitra dan dibatasi sisa margin, jadi mitra di urutan bawah bisa menerima kurang. Mitra persen mendapat persennya dari sisa sesudah semua nominal tetap. Sisanya bagian perusahaan. Rugi tidak dibagi.
+3. Hak mitra = modal kembali + bagian laba. Terutang = hak dikurangi pengembalian modal dan bagi laba yang sudah disetujui. Status pembayaran memakai toleransi Rp 0,50: Lebih bayar, Lunas, Sebagian dibayar, Perlu dibayar, atau Belum ada hak.
+
+Pengembalian modal tidak boleh melebihi sisa modal mitra (talangan disetujui dikurangi pengembalian modal). Saat dibuat, pengembalian yang masih draf atau menunggu ikut dihitung; saat disetujui, diperiksa ulang terhadap dokumen yang sudah disetujui. Kelebihan bayar ke mitra dicatat sebagai bagi laba. Talangan yang sudah dikembalikan sebagai modal hanya bisa dihapus sesudah pengembalian modalnya dihapus. Bagi hasil dibayar penuh tanpa potongan PPh.
+
+Halaman Integritas memeriksa saldo akun Hutang Mitra Proyek terhadap talangan disetujui dikurangi pengembalian modal disetujui. Akun 2-1700 sebaiknya khusus untuk modul ini, karena jurnal umum atau kas langsung ke akun itu akan tampil sebagai selisih.
 
 ## 9. Yang sengaja belum dibuat
 
@@ -114,6 +185,8 @@ Barang inventaris yang dibawa kru ke lokasi event dicatat sebagai dokumen Peminj
 - Praktik pembayaran EO/WO Indonesia (DP 20 sampai 50 persen, termin, pelunasan H-7/H-14).
 
 ## Riwayat
+
+- 12 Nov 2026: peleburan HKA Console ke Produksia (berlaku saat cabang `fitur/lebur-hka` dirilis). Perusahaan sebagai dimensi pembukuan: jurnal wajib punya perusahaan dan memakai perusahaan dokumen, rujukan milik perusahaan lain ditolak, pajak dan PPh Final per perusahaan, penyusutan dan penilaian kurs satu jurnal per perusahaan, pemilik data induk hanya bisa diganti bila aman (bagian 5 dan 8d). Tutup buku serentak dengan jurnal penutup per perusahaan (8e). Transaksi antar perusahaan dengan dua jurnal JU-AP dan laporan gabungan tanpa eliminasi (8f). Management fee masuk DPP dan dikredit ke akun fee, frekuensi hanya mengalikan nilai uang, bobot basis kas memuat fee, nomor cetak faktur saat posting (8g). Catatan konsumsi surat jalan dan batas progres faktur (8h). Keuangan proyek: anggaran per kategori, Talangan Mitra, Pembayaran ke Mitra, dan perhitungan bagi hasil (8i). Enam akun standar baru: 1-1750, 2-1550, 2-1700, 5-1500, 5-1600, 5-1700.
 
 - 18 Sep 2026: peminjaman barang (loading out / loading in) sebagai custody tanpa jurnal; kehilangan diselesaikan lewat Penyesuaian Stok yang ditautkan (bagian 8c).
 - 14 Sep 2026: persetujuan dokumen (maker-checker), multi mata uang, dan cadangan basis data terverifikasi; rinciannya di DOKUMENTASI-PERSETUJUAN-KURS-BACKUP.md.

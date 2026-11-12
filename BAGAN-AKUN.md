@@ -11,6 +11,8 @@ Kurasi dari `coa-draft-eo-wo.md` (catatan tangan, 10 September 2026). Sumber dat
 3. **Akun kelompok tidak bisa dijurnal** — jurnal umum, kas masuk/keluar, jurnal otomatis penjualan/pembelian/persediaan/aset, penyusutan, dan pemetaan akun menolaknya dengan pesan jelas. Pilihan akun di formulir hanya menampilkan akun rinci; pilihan Kas/Bank hanya akun bertanda kas/bank.
 4. **Neraca Saldo** menampilkan subtotal per kelompok (baris tebal); total bawah hanya menjumlahkan akun rinci.
 5. Akun per barang/jasa (Data Induk → Barang & Jasa): pendapatan, persediaan, HPP, dan beban (untuk jasa yang dibeli) bisa diarahkan ke akun tertentu; kosong = memakai pemetaan.
+6. Akun standar dibuat sebagai akun bersama, jadi bisa dipakai keenam perusahaan grup. Akun milik satu perusahaan (misalnya rekening bank perusahaan itu) dibuat lewat Data Induk → Bagan Akun dengan isian Perusahaan; jurnal perusahaan lain yang memakainya ditolak. Lihat `KEBIJAKAN-AKUNTANSI.md` bagian 8d.
+7. Basis data yang sudah berjalan sebelum peleburan HKA belum punya enam akun baru (1-1750, 2-1550, 2-1700, 5-1500, 5-1600, 5-1700). Sesudah deploy, Pemilik membuka kartu **Terapkan ke sistem** di halaman ini dan menekan tombol **Buat 6 akun** sekali (angkanya mengikuti jumlah akun yang belum ada). Langkah itu juga menyiapkan kategori anggaran proyek bawaan beserta pemetaan akun bebannya. Sebelum itu, Transaksi Antar Perusahaan dan dokumen mitra ditolak dengan pesan yang menunjuk langkah ini.
 
 ## Penomoran
 
@@ -37,6 +39,12 @@ Format standar `X-YZWW` (umum dipakai software akuntansi komersial): `X` jenis (
 | Uang muka pelanggan (DP) | `2-1200` — dicatat lewat Kas Masuk (Kas/Bank ↔ 2-1200); belum ada fitur DP pada pesanan |
 | PPN Keluaran (Faktur Penjualan bila PKP) / PPN Masukan (Faktur Pembelian) | `2-1330` / `1-1800` — diatur di Pengaturan → Perusahaan & Pajak |
 | PPh 23 dipotong klien (Penerimaan) / PPh 23 kita potong dari vendor (Pembayaran) | `1-1900` / `2-1320` |
+| Transaksi Antar Perusahaan (dokumen AP, jurnal JU-AP): piutang di buku pemberi, hutang di buku penerima | `1-1750` / `2-1550` (akun bersama; bisa diganti lewat pemetaan tambahan) |
+| Talangan Mitra (JU-TLM: Dr beban / Cr hutang mitra) dan Pembayaran ke Mitra jenis Modal (JU-BYM: Dr hutang mitra / Cr kas) | `2-1700` |
+| Pembayaran ke Mitra jenis Laba (JU-BYM: Dr bagi hasil / Cr kas); tidak dihitung sebagai biaya aktual proyek | `5-1700` |
+| Akun beban bawaan kategori anggaran proyek Talent / Artis dan Venue | `5-1500` / `5-1600` |
+| Pendapatan management fee faktur penjualan | pemetaan tambahan "Pendapatan Fee Manajemen"; tanpa pemetaan masuk akun Pendapatan Penjualan |
+| Selisih kurs (penilaian kembali piutang dan hutang mata uang asing, satu jurnal JU-SK per perusahaan) | `5-8530` |
 
 ## Alur rekonsiliasi (bagian 6 catatan) → modul
 
