@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibMasuk } from "@/lib/otentikasi";
@@ -30,6 +31,8 @@ type Baris = {
   diajukanOleh: string | null;
   catatanPenolakan: string | null;
   perusahaan: { kode: string; nama: string; warna: string | null };
+  /** halaman dokumen bila ada (dokumen mitra proyek, D5 §7.1) */
+  href?: string;
 };
 
 const BELUM_SELESAI = { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] satisfies StatusPersetujuan[] } };
@@ -54,6 +57,12 @@ async function hitungMenungguLain(lp: string, bolehLihat: (kode: string) => bool
     bolehLihat("aset") ? db.asetTetap.count({ where }) : nol,
     bolehLihat("penggajian") ? db.penggajian.count({ where }) : nol,
   ]);
+  // dokumen mitra proyek (D5 §8 no. 15, P37): hitungan kedua supaya tuple lama tidak berubah
+  const mitra = await Promise.all([
+    bolehLihat("talangan-mitra") ? db.talanganMitra.count({ where }) : nol,
+    bolehLihat("pembayaran-mitra") ? db.pembayaranMitra.count({ where }) : nol,
+  ]);
+  hitungan.push(...mitra);
   return hitungan.reduce((a, b) => a + b, 0);
 }
 
@@ -79,6 +88,11 @@ export default async function HalamanPersetujuan() {
     db.laporanKerusakanBarang.findMany({ where, include: { ...PERUSAHAAN, gudang: true, baris: true, diajukanOleh: true }, orderBy: { waktuLapor: "desc" } }),
     db.asetTetap.findMany({ where, include: { ...PERUSAHAAN, diajukanOleh: true }, orderBy: { tanggalPerolehan: "desc" } }),
     db.penggajian.findMany({ where, include: { ...PERUSAHAAN, baris: true, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
+  ]);
+  // Promise.all kedua untuk dokumen mitra proyek (D5 §8 no. 15), supaya tuple sembilan elemen lama tidak berubah
+  const [talangan, bayarMitra] = await Promise.all([
+    db.talanganMitra.findMany({ where, include: { ...PERUSAHAAN, mitra: { select: { nama: true } }, proyek: { select: { kode: true } }, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
+    db.pembayaranMitra.findMany({ where, include: { ...PERUSAHAAN, mitra: { select: { nama: true } }, proyek: { select: { kode: true } }, diajukanOleh: true }, orderBy: { tanggal: "desc" } }),
   ]);
 
   const daftar: Baris[] = [
@@ -123,6 +137,18 @@ export default async function HalamanPersetujuan() {
       jenis: "penggajian" as const, kode: "penggajian", label: "Penggajian", id: g.id, nomor: g.nomor, tanggal: g.tanggal,
       keterangan: `Periode ${g.bulan}, ${g.baris.length} karyawan`, nilai: Number(g.totalDibayar), status: g.statusPersetujuan,
       diajukanOlehId: g.diajukanOlehId, diajukanOleh: nama(g.diajukanOleh), catatanPenolakan: g.catatanPenolakan, perusahaan: g.perusahaan,
+    })),
+    ...talangan.map((t) => ({
+      jenis: "talanganMitra" as const, kode: "talangan-mitra", label: "Talangan Mitra", id: t.id, nomor: t.nomor, tanggal: t.tanggal,
+      keterangan: `${t.mitra.nama} · ${t.proyek.kode} · ${t.deskripsi}`, nilai: Number(t.jumlah), status: t.statusPersetujuan,
+      diajukanOlehId: t.diajukanOlehId, diajukanOleh: nama(t.diajukanOleh), catatanPenolakan: t.catatanPenolakan, perusahaan: t.perusahaan,
+      href: `/proyek/${t.proyekId}/keuangan/talangan/${t.id}`,
+    })),
+    ...bayarMitra.map((b) => ({
+      jenis: "pembayaranMitra" as const, kode: "pembayaran-mitra", label: "Pembayaran ke Mitra", id: b.id, nomor: b.nomor, tanggal: b.tanggal,
+      keterangan: `${b.mitra.nama} · ${b.proyek.kode} · ${b.jenis === "MODAL" ? "Pengembalian modal" : "Bagi laba"}`, nilai: Number(b.jumlah), status: b.statusPersetujuan,
+      diajukanOlehId: b.diajukanOlehId, diajukanOleh: nama(b.diajukanOleh), catatanPenolakan: b.catatanPenolakan, perusahaan: b.perusahaan,
+      href: `/proyek/${b.proyekId}/keuangan/bayar/${b.id}`,
     })),
   ]
     .filter((b) => bolehLihat(b.kode))
@@ -170,7 +196,13 @@ export default async function HalamanPersetujuan() {
               {daftar.map((b) => (
                 <tr key={`${b.jenis}-${b.id}`}>
                   <td>
-                    <NomorDokumen nomor={b.nomor} />
+                    {b.href ? (
+                      <Link href={b.href} className="hover:underline">
+                        <NomorDokumen nomor={b.nomor} />
+                      </Link>
+                    ) : (
+                      <NomorDokumen nomor={b.nomor} />
+                    )}
                   </td>
                   {!lp && (
                     <td>

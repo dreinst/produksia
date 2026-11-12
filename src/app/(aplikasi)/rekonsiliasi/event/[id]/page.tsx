@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
+import { punyaHak } from "@/lib/hakAkses";
 import { ringkasanProyek } from "@/lib/proyek";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { LencanaStatus, NomorDokumen } from "@/komponen/ui/Lencana";
@@ -40,7 +41,7 @@ function Langkah({ nomor, judul, keterangan, children }: { nomor: string; judul:
 }
 
 export default async function HalamanLpjEvent({ params }: { params: Promise<{ id: string }> }) {
-  await wajibHak("rekonsiliasi.lihat");
+  const pengguna = await wajibHak("rekonsiliasi.lihat");
   const { id } = await params;
   const r = await ringkasanProyek(db, id);
   if (!r) notFound();
@@ -70,6 +71,7 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
         }
         aksi={
           <span className="flex items-center gap-2">
+            {punyaHak(pengguna, "anggaran-proyek.lihat") && <Link href={`/proyek/${p.id}/keuangan`} className="tombol tombol-garis">Keuangan proyek</Link>}
             <Link href={`/buku-besar/laba-rugi?proyek=${p.id}&dari=2000-01-01&sampai=${hariIniIso()}`} className="tombol tombol-garis">Laba Rugi event</Link>
             <Link href={`/data-induk/proyek/${p.id}`} className="tombol tombol-garis">Ubah data event</Link>
           </span>

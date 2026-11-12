@@ -19,7 +19,7 @@ import { harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
  *     (bukan utama), bertanda proyek, Dr beban / Cr 2-1700; posting ulang, perusahaan dokumen beda dari proyek, mitra
  *     proyek lain, dan akun Bagi Hasil sebagai beban talangan ditolak.
  *  3. Alur persetujuan lewat aksi bersama: ajukan (notifikasi ke pemegang talangan-mitra.setujui, bukan pengaju),
- *     setujui (jurnal, notifikasi hasil tanpa tautan karena halaman dokumen belum ada), tolak.
+ *     setujui (jurnal, notifikasi hasil bertautan halaman dokumen P37), tolak.
  *  4. Pembayaran MODAL sampai sisa modal, sisa yang dipesan draf, MODAL melebihi sisa ditolak saat disetujui (P-56),
  *     LABA ke 5-1700, hak setujui pembayaran (ADMIN ditolak).
  *  5. hutangMitra sinkron per perusahaan dan gabungan; jurnal manual ke akun hutang mitra membuat selisih (digulung
@@ -118,7 +118,7 @@ async function main() {
     console.log("=== 1. Struktur dan data seed ===");
     pastikan(BERKAS.talanganMitra.label === "Talangan Mitra" && BERKAS.talanganMitra.kode === "talangan-mitra", "BERKAS talanganMitra: label dan kode hak");
     pastikan(BERKAS.pembayaranMitra.label === "Pembayaran ke Mitra" && BERKAS.pembayaranMitra.kode === "pembayaran-mitra", "BERKAS pembayaranMitra: label dan kode hak");
-    pastikan(tautanDokumenPersetujuan("talanganMitra", "talangan-mitra") === null && tautanDokumenPersetujuan("pembayaranMitra", "pembayaran-mitra") === null, "tautan dokumen mitra null selama halamannya belum ada");
+    pastikan(tautanDokumenPersetujuan("talanganMitra", "talangan-mitra") === null && tautanDokumenPersetujuan("pembayaranMitra", "pembayaran-mitra") === null, "dokumen mitra tanpa tautan daftar statis (tautannya per dokumen, P37)");
     pastikan(sinkronAwal.seimbang && sinkronAwal.hutangMitra.sinkron && sinkronAwal.hutangMitra.bukuBesar.isZero() && sinkronAwal.hutangMitra.dokumen.isZero(), `periksaSinkron awal seimbang, hutangMitra nol dan cocok (${sinkronAwal.hutangMitra.bukuBesar} / ${sinkronAwal.hutangMitra.dokumen})`);
     const lamaCocok = (["persediaan", "piutang", "hutang", "barangBelumDitagih", "barangTerkirim", "uangMuka"] as const).every((k) => sinkronAwal[k].sinkron);
     pastikan(lamaCocok, "butir sinkron lama tetap cocok");
@@ -174,7 +174,7 @@ async function main() {
     const j2 = await jurnalDok(t2b.jurnalId);
     pastikan(t2b.statusPersetujuan === "DISETUJUI" && t2b.disetujuiOlehId === owner.id && j2?.perusahaanId === P && sama(j2.baris[0].debit, 500_000), "talangan disetujui: jurnal milik perusahaan proyek");
     const [nHasil] = await notif(admin.id, `Talangan Mitra ${t2.nomor} disetujui`);
-    pastikan(nHasil?.jenis === "HASIL_PERSETUJUAN" && nHasil.tautan === null && nHasil.isi === `Disetujui oleh ${owner.nama}`, "pengaju mendapat hasil persetujuan tanpa tautan");
+    pastikan(nHasil?.jenis === "HASIL_PERSETUJUAN" && nHasil.tautan === `/proyek/${proyek.id}/keuangan/talangan/${t2.id}` && nHasil.isi === `Disetujui oleh ${owner.nama}`, `pengaju mendapat hasil persetujuan bertautan halaman talangan (P37) (${nHasil?.tautan})`);
     const logSetuju = await db.logAktivitas.findFirst({ where: { nomor: t2.nomor, aksi: "SETUJUI" } });
     pastikan(logSetuju?.keterangan?.includes(`Mitra Uji A, 500.000, proyek ${proyek.kode}`), `log setujui memuat ringkasan (${logSetuju?.keterangan})`);
     const t3 = await talangan(70_000);

@@ -18,7 +18,7 @@ import TitikWarnaProyek from "@/komponen/proyek/TitikWarnaProyek";
 /*
  * Proyek & Event (D5 §7.2): daftar proyek dalam lingkup perusahaan beserta jumlah pekerjaan per modul yang boleh
  * dilihat pengguna, tanpa angka keuangan. Saringan status bawaan menyembunyikan proyek diarsipkan. Tautan Keuangan
- * dipasang paket halaman keuangan proyek bersama rutenya.
+ * (halaman keuangan proyek, P37) hanya untuk pemegang anggaran-proyek.lihat.
  */
 
 /** Nilai saringan status: kosong = semua kecuali diarsipkan, "semua" = semua status, selain itu satu status. */
@@ -50,6 +50,8 @@ export default async function HalamanProyek({ searchParams }: { searchParams: Pr
   const penghitung = penghitungTerlihat((h) => boleh(h));
   const adaSaringan = !!param.q || status !== "";
   const lihatLpj = boleh("rekonsiliasi.lihat");
+  const lihatKeuangan = boleh("anggaran-proyek.lihat");
+  const bolehProyekBaru = boleh(hakDataInduk("proyek").tulis) && boleh(hakDataInduk("proyek").lihat);
   const kolom = 3 + (gabungan ? 1 : 0) + penghitung.length + 1;
 
   return (
@@ -59,11 +61,21 @@ export default async function HalamanProyek({ searchParams }: { searchParams: Pr
         judul="Proyek & Event"
         subjudul="Semua proyek beserta jumlah pekerjaan per modul. Proyek yang diarsipkan disembunyikan kecuali dipilih di filter status."
         aksi={
-          boleh(hakDataInduk("proyek").tulis) && boleh(hakDataInduk("proyek").lihat) ? (
-            <Link href="/data-induk/proyek" className="tombol tombol-utama">
-              <Ikon nama="add" className="!text-[18px]" />
-              Proyek baru
-            </Link>
+          bolehProyekBaru || lihatKeuangan ? (
+            <>
+              {lihatKeuangan && (
+                <Link href="/proyek/keuangan" className="tombol tombol-garis">
+                  <Ikon nama="savings" className="!text-[18px]" />
+                  Keuangan proyek
+                </Link>
+              )}
+              {bolehProyekBaru && (
+                <Link href="/data-induk/proyek" className="tombol tombol-utama">
+                  <Ikon nama="add" className="!text-[18px]" />
+                  Proyek baru
+                </Link>
+              )}
+            </>
           ) : undefined
         }
       />
@@ -165,6 +177,11 @@ export default async function HalamanProyek({ searchParams }: { searchParams: Pr
                         <Link href={`/proyek/${p.id}`} className="tombol-tautan">
                           Ringkasan
                         </Link>
+                        {lihatKeuangan && (
+                          <Link href={`/proyek/${p.id}/keuangan`} className="tombol-tautan">
+                            Keuangan
+                          </Link>
+                        )}
                         {lihatLpj && (
                           <Link href={`/rekonsiliasi/event/${p.id}`} className="tombol-tautan">
                             LPJ

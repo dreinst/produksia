@@ -9,7 +9,7 @@ import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
  */
 
 /** Jenis dokumen yang sudah tersambung ke alur persetujuan (lihat BERKAS di src/lib/persetujuan.ts). */
-export const DOKUMEN_PERSETUJUAN = ["faktur", "faktur-pembelian", "kas-masuk", "kas-keluar", "penyesuaian", "peminjaman", "kerusakan", "aset", "penggajian"] as const;
+export const DOKUMEN_PERSETUJUAN = ["faktur", "faktur-pembelian", "kas-masuk", "kas-keluar", "penyesuaian", "peminjaman", "kerusakan", "aset", "penggajian", "talangan-mitra", "pembayaran-mitra"] as const;
 
 export type TautanNavigasi = { href: string; label: string; kode?: string; hak: Hak; ikon?: string };
 export type Grup = { judul: string; ikon: string; tautan: TautanNavigasi[] };
@@ -93,6 +93,7 @@ export const GRUP_OPERASIONAL: Grup[] = [
     ikon: "fact_check",
     tautan: [
       { href: "/rekonsiliasi", label: "Rekonsiliasi Event (LPJ)", kode: "LPJ", hak: "rekonsiliasi.lihat" },
+      { href: "/proyek/keuangan", label: "Keuangan Proyek", kode: "ANG", hak: "anggaran-proyek.lihat" },
       { href: "/rekonsiliasi/kas-bank", label: "Rekonsiliasi Kas/Bank", hak: "rekonsiliasi.lihat" },
       { href: "/rekonsiliasi/mutasi", label: "Impor Mutasi Rekening", kode: "CSV", hak: "rekonsiliasi.tulis" },
     ],
@@ -223,6 +224,7 @@ export function semuaHrefMenu(): string[] {
  */
 export function aktifDi(href: string, pathname: string): boolean {
   if (href === "/proyek") return pathname === "/proyek" || (/^\/proyek\/[^/]+$/.test(pathname) && pathname !== "/proyek/keuangan");
+  if (href === "/proyek/keuangan") return pathname === "/proyek/keuangan" || /^\/proyek\/[^/]+\/keuangan(\/|$)/.test(pathname);
   if (href === "/aset-tetap") return pathname === "/aset-tetap" || pathname === "/aset-tetap/baru" || /^\/aset-tetap\/[^/]+\/lepas$/.test(pathname);
   if (href === "/rekonsiliasi") return pathname === "/rekonsiliasi" || pathname.startsWith("/rekonsiliasi/event");
   return pathname === href || pathname.startsWith(href + "/");

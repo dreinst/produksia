@@ -39,10 +39,19 @@ const PERUSAHAAN_DOKUMEN: Record<JenisPersetujuan, (tx: Tx, id: string) => Promi
 };
 
 /**
- * Jenis yang halaman dokumennya belum ada (dokumen mitra proyek, D5 §7.1; dibuat paket Keuangan Proyek). Notifikasi
- * hasil persetujuannya tanpa tautan sampai halaman itu ada, karena aplikasi tidak menaut ke halaman yang belum ada.
+ * Halaman dokumen mitra proyek (D5 §7.1, P37) bergantung pada proyek dokumennya, jadi tautannya dibaca per dokumen.
+ * null bila dokumen sudah tidak ada.
  */
-const TANPA_HALAMAN_DOKUMEN: ReadonlySet<JenisPersetujuan> = new Set(["talanganMitra", "pembayaranMitra"]);
+const HALAMAN_DOKUMEN_MITRA: Partial<Record<JenisPersetujuan, (tx: Tx, id: string) => Promise<string | null>>> = {
+  talanganMitra: async (tx, id) => {
+    const d = await tx.talanganMitra.findUnique({ where: { id }, select: { proyekId: true } });
+    return d ? `/proyek/${d.proyekId}/keuangan/talangan/${id}` : null;
+  },
+  pembayaranMitra: async (tx, id) => {
+    const d = await tx.pembayaranMitra.findUnique({ where: { id }, select: { proyekId: true } });
+    return d ? `/proyek/${d.proyekId}/keuangan/bayar/${id}` : null;
+  },
+};
 
 /** Label dokumen untuk teks notifikasi; Kas Masuk dan Kas Keluar dibedakan menurut kode haknya. */
 function labelDokumen(jenis: JenisPersetujuan, kode: string): string {
@@ -52,12 +61,19 @@ function labelDokumen(jenis: JenisPersetujuan, kode: string): string {
 
 /**
  * Halaman tempat pengaju melihat dokumennya. Kas memakai kode hasil hakSetujui karena jalur[0] selalu Kas Masuk.
- * null untuk jenis yang halaman dokumennya belum ada (TANPA_HALAMAN_DOKUMEN).
+ * Dokumen mitra proyek tidak punya halaman daftar sendiri; tautannya per dokumen lewat tautanHasilPersetujuan, jadi di
+ * sini null.
  */
 export function tautanDokumenPersetujuan(jenis: JenisPersetujuan, kode: string): string | null {
-  if (TANPA_HALAMAN_DOKUMEN.has(jenis)) return null;
+  if (HALAMAN_DOKUMEN_MITRA[jenis]) return null;
   if (jenis === "dokumenKas") return kode === "kas-masuk" ? "/kas-bank/masuk" : "/kas-bank/keluar";
   return BERKAS[jenis].jalur[0];
+}
+
+/** Tautan notifikasi hasil persetujuan: halaman dokumen mitra (butuh proyek dan id), selain itu tautanDokumenPersetujuan. */
+export async function tautanHasilPersetujuan(tx: Tx, jenis: JenisPersetujuan, kode: string, id: string): Promise<string | null> {
+  const perDokumen = HALAMAN_DOKUMEN_MITRA[jenis];
+  return perDokumen ? perDokumen(tx, id) : tautanDokumenPersetujuan(jenis, kode);
 }
 
 /** Halaman tempat pemeriksa menyetujui. Gudang dialihkan dari /persetujuan, jadi dokumen persediaannya ke halamannya sendiri. */
@@ -96,7 +112,7 @@ async function kirim(tx: Tx, m: MasukanBeritahuPersetujuan): Promise<number> {
     kecuali: m.pelaku.id,
     judul: `${label} ${m.nomor} ${disetujui ? "disetujui" : "ditolak"}`,
     isi: disetujui ? `Disetujui oleh ${m.pelaku.nama}` : `Alasan: ${(m.catatan ?? "").trim()}`,
-    tautan: tautanDokumenPersetujuan(m.jenis, kode),
+    tautan: await tautanHasilPersetujuan(tx, m.jenis, kode, m.id),
     jenis: "HASIL_PERSETUJUAN",
     perusahaanId,
   });

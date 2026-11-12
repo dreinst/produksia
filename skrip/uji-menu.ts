@@ -199,6 +199,9 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
   { paket: "P24", letak: "grup", grup: "Buku Besar", setelah: "/buku-besar/jurnal", tautan: { href: "/buku-besar/antar-perusahaan", label: "Transaksi Antar Perusahaan", kode: "AP", hak: "antar-perusahaan.lihat" } },
   { paket: "P36", letak: "atas", setelah: "/berkas", tautan: { href: "/proyek", label: "Proyek & Event", ikon: "event_note", hak: "proyek.lihat" } },
   { paket: "P36", letak: "pengaturan", setelah: "/pengaturan/pemetaan-akun", tautan: { href: "/pengaturan/kategori-anggaran", label: "Kategori Anggaran Proyek", ikon: "category", hak: "kategori-anggaran.ubah" } },
+  { paket: "P37", letak: "grup", grup: "Rekonsiliasi", setelah: "/rekonsiliasi", tautan: { href: "/proyek/keuangan", label: "Keuangan Proyek", kode: "ANG", hak: "anggaran-proyek.lihat" } },
+  { paket: "P37", letak: "persetujuan", kode: "talangan-mitra" },
+  { paket: "P37", letak: "persetujuan", kode: "pembayaran-mitra" },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -421,6 +424,26 @@ async function main() {
     pastikan(aktifDi("/proyek", path) === nyala, `aktifDi("/proyek", "${path}") = ${nyala}`);
   }
   pastikan(aktifDi("/data-induk/proyek", "/data-induk/proyek/abc") && !aktifDi("/data-induk/proyek", "/proyek/abc"), "Data Induk Proyek tetap menyala hanya di bawah /data-induk/proyek");
+
+  // P37 (D5 §7.6, HAK.md §2.6): Keuangan Proyek di grup Rekonsiliasi sesudah LPJ untuk anggaran-proyek.lihat; KASIR tidak.
+  // Dokumen mitra ikut alur persetujuan; peran yang membuat atau menyetujuinya sudah melihat Persetujuan sebelumnya.
+  for (const peran of DAFTAR_PERAN) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    const rek = m.operasional.find((g) => g.judul === "Rekonsiliasi")?.tautan ?? [];
+    const i = rek.findIndex((l) => l.href === "/proyek/keuangan");
+    if (punyaHak(peran, "anggaran-proyek.lihat")) pastikan(i >= 0 && rek[i - 1]?.href === "/rekonsiliasi" && rek[i].label === "Keuangan Proyek" && rek[i].kode === "ANG", `${peran}: Keuangan Proyek tepat sesudah Rekonsiliasi Event (LPJ)`);
+    else pastikan(i < 0, `${peran}: tanpa Keuangan Proyek`);
+  }
+  pastikan(!mPeran("KASIR").includes("/proyek/keuangan") && mPeran("ADMIN").includes("/proyek/keuangan") && mPeran("PEMILIK").includes("/proyek/keuangan"), "KASIR tidak melihat Keuangan Proyek, ADMIN dan PEMILIK melihatnya");
+  for (const peran of DAFTAR_PERAN) {
+    const sekarang = menuTerlihat(penggunaSintetis(peran, hitungHak(peran))).atas.some((t) => t.href === "/persetujuan");
+    const lama = !BEKU_PERAN_TANPA_BERANDA.has(peran) && BEKU_DOKUMEN_PERSETUJUAN.some((k) => punyaHak(peran, `${k}.buat` as Hak) || punyaHak(peran, `${k}.setujui` as Hak));
+    pastikan(sekarang === lama, `${peran}: tampil tidaknya Persetujuan sama dengan sebelum dokumen mitra ditambahkan (${sekarang})`);
+  }
+  for (const [path, nyala] of [["/proyek/keuangan", true], ["/proyek/abc123/keuangan", true], ["/proyek/abc123/keuangan/talangan/baru", true], ["/proyek/abc123/keuangan/bayar/xyz", true], ["/proyek", false], ["/proyek/abc123", false], ["/proyek/keuanganx", false], ["/rekonsiliasi/event/abc123", false]] as const) {
+    pastikan(aktifDi("/proyek/keuangan", path) === nyala, `aktifDi("/proyek/keuangan", "${path}") = ${nyala}`);
+  }
+  pastikan(aktifDi("/rekonsiliasi", "/rekonsiliasi") && !aktifDi("/rekonsiliasi", "/proyek/keuangan"), "Rekonsiliasi Event (LPJ) tidak menyala di Keuangan Proyek");
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");
   const kosong = menuTerlihat(penggunaSintetis("KASIR", []));

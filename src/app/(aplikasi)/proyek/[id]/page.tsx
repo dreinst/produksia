@@ -20,7 +20,8 @@ import TitikWarnaProyek from "@/komponen/proyek/TitikWarnaProyek";
 /*
  * Ringkasan satu proyek (D5 §7.2): pekerjaan per modul, tampilan dan klien, akses berkas proyek (D7 §3.3.7), dan berkas
  * proyek, tanpa angka keuangan. Halaman detail memakai perusahaan proyek itu sendiri, bukan lingkup aktif (D5 §4.7).
- * Kartu dokumen mitra dan tautan Keuangan dipasang paket halaman keuangan proyek bersama rutenya.
+ * Kartu Dokumen mitra memberi jalan membuat talangan dan pembayaran bagi peran yang diberi hak dokumennya walau tidak
+ * melihat halaman keuangan (D5 §7.2).
  */
 
 function jadwal(mulai: Date | null, selesai: Date | null): string {
@@ -83,6 +84,12 @@ export default async function HalamanRingkasanProyek({ params }: { params: Promi
         }
         aksi={
           <>
+            {boleh("anggaran-proyek.lihat") && (
+              <Link href={`/proyek/${proyek.id}/keuangan`} className="tombol tombol-garis">
+                <Ikon nama="savings" className="!text-[18px]" />
+                Keuangan
+              </Link>
+            )}
             {boleh("rekonsiliasi.lihat") && (
               <Link href={`/rekonsiliasi/event/${proyek.id}`} className="tombol tombol-garis">
                 <Ikon nama="fact_check" className="!text-[18px]" />
@@ -124,6 +131,29 @@ export default async function HalamanRingkasanProyek({ params }: { params: Promi
                 </div>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {(boleh("talangan-mitra.buat") || boleh("pembayaran-mitra.buat")) && (
+        <section className="kartu space-y-3" aria-labelledby="judul-dokumen-mitra">
+          <h2 id="judul-dokumen-mitra" className="judul-kartu flex items-center gap-2">
+            <Ikon nama="handshake" className="!text-[20px] text-slate-500" />
+            Dokumen mitra
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            {boleh("talangan-mitra.buat") && (
+              <Link href={`/proyek/${proyek.id}/keuangan/talangan/baru`} className="tombol tombol-garis">
+                <Ikon nama="add" className="!text-[18px]" />
+                Catat talangan mitra
+              </Link>
+            )}
+            {boleh("pembayaran-mitra.buat") && (
+              <Link href={`/proyek/${proyek.id}/keuangan/bayar/baru`} className="tombol tombol-garis">
+                <Ikon nama="account_balance_wallet" className="!text-[18px]" />
+                Bayar mitra
+              </Link>
+            )}
           </div>
         </section>
       )}
