@@ -23,7 +23,7 @@ function galatInternalTakTerduga(galat: unknown): boolean {
  * SQLSTATE PostgreSQL di balik galat Prisma/driver: dari adapter pg (meta.driverAdapterError.cause.originalCode),
  * dari kueri mentah lama (meta.code), atau dari galat pg langsung (code lima karakter). null bila tidak ada.
  */
-function kodeSqlState(e: { code?: unknown; meta?: unknown }): string | null {
+export function kodeSqlState(e: { code?: unknown; meta?: unknown }): string | null {
   const meta = e.meta as { code?: unknown; driverAdapterError?: { cause?: { originalCode?: unknown } } } | undefined;
   for (const k of [meta?.driverAdapterError?.cause?.originalCode, meta?.code, e.code]) {
     if (typeof k === "string" && /^[0-9A-Z]{5}$/.test(k)) return k;

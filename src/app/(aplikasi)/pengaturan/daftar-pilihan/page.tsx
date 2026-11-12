@@ -15,15 +15,21 @@ import PengaturanDaftarPemasaran from "@/komponen/pemasaran/PengaturanDaftarPema
  * datanya milik domain masing-masing. Jenis dan pilar konten memakai editor D6 (PengaturanDaftarPemasaran). Sumber
  * lead (D4) dan seksi baris dokumen (D2) hanya punya halaman sendiri, jadi di sini berupa ringkasan dengan tautan
  * "Ubah". Halaman ini tidak punya aksi server sendiri dan tidak menulis data (bawaan hanya ditampilkan).
- * ?perusahaan= memilih perusahaan aktif; kosong = lingkup aktif, gabungan = "Pilih perusahaan dulu".
+ * ?perusahaan= memilih perusahaan aktif; kosong = lingkup aktif, gabungan = "Pilih perusahaan dulu", perusahaan arsip
+ * atau id tak dikenal = kotak amber tanpa editor.
  */
 
 export default async function HalamanDaftarPilihan({ searchParams }: { searchParams: Promise<{ perusahaan?: string | string[] }> }) {
   const pengguna = await wajibHak("pengaturan.tulis");
   const q = await searchParams;
   const pilihan = typeof q.perusahaan === "string" ? q.perusahaan : undefined;
-  const [lingkup, aktif] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan()]);
-  const p = aktif.find((x) => x.id === pilihan) ?? aktif.find((x) => x.id === lingkup.perusahaanId) ?? null;
+  const [lingkup, aktif, semua] = await Promise.all([lingkupPerusahaan(), daftarPerusahaan(), daftarPerusahaan(true)]);
+  // ?perusahaan= yang diisi tidak pernah jatuh ke lingkup: perusahaan arsip atau id tak dikenal memberi kotak amber
+  // (perbaikan tinjauan P44 R1). Tanpa ?perusahaan=, lingkup aktif dipakai; lingkup perusahaan arsip juga diberi tahu.
+  const diminta = pilihan ?? lingkup.perusahaanId ?? undefined;
+  const p = diminta ? (aktif.find((x) => x.id === diminta) ?? null) : null;
+  const arsip = diminta && !p ? (semua.find((x) => x.id === diminta) ?? null) : null;
+  const tidakDikenal = !!pilihan && !p && !arsip;
   const bolehCrm = punyaHak(pengguna, "pengaturan-crm.ubah");
 
   const [sumber, dokumen] = p
@@ -58,7 +64,13 @@ export default async function HalamanDaftarPilihan({ searchParams }: { searchPar
         ))}
       </nav>
 
-      {!p ? (
+      {arsip ? (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Perusahaan {arsip.nama} sudah diarsipkan. Aktifkan dulu untuk mengubah daftarnya, atau pilih perusahaan lain di atas.
+        </p>
+      ) : tidakDikenal ? (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">Perusahaan tidak dikenal. Pilih perusahaan dari daftar di atas.</p>
+      ) : !p ? (
         <div className="kartu text-sm text-slate-600">Pilih perusahaan dulu. Daftar pilihan diatur per perusahaan.</div>
       ) : (
         <>

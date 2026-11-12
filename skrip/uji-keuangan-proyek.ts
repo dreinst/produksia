@@ -752,9 +752,10 @@ async function main() {
         await jalankan("hapus proyek bermitra sesudah kunci dilepas", () => hapusDataInduk("proyek", prjK.id));
         pastikan((await db.proyek.count({ where: { id: prjK.id } })) === 0 && (await db.mitraProyek.count({ where: { id: mK.id } })) === 0, "proyek bermitra tanpa dokumen terhapus, mitranya ikut terhapus (CASCADE)");
       }
-      // tinjauan P37 R3 (1): pra-kunci pesanan dan penawaran memakai FOR NO KEY UPDATE, jadi hapus proyek tidak menunggu
-      // sisipan anak pesanan yang belum selesai (FK anak mengambil FOR KEY SHARE pada pesanan). Kode lama (FOR UPDATE)
-      // tertahan sampai sisipan selesai. Pesanan tetap kehilangan proyekId (SET NULL) dan sisipan anaknya tetap tersimpan.
+      // tinjauan P37 R3 (1), diubah sesudah tinjauan P44 S1: pra-kunci pesanan dan penawaran kembali FOR UPDATE, karena
+      // FOR NO KEY UPDATE membentuk kebuntuan dengan buatPengiriman (diuji di blok berikutnya). Hapus proyek selagi
+      // sisipan anak pesanan belum selesai kini menunggu sisipan itu, lalu selesai (pesanan dikosongkan proyeknya), atau
+      // ditolak "Proyek masih dipakai" bila menunggu melewati batas waktu transaksi. Sisipan anaknya tetap tersimpan.
       {
         const prjN = await db.proyek.create({ data: { kode: `PRJ-${K}-HN`, nama: "Event Uji Hapus Sisipan Pesanan", perusahaanId: P2 } });
         const psnN = await db.pesananPenjualan.create({ data: { nomor: `PSJ-${K}-HN`, pelangganId: pelanggan.id, perusahaanId: P2, proyekId: prjN.id, total: 1_000 } });
@@ -779,13 +780,60 @@ async function main() {
           lepas();
           const [hSisip, hHapusN] = await Promise.all([sisip, hapusN]);
           const psnSesudah = await db.pesananPenjualan.findUnique({ where: { id: psnN.id }, select: { proyekId: true } });
+          const sisaProyekN = await db.proyek.count({ where: { id: prjN.id } });
+          const selesaiN = hHapusN === "ok" && sisaProyekN === 0 && psnSesudah?.proyekId === null;
+          const ditolakN = hHapusN.includes("Proyek masih dipakai; muat ulang lalu coba lagi") && sisaProyekN === 1 && psnSesudah?.proyekId === prjN.id;
           pastikan(
-            awalN === "ok" && hHapusN === "ok" && hSisip === "ok" && (await db.proyek.count({ where: { id: prjN.id } })) === 0 && psnSesudah?.proyekId === null && (await db.rencanaTermin.count({ where: { pesananId: psnN.id } })) === 1,
-            `hapus proyek selagi sisipan anak pesanan belum selesai: tidak menunggu, pesanan dikosongkan proyeknya, sisipan tetap tersimpan (hapus=[${awalN === "TERTAHAN" ? "TERTAHAN, lalu " : ""}${hHapusN}] sisip=[${hSisip}])`,
+            (selesaiN || ditolakN) && hSisip === "ok" && (await db.rencanaTermin.count({ where: { pesananId: psnN.id } })) === 1,
+            `hapus proyek selagi sisipan anak pesanan belum selesai: menunggu lalu selesai atau ditolak jelas, sisipan tetap tersimpan (hapus=[${awalN === "TERTAHAN" ? "TERTAHAN, lalu " : ""}${hHapusN}] sisip=[${hSisip}])`,
           );
         } finally {
           await db.pesananPenjualan.deleteMany({ where: { id: psnN.id } });
           await db.proyek.deleteMany({ where: { id: prjN.id } });
+        }
+      }
+      // tinjauan P44 S1: urutan kunci buatPengiriman (sisip SJ mengambil KEY SHARE pesanan, tandaiProyek mengambil KEY
+      // SHARE Proyek, lalu status pesanan diubah) dengan hapus proyek di antara langkah 2 dan 3. Dengan FOR NO KEY UPDATE
+      // keduanya buntu (40P01 lewat P2010). Dengan FOR UPDATE, hapus menunggu SJ lalu selesai; bila tetap gagal karena
+      // kebuntuan atau batas waktu, pesannya harus "Proyek masih dipakai". SJ selalu selesai.
+      {
+        const prjS = await db.proyek.create({ data: { kode: `PRJ-${K}-HS`, nama: "Event Uji Hapus Kebuntuan SJ", perusahaanId: P2 } });
+        const psnS = await db.pesananPenjualan.create({ data: { nomor: `PSJ-${K}-HS`, pelangganId: pelanggan.id, perusahaanId: P2, proyekId: prjS.id, total: 1_000 } });
+        try {
+          let lepas!: () => void;
+          const tahan = new Promise<void>((r) => (lepas = r));
+          let siap!: () => void;
+          const terkunci = new Promise<void>((r) => (siap = r));
+          const sj = db
+            .$transaction(
+              async (tx) => {
+                await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "id" = ${psnS.id} FOR KEY SHARE`;
+                await tx.$queryRaw`SELECT 1 FROM "Proyek" WHERE "id" = ${prjS.id} FOR KEY SHARE`;
+                siap();
+                await tahan;
+                await tx.pesananPenjualan.update({ where: { id: psnS.id }, data: { status: "SEBAGIAN" } });
+              },
+              { timeout: 30_000 },
+            )
+            .then(() => "ok", (e: Error) => e.message);
+          await terkunci;
+          const hapusS = aksi(() => hapusDataInduk("proyek", prjS.id));
+          // beri waktu hapus mengambil kunci yang bisa ia ambil dan mulai menunggu sebelum SJ melanjutkan
+          await new Promise((r) => setTimeout(r, 800));
+          lepas();
+          const [hSj, hHapusS] = await Promise.all([sj, hapusS]);
+          const sisaProyekS = await db.proyek.count({ where: { id: prjS.id } });
+          const psnSesudah = await db.pesananPenjualan.findUnique({ where: { id: psnS.id }, select: { proyekId: true, status: true } });
+          const selesaiS = hHapusS === "ok" && sisaProyekS === 0 && psnSesudah?.proyekId === null;
+          const ditolakS = hHapusS.includes("Proyek masih dipakai; muat ulang lalu coba lagi") && sisaProyekS === 1;
+          pastikan(
+            hSj === "ok" && psnSesudah?.status === "SEBAGIAN" && (selesaiS || ditolakS),
+            `hapus proyek di tengah urutan kunci surat jalan: SJ selesai, hapus selesai atau ditolak "Proyek masih dipakai" (hapus=[${hHapusS.replace(/\s+/g, " ").slice(-200)}] sj=[${hSj}])`,
+          );
+          pastikan(selesaiS, "dengan pra-kunci FOR UPDATE hapus menunggu SJ lalu selesai, tanpa kebuntuan");
+        } finally {
+          await db.pesananPenjualan.deleteMany({ where: { id: psnS.id } });
+          await db.proyek.deleteMany({ where: { id: prjS.id } });
         }
       }
       // tinjauan P37 R3 (2): hapus yang menunggu kunci jalur lain melewati batas transaksi interaktif (5 detik, P2028)

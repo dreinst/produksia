@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Prisma } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
-import { galatMasihDipakai, jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
+import { galatMasihDipakai, jalankanFormulir, kodeSqlState, type StatusFormulir } from "@/lib/statusFormulir";
 import { BIDANG_PERUSAHAAN, ambilKonfigurasiEntitas, type KonfigurasiEntitas } from "@/lib/konfigurasiDataInduk";
 import { wajibHakAksi } from "@/lib/otentikasi";
 import { hakDataInduk, type PenggunaSesi } from "@/lib/hakAkses";
@@ -437,13 +437,18 @@ export async function ubahDataInduk(slug: string, id: string, dataFormulir: Form
   redirect(`/data-induk/${slug}`);
 }
 
+/** SQLSTATE kebuntuan (40P01), gagal serialisasi (40001), dan kunci tidak tersedia (55P03). */
+const SQLSTATE_PROYEK_DIPAKAI = new Set(["40P01", "40001", "55P03"]);
+
 /**
  * Galat basis data yang berarti proyek sedang atau masih dipakai transaksi lain (P2034 deadlock/konflik, P2003 FK, dan
- * P2028 batas waktu transaksi interaktif habis karena menunggu kunci jalur lain, tinjauan P37 R3).
+ * P2028 batas waktu transaksi interaktif habis karena menunggu kunci jalur lain, tinjauan P37 R3). Galat dari kueri
+ * mentah datang sebagai P2010 dengan SQLSTATE di meta adapter pg, jadi SQLSTATE dibaca lewat kodeSqlState
+ * (tinjauan P44 S1).
  */
 function galatProyekDipakai(e: unknown): boolean {
-  const kode = (e as { code?: unknown } | null)?.code;
-  return kode === "P2034" || kode === "P2028" || kode === "40P01" || kode === "40001" || galatMasihDipakai(e);
+  const g = (e ?? {}) as { code?: unknown; meta?: unknown };
+  return g.code === "P2034" || g.code === "P2028" || SQLSTATE_PROYEK_DIPAKAI.has(kodeSqlState(g) ?? "") || galatMasihDipakai(e);
 }
 
 /**
@@ -452,10 +457,12 @@ function galatProyekDipakai(e: unknown): boolean {
  * Penolakan hanya untuk anak yang FK-nya RESTRICT: talangan mitra, pembayaran ke mitra, dan berkas (D7 §3.3.7 no. 5).
  *
  * Urutan kunci (catatan orkestrator sesudah P35 dan P36, tinjauan P36 R1): pesanan lalu penawaran penjualan yang menaut
- * proyek dikunci urut id lebih dulu, karena SET NULL akan menulis baris itu. Kuncinya FOR NO KEY UPDATE (tinjauan P37
- * R3), setara kebutuhan SET NULL: tetap bentrok dengan FOR SHARE sinkron anggaran, tetapi tidak menunggu FOR KEY SHARE
- * yang diambil setiap sisipan anak pesanan (surat jalan, faktur, uang muka, termin). Sinkron anggaran memegang
- * dokumen sumber (FOR SHARE) sebelum Proyek, jadi hapus harus memakai urutan yang sama: dokumen, lalu Proyek. Pesanan
+ * proyek dikunci urut id lebih dulu, karena SET NULL akan menulis baris itu. Kuncinya FOR UPDATE, sehingga hapus juga
+ * menunggu FOR KEY SHARE yang diambil sisipan anak pesanan (surat jalan, faktur, uang muka, termin) sampai jalur itu
+ * selesai. FOR NO KEY UPDATE (tinjauan P37 R3) sempat dipakai, tetapi membentuk kebuntuan dengan buatPengiriman: SJ
+ * memegang KEY SHARE pesanan dan Proyek lalu mengubah status pesanan, sementara hapus memegang pesanan dan menunggu
+ * Proyek (tinjauan P44 S1). Bila menunggu melewati batas waktu transaksi, P2028 menjadi "Proyek masih dipakai".
+ * Sinkron anggaran memegang dokumen sumber (FOR SHARE) sebelum Proyek, jadi hapus harus memakai urutan yang sama: dokumen, lalu Proyek. Pesanan
  * dikunci sebelum penawaran seperti hapus pesanan (kepala pesanan lalu penawaran asal). Sesudah itu baris Proyek FOR
  * UPDATE, lalu anak RESTRICT dihitung di dalam transaksi. Baris mitra lalu dikunci FOR UPDATE SKIP LOCKED. Mitra yang sedang dipegang
  * jalur dokumen mitra (kunci mitra lalu sisipan ber-proyekId) tidak ditunggu, karena menunggunya lewat cascade
@@ -464,8 +471,8 @@ function galatProyekDipakai(e: unknown): boolean {
 async function hapusProyek(id: string) {
   try {
     await db.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR NO KEY UPDATE`;
-      await tx.$queryRaw`SELECT 1 FROM "PenawaranPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR NO KEY UPDATE`;
+      await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR UPDATE`;
+      await tx.$queryRaw`SELECT 1 FROM "PenawaranPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR UPDATE`;
       const [p] = await tx.$queryRaw<{ kode: string }[]>`SELECT "kode" FROM "Proyek" WHERE "id" = ${id} FOR UPDATE`;
       if (!p) throw new Error("Data tidak ditemukan (mungkin sudah dihapus).");
       // berurutan: transaksi interaktif tidak boleh menjalankan kueri bersamaan
