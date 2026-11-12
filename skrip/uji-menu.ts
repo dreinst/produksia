@@ -217,6 +217,7 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
     },
   },
   { paket: "P43", letak: "grup", grup: "Pemasaran", setelah: "/pemasaran/desain", tautan: { href: "/pemasaran/iklan", label: "Iklan", hak: "kampanye.lihat" } },
+  { paket: "P44", letak: "pengaturan", setelah: "/crm/pengaturan", tautan: { href: "/pengaturan/daftar-pilihan", label: "Daftar Pilihan", ikon: "format_list_bulleted", hak: "pengaturan.tulis" } },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -491,6 +492,18 @@ async function main() {
     const nyala = ["/pemasaran/konten", "/pemasaran/desain", "/pemasaran/iklan"].filter((h) => aktifDi(h, path));
     pastikan(nyala.join() === href, `${path} hanya menyalakan ${href}`);
   }
+  // P44 (D7 §7.7, §7.8): Daftar Pilihan tepat sesudah Pengaturan CRM dan sebelum Akses Berkas, hanya untuk pengaturan.tulis
+  for (const peran of DAFTAR_PERAN) {
+    const atur = menuTerlihat(penggunaSintetis(peran, hitungHak(peran))).pengaturan;
+    const i = atur.findIndex((l) => l.href === "/pengaturan/daftar-pilihan");
+    if (peran === "SUPERADMIN" || peran === "PEMILIK") {
+      pastikan(
+        i >= 0 && atur[i].label === "Daftar Pilihan" && atur[i].ikon === "format_list_bulleted" && atur[i - 1]?.href === "/crm/pengaturan" && atur[i + 1]?.href === "/pengaturan/berkas",
+        `${peran}: Daftar Pilihan tepat sesudah Pengaturan CRM dan sebelum Akses Berkas`,
+      );
+    } else pastikan(i < 0, `${peran}: tanpa Daftar Pilihan`);
+  }
+  pastikan(aktifDi("/pengaturan/daftar-pilihan", "/pengaturan/daftar-pilihan") && !aktifDi("/pengaturan/perusahaan", "/pengaturan/daftar-pilihan"), "Daftar Pilihan hanya menyalakan tautannya sendiri");
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");
   const kosong = menuTerlihat(penggunaSintetis("KASIR", []));

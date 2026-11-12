@@ -84,6 +84,8 @@ export default async function HalamanPerencanaKonten({ searchParams }: { searchP
   };
 
   const bolehBuat = punyaHak(pengguna, "konten.buat");
+  // "Atur daftar" (P44, D6 §7.9) menaut Daftar Pilihan, yang hanya terbuka bagi pengaturan.tulis
+  const bolehAturDaftar = punyaHak(pengguna, "pengaturan.tulis");
   const lihatDesain = punyaHak(pengguna, "tugas-desain.lihat");
   const penyetuju = punyaHak(pengguna, "konten.setujui");
   const [proyekLingkup, menunggu] = await Promise.all([
@@ -234,10 +236,22 @@ export default async function HalamanPerencanaKonten({ searchParams }: { searchP
           ) : undefined
         }
         aksi={
-          bolehBuat ? (
-            <Link href={url({ konten: "baru" })} scroll={false} className="tombol tombol-utama min-h-11 w-full sm:w-auto">
-              <Ikon nama="add" className="!text-[18px]" /> Konten baru
-            </Link>
+          bolehBuat || bolehAturDaftar ? (
+            <>
+              {bolehAturDaftar && (
+                <Link
+                  href={gabungan ? "/pengaturan/daftar-pilihan" : `/pengaturan/daftar-pilihan?perusahaan=${encodeURIComponent(lingkup.perusahaanId ?? "")}`}
+                  className="tombol tombol-garis min-h-11 w-full sm:w-auto"
+                >
+                  <Ikon nama="format_list_bulleted" className="!text-[18px]" /> Atur daftar
+                </Link>
+              )}
+              {bolehBuat && (
+                <Link href={url({ konten: "baru" })} scroll={false} className="tombol tombol-utama min-h-11 w-full sm:w-auto">
+                  <Ikon nama="add" className="!text-[18px]" /> Konten baru
+                </Link>
+              )}
+            </>
           ) : undefined
         }
       />

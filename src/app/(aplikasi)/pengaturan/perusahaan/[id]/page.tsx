@@ -114,6 +114,14 @@ export default async function HalamanUbahPerusahaan({ params }: { params: Promis
               <span className="redup"> · tahap pipeline dan sumber lead</span>
             </li>
           )}
+          {perusahaan.aktif && (
+            <li>
+              <Link href={`/pengaturan/daftar-pilihan?perusahaan=${encodeURIComponent(perusahaan.id)}`} className="tombol-tautan">
+                Daftar Pilihan
+              </Link>
+              <span className="redup"> · sumber lead, jenis dan pilar konten, seksi baris dokumen</span>
+            </li>
+          )}
         </ul>
       </div>
     </div>

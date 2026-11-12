@@ -163,6 +163,7 @@ export const TAUTAN_PENGATURAN: TautanBerikon[] = [
   { href: "/pengaturan/hak-akses", label: "Hak Akses", ikon: "shield", hak: "hak-akses.kelola" },
   { href: "/pengaturan/log-aktivitas", label: "Log Aktivitas", ikon: "history", hak: "log-aktivitas.lihat" },
   { href: "/crm/pengaturan", label: "Pengaturan CRM", ikon: "handshake", hak: "pengaturan-crm.ubah" },
+  { href: "/pengaturan/daftar-pilihan", label: "Daftar Pilihan", ikon: "format_list_bulleted", hak: "pengaturan.tulis" },
   { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" },
 ];
 
