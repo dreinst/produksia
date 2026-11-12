@@ -9,7 +9,7 @@ import { periksaSinkron } from "../src/lib/sinkron";
 import { terapkanBaganAkunStandar } from "../src/lib/baganAkun";
 import { ringkasanKeuanganProyek } from "../src/lib/keuanganProyek";
 import { buatPerekam } from "../src/lib/cetak";
-import { buatPdfLaporanKeuanganProyek, dataLaporanKeuanganProyek, namaBerkasLaporanKeuangan, simpanLaporanKeuanganProyek } from "../src/lib/pdf/laporanKeuanganProyek";
+import { buatPdfLaporanKeuanganProyek, dataLaporanKeuanganLampiran, dataLaporanKeuanganProyek, namaBerkasLaporanKeuangan, simpanLaporanKeuanganProyek } from "../src/lib/pdf/laporanKeuanganProyek";
 import { simpanLaporanKeuanganKeBerkas, simpanLaporanKeuanganKeBerkasFormulir } from "../src/lib/aksi/laporanKeuanganProyek";
 import { buatPembayaranMitra, buatTalanganMitra, tambahMitraProyek } from "../src/lib/aksi/bagiHasil";
 import { buatFaktur, buatPenawaran, buatPenerimaan, konversiPenawaranKePesanan } from "../src/lib/aksi/penjualan";
@@ -29,6 +29,8 @@ import { aturPersetujuan, formulir, harusDitolak, jalankan, pastikan } from "./b
  *     KASIR dan GUDANG 403, proyek tidak ada 404.
  *  5. Simpan ke berkas: Berkas laporan-keuangan-proyek bertag DOKUMEN di folder KEUANGAN, isi %PDF, log UNGGAH dan
  *     CETAK; GUDANG, pengguna tanpa hak lihat, dan pengguna tanpa hak unggah ditolak; simpan kedua menjadi riwayat.
+ *  5b. Versi lampiran (perbaikan tinjauan P45 T2): berkas yang disimpan PEMILIK tidak memuat bagi hasil, pembayaran ke
+ *     mitra, baris bagi laba, maupun daftar dokumen pendapatan. Penanda terpotong menyebut baris tercetak (P45 R1).
  * Data uji berawalan LKP; berkas uji dihapus permanen, log dan notifikasi uji dibuang, periksaSinkron sama di awal dan
  * akhir. Tidak ada baris HakAksesPeran yang dibuat: pengguna tanpa hak tertentu dibentuk langsung sebagai PenggunaSesi.
  */
@@ -160,7 +162,8 @@ async function main() {
     pastikan(pdfSah(kosong.isi) && kosong.teks.includes("Belum ada penawaran, pesanan, atau faktur untuk proyek ini.") && kosong.teks.includes("Belum ada biaya yang dijurnal.") && kosong.teks.includes("Belum ada mitra untuk proyek ini."), "proyek kosong: PDF sah dengan teks kosong tiap bagian");
     const panjang = { ...penuh, biaya: { ...penuh.biaya, terpotong: true, batas: 500, baris: Array.from({ length: 120 }, (_, i) => ({ ...penuh.biaya.baris[0], uraian: `Baris uji ${i + 1}` })) } };
     const p3 = await teksPdf(panjang);
-    pastikan(pdfSah(p3.isi) && p3.halaman >= 3 && p3.teks.includes("Menampilkan 500 baris jurnal terbaru") && p3.teks.includes("Total (500 baris terbaru)") && p3.teks.includes(`Halaman 1 dari ${p3.halaman}`), `biaya terpotong: penanda dicetak, tabel berlanjut ke ${p3.halaman} halaman`);
+    // perbaikan tinjauan P45 R1: penanda dan baris total menyebut jumlah baris yang benar-benar tercetak (120), bukan batas
+    pastikan(pdfSah(p3.isi) && p3.halaman >= 3 && p3.teks.includes("Menampilkan 120 baris biaya terbaru") && p3.teks.includes("Total (120 baris terbaru)") && !p3.teks.includes("500 baris") && p3.teks.includes(`Halaman 1 dari ${p3.halaman}`), `biaya terpotong: penanda menyebut baris yang tercetak, tabel berlanjut ke ${p3.halaman} halaman`);
 
     console.log("=== 3. Nama berkas ===");
     pastikan(namaBerkasLaporanKeuangan(prj) === "Laporan-Keuangan-PRJ-LKP-Event-Uji-Laporan-Keuangan.pdf", `nama berkas dibersihkan (${namaBerkasLaporanKeuangan(prj)})`);
@@ -202,6 +205,22 @@ async function main() {
     pastikan((await db.berkas.count({ where: { jenisEntitas: "laporan-keuangan-proyek", entitasId: prj.id } })) === 1, "penolakan tidak menyimpan berkas");
     const b2 = await simpanLaporanKeuanganProyek(db, tanpaBagi, prj.id);
     pastikan(b2.id !== b1.id && (await db.berkas.count({ where: { jenisEntitas: "laporan-keuangan-proyek", entitasId: prj.id, dihapusPada: null } })) === 2, "simpan kedua menjadi berkas kedua (riwayat)");
+
+    console.log("=== 5b. Versi lampiran (perbaikan tinjauan P45 T2) ===");
+    // berkas tersimpan dibaca setiap pemegang anggaran-proyek.lihat, jadi isinya versi hak minimum apa pun hak penyimpannya
+    const lampiran = (await dataLaporanKeuanganLampiran(db, prj.id, pemilik))!;
+    pastikan(lampiran.versiLampiran && !penuh.versiLampiran && lampiran.bagiHasil === null && lampiran.pembayaranMitra.length === 0 && lampiran.pendapatan.length === 0, "versi lampiran PEMILIK: tanpa bagi hasil, tanpa pembayaran ke mitra, tanpa daftar dokumen pendapatan");
+    pastikan(!JSON.stringify(lampiran.biaya.baris).includes("Bagi laba") && lampiran.biaya.bagiLabaTersembunyi?.equals(500_000) === true && JSON.stringify(lampiran.ringkasan) === JSON.stringify(penuh.ringkasan) && lampiran.dibuatOleh === pemilik.nama, "versi lampiran: baris bagi laba menjadi keterangan, ringkasan sama, nama pembuat tetap penyimpan");
+    const rekamSimpan = buatPerekam();
+    const b3 = await simpanLaporanKeuanganProyek(db, pemilik, prj.id, { perekam: rekamSimpan });
+    const teksSimpan = rekamSimpan.teks.map((t) => t.teks).join("\n");
+    pastikan(
+      !!b3.id &&
+        !teksSimpan.includes("5. Penyelesaian dan bagi hasil") && !teksSimpan.includes("6. Pembayaran ke mitra") && !teksSimpan.includes("Perusahaan (sisa)") &&
+        penuh.pendapatan.every((d) => !teksSimpan.includes(d.nomor)) &&
+        teksSimpan.includes("Versi lampiran berkas") && teksSimpan.includes("Rincian dokumen pendapatan tidak dimuat di versi lampiran") && teksSimpan.includes("termasuk bagi laba mitra Rp 500.000"),
+      `PDF yang disimpan PEMILIK: tanpa bagian bagi hasil dan nomor dokumen pendapatan; pendapatan hanya total (${["5. Penyelesaian dan bagi hasil", "6. Pembayaran ke mitra", "Perusahaan (sisa)", ...penuh.pendapatan.map((d) => d.nomor)].filter((t) => teksSimpan.includes(t)).join(", ")})`,
+    );
   } finally {
     aturPersetujuan(false);
     nomorDokumen = await bersihkanDokumen();

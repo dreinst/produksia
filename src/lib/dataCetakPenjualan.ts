@@ -171,6 +171,43 @@ export async function dataCetakPenjualan(jenis: JenisCetakPenjualan, id: string,
   }
 }
 
+/** Nilai yang dibutuhkan panel Cetak di halaman detail (perusahaan, kop, tanda draf, mode dan tampilan event). */
+export type InfoPanelCetak = { perusahaanId: string; kopSuratId: string | null; draf: boolean; modeEvent: boolean; tampilan: "RINCI" | "RINGKAS" };
+
+/**
+ * Kueri ringan untuk TombolCetakDokumen (tinjauan P45 R3): hanya kolom yang dipakai panel, dengan aturan draf yang sama
+ * dengan dataCetakPenjualan. Data cetak lengkap tetap hanya dibaca rute cetak dan aksi simpan. null bila tidak ada.
+ */
+export async function infoPanelCetak(jenis: JenisCetakPenjualan, id: string, klien: Klien = db): Promise<InfoPanelCetak | null> {
+  const ev = (e: { mode: "STANDAR" | "EVENT"; tampilanEvent: "RINCI" | "RINGKAS" }) => ({ modeEvent: e.mode === "EVENT", tampilan: e.tampilanEvent });
+  const EV = { mode: true, tampilanEvent: true } as const;
+  switch (jenis) {
+    case "penawaran": {
+      const p = await klien.penawaranPenjualan.findUnique({ where: { id }, select: { perusahaanId: true, kopSuratId: true, status: true, ...EV } });
+      return p && { perusahaanId: p.perusahaanId, kopSuratId: p.kopSuratId, draf: p.status === "DIBATALKAN", ...ev(p) };
+    }
+    case "faktur": {
+      const f = await klien.fakturPenjualan.findUnique({ where: { id }, select: { perusahaanId: true, kopSuratId: true, status: true, statusPersetujuan: true, ...EV } });
+      return f && { perusahaanId: f.perusahaanId, kopSuratId: f.kopSuratId, draf: f.statusPersetujuan !== "DISETUJUI" || f.status === "DIBATALKAN", ...ev(f) };
+    }
+    case "kwitansi": {
+      const t = await klien.penerimaanPenjualan.findUnique({ where: { id }, select: { perusahaanId: true, kopSuratId: true, statusPersetujuan: true, faktur: { select: EV } } });
+      return t && { perusahaanId: t.perusahaanId, kopSuratId: t.kopSuratId, draf: t.statusPersetujuan !== "DISETUJUI", ...ev(t.faktur) };
+    }
+    case "kwitansi-dp": {
+      const u = await klien.uangMukaPelanggan.findUnique({ where: { id }, select: { perusahaanId: true, kopSuratId: true, statusPersetujuan: true, pesanan: { select: EV } } });
+      return u && { perusahaanId: u.perusahaanId, kopSuratId: u.kopSuratId, draf: u.statusPersetujuan !== "DISETUJUI", ...ev(u.pesanan) };
+    }
+    case "tagihan-termin": {
+      const t = await klien.rencanaTermin.findUnique({ where: { id }, select: { ditagihPada: true, pesanan: { select: { perusahaanId: true, kopSuratId: true, status: true, ...EV } } } });
+      if (!t?.pesanan) return null;
+      return { perusahaanId: t.pesanan.perusahaanId, kopSuratId: t.pesanan.kopSuratId, draf: !t.ditagihPada || t.pesanan.status === "DIBATALKAN", ...ev(t.pesanan) };
+    }
+    default:
+      return null;
+  }
+}
+
 async function cetakPenawaran(klien: Klien, id: string): Promise<DokumenCetakPenjualan | null> {
   const p = await klien.penawaranPenjualan.findUnique({
     where: { id },

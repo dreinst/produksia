@@ -28,7 +28,9 @@ const LABEL_UKURAN: Record<UkuranOpsi, string> = { A4: "A4", A5: "A5", A5L: "A5 
 /**
  * Formulir cetak klien (D3 §7.1). Pratinjau dan unduh lewat formulir GET ke /cetak/{jenis}/{id} di tab baru (lolos
  * CSP form-action 'self' tanpa window.open). Bila `aksiSimpan` diisi (P45), tombol "Simpan PDF ke Lampiran" mengirim
- * pilihan yang sama ke aksi server. Server tetap menentukan ulang tanda tangan menurut hak dan status dokumen.
+ * pilihan yang sama ke aksi server, kecuali tanda tangan: PDF lampiran selalu disimpan tanpa tanda tangan dan stempel
+ * (perbaikan tinjauan P45 T1), karena lampiran terbuka bagi semua pemegang hak lihat dokumen. Server tetap menentukan
+ * ulang tanda tangan unduhan menurut hak dan status dokumen.
  */
 export default function FormulirCetak({
   aksi,
@@ -127,12 +129,12 @@ export default function FormulirCetak({
         <FormulirAksi aksi={aksiSimpan} pesanSukses="PDF tersimpan sebagai lampiran.">
           {pilihan.id && <input type="hidden" name="kop" value={pilihan.id} />}
           <input type="hidden" name="ukuran" value={ukuran} />
-          <input type="hidden" name="ttd" value={ttd ? "1" : "0"} />
           {pilihan.tampilanEvent && <input type="hidden" name="tampilan" value={tampilan} />}
           <button type="submit" className="tombol tombol-lembut">
             <Ikon nama="attach_file" className="!text-[18px]" />
             Simpan PDF ke Lampiran
           </button>
+          <p className="petunjuk mt-1">PDF lampiran selalu disimpan tanpa tanda tangan dan stempel. PDF bertanda tangan hanya bisa diunduh.</p>
         </FormulirAksi>
       )}
     </div>

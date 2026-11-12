@@ -1,7 +1,7 @@
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { pastikanHak } from "@/lib/otentikasi";
-import { simpanBerkas, type MetaBerkas } from "@/lib/berkas";
+import { JENIS_LAMPIRAN, simpanBerkas, type MetaBerkas } from "@/lib/berkas";
 import { catatAktivitas } from "@/lib/log";
 import { labelStatus } from "@/komponen/ui/Lencana";
 import { rincianRealisasi, ringkasanKeuanganProyek, type BagiHasilProyek, type ProyekKeuangan, type RingkasanKeuangan } from "@/lib/keuanganProyek";
@@ -18,7 +18,9 @@ import { desimalDokumen } from "@/lib/cetak/format";
  *   disaring hak lihat per jenis, sama dengan tab Pendapatan.
  * - buatPdfLaporanKeuanganProyek hanya menggambar (A4, Carlito, tanpa kop dan tanpa tanda tangan, angka gaya titik).
  * - simpanLaporanKeuanganProyek menyimpan PDF ke jenis lampiran laporan-keuangan-proyek; aksi server di
- *   src/lib/aksi/laporanKeuanganProyek.ts memanggilnya sesudah wajibHakAksi.
+ *   src/lib/aksi/laporanKeuanganProyek.ts memanggilnya sesudah wajibHakAksi. Berkas itu dibaca setiap pemegang
+ *   anggaran-proyek.lihat, jadi isinya selalu versi lampiran (dataLaporanKeuanganLampiran, perbaikan tinjauan P45 T2):
+ *   tanpa bagian bagi hasil, tanpa pembayaran ke mitra, tanpa baris bagi laba, dan pendapatan hanya sebagai total.
  */
 
 type Klien = PrismaClient | Prisma.TransactionClient;
@@ -52,6 +54,8 @@ export type DataLaporanKeuanganProyek = {
   bagiHasil: BagiHasilProyek | null;
   /** pembayaran ke mitra yang disetujui, urut tanggal naik; kosong tanpa bagi-hasil.lihat dan pembayaran-mitra.lihat */
   pembayaranMitra: PembayaranMitraLaporan[];
+  /** true = versi lampiran berkas (hak minimum pembaca lampiran): pendapatan hanya total, tanpa daftar dokumen */
+  versiLampiran: boolean;
 };
 
 const NOL = D(0);
@@ -129,7 +133,19 @@ export async function dataLaporanKeuanganProyek(klien: Klien, proyekId: string, 
     },
     bagiHasil: bh,
     pembayaranMitra,
+    versiLampiran: false,
   };
+}
+
+/**
+ * Data laporan untuk berkas lampiran laporan-keuangan-proyek (perbaikan tinjauan P45 T2): disusun untuk pengguna
+ * sintetis yang hanya memegang hak lihat registri lampiran itu (anggaran-proyek.lihat), jadi tidak memuat bagi hasil,
+ * pembayaran ke mitra, baris bagi laba, maupun daftar dokumen pendapatan, apa pun hak penyimpannya.
+ */
+export async function dataLaporanKeuanganLampiran(klien: Klien, proyekId: string, pengguna: PenggunaSesi): Promise<DataLaporanKeuanganProyek | null> {
+  const pembaca: PenggunaSesi = { ...pengguna, hak: [JENIS_LAMPIRAN["laporan-keuangan-proyek"].hakLihat] };
+  const d = await dataLaporanKeuanganProyek(klien, proyekId, pembaca);
+  return d ? { ...d, pendapatan: [], versiLampiran: true } : null;
 }
 
 /**
@@ -256,6 +272,10 @@ export async function buatPdfLaporanKeuanganProyek(d: DataLaporanKeuanganProyek,
   k.teks(meta.join(" | "), { x: x0, lebar: W, ukuran: 9, warna: TEKS });
   jarak(mm(1));
   k.teks("Semua angka pendapatan tanpa PPN. Biaya aktual diambil dari jurnal bertanda proyek ini, di luar bagi hasil mitra.", { x: x0, lebar: W, ukuran: 8, font: "I", warna: ABU });
+  if (d.versiLampiran) {
+    jarak(mm(1));
+    k.teks("Versi lampiran berkas: tanpa rincian dokumen pendapatan dan tanpa bagian bagi hasil. Versi lengkap tersedia lewat Unduh PDF bagi pemegang haknya.", { x: x0, lebar: W, ukuran: 8, font: "I", warna: AMBER });
+  }
 
   // 1. Ringkasan
   judulBagian("1. Ringkasan");
@@ -273,7 +293,9 @@ export async function buatPdfLaporanKeuanganProyek(d: DataLaporanKeuanganProyek,
 
   // 2. Pendapatan
   judulBagian("2. Pendapatan");
-  if (d.pendapatan.length === 0) kosong("Belum ada penawaran, pesanan, atau faktur untuk proyek ini.");
+  if (d.versiLampiran)
+    paragraf(`Rincian dokumen pendapatan tidak dimuat di versi lampiran. ${LABEL_PENDAPATAN[r.sumberPendapatan]} ${rp(r.pendapatanRencana)}, ditagih ${rp(r.ditagih)}, diterima ${rp(r.diterima)}.`, { warna: ABU });
+  else if (d.pendapatan.length === 0) kosong("Belum ada penawaran, pesanan, atau faktur untuk proyek ini.");
   else
     tabel(
       [62, 58, 26, 34],
@@ -302,8 +324,9 @@ export async function buatPdfLaporanKeuanganProyek(d: DataLaporanKeuanganProyek,
   // 4. Biaya aktual dan pembayar
   judulBagian("4. Biaya aktual dan pembayar");
   const b = d.biaya;
+  // tinjauan P45 R1: jumlah baris yang benar-benar tercetak, karena baris bagi laba di dalam batas sudah dibuang
   if (b.terpotong)
-    paragraf(`Menampilkan ${b.batas.toLocaleString("id-ID")} baris jurnal terbaru. Baris yang lebih lama tidak tercetak, tetapi tetap dihitung di biaya aktual ${rp(r.aktual)}.`, { warna: AMBER });
+    paragraf(`Menampilkan ${b.baris.length.toLocaleString("id-ID")} baris biaya terbaru. Baris yang lebih lama tidak tercetak, tetapi tetap dihitung di biaya aktual ${rp(r.aktual)}.`, { warna: AMBER });
   if (b.terpotong) jarak(mm(1.5));
   if (b.baris.length === 0) kosong("Belum ada biaya yang dijurnal.");
   else
@@ -312,7 +335,7 @@ export async function buatPdfLaporanKeuanganProyek(d: DataLaporanKeuanganProyek,
       [kepala("Tanggal"), kepala("Kategori"), kepala("Uraian"), kepala("Didanai oleh"), kepala("Jumlah", "kanan")],
       [
         ...b.baris.map((x) => ({ sel: [sel(formatTanggalPendek(x.tanggal)), sel(x.kategori), sel(x.uraian), sel(x.didanaiOleh), uang(x.jumlah)] })),
-        { sel: [sel(b.terpotong ? `Total (${b.batas.toLocaleString("id-ID")} baris terbaru)` : "Total", { font: "B", span: 4 }), uang(b.total, { font: "B" })] },
+        { sel: [sel(b.terpotong ? `Total (${b.baris.length.toLocaleString("id-ID")} baris terbaru)` : "Total", { font: "B", span: 4 }), uang(b.total, { font: "B" })] },
       ],
       true,
     );
@@ -399,13 +422,14 @@ export async function buatPdfLaporanKeuanganProyek(d: DataLaporanKeuanganProyek,
  * (simpanBerkas) dan CETAK (meta disimpanKeBerkas, berkasId) ditulis dalam satu transaksi. Galat yang aman
  * ditampilkan dilempar sebagai Error biasa.
  */
-export async function simpanLaporanKeuanganProyek(klien: PrismaClient, pengguna: PenggunaSesi, proyekId: string): Promise<MetaBerkas> {
+/** `opsiUji.perekam` hanya untuk uji: merekam teks PDF yang disimpan. */
+export async function simpanLaporanKeuanganProyek(klien: PrismaClient, pengguna: PenggunaSesi, proyekId: string, opsiUji: { perekam?: Perekam } = {}): Promise<MetaBerkas> {
   pastikanHak(pengguna, "anggaran-proyek.lihat");
-  const data = await dataLaporanKeuanganProyek(klien, String(proyekId ?? ""), pengguna);
+  const data = await dataLaporanKeuanganLampiran(klien, String(proyekId ?? ""), pengguna);
   if (!data) throw new Error("Proyek tidak ditemukan");
   let isi: Uint8Array;
   try {
-    isi = await buatPdfLaporanKeuanganProyek(data);
+    isi = await buatPdfLaporanKeuanganProyek(data, { perekam: opsiUji.perekam });
   } catch (e) {
     // GalatIsiTerlaluTinggi berpesan aman; galat lain hanya dicatat
     if (e instanceof GalatIsiTerlaluTinggi) throw new Error(e.message);
