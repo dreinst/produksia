@@ -6,8 +6,11 @@ import { useState } from "react";
 export type AngkaBayarMitra = {
   modalKembali: number;
   dibayarModal: number;
+  /** jumlah bawaan MODAL: modal terutang, paling banyak sisa modal */
   modalTerutang: number;
+  /** sisa modal seperti batas server: talangan disetujui dikurangi pengembalian modal yang belum ditolak (termasuk draf) */
   sisaModal: number;
+  sisaTermasukDraf: boolean;
   bagianLaba: number;
   dibayarLaba: number;
   labaTerutang: number;
@@ -63,6 +66,7 @@ export default function IsianBayarMitra({ mitra, mitraAwal }: { mitra: MitraIsia
         {terpilih?.angka && (
           <p className="petunjuk">
             Modal kembali {rp(terpilih.angka.modalKembali)} (dibayar {rp(terpilih.angka.dibayarModal)}) · Bagian laba {rp(terpilih.angka.bagianLaba)} (dibayar {rp(terpilih.angka.dibayarLaba)}) · Sisa modal {rp(terpilih.angka.sisaModal)}
+            {terpilih.angka.sisaTermasukDraf && " (sudah dikurangi pengembalian modal yang belum disetujui)"}
           </p>
         )}
       </div>

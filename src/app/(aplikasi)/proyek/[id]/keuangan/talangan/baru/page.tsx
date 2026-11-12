@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { persetujuanWajib } from "@/lib/persetujuan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { muatPetaKategori } from "@/lib/kategoriAnggaran";
 import { NAMA_TANPA_KATEGORI, akunKeuanganProyek } from "@/lib/keuanganProyek";
 import { tanggalIso } from "@/lib/waktu";
@@ -11,6 +12,7 @@ import { buatTalanganMitraFormulir } from "@/lib/aksi/bagiHasil";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import Ikon from "@/komponen/ui/Ikon";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import { BidangPerusahaanProyek, PesanPerusahaanDiarsipkan } from "@/komponen/proyek/PerusahaanDokumenMitra";
 
 /*
  * Formulir Talangan Mitra (D5 §7.2): biaya proyek yang dibayar mitra dengan uangnya sendiri. Akun beban dikelompokkan
@@ -21,11 +23,21 @@ import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 export default async function HalamanTalanganBaru({ params }: { params: Promise<{ id: string }> }) {
   const pengguna = await wajibHak("talangan-mitra.buat");
   const { id } = await params;
-  const proyek = await db.proyek.findUnique({ where: { id }, select: { id: true, kode: true, nama: true, perusahaanId: true } });
+  const proyek = await db.proyek.findUnique({ where: { id }, select: { id: true, kode: true, nama: true, perusahaanId: true, perusahaan: { select: { kode: true, nama: true, warna: true, aktif: true } } } });
   if (!proyek) notFound();
   const mitra = await db.mitraProyek.findMany({ where: { proyekId: proyek.id }, orderBy: [{ urutan: "asc" }, { dibuatPada: "asc" }, { id: "asc" }], select: { id: true, nama: true } });
   const keuangan = punyaHak(pengguna, "anggaran-proyek.lihat") ? `/proyek/${proyek.id}/keuangan` : null;
   const jejak = [{ label: "Keuangan Proyek", href: keuangan ? "/proyek/keuangan" : undefined }, { label: proyek.kode, href: keuangan ?? undefined }, { label: "Catat talangan" }];
+
+  // tinjauan P37 S2: perusahaan proyek yang diarsipkan tidak menerima dokumen mitra baru, jadi formulir tidak dijalankan
+  if (!proyek.perusahaan.aktif)
+    return (
+      <div className="space-y-6">
+        <KepalaHalaman jejak={jejak} judul="Catat Talangan Mitra" subjudul={`${proyek.kode} · ${proyek.nama}`} />
+        <PesanPerusahaanDiarsipkan perusahaan={proyek.perusahaan} />
+      </div>
+    );
+  const bedaLingkup = (await lingkupPerusahaan()).perusahaanId !== proyek.perusahaanId;
 
   if (mitra.length === 0)
     return (
@@ -71,7 +83,8 @@ export default async function HalamanTalanganBaru({ params }: { params: Promise<
           Talangan dibuat sebagai draf dan baru masuk buku besar setelah disetujui pengguna lain.
         </p>
       )}
-      <FormulirAksi aksi={buatTalanganMitraFormulir.bind(null, proyek.id)} verifikasi={{ judul: "Periksa talangan mitra" }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormulirAksi aksi={buatTalanganMitraFormulir.bind(null, proyek.id)} verifikasi={{ judul: "Periksa talangan mitra" }} pesanSukses="Talangan mitra tersimpan" className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+        {bedaLingkup && <BidangPerusahaanProyek perusahaan={proyek.perusahaan} />}
         <div className="space-y-1">
           <label htmlFor="talangan-mitra" className="label">
             Mitra *

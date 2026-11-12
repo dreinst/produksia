@@ -437,10 +437,13 @@ export async function ubahDataInduk(slug: string, id: string, dataFormulir: Form
   redirect(`/data-induk/${slug}`);
 }
 
-/** Galat basis data yang berarti proyek sedang atau masih dipakai transaksi lain (P2034 deadlock/konflik, P2003 FK). */
+/**
+ * Galat basis data yang berarti proyek sedang atau masih dipakai transaksi lain (P2034 deadlock/konflik, P2003 FK, dan
+ * P2028 batas waktu transaksi interaktif habis karena menunggu kunci jalur lain, tinjauan P37 R3).
+ */
 function galatProyekDipakai(e: unknown): boolean {
   const kode = (e as { code?: unknown } | null)?.code;
-  return kode === "P2034" || kode === "40P01" || kode === "40001" || galatMasihDipakai(e);
+  return kode === "P2034" || kode === "P2028" || kode === "40P01" || kode === "40001" || galatMasihDipakai(e);
 }
 
 /**
@@ -449,7 +452,9 @@ function galatProyekDipakai(e: unknown): boolean {
  * Penolakan hanya untuk anak yang FK-nya RESTRICT: talangan mitra, pembayaran ke mitra, dan berkas (D7 §3.3.7 no. 5).
  *
  * Urutan kunci (catatan orkestrator sesudah P35 dan P36, tinjauan P36 R1): pesanan lalu penawaran penjualan yang menaut
- * proyek dikunci FOR UPDATE urut id lebih dulu, karena SET NULL akan menulis baris itu. Sinkron anggaran memegang
+ * proyek dikunci urut id lebih dulu, karena SET NULL akan menulis baris itu. Kuncinya FOR NO KEY UPDATE (tinjauan P37
+ * R3), setara kebutuhan SET NULL: tetap bentrok dengan FOR SHARE sinkron anggaran, tetapi tidak menunggu FOR KEY SHARE
+ * yang diambil setiap sisipan anak pesanan (surat jalan, faktur, uang muka, termin). Sinkron anggaran memegang
  * dokumen sumber (FOR SHARE) sebelum Proyek, jadi hapus harus memakai urutan yang sama: dokumen, lalu Proyek. Pesanan
  * dikunci sebelum penawaran seperti hapus pesanan (kepala pesanan lalu penawaran asal). Sesudah itu baris Proyek FOR
  * UPDATE, lalu anak RESTRICT dihitung di dalam transaksi. Baris mitra lalu dikunci FOR UPDATE SKIP LOCKED. Mitra yang sedang dipegang
@@ -459,8 +464,8 @@ function galatProyekDipakai(e: unknown): boolean {
 async function hapusProyek(id: string) {
   try {
     await db.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR UPDATE`;
-      await tx.$queryRaw`SELECT 1 FROM "PenawaranPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR UPDATE`;
+      await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR NO KEY UPDATE`;
+      await tx.$queryRaw`SELECT 1 FROM "PenawaranPenjualan" WHERE "proyekId" = ${id} ORDER BY "id" FOR NO KEY UPDATE`;
       const [p] = await tx.$queryRaw<{ kode: string }[]>`SELECT "kode" FROM "Proyek" WHERE "id" = ${id} FOR UPDATE`;
       if (!p) throw new Error("Data tidak ditemukan (mungkin sudah dihapus).");
       // berurutan: transaksi interaktif tidak boleh menjalankan kueri bersamaan

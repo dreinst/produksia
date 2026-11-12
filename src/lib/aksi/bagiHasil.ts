@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { wajibHakAksi } from "@/lib/otentikasi";
+import { punyaHak, type Hak, type PenggunaSesi } from "@/lib/hakAkses";
 import { catatAktivitas } from "@/lib/log";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { nomorDokumenBerikutnya } from "@/lib/penomoran";
@@ -38,6 +39,16 @@ const PANJANG_CATATAN = 1000;
 type Tx = Prisma.TransactionClient;
 
 const ruteKeuangan = (proyekId: string) => `/proyek/${proyekId}/keuangan`;
+
+/**
+ * Tujuan sesudah dokumen mitra dibuat (tinjauan P37 R2). Detail dokumen butuh hak lihat jenisnya, jadi pemegang hak buat
+ * saja dikembalikan ke ringkasan proyek dengan pesan sukses (?tersimpan=), atau tetap di formulir (pesan sukses
+ * FormulirAksi) bila ringkasan proyek pun tidak boleh dibuka.
+ */
+function alihkanSesudahBuat(pengguna: PenggunaSesi, proyekId: string, hakLihat: Hak, detail: string, jenis: "talangan" | "bayar") {
+  if (punyaHak(pengguna, hakLihat)) redirect(detail);
+  if (punyaHak(pengguna, "proyek.lihat")) redirect(`/proyek/${proyekId}?tersimpan=${jenis}`);
+}
 function revalidasiMitra(proyekId: string) {
   revalidatePath(ruteKeuangan(proyekId));
   revalidatePath("/proyek/keuangan");
@@ -313,7 +324,7 @@ export async function buatTalanganMitra(proyekId: string, dataFormulir: FormData
     return d;
   });
   revalidasiDokumen(proyek.id);
-  redirect(`${ruteKeuangan(proyek.id)}/talangan/${dok.id}`);
+  alihkanSesudahBuat(pengguna, proyek.id, "talangan-mitra.lihat", `${ruteKeuangan(proyek.id)}/talangan/${dok.id}`, "talangan");
 }
 
 export async function buatTalanganMitraFormulir(proyekId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {
@@ -375,7 +386,7 @@ export async function buatPembayaranMitra(proyekId: string, dataFormulir: FormDa
     return d;
   });
   revalidasiDokumen(proyek.id);
-  redirect(`${ruteKeuangan(proyek.id)}/bayar/${dok.id}`);
+  alihkanSesudahBuat(pengguna, proyek.id, "pembayaran-mitra.lihat", `${ruteKeuangan(proyek.id)}/bayar/${dok.id}`, "bayar");
 }
 
 export async function buatPembayaranMitraFormulir(proyekId: string, _sebelumnya: StatusFormulir, dataFormulir: FormData) {

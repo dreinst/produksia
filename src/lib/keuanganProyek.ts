@@ -324,13 +324,13 @@ export type ProyekKeuangan = {
   klien: string | null;
   tanggalMulai: Date | null;
   tanggalSelesai: Date | null;
-  perusahaan: { id: string; kode: string; nama: string; warna: string | null };
+  perusahaan: { id: string; kode: string; nama: string; warna: string | null; aktif: boolean };
 };
 
 const PILIH_PROYEK = {
   id: true, kode: true, nama: true, warna: true, status: true, namaKlien: true, tanggalMulai: true, tanggalSelesai: true,
   pelanggan: { select: { nama: true } },
-  perusahaan: { select: { id: true, kode: true, nama: true, warna: true } },
+  perusahaan: { select: { id: true, kode: true, nama: true, warna: true, aktif: true } },
 } as const;
 
 function proyekRingkas(p: Prisma.ProyekGetPayload<{ select: typeof PILIH_PROYEK }>): ProyekKeuangan {

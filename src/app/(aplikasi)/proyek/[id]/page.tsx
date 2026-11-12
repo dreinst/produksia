@@ -31,10 +31,15 @@ function jadwal(mulai: Date | null, selesai: Date | null): string {
   return "Tanpa jadwal";
 }
 
-export default async function HalamanRingkasanProyek({ params }: { params: Promise<{ id: string }> }) {
+// tinjauan P37 R2: aksi buat dokumen mitra mengalihkan ke sini bila pembuatnya tidak boleh membuka detail dokumen
+const PESAN_TERSIMPAN: Record<string, string> = { talangan: "Talangan mitra tersimpan.", bayar: "Pembayaran ke mitra tersimpan." };
+
+export default async function HalamanRingkasanProyek({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tersimpan?: string | string[] }> }) {
   const pengguna = await wajibHak("proyek.lihat");
   const boleh = (h: Parameters<typeof punyaHak>[1]) => punyaHak(pengguna, h);
   const { id } = await params;
+  const tersimpan = (await searchParams).tersimpan;
+  const pesanTersimpan = typeof tersimpan === "string" ? (PESAN_TERSIMPAN[tersimpan] ?? null) : null;
   const aksesPenuh = boleh("berkas.akses-penuh");
   const proyek = await db.proyek.findUnique({
     where: { id },
@@ -48,7 +53,7 @@ export default async function HalamanRingkasanProyek({ params }: { params: Promi
       tanggalMulai: true,
       tanggalSelesai: true,
       pelanggan: { select: { nama: true } },
-      perusahaan: { select: { kode: true, nama: true, warna: true } },
+      perusahaan: { select: { kode: true, nama: true, warna: true, aktif: true } },
     },
   });
   if (!proyek) notFound();
@@ -106,6 +111,12 @@ export default async function HalamanRingkasanProyek({ params }: { params: Promi
         }
       />
 
+      {pesanTersimpan && (
+        <p role="status" className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          {pesanTersimpan}
+        </p>
+      )}
+
       {penghitung.length > 0 && (
         <section className="kartu space-y-4" aria-labelledby="judul-modul">
           <h2 id="judul-modul" className="judul-kartu">
@@ -141,20 +152,27 @@ export default async function HalamanRingkasanProyek({ params }: { params: Promi
             <Ikon nama="handshake" className="!text-[20px] text-slate-500" />
             Dokumen mitra
           </h2>
-          <div className="flex flex-wrap gap-3">
-            {boleh("talangan-mitra.buat") && (
-              <Link href={`/proyek/${proyek.id}/keuangan/talangan/baru`} className="tombol tombol-garis">
-                <Ikon nama="add" className="!text-[18px]" />
-                Catat talangan mitra
-              </Link>
-            )}
-            {boleh("pembayaran-mitra.buat") && (
-              <Link href={`/proyek/${proyek.id}/keuangan/bayar/baru`} className="tombol tombol-garis">
-                <Ikon nama="account_balance_wallet" className="!text-[18px]" />
-                Bayar mitra
-              </Link>
-            )}
-          </div>
+          {/* tinjauan P37 S2: dokumen mitra tidak bisa dicatat untuk perusahaan yang diarsipkan */}
+          {proyek.perusahaan.aktif ? (
+            <div className="flex flex-wrap gap-3">
+              {boleh("talangan-mitra.buat") && (
+                <Link href={`/proyek/${proyek.id}/keuangan/talangan/baru`} className="tombol tombol-garis">
+                  <Ikon nama="add" className="!text-[18px]" />
+                  Catat talangan mitra
+                </Link>
+              )}
+              {boleh("pembayaran-mitra.buat") && (
+                <Link href={`/proyek/${proyek.id}/keuangan/bayar/baru`} className="tombol tombol-garis">
+                  <Ikon nama="account_balance_wallet" className="!text-[18px]" />
+                  Bayar mitra
+                </Link>
+              )}
+            </div>
+          ) : (
+            <p role="status" className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              Perusahaan {proyek.perusahaan.nama} sudah diarsipkan; aktifkan dulu untuk mencatat dokumen mitra.
+            </p>
+          )}
         </section>
       )}
 

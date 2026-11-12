@@ -4,13 +4,16 @@ import { db } from "@/lib/db";
 import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { persetujuanWajib } from "@/lib/persetujuan";
+import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { daftarAkunKasBank } from "@/lib/baganAkun";
 import { ringkasanKeuanganProyek } from "@/lib/keuanganProyek";
+import { sisaModalMitra } from "@/lib/jurnalMitra";
 import { tanggalIso } from "@/lib/waktu";
 import { buatPembayaranMitraFormulir } from "@/lib/aksi/bagiHasil";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import Ikon from "@/komponen/ui/Ikon";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
+import { BidangPerusahaanProyek, PesanPerusahaanDiarsipkan } from "@/komponen/proyek/PerusahaanDokumenMitra";
 import IsianBayarMitra, { type MitraIsianBayar } from "@/komponen/proyek/IsianBayarMitra";
 
 /*
@@ -23,11 +26,21 @@ export default async function HalamanBayarMitraBaru({ params, searchParams }: { 
   const pengguna = await wajibHak("pembayaran-mitra.buat");
   const { id } = await params;
   const sp = await searchParams;
-  const proyek = await db.proyek.findUnique({ where: { id }, select: { id: true, kode: true, nama: true, perusahaanId: true } });
+  const proyek = await db.proyek.findUnique({ where: { id }, select: { id: true, kode: true, nama: true, perusahaanId: true, perusahaan: { select: { kode: true, nama: true, warna: true, aktif: true } } } });
   if (!proyek) notFound();
   const keuangan = punyaHak(pengguna, "anggaran-proyek.lihat") ? `/proyek/${proyek.id}/keuangan` : null;
   const jejak = [{ label: "Keuangan Proyek", href: keuangan ? "/proyek/keuangan" : undefined }, { label: proyek.kode, href: keuangan ?? undefined }, { label: "Bayar mitra" }];
   const daftarMitra = await db.mitraProyek.findMany({ where: { proyekId: proyek.id }, orderBy: [{ urutan: "asc" }, { dibuatPada: "asc" }, { id: "asc" }], select: { id: true, nama: true } });
+
+  // tinjauan P37 S2: perusahaan proyek yang diarsipkan tidak menerima dokumen mitra baru, jadi formulir tidak dijalankan
+  if (!proyek.perusahaan.aktif)
+    return (
+      <div className="space-y-6">
+        <KepalaHalaman jejak={jejak} judul="Bayar Mitra" subjudul={`${proyek.kode} · ${proyek.nama}`} />
+        <PesanPerusahaanDiarsipkan perusahaan={proyek.perusahaan} />
+      </div>
+    );
+  const bedaLingkup = (await lingkupPerusahaan()).perusahaanId !== proyek.perusahaanId;
 
   if (daftarMitra.length === 0)
     return (
@@ -49,8 +62,18 @@ export default async function HalamanBayarMitraBaru({ params, searchParams }: { 
   const bh = lihatBagi ? (await ringkasanKeuanganProyek(db, proyek.id, { denganBagiHasil: true }))?.bagiHasil ?? null : null;
   const angka = new Map((bh?.mitra ?? []).map((m) => [m.id, m]));
   const n = (v: { toString(): string }) => Number(v.toString());
+  // tinjauan P37 S1: sisa modal sama dengan batas server buatPembayaranMitra (draf dan pengajuan MODAL yang belum ditolak
+  // ikut memesan sisa), tanpa kunci karena halaman hanya membaca
+  const sisaServer = new Map<string, number>();
+  const adaDraf = new Set<string>();
+  if (bh) {
+    for (const m of daftarMitra) sisaServer.set(m.id, n(await sisaModalMitra(db, m.id, { hanyaDisetujui: false })));
+    const draf = await db.pembayaranMitra.groupBy({ by: ["mitraId"], where: { proyekId: proyek.id, jenis: "MODAL", statusPersetujuan: { in: ["DRAFT", "MENUNGGU"] } } });
+    for (const d of draf) adaDraf.add(d.mitraId);
+  }
   const mitra: MitraIsianBayar[] = daftarMitra.map((m) => {
     const b = angka.get(m.id);
+    const sisa = Math.max(0, sisaServer.get(m.id) ?? 0);
     return {
       id: m.id,
       nama: m.nama,
@@ -58,8 +81,9 @@ export default async function HalamanBayarMitraBaru({ params, searchParams }: { 
         ? {
             modalKembali: n(b.modalKembali),
             dibayarModal: n(b.dibayarModal),
-            modalTerutang: n(b.modalTerutang),
-            sisaModal: Math.max(0, n(b.modalMasuk.minus(b.dibayarModal))),
+            modalTerutang: Math.min(n(b.modalTerutang), sisa),
+            sisaModal: sisa,
+            sisaTermasukDraf: adaDraf.has(m.id),
             bagianLaba: n(b.realisasi),
             dibayarLaba: n(b.dibayarLaba),
             labaTerutang: n(b.labaTerutang),
@@ -79,7 +103,8 @@ export default async function HalamanBayarMitraBaru({ params, searchParams }: { 
           Pembayaran dibuat sebagai draf dan baru masuk buku besar setelah disetujui pengguna lain.
         </p>
       )}
-      <FormulirAksi aksi={buatPembayaranMitraFormulir.bind(null, proyek.id)} verifikasi={{ judul: "Periksa pembayaran ke mitra" }} className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormulirAksi aksi={buatPembayaranMitraFormulir.bind(null, proyek.id)} verifikasi={{ judul: "Periksa pembayaran ke mitra" }} pesanSukses="Pembayaran ke mitra tersimpan" className="kartu grid grid-cols-1 md:grid-cols-2 gap-4">
+        {bedaLingkup && <BidangPerusahaanProyek perusahaan={proyek.perusahaan} />}
         <IsianBayarMitra mitra={mitra} mitraAwal={mitraAwal} />
         <div className="space-y-1">
           <label htmlFor="bayar-tanggal" className="label">

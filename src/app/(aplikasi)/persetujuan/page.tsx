@@ -142,13 +142,14 @@ export default async function HalamanPersetujuan() {
       jenis: "talanganMitra" as const, kode: "talangan-mitra", label: "Talangan Mitra", id: t.id, nomor: t.nomor, tanggal: t.tanggal,
       keterangan: `${t.mitra.nama} · ${t.proyek.kode} · ${t.deskripsi}`, nilai: Number(t.jumlah), status: t.statusPersetujuan,
       diajukanOlehId: t.diajukanOlehId, diajukanOleh: nama(t.diajukanOleh), catatanPenolakan: t.catatanPenolakan, perusahaan: t.perusahaan,
-      href: `/proyek/${t.proyekId}/keuangan/talangan/${t.id}`,
+      // tinjauan P37 R1: tautan hanya bagi pemegang hak lihat, karena baris juga tampil bagi pemegang setujui saja
+      href: punyaHak(pengguna, "talangan-mitra.lihat") ? `/proyek/${t.proyekId}/keuangan/talangan/${t.id}` : undefined,
     })),
     ...bayarMitra.map((b) => ({
       jenis: "pembayaranMitra" as const, kode: "pembayaran-mitra", label: "Pembayaran ke Mitra", id: b.id, nomor: b.nomor, tanggal: b.tanggal,
       keterangan: `${b.mitra.nama} · ${b.proyek.kode} · ${b.jenis === "MODAL" ? "Pengembalian modal" : "Bagi laba"}`, nilai: Number(b.jumlah), status: b.statusPersetujuan,
       diajukanOlehId: b.diajukanOlehId, diajukanOleh: nama(b.diajukanOleh), catatanPenolakan: b.catatanPenolakan, perusahaan: b.perusahaan,
-      href: `/proyek/${b.proyekId}/keuangan/bayar/${b.id}`,
+      href: punyaHak(pengguna, "pembayaran-mitra.lihat") ? `/proyek/${b.proyekId}/keuangan/bayar/${b.id}` : undefined,
     })),
   ]
     .filter((b) => bolehLihat(b.kode))

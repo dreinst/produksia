@@ -21,7 +21,7 @@ import Ikon from "@/komponen/ui/Ikon";
 import KartuKpi from "@/komponen/ui/KartuKpi";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import KontrolDaftar from "@/komponen/ui/KontrolDaftar";
-import { LencanaStatus, NomorDokumen, Rp } from "@/komponen/ui/Lencana";
+import { LencanaPersetujuan, LencanaStatus, NomorDokumen, Rp } from "@/komponen/ui/Lencana";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import BilahPersen from "@/komponen/ui/BilahPersen";
 import TabTautan from "@/komponen/ui/TabTautan";
@@ -161,6 +161,12 @@ export default async function HalamanDetailKeuanganProyek({
           </>
         )}
       </p>
+
+      {!proyek.perusahaan.aktif && (boleh("talangan-mitra.buat") || boleh("pembayaran-mitra.buat")) && (
+        <p role="status" className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Perusahaan {proyek.perusahaan.nama} sudah diarsipkan; aktifkan dulu untuk mencatat dokumen mitra.
+        </p>
+      )}
 
       <TabTautan aktif={tab} daftar={tabs} label="Bagian keuangan proyek" />
 
@@ -360,7 +366,7 @@ async function TabAnggaran({ proyek, pengguna, sp }: { proyek: ProyekKeuangan; p
   ];
   const basi = [...status.values()].filter((s) => s.basi && (s.jenis === "penawaran" ? lihatPnw : lihatPsj));
   const totalRencana = baris.reduce((t, b) => t.plus(D(b.rencana)), D(0));
-  const ubahId = ambilTeks(sp.ubah);
+  const ubahId = ambilTeks(sp.ubahBaris);
   const banner = bannerSinkron(sp);
   const anggaranLpj = (await db.proyek.findUnique({ where: { id: proyek.id }, select: { anggaranBiaya: true } }))?.anggaranBiaya ?? null;
   // kontrak perbaikan P34 R3: tombol Samakan hanya bila proyek sudah punya baris anggaran
@@ -496,7 +502,7 @@ async function TabAnggaran({ proyek, pengguna, sp }: { proyek: ProyekKeuangan; p
                       <td className="td-lekat whitespace-nowrap">
                         <span className="flex items-center gap-3">
                           {ubah && (
-                            <Link href={`/proyek/${proyek.id}/keuangan?tab=anggaran&ubah=${b.id}`} className="tombol-tautan">
+                            <Link href={`/proyek/${proyek.id}/keuangan?tab=anggaran&ubahBaris=${b.id}`} className="tombol-tautan">
                               Ubah
                             </Link>
                           )}
@@ -570,7 +576,8 @@ async function TabBiaya({
     : rinci.baris;
   const halaman = tersaring.slice(param.lewati, param.lewati + param.ambil);
   const totalBiaya = tersaring.filter((b) => !b.bagiHasil).reduce((t, b) => t.plus(b.jumlah), D(0));
-  const bolehTalangan = punyaHak(pengguna, "talangan-mitra.buat");
+  // tinjauan P37 S2: dokumen mitra tidak bisa dicatat untuk perusahaan yang diarsipkan, jadi tombolnya disembunyikan
+  const bolehTalangan = punyaHak(pengguna, "talangan-mitra.buat") && proyek.perusahaan.aktif;
   const bolehKas = punyaHak(pengguna, "kas-keluar.buat");
   return (
     <section className="space-y-4">
@@ -684,21 +691,25 @@ async function TabBiaya({
 async function TabPendapatan({ proyek, pengguna }: { proyek: ProyekKeuangan; pengguna: PenggunaSesi }) {
   const boleh = (h: Hak) => punyaHak(pengguna, h);
   const lihatBayar = boleh("uang-muka.lihat") && boleh("penerimaan.lihat");
-  type Dok = { kunci: string; href: string; nomor: string; jenis: string; status: string; tanggal: Date; nilai: Desimal; catatan?: string };
+  // tinjauan P37 R5: dokumen perusahaan lain yang masih menaut proyek tetap dihitung (sama dengan ringkasan), tetapi diberi
+  // lencana perusahaannya supaya bedanya dengan kartu impor di tab Anggaran terlihat
+  type PerusahaanDok = { id: string; kode: string; nama: string; warna: string | null };
+  type Dok = { kunci: string; href: string; nomor: string; jenis: string; status: string; persetujuan?: boolean; tanggal: Date; nilai: Desimal; catatan?: string; perusahaan: PerusahaanDok };
+  const pilihPerusahaan = { select: { id: true, kode: true, nama: true, warna: true } } as const;
   const dok: Dok[] = [];
   if (boleh("penawaran.lihat"))
-    for (const d of await db.penawaranPenjualan.findMany({ where: { proyekId: proyek.id }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, status: true, tanggal: true, total: true } }))
-      dok.push({ kunci: `pnw-${d.id}`, href: `/penjualan/penawaran/${d.id}`, nomor: d.nomor, jenis: "Penawaran", status: d.status, tanggal: d.tanggal, nilai: D(d.total) });
+    for (const d of await db.penawaranPenjualan.findMany({ where: { proyekId: proyek.id }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, status: true, tanggal: true, total: true, perusahaan: pilihPerusahaan } }))
+      dok.push({ kunci: `pnw-${d.id}`, href: `/penjualan/penawaran/${d.id}`, nomor: d.nomor, jenis: "Penawaran", status: d.status, tanggal: d.tanggal, nilai: D(d.total), perusahaan: d.perusahaan });
   const pesanan = boleh("pesanan.lihat")
-    ? await db.pesananPenjualan.findMany({ where: { proyekId: proyek.id }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, status: true, tanggal: true, total: true } })
+    ? await db.pesananPenjualan.findMany({ where: { proyekId: proyek.id }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, status: true, tanggal: true, total: true, perusahaan: pilihPerusahaan } })
     : [];
-  for (const d of pesanan) dok.push({ kunci: `psj-${d.id}`, href: `/penjualan/pesanan/${d.id}`, nomor: d.nomor, jenis: "Pesanan", status: d.status, tanggal: d.tanggal, nilai: D(d.total) });
+  for (const d of pesanan) dok.push({ kunci: `psj-${d.id}`, href: `/penjualan/pesanan/${d.id}`, nomor: d.nomor, jenis: "Pesanan", status: d.status, tanggal: d.tanggal, nilai: D(d.total), perusahaan: d.perusahaan });
   if (boleh("faktur.lihat"))
-    for (const d of await db.fakturPenjualan.findMany({ where: { pesanan: { proyekId: proyek.id } }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, status: true, statusPersetujuan: true, tanggal: true, dpp: true } }))
-      dok.push({ kunci: `fj-${d.id}`, href: `/penjualan/faktur/${d.id}`, nomor: d.nomor, jenis: "Faktur", status: d.status, tanggal: d.tanggal, nilai: D(d.dpp), catatan: d.statusPersetujuan === "DISETUJUI" ? undefined : "tidak dihitung" });
+    for (const d of await db.fakturPenjualan.findMany({ where: { pesanan: { proyekId: proyek.id } }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, status: true, statusPersetujuan: true, tanggal: true, dpp: true, perusahaan: pilihPerusahaan } }))
+      dok.push({ kunci: `fj-${d.id}`, href: `/penjualan/faktur/${d.id}`, nomor: d.nomor, jenis: "Faktur", status: d.status, tanggal: d.tanggal, nilai: D(d.dpp), catatan: d.statusPersetujuan === "DISETUJUI" ? undefined : "tidak dihitung", perusahaan: d.perusahaan });
   if (boleh("uang-muka.lihat"))
-    for (const d of await db.uangMukaPelanggan.findMany({ where: { pesanan: { proyekId: proyek.id } }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, tanggal: true, jumlah: true, statusPersetujuan: true, rencanaTermin: { select: { label: true } } } }))
-      dok.push({ kunci: `um-${d.id}`, href: `/penjualan/uang-muka/${d.id}`, nomor: d.nomor, jenis: "Uang muka", status: d.statusPersetujuan, tanggal: d.tanggal, nilai: D(d.jumlah), catatan: d.rencanaTermin ? `termin ${d.rencanaTermin.label}, termasuk PPN` : "termasuk PPN" });
+    for (const d of await db.uangMukaPelanggan.findMany({ where: { pesanan: { proyekId: proyek.id } }, orderBy: [{ tanggal: "desc" }, { nomor: "desc" }], select: { id: true, nomor: true, tanggal: true, jumlah: true, statusPersetujuan: true, rencanaTermin: { select: { label: true } }, perusahaan: pilihPerusahaan } }))
+      dok.push({ kunci: `um-${d.id}`, href: `/penjualan/uang-muka/${d.id}`, nomor: d.nomor, jenis: "Uang muka", status: d.statusPersetujuan, persetujuan: true, tanggal: d.tanggal, nilai: D(d.jumlah), catatan: d.rencanaTermin ? `termin ${d.rencanaTermin.label}, termasuk PPN` : "termasuk PPN", perusahaan: d.perusahaan });
   const termin: { pesanan: { id: string; nomor: string }; butir: NonNullable<Awaited<ReturnType<typeof progresTermin>>>["butir"] }[] = [];
   for (const p of pesanan) {
     const pr = await progresTermin(db, p.id);
@@ -707,6 +718,11 @@ async function TabPendapatan({ proyek, pengguna }: { proyek: ProyekKeuangan; pen
   return (
     <section className="space-y-4">
       <p className="text-sm text-slate-600">Nilai tanpa PPN. Faktur yang belum disetujui tidak dihitung sebagai ditagih.</p>
+      {dok.some((d) => d.perusahaan.id !== proyek.perusahaan.id) && (
+        <p role="status" className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Dokumen berlencana kode perusahaan milik perusahaan lain, bukan {proyek.perusahaan.nama}. Dokumen itu tetap dihitung di ringkasan, tetapi tidak bisa diimpor ke anggaran.
+        </p>
+      )}
       <div className="kartu kartu-tabel">
         <div className="bungkus-tabel">
           <table className="tabel min-w-[44rem]">
@@ -730,14 +746,15 @@ async function TabPendapatan({ proyek, pengguna }: { proyek: ProyekKeuangan; pen
                 dok.map((d) => (
                   <tr key={d.kunci}>
                     <td>
-                      <Link href={d.href} className="hover:underline">
-                        <NomorDokumen nomor={d.nomor} />
-                      </Link>
+                      <span className="inline-flex flex-wrap items-center gap-2">
+                        <Link href={d.href} className="hover:underline">
+                          <NomorDokumen nomor={d.nomor} />
+                        </Link>
+                        {d.perusahaan.id !== proyek.perusahaan.id && <LencanaPerusahaan kode={d.perusahaan.kode} warna={d.perusahaan.warna} nama={`Milik ${d.perusahaan.nama}, bukan perusahaan proyek`} />}
+                      </span>
                     </td>
                     <td className="text-slate-600">{d.jenis}</td>
-                    <td>
-                      <LencanaStatus status={d.status} />
-                    </td>
+                    <td>{d.persetujuan ? <LencanaPersetujuan status={d.status} /> : <LencanaStatus status={d.status} />}</td>
                     <td className="whitespace-nowrap text-slate-500">{formatTanggal(d.tanggal)}</td>
                     <td className="text-right">
                       <Rp nilai={d.nilai} />
@@ -797,7 +814,9 @@ async function TabPendapatan({ proyek, pengguna }: { proyek: ProyekKeuangan; pen
 async function TabBagiHasil({ proyek, r, bh, pengguna, sp }: { proyek: ProyekKeuangan; r: RingkasanKeuangan; bh: BagiHasilProyek; pengguna: PenggunaSesi; sp: Record<string, string | string[] | undefined> }) {
   const boleh = (h: Hak) => punyaHak(pengguna, h);
   const [buatMitra, ubahMitra, hapusMitra] = [boleh("bagi-hasil.buat"), boleh("bagi-hasil.ubah"), boleh("bagi-hasil.hapus")];
-  const bayar = boleh("pembayaran-mitra.buat");
+  // tinjauan P37 S2: pembuat dokumen mitra disembunyikan bila perusahaan proyek diarsipkan
+  const aktif = proyek.perusahaan.aktif;
+  const bayar = boleh("pembayaran-mitra.buat") && aktif;
   const lihatTalangan = boleh("talangan-mitra.lihat");
   const lihatBayar = boleh("pembayaran-mitra.lihat");
   const catatan = new Map((await db.mitraProyek.findMany({ where: { proyekId: proyek.id }, select: { id: true, catatan: true } })).map((m) => [m.id, m.catatan]));
@@ -1035,7 +1054,7 @@ async function TabBagiHasil({ proyek, r, bh, pengguna, sp }: { proyek: ProyekKeu
         <div className="kartu kartu-tabel">
           <div className="kepala-kartu flex flex-wrap items-center justify-between gap-3">
             <h2 className="judul-kartu">Talangan mitra</h2>
-            {boleh("talangan-mitra.buat") && (
+            {boleh("talangan-mitra.buat") && aktif && (
               <Link href={`/proyek/${proyek.id}/keuangan/talangan/baru`} className="tombol tombol-garis">
                 <Ikon nama="add" className="!text-[18px]" />
                 Catat talangan

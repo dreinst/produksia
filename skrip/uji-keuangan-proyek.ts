@@ -752,6 +752,78 @@ async function main() {
         await jalankan("hapus proyek bermitra sesudah kunci dilepas", () => hapusDataInduk("proyek", prjK.id));
         pastikan((await db.proyek.count({ where: { id: prjK.id } })) === 0 && (await db.mitraProyek.count({ where: { id: mK.id } })) === 0, "proyek bermitra tanpa dokumen terhapus, mitranya ikut terhapus (CASCADE)");
       }
+      // tinjauan P37 R3 (1): pra-kunci pesanan dan penawaran memakai FOR NO KEY UPDATE, jadi hapus proyek tidak menunggu
+      // sisipan anak pesanan yang belum selesai (FK anak mengambil FOR KEY SHARE pada pesanan). Kode lama (FOR UPDATE)
+      // tertahan sampai sisipan selesai. Pesanan tetap kehilangan proyekId (SET NULL) dan sisipan anaknya tetap tersimpan.
+      {
+        const prjN = await db.proyek.create({ data: { kode: `PRJ-${K}-HN`, nama: "Event Uji Hapus Sisipan Pesanan", perusahaanId: P2 } });
+        const psnN = await db.pesananPenjualan.create({ data: { nomor: `PSJ-${K}-HN`, pelangganId: pelanggan.id, perusahaanId: P2, proyekId: prjN.id, total: 1_000 } });
+        try {
+          let lepas!: () => void;
+          const tahan = new Promise<void>((r) => (lepas = r));
+          let siap!: () => void;
+          const tersisip = new Promise<void>((r) => (siap = r));
+          const sisip = db
+            .$transaction(
+              async (tx) => {
+                await tx.rencanaTermin.create({ data: { perusahaanId: P2, pesananId: psnN.id, no: 1, label: "Termin 1", jumlah: 1_000, persen: 100 } });
+                siap();
+                await tahan;
+              },
+              { timeout: 60_000 },
+            )
+            .then(() => "ok", (e: Error) => e.message);
+          await tersisip;
+          const hapusN = aksi(() => hapusDataInduk("proyek", prjN.id));
+          const awalN = await Promise.race([hapusN, new Promise<string>((r) => setTimeout(() => r("TERTAHAN"), 3_000))]);
+          lepas();
+          const [hSisip, hHapusN] = await Promise.all([sisip, hapusN]);
+          const psnSesudah = await db.pesananPenjualan.findUnique({ where: { id: psnN.id }, select: { proyekId: true } });
+          pastikan(
+            awalN === "ok" && hHapusN === "ok" && hSisip === "ok" && (await db.proyek.count({ where: { id: prjN.id } })) === 0 && psnSesudah?.proyekId === null && (await db.rencanaTermin.count({ where: { pesananId: psnN.id } })) === 1,
+            `hapus proyek selagi sisipan anak pesanan belum selesai: tidak menunggu, pesanan dikosongkan proyeknya, sisipan tetap tersimpan (hapus=[${awalN === "TERTAHAN" ? "TERTAHAN, lalu " : ""}${hHapusN}] sisip=[${hSisip}])`,
+          );
+        } finally {
+          await db.pesananPenjualan.deleteMany({ where: { id: psnN.id } });
+          await db.proyek.deleteMany({ where: { id: prjN.id } });
+        }
+      }
+      // tinjauan P37 R3 (2): hapus yang menunggu kunci jalur lain melewati batas transaksi interaktif (5 detik, P2028)
+      // diterjemahkan menjadi "Proyek masih dipakai", bukan pesan galat umum. Lawannya memegang pesanan FOR SHARE seperti
+      // sinkron anggaran, yang tetap diserialkan dengan hapus. Proyek dan pesanan tidak berubah.
+      {
+        const prjT = await db.proyek.create({ data: { kode: `PRJ-${K}-HT`, nama: "Event Uji Hapus Batas Waktu", perusahaanId: P2 } });
+        const psnT = await db.pesananPenjualan.create({ data: { nomor: `PSJ-${K}-HT`, pelangganId: pelanggan.id, perusahaanId: P2, proyekId: prjT.id, total: 1_000 } });
+        try {
+          let lepas!: () => void;
+          const tahan = new Promise<void>((r) => (lepas = r));
+          let siap!: () => void;
+          const terkunci = new Promise<void>((r) => (siap = r));
+          const pegangT = db
+            .$transaction(
+              async (tx) => {
+                await tx.$queryRaw`SELECT 1 FROM "PesananPenjualan" WHERE "id" = ${psnT.id} FOR SHARE`;
+                siap();
+                await tahan;
+              },
+              { timeout: 60_000 },
+            )
+            .then(() => "ok", (e: Error) => e.message);
+          await terkunci;
+          const hapusT = aksi(() => hapusDataInduk("proyek", prjT.id));
+          const awalT = await Promise.race([hapusT, new Promise<string>((r) => setTimeout(() => r("TERTAHAN"), 7_000))]);
+          lepas();
+          const [hPegangT, hHapusT] = await Promise.all([pegangT, hapusT]);
+          const psnSesudah = await db.pesananPenjualan.findUnique({ where: { id: psnT.id }, select: { proyekId: true } });
+          pastikan(
+            hHapusT.includes("Proyek masih dipakai; muat ulang lalu coba lagi") && hPegangT === "ok" && (await db.proyek.count({ where: { id: prjT.id } })) === 1 && psnSesudah?.proyekId === prjT.id,
+            `hapus proyek yang menunggu kunci pesanan melewati batas waktu transaksi: P2028 menjadi "Proyek masih dipakai", data tetap (hapus=[${awalT === "TERTAHAN" ? "TERTAHAN, lalu " : ""}${hHapusT.replace(/\s+/g, " ").slice(-200)}] lawan=[${hPegangT}])`,
+          );
+        } finally {
+          await db.pesananPenjualan.deleteMany({ where: { id: psnT.id } });
+          await db.proyek.deleteMany({ where: { id: prjT.id } });
+        }
+      }
       // berkas proyek (FK RESTRICT, D7 §3.3.7 no. 5) tetap menahan hapus, termasuk berkas di Sampah
       {
         const prjB = await db.proyek.create({ data: { kode: `PRJ-${K}-HB`, nama: "Event Uji Hapus Berkas", perusahaanId: P2 } });
