@@ -1,13 +1,28 @@
-import type { Prisma, PrismaClient } from "@/prisma-klien/client";
-import type { StatusKampanye, TujuanKampanye } from "@/prisma-klien/enums";
-import { URUTAN_STATUS_KAMPANYE } from "@/lib/labelPemasaran";
+import type { Kampanye, Prisma, PrismaClient } from "@/prisma-klien/client";
+import type { GenderAudiens, StatusKampanye, TujuanKampanye } from "@/prisma-klien/enums";
+import { URUTAN_STATUS_KAMPANYE, URUTAN_TUJUAN } from "@/lib/labelPemasaran";
 import { saringPerusahaan } from "@/lib/perusahaan";
 import { D, uang, type Desimal } from "@/lib/uang";
+import type { ParamDaftar } from "@/lib/daftar";
+import { bacaWaktuLokal, tanggalIso } from "@/lib/waktu";
+import {
+  bulatOpsional,
+  enumWajib,
+  geserHari,
+  idOpsional,
+  tanggalDariIso,
+  tanggalOpsional,
+  teksOpsional,
+  teksWajib,
+  uangBolehKosong,
+  uangOpsional,
+} from "@/lib/pemasaran";
 
 /*
  * Pustaka Perencana Iklan Meta (D6 §3.3, §6.1). Bukan "use server". Berisi rumus turunan (semua Prisma.Decimal,
- * pembulatan uang() 2 desimal setengah ke atas) dan ringkasanIklan. daftarKampanye dan kampanyeLengkap ditambahkan
- * paket Pemasaran dengan nama dan tanda tangan rancangan.
+ * pembulatan uang() 2 desimal setengah ke atas) dan ringkasanIklan dari paket dashboard (rumus tidak diubah), ditambah
+ * pembaca isian kampanye, set iklan, iklan, dan laporan harian, kunci kampanye aktif, daftarKampanye, dan
+ * kampanyeLengkap untuk halaman.
  */
 
 type Klien = PrismaClient | Prisma.TransactionClient;
@@ -265,4 +280,289 @@ export async function ringkasanIklan(klien: Klien, saringan: SaringanIklan = {},
     total: totalDariJumlah(keseluruhan, satuTujuan),
     perKampanye,
   };
+}
+
+// ---------- Kunci dan pembaca isian (D6 §3.3 no. 1 sampai 4) ----------
+
+export const PESAN_KAMPANYE_TIDAK_ADA = "Kampanye tidak ditemukan";
+
+/**
+ * Kunci baris kampanye lalu baca ulang; melempar bila tidak ada atau sudah diarsipkan. `eksklusif` (FOR UPDATE) untuk
+ * ubah dan arsip kampanye serta laporan harian (unik per tanggal); aksi anak lain cukup FOR SHARE supaya kampanye tidak
+ * diarsipkan di tengah jalan.
+ */
+export async function kunciKampanyeAktif(tx: Klien, id: string, eksklusif = false): Promise<Kampanye> {
+  if (eksklusif) await tx.$queryRaw`SELECT 1 FROM "Kampanye" WHERE "id" = ${id} FOR UPDATE`;
+  else await tx.$queryRaw`SELECT 1 FROM "Kampanye" WHERE "id" = ${id} FOR SHARE`;
+  const k = await tx.kampanye.findFirst({ where: { id, diarsipkanPada: null } });
+  if (!k) throw new Error(PESAN_KAMPANYE_TIDAK_ADA);
+  return k;
+}
+
+export type IsianKampanye = {
+  nama: string;
+  tujuan: TujuanKampanye;
+  anggaran: Desimal;
+  tanggalMulai: Date | null;
+  tanggalSelesai: Date | null;
+  status: StatusKampanye;
+  catatan: string | null;
+};
+
+/** Isian kampanye (D6 §3.3 no. 1). Proyek dibaca terpisah dengan bacaProyekId terhadap perusahaan kampanye. */
+export function bacaIsianKampanye(fd: FormData): IsianKampanye {
+  const tanggalMulai = tanggalOpsional(fd, "tanggalMulai", "Tanggal mulai");
+  const tanggalSelesai = tanggalOpsional(fd, "tanggalSelesai", "Tanggal selesai");
+  if (tanggalMulai && tanggalSelesai && tanggalIso(tanggalSelesai) < tanggalIso(tanggalMulai)) throw new Error("Tanggal selesai tidak boleh sebelum tanggal mulai");
+  return {
+    nama: teksWajib(fd, "nama", "Nama kampanye", 200),
+    tujuan: enumWajib(fd, "tujuan", URUTAN_TUJUAN, "PROSPEK", "Tujuan kampanye"),
+    anggaran: uangOpsional(fd, "anggaran", "Anggaran"),
+    tanggalMulai,
+    tanggalSelesai,
+    status: enumWajib(fd, "status", URUTAN_STATUS_KAMPANYE, "DIRENCANAKAN", "Status kampanye"),
+    catatan: teksOpsional(fd, "catatan", "Catatan", 5000),
+  };
+}
+
+const URUTAN_GENDER: readonly GenderAudiens[] = ["SEMUA", "PEREMPUAN", "LAKI_LAKI"];
+
+export type IsianSetIklan = {
+  nama: string;
+  audiens: string | null;
+  lokasi: string | null;
+  usia: string | null;
+  gender: GenderAudiens;
+  penempatan: string | null;
+  anggaran: Desimal;
+  catatan: string | null;
+};
+
+/** Isian set iklan (D6 §3.3 no. 2). Kampanye diambil dari argumen aksi, tidak dari isian. */
+export function bacaIsianSetIklan(fd: FormData): IsianSetIklan {
+  return {
+    nama: teksWajib(fd, "nama", "Nama set iklan", 200),
+    audiens: teksOpsional(fd, "audiens", "Audiens", 500),
+    lokasi: teksOpsional(fd, "lokasi", "Lokasi", 200),
+    usia: teksOpsional(fd, "usia", "Usia", 20),
+    gender: enumWajib(fd, "gender", URUTAN_GENDER, "SEMUA", "Gender"),
+    penempatan: teksOpsional(fd, "penempatan", "Penempatan", 200),
+    anggaran: uangOpsional(fd, "anggaran", "Anggaran"),
+    catatan: teksOpsional(fd, "catatan", "Catatan", 5000),
+  };
+}
+
+export type IsianIklan = {
+  setIklanId: string;
+  nama: string;
+  berkasKreatifId: string | null;
+  teksUtama: string | null;
+  judulIklan: string | null;
+  cta: string | null;
+  urlTujuan: string | null;
+  catatan: string | null;
+};
+
+/** URL tujuan iklan harus http:// atau https:// (mencegah javascript: ikut dirender sebagai tautan). Murni. */
+export function urlTujuanSah(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** Isian iklan (D6 §3.3 no. 3). Kepemilikan set iklan dan berkas kreatif diperiksa aksi di dalam transaksi. */
+export function bacaIsianIklan(fd: FormData): IsianIklan {
+  const setIklanId = idOpsional(fd, "setIklanId");
+  if (!setIklanId) throw new Error("Set iklan wajib dipilih");
+  const urlTujuan = teksOpsional(fd, "urlTujuan", "URL tujuan", 2000);
+  if (urlTujuan && !urlTujuanSah(urlTujuan)) throw new Error("URL tujuan harus diawali http:// atau https://");
+  return {
+    setIklanId,
+    nama: teksWajib(fd, "nama", "Nama iklan", 200),
+    berkasKreatifId: idOpsional(fd, "berkasKreatifId"),
+    teksUtama: teksOpsional(fd, "teksUtama", "Teks utama", 5000),
+    judulIklan: teksOpsional(fd, "judulIklan", "Judul iklan", 200),
+    cta: teksOpsional(fd, "cta", "CTA", 60),
+    urlTujuan,
+    catatan: teksOpsional(fd, "catatan", "Catatan", 5000),
+  };
+}
+
+export type IsianMetrik = {
+  tanggal: Date;
+  belanja: Desimal;
+  jangkauan: number;
+  tayangan: number;
+  klik: number;
+  leads: number;
+  konversi: number;
+  hasil: number | null;
+  pendapatan: Desimal;
+  ctrManual: Desimal | null;
+  cpcManual: Desimal | null;
+  cpmManual: Desimal | null;
+  catatan: string | null;
+};
+
+/** Isian laporan harian (D6 §3.3 no. 4). Kosong pada hasil dan nilai CTR/CPC/CPM manual = dihitung otomatis. */
+export function bacaIsianMetrik(fd: FormData): IsianMetrik {
+  const t = String(fd.get("tanggal") ?? "").trim();
+  if (!t) throw new Error("Tanggal laporan wajib diisi");
+  const tanggal = tanggalDariIso(t);
+  if (!tanggal) throw new Error("Tanggal laporan tidak valid");
+  return {
+    tanggal,
+    belanja: uangOpsional(fd, "belanja", "Belanja"),
+    jangkauan: bulatOpsional(fd, "jangkauan", "Jangkauan"),
+    tayangan: bulatOpsional(fd, "tayangan", "Tayangan"),
+    klik: bulatOpsional(fd, "klik", "Klik"),
+    leads: bulatOpsional(fd, "leads", "Leads"),
+    konversi: bulatOpsional(fd, "konversi", "Konversi"),
+    hasil: bulatOpsional(fd, "hasil", "Hasil", { bolehKosong: true }),
+    pendapatan: uangOpsional(fd, "pendapatan", "Pendapatan"),
+    ctrManual: uangBolehKosong(fd, "ctrManual", "CTR"),
+    cpcManual: uangBolehKosong(fd, "cpcManual", "CPC"),
+    cpmManual: uangBolehKosong(fd, "cpmManual", "CPM"),
+    catatan: teksOpsional(fd, "catatan", "Catatan", 2000),
+  };
+}
+
+/** Rentang satu hari (ZONA_WAKTU) untuk tanggal laporan, dipakai pemeriksaan unik per kampanye per tanggal. */
+export function rentangHariLaporan(tanggal: Date): { gte: Date; lt: Date } {
+  const iso = tanggalIso(tanggal);
+  return { gte: bacaWaktuLokal(`${iso}T00:00`)!, lt: bacaWaktuLokal(`${geserHari(iso, 1)}T00:00`)! };
+}
+
+// ---------- Fungsi baca halaman (D6 §6.6) ----------
+
+type ParamMentah = Record<string, string | string[] | undefined>;
+const satu = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v ?? "").trim();
+
+/** Saringan dari query string halaman; nilai tidak dikenal diabaikan. q diambil dari param daftar. */
+export function bacaSaringanIklan(p: ParamMentah): SaringanIklan {
+  const status = satu(p.status);
+  return { proyek: satu(p.proyek).slice(0, 100), status: (URUTAN_STATUS_KAMPANYE as readonly string[]).includes(status) ? (status as StatusKampanye) : "" };
+}
+
+const PILIH_KAMPANYE_DAFTAR = {
+  id: true,
+  nama: true,
+  tujuan: true,
+  status: true,
+  anggaran: true,
+  tanggalMulai: true,
+  tanggalSelesai: true,
+  proyekId: true,
+  perusahaanId: true,
+  dibuatPada: true,
+  perusahaan: { select: { id: true, kode: true, nama: true, warna: true } },
+  proyek: { select: { id: true, kode: true, nama: true, warna: true } },
+} satisfies Prisma.KampanyeSelect;
+
+export type BarisKampanyeDaftar = Omit<Prisma.KampanyeGetPayload<{ select: typeof PILIH_KAMPANYE_DAFTAR }>, "anggaran"> & { anggaran: Desimal; total: TotalMetrik };
+
+/**
+ * Tabel kampanye halaman Perencana Iklan (D6 §6.6): kampanye aktif tersaring dipaginasi param (urut dibuat terbaru),
+ * dengan total metrik per kampanye yang dihitung hanya untuk baris halaman itu (dua groupBy seperti ringkasanIklan).
+ */
+export async function daftarKampanye(klien: Klien, saringan: SaringanIklan, param: Pick<ParamDaftar, "q" | "lewati" | "ambil">, perusahaanId?: string | null): Promise<{ total: number; baris: BarisKampanyeDaftar[] }> {
+  const where = whereKampanye({ ...saringan, q: param.q || saringan.q }, perusahaanId);
+  const [total, kampanye] = await Promise.all([
+    klien.kampanye.count({ where }),
+    klien.kampanye.findMany({ where, orderBy: [{ dibuatPada: "desc" }, { id: "asc" }], skip: param.lewati, take: param.ambil, select: PILIH_KAMPANYE_DAFTAR }),
+  ]);
+  const ids = kampanye.map((k) => k.id);
+  const _sum = { belanja: true, jangkauan: true, tayangan: true, klik: true, leads: true, konversi: true, pendapatan: true, hasil: true } as const;
+  const [semua, manualHasil] = ids.length
+    ? await Promise.all([
+        klien.metrikIklan.groupBy({ by: ["kampanyeId"], where: { kampanyeId: { in: ids } }, _sum }),
+        klien.metrikIklan.groupBy({ by: ["kampanyeId"], where: { kampanyeId: { in: ids }, hasil: { not: null } }, _sum }),
+      ])
+    : [[], []];
+  const petaSemua = new Map(semua.map((g) => [g.kampanyeId, g._sum]));
+  const petaManual = new Map(manualHasil.map((g) => [g.kampanyeId, g._sum]));
+  return {
+    total,
+    baris: kampanye.map((k) => {
+      const s = petaSemua.get(k.id);
+      const m = petaManual.get(k.id);
+      const dasar = (x: typeof s) => ({ jangkauan: x?.jangkauan ?? 0, klik: x?.klik ?? 0, leads: x?.leads ?? 0, konversi: x?.konversi ?? 0 });
+      const ds = dasar(s);
+      const dm = dasar(m);
+      const dasarOtomatis = dasarHasil({ jangkauan: ds.jangkauan - dm.jangkauan, klik: ds.klik - dm.klik, leads: ds.leads - dm.leads, konversi: ds.konversi - dm.konversi }, k.tujuan);
+      const j: JumlahDasar = { belanja: D(s?.belanja), tayangan: s?.tayangan ?? 0, pendapatan: D(s?.pendapatan), ...ds, hasilEfektif: (m?.hasil ?? 0) + dasarOtomatis };
+      return { ...k, anggaran: D(k.anggaran), total: totalDariJumlah(j) };
+    }),
+  };
+}
+
+const PILIH_KAMPANYE_LENGKAP = {
+  perusahaan: { select: { id: true, kode: true, nama: true, warna: true } },
+  proyek: { select: { id: true, kode: true, nama: true, warna: true } },
+  setIklan: { orderBy: [{ dibuatPada: "asc" }, { id: "asc" }] },
+  metrik: { orderBy: [{ tanggal: "desc" }, { id: "asc" }] },
+  tugasDesain: {
+    where: { diarsipkanPada: null },
+    orderBy: [{ dibuatPada: "desc" }, { id: "asc" }],
+    select: { id: true, judul: true, status: true, prioritas: true, tenggat: true, desainer: { select: { id: true, nama: true } } },
+  },
+} satisfies Prisma.KampanyeInclude;
+
+type KampanyeLengkapMentah = Prisma.KampanyeGetPayload<{ include: typeof PILIH_KAMPANYE_LENGKAP }>;
+
+/** Satu laporan harian beserta turunannya; `manual` menandai CTR/CPC/CPM/hasil yang diketik (bukan hitungan). */
+export type LaporanIklan = KampanyeLengkapMentah["metrik"][number] & {
+  turunan: TurunanMetrik;
+  manual: { ctr: boolean; cpc: boolean; cpm: boolean; hasil: boolean };
+};
+
+export type IklanLengkap = Prisma.IklanGetPayload<{ include: { setIklan: { select: { id: true; nama: true } }; berkasKreatif: { select: { id: true; namaBerkas: true; tipeMime: true; dihapusPada: true } } } }>;
+
+export type KampanyeLengkap = Omit<KampanyeLengkapMentah, "metrik"> & {
+  iklan: IklanLengkap[];
+  laporan: LaporanIklan[];
+  /** total dari jumlah angka dasar; nilai manual per laporan diabaikan (D6 §3.3 no. 5) */
+  total: TotalMetrik;
+};
+
+/**
+ * Detail kampanye (D6 §6.6): kampanye, perusahaan, proyek, set iklan (urut dibuat), iklan (urut dibuat, dengan nama set
+ * dan berkas kreatif), laporan harian (tanggal terbaru dulu, dengan turunan per baris), total, dan tugas desain aktif
+ * yang menaut kampanye ini. null bila tidak ada atau sudah diarsipkan.
+ */
+export async function kampanyeLengkap(klien: Klien, id: string): Promise<KampanyeLengkap | null> {
+  const k = await klien.kampanye.findFirst({ where: { id, diarsipkanPada: null }, include: PILIH_KAMPANYE_LENGKAP });
+  if (!k) return null;
+  const iklan = await klien.iklan.findMany({
+    where: { setIklan: { kampanyeId: id } },
+    orderBy: [{ dibuatPada: "asc" }, { id: "asc" }],
+    include: { setIklan: { select: { id: true, nama: true } }, berkasKreatif: { select: { id: true, namaBerkas: true, tipeMime: true, dihapusPada: true } } },
+  });
+  const { metrik, ...sisa } = k;
+  const laporan: LaporanIklan[] = metrik.map((m) => ({
+    ...m,
+    turunan: turunanMetrik(m, k.tujuan),
+    manual: { ctr: m.ctrManual !== null, cpc: m.cpcManual !== null, cpm: m.cpmManual !== null, hasil: m.hasil !== null },
+  }));
+  return { ...sisa, iklan, laporan, total: totalMetrik(metrik, k.tujuan) };
+}
+
+/** Penjelasan "hasil" otomatis menurut tujuan kampanye, untuk label formulir dan KPI (mis. "Hasil = leads"). */
+export function aturanHasil(tujuan: TujuanKampanye): string {
+  switch (tujuan) {
+    case "PROSPEK":
+      return "leads";
+    case "PENJUALAN":
+    case "PROMOSI_APLIKASI":
+      return "konversi";
+    case "TRAFFIC":
+      return "klik";
+    case "KESADARAN":
+      return "jangkauan";
+    case "INTERAKSI":
+      return "isi manual";
+  }
 }
