@@ -1,13 +1,15 @@
 import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { saringPerusahaan } from "@/lib/perusahaan";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
+import { muatPetaKategori } from "@/lib/kategoriAnggaran";
 import { D, terbesar, uang, type Desimal } from "@/lib/uang";
 
 /*
  * Keuangan proyek (D5 §3.7, §3.8, §6.3), bagian baca saja: rumus ringkasan murni dan pemuatnya. Bukan "use server".
  * Biaya aktual dibaca dari baris jurnal akun BEBAN yang jurnalnya bertanda proyek dan bukan jurnal penutup, persis
- * seperti ringkasanProyek LPJ (src/lib/proyek.ts). Posting talangan dan pembayaran mitra, bagi hasil, dan halaman
- * keuangan proyek ditambahkan paket Keuangan Proyek dengan nama dan tanda tangan rancangan.
+ * seperti ringkasanProyek LPJ (src/lib/proyek.ts). Peta akun ke kategori anggaran dari src/lib/kategoriAnggaran.ts.
+ * Posting talangan dan pembayaran mitra ada di src/lib/jurnalMitra.ts; bagi hasil dan halaman keuangan proyek
+ * ditambahkan paket Keuangan Proyek berikutnya.
  */
 
 type Klien = PrismaClient | Prisma.TransactionClient;
@@ -208,36 +210,12 @@ export async function akunKeuanganProyek(klien: Klien): Promise<{ hutangMitra: A
 }
 
 /**
- * Peta akun → kategori anggaran: pemetaan terdekat ke atas pohon akun menang (D5 §2.6). Padanan muatPetaKategori
- * rancangan (src/lib/kategoriAnggaran.ts milik paket Keuangan Proyek); dipindah ke sana saat berkas itu dibuat.
+ * Kunci baris proyek (FOR NO KEY UPDATE) sampai transaksi pemanggil selesai: menyerialkan sinkron anggaran dan
+ * perubahan mitra satu proyek tanpa menghalangi sisipan baris anak ber-FK (KEY SHARE dari Jurnal ber-proyekId).
+ * Urutan kunci keuangan proyek: baris dokumen, lalu Proyek, lalu MitraProyek (KONTRAK-TAMBAHAN, tinjauan P33).
  */
-async function muatPetaKategoriBaca(klien: Klien): Promise<{ kategoriUntukAkun: (akunId: string) => string | null; namaKategori: Map<string, string> }> {
-  const [akun, peta, kategori] = await Promise.all([
-    klien.akun.findMany({ select: { id: true, indukId: true } }),
-    klien.akunKategoriAnggaran.findMany({ select: { akunId: true, kategoriId: true } }),
-    klien.kategoriAnggaran.findMany({ select: { id: true, nama: true } }),
-  ]);
-  const induk = new Map(akun.map((a) => [a.id, a.indukId]));
-  const langsung = new Map(peta.map((p) => [p.akunId, p.kategoriId]));
-  const tembolok = new Map<string, string | null>();
-  const kategoriUntukAkun = (akunId: string): string | null => {
-    if (tembolok.has(akunId)) return tembolok.get(akunId)!;
-    let id: string | null | undefined = akunId;
-    const dilihat = new Set<string>();
-    let hasil: string | null = null;
-    while (id && !dilihat.has(id)) {
-      dilihat.add(id);
-      const k = langsung.get(id);
-      if (k) {
-        hasil = k;
-        break;
-      }
-      id = induk.get(id);
-    }
-    tembolok.set(akunId, hasil);
-    return hasil;
-  };
-  return { kategoriUntukAkun, namaKategori: new Map(kategori.map((k) => [k.id, k.nama])) };
+export async function kunciBarisProyek(tx: Prisma.TransactionClient, proyekId: string): Promise<void> {
+  await tx.$queryRaw`SELECT 1 FROM "Proyek" WHERE "id" = ${proyekId} FOR NO KEY UPDATE`;
 }
 
 /** Batas proyek per panggilan, seperti overview HKA. */
@@ -277,7 +255,7 @@ export async function muatMasukanKeuangan(klien: Klien, proyekIds: string[]): Pr
       JOIN "Akun" a ON a."id" = b."akunId"
       WHERE a."jenis" = 'BEBAN' AND j."sumber" <> 'PENUTUP' AND j."proyekId" IN (${Prisma.join(ids)})
       GROUP BY 1, 2`,
-    muatPetaKategoriBaca(klien),
+    muatPetaKategori(klien),
     akunKeuanganProyek(klien),
   ]);
   const perusahaanIds = [...new Set(proyek.map((p) => p.perusahaanId))];

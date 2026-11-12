@@ -363,6 +363,10 @@ function aturanKonsistensi(): { kode: KodeKonsistensi; label: string; hitung: Pr
       hitung: [
         ...ANAK_INDUK.map(([t, fk, ti]) => bedaInduk(t, fk, ti)),
         Prisma.sql`SELECT COUNT(*) FROM "PemakaianUangMuka" x JOIN "UangMukaPelanggan" u ON u."id" = x."uangMukaId" JOIN "FakturPenjualan" f ON f."id" = x."fakturId" WHERE u."perusahaanId" <> f."perusahaanId"`,
+        // anggaran proyek (KONTRAK-TAMBAHAN P34): dokumen sumber impor anggaran satu perusahaan dengan proyek barisnya
+        ...[["sumberPenawaranId", "PenawaranPenjualan"], ["sumberPesananId", "PesananPenjualan"]].map(
+          ([kolom, tabel]) => Prisma.sql`SELECT COUNT(*) FROM "BarisAnggaranProyek" x JOIN "Proyek" p ON p."id" = x."proyekId" JOIN ${nm(tabel)} d ON d."id" = x.${nm(kolom)} WHERE d."perusahaanId" <> p."perusahaanId"`,
+        ),
         // konsumsi SJ: faktur dan surat jalan yang dikonsumsinya harus satu perusahaan (perbaikan tinjauan P27)
         Prisma.sql`SELECT COUNT(*) FROM "KonsumsiSuratJalan" x JOIN "BarisFakturPenjualan" bf ON bf."id" = x."barisFakturId" JOIN "FakturPenjualan" f ON f."id" = bf."fakturId" JOIN "BarisPengiriman" bp ON bp."id" = x."barisPengirimanId" JOIN "PengirimanPesanan" s ON s."id" = bp."pengirimanId" WHERE f."perusahaanId" <> s."perusahaanId"`,
       ],

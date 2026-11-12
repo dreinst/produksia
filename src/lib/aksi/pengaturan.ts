@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { pastikanAkunRinci, terapkanBaganAkunStandar } from "@/lib/baganAkun";
 import { terapkanDataFlagship } from "@/lib/flagshipStandar";
+import { terapkanKategoriAnggaranBawaan } from "@/lib/kategoriAnggaran";
 
 /**
  * Pemetaan akun (standar dan tambahan) berlaku untuk semua perusahaan, jadi hanya akun bersama yang boleh dipilih.
@@ -65,11 +66,16 @@ export async function simpanPemetaanAkunFormulir(_sebelumnya: StatusFormulir, da
 
 // ---------- Bagan Akun Standar EO/WO ----------
 
-/** Membuat akun standar yang belum ada (idempoten), pemetaan akun bila belum diatur, plus data induk flagship (jasa tiket/sponsor/booth, Pelanggan Umum). */
+/**
+ * Membuat akun standar yang belum ada (idempoten), pemetaan akun bila belum diatur, plus data induk flagship (jasa
+ * tiket/sponsor/booth, Pelanggan Umum), lalu kategori anggaran proyek bawaan dan pemetaan akunnya (D5 §8 no. 23).
+ */
 export async function terapkanBaganAkun() {
   await wajibHakAksi("pengaturan.tulis");
   const hasil = await terapkanBaganAkunStandar(db);
   await terapkanDataFlagship(db);
+  await terapkanKategoriAnggaranBawaan(db);
+  revalidatePath("/pengaturan/kategori-anggaran");
   revalidatePath("/pengaturan/bagan-akun");
   revalidatePath("/pengaturan/pemetaan-akun");
   revalidatePath("/data-induk/akun");
