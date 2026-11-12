@@ -197,6 +197,8 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
   },
   { paket: "P32", letak: "pengaturan", setelah: "/pengaturan/log-aktivitas", tautan: { href: "/crm/pengaturan", label: "Pengaturan CRM", ikon: "handshake", hak: "pengaturan-crm.ubah" } },
   { paket: "P24", letak: "grup", grup: "Buku Besar", setelah: "/buku-besar/jurnal", tautan: { href: "/buku-besar/antar-perusahaan", label: "Transaksi Antar Perusahaan", kode: "AP", hak: "antar-perusahaan.lihat" } },
+  { paket: "P36", letak: "atas", setelah: "/berkas", tautan: { href: "/proyek", label: "Proyek & Event", ikon: "event_note", hak: "proyek.lihat" } },
+  { paket: "P36", letak: "pengaturan", setelah: "/pengaturan/pemetaan-akun", tautan: { href: "/pengaturan/kategori-anggaran", label: "Kategori Anggaran Proyek", ikon: "category", hak: "kategori-anggaran.ubah" } },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -396,6 +398,29 @@ async function main() {
     // Daftar Pilihan di antara keduanya, dan paket pemiliknya menyisip dengan setelah: "/pengaturan/log-aktivitas".
     pastikan(atas.indexOf("/berkas") === atas.indexOf("/persetujuan") + 1 && atur.indexOf("/pengaturan/log-aktivitas") >= 0 && atur.indexOf("/pengaturan/berkas") > atur.indexOf("/pengaturan/log-aktivitas"), `${peran}: Berkas sesudah Persetujuan, Akses Berkas sesudah Log Aktivitas`);
   }
+
+  // P36 (D5 §7.6, HAK.md §2.6, DESAIN R12/R13): Proyek & Event sesudah Berkas untuk proyek.lihat (KASIR ikut, P-61),
+  // Kategori Anggaran Proyek sesudah Pemetaan Akun untuk kategori-anggaran.ubah
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN", "KASIR", "SOSMED", "IKLAN", "DESAINER"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    const atas = m.atas.map((t) => t.href);
+    const proyek = m.atas.find((t) => t.href === "/proyek");
+    const sebelum = atas.includes("/berkas") ? "/berkas" : "/persetujuan";
+    pastikan(proyek?.label === "Proyek & Event" && proyek.ikon === "event_note" && atas.indexOf("/proyek") === atas.indexOf(sebelum) + 1, `${peran}: Proyek & Event tepat sesudah ${sebelum === "/berkas" ? "Berkas" : "Persetujuan"}`);
+  }
+  for (const peran of ["GUDANG", "KRU", "GUEST"] as const) pastikan(!mPeran(peran).includes("/proyek"), `${peran}: tanpa Proyek & Event`);
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN"] as const) {
+    const atur = menuTerlihat(penggunaSintetis(peran, hitungHak(peran))).pengaturan;
+    const i = atur.findIndex((l) => l.href === "/pengaturan/kategori-anggaran");
+    pastikan(i >= 0 && atur[i - 1]?.href === "/pengaturan/pemetaan-akun" && atur[i].ikon === "category" && atur[i].label === "Kategori Anggaran Proyek", `${peran}: Kategori Anggaran Proyek tepat sesudah Pemetaan Akun`);
+  }
+  for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST", "SOSMED", "IKLAN", "DESAINER"] as const) pastikan(!mPeran(peran).includes("/pengaturan/kategori-anggaran"), `${peran}: tanpa Kategori Anggaran Proyek`);
+  const kasirDulu = hrefTerlihat(menuTerlihat(penggunaSintetis("KASIR", hitungHak("KASIR")))).filter((h) => h !== "/proyek");
+  pastikan(JSON.stringify(kasirDulu) === JSON.stringify(hrefTerlihat(menuHarapan(penggunaSintetis("KASIR", hitungHak("KASIR")))).filter((h) => h !== "/proyek")), "KASIR: selain Proyek & Event menu sama dengan harapan");
+  for (const [path, nyala] of [["/proyek", true], ["/proyek/abc123", true], ["/proyek/keuangan", false], ["/proyek/abc123/keuangan", false], ["/proyek/abc123/keuangan/talangan/baru", false], ["/proyekx", false], ["/data-induk/proyek", false]] as const) {
+    pastikan(aktifDi("/proyek", path) === nyala, `aktifDi("/proyek", "${path}") = ${nyala}`);
+  }
+  pastikan(aktifDi("/data-induk/proyek", "/data-induk/proyek/abc") && !aktifDi("/data-induk/proyek", "/proyek/abc"), "Data Induk Proyek tetap menyala hanya di bawah /data-induk/proyek");
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");
   const kosong = menuTerlihat(penggunaSintetis("KASIR", []));

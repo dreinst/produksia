@@ -513,18 +513,21 @@ export type BarisProyekHalaman = {
 };
 
 /**
- * Data halaman /proyek (D5 §3.3, §6.3): proyek tersaring (q pada kode, nama, nama klien, pelanggan; status), urut
+ * Data halaman /proyek (D5 §3.3, §6.3): proyek tersaring (q pada kode, nama, nama klien, pelanggan; status atau
+ * kecualiStatus), urut
  * tanggal mulai turun lalu kode, dipaginasi, dengan hitungan modul yang haknya dipegang pengguna. Tanpa angka keuangan.
  * perusahaanId null/undefined = gabungan.
  */
 export async function daftarProyekUntukHalaman(
   klien: Klien,
   pengguna: PenggunaSesi,
-  param: { q?: string; status?: string; lewati?: number; ambil?: number } = {},
+  param: { q?: string; status?: string; kecualiStatus?: string[]; lewati?: number; ambil?: number } = {},
   perusahaanId?: string | null,
 ): Promise<{ total: number; baris: BarisProyekHalaman[] }> {
   const where: Prisma.ProyekWhereInput = { ...saringPerusahaan(perusahaanId) };
+  // kecualiStatus: saringan bawaan halaman /proyek "Semua kecuali diarsipkan" (D5 §7.2); status tunggal menang
   if (param.status) where.status = param.status;
+  else if (param.kecualiStatus?.length) where.status = { notIn: param.kecualiStatus };
   const q = param.q?.trim();
   if (q) {
     const ci = { contains: q, mode: "insensitive" as const };

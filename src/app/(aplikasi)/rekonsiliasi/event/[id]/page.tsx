@@ -5,6 +5,8 @@ import { wajibHak } from "@/lib/otentikasi";
 import { ringkasanProyek } from "@/lib/proyek";
 import KepalaHalaman from "@/komponen/ui/KepalaHalaman";
 import { LencanaStatus, NomorDokumen } from "@/komponen/ui/Lencana";
+import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
+import { D } from "@/lib/uang";
 
 const angka = (v: { toString(): string } | null | undefined) => (v === null || v === undefined ? "-" : Number(v).toLocaleString("id-ID"));
 const tgl = (d: Date | null) => (d ? d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }) : "-");
@@ -42,6 +44,13 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
   const { id } = await params;
   const r = await ringkasanProyek(db, id);
   if (!r) notFound();
+  // perusahaan proyek (D1 §8.4) dan sisa hutang mitra proyek: talangan disetujui dikurangi pengembalian modal disetujui (D5 §8 no. 24)
+  const [pemilik, talangan, modalKembali] = await Promise.all([
+    db.proyek.findUnique({ where: { id }, select: { perusahaan: { select: { kode: true, nama: true, warna: true } } } }),
+    db.talanganMitra.aggregate({ where: { proyekId: id, statusPersetujuan: "DISETUJUI" }, _sum: { jumlah: true } }),
+    db.pembayaranMitra.aggregate({ where: { proyekId: id, statusPersetujuan: "DISETUJUI", jenis: "MODAL" }, _sum: { jumlah: true } }),
+  ]);
+  const hutangMitra = D(talangan._sum.jumlah ?? 0).minus(modalKembali._sum.jumlah ?? 0);
   const { proyek: p, pemasukan: m, pengeluaran: k, labaRugi: lr, kas } = r;
   const kontrak = p.nilaiKontrak ?? m.totalPesanan;
   const realisasiBiaya = lr.totalBeban;
@@ -53,7 +62,12 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
         jejak={[{ label: "Rekonsiliasi" }, { label: "Rekonsiliasi Event (LPJ)", href: "/rekonsiliasi" }, { label: p.kode }]}
         judul={`LPJ ${p.kode} · ${p.nama}`}
         subjudul={`${p.pelanggan ?? "Tanpa klien"}${p.tanggalMulai ? ` · ${tgl(p.tanggalMulai)}${p.tanggalSelesai ? ` s.d. ${tgl(p.tanggalSelesai)}` : ""}` : ""}${p.keterangan ? ` · ${p.keterangan}` : ""}`}
-        lencana={<LencanaStatus status={p.status} />}
+        lencana={
+          <span className="flex items-center gap-2">
+            <LencanaStatus status={p.status} />
+            {pemilik && <LencanaPerusahaan kode={pemilik.perusahaan.kode} warna={pemilik.perusahaan.warna} nama={pemilik.perusahaan.nama} />}
+          </span>
+        }
         aksi={
           <span className="flex items-center gap-2">
             <Link href={`/buku-besar/laba-rugi?proyek=${p.id}&dari=2000-01-01&sampai=${hariIniIso()}`} className="tombol tombol-garis">Laba Rugi event</Link>
@@ -191,6 +205,7 @@ export default async function HalamanLpjEvent({ params }: { params: Promise<{ id
           </table>
         </div>
         <p className="text-xs text-slate-500">Selisih laba dan kas berasal dari piutang belum tertagih (Rp {angka(m.sisaPiutang)}), hutang belum dibayar (Rp {angka(k.sisaHutang)}), dan persediaan.</p>
+        {!hutangMitra.isZero() && <p className="text-xs text-slate-500">Termasuk hutang mitra proyek Rp {angka(hutangMitra)} (talangan yang belum dikembalikan).</p>}
       </div>
     </div>
   );

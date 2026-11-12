@@ -145,6 +145,7 @@ export const GRUP_DATA_INDUK: Grup = {
 export const TAUTAN_PENGATURAN: TautanBerikon[] = [
   { href: "/pengaturan/perusahaan", label: "Perusahaan & Pajak", ikon: "domain", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pemetaan-akun", label: "Pemetaan Akun", ikon: "tune", hak: "pemetaan.tulis" },
+  { href: "/pengaturan/kategori-anggaran", label: "Kategori Anggaran Proyek", ikon: "category", hak: "kategori-anggaran.ubah" },
   { href: "/pengaturan/mata-uang", label: "Mata Uang & Kurs", ikon: "payments", hak: "pengaturan.tulis" },
   { href: "/pengaturan/bagan-akun", label: "Bagan Akun Standar", ikon: "account_tree", hak: "pengaturan.tulis" },
   { href: "/pengaturan/pengguna", label: "Pengguna", ikon: "group", hak: "pengguna.kelola" },
@@ -175,6 +176,7 @@ export const TAUTAN_ATAS: TautanAtas[] = [
   { href: "/", label: "Beranda", ikon: "space_dashboard", boleh: bolehBeranda },
   { href: "/persetujuan", label: "Persetujuan", ikon: "verified", boleh: bolehPersetujuan },
   { href: "/berkas", label: "Berkas", ikon: "folder", boleh: (p) => punyaHak(p, "berkas.lihat") },
+  { href: "/proyek", label: "Proyek & Event", ikon: "event_note", boleh: (p) => punyaHak(p, "proyek.lihat") },
 ];
 
 /** Menyaring grup & tautan sesuai hak; grup tanpa tautan tersisa dibuang. */
@@ -216,9 +218,11 @@ export function semuaHrefMenu(): string[] {
 
 /**
  * Penanda tautan aktif: cocok bila path sama dengan href atau berada di bawahnya. Pengecualian untuk href yang
- * menjadi awalan rute milik tautan lain (/aset-tetap vs /aset-tetap/penyusutan, /rekonsiliasi vs /rekonsiliasi/kas-bank).
+ * menjadi awalan rute milik tautan lain (/aset-tetap vs /aset-tetap/penyusutan, /rekonsiliasi vs /rekonsiliasi/kas-bank,
+ * /proyek vs /proyek/keuangan dan /proyek/{id}/keuangan milik Keuangan Proyek, D5 §7.6).
  */
 export function aktifDi(href: string, pathname: string): boolean {
+  if (href === "/proyek") return pathname === "/proyek" || (/^\/proyek\/[^/]+$/.test(pathname) && pathname !== "/proyek/keuangan");
   if (href === "/aset-tetap") return pathname === "/aset-tetap" || pathname === "/aset-tetap/baru" || /^\/aset-tetap\/[^/]+\/lepas$/.test(pathname);
   if (href === "/rekonsiliasi") return pathname === "/rekonsiliasi" || pathname.startsWith("/rekonsiliasi/event");
   return pathname === href || pathname.startsWith(href + "/");
