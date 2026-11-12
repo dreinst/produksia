@@ -73,7 +73,15 @@ export default function KalenderKonten({
           <div
             key={s.tanggal}
             className={`group relative min-h-24 border-b border-r border-slate-100 p-1 text-xs [&:nth-child(7n)]:border-r-0 ${s.diBulanIni ? "bg-white" : "bg-slate-50 text-slate-400"}`}
-            onDoubleClick={bolehBuat ? () => router.push(hrefTanggal(s.tanggal), { scroll: false }) : undefined}
+            onDoubleClick={
+              bolehBuat
+                ? (e) => {
+                    // klik dua kali pada tautan konten atau tombol tambah di dalam sel bukan permintaan konten baru
+                    if ((e.target as HTMLElement).closest("a, button")) return;
+                    router.push(hrefTanggal(s.tanggal), { scroll: false });
+                  }
+                : undefined
+            }
           >
             <div className="flex items-center justify-between gap-1">
               <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full angka ${s.hariIni ? "bg-navy text-white font-semibold" : ""}`}>{s.hari}</span>

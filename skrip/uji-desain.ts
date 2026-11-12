@@ -377,13 +377,22 @@ async function main() {
     const logStatusS1 = async () => (await db.logAktivitas.findMany({ where: { modul: "tugas-desain", aksi: "STATUS", entitasId: tS1.id, waktu: { gte: mulaiUji } }, select: { meta: true } })).map((l) => l.meta as { dari?: string; ke?: string });
     pastikan((await logStatusS1()).some((m) => m.dari === "DISETUJUI" && m.ke === "DITUGASKAN"), "log STATUS Disetujui ke Ditugaskan");
     await sebagai(SOS, () => jalankan("konten S1 bebas sesudah dilepas peninjau", () => ajukanKonten(kontenS1.id, formulir({}))));
-    // S2: status Permintaan dari formulir untuk tugas yang bukan Permintaan mengikuti jalur biasa (N7, log sebenarnya)
+    // S2: status Permintaan dari formulir untuk tugas yang bukan Permintaan mengikuti jalur biasa (log sebenarnya).
+    // Sejak perbaikan tinjauan P43 R2, Permintaan dengan desainer terisi ditolak di formulir dan papan, jadi asersi
+    // semula (ADMIN menyimpan Permintaan dengan desainer tetap terisi, lalu N7) diganti penolakan itu ditambah jalur
+    // yang mengosongkan desainer.
     await sebagai("owner", () => jalankan("owner setujui tugas S1 lagi", () => pindahStatusDesain(tS1.id, "DISETUJUI")));
-    const n7Permintaan = await jumlahNotif(desainer.id, "Tugas desain dipindah ke Permintaan");
-    await sebagai("admin", async () => jalankan("ADMIN mengirim status Permintaan untuk tugas Disetujui", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { status: "PERMINTAAN" }))));
-    pastikan((await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } })).status === "PERMINTAAN", "S2: tugas Disetujui tidak otomatis menjadi Ditugaskan");
-    pastikan((await jumlahNotif(desainer.id, "Tugas desain dipindah ke Permintaan")) === n7Permintaan + 1, "S2: N7 terkirim");
+    await sebagai("admin", async () =>
+      harusDitolak("ADMIN mengirim status Permintaan dengan desainer terisi", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { status: "PERMINTAAN" })), "Kosongkan desainer"),
+    );
+    await sebagai("owner", () => harusDitolak("papan ke Permintaan dengan desainer terisi", () => pindahStatusDesain(tS1.id, "PERMINTAAN"), "Kosongkan desainer"));
+    pastikan((await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } })).status === "DISETUJUI", "R2: tugas tetap Disetujui sesudah ditolak");
+    await sebagai("admin", async () => jalankan("ADMIN mengembalikan ke Permintaan dengan desainer dikosongkan", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id, { status: "PERMINTAAN", desainerId: "" }))));
+    const tS1Permintaan = await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } });
+    pastikan(tS1Permintaan.status === "PERMINTAAN" && tS1Permintaan.desainerId === null, "S2: tugas Disetujui tidak otomatis menjadi Ditugaskan");
     pastikan((await logStatusS1()).some((m) => m.dari === "DISETUJUI" && m.ke === "PERMINTAAN") && !(await logStatusS1()).some((m) => m.ke === "DITUGASKAN" && m.dari === "PERMINTAAN"), "S2: log STATUS memakai status lama sebenarnya");
+    await sebagai("admin", async () => jalankan("simpan ulang tanpa perubahan", async () => ubahTugasDesain(tS1.id, await formUbahTugas(tS1.id))));
+    pastikan((await db.tugasDesain.findUniqueOrThrow({ where: { id: tS1.id } })).status === "PERMINTAAN", "R2: simpan ulang tidak membalik status");
     // R1: galat unik kunciKontenAktif dari adapter pg dikenali
     let galatUnik: unknown = null;
     await db.tugasDesain.create({ data: { judul: `${AWALAN} R1 ganda`, kontenId: kontenS1b.id, kunciKontenAktif: kontenS1b.id, dibuatOlehNama: "Skrip Uji" } }).catch((e) => (galatUnik = e));

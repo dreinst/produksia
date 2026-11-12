@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import type { StatusFormulir } from "@/lib/statusFormulir";
 import type { Verifikasi } from "@/lib/verifikasi";
 import DialogVerifikasi, { type RingkasanVerifikasi } from "@/komponen/ui/DialogVerifikasi";
-import { umumkanPesanSukses } from "@/komponen/PesanSuksesHalaman";
+import { umumkanPesanSukses, useSaluranPesanSukses } from "@/komponen/PesanSuksesHalaman";
 import { subtotalKlien, type AngkaKlien } from "@/lib/hitungDokumenKlien";
 
 type Props = {
@@ -126,13 +126,15 @@ function susunRingkasan(form: HTMLFormElement, v: Verifikasi): RingkasanVerifika
  * - opsional: konfirmasi sebelum kirim, atau dialog verifikasi (ringkasan isian + peringatan)
  */
 export default function FormulirAksi({ aksi, children, className, pesanKonfirmasi, pesanSukses, pesanSuksesHalaman, verifikasi, alihkanKe }: Props) {
+  // saluran dari <SaluranPesanSukses> terdekat, supaya pesan halaman tampil di penampil kartu yang sama
+  const saluranPesan = useSaluranPesanSukses();
   // Tanpa pesanSuksesHalaman, aksi server dipakai langsung seperti semula.
   const aksiDipakai = pesanSuksesHalaman
     ? async (sebelumnya: StatusFormulir, dataFormulir: FormData) => {
         // alamat dicatat sebelum await: pesan dibuang bila pengguna sudah pindah halaman saat aksi berjalan
         const alamatAwal = umumkanPesanSukses(null);
         const hasil = await aksi(sebelumnya, dataFormulir);
-        if (hasil.ok && !hasil.galat) umumkanPesanSukses(pesanSuksesHalaman, alamatAwal);
+        if (hasil.ok && !hasil.galat) umumkanPesanSukses(pesanSuksesHalaman, alamatAwal, saluranPesan);
         return hasil;
       }
     : aksi;

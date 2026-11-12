@@ -41,6 +41,7 @@ import type { StatusTugasDesain } from "@/prisma-klien/enums";
  */
 
 const RUTE_DESAIN = "/pemasaran/desain";
+const PESAN_KOSONGKAN_DESAINER = "Kosongkan desainer untuk mengembalikan ke Permintaan";
 const PANJANG_CATATAN_REVISI = 3000;
 
 function revalidasiDesain(kampanyeId?: string | null) {
@@ -154,6 +155,9 @@ export async function ubahTugasDesain(id: string, dataFormulir: FormData) {
       // desainer diisi pada tugas yang memang masih Permintaan: disimpan Ditugaskan tanpa N7 (N5 penugasan sudah
       // memberi tahu). Status lama selain Permintaan mengikuti jalur biasa (perbaikan tinjauan P41 S2).
       const otomatis = !!desainerId && statusIsian === "PERMINTAAN" && lama.status === "PERMINTAAN";
+      // Permintaan dengan desainer terisi tidak boleh tersimpan (D6 §3.2.2), jadi tugas yang sudah lewat Permintaan
+      // hanya bisa kembali ke sana sesudah desainernya dikosongkan (perbaikan tinjauan P43 R2)
+      if (!!desainerId && statusIsian === "PERMINTAAN" && lama.status !== "PERMINTAAN") throw new Error(PESAN_KOSONGKAN_DESAINER);
       const ke = otomatis ? "DITUGASKAN" : statusIsian;
       if (ke !== lama.status && !otomatis) cekStatusDesain(pengguna, ke, "formulir");
       kampanyeId = rujukan.kampanye?.id ?? null;
@@ -215,6 +219,7 @@ export async function pindahStatusDesain(id: string, ke: string, catatan?: strin
     kampanyeId = tugas.kampanyeId;
     if (tugas.status === ke) return;
     if (ke === "DITINJAU") return ajukanTinjauanInternal(tx, tugas, pengguna);
+    if (ke === "PERMINTAAN" && tugas.desainerId) throw new Error(PESAN_KOSONGKAN_DESAINER);
     cekStatusDesain(pengguna, ke, "papan", isiCatatan);
     await terapkanStatusDesain(tx, tugas, ke, pengguna, isiCatatan);
   });

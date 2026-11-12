@@ -28,7 +28,6 @@ import RiwayatRevisiDesain from "@/komponen/pemasaran/RiwayatRevisiDesain";
  */
 
 const STATUS_PENYETUJU: readonly StatusKonten[] = ["DISETUJUI", "TERJADWAL", "TERBIT"];
-const STATUS_DESAIN_BERES = ["DISETUJUI", "SELESAI"];
 
 type Opsi = { id: string; nama: string };
 
@@ -293,7 +292,8 @@ export default async function LaciKonten({
 
   const konten = k as DetailKonten;
   const tugas = konten.tugasAktif;
-  const desainBelumBeres = !!tugas && !STATUS_DESAIN_BERES.includes(tugas.status);
+  // dari detailKonten, jadi tetap benar bagi pembaca tanpa tugas-desain.lihat (perbaikan tinjauan P43 R5)
+  const desainBelumBeres = !konten.desainSudahBeres;
   const bolehKirim = boleh("tugas-desain.buat") && !konten.adaTugasAktif;
   const tenggatBawaan = tenggatBawaanDesain(konten.tanggalTerbit);
 
@@ -404,7 +404,7 @@ export default async function LaciKonten({
               <LampiranBerkas jenisEntitas="hasil-desain" entitasId={tugas.id} tag="HASIL" judul="Hasil desain" bolehUnggah={false} kosong="Belum ada berkas hasil." />
               <div>
                 <h4 className="text-sm font-semibold text-slate-700 mb-1">Riwayat revisi</h4>
-                <RiwayatRevisiDesain revisi={tugas.revisi} />
+                <RiwayatRevisiDesain revisi={tugas.revisi} pengguna={pengguna} />
               </div>
             </div>
           )}

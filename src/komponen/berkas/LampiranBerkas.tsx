@@ -6,7 +6,7 @@ import { bolehAksesBerkas, daftarBerkasTerlihat, keluargaDariMime, type JenisEnt
 import { buangBerkasFormulir } from "@/lib/aksi/berkas";
 import type { TagBerkas } from "@/prisma-klien/enums";
 import FormulirAksi from "@/komponen/FormulirAksi";
-import PesanSuksesHalaman from "@/komponen/PesanSuksesHalaman";
+import PesanSuksesHalaman, { SaluranPesanSukses } from "@/komponen/PesanSuksesHalaman";
 import Ikon from "@/komponen/ui/Ikon";
 import IkonBerkas, { ukuranBerkas } from "@/komponen/berkas/IkonBerkas";
 import DialogPratinjauGambar from "@/komponen/berkas/DialogPratinjauGambar";
@@ -101,7 +101,10 @@ export default async function LampiranBerkas({
   const tautan = await petaTautanAktif(pengguna, baris);
   const unggah = bolehUnggah && bolehAksesBerkas(pengguna, { jenisEntitas }, "unggah");
 
+  // saluran pesan sukses per kartu: halaman atau laci yang memasang beberapa kartu tidak menampilkan pesan Buang dan
+  // Cabut berlipat (perbaikan tinjauan P43 R3)
   return (
+    <SaluranPesanSukses saluran={`lampiran:${jenisEntitas}:${entitasId}:${tag ?? ""}`}>
     <section className="kartu space-y-4" aria-label={judul}>
       <div className="flex items-center gap-2">
         <Ikon nama="attach_file" className="!text-[20px] text-slate-500" />
@@ -157,5 +160,6 @@ export default async function LampiranBerkas({
       )}
       {unggah && <PemilihBerkas jenisEntitas={jenisEntitas} entitasId={entitasId} tag={tag} />}
     </section>
+    </SaluranPesanSukses>
   );
 }

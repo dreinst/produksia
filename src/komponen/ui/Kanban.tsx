@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useOptimistic, useRef, useState, useTransition, type KeyboardEvent as KeyboardEventReact, type ReactElement } from "react";
+import { createPortal } from "react-dom";
 import type { StatusFormulir } from "@/lib/statusFormulir";
 import Ikon from "@/komponen/ui/Ikon";
 
@@ -277,7 +278,12 @@ function PindahKartu({ tujuan, daftarkan, onPindah }: { tujuan: KolomKanban[]; d
   );
 }
 
-/** Dialog alasan sebelum pindah ke kolom tertentu (mis. Kalah). Pola DialogVerifikasi; isian hilang saat ditutup. */
+/**
+ * Dialog alasan sebelum pindah ke kolom tertentu (mis. Kalah). Pola DialogVerifikasi; isian hilang saat ditutup.
+ * Dirender ke document.body lewat portal seperti Laci: papan dipasang di dalam <main className="animasi-masuk"> yang
+ * menyisakan transform, sehingga lapisan `fixed` tanpa portal hanya menutupi kolom konten (tinjauan P43 R7). Dialog
+ * hanya muncul sesudah interaksi di klien, jadi portal langsung tidak mengganggu hidrasi.
+ */
 function DialogAlasan({ isi, onBatal, onKonfirmasi }: { isi: DialogAlasanKanban; onBatal: () => void; onKonfirmasi: (alasan: string) => void }) {
   const [alasan, setAlasan] = useState("");
   const kotak = useRef<HTMLTextAreaElement>(null);
@@ -316,7 +322,7 @@ function DialogAlasan({ isi, onBatal, onKonfirmasi }: { isi: DialogAlasanKanban;
     }
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-slate-900/40" onClick={onBatal}>
       <div
         ref={bingkai}
@@ -348,6 +354,7 @@ function DialogAlasan({ isi, onBatal, onKonfirmasi }: { isi: DialogAlasanKanban;
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

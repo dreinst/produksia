@@ -98,11 +98,26 @@ export default async function LaciTugasDesain({
   // prapengisian tugas baru dari konten atau kampanye (hanya yang aktif dan boleh dilihat pembaca)
   const [kontenPrefill, kampanyePrefill] = baru
     ? await Promise.all([
-        kontenAwal && lihatKonten ? db.konten.findFirst({ where: { id: kontenAwal, diarsipkanPada: null }, select: { id: true, judul: true, perusahaanId: true, proyekId: true } }) : null,
-        kampanyeAwal && lihatKampanye ? db.kampanye.findFirst({ where: { id: kampanyeAwal, diarsipkanPada: null }, select: { id: true, nama: true, perusahaanId: true, proyekId: true } }) : null,
+        kontenAwal && lihatKonten
+          ? db.konten.findFirst({ where: { id: kontenAwal, diarsipkanPada: null }, select: { id: true, judul: true, perusahaanId: true, proyekId: true, perusahaan: { select: { nama: true } } } })
+          : null,
+        kampanyeAwal && lihatKampanye
+          ? db.kampanye.findFirst({ where: { id: kampanyeAwal, diarsipkanPada: null }, select: { id: true, nama: true, perusahaanId: true, proyekId: true, perusahaan: { select: { nama: true } } } })
+          : null,
       ])
     : [null, null];
   const induk = kontenPrefill ?? kampanyePrefill;
+  // induk prapengisian milik perusahaan di luar lingkup aktif: hanya pemberitahuan, tanpa formulir dan tanpa membaca
+  // pilihan perusahaan itu (perbaikan tinjauan P43 R1, D6 §3.0 no. 5)
+  if (induk && lingkup.perusahaanId !== null && induk.perusahaanId !== lingkup.perusahaanId) {
+    return (
+      <Laci judul={judulLaci} tutupHref={tutupHref}>
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          Data ini milik {induk.perusahaan.nama}. Ganti perusahaan aktif untuk membukanya.
+        </p>
+      </Laci>
+    );
+  }
   const perusahaanId = t?.perusahaanId ?? induk?.perusahaanId ?? lingkup.perusahaanId;
   const gabungan = lingkup.perusahaanId === null;
   const proyekTugas = t?.proyekId ?? (baru ? (kontenPrefill?.proyekId ?? kampanyePrefill?.proyekId ?? null) : null);
@@ -141,6 +156,10 @@ export default async function LaciTugasDesain({
   const opsiStatus = URUTAN_STATUS_DESAIN.filter((s) => s === statusSekarang || (!STATUS_JALUR_SENDIRI.includes(s) && (peninjau || !STATUS_PENINJAU.includes(s))));
   const bolehUbah = baru || boleh("tugas-desain.ubah");
   const tertautKonten = !!(t?.kontenId ?? kontenPrefill);
+  // Konten yang kuncinya dipegang tugas ini hanya boleh dilepas atau diganti peninjau atau pemegang tugas-desain.hapus
+  // (penjaga ubahTugasDesain). Pembaca lain melihatnya sebagai teks dan nilainya dikirim tersembunyi (tinjauan P43 R5).
+  const kontenTerkunci = !!t?.kunciKontenAktif && !peninjau && !boleh("tugas-desain.hapus");
+  const judulKontenSekarang = pilihanKonten.find((k) => k.id === kontenSekarang)?.judul ?? "Konten terkait";
 
   const isian = (
     <>
@@ -208,7 +227,14 @@ export default async function LaciTugasDesain({
           ))}
         </select>
       </div>
-      {lihatKonten ? (
+      {lihatKonten && kontenTerkunci ? (
+        <div className="bidang">
+          <span className="label">Konten terkait</span>
+          <p className="min-h-11 py-2 text-sm text-slate-800 break-words">{judulKontenSekarang}</p>
+          <p className="petunjuk">Hanya peninjau desain yang boleh melepas atau mengganti konten terkait.</p>
+          <input type="hidden" name="kontenId" value={kontenSekarang ?? ""} />
+        </div>
+      ) : lihatKonten ? (
         <div className="bidang">
           <label className="label" htmlFor="tugas-konten">
             Konten terkait
@@ -387,7 +413,7 @@ export default async function LaciTugasDesain({
       )}
 
       <Bagian judul="Riwayat revisi" ikon="history">
-        <RiwayatRevisiDesain revisi={tugas.revisi} />
+        <RiwayatRevisiDesain revisi={tugas.revisi} pengguna={pengguna} />
       </Bagian>
 
       {tugas.kampanye && lihatKampanye && !tugas.kampanye.diarsipkanPada && (

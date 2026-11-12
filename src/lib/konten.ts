@@ -762,6 +762,11 @@ export type DetailKonten = Omit<DetailKontenMentah, "tugasDesain"> & {
   tugasAktif: DetailKontenMentah["tugasDesain"][number] | null;
   /** benar bila konten punya tugas desain aktif, apa pun hak pembacanya (penjaga ajukan dan kirim ke desain) */
   adaTugasAktif: boolean;
+  /**
+   * benar bila konten tanpa tugas aktif atau desainnya sudah Disetujui/Selesai, apa pun hak pembacanya. Penjaga tombol
+   * "Simpan & ajukan persetujuan", sama dengan ajukanKontenInternal (perbaikan tinjauan P43 R5). Tanpa data tugas.
+   */
+  desainSudahBeres: boolean;
 };
 
 /**
@@ -774,5 +779,10 @@ export async function detailKonten(klien: Klien, id: string, pengguna: PenggunaS
   if (!k) return null;
   const { tugasDesain, ...sisa } = k;
   const tugas = tugasDesain[0] ?? null;
-  return { ...sisa, tugasAktif: tugas && punyaHak(pengguna, "tugas-desain.lihat") ? tugas : null, adaTugasAktif: !!tugas };
+  return {
+    ...sisa,
+    tugasAktif: tugas && punyaHak(pengguna, "tugas-desain.lihat") ? tugas : null,
+    adaTugasAktif: !!tugas,
+    desainSudahBeres: !tugas || STATUS_DESAIN_BOLEH_AJUKAN.includes(tugas.status),
+  };
 }

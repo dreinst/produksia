@@ -64,9 +64,10 @@ export default async function HalamanDetailKampanye({ params }: { params: Promis
   const lingkup = await lingkupPerusahaan();
   const jejak = [{ label: "Pemasaran" }, { label: "Perencana Iklan Meta", href: "/pemasaran/iklan" }, { label: k.nama }];
   if (lingkup.perusahaanId !== null && k.perusahaanId !== lingkup.perusahaanId) {
+    // nama kampanye perusahaan lain tidak ditampilkan, sama seperti laci konten dan tugas (perbaikan tinjauan P43 R1)
     return (
       <div className="space-y-6">
-        <KepalaHalaman jejak={jejak} judul={k.nama} />
+        <KepalaHalaman jejak={[...jejak.slice(0, 2), { label: "Detail kampanye" }]} judul="Detail kampanye" />
         <p className="kartu text-sm text-amber-800">Data ini milik {k.perusahaan.nama}. Ganti perusahaan aktif untuk membukanya.</p>
       </div>
     );
