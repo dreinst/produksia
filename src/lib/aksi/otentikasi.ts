@@ -9,6 +9,7 @@ import { bacaEmailOpsional, bacaNamaPengguna } from "@/lib/identitasPengguna";
 import { bacaFotoDariFormulir } from "@/lib/foto";
 import { bacaIpKlien, pastikanBolehCoba, catatKegagalanMasuk, resetPercobaanMasuk } from "@/lib/batasMasuk";
 import { catatMasuk } from "@/lib/log";
+import { kirimNotifikasi, penggunaDenganHak } from "@/lib/notifikasi";
 import {
   buatSesi,
   hapusSemuaSesiPengguna,
@@ -169,15 +170,39 @@ export async function hapusFotoProfilFormulir() {
 /**
  * Pengguna yang lupa kata sandi mengirim permintaan dari halaman masuk. Pesan yang tampil selalu sama
  * (tidak membocorkan apakah nama pengguna ada). Permintaan yang masih terbuka tidak digandakan.
+ * Permintaan baru memberi tahu pemegang pengguna.kelola lewat lonceng (lihat beritahuPermintaanAturUlang).
  */
 export async function mintaAturUlang(dataFormulir: FormData) {
   const namaPengguna = bacaTeks(dataFormulir, "namaPengguna").toLowerCase();
   if (!namaPengguna) throw new Error("Nama pengguna wajib diisi");
-  const pengguna = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true, aktif: true } });
+  const pengguna = await db.pengguna.findUnique({ where: { namaPengguna }, select: { id: true, aktif: true, nama: true, namaPengguna: true } });
   if (!pengguna || !pengguna.aktif) return;
   const terbuka = await db.permintaanAturUlang.findFirst({ where: { penggunaId: pengguna.id, status: { in: ["MENUNGGU", "TAUTAN"] } } });
   if (terbuka) return;
-  await db.permintaanAturUlang.create({ data: { penggunaId: pengguna.id } });
+  const permintaan = await db.permintaanAturUlang.create({ data: { penggunaId: pengguna.id } });
+  await beritahuPermintaanAturUlang(permintaan.id, pengguna);
+}
+
+/**
+ * Notifikasi lonceng untuk semua pengguna aktif pemegang pengguna.kelola (selain peminta). Dijalankan sesudah
+ * permintaan tersimpan dan di luar transaksinya: bila gagal, permintaan tetap ada dan galatnya hanya dicatat
+ * di log server, sehingga respons ke peminta tidak berubah.
+ */
+async function beritahuPermintaanAturUlang(permintaanId: string, peminta: { id: string; nama: string; namaPengguna: string }) {
+  try {
+    const penerima = await penggunaDenganHak(db, "pengguna.kelola");
+    await kirimNotifikasi(db, {
+      penggunaIds: penerima.map((p) => p.id),
+      kecuali: peminta.id,
+      judul: "Permintaan atur ulang kata sandi",
+      isi: `${peminta.nama} (${peminta.namaPengguna}) meminta tautan atur ulang kata sandi.`,
+      tautan: "/pengaturan/pengguna",
+      jenis: "PERSETUJUAN",
+      kunci: `atur-ulang:${permintaanId}`,
+    });
+  } catch (galat) {
+    console.error("[notifikasi atur ulang]", galat);
+  }
 }
 
 export async function mintaAturUlangFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
