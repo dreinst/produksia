@@ -193,6 +193,7 @@ Migrasi baru (aditif, jalan lewat `migrate deploy` biasa):
 | `20261111070000_notifikasi_tautan_aman` | CHECK tautan notifikasi |
 | `20261112090000_konsumsi_surat_jalan` | catatan konsumsi surat jalan per baris faktur |
 | `20261112100000_batas_jumlah_difaktur` | bagi ulang progres faktur data lama (bug B-10), lalu CHECK `0 <= jumlahDifaktur <= jumlah`; berhenti tanpa mengubah apa pun bila datanya tidak bisa dibagi ulang |
+| `20261112110000_email_dpro` | email perusahaan `utama` menjadi `office@dpro.events`, hanya bila masih berisi `dproductionorganizer@gmail.com` |
 
 ### 10.1 Sebelum deploy (baca saja, di basis data produksi)
 

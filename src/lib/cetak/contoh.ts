@@ -381,7 +381,7 @@ export const IDENTITAS_CONTOH: Record<EntitasContoh, IdentitasCetak> = {
     nama: "D'Production",
     alamat: "Jl. Raya Pandanlandung No. 16 Malang",
     telepon: "+6281938938800",
-    email: "dproductionorganizer@gmail.com",
+    email: "office@dpro.events",
     instagram: "@dpro.duction",
     namaBank: "BANK CENTRAL ASIA",
     cabangBank: "Malang Cab. Galunggung",

@@ -18,6 +18,11 @@ Nama berkas mengikuti slot `JenisAsetKop` dalam huruf kecil dengan tanda hubung 
 `judul-invoice.png`), dan nama folder mengikuti `GayaEntitas` dalam huruf kecil. Font Carlito tersalin utuh; SHA-256-nya
 dicatat di rancangan D3 §1.4 dan diperiksa `skrip/uji-mesin-cetak.ts`.
 
+Email di `dpro/kop.png` dan `dpro/kaki.png` sudah diganti menjadi `office@dpro.events`. Teks email lama ditimpa warna
+latarnya, lalu email baru ditulis dengan Montserrat Medium (SIL OFL 1.1, sama dengan teks lain di kedua gambar): 34 px
+di kop dan 28,4 px di kaki pada lebar 2480 px. Di kaki, `| @dpro.duction` tidak bergeser dan email baru berakhir di titik
+yang sama dengan email lama. Font Montserrat tidak disalin ke repo karena hanya dipakai untuk menggambar ulang PNG.
+
 ## Larangan
 
 Jangan pernah menaruh tanda tangan, cap atau stempel, KTP, maupun NPWP di folder ini. Folder ini masuk repo dan image
