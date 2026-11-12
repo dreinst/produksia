@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
 import { D, type Desimal } from "@/lib/uang";
+import { akunKeuanganProyek } from "@/lib/keuanganProyek";
 
 /*
  * Pemeriksaan sinkronisasi buku besar ↔ dokumen/stok. Dipakai kartu Integritas di beranda
@@ -26,6 +27,8 @@ export type HasilSinkron = {
   barangBelumDitagih: Perbandingan;
   barangTerkirim: Perbandingan;
   uangMuka: Perbandingan;
+  /** Hutang Mitra Proyek = Σ talangan DISETUJUI − Σ pengembalian modal DISETUJUI (D5 §4.4); kosong bila akunnya belum ada */
+  hutangMitra: Perbandingan;
 };
 
 const TOLERANSI = D(1); // pembulatan harga rata-rata ke 2 desimal
@@ -43,7 +46,7 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
   const saringJurnal = p ? { jurnal: { perusahaanId: p } } : {};
   const saringDok = p ? { perusahaanId: p } : {};
   const milikBarang = p ? Prisma.sql` AND b."perusahaanId" = ${p}` : Prisma.empty;
-  const [pemetaan, total, akunPersediaanBarang, nilaiStokRaw, nilaiDipinjamRaw, nilaiRusakRaw, fakturJual, terimaJual, returJual, fakturBeli, bayarBeli, returBeli, belumDitagihRaw, terkirimRaw, uangMukaAgg] = await Promise.all([
+  const [pemetaan, total, akunPersediaanBarang, nilaiStokRaw, nilaiDipinjamRaw, nilaiRusakRaw, fakturJual, terimaJual, returJual, fakturBeli, bayarBeli, returBeli, belumDitagihRaw, terkirimRaw, uangMukaAgg, akunMitra, talanganAgg, modalMitraAgg] = await Promise.all([
     klien.pemetaanAkun.findUnique({ where: { id: "default" } }),
     p ? klien.barisJurnal.aggregate({ where: saringJurnal, _sum: { debit: true, kredit: true } }) : klien.barisJurnal.aggregate({ _sum: { debit: true, kredit: true } }),
     klien.barang.findMany({ where: { akunPersediaanId: { not: null } }, select: { akunPersediaanId: true }, distinct: ["akunPersediaanId"] }),
@@ -94,18 +97,22 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
       ? klien.$queryRaw<Jumlah>`SELECT COALESCE(SUM((bp."jumlah" - bp."jumlahDifaktur") * bp."hargaPokok"), 0) AS nilai FROM "BarisPengiriman" bp JOIN "Barang" b ON b."id" = bp."barangId" JOIN "PengirimanPesanan" pp ON pp."id" = bp."pengirimanId" WHERE b."jenis" = 'BARANG' AND pp."perusahaanId" = ${p}`
       : klien.$queryRaw<Jumlah>`SELECT COALESCE(SUM((bp."jumlah" - bp."jumlahDifaktur") * bp."hargaPokok"), 0) AS nilai FROM "BarisPengiriman" bp JOIN "Barang" b ON b."id" = bp."barangId" WHERE b."jenis" = 'BARANG'`,
     p ? klien.uangMukaPelanggan.aggregate({ where: saringDok, _sum: { jumlah: true, jumlahDipakai: true } }) : klien.uangMukaPelanggan.aggregate({ _sum: { jumlah: true, jumlahDipakai: true } }),
+    // D5 §4.4: dokumen mitra yang sudah disetujui (jurnalnya ada); akun Hutang Mitra Proyek dari pemetaan tambahan atau 2-1700
+    akunKeuanganProyek(klien),
+    klien.talanganMitra.aggregate({ where: { statusPersetujuan: "DISETUJUI", ...saringDok }, _sum: { jumlah: true } }),
+    klien.pembayaranMitra.aggregate({ where: { statusPersetujuan: "DISETUJUI", jenis: "MODAL", ...saringDok }, _sum: { jumlah: true } }),
   ]);
   const totalDebit = D(total._sum.debit ?? 0);
   const totalKredit = D(total._sum.kredit ?? 0);
   const nol = D(0);
   const kosong = banding(nol, nol);
   if (!pemetaan) {
-    return { pemetaanAda: false, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan: kosong, piutang: kosong, hutang: kosong, barangBelumDitagih: kosong, barangTerkirim: kosong, uangMuka: kosong };
+    return { pemetaanAda: false, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan: kosong, piutang: kosong, hutang: kosong, barangBelumDitagih: kosong, barangTerkirim: kosong, uangMuka: kosong, hutangMitra: kosong };
   }
 
   // saldo tiap akun pembanding dalam satu groupBy (bukan satu kueri per akun)
   const akunPersediaan = [...new Set([pemetaan.persediaanId, ...akunPersediaanBarang.map((b) => b.akunPersediaanId!)])];
-  const akunDicek = [...new Set([...akunPersediaan, pemetaan.piutangUsahaId, pemetaan.utangUsahaId, pemetaan.barangBelumDitagihId, pemetaan.barangTerkirimId, pemetaan.uangMukaPelangganId].filter((x): x is string => Boolean(x)))];
+  const akunDicek = [...new Set([...akunPersediaan, pemetaan.piutangUsahaId, pemetaan.utangUsahaId, pemetaan.barangBelumDitagihId, pemetaan.barangTerkirimId, pemetaan.uangMukaPelangganId, akunMitra.hutangMitra?.id].filter((x): x is string => Boolean(x)))];
   const saldoPerAkun = new Map<string, { debit: Desimal; kredit: Desimal }>();
   for (const g of await klien.barisJurnal.groupBy({ by: ["akunId"], where: { akunId: { in: akunDicek }, ...saringJurnal }, _sum: { debit: true, kredit: true } })) {
     saldoPerAkun.set(g.akunId, { debit: D(g._sum.debit ?? 0), kredit: D(g._sum.kredit ?? 0) });
@@ -133,7 +140,11 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
   const nilaiUangMuka = D(uangMukaAgg._sum.jumlah ?? 0).minus(uangMukaAgg._sum.jumlahDipakai ?? 0);
   const uangMuka = pemetaan.uangMukaPelangganId ? banding(saldo([pemetaan.uangMukaPelangganId], false), nilaiUangMuka) : kosong;
 
-  return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim, uangMuka };
+  const hutangMitra = akunMitra.hutangMitra
+    ? banding(saldo([akunMitra.hutangMitra.id], false), D(talanganAgg._sum.jumlah ?? 0).minus(modalMitraAgg._sum.jumlah ?? 0))
+    : kosong;
+
+  return { pemetaanAda: true, seimbang: totalDebit.equals(totalKredit), totalDebit, totalKredit, persediaan, piutang, hutang, barangBelumDitagih, barangTerkirim, uangMuka, hutangMitra };
 }
 
 // ---------- Catatan konsumsi surat jalan (tinjauan perbaikan P27 R4) ----------

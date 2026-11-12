@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { galatMasihDipakai, jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
-import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
+import { D, format, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
+import { pastikanTalanganBolehDihapus } from "@/lib/jurnalMitra";
 import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata, urutBarang } from "@/lib/stok";
 import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
 import { Prisma } from "@/prisma-klien/client";
@@ -48,7 +49,9 @@ export type JenisDokumen =
   | "penyusutan"
   | "pelepasanAset"
   | "penggajian"
-  | "antarPerusahaan";
+  | "antarPerusahaan"
+  | "talanganMitra"
+  | "pembayaranMitra";
 
 const LABEL: Record<JenisDokumen, string> = {
   penawaran: "Penawaran Penjualan",
@@ -76,6 +79,8 @@ const LABEL: Record<JenisDokumen, string> = {
   pelepasanAset: "Pelepasan Aset",
   penggajian: "Penggajian",
   antarPerusahaan: "Transaksi Antar Perusahaan",
+  talanganMitra: "Talangan Mitra",
+  pembayaranMitra: "Pembayaran ke Mitra",
 };
 
 const JALUR: Record<JenisDokumen, string[]> = {
@@ -104,6 +109,8 @@ const JALUR: Record<JenisDokumen, string[]> = {
   pelepasanAset: ["/aset-tetap", "/buku-besar/jurnal"],
   penggajian: ["/sdm/penggajian", "/buku-besar/jurnal"],
   antarPerusahaan: ["/buku-besar/antar-perusahaan", "/buku-besar/jurnal"],
+  talanganMitra: ["/proyek", "/proyek/keuangan", "/buku-besar/jurnal", "/persetujuan"],
+  pembayaranMitra: ["/proyek", "/proyek/keuangan", "/buku-besar/jurnal", "/persetujuan"],
 };
 
 function statusFaktur(total: Desimal, dibayar: Desimal, retur: Desimal): "DRAF" | "SEBAGIAN" | "LUNAS" {
@@ -172,6 +179,8 @@ const HAK_HAPUS: Record<Exclude<JenisDokumen, "jurnal" | "dokumenKas">, Hak> = {
   pelepasanAset: "pelepasan-aset.hapus",
   penggajian: "penggajian.hapus",
   antarPerusahaan: "antar-perusahaan.hapus",
+  talanganMitra: "talangan-mitra.hapus",
+  pembayaranMitra: "pembayaran-mitra.hapus",
 };
 
 const daftarNomor = (d: { nomor: string }[]) => d.map((x) => x.nomor).join(", ");
@@ -189,6 +198,8 @@ const HAPUS_BERPERSETUJUAN: Record<JenisPersetujuan, JenisDokumen> = {
   kerusakan: "laporanKerusakan",
   aset: "aset",
   penggajian: "penggajian",
+  talanganMitra: "talanganMitra",
+  pembayaranMitra: "pembayaranMitra",
 };
 const PERSETUJUAN_DARI_HAPUS = new Map(Object.entries(HAPUS_BERPERSETUJUAN).map(([p, h]) => [h, p as JenisPersetujuan]));
 
@@ -527,6 +538,43 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
           modul: "antar-perusahaan",
           entitasId: id,
           meta: { pemberiId: d.pemberiId, penerimaId: d.penerimaId },
+        });
+        return;
+      }
+      case "talanganMitra": {
+        // D5 §4.6: baris dokumen sudah dikunci mode hapus di atas; talangan yang sudah dikembalikan sebagai modal ditolak
+        const d = await tx.talanganMitra.findUniqueOrThrow({ where: { id }, include: { mitra: { select: { nama: true } } } });
+        if (d.statusPersetujuan === "DISETUJUI") await pastikanTalanganBolehDihapus(tx, d);
+        await tx.talanganMitra.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        await catatAktivitas(tx, pengguna, {
+          aksi: "HAPUS",
+          jenis: LABEL[jenis],
+          nomor: d.nomor,
+          keterangan: d.jurnalId ? `Talangan ${format(d.jumlah)} dari ${d.mitra.nama} dibatalkan; beban dan hutang mitra dibalik` : `Draf talangan dihapus (status ${d.statusPersetujuan}); belum ada jurnal`,
+          modul: "bagi-hasil",
+          entitasId: id,
+          meta: { proyekId: d.proyekId, mitraId: d.mitraId, jumlah: d.jumlah.toString() },
+          perusahaanId: d.perusahaanId,
+        });
+        return;
+      }
+      case "pembayaranMitra": {
+        const d = await tx.pembayaranMitra.findUniqueOrThrow({ where: { id }, include: { mitra: { select: { nama: true } } } });
+        await tx.pembayaranMitra.delete({ where: { id } });
+        await hapusJurnal(tx, d.jurnalId);
+        const modal = d.jenis === "MODAL";
+        await catatAktivitas(tx, pengguna, {
+          aksi: "HAPUS",
+          jenis: LABEL[jenis],
+          nomor: d.nomor,
+          keterangan: d.jurnalId
+            ? `Pembayaran ${modal ? "modal" : "laba"} ${format(d.jumlah)} ke ${d.mitra.nama} dibatalkan; kas dan ${modal ? "hutang mitra" : "bagi hasil"} dibalik`
+            : `Draf pembayaran dihapus (status ${d.statusPersetujuan}); belum ada jurnal`,
+          modul: "bagi-hasil",
+          entitasId: id,
+          meta: { proyekId: d.proyekId, mitraId: d.mitraId, jenis: d.jenis, jumlah: d.jumlah.toString() },
+          perusahaanId: d.perusahaanId,
         });
         return;
       }

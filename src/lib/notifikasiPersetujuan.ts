@@ -34,7 +34,15 @@ const PERUSAHAAN_DOKUMEN: Record<JenisPersetujuan, (tx: Tx, id: string) => Promi
   kerusakan: (tx, id) => tx.laporanKerusakanBarang.findUnique({ where: { id }, select: { perusahaanId: true } }),
   aset: (tx, id) => tx.asetTetap.findUnique({ where: { id }, select: { perusahaanId: true } }),
   penggajian: (tx, id) => tx.penggajian.findUnique({ where: { id }, select: { perusahaanId: true } }),
+  talanganMitra: (tx, id) => tx.talanganMitra.findUnique({ where: { id }, select: { perusahaanId: true } }),
+  pembayaranMitra: (tx, id) => tx.pembayaranMitra.findUnique({ where: { id }, select: { perusahaanId: true } }),
 };
+
+/**
+ * Jenis yang halaman dokumennya belum ada (dokumen mitra proyek, D5 §7.1; dibuat paket Keuangan Proyek). Notifikasi
+ * hasil persetujuannya tanpa tautan sampai halaman itu ada, karena aplikasi tidak menaut ke halaman yang belum ada.
+ */
+const TANPA_HALAMAN_DOKUMEN: ReadonlySet<JenisPersetujuan> = new Set(["talanganMitra", "pembayaranMitra"]);
 
 /** Label dokumen untuk teks notifikasi; Kas Masuk dan Kas Keluar dibedakan menurut kode haknya. */
 function labelDokumen(jenis: JenisPersetujuan, kode: string): string {
@@ -42,8 +50,12 @@ function labelDokumen(jenis: JenisPersetujuan, kode: string): string {
   return BERKAS[jenis].label;
 }
 
-/** Halaman tempat pengaju melihat dokumennya. Kas memakai kode hasil hakSetujui karena jalur[0] selalu Kas Masuk. */
-export function tautanDokumenPersetujuan(jenis: JenisPersetujuan, kode: string): string {
+/**
+ * Halaman tempat pengaju melihat dokumennya. Kas memakai kode hasil hakSetujui karena jalur[0] selalu Kas Masuk.
+ * null untuk jenis yang halaman dokumennya belum ada (TANPA_HALAMAN_DOKUMEN).
+ */
+export function tautanDokumenPersetujuan(jenis: JenisPersetujuan, kode: string): string | null {
+  if (TANPA_HALAMAN_DOKUMEN.has(jenis)) return null;
   if (jenis === "dokumenKas") return kode === "kas-masuk" ? "/kas-bank/masuk" : "/kas-bank/keluar";
   return BERKAS[jenis].jalur[0];
 }

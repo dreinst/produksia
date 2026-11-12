@@ -15,6 +15,7 @@ const KOLOM: { kunci: Exclude<keyof HasilSinkron, "pemetaanAda" | "seimbang" | "
   { kunci: "barangBelumDitagih", label: "Barang belum ditagih" },
   { kunci: "barangTerkirim", label: "Barang terkirim" },
   { kunci: "uangMuka", label: "Uang muka" },
+  { kunci: "hutangMitra", label: "Hutang mitra" },
 ];
 
 function Cocok() {
@@ -113,7 +114,7 @@ export default async function HalamanIntegritasPerusahaan() {
           </div>
         </div>
         <div className="bungkus-tabel">
-          <table className="tabel min-w-[52rem]">
+          <table className="tabel min-w-[58rem]">
             <thead>
               <tr>
                 <th>Perusahaan</th>

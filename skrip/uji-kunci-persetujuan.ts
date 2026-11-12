@@ -13,7 +13,7 @@ import { harusDitolak, jalankan, pastikan, sebagai } from "./bantuan";
 
 /*
  * Kunci persetujuan dan stok (tinjauan perbaikan P21, dikerjakan di perbaikan P22).
- * 1. Butir 4 dan 6: untuk kedelapan jenis di BERKAS, transaksi A memegang BERKAS[jenis].kunci atas baris tabel yang
+ * 1. Butir 4 dan 6: untuk setiap jenis di BERKAS, transaksi A memegang BERKAS[jenis].kunci atas baris tabel yang
  *    ditulis di sini secara terpisah dari kode (salah salin nama tabel di kode tertangkap). Koneksi lain yang meminta
  *    FOR NO KEY UPDATE NOWAIT pada baris itu gagal 55P03, sedangkan FOR KEY SHARE NOWAIT (yang diambil sisipan baris
  *    anak lewat kunci asing) tetap berhasil. Sesudah A selesai, NOWAIT berhasil.
@@ -46,6 +46,9 @@ const TABEL: Record<JenisPersetujuan, string> = {
   kerusakan: "LaporanKerusakanBarang",
   aset: "AsetTetap",
   penggajian: "Penggajian",
+  // P33 (KONTRAK-TAMBAHAN: jenis persetujuan baru wajib masuk peta ini)
+  talanganMitra: "TalanganMitra",
+  pembayaranMitra: "PembayaranMitra",
 };
 
 async function bersihkan() {
@@ -66,6 +69,9 @@ async function bersihkan() {
   await db.laporanKerusakanBarang.deleteMany({ where: { nomor: { startsWith: AWALAN } } });
   await db.asetTetap.deleteMany({ where: { kode: { startsWith: AWALAN } } });
   await db.penggajian.deleteMany({ where: { nomor: { startsWith: AWALAN } } });
+  await db.talanganMitra.deleteMany({ where: { nomor: { startsWith: AWALAN } } });
+  await db.pembayaranMitra.deleteMany({ where: { nomor: { startsWith: AWALAN } } });
+  await db.proyek.deleteMany({ where: { kode: { startsWith: AWALAN } } });
   await db.stokBarang.deleteMany({ where: { barang: { kode: { startsWith: AWALAN } } } });
   await db.barang.deleteMany({ where: { kode: { startsWith: AWALAN } } });
   await db.pelanggan.deleteMany({ where: { kode: { startsWith: AWALAN } } });
@@ -178,6 +184,9 @@ async function main() {
     console.log("=== 1. Kunci baris per jenis: FOR NO KEY UPDATE pada tabel yang benar (butir 4 dan 6) ===");
     const pelanggan = await db.pelanggan.create({ data: { kode: `${AWALAN}-PLG`, nama: "Pelanggan Uji Kunci" } });
     const pemasok = await db.pemasok.create({ data: { kode: `${AWALAN}-PMS`, nama: "Pemasok Uji Kunci" } });
+    // dokumen mitra (P33) butuh proyek dan mitra; keduanya dibuang bersihkan lewat kode proyek (mitra ikut kaskade)
+    const proyek = await db.proyek.create({ data: { kode: `${AWALAN}-PRY`, nama: "Proyek Uji Kunci" } });
+    const mitra = await db.mitraProyek.create({ data: { proyekId: proyek.id, nama: "Mitra Uji Kunci", nilai: 10 } });
     const id: Record<JenisPersetujuan, string> = {
       faktur: (await db.fakturPenjualan.create({ data: { nomor: `${AWALAN}-FJ1`, pelangganId: pelanggan.id } })).id,
       fakturPembelian: (await db.fakturPembelian.create({ data: { nomor: `${AWALAN}-FB1`, pemasokId: pemasok.id } })).id,
@@ -187,6 +196,8 @@ async function main() {
       kerusakan: (await db.laporanKerusakanBarang.create({ data: { nomor: `${AWALAN}-LK1`, gudangId: gudang.id, namaPelapor: "Uji", dicatatOlehNama: "Uji" } })).id,
       aset: (await db.asetTetap.create({ data: { kode: `${AWALAN}-AST1`, nama: "Aset Uji Kunci", hargaPerolehan: 1000, umurBulan: 12, akunAsetId: kKas, akunBebanPenyusutanId: akunBeban.id, akunAkumulasiPenyusutanId: kKas } })).id,
       penggajian: (await db.penggajian.create({ data: { nomor: `${AWALAN}-GJ1`, periode: `${AWALAN}-2099-12`, bulan: "2099-12", akunKasId: kKas, penggunaNama: "Uji" } })).id,
+      talanganMitra: (await db.talanganMitra.create({ data: { nomor: `${AWALAN}-TLM1`, tanggal: new Date(), proyekId: proyek.id, mitraId: mitra.id, akunBebanId: akunBeban.id, jumlah: 1000, deskripsi: "Uji", dicatatOlehNama: "Uji" } })).id,
+      pembayaranMitra: (await db.pembayaranMitra.create({ data: { nomor: `${AWALAN}-BYM1`, tanggal: new Date(), proyekId: proyek.id, mitraId: mitra.id, akunKasId: kKas, jumlah: 1000, dicatatOlehNama: "Uji" } })).id,
     };
     pastikan(Object.keys(TABEL).length === Object.keys(BERKAS).length && (Object.keys(BERKAS) as JenisPersetujuan[]).every((j) => j in TABEL), "daftar tabel uji memuat setiap jenis di BERKAS");
     for (const jenis of Object.keys(BERKAS) as JenisPersetujuan[]) {

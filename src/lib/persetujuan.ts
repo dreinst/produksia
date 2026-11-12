@@ -6,6 +6,7 @@ import { bandingId, kunciStokUrut, kurangiStok, labelBarang, perbaruiHargaRata }
 import { catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { alokasiNomorCetak, simpanNomorCetak } from "@/lib/nomorCetak";
+import { postingPembayaranMitra, postingTalanganMitra } from "@/lib/jurnalMitra";
 import {
   catatJurnal,
   catatJurnalFakturPembelian,
@@ -220,7 +221,9 @@ export type JenisPersetujuan =
   | "peminjaman"
   | "kerusakan"
   | "aset"
-  | "penggajian";
+  | "penggajian"
+  | "talanganMitra"
+  | "pembayaranMitra";
 
 const pilihPersetujuan = { id: true, nomor: true, tanggal: true, statusPersetujuan: true, diajukanOlehId: true } as const;
 
@@ -525,6 +528,35 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
       const g = await tx.penggajian.findUniqueOrThrow({ where: { id }, include: { baris: true } });
       // bulan, bukan periode: periode perusahaan selain utama berisi kunci internal YYYY-MM@id (utama identik)
       return ringkasanPenggajian({ ...g, periode: g.bulan, totalGajiPokok: D(g.totalGajiPokok), totalTunjangan: D(g.totalTunjangan), totalPotongan: D(g.totalPotongan), totalDibayar: D(g.totalDibayar) });
+    },
+  },
+  // D5 §4.5: dokumen mitra proyek. Halaman dokumennya dibuat paket Keuangan Proyek; jalur di sini hanya untuk
+  // revalidatePath (tautan notifikasi hasil persetujuan tidak memakai jalur[0], lihat notifikasiPersetujuan.ts).
+  talanganMitra: {
+    label: "Talangan Mitra",
+    kode: "talangan-mitra",
+    jalur: ["/proyek", "/proyek/keuangan", "/buku-besar/jurnal"],
+    kunci: kunciBaris("TalanganMitra"),
+    baca: (tx, id) => tx.talanganMitra.findUnique({ where: { id }, select: pilihPersetujuan }),
+    simpan: async (tx, id, data) => void (await tx.talanganMitra.update({ where: { id }, data })),
+    posting: (tx, id) => postingTalanganMitra(tx, id),
+    ringkas: async (tx, id) => {
+      const d = await tx.talanganMitra.findUniqueOrThrow({ where: { id }, include: { mitra: { select: { nama: true } }, proyek: { select: { kode: true } } } });
+      return `${d.mitra.nama}, ${format(d.jumlah)}, proyek ${d.proyek.kode}`;
+    },
+  },
+
+  pembayaranMitra: {
+    label: "Pembayaran ke Mitra",
+    kode: "pembayaran-mitra",
+    jalur: ["/proyek", "/proyek/keuangan", "/buku-besar/jurnal"],
+    kunci: kunciBaris("PembayaranMitra"),
+    baca: (tx, id) => tx.pembayaranMitra.findUnique({ where: { id }, select: pilihPersetujuan }),
+    simpan: async (tx, id, data) => void (await tx.pembayaranMitra.update({ where: { id }, data })),
+    posting: (tx, id) => postingPembayaranMitra(tx, id),
+    ringkas: async (tx, id) => {
+      const d = await tx.pembayaranMitra.findUniqueOrThrow({ where: { id }, include: { mitra: { select: { nama: true } }, proyek: { select: { kode: true } } } });
+      return `${d.jenis === "MODAL" ? "Pengembalian modal" : "Bagi laba"}, ${d.mitra.nama}, ${format(d.jumlah)}, proyek ${d.proyek.kode}`;
     },
   },
 };

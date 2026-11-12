@@ -531,6 +531,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
                 { t: "Barang diterima belum ditagih", ok: sinkron.barangBelumDitagih.sinkron, d: `Buku besar ${rp(Number(sinkron.barangBelumDitagih.bukuBesar))} · TB belum difaktur ${rp(Number(sinkron.barangBelumDitagih.dokumen))}` },
                 { t: "Barang terkirim belum ditagih", ok: sinkron.barangTerkirim.sinkron, d: `Buku besar ${rp(Number(sinkron.barangTerkirim.bukuBesar))} · SJ belum difaktur ${rp(Number(sinkron.barangTerkirim.dokumen))}` },
                 { t: "Uang muka pelanggan = DP belum dipakai", ok: sinkron.uangMuka.sinkron, d: `Buku besar ${rp(Number(sinkron.uangMuka.bukuBesar))} · DP belum dipakai ${rp(Number(sinkron.uangMuka.dokumen))}` },
+                { t: "Hutang mitra proyek = talangan − pengembalian modal", ok: sinkron.hutangMitra.sinkron, d: `Buku besar ${rp(Number(sinkron.hutangMitra.bukuBesar))} · talangan belum dikembalikan ${rp(Number(sinkron.hutangMitra.dokumen))}` },
               ].map(({ t, ok, d }) => (
                 <ButirIntegritas key={t} t={t} ok={ok} d={d} />
               ))}
