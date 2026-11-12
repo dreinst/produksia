@@ -2,14 +2,20 @@ import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import { saringPerusahaan } from "@/lib/perusahaan";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
 import { muatPetaKategori } from "@/lib/kategoriAnggaran";
+import { hitungBagiHasil, type HasilBagiHasil, type MitraBagi } from "@/lib/bagiHasil";
+import { hitungModulProyek, penghitungTerlihat, type HitunganModul, type KunciModulProyek } from "@/lib/hitunganModulProyek";
+import { ruangTersembunyi, syaratBerkasTerlihat } from "@/lib/berkas";
+import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
+import { labelKlienProyek } from "@/lib/proyek";
 import { D, terbesar, uang, type Desimal } from "@/lib/uang";
 
 /*
  * Keuangan proyek (D5 §3.7, §3.8, §6.3), bagian baca saja: rumus ringkasan murni dan pemuatnya. Bukan "use server".
  * Biaya aktual dibaca dari baris jurnal akun BEBAN yang jurnalnya bertanda proyek dan bukan jurnal penutup, persis
  * seperti ringkasanProyek LPJ (src/lib/proyek.ts). Peta akun ke kategori anggaran dari src/lib/kategoriAnggaran.ts.
- * Posting talangan dan pembayaran mitra ada di src/lib/jurnalMitra.ts; bagi hasil dan halaman keuangan proyek
- * ditambahkan paket Keuangan Proyek berikutnya.
+ * Posting talangan dan pembayaran mitra ada di src/lib/jurnalMitra.ts, algoritma bagi hasil di src/lib/bagiHasil.ts.
+ * Berkas ini memuat angkanya untuk halaman keuangan proyek: ringkasan beserta bagi hasil, rincian realisasi (tab Biaya),
+ * dokumen mitra (tab Bagi Hasil), dan data daftar /proyek dengan hitungan per modul.
  */
 
 type Klien = PrismaClient | Prisma.TransactionClient;
@@ -335,15 +341,216 @@ function proyekRingkas(p: Prisma.ProyekGetPayload<{ select: typeof PILIH_PROYEK 
   };
 }
 
+export type PembayaranMitraRingkas = { id: string; nomor: string; tanggal: Date; mitraId: string; jenis: "MODAL" | "LABA"; jumlah: Desimal; catatan: string | null };
+export type BagiHasilProyek = HasilBagiHasil & { pembayaran: PembayaranMitraRingkas[] };
+
 /**
- * Ringkasan keuangan satu proyek; null bila proyek tidak ada. Angka bagi hasil (D5 §3.12) ditambahkan paket
- * Keuangan Proyek bersama src/lib/bagiHasil.ts.
+ * Bagi hasil satu proyek dari angka ringkasannya (D5 §3.12): mitra urut (urutan, dibuatPada, id), modal masuk =
+ * Σ talangan DISETUJUI, dibayar = Σ pembayaran DISETUJUI per jenis. Dokumen draf, menunggu, dan ditolak tidak masuk
+ * angka. `pembayaran` hanya yang DISETUJUI dan mitranya masih ada, urut tanggal lalu dibuatPada turun.
  */
-export async function ringkasanKeuanganProyek(klien: Klien, proyekId: string): Promise<{ proyek: ProyekKeuangan; ringkasan: RingkasanKeuangan } | null> {
+export async function muatBagiHasil(klien: Klien, proyekId: string, ringkasan: Pick<RingkasanKeuangan, "marginRencana" | "marginKas" | "diterima" | "aktual">): Promise<BagiHasilProyek> {
+  const mitra = await klien.mitraProyek.findMany({ where: { proyekId }, orderBy: [{ urutan: "asc" }, { dibuatPada: "asc" }, { id: "asc" }], select: { id: true, nama: true, mode: true, nilai: true } });
+  const talangan = await klien.talanganMitra.groupBy({ by: ["mitraId"], where: { proyekId, statusPersetujuan: "DISETUJUI" }, _sum: { jumlah: true } });
+  const bayar = await klien.pembayaranMitra.groupBy({ by: ["mitraId", "jenis"], where: { proyekId, statusPersetujuan: "DISETUJUI" }, _sum: { jumlah: true } });
+  const daftarBayar = await klien.pembayaranMitra.findMany({
+    where: { proyekId, statusPersetujuan: "DISETUJUI" },
+    orderBy: [{ tanggal: "desc" }, { dibuatPada: "desc" }, { id: "asc" }],
+    select: { id: true, nomor: true, tanggal: true, mitraId: true, jenis: true, jumlah: true, catatan: true },
+  });
+  const modalMasuk = new Map(talangan.map((t) => [t.mitraId, D(t._sum.jumlah)]));
+  const dibayar = new Map<string, { modal: Desimal; laba: Desimal }>();
+  for (const b of bayar) {
+    const ada = dibayar.get(b.mitraId) ?? { modal: NOL, laba: NOL };
+    if (b.jenis === "MODAL") ada.modal = ada.modal.plus(D(b._sum.jumlah));
+    else ada.laba = ada.laba.plus(D(b._sum.jumlah));
+    dibayar.set(b.mitraId, ada);
+  }
+  const daftarMitra: MitraBagi[] = mitra.map((m) => ({ id: m.id, nama: m.nama, mode: m.mode, nilai: D(m.nilai) }));
+  return {
+    ...hitungBagiHasil(ringkasan, daftarMitra, modalMasuk, dibayar),
+    pembayaran: daftarBayar.map((b) => ({ ...b, jumlah: D(b.jumlah) })),
+  };
+}
+
+/**
+ * Ringkasan keuangan satu proyek beserta bagi hasilnya; null bila proyek tidak ada. `denganBagiHasil: false` (pengguna
+ * tanpa bagi-hasil.lihat) melewati pemuatan mitra dan mengembalikan bagiHasil null.
+ */
+export async function ringkasanKeuanganProyek(
+  klien: Klien,
+  proyekId: string,
+  opsi: { denganBagiHasil?: boolean } = {},
+): Promise<{ proyek: ProyekKeuangan; ringkasan: RingkasanKeuangan; bagiHasil: BagiHasilProyek | null } | null> {
   const p = await klien.proyek.findUnique({ where: { id: proyekId }, select: PILIH_PROYEK });
   if (!p) return null;
   const masukan = (await muatMasukanKeuangan(klien, [p.id])).get(p.id)!;
-  return { proyek: proyekRingkas(p), ringkasan: hitungRingkasanKeuangan(masukan) };
+  const ringkasan = hitungRingkasanKeuangan(masukan);
+  const bagiHasil = opsi.denganBagiHasil === false ? null : await muatBagiHasil(klien, p.id, ringkasan);
+  return { proyek: proyekRingkas(p), ringkasan, bagiHasil };
+}
+
+export type BarisRealisasi = {
+  barisId: string;
+  jurnalId: string;
+  tanggal: Date;
+  nomorJurnal: string;
+  keterangan: string | null;
+  akun: { id: string; kode: string; nama: string };
+  kategoriId: string | null;
+  kategori: string;
+  /** "{nama mitra} (talangan)" atau nama perusahaan proyek */
+  didanaiOleh: string;
+  /** debit − kredit */
+  jumlah: Desimal;
+  /** jumlah berkas dokumen sumber yang terlihat oleh pengguna; null bila pengguna tidak diberikan */
+  lampiran: number | null;
+  /** baris akun Bagi Hasil Mitra Proyek (tidak masuk biaya aktual) */
+  bagiHasil: boolean;
+};
+
+/** Jenis lampiran dokumen sumber satu jurnal (D5 §5.3): kas, faktur pembelian, talangan, atau jurnal itu sendiri. */
+function sumberLampiran(j: { id: string; dokumenKas: { id: string; jenis: string } | null; fakturPembelian: { id: string } | null; talanganMitra: { id: string } | null }): { jenisEntitas: string; entitasId: string } {
+  if (j.dokumenKas) return { jenisEntitas: j.dokumenKas.jenis === "MASUK" ? "kas-masuk" : "kas-keluar", entitasId: j.dokumenKas.id };
+  if (j.fakturPembelian) return { jenisEntitas: "faktur-pembelian", entitasId: j.fakturPembelian.id };
+  if (j.talanganMitra) return { jenisEntitas: "talangan-mitra", entitasId: j.talanganMitra.id };
+  return { jenisEntitas: "jurnal", entitasId: j.id };
+}
+
+/**
+ * Rincian realisasi (tab Biaya, D5 §3.8): satu baris per BarisJurnal akun BEBAN pada jurnal bertanda proyek yang
+ * bukan jurnal penutup, urut tanggal turun lalu nomor. Σ jumlah baris yang bukan bagiHasil = aktual ringkasan.
+ * `pengguna` diisi: jumlah lampiran memakai syarat berkas terlihat pengguna itu (folder dan proyek terbatas, hak lihat
+ * jenis lampiran). `batas` membatasi jumlah baris (bawaan 500).
+ */
+export async function rincianRealisasi(klien: Klien, proyekId: string, pengguna?: PenggunaSesi, batas = 500): Promise<BarisRealisasi[]> {
+  const proyek = await klien.proyek.findUnique({ where: { id: proyekId }, select: { perusahaan: { select: { nama: true } } } });
+  if (!proyek) return [];
+  const baris = await klien.barisJurnal.findMany({
+    where: { akun: { jenis: "BEBAN" }, jurnal: { proyekId, sumber: { not: "PENUTUP" } } },
+    orderBy: [{ jurnal: { tanggal: "desc" } }, { jurnal: { nomor: "asc" } }, { id: "asc" }],
+    take: batas,
+    select: {
+      id: true, debit: true, kredit: true, keterangan: true,
+      akun: { select: { id: true, kode: true, nama: true } },
+      jurnal: {
+        select: {
+          id: true, nomor: true, tanggal: true, keterangan: true,
+          dokumenKas: { select: { id: true, jenis: true } },
+          fakturPembelian: { select: { id: true } },
+          talanganMitra: { select: { id: true, mitra: { select: { nama: true } } } },
+        },
+      },
+    },
+  });
+  const peta = await muatPetaKategori(klien);
+  const akunPeran = await akunKeuanganProyek(klien);
+  const sumber = new Map(baris.map((b) => [b.jurnal.id, sumberLampiran(b.jurnal)]));
+  let lampiran: Map<string, number> | null = null;
+  if (pengguna && sumber.size > 0) {
+    const ruang = await ruangTersembunyi(klien, pengguna);
+    const kunci = [...new Map([...sumber.values()].map((x) => [`${x.jenisEntitas}:${x.entitasId}`, x])).values()];
+    const hitung = await klien.berkas.groupBy({
+      by: ["jenisEntitas", "entitasId"],
+      where: { AND: [syaratBerkasTerlihat(pengguna, ruang), { OR: kunci.map((k) => ({ jenisEntitas: k.jenisEntitas, entitasId: k.entitasId })) }] },
+      _count: { _all: true },
+    });
+    lampiran = new Map(hitung.map((h) => [`${h.jenisEntitas}:${h.entitasId}`, h._count._all]));
+  }
+  return baris.map((b) => {
+    const kategoriId = peta.kategoriUntukAkun(b.akun.id);
+    const s = sumber.get(b.jurnal.id)!;
+    return {
+      barisId: b.id,
+      jurnalId: b.jurnal.id,
+      tanggal: b.jurnal.tanggal,
+      nomorJurnal: b.jurnal.nomor,
+      keterangan: b.keterangan ?? b.jurnal.keterangan,
+      akun: b.akun,
+      kategoriId,
+      kategori: kategoriId ? (peta.namaKategori.get(kategoriId) ?? NAMA_TANPA_KATEGORI) : NAMA_TANPA_KATEGORI,
+      didanaiOleh: b.jurnal.talanganMitra ? `${b.jurnal.talanganMitra.mitra.nama} (talangan)` : proyek.perusahaan.nama,
+      jumlah: D(b.debit).minus(D(b.kredit)),
+      lampiran: lampiran ? (lampiran.get(`${s.jenisEntitas}:${s.entitasId}`) ?? 0) : null,
+      bagiHasil: akunPeran.bebanBagiHasil?.id === b.akun.id,
+    };
+  });
+}
+
+/**
+ * Dokumen mitra satu proyek untuk tab Bagi Hasil: semua status (draf dan yang menunggu tampil dengan lencana
+ * persetujuan), urut tanggal lalu dibuatPada turun. Pemanggil menyaring dengan hak talangan-mitra.lihat dan
+ * pembayaran-mitra.lihat.
+ */
+export async function daftarDokumenMitra(klien: Klien, proyekId: string) {
+  const pilihStatus = { statusPersetujuan: true, diajukanOlehId: true, catatanPenolakan: true, jurnalId: true } as const;
+  const talangan = await klien.talanganMitra.findMany({
+    where: { proyekId },
+    orderBy: [{ tanggal: "desc" }, { dibuatPada: "desc" }, { id: "asc" }],
+    select: { id: true, nomor: true, tanggal: true, jumlah: true, deskripsi: true, vendor: true, mitraId: true, mitra: { select: { nama: true } }, akunBeban: { select: { kode: true, nama: true } }, ...pilihStatus },
+  });
+  const pembayaran = await klien.pembayaranMitra.findMany({
+    where: { proyekId },
+    orderBy: [{ tanggal: "desc" }, { dibuatPada: "desc" }, { id: "asc" }],
+    select: { id: true, nomor: true, tanggal: true, jumlah: true, jenis: true, catatan: true, mitraId: true, mitra: { select: { nama: true } }, akunKas: { select: { kode: true, nama: true } }, ...pilihStatus },
+  });
+  return { talangan, pembayaran };
+}
+
+export type BarisProyekHalaman = {
+  id: string;
+  kode: string;
+  nama: string;
+  warna: string | null;
+  status: string;
+  klien: string | null;
+  tanggalMulai: Date | null;
+  tanggalSelesai: Date | null;
+  perusahaan: { id: string; kode: string; nama: string; warna: string | null };
+  /** hanya diisi untuk pemegang berkas.akses-penuh: proyek punya pembatasan berkas (AksesBerkasProyek) */
+  terbatas?: boolean;
+  hitungan: Partial<Record<KunciModulProyek, HitunganModul>>;
+};
+
+/**
+ * Data halaman /proyek (D5 §3.3, §6.3): proyek tersaring (q pada kode, nama, nama klien, pelanggan; status), urut
+ * tanggal mulai turun lalu kode, dipaginasi, dengan hitungan modul yang haknya dipegang pengguna. Tanpa angka keuangan.
+ * perusahaanId null/undefined = gabungan.
+ */
+export async function daftarProyekUntukHalaman(
+  klien: Klien,
+  pengguna: PenggunaSesi,
+  param: { q?: string; status?: string; lewati?: number; ambil?: number } = {},
+  perusahaanId?: string | null,
+): Promise<{ total: number; baris: BarisProyekHalaman[] }> {
+  const where: Prisma.ProyekWhereInput = { ...saringPerusahaan(perusahaanId) };
+  if (param.status) where.status = param.status;
+  const q = param.q?.trim();
+  if (q) {
+    const ci = { contains: q, mode: "insensitive" as const };
+    where.OR = [{ kode: ci }, { nama: ci }, { namaKlien: ci }, { pelanggan: { nama: ci } }];
+  }
+  const aksesPenuh = punyaHak(pengguna, "berkas.akses-penuh");
+  const total = await klien.proyek.count({ where });
+  const proyek = await klien.proyek.findMany({
+    where,
+    orderBy: [{ tanggalMulai: { sort: "desc", nulls: "last" } }, { kode: "asc" }],
+    skip: Math.max(0, param.lewati ?? 0),
+    take: Math.min(Math.max(1, param.ambil ?? 50), BATAS_PROYEK_MUAT),
+    select: { ...PILIH_PROYEK, ...(aksesPenuh ? { aksesBerkas: { select: { proyekId: true } } } : {}) },
+  });
+  const ids = proyek.map((p) => p.id);
+  const hitungan = await hitungModulProyek(klien, ids, penghitungTerlihat((h) => punyaHak(pengguna, h)));
+  return {
+    total,
+    baris: proyek.map((p) => ({
+      id: p.id, kode: p.kode, nama: p.nama, warna: p.warna, status: p.status,
+      klien: labelKlienProyek(p),
+      tanggalMulai: p.tanggalMulai, tanggalSelesai: p.tanggalSelesai, perusahaan: p.perusahaan,
+      ...(aksesPenuh ? { terbatas: !!(p as { aksesBerkas?: unknown }).aksesBerkas } : {}),
+      hitungan: hitungan.get(p.id) ?? {},
+    })),
+  };
 }
 
 export type TotalKeuanganProyek = {
