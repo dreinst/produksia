@@ -579,8 +579,9 @@ export async function buatFaktur(dataFormulir: FormData) {
   // teks surat, kop, dan kolom event diwarisi pesanan; kunci teks yang ada di formulir menimpa warisan (D2 §3.5)
   const pengaturanDokumen = await db.pengaturanDokumenPenjualan.findUnique({ where: { perusahaanId }, select: { syaratPembayaran: true } });
   const teks = bacaTeksDokumen(dataFormulir, KOLOM_TEKS_FAKTUR, { warisan: pesanan, bawaanSyarat: pengaturanDokumen?.syaratPembayaran ?? null });
-  const tanggal = new Date();
-  const jatuhTempo = bacaJatuhTempo(dataFormulir, pengaturan.terminHari, tanggal);
+  // jatuh tempo isian diperiksa di posisi lama (urutan pesan galat tetap); tanggal faktur dan jatuh tempo yang disimpan
+  // dihitung ulang di dalam transaksi sesudah kunci baris pesanan
+  bacaJatuhTempo(dataFormulir, pengaturan.terminHari, new Date());
   const kopDariFormulir = dataFormulir.has("kopSuratId");
   const kopSuratIdIsian = kopDariFormulir ? kopIsian(dataFormulir) : pesanan.kopSuratId;
   const nomorCetakManual = await bacaNomorCetakIsian(dataFormulir, "faktur", perusahaanId);
@@ -599,6 +600,11 @@ export async function buatFaktur(dataFormulir: FormData) {
     // serentak atas pesanan yang sama berjalan bergiliran, jadi pembagian jalur lama dan konteks prorata dihitung dari
     // keadaan sesudah faktur sebelumnya selesai.
     await kunciBarisPesananPenjualan(tx, pesananId);
+    // Tanggal faktur diambil sesudah kunci, seperti surat jalan (tinjauan perbaikan P27 tahap 2 T3): urutan tanggal faktur
+    // dan surat jalan satu pesanan sama dengan urutan commit, jadi pemeriksaan "lebih baru" dan "SJ sesudah faktur" di
+    // hapus tidak bisa saling menahan. Jatuh tempo bawaan dihitung dari tanggal ini.
+    const tanggal = new Date();
+    const jatuhTempo = bacaJatuhTempo(dataFormulir, pengaturan.terminHari, tanggal);
     const segar = await tx.pesananPenjualan.findUniqueOrThrow({
       where: { id: pesananId },
       select: { baris: { orderBy: [{ urutan: "asc" }, { id: "asc" }] }, faktur: { select: { fee: true, diskon: true } } },

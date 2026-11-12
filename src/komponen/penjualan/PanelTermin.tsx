@@ -171,7 +171,8 @@ export default function PanelTermin(p: Props) {
 /**
  * Tombol per butir. Tanpa lihatBayar (tinjauan perbaikan P27 R5) tombol hanya mengikuti status tagih, supaya pemegang
  * pesanan.ubah tanpa hak lihat uang muka dan penerimaan tidak bisa menyimpulkan butir mana yang sudah dibayar dari
- * tombol yang muncul. Server tetap menolak terbitkan, batal, atau bayar yang tidak sah.
+ * tombol yang muncul. Server tetap menolak terbitkan butir yang sudah lunas, batal butir yang sudah dibayar, dan bayar
+ * yang melebihi sisa.
  */
 function AksiButir({ pesananId, butir: b, bolehUbah, bolehBayar, lihatBayar }: { pesananId: string; butir: ProgresTermin["butir"][number]; bolehUbah: boolean; bolehBayar: boolean; lihatBayar: boolean }) {
   const terbit = bolehUbah && !b.ditagihPada && (!lihatBayar || b.sisa.gt(0));

@@ -574,7 +574,7 @@ async function bagianR4(k: Konteks) {
   console.log("=== r4. Invarian catatan konsumsi, CHECK jumlahDifaktur, pembalik catatan bersyarat ===");
   const awal = await sinkron("awal r4");
   const mulai = await periksaKonsumsiSj(db);
-  pastikan(mulai.sinkron && mulai.rincian.length === 3 && mulai.rincian.every((r) => r.jumlah === 0), `periksaKonsumsiSj tanpa temuan di awal (${mulai.rincian.map((r) => `${r.kode} ${r.jumlah}`).join(", ")})`);
+  pastikan(mulai.sinkron && mulai.rincian.length === 4 && mulai.rincian.every((r) => r.jumlah === 0), `periksaKonsumsiSj tanpa temuan di awal (${mulai.rincian.map((r) => `${r.kode} ${r.jumlah}`).join(", ")})`);
   const psj = await pesananBaru(k, "R4: R 1 @ 100.000", [{ barangId: k.barang.id, jumlah: 1, harga: 100_000 }]);
   const [bR] = psj.baris;
   const ps = await stokSesudah(k, "r4 stok 1 @ 50.000", 1, 50_000);

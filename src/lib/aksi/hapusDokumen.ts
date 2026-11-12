@@ -8,7 +8,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, kali, jumlahkan, terkecil, type Desimal } from "@/lib/uang";
 import { kunciStokUrut, kurangiStok, tambahStok, labelBarang, ubahNilaiStok, sesuaikanHargaRata, urutBarang } from "@/lib/stok";
 import type { Hak, PenggunaSesi } from "@/lib/hakAkses";
-import type { Prisma } from "@/prisma-klien/client";
+import { Prisma } from "@/prisma-klien/client";
 import { pastikanTahunTerbuka } from "@/lib/tutupBuku";
 import { BERKAS, type JenisPersetujuan } from "@/lib/persetujuan";
 import { catatAktivitas } from "@/lib/log";
@@ -226,6 +226,10 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         return;
       }
       case "pesanan": {
+        // Baris pesanan dikunci urut id lebih dulu, sama dengan faktur, surat jalan, dan hapus keduanya (tinjauan perbaikan
+        // P27 tahap 2 T2). Surat jalan, faktur, dan uang muka dibaca sesudah kunci, jadi faktur yang selesai selagi hapus ini
+        // menunggu ikut menahan hapus, bukan tertinggal tanpa pesanan (FK faktur ON DELETE SET NULL).
+        await kunciBarisPesananPenjualan(tx, id);
         const d = await tx.pesananPenjualan.findUniqueOrThrow({ where: { id }, include: { pengiriman: true, faktur: true, uangMuka: true } });
         if (d.pengiriman.length) throw new Error(`${d.nomor} sudah punya surat jalan ${daftarNomor(d.pengiriman)}; hapus itu dulu`);
         if (d.faktur.length) throw new Error(`${d.nomor} sudah punya faktur ${daftarNomor(d.faktur)}; hapus itu dulu`);
@@ -303,13 +307,34 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
         for (const b of d.baris) {
           if (!d.pesananId) continue;
           // Baris faktur jalur id (barisPesananId terisi) membalik tepat baris pesanannya, sehingga barang yang muncul di
-          // beberapa baris pesanan tidak menumpuk di baris pertama (D2 §4.6, bug B-10 / §10.5 no. 6). Tanpa
-          // barisPesananId: kode lama persis (baris pesanan pertama dengan barang sama).
-          const bp = b.barisPesananId ? { id: b.barisPesananId } : await tx.barisPesananPenjualan.findFirst({ where: { pesananId: d.pesananId, barangId: b.barangId } });
-          if (!bp) continue;
-          // bersyarat: progres faktur baris pesanan tidak pernah turun di bawah nol (CHECK jumlahDifaktur 0..jumlah)
-          const { count } = await tx.barisPesananPenjualan.updateMany({ where: { id: bp.id, jumlahDifaktur: { gte: b.jumlah } }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
-          if (count !== 1) throw new Error(`Progres faktur baris pesanan lebih kecil dari jumlah ${d.nomor}; data pesanan tidak cocok, periksa dulu sebelum menghapus`);
+          // beberapa baris pesanan tidak menumpuk di baris pertama (D2 §4.6, bug B-10 / §10.5 no. 6). Pembalik bersyarat:
+          // progres faktur baris pesanan tidak pernah turun di bawah nol (CHECK jumlahDifaktur 0..jumlah).
+          const pesanTidakCocok = `Progres faktur baris pesanan lebih kecil dari jumlah ${d.nomor}; data pesanan tidak cocok, periksa dulu sebelum menghapus`;
+          if (b.barisPesananId) {
+            const { count } = await tx.barisPesananPenjualan.updateMany({ where: { id: b.barisPesananId, jumlahDifaktur: { gte: b.jumlah } }, data: { jumlahDifaktur: { decrement: b.jumlah } } });
+            if (count !== 1) throw new Error(pesanTidakCocok);
+            continue;
+          }
+          // Tanpa barisPesananId (faktur lama atas barang ganda): kurangi baris pesanan berbarang sama urut terbalik
+          // (urutan lalu id turun), masing-masing sampai jumlahDifaktur-nya, hingga jumlah baris faktur habis (tinjauan
+          // perbaikan P27 tahap 2 T1). Migrasi 20261112100000 membagi ulang data lama B-10 urut naik, jadi faktur lama
+          // tetap bisa dihapus apa pun baris yang dulu menampung progresnya. Ditolak hanya bila totalnya kurang.
+          const kandidat = await tx.barisPesananPenjualan.findMany({
+            where: { pesananId: d.pesananId, barangId: b.barangId },
+            orderBy: [{ urutan: "desc" }, { id: "desc" }],
+            select: { id: true, jumlahDifaktur: true },
+          });
+          if (kandidat.length === 0) continue;
+          let sisa = D(b.jumlah);
+          if (jumlahkan(kandidat.map((k) => k.jumlahDifaktur)).lt(sisa)) throw new Error(pesanTidakCocok);
+          for (const k of kandidat) {
+            if (sisa.lte(0)) break;
+            const ambil = terkecil(D(k.jumlahDifaktur), sisa);
+            if (ambil.lte(0)) continue;
+            const { count } = await tx.barisPesananPenjualan.updateMany({ where: { id: k.id, jumlahDifaktur: { gte: ambil } }, data: { jumlahDifaktur: { decrement: ambil } } });
+            if (count !== 1) throw new Error(pesanTidakCocok);
+            sisa = sisa.minus(ambil);
+          }
         }
         if (d.konsumsiSjTercatat) {
           // Konsumsi SJ dibalik persis menurut catatan KonsumsiSuratJalan (tinjauan P27 T1, S2): hanya baris SJ yang
@@ -330,7 +355,9 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
           // - bila pesanan masih punya faktur lain, pembalikan berhenti begitu nilainya mencapai nilaiTransit baris faktur
           //   (nilai yang dulu benar-benar dikonsumsinya), jadi baris bertransit 0 tidak mengembalikan SJ milik faktur lain.
           //   Tanpa faktur lain, semua konsumsi SJ pesanan milik faktur ini, jadi aturan lama berlaku utuh.
-          // Batas yang tersisa: SJ berharga pokok 0 tidak terlihat oleh batas nilai (dampak nilainya juga 0).
+          // Batas yang tersisa: SJ berharga pokok 0 tidak terlihat oleh batas nilai (dampak nilainya juga 0). Pada data lama
+          // B-10 atau ber-SJ yatim, baris SJ terbaru bisa milik faktur lain dengan harga pokok berbeda, sehingga pecahan
+          // unit dibalik di baris SJ yang bukan miliknya; nilai transitnya tetap dalam batas (tinjauan perbaikan P27 tahap 2 T5).
           await kunciBarisSuratJalanPesanan(tx, d.pesananId);
           const adaFakturLain = fakturPesanan.some((f) => f.id !== id);
           const tercatat = new Map(
@@ -348,7 +375,8 @@ export async function hapusDokumen(jenis: JenisDokumen, id: string) {
               if (adaFakturLain && nilai.gte(batasNilai)) break;
               let bisa = terkecil(D(sj.jumlahDifaktur).minus(tercatat.get(sj.id) ?? 0), sisa);
               const hargaPokok = D(sj.hargaPokok);
-              if (adaFakturLain && hargaPokok.gt(0)) bisa = terkecil(bisa, batasNilai.minus(nilai).div(hargaPokok).toDecimalPlaces(2));
+              // dibulatkan ke bawah supaya nilai yang dibalik tidak melewati nilaiTransit (tinjauan perbaikan P27 tahap 2 T5)
+              if (adaFakturLain && hargaPokok.gt(0)) bisa = terkecil(bisa, batasNilai.minus(nilai).div(hargaPokok).toDecimalPlaces(2, Prisma.Decimal.ROUND_DOWN));
               if (bisa.lte(0)) continue;
               const { count } = await tx.barisPengiriman.updateMany({ where: { id: sj.id, jumlahDifaktur: { gte: bisa } }, data: { jumlahDifaktur: { decrement: bisa } } });
               if (count !== 1) throw new Error(`Surat jalan pesanan ${d.nomor} berubah saat dihapus; muat ulang halaman lalu coba lagi`);

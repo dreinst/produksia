@@ -138,8 +138,16 @@ export async function periksaSinkron(klien: PrismaClient = db, opsi: { perusahaa
 
 // ---------- Catatan konsumsi surat jalan (tinjauan perbaikan P27 R4) ----------
 
-export type KodeKonsumsiSj = "TRANSIT_CATATAN" | "CATATAN_MELEBIHI_DIFAKTUR" | "DIFAKTUR_DI_LUAR_BATAS";
-export type HasilKonsumsiSj = { sinkron: boolean; rincian: { kode: KodeKonsumsiSj; label: string; jumlah: number }[] };
+export type KodeKonsumsiSj = "TRANSIT_CATATAN" | "CATATAN_MELEBIHI_DIFAKTUR" | "DIFAKTUR_DI_LUAR_BATAS" | "CATATAN_FAKTUR_TIDAK_TERCATAT";
+export type HasilKonsumsiSj = { sinkron: boolean; rincian: { kode: KodeKonsumsiSj; label: string; jumlah: number; contoh: string[] }[] };
+
+const LABEL_KONSUMSI_SJ: Record<KodeKonsumsiSj, string> = {
+  TRANSIT_CATATAN: "Baris faktur yang nilai transitnya beda dari catatan konsumsi surat jalannya",
+  CATATAN_MELEBIHI_DIFAKTUR: "Baris surat jalan yang catatan konsumsinya melebihi jumlah yang sudah difaktur",
+  DIFAKTUR_DI_LUAR_BATAS: "Baris surat jalan atau pesanan dengan jumlah difaktur di bawah nol atau di atas jumlahnya",
+  CATATAN_FAKTUR_TIDAK_TERCATAT: "Catatan konsumsi surat jalan milik faktur lama yang ditandai belum tercatat",
+};
+const URUTAN_KONSUMSI_SJ = Object.keys(LABEL_KONSUMSI_SJ) as KodeKonsumsiSj[];
 
 /**
  * Invarian catatan konsumsi surat jalan (KonsumsiSuratJalan). Kerusakan di sini tidak terlihat periksaSinkron, karena
@@ -147,26 +155,50 @@ export type HasilKonsumsiSj = { sinkron: boolean; rincian: { kode: KodeKonsumsiS
  * 1. baris faktur tercatat (konsumsiSjTercatat) yang nilaiTransit-nya beda dari jumlah nilai catatannya;
  * 2. baris SJ yang jumlah catatan konsumsinya melebihi jumlahDifaktur-nya;
  * 3. baris SJ atau baris pesanan penjualan dengan jumlahDifaktur di luar 0..jumlah (dijaga CHECK sejak migrasi
- *    20261112100000_batas_jumlah_difaktur, tetap dihitung untuk berjaga-jaga).
- * Dihitung di PostgreSQL dalam satu kueri, tanpa memuat baris ke memori.
+ *    20261112100000_batas_jumlah_difaktur, tetap dihitung untuk berjaga-jaga);
+ * 4. catatan konsumsi pada faktur konsumsiSjTercatat = false (hapus faktur seperti itu membuang catatan lewat kaskade
+ *    tanpa membalik SJ-nya). Hanya buatFaktur yang menulis catatan, selalu dengan penanda true.
+ * Tiap kode membawa sampai lima nomor dokumen (faktur, surat jalan, atau pesanan) sebagai petunjuk letaknya (tinjauan
+ * perbaikan P27 tahap 2 T6). Dihitung di PostgreSQL dalam satu kueri, tanpa memuat baris ke memori.
  */
 export async function periksaKonsumsiSj(klien: PrismaClient | Prisma.TransactionClient = db): Promise<HasilKonsumsiSj> {
-  const [baris] = await klien.$queryRaw<{ transit: number; melebihi: number; batas: number }[]>`
-    SELECT
-      (SELECT COUNT(*) FROM "BarisFakturPenjualan" bf
-         JOIN "FakturPenjualan" f ON f."id" = bf."fakturId"
-         LEFT JOIN (SELECT "barisFakturId", SUM("nilaiTransit") AS nilai FROM "KonsumsiSuratJalan" GROUP BY "barisFakturId") k ON k."barisFakturId" = bf."id"
-       WHERE f."konsumsiSjTercatat" AND bf."nilaiTransit" <> COALESCE(k.nilai, 0))::int AS "transit",
-      (SELECT COUNT(*) FROM "BarisPengiriman" bp
-         JOIN (SELECT "barisPengirimanId", SUM("jumlah") AS jumlah FROM "KonsumsiSuratJalan" GROUP BY "barisPengirimanId") k ON k."barisPengirimanId" = bp."id"
-       WHERE k.jumlah > bp."jumlahDifaktur")::int AS "melebihi",
-      ((SELECT COUNT(*) FROM "BarisPengiriman" WHERE "jumlahDifaktur" < 0 OR "jumlahDifaktur" > "jumlah")
-        + (SELECT COUNT(*) FROM "BarisPesananPenjualan" WHERE "jumlahDifaktur" < 0 OR "jumlahDifaktur" > "jumlah"))::int AS "batas"`;
-  const rincian: HasilKonsumsiSj["rincian"] = [
-    { kode: "TRANSIT_CATATAN", label: "Baris faktur yang nilai transitnya beda dari catatan konsumsi surat jalannya", jumlah: Number(baris?.transit ?? 0) },
-    { kode: "CATATAN_MELEBIHI_DIFAKTUR", label: "Baris surat jalan yang catatan konsumsinya melebihi jumlah yang sudah difaktur", jumlah: Number(baris?.melebihi ?? 0) },
-    { kode: "DIFAKTUR_DI_LUAR_BATAS", label: "Baris surat jalan atau pesanan dengan jumlah difaktur di bawah nol atau di atas jumlahnya", jumlah: Number(baris?.batas ?? 0) },
-  ];
+  const baris = await klien.$queryRaw<{ kode: KodeKonsumsiSj; jumlah: number; contoh: string[] | null }[]>`
+    WITH transit AS (
+      SELECT f."nomor" FROM "BarisFakturPenjualan" bf
+        JOIN "FakturPenjualan" f ON f."id" = bf."fakturId"
+        LEFT JOIN (SELECT "barisFakturId", SUM("nilaiTransit") AS nilai FROM "KonsumsiSuratJalan" GROUP BY "barisFakturId") k ON k."barisFakturId" = bf."id"
+       WHERE f."konsumsiSjTercatat" AND bf."nilaiTransit" <> COALESCE(k.nilai, 0)
+    ), melebihi AS (
+      SELECT s."nomor" FROM "BarisPengiriman" bp
+        JOIN (SELECT "barisPengirimanId", SUM("jumlah") AS jumlah FROM "KonsumsiSuratJalan" GROUP BY "barisPengirimanId") k ON k."barisPengirimanId" = bp."id"
+        JOIN "PengirimanPesanan" s ON s."id" = bp."pengirimanId"
+       WHERE k.jumlah > bp."jumlahDifaktur"
+    ), batas AS (
+      SELECT s."nomor" FROM "BarisPengiriman" bp JOIN "PengirimanPesanan" s ON s."id" = bp."pengirimanId"
+       WHERE bp."jumlahDifaktur" < 0 OR bp."jumlahDifaktur" > bp."jumlah"
+      UNION ALL
+      SELECT p."nomor" FROM "BarisPesananPenjualan" bp JOIN "PesananPenjualan" p ON p."id" = bp."pesananId"
+       WHERE bp."jumlahDifaktur" < 0 OR bp."jumlahDifaktur" > bp."jumlah"
+    ), tidak_tercatat AS (
+      SELECT f."nomor" FROM "KonsumsiSuratJalan" k
+        JOIN "BarisFakturPenjualan" bf ON bf."id" = k."barisFakturId"
+        JOIN "FakturPenjualan" f ON f."id" = bf."fakturId"
+       WHERE NOT f."konsumsiSjTercatat"
+    )
+    SELECT 'TRANSIT_CATATAN' AS kode, (SELECT COUNT(*) FROM transit)::int AS jumlah, ARRAY(SELECT DISTINCT "nomor" FROM transit ORDER BY "nomor" LIMIT 5) AS contoh
+    UNION ALL
+    SELECT 'CATATAN_MELEBIHI_DIFAKTUR', (SELECT COUNT(*) FROM melebihi)::int, ARRAY(SELECT DISTINCT "nomor" FROM melebihi ORDER BY "nomor" LIMIT 5)
+    UNION ALL
+    SELECT 'DIFAKTUR_DI_LUAR_BATAS', (SELECT COUNT(*) FROM batas)::int, ARRAY(SELECT DISTINCT "nomor" FROM batas ORDER BY "nomor" LIMIT 5)
+    UNION ALL
+    SELECT 'CATATAN_FAKTUR_TIDAK_TERCATAT', (SELECT COUNT(*) FROM tidak_tercatat)::int, ARRAY(SELECT DISTINCT "nomor" FROM tidak_tercatat ORDER BY "nomor" LIMIT 5)`;
+  const perKode = new Map(baris.map((b) => [b.kode, b]));
+  const rincian: HasilKonsumsiSj["rincian"] = URUTAN_KONSUMSI_SJ.map((kode) => ({
+    kode,
+    label: LABEL_KONSUMSI_SJ[kode],
+    jumlah: Number(perKode.get(kode)?.jumlah ?? 0),
+    contoh: perKode.get(kode)?.contoh ?? [],
+  }));
   return { sinkron: rincian.every((r) => r.jumlah === 0), rincian };
 }
 

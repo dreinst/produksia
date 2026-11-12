@@ -44,7 +44,7 @@ import {
   type BarisDokumen,
   type JenisDokumenPenjualan,
 } from "@/lib/dokumenPenjualan";
-import { bacaRencanaTermin, dataButirTermin, kunciButirTermin, pastikanBatalTagihanTermin, pastikanRencanaPesananBolehDiubah, periksaBrutoRencana, selesaikanRencana } from "@/lib/rencanaTermin";
+import { bacaRencanaTermin, brutoRencana, dataButirTermin, kunciButirTermin, pastikanBatalTagihanTermin, pastikanRencanaPesananBolehDiubah, periksaBrutoRencana, selesaikanRencana } from "@/lib/rencanaTermin";
 import { alokasiNomorCetak, bacaFormatNomor, bacaNomorCetakManual, setelNomorTerakhir, simpanNomorCetak, type JenisNomorCetak } from "@/lib/nomorCetak";
 import type { StatusKomersial } from "@/prisma-klien/enums";
 
@@ -420,6 +420,12 @@ export async function terbitkanTagihanTermin(rencanaTerminId: string, dataFormul
     if (!k) throw new Error("Termin tidak ditemukan");
     const b = k.butir;
     if (!b.pesananId) throw new Error("Tagihan termin diterbitkan dari pesanan");
+    // Butir yang sudah lunas (dibayar sebelum ditagih) tidak diberi tagihan bernomor cetak (tinjauan perbaikan P27 tahap
+    // 2 T4). Tombol terbit tanpa hak lihat bayar tetap tampil, jadi penolakan ini yang menjaga; pesannya sama untuk semua.
+    if (!b.ditagihPada && b.pesanan) {
+      const bruto = brutoRencana(b.pesanan.rencanaTermin, b.pesanan.ppnPersen).find((x) => x.butir.no === b.no)?.bruto ?? D(0);
+      if (bruto.minus(k.dibayar).lte(0)) throw new Error(`Termin ${b.label} sudah lunas; tagihannya tidak perlu diterbitkan`);
+    }
     const { jatuhTempo: jatuhTempoLama } = await tx.rencanaTermin.findUniqueOrThrow({ where: { id: b.id }, select: { jatuhTempo: true } });
     const sekarang = new Date();
     let nomorCetak = b.nomorCetak;

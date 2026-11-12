@@ -190,7 +190,10 @@ export default async function HalamanIntegritasPerusahaan() {
           <ul className="divide-y divide-slate-100 text-sm">
             {konsumsiSj.rincian.map((r) => (
               <li key={r.kode} className="flex items-center justify-between gap-3 py-2">
-                <span className={r.jumlah > 0 ? "text-rose-700" : "text-slate-600"}>{r.label}</span>
+                <span className={r.jumlah > 0 ? "text-rose-700" : "text-slate-600"}>
+                  {r.label}
+                  {r.contoh.length > 0 && <span className="block text-xs text-slate-500">Contoh dokumen: {r.contoh.join(", ")}</span>}
+                </span>
                 <span className={`angka ${r.jumlah > 0 ? "font-semibold text-rose-700" : "text-slate-500"}`}>{r.jumlah}</span>
               </li>
             ))}
