@@ -199,6 +199,20 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
   { paket: "P24", letak: "grup", grup: "Buku Besar", setelah: "/buku-besar/jurnal", tautan: { href: "/buku-besar/antar-perusahaan", label: "Transaksi Antar Perusahaan", kode: "AP", hak: "antar-perusahaan.lihat" } },
   { paket: "P36", letak: "atas", setelah: "/berkas", tautan: { href: "/proyek", label: "Proyek & Event", ikon: "event_note", hak: "proyek.lihat" } },
   { paket: "P36", letak: "pengaturan", setelah: "/pengaturan/pemetaan-akun", tautan: { href: "/pengaturan/kategori-anggaran", label: "Kategori Anggaran Proyek", ikon: "category", hak: "kategori-anggaran.ubah" } },
+  {
+    paket: "P42",
+    letak: "grup-baru",
+    bagian: "operasional",
+    setelah: "CRM",
+    grup: {
+      judul: "Pemasaran",
+      ikon: "campaign",
+      tautan: [
+        { href: "/pemasaran/konten", label: "Konten", hak: "konten.lihat" },
+        { href: "/pemasaran/desain", label: "Desain", hak: "tugas-desain.lihat" },
+      ],
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -421,6 +435,26 @@ async function main() {
     pastikan(aktifDi("/proyek", path) === nyala, `aktifDi("/proyek", "${path}") = ${nyala}`);
   }
   pastikan(aktifDi("/data-induk/proyek", "/data-induk/proyek/abc") && !aktifDi("/data-induk/proyek", "/proyek/abc"), "Data Induk Proyek tetap menyala hanya di bawah /data-induk/proyek");
+
+  // P42 (D6 §7.1, D7 §7.8): grup Pemasaran sesudah CRM; Konten untuk konten.lihat, Desain untuk tugas-desain.lihat
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN", "SOSMED", "IKLAN", "DESAINER"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    const judul = m.operasional.map((g) => g.judul);
+    const g = m.operasional.find((x) => x.judul === "Pemasaran");
+    const sebelum = judul.includes("CRM") ? "CRM" : null;
+    pastikan(
+      !!g && g.ikon === "campaign" && g.tautan.slice(0, 2).map((l) => `${l.label} ${l.href}`).join(", ") === "Konten /pemasaran/konten, Desain /pemasaran/desain" && (sebelum ? judul.indexOf("Pemasaran") === judul.indexOf(sebelum) + 1 : judul.indexOf("Pemasaran") === 0),
+      `${peran}: grup Pemasaran (Konten, Desain)${sebelum ? " tepat sesudah CRM" : " sebagai grup operasional pertama"}`,
+    );
+  }
+  for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    pastikan(!m.operasional.some((g) => g.judul === "Pemasaran") && !hrefTerlihat(m).some((h) => h.startsWith("/pemasaran")), `${peran}: tanpa grup Pemasaran`);
+  }
+  for (const [href, path] of [["/pemasaran/konten", "/pemasaran/konten"], ["/pemasaran/desain", "/pemasaran/desain"]] as const) {
+    const nyala = ["/pemasaran/konten", "/pemasaran/desain"].filter((h) => aktifDi(h, path));
+    pastikan(nyala.join() === href, `${path} hanya menyalakan ${href}`);
+  }
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");
   const kosong = menuTerlihat(penggunaSintetis("KASIR", []));

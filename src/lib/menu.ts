@@ -42,6 +42,15 @@ export const GRUP_OPERASIONAL: Grup[] = [
       { href: "/crm/tindak-lanjut", label: "Tindak Lanjut", hak: "lead.lihat" },
     ],
   },
+  // Pemasaran (D6 §7.1, D7 §7.8, DESAIN R4): Konten dan Desain dipasang P42
+  {
+    judul: "Pemasaran",
+    ikon: "campaign",
+    tautan: [
+      { href: "/pemasaran/konten", label: "Konten", hak: "konten.lihat" },
+      { href: "/pemasaran/desain", label: "Desain", hak: "tugas-desain.lihat" },
+    ],
+  },
   {
     judul: "Pembelian",
     ikon: "shopping_bag",
