@@ -392,7 +392,10 @@ export default async function LaciTugasDesain({
 
       {tugas.kampanye && lihatKampanye && !tugas.kampanye.diarsipkanPada && (
         <p className="text-sm text-slate-600">
-          Kampanye terkait: <span className="font-medium text-slate-800">{tugas.kampanye.nama}</span>
+          Kampanye terkait:{" "}
+          <Link href={`/pemasaran/iklan/${tugas.kampanye.id}`} className="tombol-tautan">
+            {tugas.kampanye.nama}
+          </Link>
         </p>
       )}
       <p className="text-xs text-slate-500">

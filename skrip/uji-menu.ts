@@ -213,6 +213,7 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
       ],
     },
   },
+  { paket: "P43", letak: "grup", grup: "Pemasaran", setelah: "/pemasaran/desain", tautan: { href: "/pemasaran/iklan", label: "Iklan", hak: "kampanye.lihat" } },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -451,8 +452,21 @@ async function main() {
     const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
     pastikan(!m.operasional.some((g) => g.judul === "Pemasaran") && !hrefTerlihat(m).some((h) => h.startsWith("/pemasaran")), `${peran}: tanpa grup Pemasaran`);
   }
-  for (const [href, path] of [["/pemasaran/konten", "/pemasaran/konten"], ["/pemasaran/desain", "/pemasaran/desain"]] as const) {
-    const nyala = ["/pemasaran/konten", "/pemasaran/desain"].filter((h) => aktifDi(h, path));
+  // P43 (D6 §7.1, D7 §7.8): Iklan sesudah Desain hanya untuk kampanye.lihat (SOSMED dan DESAINER tanpa Iklan)
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN", "IKLAN"] as const) {
+    const g = menuTerlihat(penggunaSintetis(peran, hitungHak(peran))).operasional.find((x) => x.judul === "Pemasaran");
+    pastikan(g?.tautan.map((l) => l.href).join(",") === "/pemasaran/konten,/pemasaran/desain,/pemasaran/iklan", `${peran}: Pemasaran berisi Konten, Desain, Iklan`);
+  }
+  for (const peran of ["SOSMED", "DESAINER"] as const) pastikan(!mPeran(peran).includes("/pemasaran/iklan"), `${peran}: tanpa Iklan`);
+  for (const [href, path] of [
+    ["/pemasaran/konten", "/pemasaran/konten"],
+    ["/pemasaran/desain", "/pemasaran/desain"],
+    ["/pemasaran/iklan", "/pemasaran/iklan"],
+    ["/pemasaran/iklan", "/pemasaran/iklan/baru"],
+    ["/pemasaran/iklan", "/pemasaran/iklan/abc123"],
+    ["/pemasaran/iklan", "/pemasaran/iklan/abc123/ubah"],
+  ] as const) {
+    const nyala = ["/pemasaran/konten", "/pemasaran/desain", "/pemasaran/iklan"].filter((h) => aktifDi(h, path));
     pastikan(nyala.join() === href, `${path} hanya menyalakan ${href}`);
   }
 
