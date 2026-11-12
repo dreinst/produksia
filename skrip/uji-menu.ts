@@ -202,6 +202,21 @@ const TAMBAHAN_PER_PAKET: Tambahan[] = [
   { paket: "P37", letak: "grup", grup: "Rekonsiliasi", setelah: "/rekonsiliasi", tautan: { href: "/proyek/keuangan", label: "Keuangan Proyek", kode: "ANG", hak: "anggaran-proyek.lihat" } },
   { paket: "P37", letak: "persetujuan", kode: "talangan-mitra" },
   { paket: "P37", letak: "persetujuan", kode: "pembayaran-mitra" },
+  {
+    paket: "P42",
+    letak: "grup-baru",
+    bagian: "operasional",
+    setelah: "CRM",
+    grup: {
+      judul: "Pemasaran",
+      ikon: "campaign",
+      tautan: [
+        { href: "/pemasaran/konten", label: "Konten", hak: "konten.lihat" },
+        { href: "/pemasaran/desain", label: "Desain", hak: "tugas-desain.lihat" },
+      ],
+    },
+  },
+  { paket: "P43", letak: "grup", grup: "Pemasaran", setelah: "/pemasaran/desain", tautan: { href: "/pemasaran/iklan", label: "Iklan", hak: "kampanye.lihat" } },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -444,6 +459,38 @@ async function main() {
     pastikan(aktifDi("/proyek/keuangan", path) === nyala, `aktifDi("/proyek/keuangan", "${path}") = ${nyala}`);
   }
   pastikan(aktifDi("/rekonsiliasi", "/rekonsiliasi") && !aktifDi("/rekonsiliasi", "/proyek/keuangan"), "Rekonsiliasi Event (LPJ) tidak menyala di Keuangan Proyek");
+  // P42 (D6 §7.1, D7 §7.8): grup Pemasaran sesudah CRM; Konten untuk konten.lihat, Desain untuk tugas-desain.lihat
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN", "SOSMED", "IKLAN", "DESAINER"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    const judul = m.operasional.map((g) => g.judul);
+    const g = m.operasional.find((x) => x.judul === "Pemasaran");
+    const sebelum = judul.includes("CRM") ? "CRM" : null;
+    pastikan(
+      !!g && g.ikon === "campaign" && g.tautan.slice(0, 2).map((l) => `${l.label} ${l.href}`).join(", ") === "Konten /pemasaran/konten, Desain /pemasaran/desain" && (sebelum ? judul.indexOf("Pemasaran") === judul.indexOf(sebelum) + 1 : judul.indexOf("Pemasaran") === 0),
+      `${peran}: grup Pemasaran (Konten, Desain)${sebelum ? " tepat sesudah CRM" : " sebagai grup operasional pertama"}`,
+    );
+  }
+  for (const peran of ["KASIR", "GUDANG", "KRU", "GUEST"] as const) {
+    const m = menuTerlihat(penggunaSintetis(peran, hitungHak(peran)));
+    pastikan(!m.operasional.some((g) => g.judul === "Pemasaran") && !hrefTerlihat(m).some((h) => h.startsWith("/pemasaran")), `${peran}: tanpa grup Pemasaran`);
+  }
+  // P43 (D6 §7.1, D7 §7.8): Iklan sesudah Desain hanya untuk kampanye.lihat (SOSMED dan DESAINER tanpa Iklan)
+  for (const peran of ["SUPERADMIN", "PEMILIK", "ADMIN", "IKLAN"] as const) {
+    const g = menuTerlihat(penggunaSintetis(peran, hitungHak(peran))).operasional.find((x) => x.judul === "Pemasaran");
+    pastikan(g?.tautan.map((l) => l.href).join(",") === "/pemasaran/konten,/pemasaran/desain,/pemasaran/iklan", `${peran}: Pemasaran berisi Konten, Desain, Iklan`);
+  }
+  for (const peran of ["SOSMED", "DESAINER"] as const) pastikan(!mPeran(peran).includes("/pemasaran/iklan"), `${peran}: tanpa Iklan`);
+  for (const [href, path] of [
+    ["/pemasaran/konten", "/pemasaran/konten"],
+    ["/pemasaran/desain", "/pemasaran/desain"],
+    ["/pemasaran/iklan", "/pemasaran/iklan"],
+    ["/pemasaran/iklan", "/pemasaran/iklan/baru"],
+    ["/pemasaran/iklan", "/pemasaran/iklan/abc123"],
+    ["/pemasaran/iklan", "/pemasaran/iklan/abc123/ubah"],
+  ] as const) {
+    const nyala = ["/pemasaran/konten", "/pemasaran/desain", "/pemasaran/iklan"].filter((h) => aktifDi(h, path));
+    pastikan(nyala.join() === href, `${path} hanya menyalakan ${href}`);
+  }
 
   console.log("=== 4. Grup tanpa tautan terlihat dibuang ===");
   const kosong = menuTerlihat(penggunaSintetis("KASIR", []));

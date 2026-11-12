@@ -424,9 +424,13 @@ function aturanKonsistensi(): { kode: KodeKonsistensi; label: string; hitung: Pr
     {
       kode: "BERKAS_ENTITAS",
       label: "Berkas lampiran berbeda perusahaan dengan data yang dilampirinya",
-      hitung: [...jenisPerTabel].map(
-        ([tabel, jenis]) => Prisma.sql`SELECT COUNT(*) FROM "Berkas" x JOIN ${nm(tabel)} e ON e."id" = x."entitasId" WHERE x."jenisEntitas" IN (${Prisma.join(jenis)}) AND x."perusahaanId" <> e."perusahaanId"`,
-      ),
+      hitung: [
+        ...[...jenisPerTabel].map(
+          ([tabel, jenis]) => Prisma.sql`SELECT COUNT(*) FROM "Berkas" x JOIN ${nm(tabel)} e ON e."id" = x."entitasId" WHERE x."jenisEntitas" IN (${Prisma.join(jenis)}) AND x."perusahaanId" <> e."perusahaanId"`,
+        ),
+        // kreatif iklan (KONTRAK-TAMBAHAN P41): berkas kreatif milik perusahaan kampanye iklannya
+        Prisma.sql`SELECT COUNT(*) FROM "Iklan" x JOIN "SetIklan" s ON s."id" = x."setIklanId" JOIN "Kampanye" k ON k."id" = s."kampanyeId" JOIN "Berkas" b ON b."id" = x."berkasKreatifId" WHERE b."perusahaanId" <> k."perusahaanId"`,
+      ],
     },
     {
       // kontrak P30: kop dokumen milik perusahaan dokumen (D3 §3.1), gambar kop terlampir ke kopnya sendiri
