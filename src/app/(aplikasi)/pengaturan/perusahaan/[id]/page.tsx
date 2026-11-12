@@ -89,7 +89,7 @@ export default async function HalamanUbahPerusahaan({ params }: { params: Promis
         }}
       />
 
-      {/* tautan ke pengaturan kop dan pilihan dokumen ditambahkan paket pemiliknya (P31, P32, P44) saat halamannya ada */}
+      {/* tautan pengaturan cetak lain ditambahkan paket pemiliknya (P32, P44) saat halamannya ada */}
       <div className="kartu space-y-2">
         <h2 className="judul-kartu">Dokumen cetak</h2>
         <ul className="text-sm space-y-1">
@@ -98,6 +98,12 @@ export default async function HalamanUbahPerusahaan({ params }: { params: Promis
               Dokumen &amp; nomor cetak
             </Link>
             <span className="redup"> · bawaan teks dokumen penjualan dan format nomor cetak</span>
+          </li>
+          <li>
+            <Link href={`/pengaturan/perusahaan/kop?perusahaan=${encodeURIComponent(perusahaan.id)}`} className="tombol-tautan">
+              Kop &amp; Template
+            </Link>
+            <span className="redup"> · kop surat, gambar, tanda tangan, dan tata letak PDF</span>
           </li>
         </ul>
       </div>

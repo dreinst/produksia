@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from "@/prisma-klien/client";
 import { db } from "@/lib/db";
+import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
 import { D, jumlahkan, terbesar, type Desimal } from "@/lib/uang";
 import { hitungPpn } from "@/lib/pengaturanPerusahaan";
 import { nilaiBaris, subtotalDokumen, subtotalFaktur } from "@/lib/dokumenPenjualan";
@@ -427,5 +428,43 @@ async function cetakTagihanTermin(klien: Klien, id: string): Promise<DokumenCeta
     catatanKanan: p.catatanKanan,
     syaratPembayaran: p.syaratPembayaran,
     infoBank: p.infoBank,
+  };
+}
+
+/**
+ * Data cetak untuk satu pengguna (KONTRAK-TAMBAHAN P31): kwitansi membawa baris dan ringkasan faktur yang dilunasinya,
+ * dan kwitansi DP membawa baris, ringkasan, dan progres termin pesanannya. Pemegang penerimaan.lihat atau
+ * uang-muka.lihat tanpa faktur.lihat (kwitansi) atau pesanan.lihat (kwitansi DP) tidak boleh melihat isi dokumen asal
+ * itu lewat PDF, jadi bagian tersebut dikosongkan. Nomor dokumen asal dan nilai kwitansi tetap, karena tercantum di
+ * kwitansi itu sendiri. Rute cetak dan aksi simpan PDF memanggil ini sesudah dataCetakPenjualan.
+ */
+export function dataCetakUntukPengguna(data: DokumenCetakPenjualan, pengguna: PenggunaSesi): DokumenCetakPenjualan {
+  const hakAsal = data.jenis === "kwitansi" ? "faktur.lihat" : data.jenis === "kwitansi-dp" ? "pesanan.lihat" : null;
+  if (!hakAsal || punyaHak(pengguna, hakAsal)) return data;
+  const nol = s2(NOL);
+  return {
+    ...data,
+    baris: [],
+    ringkasan: {
+      subtotal: nol,
+      jenisDiskon: "NOMINAL",
+      nilaiDiskon: nol,
+      diskon: nol,
+      jenisFee: "NOMINAL",
+      nilaiFee: nol,
+      fee: nol,
+      dpp: nol,
+      ppnPersen: nol,
+      ppn: nol,
+      total: data.kwitansi?.jumlah ?? nol,
+      uangMuka: nol,
+      terbayar: nol,
+      retur: nol,
+      sisa: nol,
+      addOn: null,
+    },
+    uangMukaDipakai: [],
+    termin: [],
+    konteksTermin: null,
   };
 }
