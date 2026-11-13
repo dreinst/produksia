@@ -17,6 +17,10 @@ export type TautanBerikon = TautanNavigasi & { ikon: string };
 /** Tautan tunggal di blok atas (Beranda, Persetujuan, ...): syarat tampilnya tidak selalu satu kunci hak. */
 export type TautanAtas = { href: string; label: string; ikon: string; boleh: (pengguna: PenggunaSesi) => boolean };
 
+/*
+ * Data grup. Nama konstanta dan pembagian operasional/administrasi di bawah ini adalah bentuk data lama yang dijaga
+ * uji-menu.ts (salinan beku). Letak grup di bilah samping diatur terpisah oleh SUSUNAN_BAGIAN di bawah.
+ */
 export const GRUP_OPERASIONAL: Grup[] = [
   {
     judul: "Penjualan",
@@ -167,6 +171,23 @@ export const TAUTAN_PENGATURAN: TautanBerikon[] = [
   { href: "/pengaturan/berkas", label: "Akses Berkas", ikon: "lock", hak: "berkas.akses-penuh" },
 ];
 
+/** Grup lipat "Pengaturan" di bilah samping: semua tautan pengaturan, urutannya sama dengan TAUTAN_PENGATURAN. */
+export const GRUP_PENGATURAN: Grup = { judul: "Pengaturan", ikon: "settings", tautan: TAUTAN_PENGATURAN };
+
+export type KunciBagian = "operasional" | "keuangan" | "administrasi";
+export type SusunanBagian = { kunci: KunciBagian; judul: string; terbukaBawaan: boolean; grup: readonly string[] };
+
+/**
+ * Tiga bagian bilah samping, urut tampil. `grup` berisi judul grup; grup yang tidak disebut di sini tidak tampil,
+ * jadi grup baru wajib didaftarkan ke salah satu bagian (uji-menu.ts menolak grup yang tertinggal).
+ * `terbukaBawaan` berlaku selama pengguna belum memilih sendiri; bagian yang memuat halaman aktif tetap dibuka.
+ */
+export const SUSUNAN_BAGIAN: readonly SusunanBagian[] = [
+  { kunci: "operasional", judul: "Operasional", terbukaBawaan: true, grup: ["Penjualan", "CRM", "Pemasaran", "Pembelian", "Persediaan"] },
+  { kunci: "keuangan", judul: "Keuangan", terbukaBawaan: false, grup: ["Kas & Bank", "Buku Besar", "Laporan", "Rekonsiliasi", "Aset Tetap"] },
+  { kunci: "administrasi", judul: "Administrasi", terbukaBawaan: false, grup: ["SDM", "Data Induk", "Pengaturan"] },
+];
+
 /**
  * Gudang, Kru & Guest tidak melihat Beranda dan kotak masuk Persetujuan: perannya murni operasional (Gudang:
  * input/output stok; Kru/Guest: hanya ajukan peminjaman), dan persetujuan Kru/Guest sendiri sudah ada langsung
@@ -201,11 +222,11 @@ export function saringGrup(daftar: readonly Grup[], pengguna: PenggunaSesi): Gru
 export type MenuTerlihat = {
   /** Beranda, Persetujuan, dan tautan tunggal atas lain yang boleh. */
   atas: TautanAtas[];
-  /** Bagian "Operasional". */
+  /** Grup dari GRUP_OPERASIONAL. */
   operasional: Grup[];
-  /** Grup di bagian "Administrasi & Pengaturan" (Persediaan, Data Induk). */
+  /** Persediaan dan Data Induk. */
   administrasi: Grup[];
-  /** Tautan tunggal di bawah grup administrasi. */
+  /** Tautan pengaturan; di bilah samping menjadi isi grup "Pengaturan". */
   pengaturan: TautanBerikon[];
 };
 
@@ -217,6 +238,27 @@ export function menuTerlihat(pengguna: PenggunaSesi): MenuTerlihat {
     administrasi: saringGrup([GRUP_PERSEDIAAN, GRUP_DATA_INDUK], pengguna),
     pengaturan: TAUTAN_PENGATURAN.filter((l) => punyaHak(pengguna, l.hak)),
   };
+}
+
+export type BagianMenu = { kunci: KunciBagian; judul: string; terbukaBawaan: boolean; grup: Grup[] };
+export type MenuBagian = { atas: TautanAtas[]; bagian: BagianMenu[] };
+
+/**
+ * Menu seperti yang dirender bilah samping: hasil menuTerlihat disusun ke tiga bagian menurut SUSUNAN_BAGIAN.
+ * Tautan, hak, dan urutan di dalam grup tidak diubah. Bagian tanpa grup tersisa dibuang, jadi peran bermenu
+ * sedikit tidak mendapat judul bagian kosong.
+ */
+export function menuBagian(pengguna: PenggunaSesi): MenuBagian {
+  const m = menuTerlihat(pengguna);
+  const perJudul = new Map<string, Grup>([...m.operasional, ...m.administrasi].map((g) => [g.judul, g]));
+  if (m.pengaturan.length > 0) perJudul.set(GRUP_PENGATURAN.judul, { ...GRUP_PENGATURAN, tautan: m.pengaturan });
+  const bagian = SUSUNAN_BAGIAN.map((b) => ({
+    kunci: b.kunci,
+    judul: b.judul,
+    terbukaBawaan: b.terbukaBawaan,
+    grup: b.grup.flatMap((judul) => perJudul.get(judul) ?? []),
+  })).filter((b) => b.grup.length > 0);
+  return { atas: m.atas, bagian };
 }
 
 /** Semua href di data menu (tanpa penyaringan hak), untuk pemeriksaan rute. */

@@ -1,13 +1,20 @@
+/** "Made by dreinst" dengan tautan Instagram. Satu sumber untuk KakiHalaman dan kaki bilah samping. */
+export function KreditPembuat() {
+  return (
+    <span>
+      Made by{" "}
+      <a href="https://www.instagram.com/dreiinst/" target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">
+        dreinst
+      </a>
+    </span>
+  );
+}
+
 /** Kredit pembuat dan pengelola: dipakai di halaman publik (masuk, lupa/atur ulang kata sandi) dan di bawah kanvas aplikasi. */
 export default function KakiHalaman({ className = "" }: { className?: string }) {
   return (
     <footer className={`flex items-center justify-center gap-3 text-[11px] text-slate-400 ${className}`}>
-      <span>
-              Made by{" "}
-              <a href="https://www.instagram.com/dreiinst/" target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">
-                dreinst
-              </a>
-            </span>
+      <KreditPembuat />
       <span aria-hidden="true" className="h-3.5 w-px bg-slate-300" />
       <span className="flex items-center gap-2">
         Organized by

@@ -2,16 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Ikon from "@/komponen/ui/Ikon";
 import Logo from "@/komponen/ui/Logo";
+import { KreditPembuat } from "@/komponen/ui/KakiHalaman";
 import FormulirAksi from "@/komponen/FormulirAksi";
 import PemilihLingkup from "@/komponen/PemilihLingkup";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { gantiTahunBukuFormulir } from "@/lib/aksi/pengaturan";
 import { punyaHak, type PenggunaSesi } from "@/lib/hakAkses";
-import { aktifDi, menuTerlihat, type Grup } from "@/lib/menu";
+import { aktifDi, menuBagian, type BagianMenu, type Grup, type KunciBagian } from "@/lib/menu";
 import type { RingkasPerusahaan } from "@/lib/perusahaan";
+
+/*
+ * Tinggi baris: 44 px di HP (target sentuh), 32 px di desktop untuk tautan atas dan grup, 28 px untuk sub-tautan.
+ * Label panjang dipotong dengan elipsis dan tetap terbaca lewat title.
+ */
+const BARIS = "min-h-11 md:min-h-8";
+const BARIS_SUB = "min-h-11 md:min-h-7";
 
 function GrupNavigasi({
   group,
@@ -35,40 +43,34 @@ function GrupNavigasi({
         onClick={saatBuka}
         aria-expanded={open}
         aria-controls={panelId}
-        className={`flex w-full items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors select-none ${
+        className={`flex w-full items-center gap-2.5 px-3 ${BARIS} rounded-lg text-sm font-medium text-left transition-colors select-none ${
           memuatAktif ? "text-slate-900" : "text-slate-600 hover:text-slate-900"
         } hover:bg-slate-50`}
       >
-        <span className="flex items-center gap-3">
-          <Ikon nama={group.ikon} className={`!text-[20px] ${memuatAktif ? "text-slate-700" : "text-slate-400"}`} />
-          <span>{group.judul}</span>
-        </span>
-        <Ikon
-          nama="expand_more"
-          className={`!text-[18px] text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
-        />
+        <Ikon nama={group.ikon} className={`!text-[18px] shrink-0 ${memuatAktif ? "text-slate-700" : "text-slate-400"}`} />
+        <span className="flex-1 min-w-0 truncate" title={group.judul}>{group.judul}</span>
+        <Ikon nama="expand_more" className={`!text-[16px] shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && (
-        <div id={panelId} className="pl-9 pr-2 py-1 space-y-0.5 text-[13px]">
-          {group.tautan.map((l) => {
-            const aktif = aktifDi(l.href, pathname);
-            return (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={saatNavigasi}
-                aria-current={aktif ? "page" : undefined}
-                className={`flex items-center justify-between gap-2 py-1.5 px-2 rounded-md transition-all duration-150 ${
-                  aktif ? "bg-slate-100 text-navy font-semibold" : "text-slate-500 hover:text-navy hover:bg-slate-50 hover:translate-x-0.5"
-                }`}
-              >
-                <span className="truncate">{l.label}</span>
-                {l.kode && <span className="mono text-[10px] text-slate-400">{l.kode}</span>}
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {/* Panel tertutup tetap ada di DOM (atribut hidden) supaya tautannya ikut terbaca perayap dan uji asap. */}
+      <div id={panelId} hidden={!open} className="ml-[21px] border-l border-slate-200/80 pl-[9px] py-0.5 space-y-0.5 text-[13px]">
+        {group.tautan.map((l) => {
+          const aktif = aktifDi(l.href, pathname);
+          return (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={saatNavigasi}
+              aria-current={aktif ? "page" : undefined}
+              className={`flex items-center justify-between gap-2 px-2.5 ${BARIS_SUB} rounded-md transition-all duration-150 ${
+                aktif ? "bg-slate-100 text-navy font-semibold" : "text-slate-500 hover:text-navy hover:bg-slate-50 hover:translate-x-0.5"
+              }`}
+            >
+              <span className="min-w-0 truncate" title={l.label}>{l.label}</span>
+              {l.kode && <span className="mono shrink-0 text-[10px] text-slate-400">{l.kode}</span>}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -80,73 +82,137 @@ function TautanTunggal({ href, label, ikon, pathname, saatNavigasi }: { href: st
       href={href}
       onClick={saatNavigasi}
       aria-current={aktif ? "page" : undefined}
-      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+      className={`flex items-center gap-2.5 px-3 ${BARIS} rounded-lg text-sm font-medium transition-all ${
         aktif ? "menu-aktif text-white" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:translate-x-0.5"
       }`}
     >
-      <Ikon nama={ikon} className={`!text-[20px] ${aktif ? "" : "text-slate-400"}`} />
-      <span>{label}</span>
+      <Ikon nama={ikon} className={`!text-[18px] shrink-0 ${aktif ? "" : "text-slate-400"}`} />
+      <span className="min-w-0 truncate" title={label}>{label}</span>
     </Link>
   );
 }
 
-/** Accordion: satu grup terbuka; grup yang memuat halaman aktif terbuka otomatis (reset via key={pathname}). */
+/*
+ * Pilihan lipat bagian (Operasional, Keuangan, Administrasi) diingat di localStorage. Dibaca lewat
+ * useSyncExternalStore: render server dan render pertama klien sama-sama memakai bawaan (snapshot null), pilihan
+ * tersimpan baru dipakai sesudah hidrasi. Bila localStorage tidak bisa dipakai, pilihan hanya diingat di memori.
+ */
+const KUNCI_LIPAT = "produksia.bilah-samping.bagian";
+type PilihanLipat = Partial<Record<KunciBagian, boolean>>;
+const pendengarLipat = new Set<() => void>();
+let lipatDiMemori: string | null = null;
+
+function langgananLipat(f: () => void) {
+  pendengarLipat.add(f);
+  window.addEventListener("storage", f);
+  return () => {
+    pendengarLipat.delete(f);
+    window.removeEventListener("storage", f);
+  };
+}
+
+function bacaLipat(): string | null {
+  try {
+    return window.localStorage.getItem(KUNCI_LIPAT) ?? lipatDiMemori;
+  } catch {
+    return lipatDiMemori;
+  }
+}
+
+function simpanLipat(pilihan: PilihanLipat) {
+  lipatDiMemori = JSON.stringify(pilihan);
+  try {
+    window.localStorage.setItem(KUNCI_LIPAT, lipatDiMemori);
+  } catch {
+    // penyimpanan diblokir peramban: cukup di memori
+  }
+  pendengarLipat.forEach((f) => f());
+}
+
+function uraiLipat(teks: string | null): PilihanLipat {
+  if (!teks) return {};
+  try {
+    const isi: unknown = JSON.parse(teks);
+    return isi && typeof isi === "object" ? (isi as PilihanLipat) : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Tiga bagian yang bisa dilipat, masing-masing berisi grup akordeon: di seluruh menu hanya satu grup terbuka.
+ * Grup dan bagian yang memuat halaman aktif terbuka saat halaman dimuat (state direset lewat key={pathname}).
+ */
 function AkordeonNavigasi({ pengguna, pathname, saatNavigasi }: { pengguna: PenggunaSesi; pathname: string; saatNavigasi: () => void }) {
   // Data dan aturan penyaringan menu ada di src/lib/menu.ts; komponen ini hanya merender.
-  const { atas, operasional: grupOperasional, administrasi: grupDataInduk, pengaturan: pengaturanBoleh } = menuTerlihat(pengguna);
-  const semuaGrup = [...grupOperasional, ...grupDataInduk];
+  const { atas, bagian } = menuBagian(pengguna);
+  const memuatAktif = (g: Grup) => g.tautan.some((l) => aktifDi(l.href, pathname));
 
-  const judulAktif = semuaGrup.find((g) => g.tautan.some((l) => aktifDi(l.href, pathname)))?.judul ?? null;
+  const judulAktif = bagian.flatMap((b) => b.grup).find(memuatAktif)?.judul ?? null;
   const [judulTerbuka, setJudulTerbuka] = useState<string | null>(judulAktif);
   const alihkan = (judul: string) => setJudulTerbuka((cur) => (cur === judul ? null : judul));
 
+  const pilihan = uraiLipat(useSyncExternalStore(langgananLipat, bacaLipat, () => null));
+  const kunciAktif = bagian.find((b) => b.grup.some(memuatAktif))?.kunci ?? null;
+  // Bagian halaman aktif terbuka apa pun pilihan tersimpannya; pengguna tetap bisa melipatnya sampai pindah halaman.
+  const [aktifDilipat, setAktifDilipat] = useState(false);
+  const terbuka = (b: BagianMenu) => {
+    if (b.kunci === kunciAktif) return !aktifDilipat;
+    const tersimpan = pilihan[b.kunci];
+    return typeof tersimpan === "boolean" ? tersimpan : b.terbukaBawaan;
+  };
+  const alihkanBagian = (b: BagianMenu) => {
+    const lanjut = !terbuka(b);
+    if (b.kunci === kunciAktif) setAktifDilipat(!lanjut);
+    simpanLipat({ ...pilihan, [b.kunci]: lanjut });
+  };
+
   return (
-    <nav className="space-y-5" aria-label="Menu utama">
-      <div className="space-y-0.5">
-        {atas.map((t) => (
-          <TautanTunggal key={t.href} href={t.href} label={t.label} ikon={t.ikon} pathname={pathname} saatNavigasi={saatNavigasi} />
-        ))}
-      </div>
-
-      {grupOperasional.length > 0 && (
-        <div className="space-y-1">
-          <span className="px-3 teks-label">Operasional</span>
-          {grupOperasional.map((g) => (
-            <GrupNavigasi
-              key={g.judul}
-              group={g}
-              pathname={pathname}
-              open={judulTerbuka === g.judul}
-              saatBuka={() => alihkan(g.judul)}
-              saatNavigasi={saatNavigasi}
-            />
+    <nav className="space-y-2 pb-2" aria-label="Menu utama">
+      {atas.length > 0 && (
+        <div className="space-y-0.5">
+          {atas.map((t) => (
+            <TautanTunggal key={t.href} href={t.href} label={t.label} ikon={t.ikon} pathname={pathname} saatNavigasi={saatNavigasi} />
           ))}
         </div>
       )}
 
-      {(grupDataInduk.length > 0 || pengaturanBoleh.length > 0) && (
-        <div className="space-y-1">
-          <span className="px-3 teks-label">Administrasi &amp; Pengaturan</span>
-          {grupDataInduk.map((g) => (
-            <GrupNavigasi
-              key={g.judul}
-              group={g}
-              pathname={pathname}
-              open={judulTerbuka === g.judul}
-              saatBuka={() => alihkan(g.judul)}
-              saatNavigasi={saatNavigasi}
-            />
-          ))}
-          {pengaturanBoleh.map((l) => (
-            <TautanTunggal key={l.href} href={l.href} label={l.label} ikon={l.ikon} pathname={pathname} saatNavigasi={saatNavigasi} />
-          ))}
-        </div>
-      )}
+      {bagian.map((b) => {
+        const buka = terbuka(b);
+        const panelId = `bagian-${b.kunci}`;
+        return (
+          <div key={b.kunci}>
+            <button
+              type="button"
+              onClick={() => alihkanBagian(b)}
+              aria-expanded={buka}
+              aria-controls={panelId}
+              className="teks-label flex w-full items-center justify-between gap-2 px-3 min-h-11 md:min-h-7 rounded-lg text-left select-none transition-colors hover:text-slate-600 hover:bg-slate-50"
+            >
+              <span>{b.judul}</span>
+              <Ikon nama="expand_more" className={`!text-[16px] shrink-0 transition-transform ${buka ? "rotate-180" : ""}`} />
+            </button>
+            <div id={panelId} hidden={!buka} className="space-y-0.5">
+              {b.grup.map((g) => (
+                <GrupNavigasi
+                  key={g.judul}
+                  group={g}
+                  pathname={pathname}
+                  open={judulTerbuka === g.judul}
+                  saatBuka={() => alihkan(g.judul)}
+                  saatNavigasi={saatNavigasi}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </nav>
   );
 }
 
-function StatusBasisData() {
+/** Kaki bilah: titik status basis data (keterangannya di title dan teks pembaca layar) dan kredit pembuat. */
+function KakiBilah() {
   const [keadaan, setKeadaan] = useState<"memeriksa" | "ok" | "galat">("memeriksa");
   useEffect(() => {
     let dibatalkan = false;
@@ -159,14 +225,14 @@ function StatusBasisData() {
     };
   }, []);
   const titik = keadaan === "ok" ? "bg-emerald-500" : keadaan === "galat" ? "bg-rose-500" : "bg-slate-300 animate-pulse";
-  const label = keadaan === "ok" ? "Terhubung" : keadaan === "galat" ? "Gagal" : "…";
+  const keterangan = keadaan === "ok" ? "Basis data terhubung" : keadaan === "galat" ? "Basis data gagal" : "Memeriksa basis data";
   return (
-    <div className="flex items-center justify-between px-3 py-2 bg-slate-50 rounded-lg text-xs font-medium text-slate-600">
-      <div className="flex items-center gap-2">
-        <span className={`w-2 h-2 rounded-full ${titik}`} />
-        <span>PostgreSQL 18</span>
-      </div>
-      <span className="text-[10px] text-slate-400 font-mono">{label}</span>
+    <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400">
+      <span className="inline-flex items-center" title={keterangan}>
+        <span aria-hidden="true" className={`w-2 h-2 rounded-full ${titik}`} />
+        <span className="sr-only">{keterangan}</span>
+      </span>
+      <KreditPembuat />
     </div>
   );
 }
@@ -304,8 +370,8 @@ export default function BilahSamping({
         </div>
 
         {/* Kaki */}
-        <div className="p-3 border-t border-slate-100 shrink-0">
-          <StatusBasisData />
+        <div className="px-3 py-2.5 border-t border-slate-100 shrink-0">
+          <KakiBilah />
         </div>
       </aside>
     </>

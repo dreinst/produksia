@@ -2,7 +2,7 @@ import "dotenv/config";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DAFTAR_PERAN, hitungHak, hitungHakPengguna, punyaHak, type Hak, type PenggunaSesi } from "../src/lib/hakAkses";
-import { aktifDi, DOKUMEN_PERSETUJUAN, GRUP_DATA_INDUK, GRUP_OPERASIONAL, GRUP_PERSEDIAAN, menuTerlihat, semuaHrefMenu, TAUTAN_ATAS, TAUTAN_PENGATURAN, type MenuTerlihat } from "../src/lib/menu";
+import { aktifDi, DOKUMEN_PERSETUJUAN, GRUP_DATA_INDUK, GRUP_OPERASIONAL, GRUP_PENGATURAN, GRUP_PERSEDIAAN, menuBagian, menuTerlihat, semuaHrefMenu, SUSUNAN_BAGIAN, TAUTAN_ATAS, TAUTAN_PENGATURAN, type MenuTerlihat } from "../src/lib/menu";
 import type { PeranPengguna } from "../src/prisma-klien/enums";
 import { pastikan } from "./bantuan";
 
@@ -13,6 +13,9 @@ import { pastikan } from "./bantuan";
  * 2. Setiap href di seluruh data menu punya page.tsx atau route.ts di src/app (tidak ada tautan mati).
  * 3. aktifDi untuk semua href lama sama dengan fungsi lama pada sampel path.
  * 4. Grup tanpa tautan terlihat dibuang, dan data menu tidak lagi ditulis di BilahSamping.tsx.
+ * 5. Bilah samping merender menuBagian: tiga bagian (Operasional, Keuangan, Administrasi) dan grup Pengaturan.
+ *    menuBagian hanya menyusun ulang hasil menuTerlihat, jadi butir 1 tetap menjaga href, hak, label, dan urutan
+ *    tautan di dalam grup (bagian 7 di bawah memeriksa penyusunan ulangnya).
  *
  * Paket yang memasang menu baru menambah entrinya di src/lib/menu.ts DAN di TAMBAHAN_PER_PAKET di bawah.
  * Salinan beku (BEKU_*) tidak pernah diubah.
@@ -334,12 +337,12 @@ async function main() {
     `DOKUMEN_PERSETUJUAN sama dengan salinan beku ditambah paket (${DOKUMEN_PERSETUJUAN.join(", ")})`,
   );
   const sumberMenu = readFileSync("src/lib/menu.ts", "utf8");
-  const semuaIkon = [...TAUTAN_ATAS.map((t) => t.ikon), ...[...GRUP_OPERASIONAL, GRUP_PERSEDIAAN, GRUP_DATA_INDUK].flatMap((g) => [g.ikon, ...g.tautan.flatMap((l) => (l.ikon ? [l.ikon] : []))]), ...TAUTAN_PENGATURAN.map((l) => l.ikon)];
+  const semuaIkon = [...TAUTAN_ATAS.map((t) => t.ikon), ...[...GRUP_OPERASIONAL, GRUP_PERSEDIAAN, GRUP_DATA_INDUK].flatMap((g) => [g.ikon, ...g.tautan.flatMap((l) => (l.ikon ? [l.ikon] : []))]), ...TAUTAN_PENGATURAN.map((l) => l.ikon), GRUP_PENGATURAN.ikon];
   const ikonTakTertangkap = [...new Set(semuaIkon)].filter((i) => !sumberMenu.includes(`ikon: "${i}"`));
   pastikan(ikonTakTertangkap.length === 0, `setiap ikon menu ditulis literal ikon: "..." di menu.ts sehingga ikut subset font${ikonTakTertangkap.length ? `; tidak: ${ikonTakTertangkap.join(", ")}` : ""}`);
   const sumberBilah = readFileSync("src/komponen/BilahSamping.tsx", "utf8");
   pastikan(!/href: "/.test(sumberBilah) && !/DOKUMEN_PERSETUJUAN|PERAN_TANPA_BERANDA|saringGrup/.test(sumberBilah), "BilahSamping.tsx tidak lagi memuat data atau aturan penyaringan menu");
-  pastikan(/menuTerlihat\(pengguna\)/.test(sumberBilah), "BilahSamping.tsx merender hasil menuTerlihat(pengguna)");
+  pastikan(/menuBagian\(pengguna\)/.test(sumberBilah) && !/menuTerlihat/.test(sumberBilah), "BilahSamping.tsx merender hasil menuBagian(pengguna)");
   pastikan(!/^import [^t].*from "@\/lib\/(db|otentikasi|perusahaan)"/m.test(sumberMenu), "menu.ts tidak mengimpor nilai dari db, otentikasi, atau perusahaan");
 
   console.log("=== 2. Menu tiap peran sama dengan salinan beku 84c3670 + tambahan paket ===");
@@ -549,6 +552,92 @@ async function main() {
   pastikan(beda === 0, `aktifDi sama dengan fungsi lama untuk ${hrefLama.length} href lama x ${sampel.size} path (${cacah} pasang)`);
   pastikan(aktifDi("/persediaan", "/persediaan/penyesuaian") && aktifDi("/persediaan/penyesuaian", "/persediaan/penyesuaian/baru"), "aktifDi lama tetap: awalan menyala (Stok per Gudang ikut menyala di bawah /persediaan)");
   pastikan(!aktifDi("/rekonsiliasi", "/rekonsiliasi/kas-bank") && !aktifDi("/aset-tetap", "/aset-tetap/penyusutan"), "pengecualian lama /rekonsiliasi dan /aset-tetap tetap");
+
+  console.log("=== 7. Tiga bagian bilah samping dan grup Pengaturan ===");
+  pastikan(
+    JSON.stringify(SUSUNAN_BAGIAN.map((b) => [b.kunci, b.judul, b.terbukaBawaan])) === JSON.stringify([["operasional", "Operasional", true], ["keuangan", "Keuangan", false], ["administrasi", "Administrasi", false]]),
+    "tiga bagian: Operasional (terbuka), Keuangan dan Administrasi (terlipat)",
+  );
+  pastikan(
+    JSON.stringify(SUSUNAN_BAGIAN.map((b) => b.grup)) ===
+      JSON.stringify([
+        ["Penjualan", "CRM", "Pemasaran", "Pembelian", "Persediaan"],
+        ["Kas & Bank", "Buku Besar", "Laporan", "Rekonsiliasi", "Aset Tetap"],
+        ["SDM", "Data Induk", "Pengaturan"],
+      ]),
+    "isi bagian: Operasional 5 grup, Keuangan 5 grup, Administrasi 3 grup, urut sesuai rancangan",
+  );
+  const judulData = [...GRUP_OPERASIONAL, GRUP_PERSEDIAAN, GRUP_DATA_INDUK, GRUP_PENGATURAN].map((g) => g.judul);
+  const judulSusunan = SUSUNAN_BAGIAN.flatMap((b) => b.grup);
+  const tertinggal = judulData.filter((j) => !judulSusunan.includes(j));
+  const takDikenal = judulSusunan.filter((j) => !judulData.includes(j));
+  pastikan(new Set(judulData).size === judulData.length && new Set(judulSusunan).size === judulSusunan.length, "judul grup unik di data dan di susunan bagian");
+  pastikan(tertinggal.length === 0 && takDikenal.length === 0, `setiap grup di data menu masuk tepat satu bagian (${judulData.length} grup)${tertinggal.length ? `; tertinggal: ${tertinggal.join(", ")}` : ""}${takDikenal.length ? `; tidak dikenal: ${takDikenal.join(", ")}` : ""}`);
+  pastikan(
+    GRUP_PENGATURAN.judul === "Pengaturan" && GRUP_PENGATURAN.ikon === "settings" && GRUP_PENGATURAN.tautan === TAUTAN_PENGATURAN &&
+      TAUTAN_PENGATURAN.map((l) => l.label).join(" | ") === "Perusahaan & Pajak | Pemetaan Akun | Kategori Anggaran Proyek | Mata Uang & Kurs | Bagan Akun Standar | Pengguna | Hak Akses | Log Aktivitas | Pengaturan CRM | Daftar Pilihan | Akses Berkas",
+    "grup Pengaturan (ikon settings) berisi 11 tautan pengaturan dengan urutan lama",
+  );
+
+  const barisTautan = (l: { href: string; label: string; kode?: string; hak?: string; ikon?: string }) => [l.href, l.label, l.kode ?? "", l.hak ?? "", l.ikon ?? ""].join("|");
+  /** menuBagian(p) harus berisi grup dan tautan yang sama persis dengan menuTerlihat(p), hanya letak grupnya yang diatur ulang. */
+  function periksaBagian(p: PenggunaSesi, nama: string) {
+    const lama = menuTerlihat(p);
+    const baru = menuBagian(p);
+    const grupLama = new Map([...lama.operasional, ...lama.administrasi].map((g) => [g.judul, `${g.ikon}#${g.tautan.map(barisTautan).join(";")}`]));
+    if (lama.pengaturan.length > 0) grupLama.set("Pengaturan", `settings#${lama.pengaturan.map(barisTautan).join(";")}`);
+    const grupBaru = baru.bagian.flatMap((b) => b.grup);
+    const sama = grupBaru.length === grupLama.size && grupBaru.every((g) => grupLama.get(g.judul) === `${g.ikon}#${g.tautan.map(barisTautan).join(";")}`);
+    const hrefBaru = [...baru.atas.map((t) => t.href), ...grupBaru.flatMap((g) => g.tautan.map((l) => l.href))];
+    pastikan(
+      JSON.stringify(baru.atas.map((t) => [t.href, t.label, t.ikon])) === JSON.stringify(lama.atas.map((t) => [t.href, t.label, t.ikon])) && sama && [...hrefBaru].sort().join() === [...hrefTerlihat(lama)].sort().join(),
+      `${nama}: menuBagian memuat tautan, hak, label, dan urutan dalam grup yang sama dengan menuTerlihat (${hrefBaru.length} tautan)`,
+    );
+    const urutBagian = baru.bagian.map((b) => SUSUNAN_BAGIAN.findIndex((x) => x.kunci === b.kunci && x.judul === b.judul && x.terbukaBawaan === b.terbukaBawaan));
+    const urutGrup = baru.bagian.every((b) => {
+      const susunan = SUSUNAN_BAGIAN.find((x) => x.kunci === b.kunci)?.grup ?? [];
+      const posisi = b.grup.map((g) => susunan.indexOf(g.judul));
+      return posisi.every((i, n) => i >= 0 && (n === 0 || i > posisi[n - 1]));
+    });
+    pastikan(urutBagian.every((i, n) => i >= 0 && (n === 0 || i > urutBagian[n - 1])) && urutGrup, `${nama}: urutan bagian dan urutan grup mengikuti susunan`);
+    pastikan(baru.bagian.every((b) => b.grup.length > 0 && b.grup.every((g) => g.tautan.length > 0)), `${nama}: tidak ada bagian atau grup kosong`);
+    return baru;
+  }
+  const ringkas = (peran: PeranPengguna, hak: readonly Hak[] = hitungHak(peran)) => menuBagian(penggunaSintetis(peran, hak)).bagian.map((b) => `${b.judul}: ${b.grup.map((g) => g.judul).join(", ")}`).join(" / ");
+  for (const peran of DAFTAR_PERAN) periksaBagian(penggunaSintetis(peran, hitungHak(peran)), peran);
+  for (const [peran, tambahan] of [["KASIR", ["SOSMED"]], ["GUDANG", ["DESAINER"]], ["ADMIN", ["IKLAN", "DESAINER"]], ["KRU", ["SOSMED", "IKLAN"]]] as [PeranPengguna, PeranPengguna[]][]) {
+    periksaBagian(penggunaSintetis(peran, hitungHakPengguna(peran, tambahan), tambahan), `${peran} + ${tambahan.join(" + ")}`);
+  }
+  for (const peran of ["SUPERADMIN", "PEMILIK"] as const) {
+    pastikan(
+      ringkas(peran) === "Operasional: Penjualan, CRM, Pemasaran, Pembelian, Persediaan / Keuangan: Kas & Bank, Buku Besar, Laporan, Rekonsiliasi, Aset Tetap / Administrasi: SDM, Data Induk, Pengaturan",
+      `${peran}: tiga bagian lengkap (5, 5, dan 3 grup)`,
+    );
+    const atur = menuBagian(penggunaSintetis(peran, hitungHak(peran))).bagian.find((b) => b.kunci === "administrasi")?.grup.find((g) => g.judul === "Pengaturan");
+    pastikan(atur?.tautan.map((l) => l.href).join() === TAUTAN_PENGATURAN.map((l) => l.href).join() && atur.tautan.length === 11, `${peran}: grup Pengaturan berisi 11 tautan, urut seperti TAUTAN_PENGATURAN`);
+  }
+  pastikan(ringkas("ADMIN").endsWith("Administrasi: Data Induk, Pengaturan"), "ADMIN: Administrasi berisi Data Induk dan Pengaturan, tanpa SDM");
+  const aturAdmin = menuBagian(penggunaSintetis("ADMIN", hitungHak("ADMIN"))).bagian.flatMap((b) => b.grup).find((g) => g.judul === "Pengaturan");
+  pastikan(aturAdmin?.tautan.map((l) => l.href).join() === menuTerlihat(penggunaSintetis("ADMIN", hitungHak("ADMIN"))).pengaturan.map((l) => l.href).join() && !aturAdmin.tautan.some((l) => l.href === "/pengaturan/pengguna" || l.href === "/pengaturan/hak-akses"), "ADMIN: grup Pengaturan hanya berisi tautan yang boleh, tanpa Pengguna dan Hak Akses");
+  pastikan(ringkas("KASIR") === "Operasional: Penjualan, Pembelian, Persediaan / Keuangan: Kas & Bank / Administrasi: Data Induk", "KASIR: tiga bagian, tanpa grup Pengaturan");
+  pastikan(ringkas("GUDANG") === "Operasional: Penjualan, Pembelian, Persediaan / Administrasi: Data Induk", "GUDANG: tanpa bagian Keuangan");
+  for (const peran of ["KRU", "GUEST"] as const) pastikan(ringkas(peran) === "Operasional: Persediaan", `${peran}: hanya bagian Operasional berisi Persediaan, tanpa judul bagian kosong`);
+  for (const peran of ["SOSMED", "IKLAN", "DESAINER"] as const) pastikan(ringkas(peran) === "Operasional: Pemasaran", `${peran}: hanya bagian Operasional berisi Pemasaran`);
+  pastikan(menuBagian(penggunaSintetis("KASIR", [])).bagian.length === 0, "pengguna tanpa hak: tidak ada bagian sama sekali");
+  pastikan(ringkas("KRU", ["prive.lihat"]) === "Keuangan: Kas & Bank", "KRU dengan prive.lihat saja: hanya bagian Keuangan");
+  pastikan(ringkas("GUEST", ["stok-induk.lihat"]) === "Administrasi: Data Induk", "GUEST dengan stok-induk.lihat saja: hanya bagian Administrasi");
+  const gudangPengguna = menuBagian(gudangDiberiFaktur).bagian.find((b) => b.kunci === "administrasi")?.grup.find((g) => g.judul === "Pengaturan");
+  pastikan(gudangPengguna?.tautan.map((l) => l.href).join() === "/pengaturan/pengguna", "GUDANG yang diberi pengguna.kelola: grup Pengaturan hanya berisi Pengguna");
+
+  // Bilah samping: panel terlipat tetap di DOM (hidden), kaki tanpa "PostgreSQL", kredit pembuat satu sumber dengan KakiHalaman.
+  const sumberKaki = readFileSync("src/komponen/ui/KakiHalaman.tsx", "utf8");
+  pastikan(/hidden=\{!open\}/.test(sumberBilah) && /hidden=\{!buka\}/.test(sumberBilah) && !/\{open && \(/.test(sumberBilah), "panel grup dan bagian yang terlipat memakai atribut hidden, tautannya tetap ada di HTML");
+  pastikan((sumberBilah.match(/aria-expanded=/g) ?? []).length === 2 && (sumberBilah.match(/aria-controls=/g) ?? []).length === 2, "tombol grup dan tombol bagian punya aria-expanded dan aria-controls");
+  pastikan(!/PostgreSQL/.test(sumberBilah) && /<KreditPembuat \/>/.test(sumberBilah) && /Basis data terhubung/.test(sumberBilah) && /Basis data gagal/.test(sumberBilah) && /sr-only/.test(sumberBilah), "kaki bilah: titik status dengan teks pembaca layar dan kredit pembuat, tanpa tulisan PostgreSQL");
+  pastikan(/Made by/.test(sumberKaki) && /href="https:\/\/www\.instagram\.com\/dreiinst\/" target="_blank" rel="noopener noreferrer"/.test(sumberKaki), "KreditPembuat: Made by dreinst menaut ke Instagram dreiinst di tab baru (noopener)");
+  const berkasSumber = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? (d.name === "prisma-klien" ? [] : berkasSumber(join(dir, d.name))) : /\.tsx?$/.test(d.name) ? [join(dir, d.name)] : []));
+  const memuatVersi = berkasSumber("src").filter((f) => readFileSync(f, "utf8").includes("PostgreSQL 18"));
+  pastikan(memuatVersi.length === 0, `tidak ada tulisan "PostgreSQL 18" di src${memuatVersi.length ? `; masih ada di: ${memuatVersi.join(", ")}` : ""}`);
 
   console.log("=== DONE, all menu checks passed ===");
 }

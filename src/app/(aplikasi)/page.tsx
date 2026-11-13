@@ -544,8 +544,7 @@ export default async function Beranda({ searchParams }: { searchParams: Promise<
               )}
               <ButirIntegritas t="DB constraint CHECK (jumlah ≥ 0)" ok d="PostgreSQL menolak stok negatif walau dua pengiriman terjadi bersamaan." />
             </div>
-            <div className="pt-3 border-t border-slate-800 flex justify-between items-center text-[11px] text-slate-400 font-mono">
-              <span>PostgreSQL 18 • Prisma 7</span>
+            <div className="pt-3 border-t border-slate-800 flex justify-end items-center text-[11px] text-slate-400 font-mono">
               <span className={seimbang ? "text-emerald-400 font-semibold" : "text-rose-400 font-semibold"}>{seimbang ? "Buku besar seimbang" : "Buku besar tidak seimbang"}</span>
             </div>
           </div>
