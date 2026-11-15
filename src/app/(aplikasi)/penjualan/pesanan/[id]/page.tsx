@@ -13,6 +13,7 @@ import TombolHapusDokumen from "@/komponen/TombolHapusDokumen";
 import LampiranBerkas from "@/komponen/berkas/LampiranBerkas";
 import NomorDokumenCetak from "@/komponen/penjualan/NomorDokumenCetak";
 import PanelTermin from "@/komponen/penjualan/PanelTermin";
+import TagihanTerminTersimpan from "@/komponen/penjualan/TagihanTerminTersimpan";
 import RingkasanNilaiDokumen from "@/komponen/penjualan/RingkasanNilaiDokumen";
 import TabelBarisDokumen, { barisTampil } from "@/komponen/penjualan/TabelBarisDokumen";
 import { BarisTurunan, DaftarInfo, Kartu, KartuTeksSurat, LABEL_TAMPILAN_EVENT, nomorTampil } from "../../_detail/bagian";
@@ -164,6 +165,8 @@ export default async function HalamanDetailPesanan({ params }: { params: Promise
           />
         </Kartu>
       )}
+
+      {progres && <TagihanTerminTersimpan butir={p.rencanaTermin} pengguna={pengguna} />}
 
       <KartuTeksSurat teks={p} />
 
