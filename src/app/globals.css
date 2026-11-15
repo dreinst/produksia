@@ -529,10 +529,12 @@ body {
     box-shadow: inset 3px 0 0 rgba(23, 65, 122, 0.45);
   }
   /* bilah samping & atas: lapisan kaca tipis */
+  /* Hanya backdrop-filter tanpa awalan: lightningcss (pengecil CSS Next) menambah -webkit- sendiri sesuai target peramban.
+     Bila -webkit-backdrop-filter ditulis sesudahnya, versi tanpa awalan ikut terbuang di build produksi dan Chrome tidak
+     memburamkan apa pun, sehingga laci menu di HP tembus pandang (skrip/uji-css-kaca.ts menjaganya). */
   .kaca {
     background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(14px) saturate(1.2);
-    -webkit-backdrop-filter: blur(14px) saturate(1.2);
   }
   .menu-aktif {
     background: linear-gradient(135deg, #17417a, #0b2141);
