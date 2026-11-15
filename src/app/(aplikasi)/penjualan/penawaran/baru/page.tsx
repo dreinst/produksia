@@ -55,7 +55,8 @@ export default async function HalamanPenawaranBaru({ searchParams }: { searchPar
         opsi={opsi}
         bolehNego={punyaHak(pengguna, "harga.nego")}
         bolehBawahMinimum={PERAN_TERTINGGI.includes(pengguna.peran)}
-        lead={lead ? { id: lead.id, nama: lead.nama, namaUsaha: lead.namaUsaha, pelangganId: lead.pelangganId! } : null}
+        // tautan ke halaman lead hanya untuk pemegang lead.lihat; lead di atas sudah disaring ke lingkup dan perusahaan aktif
+        lead={lead ? { id: lead.id, nama: lead.nama, namaUsaha: lead.namaUsaha, pelangganId: lead.pelangganId!, href: punyaHak(pengguna, "lead.lihat") ? `/crm/lead/${lead.id}` : null } : null}
       />
     </div>
   );

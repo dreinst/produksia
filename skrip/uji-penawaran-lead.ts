@@ -1,7 +1,12 @@
 import "dotenv/config";
 // Skrip ini memanggil aksi server di luar siklus HTTP; buka pintu uji (lihat penggunaSaatIni di src/lib/otentikasi.ts)
 process.env.UJI_TANPA_SESI = "1";
+import { isValidElement, type ReactElement, type ReactNode } from "react";
+import Link from "next/link";
 import { db } from "../src/lib/db";
+import FormulirAksi from "../src/komponen/FormulirAksi";
+import FormulirDokumenPenjualan from "../src/komponen/penjualan/FormulirDokumenPenjualan";
+import HalamanPenawaranBaru from "../src/app/(aplikasi)/penjualan/penawaran/baru/page";
 import { pastikanBawaanCrm } from "../src/lib/crm";
 import { buatPenawaran, konversiPenawaranKePesanan } from "../src/lib/aksi/penjualan";
 import { hapusDokumen } from "../src/lib/aksi/hapusDokumen";
@@ -36,6 +41,36 @@ async function denganEnv<T>(isian: Record<string, string | undefined>, fn: () =>
   }
 }
 const sebagaiPeran = <T>(peran: string, fn: () => Promise<T>) => denganEnv({ UJI_PERAN: peran, UJI_PENGGUNA: undefined }, fn);
+
+
+type TautanHalaman = { href: string; target: string | undefined; rel: string | undefined; teks: string };
+type HasilHalaman = { teks: string; tautan: TautanHalaman[] };
+
+/**
+ * Menelusuri keluaran halaman penawaran baru: komponen server FormulirDokumenPenjualan dijalankan, FormulirAksi dan
+ * elemen HTML ditelusuri anaknya, komponen klien lain dianggap daun. Mengumpulkan teks dan tautan (Link).
+ */
+async function telusuriHalaman(node: ReactNode | Promise<ReactNode>): Promise<HasilHalaman> {
+  const hasil: HasilHalaman = { teks: "", tautan: [] };
+  const jalan = async (n: ReactNode | Promise<ReactNode>): Promise<string> => {
+    const v = await n;
+    if (v === null || v === undefined || typeof v === "boolean") return "";
+    if (typeof v === "string" || typeof v === "number") return String(v);
+    if (Array.isArray(v)) return (await Promise.all(v.map((x) => jalan(x)))).join("");
+    if (!isValidElement(v)) return "";
+    const el = v as ReactElement<Record<string, unknown>>;
+    if (el.type === Link) {
+      const teks = await jalan(el.props.children as ReactNode);
+      hasil.tautan.push({ href: String(el.props.href), target: el.props.target as string | undefined, rel: el.props.rel as string | undefined, teks });
+      return teks;
+    }
+    if (el.type === FormulirDokumenPenjualan) return jalan((el.type as (p: unknown) => ReactNode)(el.props));
+    if (el.type === FormulirAksi || typeof el.type === "string") return jalan(el.props.children as ReactNode);
+    return "";
+  };
+  hasil.teks = await jalan(node);
+  return hasil;
+}
 
 async function bersihkan() {
   const pel = (await db.pelanggan.findMany({ where: { kode: { startsWith: `PLG-${K}` } }, select: { id: true } })).map((p) => p.id);
@@ -129,6 +164,24 @@ async function uji() {
   pastikan(pnwT.perusahaanId === "tapussa" && (await aktivitas(leadT.id)).length === 1, "penawaran tapussa dari lead tapussa tersimpan dengan aktivitas");
   await denganEnv({ UJI_PERUSAHAAN: "tapussa" }, () => jalankan("PNW di sesi tapussa dari lead tapussa (tanpa isian perusahaan)", () => buatPenawaran(formulir({ pelangganId: pelanggan.id, leadId: leadT.id, baris }))));
   pastikan((await db.penawaranPenjualan.count({ where: { leadId: leadT.id, perusahaanId: "tapussa" } })) === 2, "lingkup tapussa memberi perusahaan penawaran yang cocok dengan lead");
+
+  console.log("=== 12g. Spanduk Dari lead menaut ke halaman lead ===");
+  const halaman = (leadId: string) => HalamanPenawaranBaru({ searchParams: Promise.resolve({ leadId }) });
+  const spanduk = (h: HasilHalaman) => h.tautan.filter((t) => t.href.startsWith("/crm/lead/"));
+  const hAdmin = await sebagaiPeran("ADMIN", async () => telusuriHalaman(await halaman(leadA.id)));
+  const tautanAdmin = spanduk(hAdmin);
+  pastikan(hAdmin.teks.includes(`Dari lead ${leadA.nama}`) && tautanAdmin.length === 1 && tautanAdmin[0].href === `/crm/lead/${leadA.id}` && tautanAdmin[0].teks === leadA.nama, "ADMIN (lead.lihat): nama lead menaut ke /crm/lead/{id}");
+  pastikan(tautanAdmin[0].target === "_blank" && /noopener/.test(tautanAdmin[0].rel ?? ""), "tautan lead dibuka di tab baru agar isian formulir tidak hilang");
+  const hKasir = await sebagaiPeran("KASIR", async () => telusuriHalaman(await halaman(leadA.id)));
+  pastikan(!hKasir.teks.includes("Dari lead") && spanduk(hKasir).length === 0 && !hKasir.teks.includes(leadA.nama), "KASIR (tanpa lead.lihat): tanpa spanduk dan tanpa tautan lead, nama lead tidak bocor");
+  const hLain = await sebagaiPeran("ADMIN", async () => telusuriHalaman(await halaman(leadT.id)));
+  pastikan(!hLain.teks.includes("Dari lead") && spanduk(hLain).length === 0 && !hLain.teks.includes(leadT.nama), "lead perusahaan lain di luar lingkup utama: tanpa spanduk dan tanpa tautan");
+  const hLingkupT = await denganEnv({ UJI_PERUSAHAAN: "tapussa" }, () => sebagaiPeran("ADMIN", async () => telusuriHalaman(await halaman(leadT.id))));
+  pastikan(spanduk(hLingkupT).some((t) => t.href === `/crm/lead/${leadT.id}`), "lead tapussa di lingkup tapussa: menaut ke halaman lead");
+  const hArsip = await sebagaiPeran("ADMIN", async () => telusuriHalaman(await halaman(leadArsip.id)));
+  pastikan(!hArsip.teks.includes("Dari lead") && spanduk(hArsip).length === 0, "lead terarsip: tanpa spanduk dan tanpa tautan");
+  const hTanpa = await sebagaiPeran("ADMIN", async () => telusuriHalaman(HalamanPenawaranBaru({ searchParams: Promise.resolve({}) })));
+  pastikan(!hTanpa.teks.includes("Dari lead") && spanduk(hTanpa).length === 0, "tanpa leadId: tanpa spanduk");
 
   console.log("=== 12f. Konversi dan hapus ===");
   const tahapSebelum = (await db.lead.findUniqueOrThrow({ where: { id: leadA.id } })).tahapId;

@@ -117,8 +117,11 @@ export default function FormulirDokumenPenjualan({
   opsi: OpsiDokumenPenjualan;
   bolehNego: boolean;
   bolehBawahMinimum: boolean;
-  /** prapengisian dari lead CRM (D4 §8 no. 16) */
-  lead?: { id: string; nama: string; namaUsaha: string | null; pelangganId: string } | null;
+  /**
+   * prapengisian dari lead CRM (D4 §8 no. 16). `href` diisi halaman hanya bila pengguna berhak melihat lead dan lead itu
+   * ada di lingkupnya; tanpa itu nama lead tampil sebagai teks biasa.
+   */
+  lead?: { id: string; nama: string; namaUsaha: string | null; pelangganId: string; href?: string | null } | null;
   nilaiAwal?: { pelangganId?: string; proyekId?: string | null; berlakuSampai?: string | null; teks?: NilaiTeksDokumen; penyusun?: NilaiAwalPenyusun };
   labelSimpan?: string;
   /** tombol tambahan sesudah tombol simpan (mis. "Simpan & Buat Faktur") */
@@ -142,7 +145,14 @@ export default function FormulirDokumenPenjualan({
       <BidangPerusahaan perusahaan={perusahaan} tampil={tampilPerusahaan} />
       {lead && (
         <div className="md:col-span-2 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
-          Dari lead {lead.nama}
+          Dari lead{" "}
+          {lead.href ? (
+            <Link href={lead.href} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2">
+              {lead.nama}
+            </Link>
+          ) : (
+            lead.nama
+          )}
           {lead.namaUsaha ? ` · ${lead.namaUsaha}` : ""}
         </div>
       )}
