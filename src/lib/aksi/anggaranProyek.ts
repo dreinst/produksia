@@ -13,8 +13,8 @@ import { bacaUang, D, format, uang, type Desimal } from "@/lib/uang";
 
 /*
  * Aksi anggaran proyek (D5 §3.5, §3.6, §6.2): baris anggaran, sinkron dari penawaran atau pesanan, dan samakan
- * anggaran biaya LPJ. Baris anggaran adalah anak proyek tanpa jurnal; perusahaan log = perusahaan proyek. Rute
- * /proyek/{id}/keuangan dibuat paket halaman keuangan proyek; sampai itu ada, belum ada UI yang memanggil aksi ini.
+ * anggaran biaya LPJ. Baris anggaran adalah anak proyek tanpa jurnal; perusahaan log = perusahaan proyek. Aksi ini
+ * dipakai tab Anggaran di halaman /proyek/{id}/keuangan.
  */
 
 const MODUL = "anggaran-proyek" as const;
