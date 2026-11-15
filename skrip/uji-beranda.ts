@@ -401,6 +401,8 @@ async function main() {
     const kartu = await render(PanelSistem({ pengguna: pemilik, perusahaanId: null }));
     pastikan(kartu.teks.includes("Belum dicatat") && kartu.teks.includes("Pencatatan masuk belum aktif"), "tanpa log auth: kartu Masuk 7 hari bertanda belum aktif, bukan angka 0");
   }
+  // basis data kerja boleh berisi log dari suite lain (dan perusahaan lain), jadi aktivitas dibandingkan lewat selisih
+  const awalP1 = await muatRingkasanSistem(p1.id);
   await db.logAktivitas.createMany({
     data: [
       { penggunaNama: "Skrip Uji", aksi: "MASUK", jenis: "Sesi", nomor: "UJB-MASUK", modul: "auth", perusahaanId: null },
@@ -417,7 +419,10 @@ async function main() {
   pastikan(sistemP1.teks.includes("termasuk catatan tanpa perusahaan") && sistemP1.teks.includes("Termasuk catatan tanpa perusahaan"), "lingkup satu perusahaan: subjudul menyebut catatan tanpa perusahaan");
   const sistemGab = await render(PanelSistem({ pengguna: pemilik, perusahaanId: null }));
   pastikan(!sistemGab.teks.includes("tanpa perusahaan"), "gabungan: tanpa keterangan catatan tanpa perusahaan");
-  pastikan(sisGab.aktivitas7Hari - sisP1.aktivitas7Hari === 1, "lingkup satu perusahaan tidak menghitung log perusahaan lain");
+  // tiga log uji: tanpa perusahaan (MASUK), perusahaan p2, dan perusahaan p1. Gabungan menghitung ketiganya; lingkup p1
+  // menghitung log p1 ditambah catatan tanpa perusahaan, jadi log p2 tidak ikut.
+  pastikan(sisGab.aktivitas7Hari - sebelumMasuk.aktivitas7Hari === 3, "gabungan menghitung ketiga log uji, tanpa terpengaruh log suite lain");
+  pastikan(sisP1.aktivitas7Hari - awalP1.aktivitas7Hari === 2, "lingkup satu perusahaan tidak menghitung log perusahaan lain (hanya log p1 dan catatan tanpa perusahaan)");
   // P04: daftar terbaru memakai syaratLogTerlihat (D7 §3.7.4); tanpa penglihat hanya catatan tanpa modul
   pastikan(!sisGab.terbaru.some((l) => l.nomor === "UJB-CRM") && sisGab.terbaru.length <= 8, "daftar terbaru tanpa penglihat: hanya catatan tanpa modul, maks 8");
   const terlihatPemilik = (await muatRingkasanSistem(null, new Date(), pemilik)).terbaru;
