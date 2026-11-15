@@ -17,12 +17,16 @@ export default async function TombolCetakDokumen({ jenis, id, pengguna }: { jeni
   if (!data) return null;
   const bolehSimpan = bolehAksesBerkas(pengguna, { jenisEntitas: JENIS_CETAK_KE_LAMPIRAN[jenis] }, "unggah");
   return (
-    <details className="relative">
+    <details className="relative open:max-lg:w-full">
       <summary className="tombol tombol-garis cursor-pointer list-none">
         <Ikon nama="print" className="!text-[18px]" />
         Cetak
       </summary>
-      <div className="absolute right-0 z-30 mt-2 w-[min(36rem,calc(100vw-2rem))] rounded-lg border border-slate-200 bg-white p-3 shadow-lg">
+      {/* Di bawah lg tombol ini berada di sisi kiri kepala halaman, jadi panel yang menempel ke tepi kanan tombol
+          terpotong di kiri layar. Di sana panel mengalir biasa di bawah tombol dan baris tombol terbuka selebar
+          baris (open:max-lg:w-full). Position fixed tidak dipakai karena pembungkus halaman memegang animasi
+          transform sehingga menjadi acuan fixed. Mulai lg panel tetap melayang di bawah tombol, rata kanan. */}
+      <div className="z-30 mt-2 rounded-lg border border-slate-200 bg-white p-3 shadow-lg lg:absolute lg:right-0 lg:w-[36rem]">
         <PanelCetak
           jenis={jenis}
           id={id}
