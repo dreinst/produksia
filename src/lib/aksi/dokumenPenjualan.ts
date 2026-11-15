@@ -513,7 +513,8 @@ export async function simpanPengaturanDokumenPenjualan(dataFormulir: FormData) {
       perusahaanId: p.id,
     });
   });
-  segarkan("/pengaturan");
+  // Daftar Pilihan menanam editor seksi baris, jadi ikut disegarkan
+  segarkan("/pengaturan", "/pengaturan/daftar-pilihan");
 }
 
 /** Isian boolean formulir: nilai terakhir (kotak centang sesudah isian tersembunyi); tidak ada = bawaan. */

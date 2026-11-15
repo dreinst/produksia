@@ -56,6 +56,8 @@ const RUTE_PIPELINE = "/crm/pipeline";
 const RUTE_DASBOR = "/crm/dasbor";
 const RUTE_TINDAK_LANJUT = "/crm/tindak-lanjut";
 const RUTE_PENGATURAN = "/crm/pengaturan";
+/** Daftar Pilihan menanam editor sumber lead, jadi ikut disegarkan. */
+const RUTE_DAFTAR_PILIHAN = "/pengaturan/daftar-pilihan";
 const ruteLead = (id: string) => `/crm/lead/${id}`;
 
 const PESAN_SUDAH_DIUBAH = "Lead ini baru saja diubah orang lain. Muat ulang halaman lalu coba lagi";
@@ -720,7 +722,7 @@ export async function tambahSumberLead(dataFormulir: FormData) {
     const s = await tx.sumberLead.create({ data: { perusahaanId, nama, urutan: Math.max(0, ...daftar.map((x) => x.urutan)) + 1 } });
     await catatLogCrm(tx, pengguna, { aksi: "BUAT", jenis: "Sumber Lead", nomor: nama, keterangan: await kodePerusahaan(tx, perusahaanId), entitasId: s.id, perusahaanId });
   });
-  revalidasi(RUTE_PENGATURAN);
+  revalidasi(RUTE_PENGATURAN, RUTE_DAFTAR_PILIHAN);
 }
 
 export async function tambahSumberLeadFormulir(_sebelumnya: StatusFormulir, dataFormulir: FormData) {
@@ -740,7 +742,7 @@ export async function hapusSumberLead(id: string) {
     await tx.sumberLead.delete({ where: { id: s.id } });
     await catatLogCrm(tx, pengguna, { aksi: "HAPUS", jenis: "Sumber Lead", nomor: s.nama, keterangan: await kodePerusahaan(tx, s.perusahaanId), entitasId: s.id, perusahaanId: s.perusahaanId });
   });
-  revalidasi(RUTE_PENGATURAN);
+  revalidasi(RUTE_PENGATURAN, RUTE_DAFTAR_PILIHAN);
 }
 
 export async function hapusSumberLeadFormulir(id: string): Promise<StatusFormulir> {
