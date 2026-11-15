@@ -327,7 +327,8 @@ export async function tinjauKontenInternal(tx: Klien, konten: Konten, pengguna: 
  * Efek perubahan status konten (D6 §3.1.2, tabel efek). Prasyarat: `ke` berbeda dari status sekarang, bukan DITINJAU,
  * dan sudah lolos cekStatusKonten. Keluar dari tinjauan saat menunggu menarik pengajuan otomatis, kecuali penyetuju yang
  * memindah ke Disetujui (sama dengan tinjauan setuju). Penyetuju yang memasang Disetujui tanpa pengajuan mencatat
- * "setujui langsung".
+ * "setujui langsung". Konten yang persetujuannya Disetujui lalu dimundurkan ke Ide atau Draf kehilangan persetujuannya
+ * (TIDAK_ADA) dengan riwayat DITARIK, jadi harus diajukan dan disetujui ulang.
  */
 export async function terapkanStatusKonten(tx: Klien, konten: Konten, ke: StatusKonten, pengguna: PenggunaSesi): Promise<void> {
   if (ke === konten.status) return;
@@ -345,6 +346,14 @@ export async function terapkanStatusKonten(tx: Klien, konten: Konten, ke: Status
     await tulisRiwayat(tx, konten.id, "DISETUJUI", null, pengguna);
     await logKonten(tx, pengguna, konten, "SETUJUI", `Disetujui langsung dari ${labelStatus(konten.status)}`, { masukan: null, dari: konten.status });
     await beritahuDisetujui(tx, pengguna, konten, null);
+    return;
+  }
+  if ((ke === "IDE" || ke === "DRAF") && konten.statusPersetujuan === "DISETUJUI") {
+    // Mundur ke Ide atau Draf mencabut persetujuan: konten harus diajukan dan disetujui ulang sebelum bisa dijadwalkan.
+    // Riwayat DISETUJUI lama tetap ada sebagai jejak, tetapi entri DITARIK di atasnya menandai bahwa sudah tidak berlaku.
+    await ubahBersyarat(tx, konten, { status: ke, statusPersetujuan: "TIDAK_ADA" });
+    await tulisRiwayat(tx, konten.id, "DITARIK", `Persetujuan dicabut karena konten dimundurkan ke ${labelStatus(ke)}`, pengguna);
+    await logKonten(tx, pengguna, konten, "CABUT_SETUJU", `Persetujuan dicabut karena status dipindah dari ${labelStatus(konten.status)} ke ${labelStatus(ke)}`, { dari: konten.status, ke });
     return;
   }
   await ubahBersyarat(tx, konten, { status: ke });

@@ -285,6 +285,38 @@ async function main() {
     pastikan((await jumlahNotif(sosmed.id, "Konten disetujui")) === 2, "N3 ke SOSMED bertambah 1");
     await sebagai("owner", () => jalankan("owner menerbitkan langsung", () => pindahStatusKonten(k4.id, "TERJADWAL")));
 
+    console.log("=== K16b. Mundur ke Ide atau Draf mencabut persetujuan ===");
+    const JUDUL_MUNDUR = `${AWALAN} Konten mundur`;
+    await sebagai(SOS, () => jalankan("buat konten untuk uji mundur", () => buatKonten(formulir({ perusahaanId: "utama", judul: JUDUL_MUNDUR, status: "DRAF", tanggalTerbit: "2026-12-22" }))));
+    const kM = await kontenBernama(JUDUL_MUNDUR);
+    const riwayatM = (aksi: "DISETUJUI" | "DITARIK") => db.riwayatPersetujuanKonten.count({ where: { kontenId: kM.id, aksi } });
+    await sebagai("owner", () => jalankan("owner menyetujui langsung", () => pindahStatusKonten(kM.id, "DISETUJUI")));
+    // negatif: pindah maju tidak menyentuh persetujuan
+    await sebagai(SOS, () => jalankan("ke TERJADWAL sesudah disetujui", () => pindahStatusKonten(kM.id, "TERJADWAL")));
+    pastikan((await db.konten.findUniqueOrThrow({ where: { id: kM.id } })).statusPersetujuan === "DISETUJUI" && (await riwayatM("DITARIK")) === 0, "maju ke TERJADWAL: persetujuan tetap DISETUJUI, tanpa riwayat DITARIK");
+    // positif: mundur ke Draf
+    await sebagai(SOS, () => jalankan("SOSMED memundurkan ke DRAF", () => pindahStatusKonten(kM.id, "DRAF")));
+    const kM1 = await db.konten.findUniqueOrThrow({ where: { id: kM.id }, include: { riwayat: { orderBy: [{ dibuatPada: "desc" }, { id: "desc" }], take: 1 } } });
+    pastikan(kM1.status === "DRAF" && kM1.statusPersetujuan === "TIDAK_ADA", "mundur ke DRAF: persetujuan menjadi TIDAK_ADA");
+    pastikan(kM1.riwayat[0]?.aksi === "DITARIK" && kM1.riwayat[0].penggunaId === sosmed.id && /dicabut/.test(kM1.riwayat[0].masukan ?? "") && (await riwayatM("DISETUJUI")) === 1, "riwayat DITARIK paling baru oleh pelaku, riwayat DISETUJUI lama tetap sebagai jejak");
+    pastikan((await jumlahLog("konten", "CABUT_SETUJU", kM.id)) === 1, "log CABUT_SETUJU 1");
+    // negatif: tanpa penyetuju tidak bisa menjadwalkan sebelum disetujui ulang
+    await sebagai(SOS, () => harusDitolak("jadwalkan sesudah dimundurkan", () => pindahStatusKonten(kM.id, "TERJADWAL"), "harus disetujui"));
+    // mundur ke Draf berikutnya (persetujuan sudah TIDAK_ADA) tidak menambah riwayat DITARIK
+    await sebagai(SOS, () => jalankan("DRAF ke IDE", () => pindahStatusKonten(kM.id, "IDE")));
+    pastikan((await riwayatM("DITARIK")) === 1 && (await jumlahLog("konten", "CABUT_SETUJU", kM.id)) === 1, "mundur ke IDE tanpa persetujuan: tidak ada riwayat atau log pencabutan baru");
+    // diajukan dan disetujui ulang membuka jalan ke TERJADWAL
+    await sebagai(SOS, () => jalankan("ajukan ulang", () => ajukanKonten(kM.id, formulir({}))));
+    await sebagai("owner", () => jalankan("owner menyetujui ulang", () => tinjauKonten(kM.id, formulir({ keputusan: "SETUJUI" }))));
+    await sebagai(SOS, () => jalankan("ke TERJADWAL sesudah disetujui ulang", () => pindahStatusKonten(kM.id, "TERJADWAL")));
+    pastikan((await db.konten.findUniqueOrThrow({ where: { id: kM.id } })).status === "TERJADWAL" && (await riwayatM("DISETUJUI")) === 2, "dijadwalkan sesudah persetujuan ulang");
+    // mundur ke IDE juga mencabut, lewat formulir ubah
+    await sebagai(SOS, () => jalankan("formulir ubah status ke IDE", async () => ubahKonten(kM.id, await formUbah(kM.id, { status: "IDE" }))));
+    const kM2 = await db.konten.findUniqueOrThrow({ where: { id: kM.id } });
+    pastikan(kM2.status === "IDE" && kM2.statusPersetujuan === "TIDAK_ADA" && (await riwayatM("DITARIK")) === 2, "mundur ke IDE lewat formulir ubah juga mencabut persetujuan");
+    await db.riwayatPersetujuanKonten.deleteMany({ where: { kontenId: kM.id } });
+    await db.konten.delete({ where: { id: kM.id } });
+
     console.log("=== K17. Multi perusahaan ===");
     const JUDUL_S = `${AWALAN} Konten SMARA`;
     await sebagai(SOS, () => jalankan("buat konten SMARA dengan proyek S", () => buatKonten(formulir({ perusahaanId: "smara", judul: JUDUL_S, proyekId: proyekS.id, status: "DRAF", tanggalTerbit: "2026-12-20" }))));
