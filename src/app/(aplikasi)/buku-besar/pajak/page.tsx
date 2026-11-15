@@ -110,6 +110,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
   const pengguna = await wajibHak("buku-besar.lihat");
   const bolehTulis = punyaHak(pengguna, "pph-final.buat");
   const bolehHapus = punyaHak(pengguna, "pph-final.hapus");
+  const bolehKasKeluar = punyaHak(pengguna, "kas-keluar.lihat") && punyaHak(pengguna, "kas-keluar.buat");
   const { tahun: tahunParam } = await searchParams;
   const lingkup = await lingkupPerusahaan();
   // tahun buku global (baris default); pengaturan pajak lain dibaca per perusahaan
@@ -122,7 +123,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
     </span>
   );
 
-  if (lingkup.perusahaanId === null) return <HalamanPajakGabungan tahun={tahun} navigasiTahun={navigasiTahun} bolehTulis={bolehTulis} bolehHapus={bolehHapus} />;
+  if (lingkup.perusahaanId === null) return <HalamanPajakGabungan tahun={tahun} navigasiTahun={navigasiTahun} bolehTulis={bolehTulis} bolehHapus={bolehHapus} bolehKasKeluar={bolehKasKeluar} />;
 
   const perusahaanId = lingkup.perusahaanId;
   const pengaturan = perusahaanId === PERUSAHAAN_UTAMA ? global : await ambilPengaturanPerusahaan(db, perusahaanId);
@@ -153,7 +154,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
         <TabelMasaPajak r={r} pengaturan={pengaturan} perusahaanId={perusahaanId} aktif={lingkup.perusahaan?.aktif ?? true} tahun={tahun} bolehTulis={bolehTulis} bolehHapus={bolehHapus} />
       </div>
 
-      <CatatanPajak pphFinalPersen={angka(pengaturan.pphFinalPersen)} />
+      <CatatanPajak pphFinalPersen={angka(pengaturan.pphFinalPersen)} tautKasKeluar={bolehKasKeluar} />
     </div>
   );
 }
@@ -162,7 +163,7 @@ export default async function HalamanPajak({ searchParams }: { searchParams: Pro
  * Lingkup gabungan: ringkasan dijumlah dari semua perusahaan (PPh Final = jumlah PPh Final per perusahaan), lalu satu
  * tabel per perusahaan yang punya angka pajak tahun itu, ditambah utama. Catat dan Hapus dilakukan per perusahaan.
  */
-async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode; bolehTulis: boolean; bolehHapus: boolean }) {
+async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode; bolehTulis: boolean; bolehHapus: boolean; bolehKasKeluar: boolean }) {
   const { tahun } = p;
   const g = await ringkasanPajakGabungan(db, tahun);
   const tampil = g.perPerusahaan.filter((x) => x.perusahaan.id === PERUSAHAAN_UTAMA || adaAngkaPajak(x.ringkasan));
@@ -201,18 +202,19 @@ async function HalamanPajakGabungan(p: { tahun: number; navigasiTahun: ReactNode
         </div>
       ))}
 
-      <CatatanPajak pphFinalPersen={labelTarif === "per perusahaan" ? null : tarif[0]} />
+      <CatatanPajak pphFinalPersen={labelTarif === "per perusahaan" ? null : tarif[0]} tautKasKeluar={p.bolehKasKeluar} />
     </div>
   );
 }
 
-function CatatanPajak({ pphFinalPersen }: { pphFinalPersen: string | null }) {
+/** Kas Keluar ditaut hanya bagi yang boleh membuka halamannya (kas-keluar.lihat) dan membuat setoran (kas-keluar.buat). */
+function CatatanPajak({ pphFinalPersen, tautKasKeluar }: { pphFinalPersen: string | null; tautKasKeluar: boolean }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-sm">
       <div className="kartu space-y-2">
         <h2 className="judul-kartu">Cara pakai untuk SPT</h2>
         <ul className="list-disc pl-5 space-y-1 text-slate-600">
-          <li><strong>PPh Final UMKM</strong> ({pphFinalPersen ? `${pphFinalPersen}%` : "tarif tiap perusahaan"} dari omzet): klik <em>Catat</em> tiap akhir bulan. Setor lewat <Link href="/kas-bank/keluar/baru" className="text-blue-600 hover:underline">Kas Keluar</Link> ke akun Hutang PPh Final paling lambat tanggal 15 bulan berikutnya.</li>
+          <li><strong>PPh Final UMKM</strong> ({pphFinalPersen ? `${pphFinalPersen}%` : "tarif tiap perusahaan"} dari omzet): klik <em>Catat</em> tiap akhir bulan. Setor lewat {tautKasKeluar ? <Link href="/kas-bank/keluar" className="text-blue-600 hover:underline">Kas Keluar</Link> : "Kas Keluar"} ke akun Hutang PPh Final paling lambat tanggal 15 bulan berikutnya.</li>
           <li><strong>PPN</strong> (hanya PKP): kurang/(lebih) bayar = PPN penjualan dikurangi PPN pembelian. Lapor di SPT Masa PPN, setor lewat Kas Keluar.</li>
           <li><strong>PPh 23</strong>: potongan dari klien jadi kredit pajak (minta bukti potong). Potongan ke vendor wajib disetor dan dilaporkan.</li>
         </ul>
