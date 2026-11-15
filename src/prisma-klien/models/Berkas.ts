@@ -46,6 +46,7 @@ export type BerkasMinAggregateOutputType = {
   sha256: string | null
   jenisEntitas: string | null
   entitasId: string | null
+  slotKop: $Enums.JenisAsetKop | null
   tag: $Enums.TagBerkas | null
   proyekId: string | null
   diunggahOlehId: string | null
@@ -68,6 +69,7 @@ export type BerkasMaxAggregateOutputType = {
   sha256: string | null
   jenisEntitas: string | null
   entitasId: string | null
+  slotKop: $Enums.JenisAsetKop | null
   tag: $Enums.TagBerkas | null
   proyekId: string | null
   diunggahOlehId: string | null
@@ -90,6 +92,7 @@ export type BerkasCountAggregateOutputType = {
   sha256: number
   jenisEntitas: number
   entitasId: number
+  slotKop: number
   tag: number
   proyekId: number
   diunggahOlehId: number
@@ -122,6 +125,7 @@ export type BerkasMinAggregateInputType = {
   sha256?: true
   jenisEntitas?: true
   entitasId?: true
+  slotKop?: true
   tag?: true
   proyekId?: true
   diunggahOlehId?: true
@@ -144,6 +148,7 @@ export type BerkasMaxAggregateInputType = {
   sha256?: true
   jenisEntitas?: true
   entitasId?: true
+  slotKop?: true
   tag?: true
   proyekId?: true
   diunggahOlehId?: true
@@ -166,6 +171,7 @@ export type BerkasCountAggregateInputType = {
   sha256?: true
   jenisEntitas?: true
   entitasId?: true
+  slotKop?: true
   tag?: true
   proyekId?: true
   diunggahOlehId?: true
@@ -275,6 +281,7 @@ export type BerkasGroupByOutputType = {
   sha256: string
   jenisEntitas: string | null
   entitasId: string | null
+  slotKop: $Enums.JenisAsetKop | null
   tag: $Enums.TagBerkas | null
   proyekId: string | null
   diunggahOlehId: string | null
@@ -320,6 +327,7 @@ export type BerkasWhereInput = {
   sha256?: Prisma.StringFilter<"Berkas"> | string
   jenisEntitas?: Prisma.StringNullableFilter<"Berkas"> | string | null
   entitasId?: Prisma.StringNullableFilter<"Berkas"> | string | null
+  slotKop?: Prisma.EnumJenisAsetKopNullableFilter<"Berkas"> | $Enums.JenisAsetKop | null
   tag?: Prisma.EnumTagBerkasNullableFilter<"Berkas"> | $Enums.TagBerkas | null
   proyekId?: Prisma.StringNullableFilter<"Berkas"> | string | null
   diunggahOlehId?: Prisma.StringNullableFilter<"Berkas"> | string | null
@@ -351,6 +359,7 @@ export type BerkasOrderByWithRelationInput = {
   sha256?: Prisma.SortOrder
   jenisEntitas?: Prisma.SortOrderInput | Prisma.SortOrder
   entitasId?: Prisma.SortOrderInput | Prisma.SortOrder
+  slotKop?: Prisma.SortOrderInput | Prisma.SortOrder
   tag?: Prisma.SortOrderInput | Prisma.SortOrder
   proyekId?: Prisma.SortOrderInput | Prisma.SortOrder
   diunggahOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -385,6 +394,7 @@ export type BerkasWhereUniqueInput = Prisma.AtLeast<{
   sha256?: Prisma.StringFilter<"Berkas"> | string
   jenisEntitas?: Prisma.StringNullableFilter<"Berkas"> | string | null
   entitasId?: Prisma.StringNullableFilter<"Berkas"> | string | null
+  slotKop?: Prisma.EnumJenisAsetKopNullableFilter<"Berkas"> | $Enums.JenisAsetKop | null
   tag?: Prisma.EnumTagBerkasNullableFilter<"Berkas"> | $Enums.TagBerkas | null
   proyekId?: Prisma.StringNullableFilter<"Berkas"> | string | null
   diunggahOlehId?: Prisma.StringNullableFilter<"Berkas"> | string | null
@@ -416,6 +426,7 @@ export type BerkasOrderByWithAggregationInput = {
   sha256?: Prisma.SortOrder
   jenisEntitas?: Prisma.SortOrderInput | Prisma.SortOrder
   entitasId?: Prisma.SortOrderInput | Prisma.SortOrder
+  slotKop?: Prisma.SortOrderInput | Prisma.SortOrder
   tag?: Prisma.SortOrderInput | Prisma.SortOrder
   proyekId?: Prisma.SortOrderInput | Prisma.SortOrder
   diunggahOlehId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -446,6 +457,7 @@ export type BerkasScalarWhereWithAggregatesInput = {
   sha256?: Prisma.StringWithAggregatesFilter<"Berkas"> | string
   jenisEntitas?: Prisma.StringNullableWithAggregatesFilter<"Berkas"> | string | null
   entitasId?: Prisma.StringNullableWithAggregatesFilter<"Berkas"> | string | null
+  slotKop?: Prisma.EnumJenisAsetKopNullableWithAggregatesFilter<"Berkas"> | $Enums.JenisAsetKop | null
   tag?: Prisma.EnumTagBerkasNullableWithAggregatesFilter<"Berkas"> | $Enums.TagBerkas | null
   proyekId?: Prisma.StringNullableWithAggregatesFilter<"Berkas"> | string | null
   diunggahOlehId?: Prisma.StringNullableWithAggregatesFilter<"Berkas"> | string | null
@@ -466,6 +478,7 @@ export type BerkasCreateInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -494,6 +507,7 @@ export type BerkasUncheckedCreateInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -518,6 +532,7 @@ export type BerkasUpdateInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -546,6 +561,7 @@ export type BerkasUncheckedUpdateInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -572,6 +588,7 @@ export type BerkasCreateManyInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -592,6 +609,7 @@ export type BerkasUpdateManyMutationInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -611,6 +629,7 @@ export type BerkasUncheckedUpdateManyInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -643,6 +662,7 @@ export type BerkasCountOrderByAggregateInput = {
   sha256?: Prisma.SortOrder
   jenisEntitas?: Prisma.SortOrder
   entitasId?: Prisma.SortOrder
+  slotKop?: Prisma.SortOrder
   tag?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
   diunggahOlehId?: Prisma.SortOrder
@@ -669,6 +689,7 @@ export type BerkasMaxOrderByAggregateInput = {
   sha256?: Prisma.SortOrder
   jenisEntitas?: Prisma.SortOrder
   entitasId?: Prisma.SortOrder
+  slotKop?: Prisma.SortOrder
   tag?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
   diunggahOlehId?: Prisma.SortOrder
@@ -691,6 +712,7 @@ export type BerkasMinOrderByAggregateInput = {
   sha256?: Prisma.SortOrder
   jenisEntitas?: Prisma.SortOrder
   entitasId?: Prisma.SortOrder
+  slotKop?: Prisma.SortOrder
   tag?: Prisma.SortOrder
   proyekId?: Prisma.SortOrder
   diunggahOlehId?: Prisma.SortOrder
@@ -927,6 +949,10 @@ export type BerkasUncheckedUpdateManyWithoutFolderNestedInput = {
   deleteMany?: Prisma.BerkasScalarWhereInput | Prisma.BerkasScalarWhereInput[]
 }
 
+export type NullableEnumJenisAsetKopFieldUpdateOperationsInput = {
+  set?: $Enums.JenisAsetKop | null
+}
+
 export type NullableEnumTagBerkasFieldUpdateOperationsInput = {
   set?: $Enums.TagBerkas | null
 }
@@ -997,6 +1023,7 @@ export type BerkasCreateWithoutDiunggahOlehInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1024,6 +1051,7 @@ export type BerkasUncheckedCreateWithoutDiunggahOlehInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehNama: string
@@ -1057,6 +1085,7 @@ export type BerkasCreateWithoutDihapusOlehInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1084,6 +1113,7 @@ export type BerkasUncheckedCreateWithoutDihapusOlehInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1138,6 +1168,7 @@ export type BerkasScalarWhereInput = {
   sha256?: Prisma.StringFilter<"Berkas"> | string
   jenisEntitas?: Prisma.StringNullableFilter<"Berkas"> | string | null
   entitasId?: Prisma.StringNullableFilter<"Berkas"> | string | null
+  slotKop?: Prisma.EnumJenisAsetKopNullableFilter<"Berkas"> | $Enums.JenisAsetKop | null
   tag?: Prisma.EnumTagBerkasNullableFilter<"Berkas"> | $Enums.TagBerkas | null
   proyekId?: Prisma.StringNullableFilter<"Berkas"> | string | null
   diunggahOlehId?: Prisma.StringNullableFilter<"Berkas"> | string | null
@@ -1174,6 +1205,7 @@ export type BerkasCreateWithoutPerusahaanInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1200,6 +1232,7 @@ export type BerkasUncheckedCreateWithoutPerusahaanInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1250,6 +1283,7 @@ export type BerkasCreateWithoutProyekInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1277,6 +1311,7 @@ export type BerkasUncheckedCreateWithoutProyekInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehId?: string | null
   diunggahOlehNama: string
@@ -1326,6 +1361,7 @@ export type BerkasCreateWithoutFolderInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1352,6 +1388,7 @@ export type BerkasUncheckedCreateWithoutFolderInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1402,6 +1439,7 @@ export type BerkasCreateWithoutIsiInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1429,6 +1467,7 @@ export type BerkasUncheckedCreateWithoutIsiInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1468,6 +1507,7 @@ export type BerkasUpdateWithoutIsiInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1495,6 +1535,7 @@ export type BerkasUncheckedUpdateWithoutIsiInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1518,6 +1559,7 @@ export type BerkasCreateWithoutTautanBagiInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1545,6 +1587,7 @@ export type BerkasUncheckedCreateWithoutTautanBagiInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1584,6 +1627,7 @@ export type BerkasUpdateWithoutTautanBagiInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1611,6 +1655,7 @@ export type BerkasUncheckedUpdateWithoutTautanBagiInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1634,6 +1679,7 @@ export type BerkasCreateWithoutAsetKopSuratInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1661,6 +1707,7 @@ export type BerkasUncheckedCreateWithoutAsetKopSuratInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1700,6 +1747,7 @@ export type BerkasUpdateWithoutAsetKopSuratInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1727,6 +1775,7 @@ export type BerkasUncheckedUpdateWithoutAsetKopSuratInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1750,6 +1799,7 @@ export type BerkasCreateWithoutIklanKreatifInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehNama: string
   dibuatPada?: Date | string
@@ -1777,6 +1827,7 @@ export type BerkasUncheckedCreateWithoutIklanKreatifInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1816,6 +1867,7 @@ export type BerkasUpdateWithoutIklanKreatifInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1843,6 +1895,7 @@ export type BerkasUncheckedUpdateWithoutIklanKreatifInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1868,6 +1921,7 @@ export type BerkasCreateManyDiunggahOlehInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehNama: string
@@ -1889,6 +1943,7 @@ export type BerkasCreateManyDihapusOlehInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -1908,6 +1963,7 @@ export type BerkasUpdateWithoutDiunggahOlehInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1935,6 +1991,7 @@ export type BerkasUncheckedUpdateWithoutDiunggahOlehInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1960,6 +2017,7 @@ export type BerkasUncheckedUpdateManyWithoutDiunggahOlehInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1979,6 +2037,7 @@ export type BerkasUpdateWithoutDihapusOlehInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2006,6 +2065,7 @@ export type BerkasUncheckedUpdateWithoutDihapusOlehInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2031,6 +2091,7 @@ export type BerkasUncheckedUpdateManyWithoutDihapusOlehInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2051,6 +2112,7 @@ export type BerkasCreateManyPerusahaanInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -2071,6 +2133,7 @@ export type BerkasUpdateWithoutPerusahaanInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2097,6 +2160,7 @@ export type BerkasUncheckedUpdateWithoutPerusahaanInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2122,6 +2186,7 @@ export type BerkasUncheckedUpdateManyWithoutPerusahaanInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2144,6 +2209,7 @@ export type BerkasCreateManyProyekInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   diunggahOlehId?: string | null
   diunggahOlehNama: string
@@ -2163,6 +2229,7 @@ export type BerkasUpdateWithoutProyekInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2190,6 +2257,7 @@ export type BerkasUncheckedUpdateWithoutProyekInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2215,6 +2283,7 @@ export type BerkasUncheckedUpdateManyWithoutProyekInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2235,6 +2304,7 @@ export type BerkasCreateManyFolderInput = {
   sha256: string
   jenisEntitas?: string | null
   entitasId?: string | null
+  slotKop?: $Enums.JenisAsetKop | null
   tag?: $Enums.TagBerkas | null
   proyekId?: string | null
   diunggahOlehId?: string | null
@@ -2255,6 +2325,7 @@ export type BerkasUpdateWithoutFolderInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   diunggahOlehNama?: Prisma.StringFieldUpdateOperationsInput | string
   dibuatPada?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2281,6 +2352,7 @@ export type BerkasUncheckedUpdateWithoutFolderInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2306,6 +2378,7 @@ export type BerkasUncheckedUpdateManyWithoutFolderInput = {
   sha256?: Prisma.StringFieldUpdateOperationsInput | string
   jenisEntitas?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entitasId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slotKop?: Prisma.NullableEnumJenisAsetKopFieldUpdateOperationsInput | $Enums.JenisAsetKop | null
   tag?: Prisma.NullableEnumTagBerkasFieldUpdateOperationsInput | $Enums.TagBerkas | null
   proyekId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   diunggahOlehId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2368,6 +2441,7 @@ export type BerkasSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   sha256?: boolean
   jenisEntitas?: boolean
   entitasId?: boolean
+  slotKop?: boolean
   tag?: boolean
   proyekId?: boolean
   diunggahOlehId?: boolean
@@ -2400,6 +2474,7 @@ export type BerkasSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   sha256?: boolean
   jenisEntitas?: boolean
   entitasId?: boolean
+  slotKop?: boolean
   tag?: boolean
   proyekId?: boolean
   diunggahOlehId?: boolean
@@ -2427,6 +2502,7 @@ export type BerkasSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   sha256?: boolean
   jenisEntitas?: boolean
   entitasId?: boolean
+  slotKop?: boolean
   tag?: boolean
   proyekId?: boolean
   diunggahOlehId?: boolean
@@ -2454,6 +2530,7 @@ export type BerkasSelectScalar = {
   sha256?: boolean
   jenisEntitas?: boolean
   entitasId?: boolean
+  slotKop?: boolean
   tag?: boolean
   proyekId?: boolean
   diunggahOlehId?: boolean
@@ -2466,7 +2543,7 @@ export type BerkasSelectScalar = {
   isiDihapusPada?: boolean
 }
 
-export type BerkasOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "perusahaanId" | "folderKode" | "namaBerkas" | "tipeMime" | "ukuran" | "sha256" | "jenisEntitas" | "entitasId" | "tag" | "proyekId" | "diunggahOlehId" | "diunggahOlehNama" | "dibuatPada" | "diubahPada" | "dihapusPada" | "dihapusOlehId" | "dihapusOlehNama" | "isiDihapusPada", ExtArgs["result"]["berkas"]>
+export type BerkasOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "perusahaanId" | "folderKode" | "namaBerkas" | "tipeMime" | "ukuran" | "sha256" | "jenisEntitas" | "entitasId" | "slotKop" | "tag" | "proyekId" | "diunggahOlehId" | "diunggahOlehNama" | "dibuatPada" | "diubahPada" | "dihapusPada" | "dihapusOlehId" | "dihapusOlehNama" | "isiDihapusPada", ExtArgs["result"]["berkas"]>
 export type BerkasInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   perusahaan?: boolean | Prisma.PerusahaanDefaultArgs<ExtArgs>
   folder?: boolean | Prisma.FolderBerkasDefaultArgs<ExtArgs>
@@ -2535,6 +2612,12 @@ export type $BerkasPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     sha256: string
     jenisEntitas: string | null
     entitasId: string | null
+    /**
+     * Slot gambar kop saat berkas diunggah lewat rute aset kop (D3). Tetap terisi sesudah berkas dilepas dari slotnya dan
+     * dibuang ke Sampah, supaya hak lihat gambar tanda tangan dan stempel tetap bisa dinilai. null = slot tidak diketahui,
+     * jadi berkas kop itu hanya terlihat bagi pemegang tanda-tangan-cetak.buat.
+     */
+    slotKop: $Enums.JenisAsetKop | null
     tag: $Enums.TagBerkas | null
     /**
      * Diwarisi dari entitas bila lampiran; dipilih bebas untuk unggahan umum (harus satu perusahaan).
@@ -2997,6 +3080,7 @@ export interface BerkasFieldRefs {
   readonly sha256: Prisma.FieldRef<"Berkas", 'String'>
   readonly jenisEntitas: Prisma.FieldRef<"Berkas", 'String'>
   readonly entitasId: Prisma.FieldRef<"Berkas", 'String'>
+  readonly slotKop: Prisma.FieldRef<"Berkas", 'JenisAsetKop'>
   readonly tag: Prisma.FieldRef<"Berkas", 'TagBerkas'>
   readonly proyekId: Prisma.FieldRef<"Berkas", 'String'>
   readonly diunggahOlehId: Prisma.FieldRef<"Berkas", 'String'>

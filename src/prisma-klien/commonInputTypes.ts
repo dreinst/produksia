@@ -579,11 +579,28 @@ export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
   _max?: Prisma.NestedJsonNullableFilter<$PrismaModel>
 }
 
+export type EnumJenisAsetKopNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.JenisAsetKop | Prisma.EnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJenisAsetKopNullableFilter<$PrismaModel> | $Enums.JenisAsetKop | null
+}
+
 export type EnumTagBerkasNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.TagBerkas | Prisma.EnumTagBerkasFieldRefInput<$PrismaModel> | null
   in?: $Enums.TagBerkas[] | Prisma.ListEnumTagBerkasFieldRefInput<$PrismaModel> | null
   notIn?: $Enums.TagBerkas[] | Prisma.ListEnumTagBerkasFieldRefInput<$PrismaModel> | null
   not?: Prisma.NestedEnumTagBerkasNullableFilter<$PrismaModel> | $Enums.TagBerkas | null
+}
+
+export type EnumJenisAsetKopNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JenisAsetKop | Prisma.EnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJenisAsetKopNullableWithAggregatesFilter<$PrismaModel> | $Enums.JenisAsetKop | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJenisAsetKopNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJenisAsetKopNullableFilter<$PrismaModel>
 }
 
 export type EnumTagBerkasNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -1606,11 +1623,28 @@ export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
 }
 
+export type NestedEnumJenisAsetKopNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.JenisAsetKop | Prisma.EnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJenisAsetKopNullableFilter<$PrismaModel> | $Enums.JenisAsetKop | null
+}
+
 export type NestedEnumTagBerkasNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.TagBerkas | Prisma.EnumTagBerkasFieldRefInput<$PrismaModel> | null
   in?: $Enums.TagBerkas[] | Prisma.ListEnumTagBerkasFieldRefInput<$PrismaModel> | null
   notIn?: $Enums.TagBerkas[] | Prisma.ListEnumTagBerkasFieldRefInput<$PrismaModel> | null
   not?: Prisma.NestedEnumTagBerkasNullableFilter<$PrismaModel> | $Enums.TagBerkas | null
+}
+
+export type NestedEnumJenisAsetKopNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JenisAsetKop | Prisma.EnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  in?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.JenisAsetKop[] | Prisma.ListEnumJenisAsetKopFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumJenisAsetKopNullableWithAggregatesFilter<$PrismaModel> | $Enums.JenisAsetKop | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJenisAsetKopNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJenisAsetKopNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumTagBerkasNullableWithAggregatesFilter<$PrismaModel = never> = {

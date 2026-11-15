@@ -81,6 +81,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ kop
           await buangSatuBerkas(tx, lama.berkasId, pengguna, { keterangan: `Gambar ${LABEL_SLOT_ASET[jenis]} kop ${kop.nama} diganti` });
         }
         await tx.asetKopSurat.create({ data: { kopSuratId: kop.id, jenis, berkasId, lebarPx: info.lebarPx, tinggiPx: info.tinggiPx } });
+        // slot dicatat di berkasnya supaya tetap diketahui sesudah gambar dilepas ke Sampah (hak lihat tanda tangan dan stempel)
+        await tx.berkas.update({ where: { id: berkasId }, data: { slotKop: jenis } });
         await catatAktivitas(tx, pengguna, {
           aksi: "UBAH",
           jenis: "Kop Surat",

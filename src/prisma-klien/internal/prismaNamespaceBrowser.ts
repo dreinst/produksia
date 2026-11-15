@@ -1564,6 +1564,7 @@ export const BerkasScalarFieldEnum = {
   sha256: 'sha256',
   jenisEntitas: 'jenisEntitas',
   entitasId: 'entitasId',
+  slotKop: 'slotKop',
   tag: 'tag',
   proyekId: 'proyekId',
   diunggahOlehId: 'diunggahOlehId',

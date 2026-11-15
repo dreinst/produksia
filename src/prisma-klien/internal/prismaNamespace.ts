@@ -9498,6 +9498,7 @@ export const BerkasScalarFieldEnum = {
   sha256: 'sha256',
   jenisEntitas: 'jenisEntitas',
   entitasId: 'entitasId',
+  slotKop: 'slotKop',
   tag: 'tag',
   proyekId: 'proyekId',
   diunggahOlehId: 'diunggahOlehId',
@@ -10447,6 +10448,20 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
+ * Reference to a field of type 'JenisAsetKop'
+ */
+export type EnumJenisAsetKopFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisAsetKop'>
+    
+
+
+/**
+ * Reference to a field of type 'JenisAsetKop[]'
+ */
+export type ListEnumJenisAsetKopFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisAsetKop[]'>
+    
+
+
+/**
  * Reference to a field of type 'TagBerkas'
  */
 export type EnumTagBerkasFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TagBerkas'>
@@ -10555,20 +10570,6 @@ export type EnumGayaAngkaFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'GayaAngka[]'
  */
 export type ListEnumGayaAngkaFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GayaAngka[]'>
-    
-
-
-/**
- * Reference to a field of type 'JenisAsetKop'
- */
-export type EnumJenisAsetKopFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisAsetKop'>
-    
-
-
-/**
- * Reference to a field of type 'JenisAsetKop[]'
- */
-export type ListEnumJenisAsetKopFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JenisAsetKop[]'>
     
 
 

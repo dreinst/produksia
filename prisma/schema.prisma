@@ -2710,6 +2710,10 @@ model Berkas {
   sha256           String
   jenisEntitas     String?
   entitasId        String?
+  /// Slot gambar kop saat berkas diunggah lewat rute aset kop (D3). Tetap terisi sesudah berkas dilepas dari slotnya dan
+  /// dibuang ke Sampah, supaya hak lihat gambar tanda tangan dan stempel tetap bisa dinilai. null = slot tidak diketahui,
+  /// jadi berkas kop itu hanya terlihat bagi pemegang tanda-tangan-cetak.buat.
+  slotKop          JenisAsetKop?
   tag              TagBerkas?
   /// Diwarisi dari entitas bila lampiran; dipilih bebas untuk unggahan umum (harus satu perusahaan).
   /// Restrict: proyek yang masih punya berkas (termasuk di sampah) tidak bisa dihapus, supaya pembatasan

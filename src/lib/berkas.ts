@@ -432,7 +432,17 @@ export function syaratBerkasTerlihat(pengguna: PenggunaSesi, ruang: RuangTersemb
         : []),
       ...(punyaHak(pengguna, "tanda-tangan-cetak.buat")
         ? []
-        : [{ OR: [{ jenisEntitas: null }, { jenisEntitas: { not: "kop-surat" } }, { asetKopSurat: { is: { jenis: { notIn: [...SLOT_KOP_TANDA_TANGAN] } } } }] }]),
+        : [
+            {
+              OR: [
+                { jenisEntitas: null },
+                { jenisEntitas: { not: "kop-surat" } },
+                { asetKopSurat: { is: { jenis: { notIn: [...SLOT_KOP_TANDA_TANGAN] } } } },
+                // sudah dilepas ke Sampah: slot yang tercatat di berkas; null (tidak diketahui) tetap tertutup karena NOT IN null
+                { slotKop: { notIn: [...SLOT_KOP_TANDA_TANGAN] } },
+              ],
+            },
+          ]),
     ],
   };
 }
@@ -474,11 +484,16 @@ export async function ambilBerkasTerlihat(klien: KlienDb, pengguna: PenggunaSesi
   if (opsi.sampah ? !b.dihapusPada : !!b.dihapusPada) return null;
   if (!bolehAksesBerkas(pengguna, b, "lihat")) return null;
   if (berkasTersembunyi(b, await ruangTersembunyi(klien, pengguna))) return null;
-  // Gambar kop tanpa tanda-tangan-cetak.buat: hanya yang sedang terpasang di slot selain tanda tangan dan stempel.
-  // Berkas kop yang sudah dilepas dari slotnya (di Sampah) tidak lagi diketahui slotnya, jadi ikut tertutup.
+  // Gambar kop tanpa tanda-tangan-cetak.buat: hanya yang berslot selain tanda tangan dan stempel. Slot dibaca dari
+  // pemasangan saat ini, lalu dari slotKop di berkasnya (berkas yang sudah dilepas ke Sampah). Slot yang tidak
+  // diketahui (berkas kop yang bukan dari rute aset kop, atau log lama tidak memulihkannya) tetap tertutup.
   if (b.jenisEntitas === "kop-surat" && !punyaHak(pengguna, "tanda-tangan-cetak.buat")) {
-    const aset = await klien.asetKopSurat.findUnique({ where: { berkasId: b.id }, select: { jenis: true } });
-    if (!aset || slotTandaTangan(aset.jenis)) return null;
+    const [aset, catatan] = await Promise.all([
+      klien.asetKopSurat.findUnique({ where: { berkasId: b.id }, select: { jenis: true } }),
+      klien.berkas.findUnique({ where: { id: b.id }, select: { slotKop: true } }),
+    ]);
+    const slot = aset?.jenis ?? catatan?.slotKop ?? null;
+    if (!slot || slotTandaTangan(slot)) return null;
   }
   return b;
 }
