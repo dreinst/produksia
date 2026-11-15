@@ -285,7 +285,7 @@ async function main() {
     pastikan((await jumlahNotif(sosmed.id, "Konten disetujui")) === 2, "N3 ke SOSMED bertambah 1");
     await sebagai("owner", () => jalankan("owner menerbitkan langsung", () => pindahStatusKonten(k4.id, "TERJADWAL")));
 
-    console.log("=== K16b. Mundur ke Ide atau Draf mencabut persetujuan ===");
+    console.log("=== K16b. Mundur ke Ide, Draf, atau Desain mencabut persetujuan ===");
     const JUDUL_MUNDUR = `${AWALAN} Konten mundur`;
     await sebagai(SOS, () => jalankan("buat konten untuk uji mundur", () => buatKonten(formulir({ perusahaanId: "utama", judul: JUDUL_MUNDUR, status: "DRAF", tanggalTerbit: "2026-12-22" }))));
     const kM = await kontenBernama(JUDUL_MUNDUR);
@@ -314,6 +314,12 @@ async function main() {
     await sebagai(SOS, () => jalankan("formulir ubah status ke IDE", async () => ubahKonten(kM.id, await formUbah(kM.id, { status: "IDE" }))));
     const kM2 = await db.konten.findUniqueOrThrow({ where: { id: kM.id } });
     pastikan(kM2.status === "IDE" && kM2.statusPersetujuan === "TIDAK_ADA" && (await riwayatM("DITARIK")) === 2, "mundur ke IDE lewat formulir ubah juga mencabut persetujuan");
+    // mundur ke DESAIN juga mencabut: visual bisa diganti di tahap itu, jadi tidak boleh langsung dijadwalkan lagi
+    await sebagai("owner", () => jalankan("owner menyetujui langsung lagi", () => pindahStatusKonten(kM.id, "DISETUJUI")));
+    await sebagai(SOS, () => jalankan("SOSMED memundurkan ke DESAIN", () => pindahStatusKonten(kM.id, "DESAIN")));
+    const kM3 = await db.konten.findUniqueOrThrow({ where: { id: kM.id } });
+    pastikan(kM3.status === "DESAIN" && kM3.statusPersetujuan === "TIDAK_ADA" && (await riwayatM("DITARIK")) === 3, "mundur ke DESAIN mencabut persetujuan");
+    await sebagai(SOS, () => harusDitolak("jadwalkan sesudah dimundurkan ke DESAIN", () => pindahStatusKonten(kM.id, "TERJADWAL"), "harus disetujui"));
     await db.riwayatPersetujuanKonten.deleteMany({ where: { kontenId: kM.id } });
     await db.konten.delete({ where: { id: kM.id } });
 

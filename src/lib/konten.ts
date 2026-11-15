@@ -348,8 +348,9 @@ export async function terapkanStatusKonten(tx: Klien, konten: Konten, ke: Status
     await beritahuDisetujui(tx, pengguna, konten, null);
     return;
   }
-  if ((ke === "IDE" || ke === "DRAF") && konten.statusPersetujuan === "DISETUJUI") {
-    // Mundur ke Ide atau Draf mencabut persetujuan: konten harus diajukan dan disetujui ulang sebelum bisa dijadwalkan.
+  if ((ke === "IDE" || ke === "DRAF" || ke === "DESAIN") && konten.statusPersetujuan === "DISETUJUI") {
+    // Mundur ke Ide, Draf, atau Desain mencabut persetujuan: isi atau visualnya bisa berubah lagi di tahap itu, jadi konten
+    // harus diajukan dan disetujui ulang sebelum bisa dijadwalkan (tinjauan sisa pekerjaan, temuan 1).
     // Riwayat DISETUJUI lama tetap ada sebagai jejak, tetapi entri DITARIK di atasnya menandai bahwa sudah tidak berlaku.
     await ubahBersyarat(tx, konten, { status: ke, statusPersetujuan: "TIDAK_ADA" });
     await tulisRiwayat(tx, konten.id, "DITARIK", `Persetujuan dicabut karena konten dimundurkan ke ${labelStatus(ke)}`, pengguna);
