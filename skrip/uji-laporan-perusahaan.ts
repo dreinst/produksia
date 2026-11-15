@@ -77,6 +77,12 @@ async function dalamTxBatal<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>)
   return hasil as T;
 }
 
+/**
+ * Penanda akhir panel "Integritas & Sinkronisasi": butir terakhirnya (DB constraint CHECK) selalu tampil dan tidak
+ * bergantung pada keadaan buku besar. Dulu penandanya "PostgreSQL 18" di kaki panel, yang sudah dihapus dari beranda.
+ */
+const PENANDA_AKHIR_INTEGRITAS = "PostgreSQL menolak stok negatif";
+
 /** Menjalankan komponen server (termasuk async) secara rekursif dan mengumpulkan teksnya. */
 async function render(node: ReactNode): Promise<string> {
   const teks: string[] = [];
@@ -105,7 +111,7 @@ function potong(teks: string, dari: string, sampai: string): string {
   return teks.slice(i, j < 0 ? undefined : j);
 }
 const integritas = (peran: string, perusahaan: string) =>
-  dengan({ perusahaan, peran }, async () => potong(await render(await Beranda({ searchParams: Promise.resolve({ tab: "keuangan" }) })), "Integritas & Sinkronisasi", "PostgreSQL 18"));
+  dengan({ perusahaan, peran }, async () => potong(await render(await Beranda({ searchParams: Promise.resolve({ tab: "keuangan" }) })), "Integritas & Sinkronisasi", PENANDA_AKHIR_INTEGRITAS));
 
 const BUTIR = ["persediaan", "piutang", "hutang", "barangBelumDitagih", "barangTerkirim", "uangMuka"] as const;
 const semuaCocok = (s: HasilSinkron) => s.seimbang && BUTIR.every((b) => s[b].sinkron);

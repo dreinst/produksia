@@ -103,6 +103,12 @@ async function render(node: ReactNode): Promise<{ teks: string; href: string[]; 
   return { teks: teks.join(""), href, grafik };
 }
 
+/**
+ * Penanda akhir panel "Integritas & Sinkronisasi": butir terakhirnya (DB constraint CHECK) selalu tampil dan tidak
+ * bergantung pada keadaan buku besar. Dulu penandanya "PostgreSQL 18" di kaki panel, yang sudah dihapus dari beranda.
+ */
+const PENANDA_AKHIR_INTEGRITAS = "PostgreSQL menolak stok negatif";
+
 /** Bagian teks antara dua penanda (penanda awal termasuk). */
 function potong(teks: string, dari: string, sampai: string): string {
   const i = teks.indexOf(dari);
@@ -355,7 +361,8 @@ async function main() {
   const hal1 = await muat("PEMILIK", p1.id);
   pastikan(hal1.teks.includes("Tren Kas Masuk & Keluar") && !hal1.teks.includes("belum tersedia"), "lingkup perusahaan satu: tren kas tampil walau perusahaan lain punya data");
   pastikan(hal1.grafik.length === 1 && json(hal1.grafik[0].bulan.map((m) => [String(m.pendapatan), String(m.bebanPokok)])) === json(t1.bulan.map((m) => [String(m.diterima), String(m.dikeluarkan)])), "grafik tren lingkup satu = labaRugiKasBulanan perusahaan satu");
-  const integritas1 = potong(hal1.teks, "Integritas & Sinkronisasi", "PostgreSQL 18");
+  const integritas1 = potong(hal1.teks, "Integritas & Sinkronisasi", PENANDA_AKHIR_INTEGRITAS);
+  pastikan(hal1.teks.includes(PENANDA_AKHIR_INTEGRITAS) && integritas1.length < hal1.teks.length - hal1.teks.indexOf("Integritas & Sinkronisasi"), "penanda akhir panel Integritas ada di halaman, jadi potongan berhenti di panel itu");
   pastikan(integritas1.includes("PT Uji Lingkup Satu") && integritas1.includes("Jurnal seimbang") && integritas1.includes("stok Rp 50.000") && integritas1.includes(`dokumen Rp ${Number(sisaPiutang).toLocaleString("id-ID")}`), "Integritas lingkup satu: angka perusahaan satu (stok 50.000, piutang sisa faktur)");
   const kartuKas1 = potong(hal1.teks, "Kas & Bank Tersedia", "Nilai Persediaan");
   pastikan(kartuKas1.includes("Kas Uji Lingkup Satu + ") && !kartuKas1.includes(" + Kas Uji Lingkup Satu"), "Kas & Bank lingkup satu: rekening milik perusahaan satu disebut pertama");
@@ -366,12 +373,12 @@ async function main() {
   const kartuKasG = potong(halG.teks, "Kas & Bank Tersedia", "Nilai Persediaan");
   pastikan(kartuKasG.includes(" + Kas Uji Lingkup Satu") && !kartuKasG.includes("Kas Uji Lingkup Satu + "), "gabungan: semua rekening, urutan kode akun seperti sebelum perbaikan (UJL-KAS1 di belakang akun 1-xxxx)");
   pastikan(halG.grafik.length === 1 && json(halG.grafik[0].bulan.map((m) => String(m.pendapatan))) === json(tG.bulan.map((m) => String(m.diterima))), "gabungan: grafik tren = labaRugiKasBulanan tanpa parameter");
-  const integritasG = potong(halG.teks, "Integritas & Sinkronisasi", "PostgreSQL 18");
+  const integritasG = potong(halG.teks, "Integritas & Sinkronisasi", PENANDA_AKHIR_INTEGRITAS);
   pastikan(integritasG.includes("Buku besar dicocokkan dengan dokumen dan stok fisik") && integritasG.includes(`stok Rp ${Number(sG.persediaan.dokumen).toLocaleString("id-ID")}`), "gabungan: kalimat dan angka Integritas seperti sebelum perbaikan");
   const halKasir = await muat("KASIR", undefined);
   pastikan(halKasir.teks.includes("Jurnal seimbang") && halKasir.teks.includes("Persediaan = stok fisik") && !halKasir.teks.includes("belum tersedia"), "KASIR (lingkup utama, perusahaan lain punya data): Integritas tetap tampil dengan angka utama");
   const namaUtama = (await db.perusahaan.findUniqueOrThrow({ where: { id: "utama" }, select: { nama: true } })).nama;
-  pastikan(potong(halKasir.teks, "Integritas & Sinkronisasi", "PostgreSQL 18").includes(`Buku besar ${namaUtama} dicocokkan`), "KASIR dengan beberapa perusahaan aktif: kalimat Integritas menyebut perusahaan lingkupnya");
+  pastikan(potong(halKasir.teks, "Integritas & Sinkronisasi", PENANDA_AKHIR_INTEGRITAS).includes(`Buku besar ${namaUtama} dicocokkan`), "KASIR dengan beberapa perusahaan aktif: kalimat Integritas menyebut perusahaan lingkupnya");
   // KASIR di instalasi satu perusahaan: perusahaan aktif lain dinonaktifkan sementara lewat SQL (diubahPada tidak tersentuh),
   // lalu dipulihkan di finally sebelum pemeriksaan (pastikan menghentikan proses bila gagal)
   const aktifLain = (await db.perusahaan.findMany({ where: { aktif: true, id: { not: "utama" } }, select: { id: true } })).map((p) => p.id);
@@ -384,9 +391,9 @@ async function main() {
     if (aktifLain.length > 0) await db.$executeRaw`UPDATE "Perusahaan" SET "aktif" = true WHERE "id" IN (${Prisma.join(aktifLain)})`;
   }
   pastikan((await db.perusahaan.count({ where: { id: { in: aktifLain }, aktif: true } })) === aktifLain.length, `perusahaan yang dinonaktifkan sementara sudah aktif lagi (${aktifLain.length})`);
-  const integritasSatu = potong(halKasirSatu!.teks, "Integritas & Sinkronisasi", "PostgreSQL 18");
+  const integritasSatu = potong(halKasirSatu!.teks, "Integritas & Sinkronisasi", PENANDA_AKHIR_INTEGRITAS);
   pastikan(integritasSatu.includes(KALIMAT_INTEGRITAS_LAMA) && !integritasSatu.includes(`Buku besar ${namaUtama}`) && integritasSatu.includes("Jurnal seimbang"), "KASIR dengan satu perusahaan aktif: kalimat Integritas lama seperti sebelum peleburan");
-  pastikan(potong(halG.teks, "Integritas & Sinkronisasi", "PostgreSQL 18").includes(KALIMAT_INTEGRITAS_LAMA), "gabungan tetap memakai kalimat lama");
+  pastikan(potong(halG.teks, "Integritas & Sinkronisasi", PENANDA_AKHIR_INTEGRITAS).includes(KALIMAT_INTEGRITAS_LAMA), "gabungan tetap memakai kalimat lama");
   // Tren kas sejak sebelum multi perusahaan dijaga buku-besar.lihat; KASIR bawaan tidak memegangnya, jadi tetap tanpa tren
   const kasirBukuBesar = hitungHak("KASIR").includes("buku-besar.lihat");
   pastikan(halKasir.teks.includes("Tren Kas Masuk & Keluar") === kasirBukuBesar, `KASIR: tren kas mengikuti hak buku-besar.lihat (${kasirBukuBesar ? "punya" : "tidak punya"}), bukan data perusahaan lain`);
