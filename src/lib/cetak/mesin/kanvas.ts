@@ -13,10 +13,15 @@ import { DIR_ASET_CETAK, jalurFont, periksaGambar, type Font } from "@/lib/cetak
  */
 
 export type { Font };
-export type Segmen = { teks: string; tebal?: boolean; miring?: boolean };
+/**
+ * Segmen teks. `ukuran` (pt) opsional: tanpa ukuran, segmen memakai OpsiTeks.ukuran. Tinggi baris tetap dari
+ * OpsiTeks.ukuran, jadi ukuran segmen dimaksudkan lebih kecil atau sama (mis. deskripsi di bawah nama); segmen yang
+ * lebih besar bisa menyentuh baris di atasnya. Baris dengan ukuran campuran diluruskan pada garis dasar yang sama.
+ */
+export type Segmen = { teks: string; tebal?: boolean; miring?: boolean; ukuran?: number };
 
 /** Bentuk BarisTeks D2 (src/lib/teksBerbutir.ts, P20); ditulis struktural supaya mesin tidak bergantung pada D2. */
-export type BarisTeksCetak = { jenis: "paragraf" | "butir" | "subbutir"; isi: { teks: string; tebal: boolean }[] };
+export type BarisTeksCetak = { jenis: "paragraf" | "butir" | "subbutir"; isi: { teks: string; tebal: boolean; ukuran?: number }[] };
 
 export type OpsiTeks = {
   x: number;
@@ -54,7 +59,8 @@ export class GalatIsiTerlaluTinggi extends Error {
 
 export type Perekam = {
   halaman: number;
-  teks: { halaman: number; teks: string; x: number; y: number; lebar: number; tinggi: number; ukuran: number }[];
+  /** `potongan` hanya terisi pada baris yang memuat segmen berukuran lain dari `ukuran` (fitur ukuran per segmen). */
+  teks: { halaman: number; teks: string; x: number; y: number; lebar: number; tinggi: number; ukuran: number; potongan?: { teks: string; ukuran: number }[] }[];
   gambar: { halaman: number; slot: string | null; x: number; y: number; w: number; h: number }[];
   peringatan: string[];
 };
@@ -77,8 +83,8 @@ type Lapisan = { belakang?: (k: KanvasCetak) => void; depan?: (k: KanvasCetak, k
  */
 export type GayaGaris = { warna: string; tebal: number; gaya?: "penuh" | "putus" | "titik"; pola?: [number, number] };
 
-/** Potongan teks satu font di dalam satu baris. */
-type Potongan = { teks: string; font: Font };
+/** Potongan teks satu font dan satu ukuran di dalam satu baris. */
+type Potongan = { teks: string; font: Font; ukuran: number };
 type Token = { spasi: boolean; potongan: Potongan[]; lebar: number };
 type BarisJadi = { token: Token[]; lebar: number; akhirParagraf: boolean; inden: number };
 
@@ -309,7 +315,9 @@ export class KanvasCetak {
     return daftar.map((s) => {
       const font = fontSegmen(dasar, s);
       const teks = opsi.hurufBesar ? s.teks.toLocaleUpperCase("id-ID") : s.teks;
-      return { teks: bersihkanTeks(teks, this.adaGlyph(font)), font };
+      // ukuran segmen yang bukan angka positif diabaikan (jatuh ke ukuran dasar), supaya pdfkit tidak menerima NaN
+      const ukuran = typeof s.ukuran === "number" && Number.isFinite(s.ukuran) && s.ukuran > 0 ? s.ukuran : opsi.ukuran;
+      return { teks: bersihkanTeks(teks, this.adaGlyph(font)), font, ukuran };
     });
   }
 
@@ -317,7 +325,7 @@ export class KanvasCetak {
   private susunBaris(isi: string | Segmen[], opsi: OpsiTeks): BarisJadi[] {
     const jarak = opsi.jarakHuruf ?? 0;
     const inden = opsi.indenPertama ?? 0;
-    const lebarPot = (p: Potongan) => this.lebarTeks(p.teks, p.font, opsi.ukuran, jarak) + (p.teks ? jarak : 0);
+    const lebarPot = (p: Potongan) => this.lebarTeks(p.teks, p.font, p.ukuran, jarak) + (p.teks ? jarak : 0);
     const buatToken = (potongan: Potongan[], spasi: boolean): Token => ({ spasi, potongan, lebar: potongan.reduce((n, p) => n + lebarPot(p), 0) });
 
     // paragraf berisi deret token (kata atau spasi), dengan kata yang boleh melintasi beberapa segmen
@@ -335,9 +343,9 @@ export class KanvasCetak {
           paragraf.push([]);
         } else if (bagian[0] === " ") {
           tutupKata();
-          paragraf[paragraf.length - 1].push(buatToken([{ teks: bagian, font: p.font }], true));
+          paragraf[paragraf.length - 1].push(buatToken([{ teks: bagian, font: p.font, ukuran: p.ukuran }], true));
         } else {
-          kata.push({ teks: bagian, font: p.font });
+          kata.push({ teks: bagian, font: p.font, ukuran: p.ukuran });
         }
       }
     }
@@ -395,11 +403,11 @@ export class KanvasCetak {
 
   private potongKata(t: Token, batas: number, opsi: OpsiTeks): [Token, Token | null] {
     const jarak = opsi.jarakHuruf ?? 0;
-    const huruf: Potongan[] = t.potongan.flatMap((p) => Array.from(p.teks).map((c) => ({ teks: c, font: p.font })));
+    const huruf: Potongan[] = t.potongan.flatMap((p) => Array.from(p.teks).map((c) => ({ teks: c, font: p.font, ukuran: p.ukuran })));
     let lebar = 0;
     let n = 0;
     for (; n < huruf.length; n++) {
-      const w = this.lebarTeks(huruf[n].teks, huruf[n].font, opsi.ukuran, jarak) + jarak;
+      const w = this.lebarTeks(huruf[n].teks, huruf[n].font, huruf[n].ukuran, jarak) + jarak;
       if (n > 0 && lebar + w > batas + 0.01) break;
       lebar += w;
     }
@@ -407,10 +415,10 @@ export class KanvasCetak {
       const potongan: Potongan[] = [];
       for (const h of daftar) {
         const akhir = potongan[potongan.length - 1];
-        if (akhir && akhir.font === h.font) akhir.teks += h.teks;
+        if (akhir && akhir.font === h.font && akhir.ukuran === h.ukuran) akhir.teks += h.teks;
         else potongan.push({ ...h });
       }
-      return { spasi: false, potongan, lebar: potongan.reduce((s, p) => s + this.lebarTeks(p.teks, p.font, opsi.ukuran, jarak) + jarak, 0) };
+      return { spasi: false, potongan, lebar: potongan.reduce((s, p) => s + this.lebarTeks(p.teks, p.font, p.ukuran, jarak) + jarak, 0) };
     };
     return [gabung(huruf.slice(0, n)), n < huruf.length ? gabung(huruf.slice(n)) : null];
   }
@@ -448,21 +456,44 @@ export class KanvasCetak {
         }
         for (const p of t.potongan) {
           if (!p.teks) continue;
-          this.aturFont(p.font, opsi.ukuran);
-          this.doc.fillColor(warna).text(p.teks, x, yb, { lineBreak: false, characterSpacing: jarak });
+          this.aturFont(p.font, p.ukuran);
+          // segmen berukuran lain diluruskan pada garis dasar potongan berukuran dasar; ukuran dasar tidak bergeser
+          const geser = p.ukuran === opsi.ukuran ? 0 : this.ascender.get(p.font)! * (opsi.ukuran - p.ukuran);
+          this.doc.fillColor(warna).text(p.teks, x, yb + geser, { lineBreak: false, characterSpacing: jarak });
           ascender = Math.max(ascender, this.ascender.get(p.font)!);
-          x += this.lebarTeks(p.teks, p.font, opsi.ukuran, jarak) + jarak;
+          x += this.lebarTeks(p.teks, p.font, p.ukuran, jarak) + jarak;
         }
       }
       if (opsi.garisBawah && b.token.length) {
         const yGaris = yb + ascender * opsi.ukuran + opsi.ukuran * 0.1;
         this.garis(xAwal, yGaris, xAwal + b.lebar + (tambahSpasi * jumlahSpasi), yGaris, { warna, tebal: Math.max(0.5, opsi.ukuran * 0.06) });
       }
-      this.perekam?.teks.push({ halaman: this.halamanKe, teks: b.token.map((t) => t.potongan.map((p) => p.teks).join("")).join(""), x: xAwal, y: yb, lebar: b.lebar, tinggi: tb, ukuran: opsi.ukuran });
+      const campur = b.token.some((t) => t.potongan.some((p) => p.teks && p.ukuran !== opsi.ukuran));
+      this.perekam?.teks.push({
+        halaman: this.halamanKe,
+        teks: b.token.map((t) => t.potongan.map((p) => p.teks).join("")).join(""),
+        x: xAwal,
+        y: yb,
+        lebar: b.lebar,
+        tinggi: tb,
+        ukuran: opsi.ukuran,
+        ...(campur ? { potongan: this.gabungUkuran(b.token.flatMap((t) => t.potongan.filter((p) => p.teks).map((p) => ({ teks: p.teks, ukuran: p.ukuran })))) } : {}),
+      });
     });
     const tinggi = baris.length * tb;
     if (opsi.y === undefined) this._y += tinggi;
     return tinggi;
+  }
+
+  /** Potongan berurutan berukuran sama digabung (untuk perekam). */
+  private gabungUkuran(daftar: { teks: string; ukuran: number }[]): { teks: string; ukuran: number }[] {
+    const hasil: { teks: string; ukuran: number }[] = [];
+    for (const p of daftar) {
+      const akhir = hasil[hasil.length - 1];
+      if (akhir && akhir.ukuran === p.ukuran) akhir.teks += p.teks;
+      else hasil.push({ ...p });
+    }
+    return hasil;
   }
 
   /** Teks berbutir D2: butir inden 3 mm dengan "•", sub-butir inden 8 mm dengan "▪" (Carlito tidak punya "■"). */
@@ -478,7 +509,7 @@ export class KanvasCetak {
     let jumlahBaris = 0;
     for (const b of daftar) {
       const { inden } = this.butir(b);
-      const u = this.ukur(b.isi.map((p) => ({ teks: p.teks, tebal: p.tebal })), { ...opsi, lebar: opsi.lebar - inden, indenPertama: 0 });
+      const u = this.ukur(b.isi.map((p) => ({ teks: p.teks, tebal: p.tebal, ukuran: p.ukuran })), { ...opsi, lebar: opsi.lebar - inden, indenPertama: 0 });
       tinggi += u.tinggi;
       lebar = Math.max(lebar, u.lebar + inden);
       jumlahBaris += u.jumlahBaris;
@@ -493,7 +524,7 @@ export class KanvasCetak {
     let ke = 0;
     for (const b of daftar) {
       const { inden, penanda } = this.butir(b);
-      const isi = b.isi.map((p) => ({ teks: p.teks, tebal: p.tebal }));
+      const isi = b.isi.map((p) => ({ teks: p.teks, tebal: p.tebal, ukuran: p.ukuran }));
       const o: OpsiTeks = { ...opsi, x: opsi.x + inden, y, lebar: opsi.lebar - inden, indenPertama: 0, rentang: undefined };
       const n = opsi.rentang ? this.susunBaris(isi, o).length : 0;
       const dari = opsi.rentang ? Math.max(0, opsi.rentang.dari - ke) : 0;
@@ -528,7 +559,7 @@ export class KanvasCetak {
       this.peringatan(`Teks dipotong agar muat di kotak: ${isi.slice(0, 40)}`);
       baris = baris.slice(0, maks);
       const akhir = baris[maks - 1];
-      const elipsis: Token = { spasi: false, potongan: [{ teks: "…", font: opsi.font ?? "R" }], lebar: this.lebarTeks("…", opsi.font ?? "R", ukuran, opsi.jarakHuruf ?? 0) };
+      const elipsis: Token = { spasi: false, potongan: [{ teks: "…", font: opsi.font ?? "R", ukuran }], lebar: this.lebarTeks("…", opsi.font ?? "R", ukuran, opsi.jarakHuruf ?? 0) };
       while (akhir.token.length && akhir.lebar + elipsis.lebar > kotak.w) akhir.lebar -= akhir.token.pop()!.lebar;
       akhir.token.push(elipsis);
       akhir.lebar += elipsis.lebar;
