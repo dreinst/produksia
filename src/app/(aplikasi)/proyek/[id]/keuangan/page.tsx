@@ -25,6 +25,7 @@ import { LencanaPersetujuan, LencanaStatus, NomorDokumen, Rp } from "@/komponen/
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import BilahPersen from "@/komponen/ui/BilahPersen";
 import TabTautan from "@/komponen/ui/TabTautan";
+import LampiranBerkas from "@/komponen/berkas/LampiranBerkas";
 import AngkaMargin from "@/komponen/proyek/AngkaMargin";
 import TitikWarnaProyek from "@/komponen/proyek/TitikWarnaProyek";
 
@@ -33,7 +34,8 @@ import TitikWarnaProyek from "@/komponen/proyek/TitikWarnaProyek";
  * Biaya aktual, Pendapatan, dan Bagi hasil. Halaman detail memakai perusahaan proyek itu sendiri, bukan lingkup aktif
  * (D5 §4.7). Tab Bagi hasil dan data mitra hanya dimuat untuk pemegang bagi-hasil.lihat; tab Biaya membuang baris bagi
  * laba per mitra bagi yang tidak memegangnya (tinjauan P35 R4). Kepala halaman memuat Pratinjau PDF, Unduh PDF
- * (/cetak/proyek/[id]/keuangan), dan Simpan PDF ke berkas bagi yang boleh mengunggah lampiran laporan keuangan proyek.
+ * (/cetak/proyek/[id]/keuangan), dan Simpan PDF ke berkas bagi yang boleh mengunggah lampiran laporan keuangan proyek;
+ * laporan yang sudah disimpan tampil di kartu Laporan tersimpan di bawah tab.
  */
 
 type Tab = "ringkasan" | "anggaran" | "biaya" | "pendapatan" | "bagi-hasil";
@@ -175,6 +177,15 @@ export default async function HalamanDetailKeuanganProyek({
       {tab === "biaya" && <TabBiaya proyek={proyek} r={r} pengguna={pengguna} searchParams={searchParams} lihatBagi={lihatBagi} />}
       {tab === "pendapatan" && <TabPendapatan proyek={proyek} pengguna={pengguna} />}
       {tab === "bagi-hasil" && kp.bagiHasil && <TabBagiHasil proyek={proyek} r={r} bh={kp.bagiHasil} pengguna={pengguna} sp={sp} />}
+
+      {/* Laporan yang disimpan lewat "Simpan PDF ke berkas". Hak lihat jenis, folder terbatas, dan proyek terbatas dinilai LampiranBerkas. */}
+      <LampiranBerkas
+        jenisEntitas="laporan-keuangan-proyek"
+        entitasId={proyek.id}
+        judul="Laporan tersimpan"
+        bolehUnggah={false}
+        kosong="Belum ada laporan yang disimpan. Pakai Simpan PDF ke berkas di atas."
+      />
     </div>
   );
 }
