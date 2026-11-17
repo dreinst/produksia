@@ -6,7 +6,7 @@ import { wajibHak } from "@/lib/otentikasi";
 import { punyaHak } from "@/lib/hakAkses";
 import { bacaParamDaftar, cocokTeks } from "@/lib/daftar";
 import { daftarProyekAktif } from "@/lib/proyek";
-import { LABEL_STATUS_PEMINJAMAN, menungguKonfirmasiBaris, sisaBaris, statusPeminjaman, terlambat } from "@/lib/peminjaman";
+import { LABEL_STATUS_PEMINJAMAN, hanyaPeminjamanSendiri, menungguKonfirmasiBaris, saringPeminjamanSendiri, sisaBaris, statusPeminjaman, terlambat } from "@/lib/peminjaman";
 import { formatTanggal, formatWaktu, tanggalIso } from "@/lib/waktu";
 import {
   ajukanKembaliPeminjamanBarangFormulir,
@@ -120,9 +120,10 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
   const bolehSetujui = punyaHak(pengguna, "peminjaman.setujui");
   const bolehHapus = punyaHak(pengguna, "peminjaman.hapus");
   const bolehTautkan = punyaHak(pengguna, "penyesuaian.setujui");
-  // Kru & Guest fokus HANYA di form ajukan pinjam/kembali dan status pengajuan sendiri; kartu "Sedang
-  // di luar" dan "Riwayat" (yang memuat data semua pengguna) cuma untuk Gudang/Pemilik/Superadmin.
-  const bolehLihatSemua = pengguna.peran !== "KRU" && pengguna.peran !== "GUEST";
+  // Kru & Guest fokus HANYA di form ajukan pinjam/kembali dan status pengajuan sendiri. Kartu "Menunggu persetujuan"
+  // dan "Sedang di luar" mereka hanya memuat peminjaman yang dicatatnya sendiri (saringPeminjamanSendiri), dan
+  // "Riwayat" (data semua pengguna) cuma untuk Gudang/Pemilik/Superadmin.
+  const bolehLihatSemua = !hanyaPeminjamanSendiri(pengguna);
   const param = await bacaParamDaftar(searchParams);
   const paramGudang = (await searchParams).gudang;
   const gudangDipilih = Array.isArray(paramGudang) ? paramGudang[0] : paramGudang;
@@ -148,8 +149,8 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
     db.barang.findMany({ where: { jenis: "BARANG", ...milik, perusahaan: { aktif: true } }, orderBy: { kode: "asc" }, select: { id: true, kode: true, nama: true, satuan: true, warna: true, perusahaan: { select: { kode: true } } } }),
     db.stokBarang.findMany({ select: { gudangId: true, barangId: true, jumlah: true } }),
     db.peminjamanBarang.findMany({ where: milik, select: { namaPengambil: true }, orderBy: { waktuKeluar: "desc" }, take: 50 }),
-    db.peminjamanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] }, ...milik }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
-    db.peminjamanBarang.findMany({ where: { statusPersetujuan: "DISETUJUI", ditutupPada: null, ...milik }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
+    db.peminjamanBarang.findMany({ where: { statusPersetujuan: { in: ["DRAFT", "MENUNGGU", "DITOLAK"] }, ...milik, ...saringPeminjamanSendiri(pengguna) }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
+    db.peminjamanBarang.findMany({ where: { statusPersetujuan: "DISETUJUI", ditutupPada: null, ...milik, ...saringPeminjamanSendiri(pengguna) }, include: SERTAKAN, orderBy: { waktuKeluar: "desc" } }),
     db.peminjamanBarang.count({ where: whereRiwayat }),
     db.peminjamanBarang.findMany({ where: whereRiwayat, include: SERTAKAN, orderBy: { waktuKeluar: "desc" }, skip: param.lewati, take: param.ambil }),
     bolehTautkan ? db.penyesuaianPersediaan.findMany({ where: { statusPersetujuan: "DISETUJUI", ...milik }, select: { id: true, nomor: true, gudangId: true, keterangan: true, perusahaanId: true }, orderBy: { nomor: "desc" } }) : Promise.resolve([]),
@@ -278,14 +279,13 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
         )}
       </div>
 
-      {bolehLihatSemua && (
       <div className="kartu">
         <div className="kepala-kartu">
-          <h2 className="judul-kartu">Sedang di luar</h2>
+          <h2 className="judul-kartu">{bolehLihatSemua ? "Sedang di luar" : "Pinjaman saya yang sedang di luar"}</h2>
           <span className="text-xs text-slate-500">{terbuka.length} dokumen terbuka</span>
         </div>
         {terbuka.length === 0 ? (
-          <p className="redup">Tidak ada barang yang sedang di luar.</p>
+          <p className="redup">{bolehLihatSemua ? "Tidak ada barang yang sedang di luar." : "Tidak ada pinjaman Anda yang sedang di luar."}</p>
         ) : (
           <div className="space-y-4">
             {terbuka.map((p) => {
@@ -325,7 +325,8 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                       ))}
                     </ul>
                     <TautanFoto foto={p.foto} />
-                    {bolehBuat && <FormUbahData p={p} daftarProyek={daftarProyek} />}
+                    {/* Sesudah disetujui, data pinjaman hanya diubah peran yang mengurus semua peminjaman; Kru dan Guest cukup mengajukan kembali */}
+                    {bolehBuat && bolehLihatSemua && <FormUbahData p={p} daftarProyek={daftarProyek} />}
                   </div>
 
                   <div className="space-y-4 lg:border-l lg:border-slate-100 lg:pl-4">
@@ -370,6 +371,9 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
                     {bolehSetujui && menungguKonfirmasi.length === 0 && belumDiklaim.length > 0 && (
                       <p className="petunjuk">Menunggu Kru mengajukan kembali barangnya.</p>
                     )}
+                    {!bolehSetujui && menungguKonfirmasi.length > 0 && (
+                      <p className="petunjuk">Menunggu Gudang mengonfirmasi barang yang sudah diajukan kembali.</p>
+                    )}
                   </div>
                 </div>
               );
@@ -377,7 +381,6 @@ export default async function HalamanPeminjamanBarang({ searchParams }: { search
           </div>
         )}
       </div>
-      )}
 
       {bolehLihatSemua && (
       <div className="kartu kartu-tabel">

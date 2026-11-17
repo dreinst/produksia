@@ -46,6 +46,7 @@ export async function ajukanDokumen(jenis: JenisPersetujuan, id: string) {
     await berkas.kunci(tx, id);
     const dok = await berkas.baca(tx, id);
     if (!dok) throw new Error(`${berkas.label} tidak ditemukan (mungkin sudah dihapus)`);
+    if (berkas.pastikanBolehAjukan) await berkas.pastikanBolehAjukan(tx, id, pengguna);
     pastikanTransisi(dok, "MENUNGGU", berkas.label);
     await berkas.simpan(tx, id, dataAjukan(pengguna));
     const rinci = berkas.ringkas ? await berkas.ringkas(tx, id) : "";

@@ -38,3 +38,34 @@ export function terlambat(p: { rencanaKembali: Date | null; ditutupPada: Date | 
 export function menungguKonfirmasiBaris(b: { jumlahDiajukanKembali: unknown; jumlahKembali: unknown }): number {
   return D(b.jumlahDiajukanKembali as string).minus(D(b.jumlahKembali as string)).toNumber();
 }
+
+/**
+ * Kru dan Guest hanya mengurus peminjaman yang dicatatnya sendiri: daftar di halaman Peminjaman Barang tersaring, dan
+ * aksi ajukan, ubah data, serta ajukan kembali menolak dokumen orang lain. Peran lain (Gudang, Admin, Pemilik,
+ * Superadmin) mengurus semuanya.
+ */
+export function hanyaPeminjamanSendiri(pengguna: { peran: string }): boolean {
+  return pengguna.peran === "KRU" || pengguna.peran === "GUEST";
+}
+
+/**
+ * Milik sendiri = dicatat oleh pengguna itu. Pencatat tidak pernah berubah sesudah dokumen dibuat, sedangkan pengaju
+ * (diajukanOlehId) berganti tiap kali tombol Ajukan ditekan, jadi pengaju tidak dipakai sebagai tanda pemilik.
+ * Peminjaman yang dicatatkan Gudang atas nama kru tetap diurus Gudang.
+ */
+export function peminjamanMilik(p: { dicatatOlehId: string | null }, penggunaId: string): boolean {
+  return p.dicatatOlehId === penggunaId;
+}
+
+/** Penyaring Prisma pasangan peminjamanMilik: {} bagi peran yang mengurus semua peminjaman. */
+export function saringPeminjamanSendiri(pengguna: { id: string; peran: string }): { dicatatOlehId?: string } {
+  return hanyaPeminjamanSendiri(pengguna) ? { dicatatOlehId: pengguna.id } : {};
+}
+
+/**
+ * Penjaga aksi server: Kru dan Guest ditolak untuk peminjaman orang lain. Pesan bawaannya sama dengan dokumen yang
+ * tidak ada, supaya nomor dokumen orang lain tidak terbaca dari pesan galat.
+ */
+export function pastikanPeminjamanSendiri(pengguna: { id: string; peran: string }, dokumen: { dicatatOlehId: string | null }, pesan = "Dokumen peminjaman tidak ditemukan"): void {
+  if (hanyaPeminjamanSendiri(pengguna) && !peminjamanMilik(dokumen, pengguna.id)) throw new Error(pesan);
+}

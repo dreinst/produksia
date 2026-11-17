@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from "@/prisma-klien/client";
 import type { StatusPersetujuan } from "@/prisma-klien/enums";
 import { peranTertinggi, type Hak, type KodeDokumen, type PenggunaSesi } from "@/lib/hakAkses";
 import { D, format, type Desimal } from "@/lib/uang";
+import { pastikanPeminjamanSendiri } from "@/lib/peminjaman";
 import { bandingId, kunciStokUrut, kurangiStok, labelBarang, perbaruiHargaRata } from "@/lib/stok";
 import { catatJurnalPenggajian, ringkasanPenggajian } from "@/lib/sdm";
 import { ambilPengaturanPerusahaan } from "@/lib/pengaturanPerusahaan";
@@ -201,6 +202,11 @@ type Berkas = {
    * menyetujui pengajuan Kru/Guest). Lempar Error untuk menolak.
    */
   pastikanBolehSetujui?: (tx: Tx, id: string, pengguna: PenggunaSesi) => Promise<void>;
+  /**
+   * Penjaga tambahan di luar hak `${kode}.buat` biasa, dijalankan sebelum dokumen diajukan. Dipakai Peminjaman
+   * Barang: Kru dan Guest hanya mengajukan peminjaman yang dicatatnya sendiri. Lempar Error untuk menolak.
+   */
+  pastikanBolehAjukan?: (tx: Tx, id: string, pengguna: PenggunaSesi) => Promise<void>;
 };
 
 /** Lihat Berkas.kunci. */
@@ -438,6 +444,12 @@ export const BERKAS: Record<JenisPersetujuan, Berkas> = {
     ringkas: async (tx, id) => {
       const p = await tx.peminjamanBarang.findUniqueOrThrow({ where: { id }, include: { baris: true, gudang: { select: { nama: true } } } });
       return `${p.namaPengambil}, ${p.baris.length} barang di ${p.gudang.nama}`;
+    },
+    // Kru dan Guest hanya mengajukan peminjaman yang dicatatnya sendiri (src/lib/peminjaman.ts). Pesannya sama dengan
+    // dokumen yang tidak ada di ajukanDokumen.
+    pastikanBolehAjukan: async (tx, id, pengguna) => {
+      const p = await tx.peminjamanBarang.findUnique({ where: { id }, select: { dicatatOlehId: true } });
+      if (p) pastikanPeminjamanSendiri(pengguna, p, "Peminjaman Barang tidak ditemukan (mungkin sudah dihapus)");
     },
     // Kalau Gudang sendiri yang mengajukan (mau pinjam barang keluar), sesama Gudang tidak boleh
     // menyetujui -- harus Pemilik/Superadmin. Kru/Guest tetap bisa disetujui Gudang seperti biasa.

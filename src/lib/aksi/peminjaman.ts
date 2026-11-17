@@ -9,7 +9,7 @@ import { jalankanFormulir, type StatusFormulir } from "@/lib/statusFormulir";
 import { D, format, uang, type Desimal } from "@/lib/uang";
 import { bacaFotoDariFormulir } from "@/lib/foto";
 import { kunciStokUrut, kurangiStok, labelBarang, tambahStok } from "@/lib/stok";
-import { menungguKonfirmasiBaris, sisaBaris } from "@/lib/peminjaman";
+import { hanyaPeminjamanSendiri, menungguKonfirmasiBaris, pastikanPeminjamanSendiri, sisaBaris } from "@/lib/peminjaman";
 import { bacaProyekId } from "@/lib/proyek";
 import { bacaNomorTelepon } from "@/lib/identitasPengguna";
 import { BERKAS, dataLangsungDisetujui, idPenggunaTersimpan, persetujuanWajib } from "@/lib/persetujuan";
@@ -167,7 +167,7 @@ export async function buatPeminjamanBarangFormulir(_sebelumnya: StatusFormulir, 
 // ---------- Ajukan kembali (Kru mengklaim sudah loading in), boleh sebagian dan bertahap ----------
 
 export async function ajukanKembaliPeminjamanBarang(peminjamanId: string, dataFormulir: FormData) {
-  await wajibHakAksi("peminjaman.buat");
+  const pengguna = await wajibHakAksi("peminjaman.buat");
   const daftarKlaim = bacaBarisKembali(dataFormulir.get("baris"));
   if (!daftarKlaim.some((b) => b.jumlahKembali.gt(0))) throw new Error("Isi jumlah yang dibawa kembali minimal pada satu barang");
   const nomorTeleponKembali = bacaNomorTelepon(String(dataFormulir.get("nomorTeleponKembali") ?? ""), true);
@@ -182,6 +182,8 @@ export async function ajukanKembaliPeminjamanBarang(peminjamanId: string, dataFo
       include: { baris: { include: { barang: { select: { kode: true } } } } },
     });
     if (!dokumen) throw new Error("Dokumen peminjaman tidak ditemukan");
+    // Kru dan Guest hanya mengajukan kembali peminjaman yang dicatatnya sendiri, sama dengan kartu yang tampil bagi mereka
+    pastikanPeminjamanSendiri(pengguna, dokumen);
     if (dokumen.statusPersetujuan !== "DISETUJUI") throw new Error(`${dokumen.nomor} belum disetujui Gudang; belum ada barang yang sungguh di luar`);
     if (dokumen.ditutupPada) throw new Error(`${dokumen.nomor} sudah ditutup`);
     const petaBaris = new Map(dokumen.baris.map((b) => [b.barangId, b]));
@@ -265,18 +267,29 @@ export async function ubahPeminjamanBarang(peminjamanId: string, dataFormulir: F
   const keterangan = String(dataFormulir.get("keterangan") ?? "").trim();
   const rencanaKembali = bacaRencanaKembali(dataFormulir.get("rencanaKembali"));
   const proyekId = await bacaProyekId(dataFormulir);
-  const dokumen = await db.peminjamanBarang.findUnique({ where: { id: peminjamanId }, select: { nomor: true } });
+  // dicatatOlehId tidak pernah berubah sesudah dokumen dibuat, jadi penjaga kepemilikan aman dibaca di luar transaksi
+  const dokumen = await db.peminjamanBarang.findUnique({ where: { id: peminjamanId }, select: { nomor: true, dicatatOlehId: true } });
   if (!dokumen) throw new Error("Dokumen peminjaman tidak ditemukan");
+  pastikanPeminjamanSendiri(pengguna, dokumen);
   await db.$transaction(async (tx) => {
     // Boleh diubah kapan saja selama belum ditutup, KECUALI sedang MENUNGGU: mengubahnya diam-diam
     // di bawah pemeriksa sama berbahayanya dengan dokumen lain yang lewat alur persetujuan. Yang
     // diubah di sini cuma metadata (pengambil/event/rencana kembali/keterangan), bukan jumlah barang,
     // jadi aman diubah walau statusnya sudah DISETUJUI (stok tidak tersentuh oleh aksi ini).
+    // Kru dan Guest hanya mengubah pinjamannya selama belum disetujui (DRAFT atau DITOLAK), sama dengan formulir
+    // "Ubah data" yang tampil bagi mereka. Sesudah disetujui, datanya (termasuk rencana kembali) diubah lewat Gudang.
+    const hanyaSendiri = hanyaPeminjamanSendiri(pengguna);
     const { count } = await tx.peminjamanBarang.updateMany({
-      where: { id: peminjamanId, ditutupPada: null, statusPersetujuan: { not: "MENUNGGU" } },
+      where: { id: peminjamanId, ditutupPada: null, statusPersetujuan: hanyaSendiri ? { in: ["DRAFT", "DITOLAK"] } : { not: "MENUNGGU" } },
       data: { namaPengambil, proyekId, keterangan: keterangan || null, rencanaKembali },
     });
-    if (count === 0) throw new Error(`${dokumen.nomor} sedang menunggu persetujuan atau sudah ditutup, tidak bisa diubah`);
+    if (count === 0) {
+      throw new Error(
+        hanyaSendiri
+          ? `${dokumen.nomor} sedang menunggu persetujuan, sudah disetujui, atau sudah ditutup, tidak bisa diubah`
+          : `${dokumen.nomor} sedang menunggu persetujuan atau sudah ditutup, tidak bisa diubah`,
+      );
+    }
     await catatLog(tx, pengguna, "UBAH", dokumen.nomor, `Pengambil ${namaPengambil}${keterangan ? `; ${keterangan}` : ""}`);
   });
   revalidatePath("/persediaan/peminjaman");
