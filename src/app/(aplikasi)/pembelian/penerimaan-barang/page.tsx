@@ -7,26 +7,46 @@ import { db } from "@/lib/db";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { lingkupPerusahaan } from "@/lib/perusahaan";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
+import AntreanPesanan from "@/komponen/persediaan/AntreanPesanan";
+import { pesananMenungguDiterima } from "@/lib/pesananTerbuka";
 
 export default async function HalamanPenerimaanBarang({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("penerimaan-barang.lihat");
   const bolehHapus = punyaHak(pengguna, "penerimaan-barang.hapus");
+  const bolehBuat = punyaHak(pengguna, "penerimaan-barang.buat");
   const param = await bacaParamDaftar(searchParams);
   // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya saja; gabungan = kueri lama + kolom Perusahaan
   const { perusahaanId } = await lingkupPerusahaan();
   const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pesanan: { nomor: cocokTeks(param.q) } }, { pesanan: { pemasok: { nama: cocokTeks(param.q) } } }] } : undefined;
   const where = perusahaanId ? { AND: [cari ?? {}, { perusahaanId }] } : cari;
-  const [total, daftarPenerimaan] = await Promise.all([
+  const [total, daftarPenerimaan, antrean] = await Promise.all([
     db.penerimaanBarang.count({ where }),
     db.penerimaanBarang.findMany({ where, include: { perusahaan: { select: { kode: true, nama: true, warna: true } }, pesanan: { include: { pemasok: true } }, gudang: true }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    // Antrean kerja: jalan masuk Gudang ke formulir Terima Barang, karena halaman Pesanan Pembelian bukan haknya
+    bolehBuat ? pesananMenungguDiterima(perusahaanId) : null,
   ]);
 
   return (
     <div className="space-y-6">
       <h1 className="judul-halaman">Penerimaan Barang</h1>
       <p className="redup">
-        Penerimaan dibuat dari halaman Pesanan Pembelian (tombol &quot;Terima Barang&quot;).
+        {bolehBuat
+          ? "Penerimaan dibuat dari pesanan pembelian. Klik \"Terima Barang\" pada pesanan di daftar \"Menunggu diterima\"."
+          : "Penerimaan dibuat dari pesanan pembelian yang barangnya sudah datang."}
       </p>
+
+      {antrean && (
+        <AntreanPesanan
+          antrean={antrean}
+          judul="Menunggu diterima"
+          labelMitra="Pemasok"
+          labelSisa="Belum diterima"
+          labelAksi="Terima Barang"
+          hrefFormulir="/pembelian/penerimaan-barang/baru"
+          pesanKosong="Tidak ada pesanan pembelian yang barangnya menunggu diterima."
+          gabungan={!perusahaanId}
+        />
+      )}
 
       <div className="kartu kartu-tabel">
         <KontrolDaftar param={param} total={total} placeholder="Cari nomor TB / pesanan / pemasok…" />

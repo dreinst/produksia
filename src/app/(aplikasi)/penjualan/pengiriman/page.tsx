@@ -7,26 +7,46 @@ import { db } from "@/lib/db";
 import { lingkupPerusahaan, saringPerusahaan } from "@/lib/perusahaan";
 import LencanaPerusahaan from "@/komponen/ui/LencanaPerusahaan";
 import { NomorDokumen, LencanaStatus } from "@/komponen/ui/Lencana";
+import AntreanPesanan from "@/komponen/persediaan/AntreanPesanan";
+import { pesananMenungguDikirim } from "@/lib/pesananTerbuka";
 
 export default async function HalamanPengiriman({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const pengguna = await wajibHak("pengiriman.lihat");
   const bolehHapus = punyaHak(pengguna, "pengiriman.hapus");
+  const bolehBuat = punyaHak(pengguna, "pengiriman.buat");
   const param = await bacaParamDaftar(searchParams);
   // Lingkup perusahaan (D1 §7.4): satu perusahaan = dokumen miliknya; gabungan = semua + kolom Perusahaan
   const { perusahaanId } = await lingkupPerusahaan();
   const cari = param.q ? { OR: [{ nomor: cocokTeks(param.q) }, { pesanan: { nomor: cocokTeks(param.q) } }, { pesanan: { pelanggan: { nama: cocokTeks(param.q) } } }] } : {};
   const where = { AND: [cari, saringPerusahaan(perusahaanId)] };
-  const [total, daftarPengiriman] = await Promise.all([
+  const [total, daftarPengiriman, antrean] = await Promise.all([
     db.pengirimanPesanan.count({ where }),
     db.pengirimanPesanan.findMany({ where, include: { pesanan: { include: { pelanggan: true } }, gudang: true, perusahaan: { select: { kode: true, nama: true, warna: true } } }, orderBy: { tanggal: "desc" }, skip: param.lewati, take: param.ambil }),
+    // Antrean kerja: jalan masuk Gudang ke formulir Kirim, karena halaman Pesanan Penjualan bukan haknya
+    bolehBuat ? pesananMenungguDikirim(perusahaanId) : null,
   ]);
 
   return (
     <div className="space-y-6">
       <h1 className="judul-halaman">Pengiriman Pesanan</h1>
       <p className="redup">
-        Pengiriman dibuat dari halaman Pesanan Penjualan (tombol &quot;Kirim&quot;).
+        {bolehBuat
+          ? "Pengiriman dibuat dari pesanan penjualan. Klik \"Kirim\" pada pesanan di daftar \"Menunggu dikirim\"."
+          : "Pengiriman dibuat dari pesanan penjualan yang barangnya siap dikirim."}
       </p>
+
+      {antrean && (
+        <AntreanPesanan
+          antrean={antrean}
+          judul="Menunggu dikirim"
+          labelMitra="Pelanggan"
+          labelSisa="Belum dikirim"
+          labelAksi="Kirim"
+          hrefFormulir="/penjualan/pengiriman/baru"
+          pesanKosong="Tidak ada pesanan penjualan yang barangnya menunggu dikirim."
+          gabungan={!perusahaanId}
+        />
+      )}
 
       <div className="kartu kartu-tabel">
         <KontrolDaftar param={param} total={total} placeholder="Cari nomor SJ / pesanan / pelanggan…" />

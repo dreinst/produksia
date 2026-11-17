@@ -29,9 +29,9 @@ export default async function HalamanPenerimaanBarangBaru({
       <div className="max-w-3xl space-y-4">
         <h1 className="judul-halaman">Penerimaan Barang Baru</h1>
         <p className="redup">
-          Pilih pesanan dari halaman{" "}
-          <a href="/pembelian/pesanan" className="font-semibold text-blue-600 hover:underline">
-            Pesanan Pembelian
+          Pilih pesanan di daftar &quot;Menunggu diterima&quot; pada halaman{" "}
+          <a href="/pembelian/penerimaan-barang" className="font-semibold text-blue-600 hover:underline">
+            Penerimaan Barang
           </a>{" "}
           lalu klik &quot;Terima Barang&quot;.
         </p>
